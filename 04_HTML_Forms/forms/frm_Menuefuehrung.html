@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hauptmenue - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        /* ============================================ */
+        /* MENUEFUEHRUNG SPEZIFISCHE STYLES            */
+        /* ============================================ */
+
+        /* Header - Standard #4316B2 */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #4316B2;
+            color: white;
+            min-height: 94px;
+            height: 94px;
+            padding: 0 16px;
+            border-bottom: 2px solid #2a0d6e;
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .header-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Menu Container */
+        .menu-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            background: #f5f5f5;
+            overflow: auto;
+        }
+
+        .menu-header {
+            font-size: 14px;
+            font-weight: bold;
+            color: #4316B2;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+        }
+
+        .menu-buttons {
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .menu-btn {
+            width: 100%;
+            padding: 10px 16px;
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #333;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+            border-color: #4316B2;
+            color: #4316B2;
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(180deg, #e0e0e0 0%, #d0d0d0 100%);
+        }
+
+        .menu-divider {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 8px 0;
+        }
+
+        /* Status Bar - Standard 19px */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 19px;
+            min-height: 19px;
+            max-height: 19px;
+            padding: 0 12px;
+            background: #e8e8e8;
+            border-top: 1px solid #ccc;
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .menu-btn {
+                font-size: 11px;
+                padding: 8px 12px;
+            }
+        }
+
+        @media (min-width: 1920px) {
+            .form-title {
+                font-size: 20px;
+            }
+
+            .menu-btn {
+                font-size: 13px;
+                padding: 12px 18px;
+            }
+        }
+    </style>
+</head>
+<body data-active-menu="dashboard">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Header -->
+            <div class="form-header">
+                <div class="header-left">
+                    <h1 class="form-title">Hauptmenü</h1>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn" id="btnClose" title="Schließen">×</button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="menu-container" id="frm_Menuefuehrung">
+                <div class="menu-header">NAVIGATIONS-MENÜ</div>
+                <div class="menu-buttons">
+                    <button class="menu-btn" id="btn_Dienstplanuebersicht" onclick="location.href='frm_N_Dienstplanuebersicht.html'">Dienstplanuebersicht</button>
+                    <button class="menu-btn" id="btn_Planungsuebersicht" onclick="location.href='frm_VA_Planungsuebersicht.html'">Planungsuebersicht</button>
+                    <button class="menu-btn" id="btn_Auftragsverwaltung" onclick="location.href='frm_va_Auftragstamm.html'">Auftragsverwaltung</button>
+                    <button class="menu-btn" id="btn_Mitarbeiterverwaltung" onclick="location.href='frm_MA_Mitarbeiterstamm.html'">Mitarbeiterverwaltung</button>
+                    <button class="menu-btn" id="btn_Offene_Mail_Anfragen" onclick="location.href='frm_N_Email_versenden.html'">Offene Mail Anfragen</button>
+                    <button class="menu-btn" id="btn_Excel_Zeitkonten" onclick="location.href='frm_MA_Zeitkonten.html'">Excel Zeitkonten</button>
+                    <hr class="menu-divider">
+                    <button class="menu-btn" id="btn_Zeitkonten" onclick="location.href='frm_MA_Zeitkonten.html'">Zeitkonten</button>
+                    <button class="menu-btn" id="btn_Abwesenheitsplanung" onclick="location.href='frm_MA_Abwesenheit.html'">Abwesenheitsplanung</button>
+                    <button class="menu-btn" id="btn_Dienstausweis" onclick="location.href='frm_Ausweis_Create.html'">Dienstausweis erstellen</button>
+                    <button class="menu-btn" id="btn_Stundenabgleich" onclick="location.href='frm_N_Stundenauswertung.html'">Stundenabgleich</button>
+                    <hr class="menu-divider">
+                    <button class="menu-btn" id="btn_Kundenverwaltung" onclick="location.href='frm_KD_Kundenstamm.html'">Kundenverwaltung</button>
+                    <button class="menu-btn" id="btn_Verrechnungssaetze" onclick="location.href='frm_KD_Kundenstamm.html'">Verrechnungssaetze</button>
+                    <button class="menu-btn" id="btn_SubRechnungen" onclick="location.href='frm_N_Lohnabrechnungen.html'">Sub Rechnungen</button>
+                    <button class="menu-btn" id="btn_Email" onclick="location.href='frm_N_Email_versenden.html'">E-Mail</button>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">Ready</div>
+                <div class="status-right">
+                    <span id="timestamp"></span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/e2e-logger.js"></script>
+    <script src="../js/e2e-visibility.js"></script>
+    <script src="../js/sidebar.js"></script>
+    <script type="module" src="logic/frm_Menuefuehrung.logic.js"></script>
+    <script>
+        // E2E: Instrumentierung
+        if (window.e2eLogger) {
+            e2eLogger.log('FORM_LOADED', {
+                form: 'frm_Menuefuehrung',
+                title: document.title,
+                url: window.location.href
+            });
+        }
+
+        document.getElementById('btnClose').addEventListener('click', () => {
+            window.close();
+        });
+        
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = now.toLocaleString('de-DE');
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+    </script>
+</body>
+</html>
+

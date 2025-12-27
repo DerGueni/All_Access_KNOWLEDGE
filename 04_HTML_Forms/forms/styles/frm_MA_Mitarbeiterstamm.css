@@ -1,0 +1,481 @@
+/**
+ * frm_MA_Mitarbeiterstamm.css
+ * Formular-spezifische Styles
+ * Layout verwendet app-layout.css und consys_theme.css
+ */
+
+/* ========== MA-CONTENT LAYOUT ========== */
+.ma-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 8px;
+    padding: 8px;
+}
+
+.ma-tabs-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.ma-list-section {
+    width: 280px;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* ========== HEADER ERWEITERT ========== */
+.ma-logo {
+    width: 40px;
+    height: 40px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%23fff"/></svg>') no-repeat center;
+    background-size: contain;
+}
+
+.ma-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.ma-btn {
+    padding: 5px 12px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.ma-btn:hover {
+    background: linear-gradient(180deg, #f5f5f5 0%, #ddd 100%);
+}
+
+.ma-btn.special {
+    background: linear-gradient(180deg, #5cb85c 0%, #449d44 100%);
+    border-color: #449d44;
+    color: white;
+}
+
+.ma-btn.success {
+    background: linear-gradient(180deg, #5cb85c 0%, #449d44 100%);
+    border-color: #449d44;
+    color: white;
+}
+
+.ma-btn.danger {
+    background: linear-gradient(180deg, #d9534f 0%, #c9302c 100%);
+    border-color: #c9302c;
+    color: white;
+}
+
+.ma-btn.primary {
+    background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+    border-color: #2980b9;
+    color: white;
+}
+
+.ma-btn-nav {
+    padding: 4px 8px;
+    min-width: 28px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.ma-btn-small {
+    padding: 2px 6px;
+    font-size: 10px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    cursor: pointer;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.header-buttons-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.ma-kuerzel {
+    font-size: 16px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 4px;
+}
+
+.ma-name {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.ma-id {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.version-info {
+    font-size: 10px;
+    opacity: 0.9;
+    text-align: right;
+}
+
+/* ========== TABS ========== */
+.tab-nav {
+    display: flex;
+    background: #e8e8e8;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    font-size: 11px;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+    color: #333;
+    background: rgba(255,255,255,0.5);
+}
+
+.tab-btn.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    background: white;
+    font-weight: 600;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: hidden;
+}
+
+.tab-pane {
+    display: none;
+    height: 100%;
+    overflow: auto;
+}
+
+.tab-pane.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ========== STAMMDATEN ========== */
+.stammdaten-header {
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+}
+
+.stammdaten-ids {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.stammdaten-content {
+    flex: 1;
+    display: flex;
+    padding: 12px;
+    gap: 12px;
+    overflow: auto;
+}
+
+.stammdaten-left,
+.stammdaten-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stammdaten-foto {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.foto-container {
+    width: 180px;
+    height: 240px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+}
+
+.foto-placeholder {
+    color: #999;
+    font-size: 14px;
+}
+
+.arbeitsstd-info {
+    padding: 8px;
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 11px;
+}
+
+.field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.field-row label {
+    min-width: 140px;
+    font-size: 11px;
+    color: #555;
+}
+
+.checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+}
+
+.input-small {
+    width: 80px;
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+}
+
+.input-medium {
+    width: 220px;
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+}
+
+.input-date {
+    width: 120px;
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+}
+
+.readonly {
+    background: #f5f5f5;
+    color: #666;
+}
+
+/* ========== EINSATZUEBERSICHT ========== */
+.einsatz-header {
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ========== SUB RECHNUNGEN ========== */
+.sub-header {
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sub-auftraege,
+.sub-details {
+    padding: 12px;
+}
+
+.sub-auftraege-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.section-title {
+    font-weight: 600;
+    font-size: 12px;
+    color: #333;
+}
+
+.hint-text {
+    font-size: 10px;
+    color: #999;
+    font-style: italic;
+}
+
+.table-container {
+    overflow: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.data-table th {
+    background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+}
+
+.data-table td {
+    border: 1px solid #ddd;
+    padding: 5px 8px;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.data-table tbody tr:hover {
+    background: #e8f4ff;
+}
+
+.data-table tbody tr.selected {
+    background: #cce5ff !important;
+}
+
+.sub-details-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.auftrag-info {
+    font-size: 12px;
+    color: #666;
+}
+
+.sub-summen {
+    padding: 8px;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.summen-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.summen-row label {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.input-betrag {
+    width: 120px;
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+}
+
+.input-betrag.highlight {
+    background: #fffacd;
+    font-weight: 600;
+}
+
+/* ========== MA LISTE ========== */
+.ma-list-header {
+    padding: 8px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+}
+
+.list-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.list-filter-row label {
+    font-size: 11px;
+    min-width: 50px;
+}
+
+.ma-list-table-container {
+    flex: 1;
+    overflow: auto;
+}
+
+.ma-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.ma-list-table thead {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+}
+
+.ma-list-table th {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.ma-list-table td {
+    border: 1px solid #ddd;
+    padding: 5px 8px;
+}
+
+.ma-list-table tbody tr:hover {
+    background: #e8f4ff;
+}
+
+.ma-list-table tbody tr.selected {
+    background: #cce5ff !important;
+}

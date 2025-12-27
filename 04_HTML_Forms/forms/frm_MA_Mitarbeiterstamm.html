@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstammblatt - CONSEC</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; font-family: Tahoma, Verdana, sans-serif; font-size: 10px; background: #F5F5F5; }
+        
+        .app-container { display: flex; height: 100vh; }
+        .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Header */
+        .form-header { background: #D0D0D0; padding: 4px 6px; display: flex; align-items: center; gap: 6px; height: 94px; border-bottom: 1px solid #888; }
+        .nav-control { display: flex; flex-direction: column; gap: 1px; background: #666; padding: 2px; border-radius: 1px; }
+        .nav-arrows { display: flex; gap: 1px; }
+        .nav-btn { width: 16px; height: 16px; background: #888; border: 1px solid #333; color: white; font-size: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .nav-btn:hover { background: #999; }
+        .header-title { font-size: 13px; font-weight: bold; color: #000; margin: 0; letter-spacing: 0.5px; }
+        .header-nav-group { display: flex; background: #999; padding: 1px; gap: 1px; border-radius: 1px; }
+        .header-nav-btn { width: 16px; height: 16px; background: white; border: 1px solid #666; font-size: 7px; cursor: pointer; padding: 0; }
+        .header-btn-group { display: flex; flex-direction: column; gap: 1px; }
+        .header-btn { padding: 2px 6px; font-size: 8px; background: #C0A080; border: 1px solid #888; cursor: pointer; margin: 0; line-height: 1; transition: background 0.2s; }
+        .header-btn:hover { background: #D4B896; }
+        .header-btn.blue { background: #4169E1; color: white; }
+        .header-btn.green { background: #7CFC00; }
+        .header-ma-nr { display: flex; align-items: center; gap: 3px; margin-left: auto; font-size: 9px; color: #fff; }
+        .header-ma-nr label { margin: 0; color: #fff; }
+        .header-ma-nr input { width: 45px; height: 16px; border: 1px solid #888; padding: 1px; text-align: center; font-size: 8px; }
+
+        /* Employee Info */
+        .employee-info { background: #D0D0D0; padding: 3px 6px; height: 42px; display: flex; align-items: center; border-bottom: 1px solid #888; }
+        .employee-name { font-size: 10px; font-weight: bold; color: #333; margin: 0; }
+
+        /* Form Area */
+        .form-area { flex: 1; display: flex; overflow: hidden; }
+        .tab-container { flex: 1; display: flex; flex-direction: column; }
+        .tab-headers { display: flex; background: #CCCCCC; border-bottom: 1px solid #888; padding: 1px; gap: 0px; overflow-x: auto; }
+        .tab-header { padding: 3px 10px; background: #CCCCCC; border: 1px solid #999; border-right: none; font-size: 8px; cursor: pointer; white-space: nowrap; margin: 0; line-height: 1.3; transition: background 0.2s; }
+        .tab-header:hover { background: #DDDDDD; }
+        .tab-header:last-child { border-right: 1px solid #999; }
+        .tab-header.active { background: white; border-bottom: 1px solid white; font-weight: bold; position: relative; z-index: 1; color: #000; }
+        .tab-content { flex: 1; overflow: hidden; }
+        .tab-page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+        .tab-page.active { display: flex; }
+
+        /* Form Body */
+        .form-body { flex: 1; display: flex; gap: 10px; padding: 6px 8px; overflow: hidden; background: white; }
+        .column { flex: 1 1 0; display: flex; flex-direction: column; gap: 0px; overflow-y: auto; overflow-x: hidden; }
+        
+        .form-row { display: flex; align-items: center; gap: 3px; height: 19px; margin: 0; }
+        .form-label { width: 105px; text-align: right; padding-right: 5px; font-size: 8px; flex-shrink: 0; margin: 0; white-space: nowrap; }
+        .form-input, .form-select { flex: 1; height: 16px; border: 1px solid #999; padding: 1px 2px; font-size: 8px; background: white; }
+        .form-input:focus, .form-select:focus { outline: none; border: 1px solid #4169E1; background: #FFFACD; }
+        .form-input.small { width: 45px; flex: none; }
+        .form-input.medium { width: 75px; flex: none; }
+        
+        .checkbox-row { margin-left: 105px; height: 16px; align-items: center; gap: 3px; margin-top: 1px; display: flex; }
+        .checkbox-row input[type="checkbox"] { width: 12px; height: 12px; margin: 0; cursor: pointer; }
+        .checkbox-row label { margin: 0; font-size: 8px; cursor: pointer; flex: 1; }
+
+        /* Photo Section */
+        .photo-section { position: absolute; right: 285px; top: 48px; display: flex; flex-direction: column; gap: 3px; background: white; padding: 5px; border: 1px solid #AAA; }
+        .photo-frame { width: 92px; height: 120px; border: 2px solid #999; background: #F5F5F5; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .photo-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .photo-btn { width: 92px; padding: 2px 3px; font-size: 7px; background: #7CFC00; border: 1px solid #999; cursor: pointer; line-height: 1.2; }
+
+        /* Employee List */
+        .employee-list { width: 280px; border-left: 1px solid #888; background: white; display: flex; flex-direction: column; }
+        .list-header { padding: 5px 4px; background: #EFEFEF; border-bottom: 1px solid #888; }
+        .search-box { display: flex; gap: 2px; align-items: center; margin-bottom: 3px; margin: 0 0 3px 0; }
+        .search-box label { font-size: 7px; margin: 0; white-space: nowrap; }
+        .search-box input { flex: 1; height: 15px; border: 1px solid #999; padding: 1px; font-size: 7px; }
+        .filter-box { display: flex; gap: 2px; align-items: center; }
+        .filter-box label { font-size: 7px; margin: 0; white-space: nowrap; }
+        .filter-box select { flex: 1; height: 15px; border: 1px solid #999; font-size: 7px; }
+        .list-content { flex: 1; overflow-y: auto; }
+        .list-table { width: 100%; border-collapse: collapse; font-size: 7px; }
+        .list-table th { background: #D0D0D0; padding: 2px 3px; text-align: left; border: 1px solid #888; position: sticky; top: 0; font-weight: bold; }
+        .list-table td { padding: 1px 2px; border: 1px solid #CCC; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .list-table tr:hover { background: #E8F4E8; }
+        .list-table tr.selected { background: #4A90D9; color: white; }
+
+        /* Status Bar */
+        .status-bar { background: #EFEFEF; padding: 2px 6px; border-top: 1px solid #888; font-size: 7px; color: #555; display: flex; justify-content: space-between; height: 16px; align-items: center; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+        <main class="app-main">
+            <!-- Header -->
+            <div class="form-header">
+                <div class="nav-control">
+                    <div class="nav-btn" id="btnUp">▲</div>
+                    <div class="nav-arrows">
+                        <div class="nav-btn" id="btnFirst">◄◄</div>
+                        <div class="nav-btn" id="btnPrev">◄</div>
+                        <div class="nav-btn" id="btnNext">►</div>
+                        <div class="nav-btn" id="btnLast">►►</div>
+                    </div>
+                    <div class="nav-btn" id="btnDown">▼</div>
+                </div>
+                <div class="header-title">Mitarbeiterstammblatt</div>
+                <div class="header-nav-group">
+                    <button class="header-nav-btn">⏮</button>
+                    <button class="header-nav-btn">◄</button>
+                    <button class="header-nav-btn">►</button>
+                    <button class="header-nav-btn">⏭</button>
+                </div>
+                <div class="header-btn-group">
+                    <button class="header-btn blue">Dienstplan</button>
+                    <button class="header-btn blue">Einsatzübersicht</button>
+                </div>
+                <div class="header-btn-group">
+                    <button class="header-btn green">Karte öffnen</button>
+                </div>
+                <div class="header-ma-nr">
+                    <label>MA-ID:</label>
+                    <input type="text" id="maNr" readonly>
+                </div>
+                <div class="header-btn-group">
+                    <button class="header-btn">MA löschen</button>
+                    <button class="header-btn">Neuer MA</button>
+                </div>
+            </div>
+
+            <!-- Employee Info -->
+            <div class="employee-info">
+                <div class="employee-name"><span id="displayNachname">-</span> <span id="displayVorname">-</span></div>
+            </div>
+
+            <!-- Form Area -->
+            <div class="form-area">
+                <div class="tab-container">
+                    <div class="tab-headers">
+                        <div class="tab-header active" data-tab="0">Stammdaten</div>
+                        <div class="tab-header" data-tab="1">Einsatzübersicht</div>
+                        <div class="tab-header" data-tab="2">Dienstplan</div>
+                        <div class="tab-header" data-tab="3">Nicht Verfügbar</div>
+                        <div class="tab-header" data-tab="4">Bestand Dienstkleidung</div>
+                        <div class="tab-header" data-tab="5">Zeitkonto</div>
+                        <div class="tab-header" data-tab="6">Jahresübersicht</div>
+                        <div class="tab-header" data-tab="7">Stundenübersicht</div>
+                        <div class="tab-header" data-tab="8">Vordrucke</div>
+                        <div class="tab-header" data-tab="9">Briefkopf</div>
+                        <div class="tab-header" data-tab="10">Karte</div>
+                        <div class="tab-header" data-tab="11">Sub Rechnungen</div>
+                        <div class="tab-header" data-tab="12">Überhang Stunden</div>
+                    </div>
+
+                    <div class="tab-content">
+                        <!-- Stammdaten Tab -->
+                        <div class="tab-page active" style="position: relative;">
+                            <div class="form-body">
+                                <!-- Column 1 -->
+                                <div class="column">
+                                    <div class="form-row"><label class="form-label">PersNr:</label><input type="text" class="form-input small" id="ID" data-field="ID"></div>
+                                    <div class="form-row"><label class="form-label">LexNr:</label><input type="text" class="form-input small" id="LEXWare_ID" data-field="LEXWare_ID"></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="IstAktiv" data-field="IstAktiv"><label for="IstAktiv">Aktiv</label></div>
+                                    
+                                    <div class="form-row"><label class="form-label">Nachname:</label><input type="text" class="form-input" id="Nachname" data-field="Nachname"></div>
+                                    <div class="form-row"><label class="form-label">Vorname:</label><input type="text" class="form-input" id="Vorname" data-field="Vorname"></div>
+                                    <div class="form-row"><label class="form-label">Straße:</label><input type="text" class="form-input" id="Strasse" data-field="Strasse"></div>
+                                    <div class="form-row"><label class="form-label">Nr:</label><input type="text" class="form-input small" id="Nr" data-field="Nr"></div>
+                                    <div class="form-row"><label class="form-label">PLZ:</label><input type="text" class="form-input medium" id="PLZ" data-field="PLZ"></div>
+                                    <div class="form-row"><label class="form-label">Ort:</label><input type="text" class="form-input" id="Ort" data-field="Ort"></div>
+                                    <div class="form-row"><label class="form-label">Land:</label><select class="form-select" id="Land" data-field="Land"><option>Deutschland</option><option>Österreich</option><option>Schweiz</option></select></div>
+                                    <div class="form-row"><label class="form-label">Bundesland:</label><input type="text" class="form-input" id="Bundesland" data-field="Bundesland"></div>
+                                    <div class="form-row"><label class="form-label">Tel. Mobil:</label><input type="text" class="form-input" id="Tel_Mobil" data-field="Tel_Mobil"></div>
+                                    <div class="form-row"><label class="form-label">Tel. Festnetz:</label><input type="text" class="form-input" id="Tel_Festnetz" data-field="Tel_Festnetz"></div>
+                                    <div class="form-row"><label class="form-label">Email:</label><input type="text" class="form-input" id="Email" data-field="Email"></div>
+                                    <div class="form-row"><label class="form-label">Geschlecht:</label><select class="form-select" id="Geschlecht" data-field="Geschlecht"><option></option><option>männlich</option><option>weiblich</option></select></div>
+                                    <div class="form-row"><label class="form-label">Staatsangehörigkeit:</label><input type="text" class="form-input" id="Staatsang" data-field="Staatsang"></div>
+                                    <div class="form-row"><label class="form-label">Geb. Datum:</label><input type="text" class="form-input" id="Geb_Dat" data-field="Geb_Dat"></div>
+                                    <div class="form-row"><label class="form-label">Geb. Ort:</label><input type="text" class="form-input" id="Geb_Ort" data-field="Geb_Ort"></div>
+                                    <div class="form-row"><label class="form-label">Geb. Name:</label><input type="text" class="form-input" id="Geb_Name" data-field="Geb_Name"></div>
+                                    <div class="form-row"><label class="form-label">Eintrittsdatum:</label><input type="text" class="form-input" id="Eintrittsdatum" data-field="Eintrittsdatum"></div>
+                                    <div class="form-row"><label class="form-label">Austrittsdatum:</label><input type="text" class="form-input" id="Austrittsdatum" data-field="Austrittsdatum"></div>
+                                    <div class="form-row"><label class="form-label">Anstellungsart:</label><select class="form-select" id="Anstellungsart_ID" data-field="Anstellungsart_ID"><option></option><option value="3">Festangestellt</option><option value="4">Freiberufler</option><option value="5">Subunternehmer</option></select></div>
+                                    <div class="form-row"><label class="form-label">Kleidergröße:</label><select class="form-select" id="Kleidergroe" data-field="Kleidergroe"><option></option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Hat_Fahrerausweis" data-field="Hat_Fahrerausweis"><label for="Hat_Fahrerausweis">Fahrerausweis</label></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Hat_EigenerPKW" data-field="Hat_EigenerPKW"><label for="Hat_EigenerPKW">Eigener PKW</label></div>
+                                    
+                                    <div class="form-row"><label class="form-label">Dienstausweis:</label><input type="text" class="form-input" id="DienstausweisNr" data-field="DienstausweisNr"></div>
+                                    <div class="form-row"><label class="form-label">Letzte Überpr. OA:</label><input type="text" class="form-input" id="Letzte_Ueberpr_OA" data-field="Letzte_Ueberpr_OA"></div>
+                                    <div class="form-row"><label class="form-label">Personalausweis-Nr:</label><input type="text" class="form-input" id="Personalausweis_Nr" data-field="Personalausweis_Nr"></div>
+                                    <div class="form-row"><label class="form-label">DFB Epin:</label><input type="text" class="form-input" id="Epin_DFB" data-field="Epin_DFB"></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="DFB_Modul_1" data-field="DFB_Modul_1"><label for="DFB_Modul_1">DFB Modul 1</label></div>
+                                    <div class="form-row"><label class="form-label">Bewacher ID:</label><input type="text" class="form-input" id="Bewacher_ID" data-field="Bewacher_ID"></div>
+                                    <div class="form-row"><label class="form-label">Zuständige Behörde:</label><input type="text" class="form-input" id="Zustaendige_Behoerde" data-field="Zustaendige_Behoerde"></div>
+                                </div>
+
+                                <!-- Column 2 -->
+                                <div class="column">
+                                    <div class="form-row"><label class="form-label">Kontoinhaber:</label><input type="text" class="form-input" id="Kontoinhaber" data-field="Kontoinhaber"></div>
+                                    <div class="form-row"><label class="form-label">BIC:</label><input type="text" class="form-input" id="BIC" data-field="BIC"></div>
+                                    <div class="form-row"><label class="form-label">IBAN:</label><input type="text" class="form-input" id="IBAN" data-field="IBAN"></div>
+                                    <div class="form-row"><label class="form-label">Lohngruppe:</label><select class="form-select" id="Stundenlohn_brutto" data-field="Stundenlohn_brutto"><option></option><option>BY Lohn 2a/b Okl. 1</option></select></div>
+                                    <div class="form-row"><label class="form-label">Bezüge gezahlt als:</label><input type="text" class="form-input" id="Bezuege_gezahlt_als" data-field="Bezuege_gezahlt_als"></div>
+                                    <div class="form-row"><label class="form-label">Koordinaten:</label><input type="text" class="form-input" id="Koordinaten" data-field="Koordinaten"></div>
+                                    <div class="form-row"><label class="form-label">Steuer-ID:</label><input type="text" class="form-input" id="SteuerNr" data-field="SteuerNr"></div>
+                                    <div class="form-row"><label class="form-label">Tätigkeit Bez.:</label><select class="form-select" id="Taetigkeit_Bezeichnung" data-field="Taetigkeit_Bezeichnung"><option></option><option>Sicherheitspersonal</option></select></div>
+                                    <div class="form-row"><label class="form-label">Krankenkasse:</label><input type="text" class="form-input" id="KV_Kasse" data-field="KV_Kasse"></div>
+                                    <div class="form-row"><label class="form-label">Steuerklasse:</label><input type="text" class="form-input small" id="Steuerklasse" data-field="Steuerklasse"></div>
+                                    <div class="form-row"><label class="form-label">Urlaub pro Jahr:</label><input type="text" class="form-input small" id="Urlaubsanspr_pro_Jahr" data-field="Urlaubsanspr_pro_Jahr"></div>
+                                    <div class="form-row"><label class="form-label">Std. Monat max.:</label><input type="text" class="form-input small" id="StundenZahlMax" data-field="StundenZahlMax"></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Ist_RV_Befrantrag" data-field="Ist_RV_Befrantrag"><label for="Ist_RV_Befrantrag">RV Befreiung beantragt</label></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="IstNSB" data-field="IstNSB"><label for="IstNSB">Brutto-Std</label></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="eMail_Abrechnung" data-field="eMail_Abrechnung"><label for="eMail_Abrechnung">Abrechnung per eMail</label></div>
+                                    <div class="form-row"><label class="form-label">Lichtbild:</label><input type="text" class="form-input" id="Lichtbild" data-field="Lichtbild" placeholder="Dateiname"></div>
+                                    <div class="form-row"><label class="form-label">Signatur:</label><input type="text" class="form-input" id="Signatur" data-field="Signatur" placeholder="Dateiname"></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Unterweisungs_34a" data-field="Unterweisungs_34a"><label for="Unterweisungs_34a">Unterweisungs § 34a</label></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Sachkunde_34a" data-field="Sachkunde_34a"><label for="Sachkunde_34a">Sachkunde § 34a</label></div>
+                                    <div class="form-row"><label class="form-label">Abzüge:</label><input type="text" class="form-input" id="Abzuege" data-field="Abzuege"></div>
+                                    <div style="flex: 1;"></div>
+                                </div>
+
+                                <!-- Column 3 -->
+                                <div class="column">
+                                    <div class="form-row"><label class="form-label">Arbeitsstd. pro Tag:</label><input type="text" class="form-input small" id="Arbst_pro_Arbeitstag" data-field="Arbst_pro_Arbeitstag"></div>
+                                    <div class="form-row"><label class="form-label">Arbeitstage/Woche:</label><input type="text" class="form-input small" id="Arbeitstage_pro_Woche" data-field="Arbeitstage_pro_Woche"></div>
+                                    <div class="form-row"><label class="form-label">Ausweis Endedatum:</label><input type="text" class="form-input" id="Ausweis_Endedatum" data-field="Ausweis_Endedatum"></div>
+                                    <div class="form-row"><label class="form-label">Ausweis Funktion:</label><input type="text" class="form-input" id="Ausweis_Funktion" data-field="Ausweis_Funktion"></div>
+                                    <div style="flex: 1;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Photo Section -->
+                            <div class="photo-section">
+                                <div class="photo-frame">
+                                    <img id="maPhoto" src="" alt="Foto">
+                                </div>
+                                <button class="photo-btn">Maps öffnen</button>
+                            </div>
+                        </div>
+
+                        <!-- Other Tabs -->
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Einsatzübersicht</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Dienstplan</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Nicht Verfügbar</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Bestand Dienstkleidung</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Zeitkonto</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Jahresübersicht</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Stundenübersicht</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Vordrucke</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Briefkopf</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Karte</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Sub Rechnungen</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Überhang Stunden</p></div>
+                    </div>
+                </div>
+
+                <!-- Employee List -->
+                <div class="employee-list">
+                    <div class="list-header">
+                        <div class="search-box">
+                            <label>Suche:</label>
+                            <input type="text" id="searchInput">
+                        </div>
+                        <div class="filter-box">
+                            <label>Filter:</label>
+                            <select id="filterSelect">
+                                <option value="aktiv">Alle Aktiven</option>
+                                <option value="alle">Alle</option>
+                                <option value="inaktiv">Inaktive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="list-content">
+                        <table class="list-table">
+                            <thead>
+                                <tr><th>Nachname</th><th>Vorname</th><th>Ort</th></tr>
+                            </thead>
+                            <tbody id="maListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span>Erstellt am: <span id="erstelltAm">-</span> von <span id="erstelltVon">-</span></span>
+                <span>Geändert am: <span id="geaendertAm">-</span> von <span id="geaendertVon">-</span></span>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let mitarbeiterList = [];
+        let currentIndex = 0;
+        let currentRecord = null;
+
+        // Tab Switching
+        document.querySelectorAll('.tab-header').forEach((header, idx) => {
+            header.addEventListener('click', () => {
+                document.querySelectorAll('.tab-header').forEach(h => h.classList.remove('active'));
+                header.classList.add('active');
+                document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.tab-page')[idx].classList.add('active');
+            });
+        });
+
+        // Load Mitarbeiter
+        async function loadMitarbeiter() {
+            try {
+                const aktiv = document.getElementById('filterSelect').value;
+                let url = `${API_URL}/mitarbeiter`;
+                if (aktiv === 'aktiv') url += '?aktiv=true';
+                else if (aktiv === 'inaktiv') url += '?aktiv=false';
+
+                const response = await fetch(url);
+                const result = await response.json();
+                mitarbeiterList = result.data || [];
+                renderMitarbeiterList();
+                if (mitarbeiterList.length > 0) await showRecord(0);
+            } catch (error) {
+                console.error('Fehler:', error);
+            }
+        }
+
+        function renderMitarbeiterList() {
+            const tbody = document.getElementById('maListBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            mitarbeiterList.forEach((ma, index) => {
+                const name = (ma.Nachname || '') + ' ' + (ma.Vorname || '');
+                if (search && !name.toLowerCase().includes(search)) return;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${ma.Nachname || ''}</td><td>${ma.Vorname || ''}</td><td>${ma.Ort || ''}</td>`;
+                tr.addEventListener('click', async () => {
+                    document.querySelectorAll('.list-table tr').forEach(r => r.classList.remove('selected'));
+                    tr.classList.add('selected');
+                    await showRecord(index);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function showRecord(index) {
+            if (index < 0 || index >= mitarbeiterList.length) return;
+            currentIndex = index;
+            const maId = mitarbeiterList[index].ID;
+
+            try {
+                const response = await fetch(`${API_URL}/mitarbeiter/${maId}`);
+                const result = await response.json();
+                currentRecord = result.data?.mitarbeiter || result.data || mitarbeiterList[index];
+            } catch (error) {
+                currentRecord = mitarbeiterList[index];
+            }
+
+            document.getElementById('displayNachname').textContent = currentRecord.Nachname || '-';
+            document.getElementById('displayVorname').textContent = currentRecord.Vorname || '-';
+            document.getElementById('maNr').value = currentRecord.ID || '';
+
+            document.querySelectorAll('[data-field]').forEach(el => {
+                const field = el.dataset.field;
+                let value = currentRecord[field] || '';
+                if (value && typeof value === 'string' && value.includes('T')) {
+                    const date = new Date(value);
+                    if (!isNaN(date)) value = date.toLocaleDateString('de-DE');
+                }
+                if (el.type === 'checkbox') el.checked = !!value;
+                else el.value = value;
+            });
+
+            if (currentRecord.Erst_am) {
+                const d = new Date(currentRecord.Erst_am);
+                document.getElementById('erstelltAm').textContent = d.toLocaleDateString('de-DE');
+            }
+            document.getElementById('erstelltVon').textContent = currentRecord.Erst_von || '-';
+            if (currentRecord.Aend_am) {
+                const d = new Date(currentRecord.Aend_am);
+                document.getElementById('geaendertAm').textContent = d.toLocaleDateString('de-DE');
+            }
+            document.getElementById('geaendertVon').textContent = currentRecord.Aend_von || '-';
+
+            const rows = document.querySelectorAll('.list-table tbody tr');
+            rows.forEach((row, i) => row.classList.toggle('selected', i === index));
+        }
+
+        document.getElementById('btnFirst')?.addEventListener('click', () => showRecord(0));
+        document.getElementById('btnPrev')?.addEventListener('click', () => showRecord(currentIndex - 1));
+        document.getElementById('btnNext')?.addEventListener('click', () => showRecord(currentIndex + 1));
+        document.getElementById('btnLast')?.addEventListener('click', () => showRecord(mitarbeiterList.length - 1));
+        document.getElementById('searchInput')?.addEventListener('input', renderMitarbeiterList);
+        document.getElementById('filterSelect')?.addEventListener('change', loadMitarbeiter);
+
+        document.addEventListener('DOMContentLoaded', loadMitarbeiter);
+    </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+{
+  "ProjectName": "frm_MA_Mitarbeiterstamm Web-Replikation",
+  "ExportDate": "2025-12-23",
+  "FormHierarchy": {
+    "RootForm": {
+      "Name": "frm_MA_Mitarbeiterstamm",
+      "Type": "Hauptformular",
+      "RecordSource": "tbl_MA_Mitarbeiterstamm",
+      "DefaultView": 0,
+      "AllowEdits": false,
+      "TabCount": 13,
+      "SubformCount": 13
+    },
+    "SubformsLevel1": [
+      {
+        "ContainerName": "Menü",
+        "FormName": "frm_Menuefuehrung",
+        "Type": "Navigation",
+        "LinkMasterFields": "",
+        "LinkChildFields": "",
+        "TabPage": null,
+        "Purpose": "Navigations-Menu für Formular-Switching",
+        "ExportStatus": "✅ VORHANDEN",
+        "NestedSubforms": 1
+      },
+      {
+        "ContainerName": "sub_MA_ErsatzEmail",
+        "FormName": "sub_MA_ErsatzEmail",
+        "Type": "DataSubform",
+        "LinkMasterFields": "ID",
+        "LinkChildFields": "MA_ID",
+        "TabPage": "pgAdresse",
+        "Purpose": "Ersatz-Email-Adressen für Mitarbeiter",
+        "ExportStatus": "❌ FEHLT",
+        "RecordSourceExpected": "tbl_MA_ErsatzEmail oder ähnlich",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "sub_MA_Einsatz_Zuo",
+        "FormName": "sub_MA_Einsatz_Zuo",
+        "Type": "DataSubform",
+        "LinkMasterFields": "ID",
+        "LinkChildFields": "MA_ID",
+        "TabPage": "pgAuftrUeb",
+        "Purpose": "Einsatz-Zuordnungen (VA-MA Link)",
+        "ExportStatus": "❌ FEHLT",
+        "RecordSourceExpected": "tbl_MA_VA_Planung oder ähnlich",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "sub_tbl_MA_Zeitkonto_Aktmon2",
+        "FormName": "sub_tbl_MA_Zeitkonto_Aktmon2",
+        "Type": "DataSubform",
+        "LinkMasterFields": "",
+        "LinkChildFields": "",
+        "TabPage": "pgMonat",
+        "Purpose": "Zeitkonto aktueller Monat - Ansicht 2",
+        "ExportStatus": "❌ FEHLT",
+        "RecordSourceExpected": "tbl_MA_Zeitkonto oder ähnlich",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "sub_tbl_MA_Zeitkonto_Aktmon1",
+        "FormName": "sub_tbl_MA_Zeitkonto_Aktmon1",
+        "Type": "DataSubform",
+        "LinkMasterFields": "",
+        "LinkChildFields": "",
+        "TabPage": "pgMonat",
+        "Purpose": "Zeitkonto aktueller Monat - Ansicht 1",
+        "ExportStatus": "❌ FEHLT",
+        "RecordSourceExpected": "tbl_MA_Zeitkonto oder ähnlich",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "frmStundenübersicht",
+        "FormName": "frm_Stundenübersicht2",
+        "Type": "DataSubform",
+        "LinkMasterFields": "ID",
+        "LinkChildFields": "MA_ID",
+        "TabPage": "pgStundenuebersicht",
+        "Purpose": "Stundenübersicht für Mitarbeiter",
+        "ExportStatus": "❌ FEHLT",
+        "Note": "Name mit Umlaut (ü) - Prüfe ob auch 'frm_Stundenuebersicht2' (ohne Umlaut)",
+        "RecordSourceExpected": "Query mit Stunden-Aggregation",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "sub_MA_tbl_MA_NVerfuegZeiten",
+        "FormName": "sub_MA_tbl_MA_NVerfuegZeiten",
+        "Type": "DataSubform",
+        "LinkMasterFields": "",
+        "LinkChildFields": "",
+        "TabPage": "pgnVerfueg",
+        "Purpose": "Nichtverfügbarkeitszeiten (Urlaub, Krank, etc.)",
+        "ExportStatus": "❌ FEHLT",
+        "RecordSourceExpected": "tbl_MA_NVerfuegZeiten",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "sub_MA_Dienstkleidung",
+        "FormName": "sub_MA_Dienstkleidung",
+        "Type": "DataSubform",
+        "LinkMasterFields": "ID",
+        "LinkChildFields": "MA_ID",
+        "TabPage": "pgDienstKl",
+        "Purpose": "Bestand an Dienstkleidung pro Mitarbeiter",
+        "ExportStatus": "❌ FEHLT",
+        "RecordSourceExpected": "tbl_MA_Dienstkleidung oder ähnlich",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "sub_tbltmp_MA_Ausgef_Vorlagen",
+        "FormName": "sub_tbltmp_MA_Ausgef_Vorlagen",
+        "Type": "DataSubform",
+        "LinkMasterFields": "",
+        "LinkChildFields": "",
+        "TabPage": "pgVordr",
+        "Purpose": "Ausgeführte Vorlagen (Briefe, Vordrucke)",
+        "ExportStatus": "❌ FEHLT",
+        "RecordSourceExpected": "tbltmp_MA_Ausgef_Vorlagen",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "Untergeordnet360",
+        "FormName": "sub_tbl_MA_StundenFolgemonat",
+        "Type": "DataSubform",
+        "LinkMasterFields": "ID;pgJahrStdVorMon",
+        "LinkChildFields": "MA_ID;AktJahr",
+        "TabPage": "pgJahr",
+        "Purpose": "Stunden Folgemonat (komplexe Verlinkung mit Jahr)",
+        "ExportStatus": "❌ FEHLT",
+        "Note": "Mehrfach-Link: ID+pgJahrStdVorMon → MA_ID+AktJahr (Jahr-Parameter)",
+        "RecordSourceExpected": "tbl_MA_Zeitkonto mit Jahr-Filter",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "ufrm_Maps",
+        "FormName": "sub_Browser",
+        "Type": "EmbeddedBrowser",
+        "LinkMasterFields": "",
+        "LinkChildFields": "",
+        "TabPage": "pgMaps",
+        "Purpose": "Google Maps/Browser-Integration (Adressenvisualisierung)",
+        "ExportStatus": "❌ FEHLT",
+        "Note": "Besonderheit: Wahrscheinlich HTML/iFrame für Kartendarstellung",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "subAuftragRech",
+        "FormName": "sub_Auftrag_Rechnung_Gueni",
+        "Type": "DataSubform",
+        "LinkMasterFields": "ID",
+        "LinkChildFields": "MA_ID",
+        "TabPage": "pgSubRech",
+        "Purpose": "Rechnungen bezüglich Aufträge (Güni-spezifisch)",
+        "ExportStatus": "❌ FEHLT",
+        "Note": "Custom-Name 'subAuftragRech' im Formular, SourceObject='sub_Auftrag_Rechnung_Gueni'",
+        "RecordSourceExpected": "tbl_VA_Auftragstamm oder Rechnungs-Query",
+        "NestedSubforms": 0
+      },
+      {
+        "ContainerName": "subZuoStunden",
+        "FormName": "zfrm_ZUO_Stunden_Sub_lb",
+        "Type": "DataSubform",
+        "LinkMasterFields": "",
+        "LinkChildFields": "",
+        "TabPage": "pgJahr",
+        "Purpose": "ZUO-Stunden Zusammenfassung (Listenbox-basiert)",
+        "ExportStatus": "❌ FEHLT",
+        "Note": "Name mit 'zfrm_' Präfix (Z=Zusatz/Zonen?), '_Sub_lb' = Subform mit Listbox",
+        "RecordSourceExpected": "Aggregations-Query über ZUO-Stunden",
+        "NestedSubforms": 0
+      }
+    ]
+  },
+  "TabPageMapping": {
+    "pgAdresse": {
+      "Caption": "Stammdaten",
+      "SubformsOnPage": ["sub_MA_ErsatzEmail"],
+      "ExpectedControls": ["TextBox für Adresse", "TextBox für Stadt", "Labels", "etc."]
+    },
+    "pgMonat": {
+      "Caption": "Zeitkonto",
+      "SubformsOnPage": ["sub_tbl_MA_Zeitkonto_Aktmon1", "sub_tbl_MA_Zeitkonto_Aktmon2"],
+      "ExpectedControls": ["Monats-Selector", "Zeitkonto-Übersicht"]
+    },
+    "pgJahr": {
+      "Caption": "Jahresübersicht",
+      "SubformsOnPage": ["sub_tbl_MA_StundenFolgemonat", "subZuoStunden"],
+      "ExpectedControls": ["Jahr-Selector", "Jahres-Übersicht Controls"]
+    },
+    "pgAuftrUeb": {
+      "Caption": "Einsatzübersicht",
+      "SubformsOnPage": ["sub_MA_Einsatz_Zuo"],
+      "ExpectedControls": ["Auftrags-Liste Controls"]
+    },
+    "pgStundenuebersicht": {
+      "Caption": "Stundenübersicht",
+      "SubformsOnPage": ["frmStundenübersicht (=frm_Stundenübersicht2)"],
+      "ExpectedControls": ["Stundenabrechnung Controls"]
+    },
+    "pgPlan": {
+      "Caption": "Dienstplan",
+      "SubformsOnPage": [],
+      "ExpectedControls": ["Dienstplan Kalender oder Grid Controls"]
+    },
+    "pgnVerfueg": {
+      "Caption": "Nicht Verfügbar",
+      "SubformsOnPage": ["sub_MA_tbl_MA_NVerfuegZeiten"],
+      "ExpectedControls": ["Datumsbereich-Controls"]
+    },
+    "pgDienstKl": {
+      "Caption": "Bestand Dienstkleidung",
+      "SubformsOnPage": ["sub_MA_Dienstkleidung"],
+      "ExpectedControls": ["Kleidungs-Inventar Controls"]
+    },
+    "pgVordr": {
+      "Caption": "Vordrucke",
+      "SubformsOnPage": ["sub_tbltmp_MA_Ausgef_Vorlagen"],
+      "ExpectedControls": ["Vordrucke-Übersicht Controls"]
+    },
+    "pgBrief": {
+      "Caption": "Briefkopf",
+      "SubformsOnPage": [],
+      "ExpectedControls": ["Briefkopf-Designelemente"]
+    },
+    "pgStdUeberlaufstd": {
+      "Caption": "Überhang Stunden",
+      "SubformsOnPage": [],
+      "ExpectedControls": ["Überhang-Anzeige Controls"]
+    },
+    "pgMaps": {
+      "Caption": "Karte",
+      "SubformsOnPage": ["ufrm_Maps (=sub_Browser)"],
+      "ExpectedControls": ["Google Maps iFrame oder HTML-Integration"]
+    },
+    "pgSubRech": {
+      "Caption": "Sub Rechnungen",
+      "SubformsOnPage": ["subAuftragRech (=sub_Auftrag_Rechnung_Gueni)"],
+      "ExpectedControls": ["Rechnungs-Liste Controls"]
+    }
+  },
+  "ExportStatusSummary": {
+    "FormsExported": 2,
+    "SubformsExported": 0,
+    "SubformsMissing": 12,
+    "VBAModulesForSubformsAvailable": 12,
+    "Status": "INCOMPLETE - Blocking INSTANZ 2 (Layout-Renderer)"
+  },
+  "DataLinkageMatrix": {
+    "Description": "Shows which Subforms link back to parent tbl_MA_Mitarbeiterstamm",
+    "LinkViaID": [
+      "sub_MA_ErsatzEmail (ID→MA_ID)",
+      "sub_MA_Einsatz_Zuo (ID→MA_ID)",
+      "frm_Stundenübersicht2 (ID→MA_ID)",
+      "sub_MA_Dienstkleidung (ID→MA_ID)",
+      "sub_Auftrag_Rechnung_Gueni (ID→MA_ID)",
+      "sub_tbl_MA_StundenFolgemonat (ID+pgJahrStdVorMon→MA_ID+AktJahr) [COMPLEX]"
+    ],
+    "LinkViaUnnamedFields": [
+      "sub_tbl_MA_Zeitkonto_Aktmon2 (no explicit link)",
+      "sub_tbl_MA_Zeitkonto_Aktmon1 (no explicit link)",
+      "sub_MA_tbl_MA_NVerfuegZeiten (no explicit link)",
+      "sub_tbltmp_MA_Ausgef_Vorlagen (no explicit link)",
+      "sub_Browser (no explicit link)",
+      "zfrm_ZUO_Stunden_Sub_lb (no explicit link)"
+    ],
+    "Note": "Subforms ohne explizite Links könnten über RecordSource-Filter oder VBA-Events verlinkt sein"
+  },
+  "VBAModuleReferences": {
+    "MainFormModule": "Form_frm_MA_Mitarbeiterstamm.bas",
+    "SubformModules": [
+      "Form_sub_MA_ErsatzEmail.bas ✅",
+      "Form_sub_MA_Einsatz_Zuo.bas ✅",
+      "Form_sub_tbl_MA_Zeitkonto_Aktmon1.bas ✅",
+      "Form_sub_tbl_MA_Zeitkonto_Aktmon2.bas ✅",
+      "Form_sub_MA_Dienstkleidung.bas ✅",
+      "Form_sub_MA_tbl_MA_NVerfuegZeiten.bas ✅",
+      "Form_sub_tbltmp_MA_Ausgef_Vorlagen.bas ✅",
+      "Form_sub_tbl_MA_StundenFolgemonat.bas ✅ (or similar)",
+      "Form_sub_Browser.bas ✅",
+      "Form_sub_Auftrag_Rechnung_Gueni.bas ✅",
+      "Form_zfrm_ZUO_Stunden_Sub_lb.bas ✅",
+      "Form_frm_Menuefuehrung.bas ✅",
+      "Form_zfrm_ZUO_Stunden_Sub.bas ✅ (alternative)"
+    ],
+    "Status": "ALL VBA MODULES PRESENT - Form structures missing"
+  },
+  "ActionItems": [
+    {
+      "Priority": "CRITICAL",
+      "Task": "Export all 12 missing Subform structures",
+      "Details": "Each needs: controls.json, form_design.txt, recordsource.json, tabs.json (if applicable)",
+      "Blocker": "INSTANZ 2 cannot render without these"
+    },
+    {
+      "Priority": "HIGH",
+      "Task": "Verify Stundenübersicht form naming",
+      "Details": "Form is named 'frm_Stundenübersicht2' but container has umlaut. Confirm if 'frm_Stundenuebersicht2' variant exists",
+      "Impact": "May affect export discovery"
+    },
+    {
+      "Priority": "HIGH",
+      "Task": "Document unnamed field links",
+      "Details": "6 Subforms have LinkMasterFields/LinkChildFields empty. Need to discover link logic from VBA or RecordSource",
+      "Impact": "INSTANZ 3 (Backend) needs this for API design"
+    },
+    {
+      "Priority": "MEDIUM",
+      "Task": "Expand dependency_map.json",
+      "Details": "Currently only 2 forms. Add all 13 + query dependencies + macro references",
+      "Impact": "Helps trace ripple effects of changes"
+    }
+  ]
+}

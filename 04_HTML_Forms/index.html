@@ -1,0 +1,40 @@
+﻿<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Consys WebHost</title>
+  <style>
+    html, body { height:100%; margin:0; font-family: Arial; }
+    #top { padding:10px; border-bottom:1px solid #ccc; }
+    #frame { height: calc(100% - 52px); }
+    iframe { width:100%; height:100%; border:0; }
+  </style>
+</head>
+<body>
+  <div id="top">
+    <b>Consys WebHost</b>
+    <span id="status" style="margin-left:10px; color:#666;"></span>
+  </div>
+  <div id="frame">
+    <iframe id="ui" src=""></iframe>
+  </div>
+  <script type="text/javascript">
+    function getParam(name) {
+      var q = window.location.search.substring(1);
+      var parts = q.split("&");
+      for (var i = 0; i < parts.length; i++) {
+        var kv = parts[i].split("=");
+        if (decodeURIComponent(kv[0]) === name) {
+          return kv.length > 1 ? decodeURIComponent(kv[1]) : "";
+        }
+      }
+      return "";
+    }
+    var form = getParam("form");
+    if (!form) form = "frm_va_Auftragstamm";
+    var url = "forms/" + form + ".html";
+    document.getElementById("ui").src = url;
+    document.getElementById("status").innerHTML = "laedt: " + url;
+  </script>
+</body>
+</html>

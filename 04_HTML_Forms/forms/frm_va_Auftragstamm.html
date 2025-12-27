@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung</title>
+    <style>
+/* ========== AUTO-GENERATED FROM ACCESS SPEC ========== */
+/* Form: frm_va_Auftragstamm - PIXEL-GENAUE NACHBILDUNG */
+/* Alle Positionen aus JSON: Twips/15 = Pixel */
+
+:root {
+    --header-bg: linear-gradient(180deg, #6B1D9E 0%, #4A1570 100%);
+    --detail-bg: #F0F0F0;
+    --footer-bg: #E8E8E8;
+    --sidebar-width: 174px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    font-size: 11px;
+    background: #C0C0C0;
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* ========== HAUPT-CONTAINER ========== */
+.form-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+}
+
+/* ========== SIDEBAR (frm_Menuefuehrung): L:1 T:0 W:174 H:792 ========== */
+.sidebar {
+    position: fixed;
+    left: 1px;
+    top: 0;
+    width: 174px;
+    height: 792px;
+    background: #2D2D2D;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar-placeholder {
+    color: #888;
+    padding: 10px;
+    font-size: 10px;
+}
+
+/* ========== HAUPT-BEREICH (rechts von Sidebar) ========== */
+.main-content {
+    margin-left: 175px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+}
+
+/* ========== FORMKOPF (Header): Höhe ca. 100px, lila ========== */
+.form-header {
+    position: relative;
+    height: 100px;
+    min-height: 100px;
+    background: var(--header-bg);
+    border-bottom: 1px solid #333;
+}
+
+/* ========== DETAIL-BEREICH ========== */
+.form-detail {
+    position: relative;
+    flex: 1;
+    background: var(--detail-bg);
+    overflow: hidden;
+    display: flex;
+}
+
+/* Linker Teil (Formularfelder + Tabs) */
+.detail-left {
+    flex: 1;
+    position: relative;
+    max-width: calc(1274px - 175px);
+    overflow: hidden;
+}
+
+/* Rechter Teil (Auftragsliste) */
+.detail-right {
+    width: 650px;
+    min-width: 650px;
+    background: #F5F5F5;
+    border-left: 1px solid #999;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ========== FOOTER ========== */
+.form-footer {
+    height: 25px;
+    min-height: 25px;
+    background: var(--footer-bg);
+    border-top: 1px solid #999;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 30px;
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+}
+
+.footer-item label { font-weight: bold; }
+.footer-item input {
+    border: 1px solid #999;
+    padding: 1px 4px;
+    font-size: 10px;
+    background: #E8E8E8;
+    width: 100px;
+}
+
+/* ========== ACCESS CONTROLS - Absolute Positionierung ========== */
+
+.access-label {
+    position: absolute;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+.access-label.header { color: #FFFFFF; }
+.access-label.title { font-size: 13pt; color: #FFFFFF; }
+
+.access-textbox {
+    position: absolute;
+    border: 1px solid #808080;
+    background: #FFFFFF;
+    padding: 2px 4px;
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+.access-textbox:focus {
+    outline: none;
+    border-color: #0066CC;
+}
+
+.access-textbox.readonly { background: #E8E8E8; }
+
+.access-combobox {
+    position: absolute;
+    border: 1px solid #808080;
+    background: #FFFFFF;
+    padding: 1px 2px;
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+.access-button {
+    position: absolute;
+    border: 1px solid #666;
+    background: linear-gradient(180deg, #F8F8F8 0%, #E0E0E0 100%);
+    cursor: pointer;
+    padding: 2px 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+.access-button:hover {
+    background: linear-gradient(180deg, #E8E8E8 0%, #D0D0D0 100%);
+}
+
+.access-button.nav {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+}
+
+.access-button.orange {
+    background: linear-gradient(180deg, #FFD9B3 0%, #F7B580 100%);
+}
+
+.access-button.blue {
+    background: linear-gradient(180deg, #D6E9FF 0%, #C6D9F1 100%);
+}
+
+.access-checkbox { position: absolute; }
+
+.access-rectangle {
+    position: absolute;
+    background: #8EB4E3;
+    border: 1px solid #666;
+}
+
+.access-subform {
+    position: absolute;
+    border: 1px solid #999;
+    background: #FFFFFF;
+    overflow: auto;
+}
+
+/* ========== TABS ========== */
+.tab-container {
+    position: absolute;
+    left: 10px;
+    top: 120px;
+    right: 20px;
+    bottom: 10px;
+    background: #FFFFFF;
+    border: 1px solid #999;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-header {
+    display: flex;
+    background: #E0E0E0;
+    border-bottom: 1px solid #999;
+}
+
+.tab-btn {
+    padding: 5px 12px;
+    font-size: 10px;
+    font-weight: bold;
+    border: none;
+    background: #D8D8D8;
+    cursor: pointer;
+    border-right: 1px solid #999;
+}
+
+.tab-btn:hover { background: #E8E8E8; }
+.tab-btn.active {
+    background: #FFFFFF;
+    border-bottom: 1px solid #FFFFFF;
+    margin-bottom: -1px;
+}
+
+.tab-page {
+    display: none;
+    position: relative;
+    flex: 1;
+    overflow: auto;
+    padding: 10px;
+}
+
+.tab-page.active { display: block; }
+
+/* ========== SUBFORM GRIDS ========== */
+.subform-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+.subform-grid th {
+    background: linear-gradient(180deg, #F5F5F5 0%, #E0E0E0 100%);
+    padding: 4px 6px;
+    text-align: left;
+    border: 1px solid #CCC;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+}
+
+.subform-grid td {
+    padding: 3px 6px;
+    border: 1px solid #DDD;
+    background: #FFFFFF;
+}
+
+.subform-grid tr:hover td { background: #E8F4FF; }
+.subform-grid tr.selected td { background: #CCE5FF; }
+
+/* ========== RECHTER BEREICH ========== */
+.right-header {
+    padding: 8px;
+    background: #E8E8E8;
+}
+
+.right-filter {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    font-size: 10px;
+}
+
+.right-filter input, .right-filter select {
+    font-size: 10px;
+    border: 1px solid #999;
+    padding: 2px 4px;
+}
+
+.right-filter button {
+    font-size: 9px;
+    padding: 2px 6px;
+    border: 1px solid #666;
+    background: linear-gradient(180deg, #F8F8F8 0%, #E0E0E0 100%);
+    cursor: pointer;
+}
+
+.auftrag-liste {
+    flex: 1;
+    overflow-y: auto;
+    background: #FFFFFF;
+    border-top: 1px solid #999;
+}
+
+.auftrag-item {
+    padding: 6px 10px;
+    border-bottom: 1px solid #EEE;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+.auftrag-item:hover { background: #F5F5F5; }
+.auftrag-item.selected { background: #CCE5FF; }
+.auftrag-item-id { font-weight: bold; color: #333; }
+.auftrag-item-name { color: #666; }
+.auftrag-item-date { color: #888; font-size: 9px; }
+
+/* Loading */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #888;
+    font-size: 10px;
+}
+
+.loading::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border: 2px solid #DDD;
+    border-top-color: #3498db;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-left: 6px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <!-- SIDEBAR: L:1 T:0 W:174 H:792 -->
+        <aside class="sidebar" id="frm_Menuefuehrung">
+            <div class="sidebar-placeholder">Menü</div>
+        </aside>
+
+        <!-- HAUPT-BEREICH -->
+        <div class="main-content">
+            <!-- HEADER (Top 0-100px) -->
+            <header class="form-header">
+                <!-- Titel: L:121 T:26 W:195 H:25 (Position relativ zu Sidebar) -->
+                <span class="access-label title" style="left:-54px; top:26px;">Auftragsverwaltung</span>
+
+                <!-- Navigation Rectangle: L:348 T:14 W:106 H:29 -->
+                <div class="access-rectangle" style="left:173px; top:14px; width:106px; height:29px;"></div>
+
+                <!-- Nav Buttons: L:353,373,392,411,431 T:19 W:16 H:18 -->
+                <button class="access-button nav" id="Befehl43" style="left:178px; top:19px; width:16px; height:18px;" title="Erster">|◄</button>
+                <button class="access-button nav" id="Befehl41" style="left:198px; top:19px; width:16px; height:18px;" title="Zurück">◄</button>
+                <button class="access-button nav" id="Befehl40" style="left:217px; top:19px; width:16px; height:18px;" title="Vor">►</button>
+                <button class="access-button nav" id="btn_letzer_Datensatz" style="left:236px; top:19px; width:16px; height:18px;" title="Letzter">►|</button>
+                <button class="access-button nav" id="btn_rueck" style="left:256px; top:19px; width:16px; height:18px;" title="Rückgängig">↩</button>
+
+                <!-- Aktualisieren: L:355 T:53 W:82 H:18 -->
+                <button class="access-button" id="btnReq" style="left:180px; top:53px; width:82px; height:18px;">Aktualisieren</button>
+
+                <!-- Rückmelde-Statistik: L:121 T:57 W:95 H:15 -->
+                <button class="access-button" id="btn_Rueckmeld" style="left:-54px; top:57px; width:95px; height:15px; font-size:7pt;">Rückmelde-Statistik</button>
+
+                <!-- Syncfehler: L:231 T:57 W:69 H:15 -->
+                <button class="access-button" id="btnSyncErr" style="left:56px; top:57px; width:69px; height:15px; font-size:7pt;">Syncfehler</button>
+
+                <!-- Datum: L:186 T:8 -->
+                <span class="access-label header" style="left:11px; top:8px;">Datum:</span>
+                <input type="text" class="access-textbox" id="Dat_VA_Von" style="left:73px; top:8px; width:87px; height:22px;">
+                <input type="text" class="access-textbox" id="Dat_VA_Bis" style="left:176px; top:8px; width:87px; height:22px;">
+                <span class="access-label header" style="left:271px; top:8px;">Nr.</span>
+                <input type="text" class="access-textbox readonly" id="ID" style="left:299px; top:8px; width:41px; height:22px;" readonly>
+
+                <!-- Mitarbeiterauswahl: L:533 T:30 W:129 H:31 -->
+                <button class="access-button blue" id="btnSchnellPlan" style="left:358px; top:30px; width:129px; height:31px;">Mitarbeiterauswahl</button>
+
+                <!-- Positionen: L:544 T:64 W:100 H:23 -->
+                <button class="access-button" id="btn_Posliste_oeffnen" style="left:369px; top:64px; width:100px; height:23px;">Positionen</button>
+
+                <!-- PKW Anzahl: L:541 T:23 -->
+                <span class="access-label header" style="left:366px; top:23px;">PKW Anzahl:</span>
+                <input type="text" class="access-textbox" id="PKW_Anzahl" style="left:494px; top:23px; width:69px; height:23px;">
+
+                <!-- Fahrtkosten: L:541 T:49 -->
+                <span class="access-label header" style="left:366px; top:49px;">Fahrtkosten/PKW:</span>
+                <input type="text" class="access-textbox" id="Fahrtkosten" style="left:494px; top:49px; width:68px; height:20px;">
+
+                <!-- Neuer Auftrag: L:703 T:49 W:133 H:23 -->
+                <button class="access-button" id="btnneuveranst" style="left:528px; top:49px; width:133px; height:23px;">Neuer Auftrag</button>
+
+                <!-- Auftrag kopieren: L:703 T:11 W:133 H:23 -->
+                <button class="access-button" id="Befehl640" style="left:528px; top:11px; width:133px; height:23px;">Auftrag kopieren</button>
+
+                <!-- Auftrag löschen: L:858 T:11 W:133 H:24 -->
+                <button class="access-button" id="mcobtnDelete" style="left:683px; top:11px; width:133px; height:24px;">Auftrag löschen</button>
+
+                <!-- Namensliste ESS: L:860 T:49 W:133 H:24 -->
+                <button class="access-button" id="btn_ListeStd" style="left:685px; top:49px; width:133px; height:24px;">Namensliste ESS</button>
+
+                <!-- Einsatzliste senden MA: L:1013 T:11 W:153 H:24 -->
+                <button class="access-button" id="btnMailEins" style="left:838px; top:11px; width:153px; height:24px;">Einsatzliste senden MA</button>
+
+                <!-- Einsatzliste drucken: L:1013 T:49 W:153 H:24 -->
+                <button class="access-button" id="btnDruckZusage" style="left:838px; top:49px; width:153px; height:24px;">Einsatzliste drucken</button>
+
+                <!-- Einsatzliste senden BOS: L:1183 T:11 W:174 H:24 -->
+                <button class="access-button orange" id="btn_Autosend_BOS" style="left:1008px; top:11px; width:174px; height:24px;">Einsatzliste senden BOS</button>
+
+                <!-- EL Autosend: L:1183 T:53 -->
+                <span class="access-label header" style="left:1008px; top:53px;">EL Autosend</span>
+                <input type="checkbox" class="access-checkbox" id="cbAutosendEL" style="left:1091px; top:55px;">
+
+                <!-- EL gesendet: L:1285 T:53 W:71 H:18 -->
+                <button class="access-button" id="Befehl709" style="left:1110px; top:53px; width:71px; height:18px; font-size:7pt;">EL gesendet</button>
+
+                <!-- Einsatzliste senden SUB: L:1365 T:11 W:128 H:34 -->
+                <button class="access-button" id="btnMailSub" style="left:1190px; top:11px; width:128px; height:34px;">EL senden SUB</button>
+
+                <!-- Treffpunkt: L:782 T:8 -->
+                <span class="access-label header" style="left:607px; top:8px;">Treffpunkt:</span>
+                <input type="text" class="access-textbox" id="Treffp_Zeit" style="left:730px; top:8px; width:58px; height:22px;">
+                <input type="text" class="access-textbox" id="Treffpunkt" style="left:791px; top:8px; width:204px; height:22px;">
+
+                <!-- Auftrag: L:185 T:33 -->
+                <span class="access-label header" style="left:10px; top:33px;">Auftrag:</span>
+                <select class="access-combobox" id="Kombinationsfeld656" style="left:73px; top:32px; width:268px; height:23px;"></select>
+
+                <!-- Dienstkleidung: L:782 T:32 -->
+                <span class="access-label header" style="left:607px; top:32px;">Dienstkleidung:</span>
+                <select class="access-combobox" id="Dienstkleidung" style="left:730px; top:33px; width:264px; height:22px;"></select>
+
+                <!-- Ort: L:186 T:59 -->
+                <span class="access-label header" style="left:11px; top:59px;">Ort:</span>
+                <select class="access-combobox" id="Ort" style="left:73px; top:58px; width:268px; height:23px;"></select>
+
+                <!-- Ansprechpartner: L:782 T:58 -->
+                <span class="access-label header" style="left:607px; top:58px;">Ansprechpartner:</span>
+                <input type="text" class="access-textbox" id="Ansprechpartner" style="left:730px; top:59px; width:264px; height:22px;">
+
+                <!-- Objekt: L:185 T:85 -->
+                <span class="access-label header" style="left:10px; top:85px;">Objekt:</span>
+                <select class="access-combobox" id="Objekt" style="left:73px; top:84px; width:248px; height:23px;"></select>
+                <select class="access-combobox" id="Objekt_ID" style="left:311px; top:84px; width:30px; height:23px; background:#8CD0A8;"></select>
+
+                <!-- Datum-Navigation: L:554,577,725 T:84 -->
+                <button class="access-button nav" id="btnDatumLeft" style="left:379px; top:84px; width:19px; height:23px;">◄</button>
+                <select class="access-combobox" id="cboVADatum" style="left:402px; top:84px; width:145px; height:23px;"></select>
+                <button class="access-button nav" id="btnDatumRight" style="left:550px; top:84px; width:19px; height:23px;">►</button>
+
+                <!-- Auftraggeber: L:782 T:85 -->
+                <span class="access-label header" style="left:607px; top:85px;">Auftraggeber:</span>
+                <select class="access-combobox" id="veranstalter_id" style="left:730px; top:85px; width:264px; height:22px;"></select>
+
+                <!-- Version: L:1757 T:8 -->
+                <span class="access-label header" id="lbl_Version" style="left:1582px; top:8px;">GPT | TEST</span>
+
+                <!-- Datum: L:1762 T:26 -->
+                <span class="access-label header" id="lbl_Datum" style="left:1587px; top:26px;"></span>
+
+                <!-- Schließen: L:1867 T:8 W:20 H:22 -->
+                <button class="access-button" id="Befehl38" style="left:1692px; top:8px; width:20px; height:22px; font-size:12pt;" title="Schließen">×</button>
+
+                <!-- Auftragsstatus: L:1504 T:19 -->
+                <span class="access-label header" style="left:1329px; top:19px;">Auftragsstatus:</span>
+                <select class="access-combobox" id="Veranst_Status_ID" style="left:1446px; top:19px; width:114px; height:22px;">
+                    <option value="">-</option>
+                    <option value="1">Anfrage</option>
+                    <option value="2">Angebot</option>
+                    <option value="3">Bestätigt</option>
+                    <option value="4">In Planung</option>
+                    <option value="5">Abgeschlossen</option>
+                    <option value="6">Storniert</option>
+                </select>
+            </header>
+
+            <!-- DETAIL-BEREICH -->
+            <section class="form-detail">
+                <!-- LINKER TEIL -->
+                <div class="detail-left">
+                    <!-- TAB-CONTAINER -->
+                    <div class="tab-container">
+                        <div class="tab-header">
+                            <button class="tab-btn active" data-tab="pgMA_Zusage">Einsatzliste</button>
+                            <button class="tab-btn" data-tab="pgMA_Plan">Antworten ausstehend</button>
+                            <button class="tab-btn" data-tab="pgAttach">Zusatzdateien</button>
+                            <button class="tab-btn" data-tab="pgRechnung">Rechnung</button>
+                            <button class="tab-btn" data-tab="pgBemerk">Bemerkungen</button>
+                        </div>
+
+                        <!-- Tab: Einsatzliste -->
+                        <div class="tab-page active" id="pgMA_Zusage">
+                            <button class="access-button" id="btn_BWN_Druck" style="position:relative; margin-bottom:10px; width:110px; height:22px;">BWN drucken</button>
+
+                            <div style="display:flex; gap:10px; height:calc(100% - 40px);">
+                                <!-- Links: Schichten + Absagen -->
+                                <div style="width:260px; display:flex; flex-direction:column; gap:10px;">
+                                    <!-- Schichten -->
+                                    <div style="flex:1; border:1px solid #999; overflow:auto;">
+                                        <table class="subform-grid">
+                                            <thead><tr><th>Start</th><th>Ende</th><th>Anz</th><th>Ist</th></tr></thead>
+                                            <tbody id="schichtenBody"><tr><td colspan="4" class="loading">Lade...</td></tr></tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Absagen -->
+                                    <div style="flex:1;">
+                                        <div style="font-weight:bold; font-size:10px; margin-bottom:4px;">Absagen:</div>
+                                        <div style="border:1px solid #999; height:calc(100% - 20px); overflow:auto;">
+                                            <table class="subform-grid">
+                                                <thead><tr><th>Name</th><th>Grund</th></tr></thead>
+                                                <tbody id="absagenBody"><tr><td colspan="2" class="loading">Lade...</td></tr></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Rechts: MA-Zuordnungen -->
+                                <div style="flex:1; border:1px solid #999; overflow:auto;">
+                                    <table class="subform-grid">
+                                        <thead><tr>
+                                            <th style="width:30px;">Lfd.</th>
+                                            <th style="width:45px;">von</th>
+                                            <th>Mitarbeiter</th>
+                                            <th style="width:45px;">bis</th>
+                                            <th style="width:35px;">PKW</th>
+                                            <th style="width:75px;">Datum</th>
+                                            <th style="width:80px;">Schicht</th>
+                                            <th style="width:25px;">i</th>
+                                        </tr></thead>
+                                        <tbody id="zuordnungenBody"><tr><td colspan="8" class="loading">Lade...</td></tr></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Antworten ausstehend -->
+                        <div class="tab-page" id="pgMA_Plan">
+                            <div style="font-weight:bold; font-size:10px; margin-bottom:8px;">Mitarbeiter geplant:</div>
+                            <div style="border:1px solid #999; height:calc(100% - 30px); overflow:auto;">
+                                <table class="subform-grid">
+                                    <thead><tr><th>Name</th><th>Vorname</th><th>Datum</th><th>Angefragt</th><th>Rückmeldung</th><th>Status</th></tr></thead>
+                                    <tbody id="antwortenBody"><tr><td colspan="6" class="loading">Lade...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Zusatzdateien -->
+                        <div class="tab-page" id="pgAttach">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                <span style="color:#7F7F7F; font-size:10px;">Doppelklick auf Dateinamen zeigt Inhalt an</span>
+                                <button class="access-button" id="btnNeuAttach" style="position:relative; width:180px; height:30px;">Neuen Attach hinzufügen</button>
+                            </div>
+                            <div style="border:1px solid #999; height:calc(100% - 50px); overflow:auto;">
+                                <table class="subform-grid">
+                                    <thead><tr><th>Dateiname</th><th>Typ</th><th>Größe</th><th>Datum</th><th>Aktionen</th></tr></thead>
+                                    <tbody id="zusatzdateienBody"><tr><td colspan="5" class="loading">Lade...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Rechnung -->
+                        <div class="tab-page" id="pgRechnung">
+                            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                                <button class="access-button" id="btnPDFKopf" style="position:relative; width:120px; height:26px;">Rechnung PDF</button>
+                                <button class="access-button" id="btnPDFPos" style="position:relative; width:150px; height:26px;">Berechnungsliste PDF</button>
+                                <button class="access-button" id="btnLoad" style="position:relative; width:90px; height:26px;">Daten laden</button>
+                                <div style="flex:1;"></div>
+                                <button class="access-button" id="btnRchLex" style="position:relative; width:180px; height:30px;">Rechnung in Lexware</button>
+                            </div>
+                            <div style="font-weight:bold; font-size:10px; margin-bottom:4px;">Rechnungspositionen:</div>
+                            <div style="border:1px solid #999; height:120px; overflow:auto; margin-bottom:10px;">
+                                <table class="subform-grid">
+                                    <thead><tr><th>Pos</th><th>Bezeichnung</th><th>Menge</th><th>Einheit</th><th>Preis</th><th>Summe</th></tr></thead>
+                                    <tbody id="rechnungsposBody"><tr><td colspan="6" class="loading">Lade...</td></tr></tbody>
+                                </table>
+                            </div>
+                            <div style="text-align:right; margin-bottom:10px;">
+                                <span style="font-weight:bold; font-size:10px;">Gesamtsumme Netto:</span>
+                                <input type="text" id="PosGesamtsumme" style="width:120px; text-align:right; border:1px solid #999; padding:2px 4px;" readonly>
+                            </div>
+                            <div style="font-weight:bold; font-size:10px; margin-bottom:4px;">Berechnungsliste:</div>
+                            <div style="border:1px solid #999; flex:1; overflow:auto;">
+                                <table class="subform-grid">
+                                    <thead><tr><th>Datum</th><th>MA</th><th>Stunden</th><th>Stundensatz</th><th>Summe</th></tr></thead>
+                                    <tbody id="berechnungslisteBody"><tr><td colspan="5" class="loading">Lade...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Bemerkungen -->
+                        <div class="tab-page" id="pgBemerk">
+                            <div style="font-weight:bold; font-size:10px; margin-bottom:8px;">Bemerkungen:</div>
+                            <textarea id="Bemerkungen" style="width:100%; height:calc(100% - 30px); border:1px solid #999; padding:8px; font-size:10px; resize:none;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECHTER TEIL (Auftragsliste) -->
+                <div class="detail-right">
+                    <div class="right-header">
+                        <!-- sub_VA_Anzeige -->
+                        <div id="sub_VA_Anzeige" style="height:60px; background:#E0E0E0; border:1px solid #999; margin-bottom:8px; padding:5px;">
+                            <div style="font-size:10px; font-weight:bold;">Auftragsübersicht</div>
+                        </div>
+                        <!-- Filter -->
+                        <div class="right-filter">
+                            <span style="font-weight:bold;">Aufträge ab:</span>
+                            <input type="text" id="Auftraege_ab" style="width:72px;">
+                            <button id="btn_AbWann">Go</button>
+                            <button id="btnTgBack">«</button>
+                            <button id="btnTgVor">»</button>
+                            <button id="btnHeute">Ab Heute</button>
+                        </div>
+                        <div class="right-filter">
+                            <span style="font-weight:bold;">Suchen:</span>
+                            <select id="cboID" style="flex:1; min-width:100px;">
+                                <option value="">-- Auftrag suchen --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="auftrag-liste" id="auftragListe">
+                        <div class="loading">Lade Aufträge...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <footer class="form-footer">
+                <div class="footer-item">
+                    <label>Erstellt</label>
+                    <input type="text" id="Erst_von" readonly>
+                    <input type="text" id="Erst_am" readonly>
+                </div>
+                <div class="footer-item">
+                    <label>Geändert</label>
+                    <input type="text" id="Aend_von" readonly>
+                    <input type="text" id="Aend_am" readonly>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentId = null;
+        let auftraege = [];
+        let currentIndex = 0;
+        let currentVADatumId = null;
+
+        const $ = id => document.getElementById(id);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const today = new Date();
+            $('lbl_Datum').textContent = today.toLocaleDateString('de-DE');
+            $('Auftraege_ab').value = today.toLocaleDateString('de-DE');
+
+            await Promise.all([loadAuftraege(), loadKunden(), loadObjekte()]);
+            setupEventListeners();
+            setupTabs();
+
+            if (auftraege.length > 0) showRecord(auftraege[0].ID);
+        });
+
+        function setupEventListeners() {
+            $('Befehl43').onclick = () => navigateTo('first');
+            $('Befehl41').onclick = () => navigateTo('prev');
+            $('Befehl40').onclick = () => navigateTo('next');
+            $('btn_letzer_Datensatz').onclick = () => navigateTo('last');
+            $('btnDatumLeft').onclick = () => navigateVADatum('prev');
+            $('btnDatumRight').onclick = () => navigateVADatum('next');
+            $('cboVADatum').onchange = onVADatumChange;
+            $('btn_AbWann').onclick = loadAuftraege;
+            $('btnHeute').onclick = () => { $('Auftraege_ab').value = new Date().toLocaleDateString('de-DE'); loadAuftraege(); };
+            $('btnTgBack').onclick = () => adjustDate(-7);
+            $('btnTgVor').onclick = () => adjustDate(7);
+            $('cboID').onchange = e => { if (e.target.value) showRecord(parseInt(e.target.value)); };
+            $('Befehl38').onclick = () => window.close();
+            $('btnReq').onclick = () => { if (currentId) showRecord(currentId); };
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+                    btn.classList.add('active');
+                    $(btn.dataset.tab).classList.add('active');
+                };
+            });
+        }
+
+        async function loadAuftraege() {
+            try {
+                const res = await fetch(`${API_BASE}/auftraege`);
+                if (!res.ok) throw new Error('API Fehler');
+                const result = await res.json();
+                auftraege = result.data || result || [];
+                renderAuftragsListe();
+                updateSearchDropdown();
+            } catch (e) {
+                $('auftragListe').innerHTML = `<div style="padding:10px;color:red;font-size:10px;">Fehler: ${e.message}</div>`;
+            }
+        }
+
+        function renderAuftragsListe() {
+            if (!auftraege.length) {
+                $('auftragListe').innerHTML = '<div style="padding:10px;color:#888;font-size:10px;">Keine Aufträge</div>';
+                return;
+            }
+            $('auftragListe').innerHTML = auftraege.map((a, i) => `
+                <div class="auftrag-item ${a.ID === currentId ? 'selected' : ''}" data-id="${a.ID}" data-idx="${i}">
+                    <div class="auftrag-item-id">${a.ID} - ${a.Auftrag || ''}</div>
+                    <div class="auftrag-item-name">${a.Objekt || ''} / ${a.Ort || ''}</div>
+                    <div class="auftrag-item-date">${formatDate(a.Dat_VA_Von)} - ${formatDate(a.Dat_VA_Bis)}</div>
+                </div>
+            `).join('');
+            $('auftragListe').querySelectorAll('.auftrag-item').forEach(item => {
+                item.onclick = () => { currentIndex = parseInt(item.dataset.idx); showRecord(parseInt(item.dataset.id)); };
+            });
+        }
+
+        function updateSearchDropdown() {
+            $('cboID').innerHTML = '<option value="">-- Suchen --</option>' +
+                auftraege.map(a => `<option value="${a.ID}">${a.Auftrag || ''} (${a.ID})</option>`).join('');
+        }
+
+        async function showRecord(id) {
+            currentId = id;
+            try {
+                const res = await fetch(`${API_BASE}/auftraege/${id}`);
+                if (!res.ok) throw new Error('Fehler');
+                const result = await res.json();
+                const d = result.data?.auftrag || result.data || result;
+
+                fillField('ID', d.ID);
+                fillField('Kombinationsfeld656', d.Auftrag);
+                fillField('Dat_VA_Von', formatDateDE(d.Dat_VA_Von));
+                fillField('Dat_VA_Bis', formatDateDE(d.Dat_VA_Bis));
+                fillField('Ort', d.Ort);
+                fillField('Objekt', d.Objekt);
+                fillField('Objekt_ID', d.Objekt_ID);
+                fillField('Treffpunkt', d.Treffpunkt);
+                fillField('Treffp_Zeit', formatTime(d.Treffp_Zeit));
+                fillField('Dienstkleidung', d.Dienstkleidung);
+                fillField('Ansprechpartner', d.Ansprechpartner);
+                fillField('veranstalter_id', d.Veranstalter_ID);
+                fillField('Veranst_Status_ID', d.Veranst_Status_ID);
+                fillField('Fahrtkosten', d.Fahrtkosten);
+                fillField('PKW_Anzahl', d.Dummy);
+                fillField('Bemerkungen', d.Bemerkungen);
+                fillField('Erst_von', d.Erst_von);
+                fillField('Erst_am', formatDateDE(d.Erst_am));
+                fillField('Aend_von', d.Aend_von);
+                fillField('Aend_am', formatDateDE(d.Aend_am));
+
+                $('auftragListe').querySelectorAll('.auftrag-item').forEach(item => {
+                    item.classList.toggle('selected', parseInt(item.dataset.id) === id);
+                });
+
+                if (result.data?.einsatztage) renderVATage(result.data.einsatztage);
+                else await loadVATage(id);
+
+                loadSchichten(id, currentVADatumId);
+                loadZuordnungen(id, currentVADatumId);
+            } catch (e) { console.error(e); }
+        }
+
+        function renderVATage(tage) {
+            const cbo = $('cboVADatum');
+            if (!tage?.length) { cbo.innerHTML = '<option value="">--</option>'; currentVADatumId = null; return; }
+            cbo.innerHTML = tage.map((t, i) => `<option value="${t.ID}" ${i === 0 ? 'selected' : ''}>${formatDateDE(t.VADatum)}</option>`).join('');
+            currentVADatumId = tage[0].ID;
+        }
+
+        async function loadVATage(auftragId) {
+            try {
+                const res = await fetch(`${API_BASE}/einsatztage?va_id=${auftragId}`);
+                if (!res.ok) throw new Error('Fehler');
+                const result = await res.json();
+                renderVATage(result.data || result);
+            } catch (e) { console.error(e); }
+        }
+
+        function onVADatumChange() {
+            currentVADatumId = $('cboVADatum').value || null;
+            if (currentId) { loadSchichten(currentId, currentVADatumId); loadZuordnungen(currentId, currentVADatumId); }
+        }
+
+        function navigateVADatum(dir) {
+            const cbo = $('cboVADatum');
+            const idx = cbo.selectedIndex;
+            if (dir === 'prev' && idx > 0) cbo.selectedIndex = idx - 1;
+            else if (dir === 'next' && idx < cbo.options.length - 1) cbo.selectedIndex = idx + 1;
+            onVADatumChange();
+        }
+
+        async function loadSchichten(auftragId, vaDatumId) {
+            try {
+                let url = `${API_BASE}/dienstplan/schichten?va_id=${auftragId}`;
+                if (vaDatumId) url += `&datum_id=${vaDatumId}`;
+                const res = await fetch(url);
+                const result = await res.json();
+                const data = result.data || result || [];
+                $('schichtenBody').innerHTML = data.length ? data.map(s => `<tr><td>${formatTime(s.VA_Start)}</td><td>${formatTime(s.VA_Ende)}</td><td>${s.MA_Anzahl || 0}</td><td>${s.MA_Anzahl_Ist || 0}</td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:#888;">Keine</td></tr>';
+            } catch (e) { $('schichtenBody').innerHTML = '<tr><td colspan="4" style="color:red;">Fehler</td></tr>'; }
+        }
+
+        async function loadZuordnungen(auftragId, vaDatumId) {
+            try {
+                let url = `${API_BASE}/zuordnungen?va_id=${auftragId}`;
+                if (vaDatumId) url += `&datum_id=${vaDatumId}`;
+                const res = await fetch(url);
+                const result = await res.json();
+                const data = result.data || result || [];
+                $('zuordnungenBody').innerHTML = data.length ? data.map((z, i) => `<tr><td>${z.PosNr || (i + 1)}</td><td>${formatTime(z.MA_Start)}</td><td>${z.MA_Nachname || ''} ${z.MA_Vorname || ''}</td><td>${formatTime(z.MA_Ende)}</td><td>${z.PKW || ''}</td><td>${formatDateDE(z.VADatum)}</td><td>${formatTime(z.VA_Start)}-${formatTime(z.VA_Ende)}</td><td><input type="checkbox" ${z.IstFraglich ? 'checked' : ''} style="width:12px;height:12px;"></td></tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:#888;">Keine</td></tr>';
+            } catch (e) { $('zuordnungenBody').innerHTML = '<tr><td colspan="8" style="color:red;">Fehler</td></tr>'; }
+        }
+
+        async function loadKunden() {
+            try {
+                const res = await fetch(`${API_BASE}/kunden?aktiv=true`);
+                const result = await res.json();
+                const data = result.data || result || [];
+                $('veranstalter_id').innerHTML = '<option value="">--</option>' + data.map(k => `<option value="${k.kun_Id}">${k.kun_Firma}</option>`).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadObjekte() {
+            try {
+                const res = await fetch(`${API_BASE}/objekte`);
+                const result = await res.json();
+                const data = result.data || result || [];
+                $('Objekt').innerHTML = '<option value="">--</option>' + data.map(o => `<option value="${o.Objekt}">${o.Objekt}</option>`).join('');
+                $('Objekt_ID').innerHTML = '<option value="">-</option>' + data.map(o => `<option value="${o.ID}">${o.ID}</option>`).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        function navigateTo(dir) {
+            if (!auftraege?.length) return;
+            switch (dir) {
+                case 'first': currentIndex = 0; break;
+                case 'prev': currentIndex = Math.max(0, currentIndex - 1); break;
+                case 'next': currentIndex = Math.min(auftraege.length - 1, currentIndex + 1); break;
+                case 'last': currentIndex = auftraege.length - 1; break;
+            }
+            showRecord(auftraege[currentIndex].ID);
+        }
+
+        function adjustDate(days) {
+            const input = $('Auftraege_ab');
+            const parts = input.value.split('.');
+            if (parts.length === 3) {
+                const date = new Date(parts[2], parts[1] - 1, parts[0]);
+                date.setDate(date.getDate() + days);
+                input.value = date.toLocaleDateString('de-DE');
+                loadAuftraege();
+            }
+        }
+
+        function fillField(id, value) {
+            const el = $(id);
+            if (el) el.value = value || '';
+        }
+
+        function formatDate(d) { if (!d) return '-'; try { return new Date(d).toLocaleDateString('de-DE'); } catch { return d; } }
+        function formatDateDE(d) { if (!d) return ''; try { return new Date(d).toLocaleDateString('de-DE'); } catch { return ''; } }
+        function formatTime(t) { if (!t) return ''; if (t.includes('T')) return t.split('T')[1]?.substring(0, 5) || ''; if (t.includes(':')) return t.substring(0, 5); return t; }
+    </script>
+</body>
+</html>

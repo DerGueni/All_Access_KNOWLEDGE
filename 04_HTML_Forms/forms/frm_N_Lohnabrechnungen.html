@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lohnabrechnungen - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+</head>
+<body data-active-menu="lohnabrechnungen">
+    <div class="app-container">
+        <!-- Sidebar wird dynamisch geladen -->
+        <aside class="app-sidebar"></aside>
+
+        <!-- Hauptbereich -->
+        <main class="app-main">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Lohnabrechnungen</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Toolbar -->
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Jahr:</label>
+                    <select id="cboJahr" class="form-control" style="width:100px;">
+                        <option value="">--</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Monat:</label>
+                    <select id="cboMonat" class="form-control" style="width:130px;">
+                        <option value="">--</option>
+                        <option value="1">Januar</option>
+                        <option value="2">Februar</option>
+                        <option value="3">März</option>
+                        <option value="4">April</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Dezember</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Anstellungsart:</label>
+                    <select id="cboAnstArt" class="form-control" style="width:150px;">
+                        <option value="">Alle</option>
+                        <option value="3">Festangestellt</option>
+                        <option value="5">Minijob</option>
+                        <option value="13">Werkstudent</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button id="btnLaden" class="btn btn-primary">Laden</button>
+                    <button id="btnVersenden" class="btn btn-success">Versenden</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="app-content">
+                <!-- Tabelle -->
+                <div class="content-main">
+                    <table class="datasheet" id="tblLohn">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">
+                                    <input type="checkbox" id="chkAll" title="Alle auswählen">
+                                </th>
+                                <th style="width:60px;">Nr</th>
+                                <th style="min-width:200px;">Name</th>
+                                <th style="width:100px;">Monat</th>
+                                <th style="min-width:300px;">Datei</th>
+                                <th style="width:150px;">Versand-Status</th>
+                                <th style="min-width:200px;">Protokoll</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_Lohn">
+                            <tr>
+                                <td colspan="7" style="text-align:center; padding:40px; color:#999;">
+                                    Bitte Jahr und Monat wählen und auf "Laden" klicken...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Einträge</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Sidebar JS dynamisch laden -->
+    <script src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+
+        // Aktuelles Jahr und Monat vorauswählen
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+
+        // Jahre-Dropdown befüllen (2020-2030)
+        const cboJahr = document.getElementById('cboJahr');
+        for (let year = 2020; year <= 2030; year++) {
+            const opt = document.createElement('option');
+            opt.value = year;
+            opt.textContent = year;
+            if (year === currentYear) opt.selected = true;
+            cboJahr.appendChild(opt);
+        }
+
+        // Aktuellen Monat vorauswählen
+        document.getElementById('cboMonat').value = currentMonth;
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="logic/frm_N_Lohnabrechnungen.logic.js"></script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objekt Positionen - Subform</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .subform-toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 4px 6px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+        .subform-content { flex: 1; overflow: auto; }
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .datasheet th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            padding: 5px 6px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .datasheet td {
+            border: 1px solid #ddd;
+            padding: 4px 6px;
+        }
+        .datasheet tbody tr:hover { background: #fff8f0; }
+        .datasheet tbody tr.selected { background: #ffecd2; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .btn-sm {
+            padding: 2px 6px;
+            font-size: 9px;
+            border: 1px solid #999;
+            background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        .btn-sm:hover { background: linear-gradient(180deg, #f5f5f5 0%, #ddd 100%); }
+        .quali-badge {
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 6px;
+            font-size: 9px;
+            background: #e8e8e8;
+            color: #666;
+        }
+        .quali-badge.required { background: #d4edda; color: #155724; }
+        .sum-row {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-toolbar">
+            <button class="btn-sm" id="btnNeu">+ Neu</button>
+            <button class="btn-sm" id="btnBearbeiten">Bearbeiten</button>
+            <button class="btn-sm" id="btnLöschen">Löschen</button>
+            <span style="flex:1;"></span>
+            <span style="font-size:9px;color:#666;" id="lblAnzahl">0 Positionen</span>
+        </div>
+
+        <div class="subform-content">
+            <table class="datasheet" id="tblPositionen">
+                <thead>
+                    <tr>
+                        <th style="width:50px;">Pos</th>
+                        <th style="min-width:150px;">Bezeichnung</th>
+                        <th style="width:60px;" class="text-center">MA Soll</th>
+                        <th style="width:90px;">Qualifikation</th>
+                        <th style="width:80px;" class="text-right">Stundensatz</th>
+                        <th style="min-width:100px;">Bemerkung</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_Positionen">
+                    <!-- Daten werden via JS geladen -->
+                </tbody>
+                <tfoot>
+                    <tr class="sum-row">
+                        <td colspan="2" style="text-align:right;">Summe:</td>
+                        <td class="text-center" id="sumMA">0</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Subform: sub_OB_Objekt_Positionen
+        // LinkMaster: Objekt_ID
+        const SubOBPositionen = {
+            objektId: null,
+            selectedRow: null,
+
+            init() {
+                const params = new URLSearchParams(window.location.search);
+                this.objektId = params.get('Objekt_ID') || params.get('objekt_id');
+
+                document.getElementById('btnNeu').addEventListener('click', () => this.neuePosition());
+                document.getElementById('btnBearbeiten').addEventListener('click', () => this.bearbeiten());
+                document.getElementById('btnLöschen').addEventListener('click', () => this.löschen());
+
+                if (this.objektId) {
+                    this.ladeDaten();
+                }
+
+                window.addEventListener('message', (e) => {
+                    if (e.data && e.data.action === 'setObjektID') {
+                        this.objektId = e.data.objektId;
+                        this.ladeDaten();
+                    }
+                    if (e.data && e.data.action === 'requery') {
+                        this.ladeDaten();
+                    }
+                });
+
+                // Row Click Handler
+                document.querySelectorAll('#tbody_Positionen tr').forEach(row => {
+                    row.addEventListener('click', () => this.selectRow(row));
+                });
+
+                this.updateCount();
+            },
+
+            selectRow(row) {
+                document.querySelectorAll('#tbody_Positionen tr').forEach(r => r.classList.remove('selected'));
+                row.classList.add('selected');
+                this.selectedRow = row;
+            },
+
+            async ladeDaten() {
+                this.updateCount();
+            },
+
+            neuePosition() {
+                console.log('Neue Position für Objekt:', this.objektId);
+                alert('Neue Position hinzufügen');
+            },
+
+            bearbeiten() {
+                if (!this.selectedRow) {
+                    alert('Bitte zuerst eine Position auswählen');
+                    return;
+                }
+                console.log('Position bearbeiten');
+            },
+
+            löschen() {
+                if (!this.selectedRow) {
+                    alert('Bitte zuerst eine Position auswählen');
+                    return;
+                }
+                if (confirm('Position wirklich löschen?')) {
+                    this.selectedRow.remove();
+                    this.selectedRow = null;
+                    this.updateCount();
+                    this.updateSumme();
+                }
+            },
+
+            updateCount() {
+                const rows = document.querySelectorAll('#tbody_Positionen tr');
+                document.getElementById('lblAnzahl').textContent =
+                    rows.length + ' Position' + (rows.length !== 1 ? 'en' : '');
+            },
+
+            updateSumme() {
+                let sum = 0;
+                document.querySelectorAll('#tbody_Positionen tr').forEach(row => {
+                    const maCell = row.cells[2];
+                    if (maCell) {
+                        sum += parseInt(maCell.textContent) || 0;
+                    }
+                });
+                document.getElementById('sumMA').textContent = sum;
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => SubOBPositionen.init());
+    </script>
+</body>
+</html>

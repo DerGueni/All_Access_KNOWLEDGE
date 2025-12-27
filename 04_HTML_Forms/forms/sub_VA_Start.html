@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schichten (sub_VA_Start)</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .subform-header {
+            padding: 6px 10px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+        }
+        .subform-title {
+            font-weight: 600;
+            color: #333;
+        }
+        .datasheet-container {
+            flex: 1;
+            overflow: auto;
+        }
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .datasheet th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            padding: 5px 6px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .datasheet td {
+            border: 1px solid #ddd;
+            padding: 4px 6px;
+        }
+        .datasheet tbody tr:hover { background: #f0f0f0; }
+        .datasheet tbody tr.selected { background: #e8e8e8; }
+        .new-row-area {
+            padding: 8px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .txt-input {
+            padding: 4px 6px;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            font-size: 10px;
+        }
+        .txt-small {
+            width: 60px;
+        }
+        .btn-add {
+            padding: 4px 12px;
+            background: #4316B2;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .btn-add:hover { background: #3558c0; }
+    </style>
+</head>
+<body>
+    <div class="subform-container" id="sub_VA_Start">
+        <!-- Subform Header -->
+        <div class="subform-header">
+            <span class="subform-title">Schichten</span>
+        </div>
+
+        <!-- Datenbereich (Datenblattansicht) -->
+        <div class="datasheet-container">
+            <table class="datasheet" id="tbl_VA_Start">
+                <thead>
+                    <tr>
+                        <th>Start</th>
+                        <th>Ende</th>
+                        <th>MA Soll</th>
+                        <th>MA Ist</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_VA_Start">
+                    <!-- Daten werden via JS geladen -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Neue Zeile Bereich -->
+        <div class="new-row-area" id="newRowArea" style="display:none;">
+            <input type="text" class="txt-input" id="new_VA_Start" placeholder="Start">
+            <input type="text" class="txt-input" id="new_VA_Ende" placeholder="Ende">
+            <input type="text" class="txt-input txt-small" id="new_MA_Anzahl" placeholder="Soll">
+            <button type="button" class="btn-add" id="btnAddRow">+</button>
+        </div>
+    </div>
+
+    <!-- Logic Module -->
+    <script type="module" src="logic/sub_VA_Start.logic.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,366 @@
+/**
+ * frm_OB_Objekt.css
+ * Formular-spezifische Styles
+ * Layout verwendet app-layout.css und consys_theme.css
+ */
+
+/* ========== HEADER ERWEITERT ========== */
+.ob-logo {
+    width: 40px;
+    height: 40px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" fill="%23fff"/></svg>') no-repeat center;
+    background-size: contain;
+}
+
+.ob-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+#header-date {
+    font-size: 11px;
+    color: white;
+    opacity: 0.9;
+}
+
+/* ========== TOOLBAR ========== */
+.ob-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+    gap: 8px;
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 22px;
+    background: #ccc;
+    margin: 0 8px;
+}
+
+.ob-btn {
+    padding: 5px 12px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.ob-btn:hover {
+    background: linear-gradient(180deg, #f5f5f5 0%, #ddd 100%);
+}
+
+.ob-btn.primary {
+    background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+    border-color: #2980b9;
+    color: white;
+}
+
+.ob-btn.danger {
+    background: linear-gradient(180deg, #d9534f 0%, #c9302c 100%);
+    border-color: #c9302c;
+    color: white;
+}
+
+.ob-btn-nav {
+    padding: 4px 8px;
+    min-width: 28px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    text-align: center;
+}
+
+.ob-input {
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+    min-width: 0;
+}
+
+.ob-select {
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+    background: white;
+    min-width: 0;
+}
+
+/* Info Row Input Overrides */
+.info-row .ob-input,
+.info-row .ob-select {
+    flex: 1;
+}
+
+.info-row .ob-textarea {
+    flex: 1;
+}
+
+/* ========== CONTENT LAYOUT ========== */
+.ob-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 1%;
+    padding: 8px;
+}
+
+.ob-liste {
+    width: 20%;
+    min-width: 280px;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    padding: 8px;
+    background: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.ob-detail {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* ========== OBJEKT-KARTE ========== */
+.objekt-karte {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.objekt-karte:hover {
+    border-color: #3498db;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.objekt-karte.selected {
+    border-color: #3498db;
+    background: #e8f4ff;
+}
+
+.objekt-icon {
+    font-size: 32px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.objekt-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.objekt-name {
+    font-weight: 600;
+    font-size: 12px;
+    color: #333;
+}
+
+.objekt-adresse {
+    font-size: 10px;
+    color: #666;
+}
+
+.objekt-kunde {
+    font-size: 10px;
+    color: #999;
+    font-style: italic;
+}
+
+.objekt-status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 9px;
+    font-weight: 600;
+    align-self: flex-start;
+}
+
+.objekt-status.aktiv {
+    background: #dff0d8;
+    color: #3c763d;
+}
+
+.objekt-status.inaktiv {
+    background: #f2dede;
+    color: #a94442;
+}
+
+/* ========== TABS ========== */
+.tabs {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.tab-buttons {
+    display: flex;
+    background: #e8e8e8;
+    border-bottom: 1px solid #ccc;
+    padding: 0 8px;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    font-size: 11px;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+    color: #333;
+    background: rgba(255,255,255,0.5);
+}
+
+.tab-btn.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    background: white;
+    font-weight: 600;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: hidden;
+    background: white;
+}
+
+.tab-pane {
+    display: none;
+    height: 100%;
+    overflow: auto;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* ========== FIELDSETS ========== */
+.info-fieldset {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    background: white;
+}
+
+.info-fieldset legend {
+    font-weight: 600;
+    color: #3498db;
+    padding: 0 6px;
+    font-size: 12px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.info-label {
+    min-width: 140px;
+    width: 140px;
+    font-size: 11px;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.ob-textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #999;
+    font-size: 11px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+/* ========== POSITIONEN TABELLE ========== */
+.positionen-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    table-layout: auto;
+}
+
+.positionen-table thead {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+}
+
+.positionen-table th {
+    background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.positionen-table td {
+    border: 1px solid #ddd;
+    padding: 5px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.positionen-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.positionen-table tbody tr:hover {
+    background: #e8f4ff;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 1366px) {
+    .ob-liste { min-width: 240px; }
+    .info-label { min-width: 120px; width: 120px; }
+}
+
+@media (min-width: 1920px) {
+    .ob-liste { width: 18%; }
+}
+
+@media (min-width: 2560px) {
+    .ob-liste { width: 16%; max-width: 420px; }
+}

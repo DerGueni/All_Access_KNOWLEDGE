@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abwesenheitsübersicht - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+</head>
+<body data-active-menu="abwesenheit">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Abwesenheitsübersicht</h1>
+                </div>
+                <div class="header-center">
+                    <span id="lblRecordInfo">Datensatz: - / -</span>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <button class="btn btn-nav" id="btnErster">|&#9664;</button>
+                    <button class="btn btn-nav" id="btnVorheriger">&#9664;</button>
+                    <button class="btn btn-nav" id="btnNächster">&#9654;</button>
+                    <button class="btn btn-nav" id="btnLetzter">&#9654;|</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-success" id="btnNeu">+ Neu</button>
+                    <button class="btn btn-primary" id="btnSpeichern">Speichern</button>
+                    <button class="btn btn-danger" id="btnLöschen">Löschen</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Mitarbeiter:</label>
+                    <select id="cboMitarbeiter" class="form-control" style="width:180px;">
+                        <option value="">Alle Mitarbeiter</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Zeitraum:</label>
+                    <input type="date" id="datVon" class="form-control">
+                    <span style="margin:0 4px;">bis</span>
+                    <input type="date" id="datBis" class="form-control">
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="content-main" style="overflow:auto;">
+                    <table class="datasheet">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;">ID</th>
+                                <th style="width:150px;">Mitarbeiter</th>
+                                <th style="width:100px;">Von</th>
+                                <th style="width:100px;">Bis</th>
+                                <th style="width:100px;">Grund</th>
+                                <th style="width:80px;">Ganztaegig</th>
+                                <th>Bemerkung</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_Liste">
+                            <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Lade Daten...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="content-sidebar" style="width:320px;">
+                    <div class="detail-header">
+                        <span class="detail-title">Abwesenheit bearbeiten</span>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-section">
+                            <div class="field-row">
+                                <label style="width:90px;">ID:</label>
+                                <input type="text" id="NV_ID" class="form-control" style="width:80px;" readonly>
+                            </div>
+                            <div class="field-row">
+                                <label style="width:90px;">Mitarbeiter:</label>
+                                <select id="NV_MA_ID" class="form-control" style="flex:1;"></select>
+                            </div>
+                            <div class="field-row">
+                                <label style="width:90px;">Von:</label>
+                                <input type="date" id="NV_VonDat" class="form-control">
+                            </div>
+                            <div class="field-row">
+                                <label style="width:90px;">Bis:</label>
+                                <input type="date" id="NV_BisDat" class="form-control">
+                            </div>
+                            <div class="field-row">
+                                <label style="width:90px;">Grund:</label>
+                                <select id="NV_Grund" class="form-control" style="flex:1;">
+                                    <option value="Urlaub">Urlaub</option>
+                                    <option value="Krank">Krankheit</option>
+                                    <option value="Privat">Privat</option>
+                                    <option value="Fortbildung">Fortbildung</option>
+                                    <option value="Sonstiges">Sonstiges</option>
+                                </select>
+                            </div>
+                            <div class="field-row">
+                                <label style="width:90px;">Ganztaegig:</label>
+                                <input type="checkbox" id="NV_Ganztaegig" checked>
+                            </div>
+                            <div class="field-row" style="flex-direction:column;align-items:stretch;">
+                                <label>Bemerkung:</label>
+                                <textarea id="NV_Bemerkung" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer" style="height: 19px; min-height: 19px; max-height: 19px;">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Einträge</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+        function updateTimestamp() {
+            const now = new Date();
+            if (document.getElementById('timestamp')) {
+                document.getElementById('timestamp').textContent = now.toLocaleString('de-DE');
+            }
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+    </script>
+    <script type="module" src="logic/frm_Abwesenheiten.logic.js"></script>
+</body>
+</html>

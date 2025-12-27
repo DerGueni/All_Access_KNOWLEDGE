@@ -1,0 +1,370 @@
+/**
+ * frm_KD_Kundenstamm.css
+ * Formular-spezifische Styles
+ * Layout verwendet app-layout.css und consys_theme.css
+ */
+
+/* ========== KD-CONTENT LAYOUT ========== */
+.kd-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 8px;
+    padding: 8px;
+}
+
+.kd-liste-container {
+    width: 320px;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.kd-formular-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* ========== HEADER ERWEITERT ========== */
+.kd-logo {
+    width: 40px;
+    height: 40px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2" fill="%23fff"/></svg>') no-repeat center;
+    background-size: contain;
+}
+
+.kd-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.kd-btn {
+    padding: 5px 12px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.kd-btn:hover {
+    background: linear-gradient(180deg, #f5f5f5 0%, #ddd 100%);
+}
+
+.kd-btn.success {
+    background: linear-gradient(180deg, #5cb85c 0%, #449d44 100%);
+    border-color: #449d44;
+    color: white;
+}
+
+.kd-btn.danger {
+    background: linear-gradient(180deg, #d9534f 0%, #c9302c 100%);
+    border-color: #c9302c;
+    color: white;
+}
+
+.kd-btn.primary {
+    background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+    border-color: #2980b9;
+    color: white;
+}
+
+.kd-btn-nav {
+    padding: 4px 8px;
+    min-width: 28px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.kd-btn-small {
+    padding: 2px 6px;
+    font-size: 10px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    cursor: pointer;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.version-info {
+    font-size: 10px;
+    opacity: 0.9;
+    text-align: right;
+}
+
+/* ========== KUNDENLISTE ========== */
+.liste-header {
+    padding: 8px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.liste-title {
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.liste-filter {
+    padding: 8px;
+    background: #fafafa;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+}
+
+.liste-scroll {
+    flex: 1;
+    overflow: auto;
+}
+
+.kd-liste {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.kd-liste thead {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+    z-index: 1;
+}
+
+.kd-liste th {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.kd-liste td {
+    border: 1px solid #ddd;
+    padding: 5px 8px;
+}
+
+.kd-liste tbody tr:hover {
+    background: #e8f4ff;
+}
+
+.kd-liste tbody tr.selected {
+    background: #cce5ff !important;
+}
+
+/* ========== TABS ========== */
+.tab-nav {
+    display: flex;
+    background: #e8e8e8;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    font-size: 11px;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+    color: #333;
+    background: rgba(255,255,255,0.5);
+}
+
+.tab-btn.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    background: white;
+    font-weight: 600;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: hidden;
+}
+
+.tab-pane {
+    display: none;
+    height: 100%;
+    overflow: auto;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* ========== FORMULARE ========== */
+.form-columns {
+    display: flex;
+    gap: 16px;
+    padding: 12px;
+}
+
+.form-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.kd-fieldset {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    background: white;
+}
+
+.kd-fieldset legend {
+    font-weight: 600;
+    color: #3498db;
+    padding: 0 6px;
+    font-size: 12px;
+}
+
+.field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.field-row label {
+    min-width: 140px;
+    font-size: 11px;
+    color: #555;
+}
+
+.checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+}
+
+.kd-input {
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+    font-family: inherit;
+}
+
+.kd-select {
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+    font-family: inherit;
+    background: white;
+}
+
+.kd-textarea {
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    border: 1px solid #999;
+    font-size: 11px;
+    font-family: inherit;
+    resize: none;
+}
+
+.kd-input.readonly {
+    background: #f5f5f5;
+    color: #666;
+}
+
+/* ========== TABELLEN ========== */
+.kd-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.kd-data-table th {
+    background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.kd-data-table td {
+    border: 1px solid #ddd;
+    padding: 5px 8px;
+}
+
+.kd-data-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.kd-data-table tbody tr:hover {
+    background: #e8f4ff;
+}
+
+.status-ok {
+    color: #5cb85c;
+    font-weight: 600;
+}
+
+.status-warn {
+    color: #f0ad4e;
+    font-weight: 600;
+}
+
+.status-open {
+    color: #999;
+    font-weight: 600;
+}
+
+/* ========== AUFTRAEGE TAB ========== */
+.auftraege-filter {
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ========== DATEIEN TAB ========== */
+.dateien-toolbar {
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+}
+
+/* ========== FOOTER ========== */
+.footer-sep {
+    color: rgba(255,255,255,0.5);
+}

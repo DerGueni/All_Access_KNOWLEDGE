@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abwesenheitsplanung - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="styles/frm_MA_Abwesenheit.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">CONSYS</div>
+            <nav class="sidebar-menu">
+                <a href="frm_N_Dienstplanuebersicht.html" class="sidebar-btn">Dienstplanübersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="sidebar-btn">Planungsübersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="sidebar-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="sidebar-btn">Mitarbeiterverwaltung</a>
+                <a href="frm_N_Email_versenden.html" class="sidebar-btn">Offene Mail Anfragen</a>
+                <a href="frm_MA_Zeitkonten.html" class="sidebar-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="sidebar-btn">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="sidebar-btn active">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="sidebar-btn">Dienstausweis erstellen</a>
+                <a href="frm_N_Stundenauswertung.html" class="sidebar-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="sidebar-btn">Kundenverwaltung</a>
+                <a href="frm_KD_Kundenstamm.html" class="sidebar-btn">Verrechnungssätze</a>
+                <a href="frm_N_Lohnabrechnungen.html" class="sidebar-btn">Sub Rechnungen</a>
+                <a href="frm_N_Email_versenden.html" class="sidebar-btn">E-Mail</a>
+                <hr class="sidebar-divider">
+                <a href="frm_Menuefuehrung.html" class="sidebar-btn">Hauptmenü</a>
+                <a href="frm_N_Optimierung.html" class="sidebar-btn">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Header -->
+            <div class="form-header">
+                <div class="header-left">
+                    <h1 class="form-title">Abwesenheitsplanung</h1>
+                </div>
+                <div class="header-center">
+                    <button class="header-btn-icon" id="btnRefresh" title="Aktualisieren">↻</button>
+                    <button class="header-btn-icon" id="btnExcel" title="Excel Export">📄</button>
+                </div>
+                <div class="header-right">
+                    <span id="lblDatum"></span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Mitarbeiter Auswahl -->
+                <div class="field-row">
+                    <label>Mitarbeiter</label>
+                    <select id="cboMitarbeiter" class="input-large">
+                        <option value="">-- Mitarbeiter wählen --</option>
+                    </select>
+                </div>
+
+                <!-- Hauptbereich mit Eingabe und Liste -->
+                <div class="main-content-area">
+                    <!-- Eingabebereich links -->
+                    <div class="input-section">
+                        <fieldset>
+                            <div class="field-row">
+                                <label>Grund:</label>
+                                <select id="cboGrund" class="input-field">
+                                    <option value=""></option>
+                                    <option value="Urlaub">Urlaub</option>
+                                    <option value="Krank">Krankheit</option>
+                                    <option value="Privat verplant">Privat verplant</option>
+                                    <option value="Fortbildung">Fortbildung</option>
+                                    <option value="Sonstiges">Sonstiges</option>
+                                </select>
+                            </div>
+
+                            <div class="field-row">
+                                <label>Bemerkung:</label>
+                                <input type="text" id="txtBemerkung" class="input-field">
+                            </div>
+
+                            <div class="field-row checkbox-row">
+                                <input type="checkbox" id="chkNurWerktags">
+                                <label for="chkNurWerktags">Nur Werktags (Mo - Fr)</label>
+                            </div>
+
+                            <div class="field-row date-row">
+                                <label>von</label>
+                                <input type="date" id="datVon" class="input-date">
+                                <label>bis</label>
+                                <input type="date" id="datBis" class="input-date">
+                            </div>
+
+                            <div class="field-row radio-row">
+                                <label class="radio-label">
+                                    <input type="radio" name="zeitart" id="radGanztaegig" checked>
+                                    Ganztägig
+                                </label>
+                            </div>
+
+                            <div class="field-row radio-row">
+                                <label class="radio-label">
+                                    <input type="radio" name="zeitart" id="radStundenweise">
+                                    Stundenweise
+                                </label>
+                            </div>
+
+                            <div class="field-row time-row" id="rowZeiten">
+                                <label>von</label>
+                                <input type="text" id="txtZeitVon" class="input-time" value="00:00" disabled>
+                                <label>bis</label>
+                                <input type="text" id="txtZeitBis" class="input-time" value="00:00" disabled>
+                            </div>
+                        </fieldset>
+
+                        <!-- Buttons -->
+                        <div class="button-section">
+                            <button class="btn btn-primary" id="btnUebernehmen">Übernehmen</button>
+                            <button class="btn" id="btnMarkierteLoeschen">Markierte löschen</button>
+                            <button class="btn" id="btnAlleLoeschen">Alle löschen</button>
+                        </div>
+                    </div>
+
+                    <!-- Abwesenheitszeiten rechts -->
+                    <div class="list-section">
+                        <div class="list-header">Abwesenheitszeiten:</div>
+                        <div class="table-container">
+                            <table class="data-table" id="tblAbwesenheiten">
+                                <thead>
+                                    <tr>
+                                        <th class="col-select"></th>
+                                        <th class="col-datvon">von</th>
+                                        <th class="col-datbis">bis</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyAbwesenheiten">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left" id="lblStatus">Bereit</div>
+                <div class="status-right">
+                    <span id="lblAnzahl">0 Einträge</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Datum anzeigen
+        document.getElementById('lblDatum').textContent = new Date().toLocaleDateString('de-DE', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+    </script>
+    <script type="module" src="../js/sidebar.js"></script>
+    <script type="module" src="logic/frm_MA_Abwesenheit.logic.js"></script>
+</body>
+</html>
+

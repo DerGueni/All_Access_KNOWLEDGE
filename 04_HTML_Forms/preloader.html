@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS HTML Preloader</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        .preloader-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        h1 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .form-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-item.loading { background: #fff3cd; }
+        .form-item.loaded { background: #d4edda; }
+        .form-item.error { background: #f8d7da; }
+        .status-icon { font-size: 14px; }
+        .progress-bar {
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .status-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .hidden-frames {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="preloader-container">
+        <h1>🚀 CONSYS HTML Forms Preloader</h1>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="status-text" id="statusText">Initialisiere...</div>
+
+        <div class="form-list" id="formList"></div>
+    </div>
+
+    <!-- Versteckte iframes für Preloading -->
+    <div class="hidden-frames" id="hiddenFrames"></div>
+
+    <script>
+        /**
+         * CONSYS HTML Forms Preloader
+         * Lädt alle wichtigen Formulare im Hintergrund vor,
+         * damit sie beim tatsächlichen Aufruf sofort erscheinen.
+         */
+
+        const FORMS_TO_PRELOAD = [
+            // Hauptformulare
+            { name: 'frm_MA_Mitarbeiterstamm', label: 'Mitarbeiterstamm' },
+            { name: 'frm_KD_Kundenstamm', label: 'Kundenstamm' },
+            { name: 'frm_va_Auftragstamm', label: 'Auftragstamm' },
+            { name: 'frm_N_Dienstplanuebersicht', label: 'Dienstplanübersicht' },
+            { name: 'frm_VA_Planungsuebersicht', label: 'Planungsübersicht' },
+            { name: 'frm_Einsatzuebersicht', label: 'Einsatzübersicht' },
+            { name: 'frm_MA_Abwesenheit', label: 'Abwesenheit' },
+            { name: 'frm_MA_Zeitkonten', label: 'Zeitkonten' },
+            { name: 'frm_OB_Objekt', label: 'Objektstamm' },
+
+            // Zusätzliche Formulare
+            { name: 'zfrm_Lohnabrechnungen', label: 'Lohnabrechnungen' },
+            { name: 'zfrm_Rueckmeldungen', label: 'Rückmeldungen' },
+            { name: 'frm_N_MA_Bewerber_Verarbeitung', label: 'Bewerber' },
+
+            // Subforms
+            { name: 'sub_VA_Start', label: 'Schichten' },
+            { name: 'sub_MA_VA_Zuordnung', label: 'MA-Zuordnung' },
+            { name: 'sub_VA_Anzeige', label: 'VA-Anzeige' },
+
+            // Dashboard
+            { name: 'index', label: 'Dashboard' }
+        ];
+
+        const state = {
+            loaded: 0,
+            total: FORMS_TO_PRELOAD.length,
+            forms: {}
+        };
+
+        function init() {
+            renderFormList();
+            startPreloading();
+        }
+
+        function renderFormList() {
+            const container = document.getElementById('formList');
+            container.innerHTML = FORMS_TO_PRELOAD.map(form => `
+                <div class="form-item" id="form-${form.name}">
+                    <span class="status-icon">⏳</span>
+                    <span>${form.label}</span>
+                </div>
+            `).join('');
+        }
+
+        async function startPreloading() {
+            const hiddenFrames = document.getElementById('hiddenFrames');
+
+            for (let i = 0; i < FORMS_TO_PRELOAD.length; i++) {
+                const form = FORMS_TO_PRELOAD[i];
+
+                updateStatus(`Lade ${form.label}...`);
+                setFormStatus(form.name, 'loading');
+
+                try {
+                    await preloadForm(form.name, hiddenFrames);
+                    setFormStatus(form.name, 'loaded');
+                } catch (error) {
+                    console.error(`Fehler beim Laden von ${form.name}:`, error);
+                    setFormStatus(form.name, 'error');
+                }
+
+                state.loaded++;
+                updateProgress();
+
+                // Kleine Pause zwischen den Ladevorgängen
+                await delay(100);
+            }
+
+            updateStatus(`✅ ${state.loaded} von ${state.total} Formulare geladen`);
+
+            // Nach dem Preloading minimieren oder verstecken
+            // window.minimize(); // Falls nötig
+        }
+
+        function preloadForm(formName, container) {
+            return new Promise((resolve, reject) => {
+                const iframe = document.createElement('iframe');
+                iframe.style.width = '1px';
+                iframe.style.height = '1px';
+                iframe.style.border = 'none';
+
+                iframe.onload = () => {
+                    state.forms[formName] = iframe;
+                    resolve();
+                };
+
+                iframe.onerror = (err) => {
+                    reject(err);
+                };
+
+                iframe.src = `forms/${formName}.html`;
+                container.appendChild(iframe);
+
+                // Timeout nach 10 Sekunden
+                setTimeout(() => {
+                    if (!state.forms[formName]) {
+                        reject(new Error('Timeout'));
+                    }
+                }, 10000);
+            });
+        }
+
+        function setFormStatus(formName, status) {
+            const el = document.getElementById(`form-${formName}`);
+            if (!el) return;
+
+            el.classList.remove('loading', 'loaded', 'error');
+            el.classList.add(status);
+
+            const icon = el.querySelector('.status-icon');
+            if (icon) {
+                switch (status) {
+                    case 'loading': icon.textContent = '⏳'; break;
+                    case 'loaded': icon.textContent = '✅'; break;
+                    case 'error': icon.textContent = '❌'; break;
+                }
+            }
+        }
+
+        function updateProgress() {
+            const percent = (state.loaded / state.total) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        function updateStatus(text) {
+            document.getElementById('statusText').textContent = text;
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // API-Server vorladen
+        async function preloadAPI() {
+            try {
+                const response = await fetch('http://localhost:5000/api/tables');
+                if (response.ok) {
+                    console.log('[Preloader] API-Server erreichbar');
+                }
+            } catch (error) {
+                console.warn('[Preloader] API-Server nicht erreichbar:', error.message);
+            }
+        }
+
+        // Start
+        document.addEventListener('DOMContentLoaded', () => {
+            preloadAPI();
+            init();
+        });
+
+        // Globale Funktion für Access-Aufruf
+        window.getPreloadedForms = () => state.forms;
+        window.isFormPreloaded = (name) => !!state.forms[name];
+    </script>
+</body>
+</html>
