@@ -1,0 +1,51 @@
+name: Rebuild FORM_MAP_INDEX
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - "FORM_MAP_INDEX.json"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rebuild-form-index-main
+  cancel-in-progress: true
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run build_form_index.py
+        run: |
+          python SCRIPTS/build_form_index.py
+
+      - name: Show diff
+        run: |
+          git status
+          git diff --stat || true
+
+      - name: Commit changes (if any)
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "ci: rebuild FORM_MAP_INDEX.json"
+            git push
+          else
+            echo "No changes to commit."
+          fi
