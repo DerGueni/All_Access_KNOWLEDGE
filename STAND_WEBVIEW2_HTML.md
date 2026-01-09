@@ -1,11 +1,35 @@
 # STAND DER ARBEIT - WebView2 HTML Formulare
 
-**Letztes Update:** 2026-01-09
-**Session:** DblClick-Events + Bedingte Formatierung
+**Letztes Update:** 2026-01-09 23:30
+**Session:** Veranstalter-Regeln Test + Bugfixes
 
 ---
 
 ## AKTUELLER STAND
+
+### Veranstalter-Regeln (2026-01-09) - ABGESCHLOSSEN
+
+**Aufgabe:** Veranstalter-Regeln für ID 20760 und 20750 testen.
+
+**Gefundene und behobene Bugs:**
+
+| Bug | Ursache | Fix |
+|-----|---------|-----|
+| getElementById Case-Sensitivity | `veranstalter_id` statt `Veranstalter_ID` | Zeile 179: `getElementById('Veranstalter_ID')` |
+| setFieldValue Case-Sensitivity | Gleiches Problem | Zeile 615: `setFieldValue('Veranstalter_ID', ...)` |
+
+**Test-Ergebnisse:**
+
+| Veranstalter_ID | BWN Buttons | RE Spalte | PKW/EL Spalten |
+|-----------------|-------------|-----------|----------------|
+| 20760 (isMesse) | ✅ SICHTBAR | ✅ SICHTBAR | ✅ SICHTBAR |
+| 10233 (normal) | ✅ VERSTECKT | ✅ VERSTECKT | ✅ SICHTBAR |
+| 20750 (isSpecialClient) | ✅ VERSTECKT | ✅ VERSTECKT | ✅ VERSTECKT |
+
+**Geänderte Datei:**
+- `logic/frm_va_Auftragstamm.logic.js` - Zeilen 179, 615, 1343
+
+---
 
 ### DblClick-Events und Bedingte Formatierung (2026-01-09) - ABGESCHLOSSEN
 

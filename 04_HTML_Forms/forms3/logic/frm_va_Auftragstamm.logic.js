@@ -176,7 +176,7 @@ function bindFieldEvents() {
         });
     }
 
-    const veranstalter = document.getElementById('veranstalter_id');
+    const veranstalter = document.getElementById('Veranstalter_ID');
     if (veranstalter) {
         veranstalter.addEventListener('change', () => {
             applyVeranstalterRules(veranstalter.value);
@@ -612,7 +612,7 @@ function displayRecord(rec) {
     setFieldValue('Fahrtkosten', rec.VA_Fahrtkosten || rec.Fahrtkosten);
     setFieldValue('Dienstkleidung', rec.VA_Dienstkleidung || rec.Dienstkleidung);
     setFieldValue('Ansprechpartner', rec.VA_Ansprechpartner || rec.Ansprechpartner);
-    setFieldValue('veranstalter_id', rec.VA_KD_ID || rec.Veranstalter_ID);
+    setFieldValue('Veranstalter_ID', rec.VA_KD_ID || rec.Veranstalter_ID);
     setFieldValue('Veranst_Status_ID', rec.VA_Status || rec.Veranst_Status_ID);
     setFieldValue('Bemerkungen', rec.VA_Bemerkung || rec.Bemerkungen);
 
@@ -1340,6 +1340,7 @@ function applyVeranstalterRules(value) {
     const veranstalterId = Number(value || 0);
     const isMesse = veranstalterId === 20760;
     const isSpecialClient = veranstalterId === 20750;
+    console.log('[Auftragstamm] applyVeranstalterRules:', { value, veranstalterId, isMesse, isSpecialClient });
 
     setVisible('cmd_Messezettel_NameEintragen', isMesse);
     setVisible('cmd_BWN_send', isMesse);
