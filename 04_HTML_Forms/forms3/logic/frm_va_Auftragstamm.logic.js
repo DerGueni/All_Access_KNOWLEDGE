@@ -478,7 +478,7 @@ async function loadCombos() {
 
         // Auftraggeber
         const kunden = await Bridge.execute('getKundenListe');
-        fillCombo('veranstalter_id', kunden.data, 'kun_Id', 'kun_Firma');
+        fillCombo('Veranstalter_ID', kunden.data, 'kun_Id', 'kun_Firma');
 
         // Status
         const status = await Bridge.execute('getStatusListe');
