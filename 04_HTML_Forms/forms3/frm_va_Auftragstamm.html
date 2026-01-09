@@ -1,0 +1,3409 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung</title>
+    <script>
+        // Redirect zur Shell wenn nicht im iframe geladen
+        (function() {
+            const inShell = window.location.search.includes('shell=1') || window.parent !== window;
+            if (!inShell && window.location.protocol !== 'file:') {
+                window.location.href = 'shell.html?form=frm_va_Auftragstamm';
+            }
+        })();
+    </script>
+    <style>
+        :root {
+            --base-font-size: 11px;
+            --small-font-size: 10px;
+            --header-font-size: 12px;
+            --title-font-size: 23px; /* Formulartitel +8px (war 15px) gemaess Anforderung */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: var(--base-font-size);
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .window-frame {
+            background-color: #8080c0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Title Bar - ausgeblendet gemaess Anforderung */
+        .title-bar {
+            display: none; /* Blauer Streifen oben entfernt */
+        }
+
+        .title-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .title-bar-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 21px;
+            height: 21px;
+            background: #ece9d8;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: var(--base-font-size);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-btn.close {
+            background: #c75050;
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: var(--base-font-size);
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        /* Menu-Buttons mit mehr vertikalem Abstand gemaess Anforderung - luftigeres Layout */
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 12px 10px; /* Mehr Padding vertikal fuer luftigeres Layout */
+            text-align: center;
+            cursor: pointer;
+            font-size: var(--base-font-size);
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 5px 0; /* Deutlich mehr Abstand zwischen Buttons - entzerrt */
+            overflow: visible;
+        }
+
+        /* Obere helle Kante - 4px nach rechts versetzt */
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        /* Untere dunkle Kante - 4px nach links versetzt */
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:active::before {
+            background: #404070;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn:active::after {
+            background: #ffffff;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.active::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        /* Vollbild-Button oben rechts */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #606060 #606060 #ffffff;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--title-font-size);
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .fullscreen-btn:active {
+            border-color: #606060 #ffffff #ffffff #606060;
+        }
+
+        /* Vollbild-Modus - nur Title-Bar ausblenden */
+        body.fullscreen-mode .title-bar {
+            display: none;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            background-color: #8080c0;
+            padding: 3px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Header Row - ohne grauen Hintergrund gemaess Anforderung */
+        .header-row {
+            background-color: #8080c0; /* Passt zum Body-Hintergrund */
+            border: none;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4040a0, #8080c0);
+            border: 2px solid #404080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .title-text {
+            font-size: var(--title-font-size);
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 8px;
+            margin-left: 5px;
+        }
+
+        .header-link {
+            color: #000080;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: var(--base-font-size);
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 1px solid #808080;
+            height: 26px;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: var(--base-font-size);
+            white-space: nowrap;
+            line-height: 1.2;
+            vertical-align: middle;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-green {
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+        }
+
+        .btn-yellow {
+            background: linear-gradient(to bottom, #e0e080, #c0c040);
+        }
+
+        .btn-red {
+            background: linear-gradient(to bottom, #e06060, #c04040);
+            color: white;
+            border-color: #f08080 #902020 #902020 #f08080;
+        }
+
+        .btn-red:hover {
+            background: linear-gradient(to bottom, #f07070, #d05050);
+        }
+
+        /* Einheitliche Buttons im Header-Bereich - alle gleiche Hoehe/Padding */
+        .unified-btn {
+            min-width: 85px;
+            height: 26px;
+            padding: 4px 10px;
+            text-align: center;
+            font-size: var(--base-font-size);
+            line-height: 1.2;
+        }
+
+        .unified-btn.btn-green {
+            border-color: #80d080 #206020 #206020 #80d080;
+        }
+
+        .btn-green:hover {
+            background: linear-gradient(to bottom, #70d070, #409040);
+        }
+
+        .unified-btn.btn-yellow {
+            border-color: #f0f0a0 #909030 #909030 #f0f0a0;
+        }
+
+        .btn-yellow:hover {
+            background: linear-gradient(to bottom, #f0f090, #d0d050);
+        }
+
+        /* Kombinierter Button-Block */
+        .combined-buttons {
+            flex-wrap: wrap;
+            padding: 4px 8px;
+        }
+
+        /* GPT Box - Deaktiviert (blockierte Buttons) */
+        .gpt-box {
+            display: none; /* Deaktiviert - blockierte Speichern-Button */
+            background: #ffe0e0;
+            border: 1px solid #a00000;
+            padding: 2px 6px;
+            font-size: var(--base-font-size);
+            text-align: center;
+            line-height: 1.2;
+            position: absolute;
+            right: 10px;
+            top: 28px;
+            pointer-events: none; /* Falls wieder aktiviert: Klicks durchlassen */
+        }
+
+        .header-row-wrapper {
+            position: relative;
+            min-height: auto;
+            max-height: none;
+            overflow: visible;
+        }
+
+        /* Button Row - 2 Reihen Layout */
+        .button-row {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            padding: 3px 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, auto));
+            align-items: center;
+            gap: 4px 6px;
+            flex-shrink: 0;
+        }
+
+        /* Header mit Buttons in 2 Reihen - gemaess Anforderung */
+        .header-row.combined-buttons {
+            display: flex;
+            flex-wrap: nowrap; /* KEINE Umbrueche in der Hauptzeile */
+            align-items: flex-start;
+            gap: 6px 8px;
+            max-height: none;
+            padding: 6px 8px;
+        }
+
+        /* Titel-Bereich - bleibt in erster Zeile links */
+        .header-row.combined-buttons .logo-box {
+            flex-shrink: 0;
+        }
+
+        .header-row.combined-buttons .title-text {
+            flex-shrink: 0;
+            margin-right: 10px;
+        }
+
+        .header-row.combined-buttons .header-links {
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        /* Buttons-Container fuer exakt 2 Reihen a 6 Spalten - ab Position "Positionen" */
+        .header-row.combined-buttons .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(90px, 1fr));
+            grid-template-rows: auto auto; /* Exakt 2 Reihen */
+            gap: 4px 5px;
+            flex: 0 0 auto; /* Nicht flexen, feste Groesse */
+            max-width: 650px; /* Begrenzte Breite fuer 2x6 Grid */
+        }
+
+        .header-row.combined-buttons .btn {
+            min-width: 90px;
+            height: 26px;
+            padding: 4px 8px;
+            font-size: var(--base-font-size);
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        /* Status-Gruppe unter den Buttons */
+        .header-row.combined-buttons .status-group {
+            flex-basis: 100%;
+            margin-top: 4px;
+            margin-left: 0;
+            justify-content: flex-start;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: var(--base-font-size);
+        }
+
+        .status-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: auto;
+        }
+
+        .form-label {
+            font-size: var(--base-font-size);
+        }
+
+        .form-select, .form-input {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: var(--base-font-size);
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #000080;
+            box-shadow: 0 0 2px #000080;
+        }
+
+        .form-input.readonly {
+            background: #e0e0e0;
+        }
+
+        /* Form Section - Schriftgroesse +3px und fett gemaess Anforderung */
+        .form-section {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 8px 12px;
+            display: flex;
+            gap: 30px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            font-size: calc(var(--base-font-size) + 3px); /* +3px fuer bessere Lesbarkeit */
+            font-weight: bold; /* Fett gemaess Anforderung */
+        }
+
+        .form-section .form-label,
+        .form-section .form-input,
+        .form-section .form-select {
+            font-size: calc(var(--base-font-size) + 3px); /* +3px konsistent */
+            font-weight: bold; /* Fett gemaess Anforderung */
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Labels einheitlich ausgerichtet gemaess Anforderung */
+        .form-column.left .form-label {
+            min-width: 55px;
+            text-align: right;
+        }
+
+        .form-column.middle .form-label {
+            min-width: 75px;
+            text-align: right;
+        }
+
+        .form-column.right .form-label {
+            min-width: 90px;
+            text-align: right;
+        }
+
+        /* Header-Layout Anpassungen - sauberes Layout ohne Ãœberlappung */
+        .form-column.left {
+            flex: 0 0 auto;
+        }
+
+        .form-column.right {
+            flex: 1 1 auto;
+        }
+
+        .form-column.middle {
+            flex: 0 0 auto;
+            order: 3; /* PKW/Fahrtkosten ganz rechts */
+            margin-left: auto; /* RechtsbÃ¼ndig */
+        }
+
+        /* Einheitliche Feldbreiten gemaess Anforderung - ALLE Felder gleich breit */
+        .input-narrow { width: 80px; height: 22px; } /* Nur fuer Datums-/Zeitfelder */
+        .input-medium { width: 160px; height: 22px; } /* Standard-Breite fuer alle normalen Felder */
+        .input-wide { width: 210px; height: 22px; } /* Angepasst auf gleiche Breite wie medium! */
+
+        /* Alle Eingabefelder im Formular-Bereich einheitlich */
+        .form-section .form-input,
+        .form-section .form-select {
+            height: 22px;
+            padding: 2px 4px;
+        }
+
+        /* Ausnahme: Uhrzeitfeld etwas niedriger/flacher */
+        .form-section input[type="time"] {
+            height: 20px;
+            padding: 1px 3px;
+        }
+
+        /* Work Area */
+        .work-area {
+            display: flex;
+            flex: 1;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        /* Left Work Panel */
+        .left-work-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Tab Container */
+        .tab-container {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #8080b0;
+            border-bottom: 1px solid #606090;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            padding: 4px 12px;
+            background: #a0a0c0;
+            border: 1px solid #808080;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: var(--base-font-size);
+            margin-right: -1px;
+        }
+
+        .tab-btn.active {
+            background: #9090c0;
+            border-bottom: 1px solid #9090c0;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-content {
+            padding: 5px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-page {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-page.active {
+            display: flex;
+        }
+
+        .bwn-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
+
+        .status-red {
+            color: #c00000;
+            font-weight: bold;
+        }
+
+        /* Eventdaten Tab */
+        .event-form {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .event-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-label {
+            min-width: 100px;
+            text-align: right;
+            font-size: var(--base-font-size);
+            font-weight: 500;
+        }
+
+        .event-input {
+            border: 1px solid #808080;
+            padding: 3px 6px;
+            font-size: var(--base-font-size);
+            background: white;
+        }
+
+        .event-input.readonly {
+            background: #e0e0e0;
+            color: #606060;
+        }
+
+        .event-input.from-web {
+            background: #fff8e0;
+            border-color: #c0a060;
+        }
+
+        .event-input.no-data {
+            background: #f0f0f0;
+            color: #999;
+            font-style: italic;
+        }
+
+        .event-input-narrow { width: 120px; }
+        .event-input-medium { width: 250px; }
+        .event-input-wide { width: 400px; }
+
+        .event-textarea {
+            border: 1px solid #808080;
+            padding: 6px;
+            font-size: var(--base-font-size);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            min-height: 80px;
+            background: #fff8e0;
+            border-color: #c0a060;
+        }
+
+        .event-textarea.no-data {
+            background: #f0f0f0;
+            color: #999;
+            font-style: italic;
+        }
+
+        .event-link {
+            color: #000080;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: var(--base-font-size);
+        }
+
+        .event-link:hover {
+            color: #1084d0;
+        }
+
+        .event-button-row {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #d0d0d0;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-spinner.active {
+            display: inline-block;
+        }
+
+        /* Grid Area */
+        .grid-area {
+            display: flex;
+            gap: 3px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Subform - Schichten kleiner, Absagen groesser */
+        .subform-left {
+            width: 190px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        /* Schichten-Grid begrenzen (330px weniger) */
+        .subform-left > .grid-wrapper {
+            flex: 0 0 auto;
+            max-height: 150px;
+            min-height: 80px;
+        }
+
+        .subform-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .grid-wrapper {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #808080;
+            background: white;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--base-font-size);
+        }
+
+        .data-grid th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 4px 6px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+            font-size: var(--base-font-size);
+            cursor: pointer;
+        }
+
+        .data-grid th:hover {
+            background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+        }
+
+        .data-grid td {
+            border: 1px solid #c0c0c0;
+            padding: 3px 5px;
+            height: 22px;
+        }
+
+        .data-grid tr:hover {
+            background: #e0e0ff;
+        }
+
+        .data-grid tr.selected {
+            background: #000080;
+            color: white;
+        }
+
+        .data-grid input, .data-grid select {
+            border: none;
+            width: 100%;
+            padding: 0;
+            font-size: var(--base-font-size);
+            background: transparent;
+        }
+
+        .cell-blue { background-color: transparent; }
+        .cell-green { background-color: #90ee90; }
+        .cell-yellow { background-color: #ffff90; }
+        .cell-red { background-color: #ffb0b0; }
+
+        /* Absagen Section - 330px hoeher */
+        .absagen-section {
+            margin-top: 8px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .absagen-label {
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: var(--base-font-size);
+            flex-shrink: 0;
+        }
+
+        .absagen-grid-wrapper {
+            height: 450px;
+            min-height: 350px;
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #808080;
+            background: white;
+        }
+
+        /* Right Panel - 2cm breiter gemaess Anforderung (340 + 75 = 415px) */
+        .right-panel {
+            width: 415px; /* 2cm breiter als vorher */
+            min-width: 380px;
+            max-width: 480px;
+            background: #9090c0;
+            border: 1px solid #606090;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+            padding-top: 100px; /* Reduziert - Status-Block kompakter */
+            position: relative;
+            margin-top: -100px; /* Nach oben vergroessern - nutzt freien Bereich darueber */
+            height: calc(100% + 100px); /* Hoehe entsprechend erhoehen */
+            margin-right: 0; /* Kein Rand rechts - schliesst buendig mit Einsatzliste */
+        }
+
+        .right-header {
+            padding: 5px;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #9090c0;
+            z-index: 10;
+        }
+
+        .status-table {
+            width: 100%;
+            font-size: var(--base-font-size);
+            border-collapse: collapse;
+        }
+
+        .status-table td {
+            padding: 2px 4px;
+        }
+
+        .status-table .count {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .anzeigen-btn {
+            background: #e0e0e0;
+            border: 1px solid #808080;
+            padding: 1px 6px;
+            font-size: var(--base-font-size);
+            cursor: pointer;
+        }
+
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 6px;
+            background: #a0a0c0;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+            font-size: var(--base-font-size);
+        }
+
+        .date-input {
+            width: 75px;
+            border: 1px solid #808080;
+            padding: 2px 4px;
+            font-size: var(--base-font-size);
+        }
+
+        .nav-btn {
+            background: #d0d0d0;
+            border: 1px solid #808080;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: var(--base-font-size);
+        }
+
+        .nav-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .auftraege-wrapper {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .auftraege-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--base-font-size);
+        }
+
+        .auftraege-table th {
+            background: linear-gradient(to bottom, #c0c0d0, #a0a0b0);
+            border: 1px solid #808080;
+            padding: 3px 5px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-weight: bold;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .auftraege-table td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 4px;
+            white-space: nowrap;
+            background: white;
+            height: 20px;
+            font-weight: normal;
+        }
+
+        .auftraege-table tr:nth-child(even) td {
+            background: #f0f0ff;
+        }
+
+        .auftraege-table tr:hover td {
+            background: #d0d0ff;
+        }
+
+        .auftraege-table tr.selected td {
+            background: #000080;
+            color: white;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 2px 5px;
+            display: flex;
+            gap: 10px;
+            font-size: var(--base-font-size);
+            flex-shrink: 0;
+        }
+
+        .status-section {
+            border: 1px inset #808080;
+            padding: 1px 8px;
+            background: #e0e0e0;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #fff #808080 #808080 #fff;
+            padding: 10px;
+            min-width: 300px;
+        }
+
+        .modal-header {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 4px 8px;
+            margin: -10px -10px 10px -10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-body {
+            padding: 10px 0;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #808080;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 30px;
+            right: 10px;
+            z-index: 10000;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+        .toast.warning { background: #f57f17; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Pflichtfeld-Markierung */
+        .required { color: #cc0000; font-weight: bold; }
+        input:required:invalid { border-color: #cc0000; }
+        input:required:valid { border-color: #008000; }
+        input.invalid { border-color: #cc0000 !important; background-color: #fff8f8 !important; }
+
+        /* gridZuordnungen - Konstante Zeilenhoehe und optimierte Spalten */
+        #gridZuordnungen td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 0; /* Wichtig fuer text-overflow in table-layout: fixed */
+            height: 22px;
+            line-height: 22px;
+            padding: 1px 3px;
+        }
+        #gridZuordnungen th {
+            white-space: nowrap;
+            padding: 2px 3px;
+        }
+        /* Kleinere Checkboxen in gridZuordnungen */
+        #gridZuordnungen input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            margin: 0;
+            vertical-align: middle;
+        }
+        /* Kleinere Zahlenfelder in gridZuordnungen */
+        #gridZuordnungen input[type="number"] {
+            width: 30px !important;
+            padding: 0 2px;
+            text-align: right;
+        }
+        /* Bedingte Spalten-Klassen */
+        #gridZuordnungen .col-hidden {
+            display: none;
+        }
+        /* Globale Hilfsklasse fuer versteckte Elemente */
+        .is-hidden {
+            display: none !important;
+        }
+
+        /* ========== BEDINGTE FORMATIERUNG (Access-Parität) ========== */
+        /* IstFraglich = True → türkisblaue Hintergrundfarbe */
+        tr.ist-fraglich,
+        #zuordnungenBody tr.ist-fraglich {
+            background-color: #C0FFFF !important;
+        }
+
+        /* Unterbuchung (leere Slots) → gelbe Hintergrundfarbe */
+        tr.pos-unterbuchung,
+        #zuordnungenBody tr.pos-unterbuchung {
+            background-color: #FFFFCC !important;
+        }
+
+        /* Überbuchung (mehr MA als erlaubt) → rote Hintergrundfarbe */
+        tr.pos-ueberbuchung,
+        #zuordnungenBody tr.pos-ueberbuchung {
+            background-color: #FFCCCC !important;
+        }
+    </style>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Vollbild-Button -->
+    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild" data-testid="auftrag-btn-vollbild">?</button>
+
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <span>&#128203;</span>
+                <span>Auftragsverwaltung</span>
+            </div>
+            <div class="title-bar-buttons">
+                <button class="title-btn tiny-btn" onclick="Bridge.sendEvent('minimize')" data-testid="auftrag-btn-minimieren">_</button>
+                <button class="title-btn" onclick="toggleMaximize()" data-testid="auftrag-btn-maximieren">&#9633;</button>
+                <button class="title-btn close" onclick="closeForm()" data-testid="auftrag-btn-schliessen">&#10005;</button>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Zusammengefuegter Button-Block -->
+                <div class="header-row-wrapper">
+                    <div class="header-row combined-buttons">
+                        <div class="logo-box">C</div>
+                        <span class="title-text">Auftragsverwaltung</span>
+                        <div class="header-links">
+                            <span class="header-link" onclick="openRueckmeldStatistik()" data-testid="auftrag-link-rueckmeldestatistik">RÃ¼ckmelde-Statistik</span>
+                            <span class="header-link" onclick="openSyncfehler()" data-testid="auftrag-link-syncfehler">Syncfehler</span>
+                        </div>
+                        <!-- Buttons in exakt 2 Reihen - Beginn ab "Positionen" gemaess Anforderung -->
+                        <div class="buttons-grid">
+                            <!-- Zeile 1: 6 Buttons -->
+                            <button class="btn unified-btn" id="btnPositionen" onclick="openPositionen()" data-testid="auftrag-btn-positionen">Positionen</button>
+                            <button class="btn unified-btn" id="btnNeuAuftrag" onclick="neuerAuftrag()" data-testid="auftrag-btn-neu">Neuer Auftrag</button>
+                            <button class="btn unified-btn" id="btnKopieren" onclick="auftragKopieren()" data-testid="auftrag-btn-kopieren">Auftrag kopieren</button>
+                            <button class="btn unified-btn btn-red" id="btnLoeschen" onclick="auftragLoeschen()" data-testid="auftrag-btn-loeschen">Auftrag lÃ¶schen</button>
+                            <button class="btn unified-btn" id="btnListeStd" onclick="namenslisteESS()" data-testid="auftrag-btn-namenslisteess">Namensliste ESS</button>
+                            <button class="btn unified-btn" id="btnDruckZusage" onclick="einsatzlisteDrucken()" data-testid="auftrag-btn-einsatzliste-drucken">EL drucken</button>
+                            <!-- Zeile 2: 6 Buttons/Elemente -->
+                            <button class="btn unified-btn" id="btnMailEins" onclick="sendeEinsatzlisteMA()" data-testid="auftrag-btn-el-senden-ma">EL senden MA</button>
+                            <button class="btn unified-btn btn-green" id="btnMailBOS" onclick="sendeEinsatzlisteBOS()" data-testid="auftrag-btn-el-senden-bos">EL senden BOS</button>
+                            <button class="btn unified-btn btn-yellow" id="btnMailSub" onclick="sendeEinsatzlisteSUB()" data-testid="auftrag-btn-el-senden-sub">EL senden SUB</button>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="cbAutosendEL" name="Autosend_EL" onchange="saveField('Autosend_EL', this.checked)" data-testid="auftrag-checkbox-autosendel">
+                                <label for="cbAutosendEL">EL Autosend</label>
+                            </div>
+                            <button class="btn unified-btn" id="btnELGesendet" onclick="showELGesendet()" data-testid="auftrag-btn-el-gesendet">EL gesendet</button>
+                            <span></span><!-- Platzhalter fuer symmetrisches 6-Spalten-Grid -->
+                        </div>
+                        <!-- Zusaetzliche Buttons ausserhalb Grid -->
+                        <button class="btn unified-btn" id="btnAktualisieren" onclick="refreshData()" data-testid="auftrag-btn-aktualisieren" style="margin-left: auto;">Aktualisieren</button>
+                        <div class="status-group">
+                            <span class="form-label">Auftragsstatus:</span>
+                            <select class="form-select" id="Veranst_Status_ID" name="Veranst_Status_ID" style="width: 120px;" onchange="statusChanged()" data-testid="auftrag-select-status">
+                                <option value="1">In Planung</option>
+                                <option value="2">BestÃ¤tigt</option>
+                                <option value="3">Abgeschlossen</option>
+                                <option value="4">Abgerechnet</option>
+                                <option value="5">Storniert</option>
+                            </select>
+                            <span class="form-label" style="margin-left: 15px;">Rechnung Nr.:</span>
+                            <input type="text" class="form-input readonly" id="Rech_NR" name="Rech_NR" style="width: 100px;" readonly data-testid="auftrag-input-rechnungnr">
+                        </div>
+                    </div>
+                    <div class="gpt-box">GPT | TEST<br><span id="lblDatum"></span></div>
+                </div>
+
+                <!-- Form Fields Section -->
+                <div class="form-section">
+                    <!-- Left Column -->
+                    <div class="form-column left">
+                        <div class="form-row">
+                            <span class="form-label">Datum:</span>
+                            <input type="date" class="form-input input-narrow" id="Dat_VA_Von" name="Dat_VA_Von" onchange="datumChanged()" data-testid="auftrag-date-von">
+                            <span>-</span>
+                            <input type="date" class="form-input input-narrow" id="Dat_VA_Bis" name="Dat_VA_Bis" onchange="datumBisChanged()" data-testid="auftrag-date-bis">
+                            <!-- Nr.-Feld entfernt - jetzt bei Objekt -->
+                            <input type="hidden" id="ID" name="ID" data-testid="auftrag-input-id">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Auftrag: <span class="required">*</span></span>
+                            <input type="text" class="form-input input-medium" id="Auftrag" name="Auftrag" list="auftragListe" onchange="auftragChanged()" onfocus="auftragGotFocus()" required data-testid="auftrag-input-auftrag">
+                            <datalist id="auftragListe"></datalist>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Ort:</span>
+                            <input type="text" class="form-input input-medium" id="Ort" name="Ort" list="ortListe" onchange="ortChanged()" onfocus="ortGotFocus()" data-testid="auftrag-input-ort">
+                            <datalist id="ortListe"></datalist>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Objekt:</span>
+                            <input type="text" class="form-input input-medium" id="Objekt" name="Objekt" list="objektListe" onchange="objektChanged()" data-testid="auftrag-input-objekt">
+                            <datalist id="objektListe"></datalist>
+                            <!-- Auftragsnummer an Stelle des entfernten Objekt-Kombos -->
+                            <span style="margin-left: 10px;">Nr.</span>
+                            <input type="text" class="form-input readonly input-xs" id="VA_ID_Display" name="VA_ID_Display" readonly data-testid="auftrag-input-vanr">
+                        </div>
+                    </div>
+
+                    <!-- Middle Column - PKW/Fahrtkosten + Datums-Navigation -->
+                    <div class="form-column middle">
+                        <div class="form-row">
+                            <span class="form-label">PKW Anzahl:</span>
+                            <input type="number" class="form-input input-xs" id="PKW_Anzahl" name="PKW_Anzahl" value="0" min="0" data-testid="auftrag-input-pkwanzahl">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Fahrtkosten:</span>
+                            <input type="text" class="form-input input-xs" id="Fahrtkosten" name="Fahrtkosten" value="0,00" onchange="saveField('Fahrtkosten', this.value)" data-testid="auftrag-input-fahrtkosten">
+                        </div>
+                        <!-- Datum Navigation fur Mehrtagesauftrage (verschoben) -->
+                        <div class="form-row" style="margin-top: 4px;">
+                            <button class="nav-btn" id="btnDatumLeft" onclick="datumNavLeft()" style="padding: 1px 4px;" data-testid="auftrag-btn-datum-links">&#9664;</button>
+                            <select class="form-select" id="cboVADatum" style="width: 100px;" onchange="vaDatumChanged()" data-testid="auftrag-select-vadatum"></select>
+                            <button class="nav-btn" id="btnDatumRight" onclick="datumNavRight()" style="padding: 1px 4px;" data-testid="auftrag-btn-datum-rechts">&#9654;</button>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="form-column right">
+                        <div class="form-row">
+                            <!-- Treffpunkt: Uhrzeit und Ort in einer Zeile gemaess Anforderung -->
+                            <span class="form-label">Treffpunkt:</span>
+                            <input type="time" class="form-input input-xs" id="Treffp_Zeit" name="Treffp_Zeit" style="height: 20px;" onchange="saveField('Treffp_Zeit', this.value)" data-testid="auftrag-time-treffzeit">
+                            <input type="text" class="form-input input-wide" id="Treffpunkt" name="Treffpunkt" onchange="saveField('Treffpunkt', this.value)" data-testid="auftrag-input-treffpunkt">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Dienstkleidung:</span>
+                            <input type="text" class="form-input input-wide" id="Dienstkleidung" name="Dienstkleidung" list="kleidungListe" onchange="saveField('Dienstkleidung', this.value)" data-testid="auftrag-input-dienstkleidung">
+                            <datalist id="kleidungListe"></datalist>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Ansprechpartner:</span>
+                            <input type="text" class="form-input input-wide" id="Ansprechpartner" name="Ansprechpartner" onchange="saveField('Ansprechpartner', this.value)" data-testid="auftrag-input-ansprechpartner">
+                            <!-- Mitarbeiterauswahl-Button hierher verschoben (100px Abstand) -->
+                            <button class="btn unified-btn" id="btnSchnellPlan" onclick="openMitarbeiterauswahl()" style="margin-left: 100px;" data-testid="auftrag-btn-mitarbeiterauswahl">Mitarbeiterauswahl</button>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Auftraggeber:</span>
+                            <select class="form-select input-wide" id="Veranstalter_ID" name="Veranstalter_ID" onchange="veranstalterChanged()" data-testid="auftrag-select-auftraggeber"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Work Area -->
+                <div class="work-area">
+                    <!-- Left Work Panel -->
+                    <div class="left-work-panel">
+                        <div class="tab-container">
+                            <div class="tab-header">
+                                <!-- Sichtbare Tabs (wie in Access) -->
+                                <button class="tab-btn active" data-tab="einsatzliste" data-testid="auftrag-tab-einsatzliste">Einsatzliste</button>
+                                <button class="tab-btn" data-tab="antworten" data-testid="auftrag-tab-antworten">Antworten ausstehend</button>
+                                <button class="tab-btn" data-tab="rechnung" data-testid="auftrag-tab-rechnung">Rechnung</button>
+                                <!-- Versteckte Tabs (in Access nicht sichtbar) -->
+                                <button class="tab-btn" data-tab="zusatzdateien" data-testid="auftrag-tab-zusatzdateien" hidden>Zusatzdateien</button>
+                                <button class="tab-btn" data-tab="bemerkungen" data-testid="auftrag-tab-bemerkungen" hidden>Bemerkungen</button>
+                                <button class="tab-btn" data-tab="eventdaten" data-testid="auftrag-tab-eventdaten" hidden>Eventdaten</button>
+                            </div>
+                            <div class="tab-content">
+                                <!-- Tab 1: Einsatzliste -->
+                                <div class="tab-page active" id="tab-einsatzliste">
+                                    <div class="bwn-row">
+                                        <button class="btn bwn-btn" id="btn_BWN_Druck" onclick="bwnDrucken()" data-testid="auftrag-btn-bwn-drucken">BWN drucken</button>
+                                        <button class="btn bwn-btn" id="cmd_BWN_send" onclick="bwnSenden()" data-testid="auftrag-btn-bwn-senden">BWN senden</button>
+                                        <span class="status-red" id="lblKeineEingabe" style="display: none;">Auftrag bereits berechnet</span>
+                                    </div>
+
+                                    <div class="grid-area">
+                                        <!-- Left Subform: Schichten -->
+                                        <div class="subform-left">
+                                            <div class="grid-wrapper">
+                                                <table class="data-grid" id="gridSchichten" data-testid="auftrag-table-schichten">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 28px; text-align: right;">Anz</th>
+                                                            <th style="width: 49px; text-align: center;">von</th>
+                                                            <th style="width: 49px; text-align: center;">bis</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="schichtenBody">
+                                                        <!-- Wird dynamisch gefullt -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- Absagen -->
+                                            <div class="absagen-section">
+                                                <div class="absagen-label">Absagen:</div>
+                                                <div class="absagen-grid-wrapper">
+                                                    <table class="data-grid" id="gridAbsagen" data-testid="auftrag-table-absagen">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20px;"></th>
+                                                                <th>Mitarbeiter</th>
+                                                                <th>Bemerkung</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="absagenBody">
+                                                            <!-- Wird dynamisch gefullt -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Subform: MA-Zuordnungen -->
+                                        <div class="subform-right">
+                                            <div class="grid-wrapper">
+                                                <table class="data-grid" id="gridZuordnungen" data-testid="auftrag-table-zuordnungen" style="table-layout: fixed;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 30px; text-align: right;" class="col-lfd">Lfd</th>
+                                                            <th style="width: 70px;" class="col-ma">Mitarbeiter</th>
+                                                            <th style="width: 45px; text-align: center;" class="col-von">von</th>
+                                                            <th style="width: 45px; text-align: center;" class="col-bis">bis</th>
+                                                            <th style="width: 45px; text-align: right;" class="col-std">Std</th>
+                                                            <th style="width: 120px; text-align: center;" class="col-bemerkung">Bemerkungen</th>
+                                                            <th style="width: 28px; text-align: center;" class="col-fraglich" title="Ist Fraglich">?</th>
+                                                            <th style="width: 38px; text-align: center;" class="col-pkw" title="PKW Kosten">PKW</th>
+                                                            <th style="width: 28px; text-align: center;" class="col-el" title="Einsatzleitung">EL</th>
+                                                            <th style="width: 28px; text-align: center;" class="col-re" title="Rechnung erstellt">RE</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="zuordnungenBody">
+                                                        <!-- Wird dynamisch gefullt -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 2: Antworten ausstehend -->
+                                <div class="tab-page" id="tab-antworten">
+                                    <div class="bwn-row">
+                                        <span class="form-label">Mitarbeiter geplant:</span>
+                                    </div>
+                                    <div class="grid-wrapper" style="flex: 1;">
+                                        <table class="data-grid" id="gridStatus" data-testid="auftrag-table-status">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mitarbeiter</th>
+                                                    <th>Status</th>
+                                                    <th>Angefragt am</th>
+                                                    <th>Antwort</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="statusBody">
+                                                <!-- Wird dynamisch gefullt -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 3: Zusatzdateien -->
+                                <div class="tab-page" id="tab-zusatzdateien">
+                                    <div class="bwn-row">
+                                        <span class="form-label">Doppelklick auf Dateinamen zeigt Inhalt an bzw. offnet Office-Pgm</span>
+                                        <button class="btn" onclick="neuenAttachHinzufuegen()" data-testid="auftrag-btn-attach-hinzufuegen">Neuen Attach hinzufugen</button>
+                                    </div>
+                                    <div class="grid-wrapper" style="flex: 1;">
+                                        <table class="data-grid" id="gridAttach" data-testid="auftrag-table-attach">
+                                            <thead>
+                                                <tr>
+                                                    <th>Dateiname</th>
+                                                    <th>Typ</th>
+                                                    <th>Grose</th>
+                                                    <th>Datum</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="attachBody">
+                                                <!-- Wird dynamisch gefullt -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 4: Rechnung -->
+                                <div class="tab-page" id="tab-rechnung">
+                                    <div class="bwn-row">
+                                        <button class="btn" onclick="rechnungPDF()" data-testid="auftrag-btn-rechnung-pdf">Rechnung PDF</button>
+                                        <button class="btn" onclick="berechnungslistePDF()" data-testid="auftrag-btn-berechnungsliste-pdf">Berechnungsliste PDF</button>
+                                        <button class="btn" onclick="rechnungDatenLaden()" data-testid="auftrag-btn-rechnung-daten-laden">Daten laden</button>
+                                        <button class="btn" onclick="rechnungLexware()" data-testid="auftrag-btn-rechnung-lexware">Rechnung in Lexware erstellen</button>
+                                    </div>
+                                    <div class="form-row" style="margin: 10px 0;">
+                                        <span class="form-label">Rechnungspositionen:</span>
+                                    </div>
+                                    <div class="grid-wrapper" style="height: 100px;">
+                                        <table class="data-grid" id="gridRechPos" data-testid="auftrag-table-rechnungspositionen">
+                                            <thead>
+                                                <tr>
+                                                    <th>Pos</th>
+                                                    <th>Beschreibung</th>
+                                                    <th>Menge</th>
+                                                    <th>Einzelpreis</th>
+                                                    <th>Summe</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="rechPosBody"></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="form-row" style="margin: 10px 0;">
+                                        <span class="form-label">Berechnungsliste:</span>
+                                        <span style="margin-left: auto;">Gesamtsumme Netto:</span>
+                                        <input type="text" class="form-input readonly" id="PosGesamtsumme" style="width: 100px; text-align: right;" readonly>
+                                    </div>
+                                    <div class="grid-wrapper" style="flex: 1;">
+                                        <table class="data-grid" id="gridBerech" data-testid="auftrag-table-berechnung">
+                                            <thead>
+                                                <tr>
+                                                    <th>Datum</th>
+                                                    <th>Mitarbeiter</th>
+                                                    <th>von</th>
+                                                    <th>bis</th>
+                                                    <th>Stunden</th>
+                                                    <th>Satz</th>
+                                                    <th>Summe</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="berechBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 5: Bemerkungen -->
+                                <div class="tab-page" id="tab-bemerkungen">
+                                    <textarea id="Bemerkungen" name="Bemerkungen" style="width: 100%; height: 100%; resize: none; font-size: var(--base-font-size);" onchange="saveField('Bemerkungen', this.value)" data-testid="auftrag-textarea-bemerkungen"></textarea>
+                                </div>
+
+                                <!-- Tab 6: Eventdaten -->
+                                <div class="tab-page" id="tab-eventdaten">
+                                    <div class="event-form">
+                                        <div class="event-row">
+                                            <span class="event-label">Datum:</span>
+                                            <input type="text" class="event-input event-input-narrow readonly" id="eventDatum" readonly>
+                                        </div>
+                                        <div class="event-row">
+                                            <span class="event-label">Auftrag:</span>
+                                            <input type="text" class="event-input event-input-medium readonly" id="eventAuftrag" readonly>
+                                        </div>
+                                        <div class="event-row">
+                                            <span class="event-label">Ort:</span>
+                                            <input type="text" class="event-input event-input-medium readonly" id="eventOrt" readonly>
+                                        </div>
+                                        <div class="event-row">
+                                            <span class="event-label">Objekt:</span>
+                                            <input type="text" class="event-input event-input-medium readonly" id="eventObjekt" readonly>
+                                        </div>
+                                        <div class="event-row">
+                                            <span class="event-label">Adresse:</span>
+                                            <input type="text" class="event-input event-input-wide readonly" id="eventAdresse" readonly>
+                                        </div>
+                                        <div class="event-row">
+                                            <span class="event-label">Einlass (Web):</span>
+                                            <input type="text" class="event-input event-input-narrow from-web" id="eventEinlass" placeholder="HH:MM">
+                                        </div>
+                                        <div class="event-row">
+                                            <span class="event-label">Beginn (Web):</span>
+                                            <input type="text" class="event-input event-input-narrow from-web" id="eventBeginn" placeholder="HH:MM">
+                                        </div>
+                                        <div class="event-row">
+                                            <span class="event-label">Ende (Web):</span>
+                                            <input type="text" class="event-input event-input-narrow from-web" id="eventEnde" placeholder="HH:MM">
+                                        </div>
+                                        <div class="event-row">
+                                            <span class="event-label" style="align-self: flex-start; padding-top: 6px;">Informationen (Web):</span>
+                                            <textarea class="event-textarea" id="eventInfo" placeholder="Keine Informationen verfÃ¼gbar"></textarea>
+                                        </div>
+                                        <div class="event-row">
+                                            <span class="event-label">Link (Web):</span>
+                                            <a class="event-link" id="eventLink" href="#" target="_blank" style="display: none;">Zum Event</a>
+                                            <input type="url" class="event-input event-input-wide from-web" id="eventLinkInput" placeholder="https://" pattern="https?://.+" title="Gueltige URL eingeben (http:// oder https://)">
+                                        </div>
+                                        <div class="event-button-row">
+                                            <button class="btn btn-green" onclick="webDatenLaden()" data-testid="auftrag-btn-webdaten-laden">Web-Daten laden</button>
+                                            <button class="btn" onclick="eventdatenSpeichern()" data-testid="auftrag-btn-eventdaten-speichern">Speichern</button>
+                                            <div class="loading-spinner" id="eventSpinner"></div>
+                                            <span id="eventStatus" style="font-size: var(--base-font-size); color: #606060; margin-left: 10px;"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Auftragsliste -->
+                    <div class="right-panel">
+                        <div class="right-header">
+                            <table class="status-table" id="statusOverview">
+                                <tr>
+                                    <td><strong>Auftragsstatus</strong></td>
+                                    <td class="count"><strong>Anzahl</strong></td>
+                                    <td><strong>Aktion</strong></td>
+                                </tr>
+                                <tr data-status="1">
+                                    <td>In Planung</td>
+                                    <td class="count" id="countPlanung">0</td>
+                                    <td><button class="anzeigen-btn" onclick="filterByStatus(1)">Anzeigen</button></td>
+                                </tr>
+                                <tr data-status="3">
+                                    <td>Auftrag beendet, Zeiten noch in Bearbeitung</td>
+                                    <td class="count" id="countBeendet">0</td>
+                                    <td><button class="anzeigen-btn" onclick="filterByStatus(3)">Anzeigen</button></td>
+                                </tr>
+                                <tr data-status="2">
+                                    <td>Einsatzliste versendet</td>
+                                    <td class="count" id="countVersendet">0</td>
+                                    <td><button class="anzeigen-btn" onclick="filterByStatus(2)">Anzeigen</button></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="date-nav">
+                            <span>Auftrage ab:</span>
+                            <input type="date" class="date-input" id="Auftraege_ab" onchange="filterAuftraege()" data-testid="auftrag-date-auftraege-ab">
+                            <button class="nav-btn tiny-btn" onclick="filterAuftraege()" data-testid="auftrag-btn-filter-go">Go</button>
+                            <button class="nav-btn" onclick="tageZurueck()" data-testid="auftrag-btn-tage-zurueck">&#60;&#60;</button>
+                            <button class="nav-btn" onclick="tageVor()" data-testid="auftrag-btn-tage-vor">&#62;&#62;</button>
+                            <button class="nav-btn" onclick="abHeute()" data-testid="auftrag-btn-ab-heute">Ab Heute</button>
+                        </div>
+
+                        <div class="auftraege-wrapper">
+                            <table class="auftraege-table" id="auftraegeTable" data-testid="auftrag-table-auftragsliste">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortAuftraege('datum')" style="width: 75px; text-align: center;">Datum</th>
+                                        <th onclick="sortAuftraege('auftrag')" style="width: 50px;">Auftrag</th>
+                                        <th onclick="sortAuftraege('objekt')" style="width: 100px;">Objekt</th>
+                                        <th onclick="sortAuftraege('ort')" style="width: 120px;">Ort</th>
+                                        <th onclick="sortAuftraege('soll')" style="width: 45px; text-align: center;">Soll</th>
+                                        <th onclick="sortAuftraege('ist')" style="width: 45px; text-align: center;">Ist</th>
+                                        <th onclick="sortAuftraege('status')" style="width: 60px; text-align: center;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auftraegeBody">
+                                    <!-- Wird dynamisch gefullt -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-section">Erstellt</span>
+            <span class="status-section" id="Erst_von"></span>
+            <span class="status-section" id="Erst_am"></span>
+            <span class="status-section">Geandert</span>
+            <span class="status-section" id="Aend_von"></span>
+            <span class="status-section" id="Aend_am"></span>
+        </div>
+    </div>
+
+    <!-- Bestatigungsdialog -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="confirmTitle">Bestatigung</span>
+                <button class="title-btn close" onclick="closeModal('confirmModal')">&#10005;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn tiny-btn" id="confirmYes" data-testid="auftrag-btn-confirm-ja">Ja</button>
+                <button class="btn" onclick="closeModal('confirmModal')" data-testid="auftrag-btn-confirm-nein">Nein</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logger -->
+    <script src="js/debug-logger.js"></script>
+    <script src="js/logger.js"></script>
+
+    <!-- WebView2 Bridge -->
+    <script src="js/webview2-bridge.js"></script>
+
+    <script>
+        'use strict';
+
+        // ============================================
+        // KONFIGURATION
+        // ============================================
+        // API_BASE wird bereits in webview2-bridge.js definiert
+        // Falls nicht vorhanden, hier als Fallback definieren
+        const API_BASE_LOCAL = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000/api';
+
+        // Aktueller State
+        const state = {
+            currentAuftragId: null,
+            currentVADatumId: null,
+            auftraege: [],
+            schichten: [],
+            zuordnungen: [],
+            absagen: [],
+            lookups: {
+                status: [],
+                kunden: [],
+                objekte: [],
+                orte: [],
+                auftraege: [],
+                dienstkleidung: []
+            },
+            filterStatus: null,
+            sortColumn: 'datum',
+            sortDir: 'asc'  // Aufsteigend: nÃ¤chster/aktuellster Auftrag zuerst
+        };
+
+        // ============================================
+        // INITIALISIERUNG
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Formular-Open loggen
+            if (typeof Logger !== 'undefined' && Logger.formOpen) {
+                const urlParams = new URLSearchParams(window.location.search);
+                Logger.formOpen('frm_va_Auftragstamm', {
+                    va_id: urlParams.get('id') || urlParams.get('va_id'),
+                    shell: urlParams.get('shell') === '1'
+                });
+            }
+
+            // Datum setzen
+            document.getElementById('lblDatum').textContent = formatDate(new Date());
+            // Auftraege ab aktuellem Datum filtern (aufsteigend, nÃ¤chster zuerst)
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('Auftraege_ab').value = today;
+
+            // Tab-Wechsel
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Menu-Navigation
+            document.querySelectorAll('.menu-btn[data-form]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    navigateToForm(this.dataset.form);
+                });
+            });
+
+            // Bridge-Events registrieren
+            Bridge.on('onDataReceived', function(data) {
+                if (data.auftrag) {
+                    loadAuftragData(data.auftrag);
+                }
+                if (data.action === 'load' && data.va_id) {
+                    loadAuftrag(data.va_id, data.vadatum_id);
+                }
+            });
+
+            // Lookups und Daten laden
+            await loadLookups();
+            await loadAuftraegeListe();
+
+            // URL-Parameter prÃ¼fen (va_id)
+            const params = new URLSearchParams(window.location.search);
+            const vaId = params.get('va_id');
+            if (vaId) {
+                await loadAuftrag(parseInt(vaId));
+            } else if (state.auftraege.length > 0) {
+                // Ersten (aktuellsten) Auftrag laden - API liefert ID
+                await loadAuftrag(state.auftraege[0].ID);
+            }
+
+            hideLoading();
+        });
+
+        // ============================================
+        // API-FUNKTIONEN
+        // ============================================
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method: method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (data && method !== 'GET') {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_LOCAL}${endpoint}`, options);
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'API-Fehler');
+                }
+                return result;
+            } catch (e) {
+                console.error('API Error:', e);
+                showToast('API-Fehler: ' + e.message, 'error');
+                throw e;
+            }
+        }
+
+        async function loadLookups() {
+            try {
+                // Parallel laden
+                const [statusRes, kundenRes] = await Promise.all([
+                    apiCall('/status').catch(() => ({ data: [] })),
+                    apiCall('/kunden?aktiv=true').catch(() => ({ data: [] }))
+                ]);
+
+                state.lookups.status = statusRes.data || [];
+                state.lookups.kunden = kundenRes.data || [];
+
+                // Status-Dropdown fullen
+                fillStatusDropdown();
+                fillKundenDropdown();
+
+                // VorschlÃ¤ge laden
+                await loadVorschlaege();
+
+            } catch (e) {
+                console.error('Lookups laden fehlgeschlagen:', e);
+            }
+        }
+
+        async function loadVorschlaege() {
+            try {
+                const [orteRes, objRes, auftrRes, kleidRes] = await Promise.all([
+                    apiCall('/auftraege/vorschlaege?feld=ort').catch(() => ({ data: [] })),
+                    apiCall('/auftraege/vorschlaege?feld=objekt').catch(() => ({ data: [] })),
+                    apiCall('/auftraege/vorschlaege?feld=auftrag').catch(() => ({ data: [] })),
+                    apiCall('/auftraege/vorschlaege?feld=dienstkleidung').catch(() => ({ data: [] }))
+                ]);
+
+                fillDatalist('ortListe', orteRes.data || []);
+                fillDatalist('objektListe', objRes.data || []);
+                fillDatalist('auftragListe', auftrRes.data || []);
+                fillDatalist('kleidungListe', kleidRes.data || []);
+            } catch (e) {
+                console.error('VorschlÃ¤ge laden fehlgeschlagen:', e);
+            }
+        }
+
+        async function loadAuftraegeListe() {
+            showLoading();
+            try {
+                const datumAb = document.getElementById('Auftraege_ab').value;
+                let url = '/auftraege?limit=100';
+                if (datumAb) {
+                    url += `&ab=${datumAb}`;
+                }
+                if (state.filterStatus) {
+                    url += `&status=${state.filterStatus}`;
+                }
+
+                const result = await apiCall(url);
+                state.auftraege = result.data || [];
+                renderAuftraegeListe();
+                updateStatusCounts();
+            } catch (e) {
+                console.error('Auftragsliste laden fehlgeschlagen:', e);
+            }
+            hideLoading();
+        }
+
+        async function loadAuftrag(vaId, vadatumId = null) {
+            if (!vaId) return;
+
+            // Kein Loading-Overlay bei Auftragswechsel (verhindert Blinken)
+            state.currentAuftragId = vaId;
+
+            try {
+                // Auftragsdaten laden
+                const result = await apiCall(`/auftraege/${vaId}`);
+                const auftrag = result.data?.auftrag || result.data;
+                // FIX: Einsatztage kommen bereits mit dem Auftrag
+                const einsatztage = result.data?.einsatztage || [];
+
+                if (auftrag) {
+                    loadAuftragData(auftrag);
+
+                    // Einsatztage aus dem bereits geladenen Result verwenden
+                    fillVADatumDropdown(einsatztage);
+
+                    // Wenn vadatumId gegeben, diesen wahlen
+                    if (vadatumId) {
+                        document.getElementById('cboVADatum').value = vadatumId;
+                        state.currentVADatumId = vadatumId;
+                    } else if (einsatztage.length > 0) {
+                        state.currentVADatumId = einsatztage[0].ID;
+                        document.getElementById('cboVADatum').value = state.currentVADatumId;
+                    }
+
+                    // Subformular-Daten laden
+                    await loadSubformData();
+
+                    // Zeile in Liste markieren
+                    markSelectedAuftrag(vaId);
+                }
+            } catch (e) {
+                console.error('Auftrag laden fehlgeschlagen:', e);
+                showToast('Auftrag konnte nicht geladen werden', 'error');
+            }
+        }
+
+        function loadAuftragData(auftrag) {
+            // Felder fullen - FIX: API liefert VA_ID, nicht ID
+            const vaId = auftrag.VA_ID || auftrag.ID || '';
+            document.getElementById('ID').value = vaId;
+            // Auftragsnummer auch im neuen Anzeigefeld (bei Objekt)
+            const vaIdDisplay = document.getElementById('VA_ID_Display');
+            if (vaIdDisplay) vaIdDisplay.value = vaId;
+            document.getElementById('Dat_VA_Von').value = auftrag.Dat_VA_Von ? auftrag.Dat_VA_Von.substring(0, 10) : '';
+            document.getElementById('Dat_VA_Bis').value = auftrag.Dat_VA_Bis ? auftrag.Dat_VA_Bis.substring(0, 10) : '';
+            document.getElementById('Auftrag').value = auftrag.Auftrag || '';
+            document.getElementById('Ort').value = auftrag.Ort || '';
+            document.getElementById('Objekt').value = auftrag.Objekt || '';
+            // Objekt_ID-Select entfernt gemaess Layout-Anforderung
+            document.getElementById('Treffp_Zeit').value = auftrag.Treffp_Zeit || '';
+            document.getElementById('Treffpunkt').value = auftrag.Treffpunkt || '';
+            document.getElementById('Dienstkleidung').value = auftrag.Dienstkleidung || '';
+            document.getElementById('Ansprechpartner').value = auftrag.Ansprechpartner || '';
+            document.getElementById('Veranstalter_ID').value = auftrag.Veranstalter_ID || '';
+            document.getElementById('Veranst_Status_ID').value = auftrag.Veranst_Status_ID || '1';
+            document.getElementById('PKW_Anzahl').value = auftrag.PKW_Anzahl || 0;
+            document.getElementById('Fahrtkosten').value = formatCurrency(auftrag.Fahrtkosten);
+            document.getElementById('Rech_NR').value = auftrag.Rech_NR || '';
+            document.getElementById('cbAutosendEL').checked = auftrag.Autosend_EL || false;
+            document.getElementById('Bemerkungen').value = auftrag.Bemerkungen || '';
+
+            // Audit-Felder
+            document.getElementById('Erst_von').textContent = auftrag.Erst_von || '';
+            document.getElementById('Erst_am').textContent = formatDateTime(auftrag.Erst_am);
+            document.getElementById('Aend_von').textContent = auftrag.Aend_von || '';
+            document.getElementById('Aend_am').textContent = formatDateTime(auftrag.Aend_am);
+
+            // Status prÃ¼fen: Read-Only wenn >= 3
+            const statusId = parseInt(auftrag.Veranst_Status_ID) || 1;
+            setFormReadOnly(statusId >= 3);
+
+            // Bridge informieren (state fÃ¼r WebView2 Event-Kommunikation)
+            if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
+                Bridge.sendEvent('formValueChanged', { field: 'va_id', value: auftrag.ID });
+            }
+        }
+
+        async function loadSubformData() {
+            const vaId = state.currentAuftragId;
+            const vadatumId = state.currentVADatumId;
+            if (!vaId) return;
+
+            try {
+                // Parallel laden
+                const [schichtenRes, zuordRes, absagenRes] = await Promise.all([
+                    apiCall(`/auftraege/${vaId}/schichten${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(() => ({ data: [] })),
+                    apiCall(`/auftraege/${vaId}/zuordnungen${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(() => ({ data: [] })),
+                    apiCall(`/auftraege/${vaId}/absagen${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(() => ({ data: [] }))
+                ]);
+
+                state.schichten = schichtenRes.data || [];
+                state.zuordnungen = zuordRes.data || [];
+                state.absagen = absagenRes.data || [];
+
+                renderSchichten();
+                renderZuordnungen();
+                renderAbsagen();
+
+            } catch (e) {
+                console.error('Subform-Daten laden fehlgeschlagen:', e);
+            }
+        }
+
+        // ============================================
+        // RENDERING-FUNKTIONEN
+        // ============================================
+        function renderAuftraegeListe() {
+            const tbody = document.getElementById('auftraegeBody');
+            tbody.innerHTML = '';
+
+            const sortedAuftraege = [...state.auftraege].sort((a, b) => {
+                let aVal = a[state.sortColumn] || '';
+                let bVal = b[state.sortColumn] || '';
+                if (state.sortColumn === 'datum') {
+                    aVal = a.Dat_VA_Von || '';
+                    bVal = b.Dat_VA_Von || '';
+                }
+                const cmp = aVal.localeCompare(bVal);
+                return state.sortDir === 'asc' ? cmp : -cmp;
+            });
+
+            sortedAuftraege.forEach(a => {
+                const tr = document.createElement('tr');
+                // FIX: API liefert ID (nicht VA_ID) als PrimÃ¤rschlÃ¼ssel
+                tr.dataset.id = a.ID;
+                if (a.ID === state.currentAuftragId) {
+                    tr.classList.add('selected');
+                }
+                tr.innerHTML = `
+                    <td style="text-align: center;">${formatDateShort(a.Dat_VA_Von)}</td>
+                    <td>${escapeHtml(a.Auftrag || '')}</td>
+                    <td>${escapeHtml(a.Objekt || '')}</td>
+                    <td>${escapeHtml(a.Ort || '')}</td>
+                    <td style="text-align: center;">${a.MA_Anzahl_Soll || 0}</td>
+                    <td style="text-align: center;">${a.MA_Anzahl_Ist || 0}</td>
+                    <td style="text-align: center;">${a.Veranst_Status_ID || 1}</td>
+                `;
+                tr.addEventListener('click', () => loadAuftrag(a.ID));
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderSchichten() {
+            const tbody = document.getElementById('schichtenBody');
+            tbody.innerHTML = '';
+
+            state.schichten.forEach((s, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="text-align: right;">${s.MA_Anzahl || ''}</td>
+                    <td style="text-align: center;">${formatTime(s.VA_Start)}</td>
+                    <td style="text-align: center;" class="cell-blue">${formatTime(s.VA_Ende)}</td>
+                `;
+                tr.addEventListener('click', () => selectSchicht(idx));
+                tbody.appendChild(tr);
+            });
+
+            // Neue Zeile fur Eingabe
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>*</td>
+                <td><input type="time" class="schicht-input" data-field="VA_Start"></td>
+                <td><input type="time" class="schicht-input" data-field="VA_Ende"></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        function renderZuordnungen() {
+            const tbody = document.getElementById('zuordnungenBody');
+            tbody.innerHTML = '';
+
+            // Gruppiere Zuordnungen nach Schicht (VA_Start/VA_Ende)
+            const zuordnungenBySchicht = {};
+            state.zuordnungen.forEach(z => {
+                const key = `${z.VA_Start || ''}_${z.VA_Ende || ''}`;
+                if (!zuordnungenBySchicht[key]) {
+                    zuordnungenBySchicht[key] = [];
+                }
+                zuordnungenBySchicht[key].push(z);
+            });
+
+            let lfdNr = 0;
+
+            // Iteriere Ã¼ber ALLE Schichten und zeige MA_Anzahl Zeilen pro Schicht
+            state.schichten.forEach((schicht, schichtIdx) => {
+                const key = `${schicht.VA_Start || ''}_${schicht.VA_Ende || ''}`;
+                const zuordnungen = zuordnungenBySchicht[key] || [];
+                const maAnzahl = schicht.MA_Anzahl || 1;
+
+                // Erstelle MA_Anzahl Zeilen fÃ¼r diese Schicht
+                for (let i = 0; i < maAnzahl; i++) {
+                    lfdNr++;
+                    const z = zuordnungen[i]; // Kann undefined sein wenn kein MA zugeordnet
+                    const tr = document.createElement('tr');
+
+                    // BEDINGTE FORMATIERUNG (Access-Parität):
+                    // - IstFraglich → türkisblaue Hintergrundfarbe
+                    // - Unterbuchung (leere Slots) → gelbe Hintergrundfarbe
+                    // - Überbuchung (mehr MA als MA_Anzahl) → rote Hintergrundfarbe
+
+                    if (z) {
+                        // Zeile MIT zugeordnetem Mitarbeiter
+                        const stunden = calculateStunden(z.VA_Start, z.VA_Ende);
+                        const maName = z.MA_Name || ((z.Vorname || '') + ' ' + (z.Nachname || '')).trim() || '';
+                        const stdFormatted = stunden > 0 ? stunden.toFixed(1) : '';
+
+                        // Bedingte Formatierung anwenden
+                        if (z.IstFraglich) {
+                            tr.classList.add('ist-fraglich');
+                        }
+                        // Überbuchung: Wenn mehr MA zugeordnet als MA_Anzahl erlaubt
+                        if (i >= maAnzahl) {
+                            tr.classList.add('pos-ueberbuchung');
+                        }
+
+                        tr.innerHTML = `
+                            <td style="text-align: right;">${lfdNr}</td>
+                            <td>${escapeHtml(maName)}</td>
+                            <td style="text-align: center;">${formatTime(z.VA_Start)}</td>
+                            <td style="text-align: center;">${formatTime(z.VA_Ende)}</td>
+                            <td style="text-align: right;">${stdFormatted}</td>
+                            <td style="text-align: center;">${escapeHtml(z.Bemerkung || '')}</td>
+                            <td style="text-align: center;"><input type="checkbox" data-id="${z.ID}" data-field="IstFraglich" ${z.IstFraglich ? 'checked' : ''} onchange="saveZuordnungField(this)"></td>
+                            <td style="text-align: center;"><input type="number" data-id="${z.ID}" data-field="PKW" value="${z.PKW || ''}" style="width: 35px; text-align: right;" onchange="saveZuordnungField(this)"></td>
+                            <td style="text-align: center;"><input type="checkbox" data-id="${z.ID}" data-field="Einsatzleitung" ${z.Einsatzleitung ? 'checked' : ''} onchange="saveZuordnungField(this)"></td>
+                            <td style="text-align: center;"><input type="checkbox" data-id="${z.ID}" data-field="Rch_Erstellt" ${z.Rch_Erstellt ? 'checked' : ''} onchange="saveZuordnungField(this)"></td>
+                        `;
+                        tr.dataset.id = z.ID;
+                        tr.addEventListener('click', () => selectZuordnung(lfdNr - 1));
+                    } else {
+                        // Leere Zeile OHNE zugeordneten Mitarbeiter (Platzhalter)
+                        // UNTERBUCHUNG: Leere Slots → gelbe Hintergrundfarbe (Access-Parität)
+                        tr.classList.add('pos-unterbuchung');
+
+                        tr.innerHTML = `
+                            <td style="text-align: right;">${lfdNr}</td>
+                            <td></td>
+                            <td style="text-align: center;">${formatTime(schicht.VA_Start)}</td>
+                            <td style="text-align: center;">${formatTime(schicht.VA_Ende)}</td>
+                            <td style="text-align: right;"></td>
+                            <td style="text-align: center;"></td>
+                            <td style="text-align: center;"></td>
+                            <td style="text-align: center;"></td>
+                            <td style="text-align: center;"></td>
+                            <td style="text-align: center;"></td>
+                        `;
+                        tr.dataset.schichtIdx = schichtIdx;
+                        tr.dataset.slotIdx = i;
+                        // Klick auf leere Zeile könnte Schnellplanung öffnen
+                        tr.addEventListener('click', () => {
+                            selectSchicht(schichtIdx);
+                        });
+                    }
+                    tbody.appendChild(tr);
+                }
+            });
+
+            // Falls keine Schichten definiert sind, zeige die bisherigen Zuordnungen
+            if (state.schichten.length === 0 && state.zuordnungen.length > 0) {
+                state.zuordnungen.forEach((z, idx) => {
+                    const tr = document.createElement('tr');
+                    const stunden = calculateStunden(z.VA_Start, z.VA_Ende);
+                    const maName = z.MA_Name || ((z.Vorname || '') + ' ' + (z.Nachname || '')).trim() || '';
+                    const stdFormatted = stunden > 0 ? stunden.toFixed(1) : '';
+                    tr.innerHTML = `
+                        <td style="text-align: right;">${idx + 1}</td>
+                        <td>${escapeHtml(maName)}</td>
+                        <td style="text-align: center;">${formatTime(z.VA_Start)}</td>
+                        <td style="text-align: center;">${formatTime(z.VA_Ende)}</td>
+                        <td style="text-align: right;">${stdFormatted}</td>
+                        <td style="text-align: center;">${escapeHtml(z.Bemerkung || '')}</td>
+                        <td style="text-align: center;"><input type="checkbox" data-id="${z.ID}" data-field="IstFraglich" ${z.IstFraglich ? 'checked' : ''} onchange="saveZuordnungField(this)"></td>
+                        <td style="text-align: center;"><input type="number" data-id="${z.ID}" data-field="PKW" value="${z.PKW || ''}" style="width: 35px; text-align: right;" onchange="saveZuordnungField(this)"></td>
+                        <td style="text-align: center;"><input type="checkbox" data-id="${z.ID}" data-field="Einsatzleitung" ${z.Einsatzleitung ? 'checked' : ''} onchange="saveZuordnungField(this)"></td>
+                        <td style="text-align: center;"><input type="checkbox" data-id="${z.ID}" data-field="Rch_Erstellt" ${z.Rch_Erstellt ? 'checked' : ''} onchange="saveZuordnungField(this)"></td>
+                    `;
+                    tr.dataset.id = z.ID;
+                    tr.addEventListener('click', () => selectZuordnung(idx));
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Nach dem Rendern: Spalten-Sichtbarkeit basierend auf Veranstalter_ID anwenden
+            const veranstalterId = state.auftrag?.Veranstalter_ID || state.auftrag?.VA_KD_ID || 0;
+            if (typeof window.applyGridZuordnungenColumnRules === 'function') {
+                window.applyGridZuordnungenColumnRules(veranstalterId);
+            }
+        }
+
+        // Funktion zum Speichern von Zuordnungs-Feldern
+        async function saveZuordnungField(input) {
+            const id = input.dataset.id;
+            const field = input.dataset.field;
+            const value = input.type === 'checkbox' ? input.checked : input.value;
+
+            // Bedingte Formatierung live aktualisieren (Access-Parität)
+            const row = input.closest('tr');
+            if (row && field === 'IstFraglich') {
+                row.classList.toggle('ist-fraglich', value);
+            }
+
+            try {
+                const apiBase = (typeof API_BASE_LOCAL !== 'undefined') ? API_BASE_LOCAL : 'http://localhost:5000/api';
+                const response = await fetch(apiBase + '/zuordnungen/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [field]: value })
+                });
+                if (!response.ok) throw new Error('Speichern fehlgeschlagen');
+            } catch (e) {
+                console.error('Fehler beim Speichern:', e);
+            }
+        }
+
+        function renderAbsagen() {
+            const tbody = document.getElementById('absagenBody');
+            tbody.innerHTML = '';
+
+            state.absagen.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td></td>
+                    <td>${escapeHtml(a.MA_Name || '')}</td>
+                    <td>${escapeHtml(a.Bemerkung || '')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Neue Zeile
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>*</td>
+                <td><select class="form-select" style="width: 100%;"></select></td>
+                <td><input type="text" style="width: 100%;"></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        function fillStatusDropdown() {
+            const sel = document.getElementById('Veranst_Status_ID');
+            sel.innerHTML = '';
+            state.lookups.status.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.ID;
+                opt.textContent = s.Fortschritt;
+                sel.appendChild(opt);
+            });
+        }
+
+        function fillKundenDropdown() {
+            const sel = document.getElementById('Veranstalter_ID');
+            sel.innerHTML = '<option value="">-- Wahlen --</option>';
+            state.lookups.kunden.forEach(k => {
+                const opt = document.createElement('option');
+                opt.value = k.kun_Id;
+                opt.textContent = k.kun_Firma;
+                sel.appendChild(opt);
+            });
+        }
+
+        function fillVADatumDropdown(tage) {
+            const sel = document.getElementById('cboVADatum');
+            sel.innerHTML = '';
+            tage.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.ID;
+                opt.textContent = formatDateShort(t.VADatum);
+                sel.appendChild(opt);
+            });
+        }
+
+        function fillDatalist(id, items) {
+            const dl = document.getElementById(id);
+            if (!dl) return;
+            dl.innerHTML = '';
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = typeof item === 'string' ? item : item.value;
+                dl.appendChild(opt);
+            });
+        }
+
+        function markSelectedAuftrag(vaId) {
+            document.querySelectorAll('#auftraegeBody tr').forEach(tr => {
+                tr.classList.toggle('selected', parseInt(tr.dataset.id) === vaId);
+            });
+        }
+
+        function updateStatusCounts() {
+            // Einfache Zahlung basierend auf lokalen Daten
+            let planung = 0, beendet = 0, versendet = 0;
+            state.auftraege.forEach(a => {
+                const status = parseInt(a.Veranst_Status_ID) || 1;
+                if (status === 1) planung++;
+                else if (status === 2) versendet++;
+                else if (status === 3) beendet++;
+            });
+            document.getElementById('countPlanung').textContent = planung;
+            document.getElementById('countBeendet').textContent = beendet;
+            document.getElementById('countVersendet').textContent = versendet;
+        }
+
+        // ============================================
+        // EVENT-HANDLER
+        // ============================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-page').forEach(page => {
+                page.classList.toggle('active', page.id === 'tab-' + tabName);
+            });
+
+            // Lazy Loading: Daten laden wenn Tab aktiviert wird
+            switch (tabName) {
+                case 'antworten':
+                    loadAntworten();
+                    break;
+                case 'zusatzdateien':
+                    loadAttachments();
+                    break;
+                case 'rechnung':
+                    loadRechnungsdaten();
+                    break;
+                case 'eventdaten':
+                    loadEventdaten();
+                    break;
+            }
+        }
+
+        function navigateToForm(formName, recordId) {
+            // WebView2 Modus
+            if (window.chrome && window.chrome.webview && typeof Bridge !== 'undefined') {
+                Bridge.navigate(formName, recordId);
+                return;
+            }
+            // Verwende shell-detector.js Funktion wenn verfuegbar
+            if (typeof window._shellNavigateToForm === 'function') {
+                window._shellNavigateToForm(formName, recordId);
+            } else if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'NAVIGATE', formName: formName, id: recordId }, '*');
+            } else {
+                var url = formName + '.html';
+                if (recordId) url += '?id=' + recordId;
+                window.location.href = url;
+            }
+        }
+
+        async function saveField(fieldName, value) {
+            if (!state.currentAuftragId) return;
+
+            try {
+                await apiCall(`/auftraege/${state.currentAuftragId}`, 'PUT', { [fieldName]: value });
+                showToast('Gespeichert', 'success');
+            } catch (e) {
+                showToast('Speichern fehlgeschlagen', 'error');
+            }
+        }
+
+        async function statusChanged() {
+            const statusId = document.getElementById('Veranst_Status_ID').value;
+            await saveField('Veranst_Status_ID', statusId);
+            setFormReadOnly(parseInt(statusId) >= 3);
+            await loadAuftraegeListe();
+        }
+
+        function setFormReadOnly(readonly) {
+            const lblKeine = document.getElementById('lblKeineEingabe');
+            lblKeine.style.display = readonly ? 'inline' : 'none';
+
+            // Buttons deaktivieren
+            const btns = ['btnNeuAuftrag', 'btnKopieren', 'btnLoeschen'];
+            btns.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = readonly;
+            });
+        }
+
+        async function datumChanged() {
+            const datVon = document.getElementById('Dat_VA_Von').value;
+            await saveField('Dat_VA_Von', datVon);
+        }
+
+        async function datumBisChanged() {
+            const datBis = document.getElementById('Dat_VA_Bis').value;
+            await saveField('Dat_VA_Bis', datBis);
+            // Tage neu laden wenn sich Datumsbereich andert
+            await loadAuftrag(state.currentAuftragId);
+        }
+
+        async function vaDatumChanged() {
+            state.currentVADatumId = document.getElementById('cboVADatum').value;
+            await loadSubformData();
+        }
+
+        function datumNavLeft() {
+            const sel = document.getElementById('cboVADatum');
+            if (sel.selectedIndex > 0) {
+                sel.selectedIndex--;
+                vaDatumChanged();
+            }
+        }
+
+        function datumNavRight() {
+            const sel = document.getElementById('cboVADatum');
+            if (sel.selectedIndex < sel.options.length - 1) {
+                sel.selectedIndex++;
+                vaDatumChanged();
+            }
+        }
+
+        // Template-Erkennung bei Auftragsnamen
+        function auftragChanged() {
+            const auftrag = document.getElementById('Auftrag').value.toLowerCase();
+            applyTemplate(auftrag);
+            saveField('Auftrag', document.getElementById('Auftrag').value);
+        }
+
+        function ortGotFocus() {
+            // Template-Erkennung aktivieren
+            const auftrag = document.getElementById('Auftrag').value.toLowerCase();
+            applyTemplate(auftrag);
+        }
+
+        function applyTemplate(auftrag) {
+            const templates = {
+                'kaufland': { Treffpunkt: '15 min vor Ort', Dienstkleidung: 'Schwarz neutral', Veranstalter_ID: 20770 },
+                'greuther': { Ort: 'Furth', Objekt: 'Sportpark am Ronhof', Treffpunkt: '15 min vor DB Tor F', Dienstkleidung: 'Schwarz neutral', Veranstalter_ID: 20737 },
+                '1.fcn': { Ort: 'Nurnberg', Objekt: 'Max-Morlock-Stadion', Treffpunkt: '15 min vor DB Eingang Nord West', Dienstkleidung: 'Schwarz neutral', Veranstalter_ID: 20771 },
+                'konzert': { Ort: 'Nurnberg', Objekt: 'Hirsch', Treffpunkt: '15 min vor DB vor Ort', Dienstkleidung: 'Consec', Veranstalter_ID: 10233 },
+                'clubbing': { Ort: 'Nurnberg', Objekt: 'Hirsch', Treffpunkt: '15 min vor DB vor Ort', Dienstkleidung: 'Consec', Veranstalter_ID: 10337 },
+                'hc erlangen': { Ort: 'Nurnberg', Objekt: 'Arena', Treffpunkt: '15 min vor DB Arena Ecke Kurt-Leucht', Dienstkleidung: 'Schwarz neutral', Veranstalter_ID: 20761 }
+            };
+
+            for (const [key, template] of Object.entries(templates)) {
+                if (auftrag.includes(key)) {
+                    for (const [field, value] of Object.entries(template)) {
+                        const el = document.getElementById(field);
+                        if (el && !el.value) {
+                            el.value = value;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Auftragsliste-Filter
+        function filterAuftraege() {
+            loadAuftraegeListe();
+        }
+
+        function filterByStatus(status) {
+            state.filterStatus = status;
+            loadAuftraegeListe();
+        }
+
+        function tageZurueck() {
+            const input = document.getElementById('Auftraege_ab');
+            const date = new Date(input.value);
+            date.setDate(date.getDate() - 7);
+            input.value = formatDateISO(date);
+            loadAuftraegeListe();
+        }
+
+        function tageVor() {
+            const input = document.getElementById('Auftraege_ab');
+            const date = new Date(input.value);
+            date.setDate(date.getDate() + 7);
+            input.value = formatDateISO(date);
+            loadAuftraegeListe();
+        }
+
+        function abHeute() {
+            document.getElementById('Auftraege_ab').value = formatDateISO(new Date());
+            state.filterStatus = null;
+            loadAuftraegeListe();
+        }
+
+        function sortAuftraege(column) {
+            if (state.sortColumn === column) {
+                state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sortColumn = column;
+                state.sortDir = 'asc';
+            }
+            renderAuftraegeListe();
+        }
+
+        // ============================================
+        // AKTIONS-FUNKTIONEN
+        // ============================================
+        async function neuerAuftrag() {
+            showLoading();
+            try {
+                const today = formatDateISO(new Date());
+                const result = await apiCall('/auftraege', 'POST', {
+                    Auftrag: 'Neuer Auftrag',
+                    Dat_VA_Von: today,
+                    Dat_VA_Bis: today,
+                    Veranst_Status_ID: 1
+                });
+                if (result.data && result.data.ID) {
+                    await loadAuftraegeListe();
+                    await loadAuftrag(result.data.ID);
+                    showToast('Neuer Auftrag erstellt', 'success');
+                }
+            } catch (e) {
+                showToast('Auftrag konnte nicht erstellt werden', 'error');
+            }
+            hideLoading();
+        }
+
+        async function auftragKopieren() {
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewahlt', 'warning');
+                return;
+            }
+
+            showConfirm('Auftrag kopieren', 'Mochten Sie diesen Auftrag kopieren?', async () => {
+                showLoading();
+                try {
+                    const result = await apiCall(`/auftraege/${state.currentAuftragId}/kopieren`, 'POST');
+                    if (result.data && result.data.ID) {
+                        await loadAuftraegeListe();
+                        await loadAuftrag(result.data.ID);
+                        showToast('Auftrag kopiert (ID: ' + result.data.ID + ')', 'success');
+                    }
+                } catch (e) {
+                    showToast('Kopieren fehlgeschlagen', 'error');
+                }
+                hideLoading();
+            });
+        }
+
+        async function auftragLoeschen() {
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewahlt', 'warning');
+                return;
+            }
+
+            showConfirm('Auftrag loschen', 'Mochten Sie diesen Auftrag wirklich loschen?', async () => {
+                showLoading();
+                try {
+                    await apiCall(`/auftraege/${state.currentAuftragId}`, 'DELETE');
+                    state.currentAuftragId = null;
+                    await loadAuftraegeListe();
+                    if (state.auftraege.length > 0) {
+                        await loadAuftrag(state.auftraege[0].ID);
+                    }
+                    showToast('Auftrag geloscht', 'success');
+                } catch (e) {
+                    showToast('Loschen fehlgeschlagen', 'error');
+                }
+                hideLoading();
+            });
+        }
+
+        async function refreshData() {
+            await loadAuftraegeListe();
+            if (state.currentAuftragId) {
+                await loadAuftrag(state.currentAuftragId, state.currentVADatumId);
+            }
+            showToast('Daten aktualisiert', 'success');
+        }
+
+        // Email-Funktionen
+        async function sendeEinsatzlisteMA() {
+            if (!state.currentAuftragId) return;
+            Bridge.sendEvent('email', {
+                type: 'einsatzliste_ma',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+            showToast('Einsatzliste wird an MA gesendet...', 'success');
+        }
+
+        async function sendeEinsatzlisteBOS() {
+            if (!state.currentAuftragId) return;
+            Bridge.sendEvent('email', {
+                type: 'einsatzliste_bos',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+            showToast('Einsatzliste wird an BOS gesendet...', 'success');
+        }
+
+        async function sendeEinsatzlisteSUB() {
+            if (!state.currentAuftragId) return;
+            Bridge.sendEvent('email', {
+                type: 'einsatzliste_sub',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+            showToast('Einsatzliste wird an SUB gesendet...', 'success');
+        }
+
+        function einsatzlisteDrucken() {
+            Bridge.sendEvent('print', {
+                type: 'einsatzliste',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+        }
+
+        function namenslisteESS() {
+            Bridge.sendEvent('print', {
+                type: 'namensliste_ess',
+                va_id: state.currentAuftragId
+            });
+        }
+
+        function bwnDrucken() {
+            Bridge.sendEvent('print', {
+                type: 'bwn',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+        }
+
+        function bwnSenden() {
+            if (!state.currentAuftragId) {
+                showToast('Bitte zuerst einen Auftrag auswaehlen', 'warning');
+                return;
+            }
+            Bridge.sendEvent('send', {
+                type: 'bwn',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+            showToast('BWN wird gesendet...', 'info');
+        }
+
+        function openMitarbeiterauswahl() {
+            if (!state.currentAuftragId) {
+                alert('Bitte zuerst einen Auftrag auswÃ¤hlen!');
+                return;
+            }
+            // Schnellauswahl in Shell Ã¶ffnen mit Auftragsdaten
+            // Korrektur: vadatum_id statt vadatum, currentVADatumId statt currentVADatum
+            const url = 'frm_MA_VA_Schnellauswahl.html?va_id=' + state.currentAuftragId +
+                       '&vadatum_id=' + (state.currentVADatumId || '') +
+                       '&shell=1';
+            if (window.parent && window.parent !== window) {
+                // Im iframe - an Shell senden
+                window.parent.postMessage({
+                    type: 'navigate',
+                    form: 'frm_MA_VA_Schnellauswahl',
+                    params: { va_id: state.currentAuftragId, vadatum_id: state.currentVADatumId }
+                }, '*');
+            } else {
+                // Direkt Ã¶ffnen
+                window.location.href = url;
+            }
+        }
+
+        function openPositionen() {
+            // Objekt_ID aus state (da Objekt_ID-Select entfernt)
+            Bridge.sendEvent('openPositionen', {
+                objekt_id: state.currentAuftrag?.Objekt_ID || ''
+            });
+        }
+
+        function openRueckmeldStatistik() {
+            Bridge.navigate('zfrm_Rueckmeldungen');
+        }
+
+        function openSyncfehler() {
+            Bridge.navigate('zfrm_SyncError');
+        }
+
+        function showELGesendet() {
+            // Zeigt Dialog mit gesendeten Einsatzlisten fuer aktuellen Auftrag
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewaehlt', 'warning');
+                return;
+            }
+
+            // Modal erstellen falls noch nicht vorhanden
+            let modal = document.getElementById('elGesendetModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'elGesendetModal';
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content" style="width: 600px; max-height: 80vh;">
+                        <div class="modal-header">
+                            <span>Gesendete Einsatzlisten</span>
+                            <button onclick="document.getElementById('elGesendetModal').style.display='none'">&times;</button>
+                        </div>
+                        <div class="modal-body" id="elGesendetBody" style="overflow-y: auto; max-height: 60vh;">
+                            <p>Lade Daten...</p>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+
+            modal.style.display = 'flex';
+            const body = document.getElementById('elGesendetBody');
+            body.innerHTML = '<p>Lade gesendete Einsatzlisten...</p>';
+
+            // API-Aufruf fuer gesendete Listen
+            apiCall('/einsatzlisten/gesendet?va_id=' + state.currentAuftragId)
+                .then(result => {
+                    if (result.data && result.data.length > 0) {
+                        let html = '<table class="data-table" style="width: 100%;"><thead><tr>';
+                        html += '<th>Datum</th><th>Empfaenger</th><th>Typ</th><th>Status</th></tr></thead><tbody>';
+                        result.data.forEach(el => {
+                            html += `<tr>
+                                <td>${formatDateShort(el.gesendet_am)}</td>
+                                <td>${escapeHtml(el.empfaenger || '')}</td>
+                                <td>${escapeHtml(el.typ || 'MA')}</td>
+                                <td>${el.erfolgreich ? '? Gesendet' : '? Fehler'}</td>
+                            </tr>`;
+                        });
+                        html += '</tbody></table>';
+                        body.innerHTML = html;
+                    } else {
+                        body.innerHTML = '<p>Keine gesendeten Einsatzlisten fuer diesen Auftrag gefunden.</p>';
+                    }
+                })
+                .catch(err => {
+                    body.innerHTML = '<p style="color: red;">Fehler beim Laden: ' + err.message + '</p>';
+                });
+        }
+
+        function openHtmlAnsicht() {
+            window.open('frm_va_Auftragstamm.html?va_id=' + state.currentAuftragId, '_blank');
+        }
+
+        function closeForm() {
+            Bridge.close();
+            if (!window.chrome || !window.chrome.webview) {
+                window.close();
+            }
+        }
+
+        function toggleMaximize() {
+            // WebView2: Maximize/Restore via Bridge
+            if (window.chrome && window.chrome.webview) {
+                Bridge.sendEvent('toggleMaximize');
+            } else {
+                // Browser-Fallback: Fullscreen API
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log('Fullscreen nicht verfuegbar:', err);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Rechnung-Funktionen
+        function rechnungPDF() {
+            Bridge.sendEvent('pdf', { type: 'rechnung', va_id: state.currentAuftragId });
+        }
+
+        function berechnungslistePDF() {
+            Bridge.sendEvent('pdf', { type: 'berechnungsliste', va_id: state.currentAuftragId });
+        }
+
+        async function rechnungDatenLaden() {
+            // Rechnungsdaten vom Backend laden und in Formularfelder eintragen
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewaehlt', 'warning');
+                return;
+            }
+
+            showToast('Rechnungsdaten werden geladen...', 'info');
+
+            try {
+                const result = await apiCall('/auftraege/' + state.currentAuftragId + '/rechnung');
+                if (result.success && result.data) {
+                    const rd = result.data;
+                    // Felder befuellen
+                    setFieldValue('Rechnungsnr', rd.Rechnungsnr || '');
+                    setFieldValue('Rch_Datum', rd.Rch_Datum ? formatDateInput(rd.Rch_Datum) : '');
+                    setFieldValue('Rch_Betrag', rd.Rch_Betrag || '');
+                    setFieldValue('Rch_Erstellt', rd.Rch_Erstellt || false);
+                    showToast('Rechnungsdaten geladen', 'success');
+                } else {
+                    showToast('Keine Rechnungsdaten vorhanden', 'info');
+                }
+            } catch (err) {
+                console.error('Fehler beim Laden der Rechnungsdaten:', err);
+                showToast('Fehler: ' + err.message, 'error');
+            }
+        }
+
+        function formatDateInput(dateStr) {
+            // Konvertiert Datum zu YYYY-MM-DD fuer input[type=date]
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toISOString().substring(0, 10);
+        }
+
+        function rechnungLexware() {
+            Bridge.sendEvent('lexware', { va_id: state.currentAuftragId });
+        }
+
+        async function neuenAttachHinzufuegen() {
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewÃ¤hlt', 'warning');
+                return;
+            }
+
+            // File-Input erstellen und Klick simulieren
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.accept = '.pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.txt';
+
+            input.onchange = async (e) => {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+
+                showLoading();
+                for (const file of files) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('va_id', state.currentAuftragId);
+
+                        const response = await fetch(`${API_BASE_LOCAL}/auftraege/${state.currentAuftragId}/attachments`, {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Upload fehlgeschlagen');
+                        }
+
+                        showToast(`${file.name} hochgeladen`, 'success');
+                    } catch (err) {
+                        showToast(`Fehler bei ${file.name}: ${err.message}`, 'error');
+                    }
+                }
+                hideLoading();
+                await loadAttachments();
+            };
+
+            input.click();
+        }
+
+        async function loadAttachments() {
+            if (!state.currentAuftragId) return;
+
+            try {
+                const result = await apiCall(`/auftraege/${state.currentAuftragId}/attachments`);
+                const attachments = result.data || [];
+
+                const tbody = document.getElementById('attachBody');
+                tbody.innerHTML = '';
+
+                attachments.forEach(att => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="cursor: pointer; color: #000080; text-decoration: underline;"
+                            ondblclick="openAttachment(${att.ID})">${escapeHtml(att.Dateiname || '')}</td>
+                        <td>${escapeHtml(att.Typ || '')}</td>
+                        <td>${formatFileSize(att.Groesse)}</td>
+                        <td>${formatDateShort(att.Erstellt_am)}</td>
+                    `;
+                    tr.dataset.id = att.ID;
+
+                    // KontextmenÃ¼
+                    tr.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        showAttachContextMenu(e, att.ID, att.Dateiname);
+                    });
+
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.error('Attachments laden fehlgeschlagen:', e);
+            }
+        }
+
+        function openAttachment(attachId) {
+            if (window.chrome && window.chrome.webview) {
+                Bridge.sendEvent('openAttachment', { attachment_id: attachId });
+            } else {
+                // Fallback: Download
+                window.open(`${API_BASE_LOCAL}/auftraege/${state.currentAuftragId}/attachments/${attachId}/download`, '_blank');
+            }
+        }
+
+        async function deleteAttachment(attachId) {
+            showConfirm('Datei lÃ¶schen', 'MÃ¶chten Sie diese Datei wirklich lÃ¶schen?', async () => {
+                try {
+                    await apiCall(`/auftraege/${state.currentAuftragId}/attachments/${attachId}`, 'DELETE');
+                    showToast('Datei gelÃ¶scht', 'success');
+                    await loadAttachments();
+                } catch (e) {
+                    showToast('LÃ¶schen fehlgeschlagen', 'error');
+                }
+            });
+        }
+
+        function downloadAttachment(attachId) {
+            window.open(`${API_BASE_LOCAL}/auftraege/${state.currentAuftragId}/attachments/${attachId}/download`, '_blank');
+        }
+
+        function showAttachContextMenu(event, attachId, filename) {
+            // Bestehendes MenÃ¼ entfernen
+            const existing = document.querySelector('.context-menu');
+            if (existing) existing.remove();
+
+            const menu = document.createElement('div');
+            menu.className = 'context-menu';
+            menu.style.cssText = `
+                position: fixed;
+                left: ${event.clientX}px;
+                top: ${event.clientY}px;
+                background: #c0c0c0;
+                border: 2px solid;
+                border-color: #fff #808080 #808080 #fff;
+                padding: 2px;
+                z-index: 2000;
+            `;
+            menu.innerHTML = `
+                <div class="ctx-item" onclick="openAttachment(${attachId})">Ã–ffnen</div>
+                <div class="ctx-item" onclick="downloadAttachment(${attachId})">Herunterladen</div>
+                <hr style="margin: 2px 0; border: 0; border-top: 1px solid #808080;">
+                <div class="ctx-item" onclick="deleteAttachment(${attachId})">LÃ¶schen</div>
+            `;
+
+            // Styling fÃ¼r Items
+            menu.querySelectorAll('.ctx-item').forEach(item => {
+                item.style.cssText = 'padding: 4px 20px; cursor: pointer; font-size: var(--base-font-size);';
+                item.onmouseover = () => item.style.background = '#000080'; item.style.color = 'white';
+                item.onmouseout = () => { item.style.background = ''; item.style.color = ''; };
+            });
+
+            document.body.appendChild(menu);
+
+            // MenÃ¼ schlieÃŸen bei Klick auÃŸerhalb
+            document.addEventListener('click', function closeMenu() {
+                menu.remove();
+                document.removeEventListener('click', closeMenu);
+            }, { once: true });
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return '';
+            const kb = bytes / 1024;
+            if (kb < 1024) return kb.toFixed(1) + ' KB';
+            return (kb / 1024).toFixed(1) + ' MB';
+        }
+
+        // ============================================
+        // ANTWORTEN-TAB FUNKTIONEN
+        // ============================================
+        async function loadAntworten() {
+            if (!state.currentAuftragId) return;
+
+            try {
+                const result = await apiCall(`/auftraege/${state.currentAuftragId}/anfragen`);
+                const anfragen = result.data || [];
+
+                const tbody = document.getElementById('statusBody');
+                tbody.innerHTML = '';
+
+                anfragen.forEach(a => {
+                    const tr = document.createElement('tr');
+
+                    // Status-Farbe
+                    let statusColor = '';
+                    let statusText = '';
+                    switch (a.Status) {
+                        case 0: statusText = 'Angefragt'; statusColor = 'cell-yellow'; break;
+                        case 1: statusText = 'Zugesagt'; statusColor = 'cell-green'; break;
+                        case 2: statusText = 'Abgesagt'; statusColor = 'cell-red'; break;
+                        case 3: statusText = 'Keine Antwort'; statusColor = ''; break;
+                        default: statusText = '-'; break;
+                    }
+
+                    tr.innerHTML = `
+                        <td>${escapeHtml(a.MA_Name || (a.Nachname + ', ' + a.Vorname) || '')}</td>
+                        <td class="${statusColor}">${statusText}</td>
+                        <td>${formatDateTime(a.Angefragt_am)}</td>
+                        <td>${escapeHtml(a.Antwort || '')}</td>
+                    `;
+                    tr.dataset.id = a.ID;
+                    tbody.appendChild(tr);
+                });
+
+                // Anzahl ausstehende Antworten aktualisieren
+                const ausstehend = anfragen.filter(a => a.Status === 0 || a.Status === 3).length;
+                const headerLabel = document.querySelector('#tab-antworten .form-label');
+                if (headerLabel) {
+                    headerLabel.textContent = `Mitarbeiter geplant: ${anfragen.length} | Ausstehend: ${ausstehend}`;
+                }
+
+            } catch (e) {
+                console.error('Antworten laden fehlgeschlagen:', e);
+            }
+        }
+
+        // ============================================
+        // RECHNUNG-TAB FUNKTIONEN
+        // ============================================
+        async function loadRechnungsdaten() {
+            if (!state.currentAuftragId) return;
+
+            try {
+                // Rechnungspositionen laden
+                const posResult = await apiCall(`/auftraege/${state.currentAuftragId}/rechnungspositionen`).catch(() => ({ data: [] }));
+                renderRechnungspositionen(posResult.data || []);
+
+                // Berechnungsliste laden
+                const berechResult = await apiCall(`/auftraege/${state.currentAuftragId}/berechnungsliste`).catch(() => ({ data: [] }));
+                renderBerechnungsliste(berechResult.data || []);
+
+            } catch (e) {
+                console.error('Rechnungsdaten laden fehlgeschlagen:', e);
+            }
+        }
+
+        function renderRechnungspositionen(positionen) {
+            const tbody = document.getElementById('rechPosBody');
+            tbody.innerHTML = '';
+
+            let gesamtsumme = 0;
+
+            positionen.forEach((pos, idx) => {
+                const summe = (pos.Menge || 0) * (pos.Einzelpreis || 0);
+                gesamtsumme += summe;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td>${escapeHtml(pos.Beschreibung || '')}</td>
+                    <td style="text-align: right;">${pos.Menge || 0}</td>
+                    <td style="text-align: right;">${formatCurrency(pos.Einzelpreis)}</td>
+                    <td style="text-align: right;">${formatCurrency(summe)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('PosGesamtsumme').value = formatCurrency(gesamtsumme) + ' â‚¬';
+        }
+
+        function renderBerechnungsliste(eintraege) {
+            const tbody = document.getElementById('berechBody');
+            tbody.innerHTML = '';
+
+            eintraege.forEach(e => {
+                const tr = document.createElement('tr');
+                const stunden = calculateStunden(e.VA_Start, e.VA_Ende);
+                const summe = stunden * (e.Verrechnungssatz || 0);
+
+                tr.innerHTML = `
+                    <td>${formatDateShort(e.VADatum)}</td>
+                    <td>${escapeHtml(e.MA_Name || '')}</td>
+                    <td>${formatTime(e.VA_Start)}</td>
+                    <td>${formatTime(e.VA_Ende)}</td>
+                    <td style="text-align: right;">${stunden.toFixed(2)}</td>
+                    <td style="text-align: right;">${formatCurrency(e.Verrechnungssatz)}</td>
+                    <td style="text-align: right;">${formatCurrency(summe)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function rechnungDatenLaden() {
+            loadRechnungsdaten();
+            showToast('Rechnungsdaten werden geladen...', 'success');
+        }
+
+        // ============================================
+        // HELPER-FUNKTIONEN
+        // ============================================
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            return d.toLocaleDateString('de-DE');
+        }
+
+        function formatDateISO(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            return d.toISOString().substring(0, 10);
+        }
+
+        function formatDateShort(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+            return days[d.getDay()] + '. ' + d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleString('de-DE');
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '';
+            if (typeof timeStr === 'string') {
+                // ISO-DateTime Format: "1899-12-30T18:00:00" -> "18:00"
+                if (timeStr.includes('T')) {
+                    const timePart = timeStr.split('T')[1];
+                    return timePart ? timePart.substring(0, 5) : '';
+                }
+                // Einfaches Zeit-Format: "18:00:00" -> "18:00"
+                if (timeStr.includes(':')) {
+                    return timeStr.substring(0, 5);
+                }
+            }
+            return timeStr;
+        }
+
+        function formatCurrency(value) {
+            if (!value) return '0,00';
+            const num = parseFloat(value);
+            return num.toFixed(2).replace('.', ',');
+        }
+
+        function calculateStunden(von, bis) {
+            if (!von || !bis) return 0;
+            const [vh, vm] = von.split(':').map(Number);
+            const [bh, bm] = bis.split(':').map(Number);
+            let diff = (bh * 60 + bm) - (vh * 60 + vm);
+            if (diff < 0) diff += 24 * 60; // Uber Mitternacht
+            return diff / 60;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showConfirm(title, message, onConfirm) {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmYes').onclick = () => {
+                closeModal('confirmModal');
+                onConfirm();
+            };
+            modal.classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function selectSchicht(idx) {
+            // Schicht auswaehlen und markieren
+            state.selectedSchichtIdx = idx;
+            const schicht = state.schichten[idx];
+
+            // Alle Zeilen deselektieren, aktuelle markieren
+            document.querySelectorAll('#schichtenBody tr').forEach((tr, i) => {
+                tr.classList.toggle('selected', i === idx);
+            });
+
+            // Bei Doppelklick: Schicht bearbeiten
+            if (event && event.detail === 2 && schicht) {
+                editSchichtModal(schicht);
+            }
+        }
+
+        function selectZuordnung(idx) {
+            // Zuordnung auswaehlen und markieren
+            state.selectedZuordnungIdx = idx;
+            const zuordnung = state.zuordnungen[idx];
+
+            // Alle Zeilen deselektieren, aktuelle markieren
+            document.querySelectorAll('#zuordnungenBody tr').forEach((tr, i) => {
+                tr.classList.toggle('selected', i === idx);
+            });
+
+            // Bei Doppelklick: Zuordnung bearbeiten
+            if (event && event.detail === 2 && zuordnung) {
+                editZuordnungModal(zuordnung);
+            }
+        }
+
+        function editSchichtModal(schicht) {
+            // Oeffnet Modal zum Bearbeiten einer Schicht
+            showToast('Schicht ' + (schicht.ID || '') + ' wird bearbeitet...', 'info');
+            Bridge.sendEvent('editSchicht', { schicht_id: schicht.ID, va_id: state.currentAuftragId });
+        }
+
+        function editZuordnungModal(zuordnung) {
+            // Oeffnet Modal zum Bearbeiten einer Zuordnung
+            showToast('Zuordnung ' + (zuordnung.ID || '') + ' wird bearbeitet...', 'info');
+            Bridge.sendEvent('editZuordnung', { zuordnung_id: zuordnung.ID, va_id: state.currentAuftragId });
+        }
+
+        // Placeholder fur ungenutzte Funktionen
+        function auftragGotFocus() {}
+        function ortChanged() { saveField('Ort', document.getElementById('Ort').value); }
+        function objektChanged() { saveField('Objekt', document.getElementById('Objekt').value); }
+        // objektIdChanged entfernt - Objekt_ID-Select wurde entfernt
+        function veranstalterChanged() { saveField('Veranstalter_ID', document.getElementById('Veranstalter_ID').value); }
+
+        console.log('[Auftragsverwaltung] Script geladen');
+
+        // Vollbild-Toggle Funktion (Browser Fullscreen API)
+        function toggleFullscreen() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (!document.fullscreenElement) {
+                // Vollbild aktivieren
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.title = 'Vollbild beenden';
+                }).catch(err => {
+                    console.error('Fullscreen error:', err);
+                });
+            } else {
+                // Vollbild beenden
+                document.exitFullscreen().then(() => {
+                    btn.title = 'Vollbild';
+                }).catch(err => {
+                    console.error('Exit fullscreen error:', err);
+                });
+            }
+        }
+
+        // Fullscreen-Change Event Listener
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+
+        // ============================================
+        // EVENTDATEN-FUNKTIONEN
+        // ============================================
+        function loadEventdaten() {
+            if (!currentRecord || !currentRecord.Auftrag) {
+                return;
+            }
+
+            // Readonly-Felder aus Hauptformular fÃ¼llen
+            document.getElementById('eventDatum').value = formatDate(new Date(currentRecord.VADatum || Date.now()));
+            document.getElementById('eventAuftrag').value = currentRecord.Auftrag || '';
+            document.getElementById('eventOrt').value = currentRecord.Ort || '';
+            document.getElementById('eventObjekt').value = currentRecord.Objekt || '';
+
+            // Adresse zusammenstellen
+            const adresse = [
+                currentRecord.Objekt_Strasse,
+                currentRecord.Objekt_PLZ,
+                currentRecord.Objekt_Ort
+            ].filter(Boolean).join(', ');
+            document.getElementById('eventAdresse').value = adresse;
+
+            // Web-Daten laden falls vorhanden
+            loadEventdatenFromDB();
+        }
+
+        async function loadEventdatenFromDB() {
+            if (!currentRecord || !currentRecord.Auftrag_ID) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/eventdaten/${currentRecord.Auftrag_ID}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data) {
+                        document.getElementById('eventEinlass').value = data.Einlass || '';
+                        document.getElementById('eventBeginn').value = data.Beginn || '';
+                        document.getElementById('eventEnde').value = data.Ende || '';
+                        document.getElementById('eventInfo').value = data.Informationen || '';
+                        document.getElementById('eventLinkInput').value = data.Link || '';
+
+                        // Link-Anzeige aktualisieren
+                        updateEventLink();
+                    }
+                }
+            } catch (error) {
+                console.error('Fehler beim Laden der Eventdaten:', error);
+            }
+        }
+
+        async function webDatenLaden() {
+            if (!currentRecord || !currentRecord.Auftrag) {
+                showEventStatus('Kein Auftrag ausgewÃ¤hlt', 'error');
+                return;
+            }
+
+            const spinner = document.getElementById('eventSpinner');
+            const statusEl = document.getElementById('eventStatus');
+
+            spinner.classList.add('active');
+            statusEl.textContent = 'Suche lÃ¤uft...';
+            statusEl.style.color = '#000080';
+
+            try {
+                // Simuliere Web-Scraping/API-Aufruf
+                const response = await fetch('http://localhost:5000/api/eventdaten/scrape', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        auftrag: currentRecord.Auftrag,
+                        ort: currentRecord.Ort,
+                        objekt: currentRecord.Objekt,
+                        datum: currentRecord.VADatum
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.found) {
+                        // Daten gefunden - Felder fÃ¼llen
+                        document.getElementById('eventEinlass').value = data.einlass || '';
+                        document.getElementById('eventBeginn').value = data.beginn || '';
+                        document.getElementById('eventEnde').value = data.ende || '';
+                        document.getElementById('eventInfo').value = data.informationen || '';
+                        document.getElementById('eventLinkInput').value = data.link || '';
+
+                        updateEventLink();
+                        showEventStatus('Daten erfolgreich geladen', 'success');
+                    } else {
+                        // Keine Daten gefunden
+                        clearEventWebFields();
+                        showEventStatus('Keine Informationen verfÃ¼gbar', 'warning');
+                    }
+                } else {
+                    showEventStatus('Fehler beim Laden der Daten', 'error');
+                }
+            } catch (error) {
+                console.error('Web-Daten Fehler:', error);
+                showEventStatus('Verbindungsfehler', 'error');
+            } finally {
+                spinner.classList.remove('active');
+            }
+        }
+
+        async function eventdatenSpeichern() {
+            if (!currentRecord || !currentRecord.Auftrag_ID) {
+                showEventStatus('Kein Auftrag ausgewÃ¤hlt', 'error');
+                return;
+            }
+
+            const eventData = {
+                Auftrag_ID: currentRecord.Auftrag_ID,
+                Einlass: document.getElementById('eventEinlass').value,
+                Beginn: document.getElementById('eventBeginn').value,
+                Ende: document.getElementById('eventEnde').value,
+                Informationen: document.getElementById('eventInfo').value,
+                Link: document.getElementById('eventLinkInput').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/api/eventdaten', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(eventData)
+                });
+
+                if (response.ok) {
+                    showEventStatus('Gespeichert', 'success');
+                } else {
+                    showEventStatus('Fehler beim Speichern', 'error');
+                }
+            } catch (error) {
+                console.error('Speicher-Fehler:', error);
+                showEventStatus('Verbindungsfehler', 'error');
+            }
+        }
+
+        function updateEventLink() {
+            const linkInput = document.getElementById('eventLinkInput').value;
+            const linkEl = document.getElementById('eventLink');
+
+            if (linkInput && linkInput.startsWith('http')) {
+                linkEl.href = linkInput;
+                linkEl.style.display = 'inline';
+            } else {
+                linkEl.style.display = 'none';
+            }
+        }
+
+        function clearEventWebFields() {
+            document.getElementById('eventEinlass').value = '';
+            document.getElementById('eventEinlass').classList.add('no-data');
+            document.getElementById('eventBeginn').value = '';
+            document.getElementById('eventBeginn').classList.add('no-data');
+            document.getElementById('eventEnde').value = '';
+            document.getElementById('eventEnde').classList.add('no-data');
+            document.getElementById('eventInfo').value = 'Keine Informationen verfÃ¼gbar';
+            document.getElementById('eventInfo').classList.add('no-data');
+            document.getElementById('eventLinkInput').value = '';
+            document.getElementById('eventLink').style.display = 'none';
+        }
+
+        function showEventStatus(message, type) {
+            const statusEl = document.getElementById('eventStatus');
+            statusEl.textContent = message;
+
+            switch (type) {
+                case 'success':
+                    statusEl.style.color = '#008000';
+                    break;
+                case 'error':
+                    statusEl.style.color = '#c00000';
+                    break;
+                case 'warning':
+                    statusEl.style.color = '#c08000';
+                    break;
+                default:
+                    statusEl.style.color = '#606060';
+            }
+
+            // Status nach 3 Sekunden ausblenden
+            setTimeout(() => {
+                statusEl.textContent = '';
+            }, 3000);
+        }
+
+        // Link-Input Change-Handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const linkInput = document.getElementById('eventLinkInput');
+            if (linkInput) {
+                linkInput.addEventListener('change', updateEventLink);
+                linkInput.addEventListener('input', updateEventLink);
+            }
+        });
+    </script>
+    <!-- API-Server Lifecycle (Auto-Start/Stop) -->
+    <script src="js/api-lifecycle.js"></script>
+    <!-- Formular-Logik (Button-Handler, API-Calls) -->
+    <script type="module" src="logic/frm_va_Auftragstamm.logic.js"></script>
+</body>
+</html>
+
+
