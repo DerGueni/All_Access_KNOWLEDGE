@@ -456,7 +456,7 @@ Beim Fortsetzen:
 9. ✅ DblClick-Events implementiert (2026-01-09)
 10. ✅ Bedingte Formatierung implementiert (2026-01-09)
 11. ✅ Browser-Tests DblClick + Formatierung (2026-01-09)
-12. Optional: IstFraglich mit echten Daten testen
+12. ✅ IstFraglich mit echten Daten getestet (2026-01-10) - API-Fix: tbl_MA_VA_Zuordnung statt tbl_MA_VA_Planung, VA_ID 8093 mit 9 türkisblauen Zeilen verifiziert
 13. Optional: Überbuchung mit echten Daten testen
 14. ✅ Veranstalter-Regeln getestet (20760, 20750) - 4 Case-Sensitivity Bugfixes (2026-01-09)
 
