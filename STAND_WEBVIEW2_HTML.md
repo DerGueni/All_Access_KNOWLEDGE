@@ -458,7 +458,7 @@ Beim Fortsetzen:
 11. ✅ Browser-Tests DblClick + Formatierung (2026-01-09)
 12. Optional: IstFraglich mit echten Daten testen
 13. Optional: Überbuchung mit echten Daten testen
-14. Optional: Veranstalter-Regeln testen (20760, 20750)
+14. ✅ Veranstalter-Regeln getestet (20760, 20750) - 4 Case-Sensitivity Bugfixes (2026-01-09)
 
 ---
 
