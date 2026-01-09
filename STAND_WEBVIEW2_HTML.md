@@ -1,6 +1,6 @@
 # STAND DER ARBEIT - WebView2 HTML Formulare
 
-**Letztes Update:** 2026-01-09 23:30
+**Letztes Update:** 2026-01-09 23:35
 **Session:** Veranstalter-Regeln Test + Bugfixes
 
 ---
@@ -11,23 +11,31 @@
 
 **Aufgabe:** Veranstalter-Regeln für ID 20760 und 20750 testen.
 
-**Gefundene und behobene Bugs:**
+**Gefundene und behobene Case-Sensitivity Bugs:**
 
-| Bug | Ursache | Fix |
-|-----|---------|-----|
-| getElementById Case-Sensitivity | `veranstalter_id` statt `Veranstalter_ID` | Zeile 179: `getElementById('Veranstalter_ID')` |
-| setFieldValue Case-Sensitivity | Gleiches Problem | Zeile 615: `setFieldValue('Veranstalter_ID', ...)` |
+| Datei | Zeile | Bug | Fix |
+|-------|-------|-----|-----|
+| `frm_va_Auftragstamm.logic.js` | 179 | `getElementById('veranstalter_id')` | `getElementById('Veranstalter_ID')` |
+| `frm_va_Auftragstamm.logic.js` | 481 | `fillCombo('veranstalter_id', ...)` | `fillCombo('Veranstalter_ID', ...)` |
+| `frm_va_Auftragstamm.logic.js` | 615 | `setFieldValue('veranstalter_id', ...)` | `setFieldValue('Veranstalter_ID', ...)` |
+| `frm_va_Auftragstamm.webview2.js` | 89 | `getValue('veranstalter_id')` | `getValue('Veranstalter_ID')` |
 
-**Test-Ergebnisse:**
+**Test-Ergebnisse (Browser-verifiziert):**
 
-| Veranstalter_ID | BWN Buttons | RE Spalte | PKW/EL Spalten |
-|-----------------|-------------|-----------|----------------|
-| 20760 (isMesse) | ✅ SICHTBAR | ✅ SICHTBAR | ✅ SICHTBAR |
-| 10233 (normal) | ✅ VERSTECKT | ✅ VERSTECKT | ✅ SICHTBAR |
-| 20750 (isSpecialClient) | ✅ VERSTECKT | ✅ VERSTECKT | ✅ VERSTECKT |
+| Veranstalter_ID | Auftraggeber | BWN Buttons | RE Spalte | PKW/EL |
+|-----------------|--------------|-------------|-----------|--------|
+| 20760 (isMesse) | ESS 2 Standwachen | ✅ SICHTBAR | ✅ SICHTBAR | ✅ SICHTBAR |
+| 10233 (normal) | Concertbüro Franken | ✅ VERSTECKT | ✅ VERSTECKT | ✅ SICHTBAR |
+| 20750 (isSpecialClient) | - | ✅ VERSTECKT | ✅ VERSTECKT | ✅ VERSTECKT |
 
-**Geänderte Datei:**
-- `logic/frm_va_Auftragstamm.logic.js` - Zeilen 179, 615, 1343
+**Commits:**
+- `055ef07` fix: Veranstalter-Regeln Case-Sensitivity Bugfix
+- `c2ae613` fix: weitere Case-Sensitivity Bugfixes in Auftragstamm
+- `f9da53f` chore: Debug-Logging aus applyVeranstalterRules entfernt
+
+**Geänderte Dateien:**
+- `logic/frm_va_Auftragstamm.logic.js` - Zeilen 179, 481, 615
+- `logic/frm_va_Auftragstamm.webview2.js` - Zeile 89 (neu hinzugefügt)
 
 ---
 
