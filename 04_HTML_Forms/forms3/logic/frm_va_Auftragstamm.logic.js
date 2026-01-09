@@ -1340,7 +1340,6 @@ function applyVeranstalterRules(value) {
     const veranstalterId = Number(value || 0);
     const isMesse = veranstalterId === 20760;
     const isSpecialClient = veranstalterId === 20750;
-    console.log('[Auftragstamm] applyVeranstalterRules:', { value, veranstalterId, isMesse, isSpecialClient });
 
     setVisible('cmd_Messezettel_NameEintragen', isMesse);
     setVisible('cmd_BWN_send', isMesse);
