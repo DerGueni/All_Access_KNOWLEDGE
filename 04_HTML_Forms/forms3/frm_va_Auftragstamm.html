@@ -2025,25 +2025,43 @@
             tbody.innerHTML = '';
 
             // Gruppiere Zuordnungen nach Schicht (VA_Start/VA_Ende)
+            // Normalisiere Zeit-Format für korrektes Matching (HH:MM)
+            function normalizeTimeKey(val) {
+                if (!val) return '';
+                // Falls ISO-Datetime (z.B. "1899-12-30T16:45:00"), nur Zeit extrahieren
+                if (typeof val === 'string' && val.includes('T')) {
+                    val = val.split('T')[1];
+                }
+                // Falls "HH:MM:SS", zu "HH:MM" kürzen
+                if (typeof val === 'string' && val.length >= 5) {
+                    return val.substring(0, 5);
+                }
+                return String(val);
+            }
+
             const zuordnungenBySchicht = {};
             state.zuordnungen.forEach(z => {
-                const key = `${z.VA_Start || ''}_${z.VA_Ende || ''}`;
+                const key = `${normalizeTimeKey(z.VA_Start)}_${normalizeTimeKey(z.VA_Ende)}`;
                 if (!zuordnungenBySchicht[key]) {
                     zuordnungenBySchicht[key] = [];
                 }
                 zuordnungenBySchicht[key].push(z);
             });
 
+
             let lfdNr = 0;
 
-            // Iteriere Ã¼ber ALLE Schichten und zeige MA_Anzahl Zeilen pro Schicht
+            // Iteriere über ALLE Schichten und zeige MA_Anzahl Zeilen pro Schicht
             state.schichten.forEach((schicht, schichtIdx) => {
-                const key = `${schicht.VA_Start || ''}_${schicht.VA_Ende || ''}`;
+                const key = `${normalizeTimeKey(schicht.VA_Start)}_${normalizeTimeKey(schicht.VA_Ende)}`;
                 const zuordnungen = zuordnungenBySchicht[key] || [];
                 const maAnzahl = schicht.MA_Anzahl || 1;
+                // ÜBERBUCHUNG-FIX: Zeige MAX(maAnzahl, zuordnungen.length) Zeilen
+                // damit überbuchte Zeilen (mehr zugeordnet als erlaubt) sichtbar sind
+                const rowCount = Math.max(maAnzahl, zuordnungen.length);
 
-                // Erstelle MA_Anzahl Zeilen fÃ¼r diese Schicht
-                for (let i = 0; i < maAnzahl; i++) {
+                // Erstelle Zeilen fÃ¼r diese Schicht (inkl. Überbuchungen)
+                for (let i = 0; i < rowCount; i++) {
                     lfdNr++;
                     const z = zuordnungen[i]; // Kann undefined sein wenn kein MA zugeordnet
                     const tr = document.createElement('tr');

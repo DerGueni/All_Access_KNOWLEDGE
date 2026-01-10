@@ -1,11 +1,52 @@
 # STAND DER ARBEIT - WebView2 HTML Formulare
 
-**Letztes Update:** 2026-01-09 23:35
-**Session:** Veranstalter-Regeln Test + Bugfixes
+**Letztes Update:** 2026-01-10 00:45
+**Session:** Überbuchungs-Logik Fix + Zeit-Normalisierung
 
 ---
 
 ## AKTUELLER STAND
+
+### Überbuchungs-Logik Fix (2026-01-10) - ABGESCHLOSSEN
+
+**Aufgabe:** Überbuchung mit echten Daten testen und fixen.
+
+**Gefundene und behobene Bugs:**
+
+| Bug | Beschreibung | Fix |
+|-----|--------------|-----|
+| Loop-Grenze | `for (i < maAnzahl)` verhinderte Überbuchungs-Zeilen | `for (i < Math.max(maAnzahl, zuordnungen.length))` |
+| Zeit-Matching | ISO-DateTime (`1899-12-30T16:45:00`) vs Zeit (`16:45`) | `normalizeTimeKey()` Funktion extrahiert HH:MM |
+
+**Neue Funktion `normalizeTimeKey()`:**
+```javascript
+function normalizeTimeKey(val) {
+    if (!val) return '';
+    if (typeof val === 'string' && val.includes('T')) {
+        val = val.split('T')[1]; // ISO-Datetime -> nur Zeit
+    }
+    if (typeof val === 'string' && val.length >= 5) {
+        return val.substring(0, 5); // HH:MM:SS -> HH:MM
+    }
+    return String(val);
+}
+```
+
+**Test-Ergebnisse (VA_ID 8347 - Nina Chuba):**
+
+| Metrik | Wert |
+|--------|------|
+| Gesamt-Zeilen | 97 |
+| Unterbuchung (gelb) | 44 ✅ |
+| Überbuchung (rot) | 0 (keine echten Daten) |
+| Schicht 16:45-22:30 | MA_Anzahl=75, 50 gematchte Zuordnungen |
+
+**Hinweis:** Keine echten Überbuchungs-Daten in DB vorhanden. Zuordnungen haben individuelle Endzeiten (22:15, 22:30, 22:45, etc.), die nicht alle zur Schicht-Endzeit passen.
+
+**Geänderte Datei:**
+- `frm_va_Auftragstamm.html` - renderZuordnungen() Zeilen 2027-2061
+
+---
 
 ### Veranstalter-Regeln (2026-01-09) - ABGESCHLOSSEN
 
