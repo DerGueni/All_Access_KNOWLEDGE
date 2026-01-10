@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MA-VA Positionszuordnung - CONSYS</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        body { background-color: #8080c0; }
+        .app-header { background: #4316B2; min-height: 95px; height: 95px; }
+        .zuordnung-grid { display: flex; gap: 16px; height: 100%; }
+        .zuordnung-panel { flex: 1; display: flex; flex-direction: column; background: white; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
+        .panel-header { padding: 8px 12px; background: #f5f5f5; border-bottom: 1px solid #ccc; font-weight: 600; }
+        .panel-content { flex: 1; overflow: auto; }
+        .position-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .position-item:hover { background: #f5f5f5; }
+        .position-item.selected { background: #e8e8e8; border-left: 3px solid #4316B2; }
+        .position-name { font-weight: 500; }
+        .position-info { font-size: 10px; color: #666; }
+        .ma-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: #e8e8e8; }
+        .ma-badge.zugeordnet { background: #e8e8e8; color: #333333; }
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-active-menu="planung" data-menu-style="access">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">MA-VA Positionszuordnung</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Auftrag:</label>
+                    <select id="cboAuftrag" class="form-control" style="width:250px;">
+                        <option value="">-- Auftrag wählen --</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Datum:</label>
+                    <select id="cboDatum" class="form-control" style="width:120px;">
+                        <option value="">-- Datum --</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnSpeichern">Speichern</button>
+                    <button class="btn" id="btnAktualisieren">Aktualisieren</button>
+                </div>
+            </div>
+
+            <div class="app-content" style="padding:12px;">
+                <div class="zuordnung-grid">
+                    <!-- Positionen -->
+                    <div class="zuordnung-panel">
+                        <div class="panel-header">Positionen <span id="lblPosAnzahl">(0)</span></div>
+                        <div class="panel-content" id="panelPositionen">
+                            <div class="position-item">
+                                <div>
+                                    <div class="position-name">Einlass Tor 1</div>
+                                    <div class="position-info">08:00 - 16:00 | 3 MA</div>
+                                </div>
+                                <span class="ma-badge">0/3</span>
+                            </div>
+                            <div class="position-item selected">
+                                <div>
+                                    <div class="position-name">Streife Innen</div>
+                                    <div class="position-info">08:00 - 16:00 | 2 MA</div>
+                                </div>
+                                <span class="ma-badge zugeordnet">2/2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Verfügbare MA -->
+                    <div class="zuordnung-panel">
+                        <div class="panel-header">Verfügbare Mitarbeiter <span id="lblMAAnzahl">(0)</span></div>
+                        <div class="panel-content" id="panelVerfügbar">
+                            <div class="position-item">
+                                <div>
+                                    <div class="position-name">Mustermann, Max</div>
+                                    <div class="position-info">Qualifikation: 34a</div>
+                                </div>
+                                <button class="btn btn-sm btn-success">&#10140;</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Zugeordnete MA -->
+                    <div class="zuordnung-panel">
+                        <div class="panel-header">Zugeordnet <span id="lblZugeordnetAnzahl">(0)</span></div>
+                        <div class="panel-content" id="panelZugeordnet">
+                            <div class="position-item">
+                                <div>
+                                    <div class="position-name">Meier, Hans</div>
+                                    <div class="position-info">Position: Streife Innen</div>
+                                </div>
+                                <button class="btn btn-sm btn-danger">&#10006;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblSumme">0 Positionen | 0 MA zugeordnet</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; padding:20px; border-radius:8px; text-align:center;">
+            <div style="font-size:14px; margin-bottom:10px;">Laden...</div>
+            <div style="width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid #3498db; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto;"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:10000;"></div>
+
+    <script src="js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+
+        // Form Activation Handler
+        window.onFormActivated = function() {
+            console.log('Positionszuordnung aktiviert - Daten werden geladen');
+            // Hier könnten Daten geladen werden wenn das Formular in der Shell aktiviert wird
+        };
+    </script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="js/webview2-bridge.js"></script>
+    <script src="js/global-handlers.js"></script>
+
+    <!-- Form Logic -->
+    <script type="module" src="logic/frm_MA_VA_Positionszuordnung.logic.js"></script>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>
+
+

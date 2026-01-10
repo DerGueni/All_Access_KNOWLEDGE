@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bewerberverwaltung</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            height: 100vh;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            font-size: 12px;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            color: #000;
+            font-weight: 500;
+            border: none;
+            margin: 1px 0;
+        }
+
+        .menu-btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .menu-btn.active { background: linear-gradient(to bottom, #4040a0, #6060c0); color: white; }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .header-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 8px 15px;
+            font-size: 22px; /* Formulartitel +8px (war 14px) gemaess Anforderung */
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            background: #d0d0e0;
+            padding: 8px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+        }
+
+        .toolbar input { padding: 3px 5px; border: 1px solid #808080; flex: 1; max-width: 250px; }
+        .toolbar select { padding: 3px 5px; border: 1px solid #808080; }
+
+        .btn {
+            padding: 5px 15px;
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            cursor: pointer;
+        }
+        .btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .btn-primary { background: linear-gradient(to bottom, #4080c0, #2060a0); color: white; }
+        .btn-success { background: linear-gradient(to bottom, #40a040, #208020); color: white; }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .bewerber-list {
+            width: 350px;
+            background: white;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            overflow-y: auto;
+        }
+
+        .bewerber-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bewerber-table th {
+            background: #000080;
+            color: white;
+            padding: 5px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+
+        .bewerber-table td {
+            padding: 4px 5px;
+            border-bottom: 1px solid #d0d0d0;
+        }
+
+        .bewerber-table tr:hover { background: #e0e0ff; cursor: pointer; }
+        .bewerber-table tr.selected { background: #4080c0; color: white; }
+
+        .detail-panel {
+            flex: 1;
+            background: #d0d0e0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .detail-section {
+            margin-bottom: 15px;
+        }
+
+        .detail-section h3 {
+            background: #000080;
+            color: white;
+            padding: 5px 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-row {
+            display: flex;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .form-row label {
+            width: 120px;
+            font-weight: bold;
+        }
+
+        .form-row input, .form-row select, .form-row textarea {
+            flex: 1;
+            padding: 3px 5px;
+            border: 1px solid #808080;
+        }
+
+        .form-row textarea { min-height: 60px; resize: vertical; }
+
+        .status-neu { color: #0000c0; font-weight: bold; }
+        .status-eingeladen { color: #c0a000; }
+        .status-angenommen { color: #008000; font-weight: bold; }
+        .status-abgelehnt { color: #c00000; }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: flex-end;
+        }
+
+        .footer-bar {
+            background: #d0d0e0;
+            padding: 5px 10px;
+            margin-top: 10px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+    <script src="js/webview2-bridge.js"></script>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-active-menu="bewerber">
+    <div class="left-menu">
+        <div class="menu-header">PERSONAL</div>
+        <button class="menu-btn" onclick="Bridge.navigate('mitarbeiterstamm')">Mitarbeiterstamm</button>
+        <button class="menu-btn active">Bewerber</button>
+        <button class="menu-btn" onclick="Bridge.navigate('abwesenheitsübersicht')">Abwesenheitsübersicht</button>
+        <button class="menu-btn" onclick="Bridge.navigate('zeitkonten')">Zeitkonten</button>
+        <button class="menu-btn" onclick="Bridge.navigate('dashboard')">Zurück zum Menü</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header-bar">Bewerberverwaltung</div>
+
+        <div class="toolbar">
+            <input type="text" id="txtSuche" placeholder="Suche nach Name..." onkeyup="filterBewerber()">
+            <select id="cboStatus" onchange="filterBewerber()">
+                <option value="">Alle Status</option>
+                <option value="Neu">Neu</option>
+                <option value="Eingeladen">Eingeladen</option>
+                <option value="Angenommen">Angenommen</option>
+                <option value="Abgelehnt">Abgelehnt</option>
+            </select>
+            <button class="btn" onclick="loadData()">Aktualisieren</button>
+            <button class="btn btn-primary" onclick="neuerBewerber()">+ Neuer Bewerber</button>
+        </div>
+
+        <div class="content-area">
+            <div class="bewerber-list">
+                <table class="bewerber-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Datum</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody_Bewerber">
+                        <tr><td colspan="3" style="text-align:center;">Lade...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="detail-panel">
+                <div class="detail-section">
+                    <h3>Persönliche Daten</h3>
+                    <div class="form-row">
+                        <label>Vorname:</label>
+                        <input type="text" id="txtVorname" data-field="Vorname">
+                    </div>
+                    <div class="form-row">
+                        <label>Nachname:</label>
+                        <input type="text" id="txtNachname" data-field="Nachname">
+                    </div>
+                    <div class="form-row">
+                        <label>E-Mail:</label>
+                        <input type="email" id="txtEmail" data-field="Email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Gueltige E-Mail-Adresse eingeben">
+                    </div>
+                    <div class="form-row">
+                        <label>Telefon:</label>
+                        <input type="tel" id="txtTelefon" data-field="Telefon" pattern="[0-9+\-\s/()]+" title="Telefonnummer eingeben">
+                    </div>
+                    <div class="form-row">
+                        <label>Geburtsdatum:</label>
+                        <input type="date" id="txtGeburtsdatum" data-field="Geburtsdatum">
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Bewerbung</h3>
+                    <div class="form-row">
+                        <label>Eingangsdatum:</label>
+                        <input type="date" id="txtEingangsdatum" data-field="Eingangsdatum">
+                    </div>
+                    <div class="form-row">
+                        <label>Status:</label>
+                        <select id="cboBewerberStatus" data-field="Status">
+                            <option value="Neu">Neu</option>
+                            <option value="Eingeladen">Eingeladen</option>
+                            <option value="Angenommen">Angenommen</option>
+                            <option value="Abgelehnt">Abgelehnt</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Bemerkungen:</label>
+                        <textarea id="txtBemerkungen" data-field="Bemerkungen"></textarea>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" onclick="clearForm()">Abbrechen</button>
+                    <button class="btn btn-success" onclick="uebernehmenAlsMA()">Als MA übernehmen</button>
+                    <button class="btn btn-primary" onclick="saveBewerber()">Speichern</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bar">
+            <span id="lblStatus">Bereit</span>
+            <span id="lblRecordInfo">0 Bewerber</span>
+        </div>
+    </div>
+
+    <script>
+        let bewerber = [];
+        let selectedBewerber = null;
+
+        Bridge.on('onDataReceived', function(data) {
+            if (data.type === 'bewerber') {
+                bewerber = data.records || data.data || [];
+                renderBewerber(bewerber);
+            }
+        });
+
+        Bridge.on('onSaveComplete', function(data) {
+            if (data.success) {
+                document.getElementById('lblStatus').textContent = 'Gespeichert';
+                loadData();
+            } else {
+                document.getElementById('lblStatus').textContent = 'Fehler: ' + data.error;
+            }
+        });
+
+        function renderBewerber(data) {
+            const tbody = document.getElementById('tbody_Bewerber');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Keine Bewerber</td></tr>';
+                document.getElementById('lblRecordInfo').textContent = '0 Bewerber';
+                return;
+            }
+
+            tbody.innerHTML = data.map((b, idx) => {
+                const statusClass = 'status-' + (b.Status || 'neu').toLowerCase();
+                return `<tr onclick="selectBewerber(${idx})" data-idx="${idx}">
+                    <td>${b.Nachname}, ${b.Vorname}</td>
+                    <td>${formatDate(b.Eingangsdatum)}</td>
+                    <td class="${statusClass}">${b.Status || 'Neu'}</td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('lblRecordInfo').textContent = data.length + ' Bewerber';
+        }
+
+        function selectBewerber(idx) {
+            document.querySelectorAll('.bewerber-table tr').forEach(r => r.classList.remove('selected'));
+            document.querySelector(`[data-idx="${idx}"]`)?.classList.add('selected');
+
+            selectedBewerber = bewerber[idx];
+            if (selectedBewerber) {
+                document.querySelectorAll('[data-field]').forEach(el => {
+                    const field = el.dataset.field;
+                    let value = selectedBewerber[field] || '';
+                    if (el.type === 'date' && value) {
+                        value = value.split('T')[0];
+                    }
+                    el.value = value;
+                });
+            }
+        }
+
+        function filterBewerber() {
+            const search = document.getElementById('txtSuche').value.toLowerCase();
+            const status = document.getElementById('cboStatus').value;
+
+            const filtered = bewerber.filter(b => {
+                const nameMatch = !search ||
+                    (b.Nachname + ' ' + b.Vorname).toLowerCase().includes(search);
+                const statusMatch = !status || b.Status === status;
+                return nameMatch && statusMatch;
+            });
+
+            renderBewerber(filtered);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            return new Date(dateStr).toLocaleDateString('de-DE');
+        }
+
+        function neuerBewerber() {
+            selectedBewerber = null;
+            clearForm();
+            document.getElementById('txtEingangsdatum').value = new Date().toISOString().split('T')[0];
+            document.getElementById('cboBewerberStatus').value = 'Neu';
+        }
+
+        function clearForm() {
+            document.querySelectorAll('[data-field]').forEach(el => el.value = '');
+            document.querySelectorAll('.bewerber-table tr').forEach(r => r.classList.remove('selected'));
+            selectedBewerber = null;
+        }
+
+        function saveBewerber() {
+            const data = {};
+            document.querySelectorAll('[data-field]').forEach(el => {
+                data[el.dataset.field] = el.value;
+            });
+
+            if (!data.Nachname || !data.Vorname) {
+                alert('Bitte Name eingeben');
+                return;
+            }
+
+            if (selectedBewerber) {
+                data.ID = selectedBewerber.ID;
+            }
+
+            Bridge.sendEvent('saveBewerber', data);
+            document.getElementById('lblStatus').textContent = 'Speichere...';
+        }
+
+        function uebernehmenAlsMA() {
+            if (!selectedBewerber) {
+                alert('Bitte Bewerber auswählen');
+                return;
+            }
+
+            if (confirm('Bewerber als Mitarbeiter übernehmen?')) {
+                Bridge.sendEvent('bewerberZuMA', { id: selectedBewerber.ID });
+                document.getElementById('lblStatus').textContent = 'Übernehme...';
+            }
+        }
+
+        function loadData() {
+            document.getElementById('lblStatus').textContent = 'Lade...';
+            Bridge.loadData('bewerber');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
+

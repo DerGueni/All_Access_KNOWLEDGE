@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -515,7 +515,7 @@
             text-align: right;
         }
 
-        /* Header-Layout Anpassungen - sauberes Layout ohne Ãœberlappung */
+        /* Header-Layout Anpassungen - sauberes Layout ohne Überlappung */
         .form-column.left {
             flex: 0 0 auto;
         }
@@ -527,7 +527,7 @@
         .form-column.middle {
             flex: 0 0 auto;
             order: 3; /* PKW/Fahrtkosten ganz rechts */
-            margin-left: auto; /* RechtsbÃ¼ndig */
+            margin-left: auto; /* Rechtsbündig */
         }
 
         /* Einheitliche Feldbreiten gemaess Anforderung - ALLE Felder gleich breit */
@@ -1216,7 +1216,7 @@
                         <div class="logo-box">C</div>
                         <span class="title-text">Auftragsverwaltung</span>
                         <div class="header-links">
-                            <span class="header-link" onclick="openRueckmeldStatistik()" data-testid="auftrag-link-rueckmeldestatistik">RÃ¼ckmelde-Statistik</span>
+                            <span class="header-link" onclick="openRueckmeldStatistik()" data-testid="auftrag-link-rueckmeldestatistik">Rückmelde-Statistik</span>
                             <span class="header-link" onclick="openSyncfehler()" data-testid="auftrag-link-syncfehler">Syncfehler</span>
                         </div>
                         <!-- Buttons in exakt 2 Reihen - Beginn ab "Positionen" gemaess Anforderung -->
@@ -1225,7 +1225,7 @@
                             <button class="btn unified-btn" id="btnPositionen" onclick="openPositionen()" data-testid="auftrag-btn-positionen">Positionen</button>
                             <button class="btn unified-btn" id="btnNeuAuftrag" onclick="neuerAuftrag()" data-testid="auftrag-btn-neu">Neuer Auftrag</button>
                             <button class="btn unified-btn" id="btnKopieren" onclick="auftragKopieren()" data-testid="auftrag-btn-kopieren">Auftrag kopieren</button>
-                            <button class="btn unified-btn btn-red" id="btnLoeschen" onclick="auftragLoeschen()" data-testid="auftrag-btn-loeschen">Auftrag lÃ¶schen</button>
+                            <button class="btn unified-btn btn-red" id="btnLoeschen" onclick="auftragLoeschen()" data-testid="auftrag-btn-loeschen">Auftrag löschen</button>
                             <button class="btn unified-btn" id="btnListeStd" onclick="namenslisteESS()" data-testid="auftrag-btn-namenslisteess">Namensliste ESS</button>
                             <button class="btn unified-btn" id="btnDruckZusage" onclick="einsatzlisteDrucken()" data-testid="auftrag-btn-einsatzliste-drucken">EL drucken</button>
                             <!-- Zeile 2: 6 Buttons/Elemente -->
@@ -1245,7 +1245,7 @@
                             <span class="form-label">Auftragsstatus:</span>
                             <select class="form-select" id="Veranst_Status_ID" name="Veranst_Status_ID" style="width: 120px;" onchange="statusChanged()" data-testid="auftrag-select-status">
                                 <option value="1">In Planung</option>
-                                <option value="2">BestÃ¤tigt</option>
+                                <option value="2">Bestätigt</option>
                                 <option value="3">Abgeschlossen</option>
                                 <option value="4">Abgerechnet</option>
                                 <option value="5">Storniert</option>
@@ -1556,7 +1556,7 @@
                                         </div>
                                         <div class="event-row">
                                             <span class="event-label" style="align-self: flex-start; padding-top: 6px;">Informationen (Web):</span>
-                                            <textarea class="event-textarea" id="eventInfo" placeholder="Keine Informationen verfÃ¼gbar"></textarea>
+                                            <textarea class="event-textarea" id="eventInfo" placeholder="Keine Informationen verfügbar"></textarea>
                                         </div>
                                         <div class="event-row">
                                             <span class="event-label">Link (Web):</span>
@@ -1697,7 +1697,7 @@
             },
             filterStatus: null,
             sortColumn: 'datum',
-            sortDir: 'asc'  // Aufsteigend: nÃ¤chster/aktuellster Auftrag zuerst
+            sortDir: 'asc'  // Aufsteigend: nächster/aktuellster Auftrag zuerst
         };
 
         // ============================================
@@ -1715,7 +1715,7 @@
 
             // Datum setzen
             document.getElementById('lblDatum').textContent = formatDate(new Date());
-            // Auftraege ab aktuellem Datum filtern (aufsteigend, nÃ¤chster zuerst)
+            // Auftraege ab aktuellem Datum filtern (aufsteigend, nächster zuerst)
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('Auftraege_ab').value = today;
 
@@ -1747,7 +1747,7 @@
             await loadLookups();
             await loadAuftraegeListe();
 
-            // URL-Parameter prÃ¼fen (va_id)
+            // URL-Parameter prüfen (va_id)
             const params = new URLSearchParams(window.location.search);
             const vaId = params.get('va_id');
             if (vaId) {
@@ -1801,7 +1801,7 @@
                 fillStatusDropdown();
                 fillKundenDropdown();
 
-                // VorschlÃ¤ge laden
+                // Vorschläge laden
                 await loadVorschlaege();
 
             } catch (e) {
@@ -1823,7 +1823,7 @@
                 fillDatalist('auftragListe', auftrRes.data || []);
                 fillDatalist('kleidungListe', kleidRes.data || []);
             } catch (e) {
-                console.error('VorschlÃ¤ge laden fehlgeschlagen:', e);
+                console.error('Vorschläge laden fehlgeschlagen:', e);
             }
         }
 
@@ -1920,11 +1920,11 @@
             document.getElementById('Aend_von').textContent = auftrag.Aend_von || '';
             document.getElementById('Aend_am').textContent = formatDateTime(auftrag.Aend_am);
 
-            // Status prÃ¼fen: Read-Only wenn >= 3
+            // Status prüfen: Read-Only wenn >= 3
             const statusId = parseInt(auftrag.Veranst_Status_ID) || 1;
             setFormReadOnly(statusId >= 3);
 
-            // Bridge informieren (state fÃ¼r WebView2 Event-Kommunikation)
+            // Bridge informieren (state für WebView2 Event-Kommunikation)
             if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
                 Bridge.sendEvent('formValueChanged', { field: 'va_id', value: auftrag.ID });
             }
@@ -1976,7 +1976,7 @@
 
             sortedAuftraege.forEach(a => {
                 const tr = document.createElement('tr');
-                // FIX: API liefert ID (nicht VA_ID) als PrimÃ¤rschlÃ¼ssel
+                // FIX: API liefert ID (nicht VA_ID) als Primärschlüssel
                 tr.dataset.id = a.ID;
                 if (a.ID === state.currentAuftragId) {
                     tr.classList.add('selected');
@@ -2060,7 +2060,7 @@
                 // damit überbuchte Zeilen (mehr zugeordnet als erlaubt) sichtbar sind
                 const rowCount = Math.max(maAnzahl, zuordnungen.length);
 
-                // Erstelle Zeilen fÃ¼r diese Schicht (inkl. Überbuchungen)
+                // Erstelle Zeilen für diese Schicht (inkl. Überbuchungen)
                 for (let i = 0; i < rowCount; i++) {
                     lfdNr++;
                     const z = zuordnungen[i]; // Kann undefined sein wenn kein MA zugeordnet
@@ -2606,10 +2606,10 @@
 
         function openMitarbeiterauswahl() {
             if (!state.currentAuftragId) {
-                alert('Bitte zuerst einen Auftrag auswÃ¤hlen!');
+                alert('Bitte zuerst einen Auftrag auswählen!');
                 return;
             }
-            // Schnellauswahl in Shell Ã¶ffnen mit Auftragsdaten
+            // Schnellauswahl in Shell öffnen mit Auftragsdaten
             // Korrektur: vadatum_id statt vadatum, currentVADatumId statt currentVADatum
             const url = 'frm_MA_VA_Schnellauswahl.html?va_id=' + state.currentAuftragId +
                        '&vadatum_id=' + (state.currentVADatumId || '') +
@@ -2622,7 +2622,7 @@
                     params: { va_id: state.currentAuftragId, vadatum_id: state.currentVADatumId }
                 }, '*');
             } else {
-                // Direkt Ã¶ffnen
+                // Direkt öffnen
                 window.location.href = url;
             }
         }
@@ -2775,7 +2775,7 @@
 
         async function neuenAttachHinzufuegen() {
             if (!state.currentAuftragId) {
-                showToast('Kein Auftrag ausgewÃ¤hlt', 'warning');
+                showToast('Kein Auftrag ausgewählt', 'warning');
                 return;
             }
 
@@ -2838,7 +2838,7 @@
                     `;
                     tr.dataset.id = att.ID;
 
-                    // KontextmenÃ¼
+                    // Kontextmenü
                     tr.addEventListener('contextmenu', (e) => {
                         e.preventDefault();
                         showAttachContextMenu(e, att.ID, att.Dateiname);
@@ -2861,13 +2861,13 @@
         }
 
         async function deleteAttachment(attachId) {
-            showConfirm('Datei lÃ¶schen', 'MÃ¶chten Sie diese Datei wirklich lÃ¶schen?', async () => {
+            showConfirm('Datei löschen', 'Möchten Sie diese Datei wirklich löschen?', async () => {
                 try {
                     await apiCall(`/auftraege/${state.currentAuftragId}/attachments/${attachId}`, 'DELETE');
-                    showToast('Datei gelÃ¶scht', 'success');
+                    showToast('Datei gelöscht', 'success');
                     await loadAttachments();
                 } catch (e) {
-                    showToast('LÃ¶schen fehlgeschlagen', 'error');
+                    showToast('Löschen fehlgeschlagen', 'error');
                 }
             });
         }
@@ -2877,7 +2877,7 @@
         }
 
         function showAttachContextMenu(event, attachId, filename) {
-            // Bestehendes MenÃ¼ entfernen
+            // Bestehendes Menü entfernen
             const existing = document.querySelector('.context-menu');
             if (existing) existing.remove();
 
@@ -2894,13 +2894,13 @@
                 z-index: 2000;
             `;
             menu.innerHTML = `
-                <div class="ctx-item" onclick="openAttachment(${attachId})">Ã–ffnen</div>
+                <div class="ctx-item" onclick="openAttachment(${attachId})">Öffnen</div>
                 <div class="ctx-item" onclick="downloadAttachment(${attachId})">Herunterladen</div>
                 <hr style="margin: 2px 0; border: 0; border-top: 1px solid #808080;">
-                <div class="ctx-item" onclick="deleteAttachment(${attachId})">LÃ¶schen</div>
+                <div class="ctx-item" onclick="deleteAttachment(${attachId})">Löschen</div>
             `;
 
-            // Styling fÃ¼r Items
+            // Styling für Items
             menu.querySelectorAll('.ctx-item').forEach(item => {
                 item.style.cssText = 'padding: 4px 20px; cursor: pointer; font-size: var(--base-font-size);';
                 item.onmouseover = () => item.style.background = '#000080'; item.style.color = 'white';
@@ -2909,7 +2909,7 @@
 
             document.body.appendChild(menu);
 
-            // MenÃ¼ schlieÃŸen bei Klick auÃŸerhalb
+            // Menü schließen bei Klick außerhalb
             document.addEventListener('click', function closeMenu() {
                 menu.remove();
                 document.removeEventListener('click', closeMenu);
@@ -3228,7 +3228,7 @@
                 return;
             }
 
-            // Readonly-Felder aus Hauptformular fÃ¼llen
+            // Readonly-Felder aus Hauptformular füllen
             document.getElementById('eventDatum').value = formatDate(new Date(currentRecord.VADatum || Date.now()));
             document.getElementById('eventAuftrag').value = currentRecord.Auftrag || '';
             document.getElementById('eventOrt').value = currentRecord.Ort || '';
@@ -3273,7 +3273,7 @@
 
         async function webDatenLaden() {
             if (!currentRecord || !currentRecord.Auftrag) {
-                showEventStatus('Kein Auftrag ausgewÃ¤hlt', 'error');
+                showEventStatus('Kein Auftrag ausgewählt', 'error');
                 return;
             }
 
@@ -3281,7 +3281,7 @@
             const statusEl = document.getElementById('eventStatus');
 
             spinner.classList.add('active');
-            statusEl.textContent = 'Suche lÃ¤uft...';
+            statusEl.textContent = 'Suche läuft...';
             statusEl.style.color = '#000080';
 
             try {
@@ -3301,7 +3301,7 @@
                     const data = await response.json();
 
                     if (data.found) {
-                        // Daten gefunden - Felder fÃ¼llen
+                        // Daten gefunden - Felder füllen
                         document.getElementById('eventEinlass').value = data.einlass || '';
                         document.getElementById('eventBeginn').value = data.beginn || '';
                         document.getElementById('eventEnde').value = data.ende || '';
@@ -3313,7 +3313,7 @@
                     } else {
                         // Keine Daten gefunden
                         clearEventWebFields();
-                        showEventStatus('Keine Informationen verfÃ¼gbar', 'warning');
+                        showEventStatus('Keine Informationen verfügbar', 'warning');
                     }
                 } else {
                     showEventStatus('Fehler beim Laden der Daten', 'error');
@@ -3328,7 +3328,7 @@
 
         async function eventdatenSpeichern() {
             if (!currentRecord || !currentRecord.Auftrag_ID) {
-                showEventStatus('Kein Auftrag ausgewÃ¤hlt', 'error');
+                showEventStatus('Kein Auftrag ausgewählt', 'error');
                 return;
             }
 
@@ -3378,7 +3378,7 @@
             document.getElementById('eventBeginn').classList.add('no-data');
             document.getElementById('eventEnde').value = '';
             document.getElementById('eventEnde').classList.add('no-data');
-            document.getElementById('eventInfo').value = 'Keine Informationen verfÃ¼gbar';
+            document.getElementById('eventInfo').value = 'Keine Informationen verfügbar';
             document.getElementById('eventInfo').classList.add('no-data');
             document.getElementById('eventLinkInput').value = '';
             document.getElementById('eventLink').style.display = 'none';

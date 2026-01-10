@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS - Verwaltung</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .shell-container {
+            display: flex;
+            height: 100vh;
+            background-color: #8080c0;
+        }
+
+        /* Left Sidebar - permanent, 182px breit (18px schmäler) */
+        .sidebar {
+            width: 182px;
+            background-color: #6060a0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 2px solid #404080;
+        }
+
+        /* Main Header - CONSYS PLANUNG */
+        .sidebar-header {
+            background-color: #000080;
+            color: white;
+            padding: 8px 10px;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        /* Kategorie-Container */
+        .menu-categories {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 5px 0;
+        }
+
+        /* Kategorie-Block mit Abstand */
+        .category-block {
+            margin-bottom: 10px;
+        }
+
+        .category-block:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Kategorie-Header */
+        .category-header {
+            background-color: #000080;
+            color: #c0c0ff;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Menu-Buttons */
+        .menu-btn {
+            background: linear-gradient(to bottom, #c8c8e0, #a0a0c0);
+            padding: 6px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 11px;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-top: 1px solid #e0e0f0;
+            border-bottom: 1px solid #606090;
+            display: block;
+            width: 100%;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #d8d8f0, #b8b8d8);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #9090b0, #a0a0c0);
+            border-top: 1px solid #606090;
+            border-bottom: 1px solid #e0e0f0;
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #8080b0, #a0a0d0);
+            border-top: 1px solid #505080;
+            border-bottom: 1px solid #c0c0e0;
+            color: #000080;
+            font-weight: 500;
+        }
+
+        /* Tooltip-Styling */
+        .menu-btn[title] {
+            position: relative;
+        }
+
+        .menu-btn[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #000080;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-left: 5px;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .menu-btn[title]:hover::before {
+            content: '';
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-right-color: #000080;
+            z-index: 1000;
+        }
+
+        /* Content Header - AUSGEBLENDET per User-Anfrage */
+        .content-header {
+            display: none;
+        }
+
+        /* Right Content Area */
+        .content-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            flex: 1;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 182px;
+            width: calc(100% - 182px);
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+
+        /* Menu Popup Overlay */
+        .menu-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            display: none;
+        }
+
+        .menu-popup-overlay.active {
+            display: block;
+        }
+
+        .menu-popup-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 182px;
+            height: 100%;
+            border: none;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Menu Popup Overlay (fuer Menu 2) -->
+    <div class="menu-popup-overlay" id="menuPopupOverlay" onclick="closeMenuPopup(event)">
+        <iframe id="menuPopupFrame" class="menu-popup-iframe" src="about:blank"></iframe>
+    </div>
+
+    <div class="shell-container">
+        <!-- Sidebar - permanent -->
+        <div class="sidebar">
+            <!-- Main Header -->
+            <div class="sidebar-header">CONSYS PLANUNG</div>
+
+            <!-- Kategorien mit Buttons -->
+            <div class="menu-categories" id="menuButtons">
+                <!-- PLANUNG -->
+                <div class="category-block">
+                    <div class="category-header">PLANUNG</div>
+                    <button class="menu-btn" data-form="frm_N_Dienstplanuebersicht" title="Dienstplan aller Mitarbeiter anzeigen">Dienstplanübersicht</button>
+                    <button class="menu-btn" data-form="frm_VA_Planungsuebersicht" title="Aufträge und Einsätze planen">Planungsübersicht</button>
+                </div>
+
+                <!-- STAMMDATEN -->
+                <div class="category-block">
+                    <div class="category-header">STAMMDATEN</div>
+                    <button class="menu-btn active" data-form="frm_va_Auftragstamm" title="Aufträge verwalten und bearbeiten">Aufträge</button>
+                    <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm" title="Mitarbeiterdaten verwalten">Mitarbeiter</button>
+                    <button class="menu-btn" data-form="frm_KD_Kundenstamm" title="Kundendaten verwalten">Kunden</button>
+                    <button class="menu-btn" data-form="frm_OB_Objekt" title="Objekte/Standorte verwalten">Objekte</button>
+                </div>
+
+                <!-- PERSONAL -->
+                <div class="category-block">
+                    <div class="category-header">PERSONAL</div>
+                    <button class="menu-btn" data-form="frm_MA_Zeitkonten" title="Zeitkonten der Mitarbeiter einsehen">Zeitkonten</button>
+                    <button class="menu-btn" data-form="frm_N_Stundenauswertung" title="Stundenauswertung und Statistik">Stundenauswertung</button>
+                    <button class="menu-btn" data-form="frm_MA_Abwesenheit" title="Urlaub, Krankheit, Abwesenheiten">Abwesenheiten</button>
+                    <button class="menu-btn" data-form="frm_N_Lohnabrechnungen" title="Lohnabrechnungen erstellen">Lohn</button>
+                </div>
+
+                <!-- EXTRAS -->
+                <div class="category-block">
+                    <div class="category-header">EXTRAS</div>
+                    <button class="menu-btn" data-form="frm_MA_VA_Schnellauswahl" title="Schnelle Mitarbeiter-Zuweisung">Schnellauswahl</button>
+                    <button class="menu-btn" data-form="frm_Einsatzuebersicht" title="Alle Einsätze auf einen Blick">Einsatzübersicht</button>
+                    <button class="menu-btn" id="btnMenu2" onclick="openMenuPopup()" title="Weitere Menü-Optionen anzeigen">Menü 2</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-container">
+            <div class="content-header" id="contentHeader">Auftragsverwaltung</div>
+            <iframe id="contentFrame" class="content-iframe" src="frm_va_Auftragstamm.html?shell=1"></iframe>
+        </div>
+    </div>
+
+    <!-- Logger (muss vor anderen Scripts geladen werden) -->
+    <script src="js/debug-logger.js"></script>
+    <script src="js/logger.js"></script>
+
+    <!-- WebView2 Bridge (falls verfügbar) -->
+    <script src="js/webview2-bridge.js"></script>
+
+    <script>
+        'use strict';
+
+        // Form-Namen zu Anzeige-Namen Mapping
+        const FORM_TITLES = {
+            'frm_N_Dienstplanuebersicht': 'Dienstplanübersicht',
+            'frm_VA_Planungsuebersicht': 'Planungsübersicht',
+            'frm_va_Auftragstamm': 'Auftragsverwaltung',
+            'frm_MA_Mitarbeiterstamm': 'Mitarbeiterstamm',
+            'frm_KD_Kundenstamm': 'Kundenstamm',
+            'frm_OB_Objekt': 'Objektverwaltung',
+            'frm_MA_Zeitkonten': 'Zeitkonten',
+            'frm_N_Stundenauswertung': 'Stundenauswertung',
+            'frm_MA_Abwesenheit': 'Abwesenheiten',
+            'frm_N_Lohnabrechnungen': 'Lohnabrechnungen',
+            'frm_MA_VA_Schnellauswahl': 'Schnellauswahl',
+            'frm_Einsatzuebersicht': 'Einsatzübersicht'
+        };
+
+        // =====================================================
+        // SHELL STATE
+        // =====================================================
+        const ShellState = {
+            currentForm: 'frm_va_Auftragstamm',
+            iframe: null,
+            isWebView2: false,
+            initialData: null
+        };
+
+        // =====================================================
+        // WEBVIEW2 INTEGRATION
+        // =====================================================
+        function initWebView2Bridge() {
+            if (window.chrome && window.chrome.webview) {
+                ShellState.isWebView2 = true;
+
+                if (window.Bridge) {
+                    Bridge.on('onDataReceived', function(data) {
+                        console.log('[Shell] Daten von Access:', data);
+                        ShellState.initialData = data;
+
+                        if (data && data.form) {
+                            loadForm(data.form, data.id);
+                        }
+                        sendDataToIframe(data);
+                    });
+
+                    Bridge.on('onRefresh', function() {
+                        if (ShellState.iframe) {
+                            ShellState.iframe.contentWindow.location.reload();
+                        }
+                    });
+                }
+
+                console.log('[Shell] WebView2 Bridge aktiv');
+            } else {
+                console.log('[Shell] Browser-Modus (REST API)');
+            }
+        }
+
+        function sendDataToIframe(data) {
+            if (ShellState.iframe && ShellState.iframe.contentWindow) {
+                ShellState.iframe.contentWindow.postMessage({
+                    type: 'LOAD_DATA',
+                    ...data
+                }, '*');
+            }
+        }
+
+        // =====================================================
+        // NAVIGATION
+        // =====================================================
+        function loadForm(formName, recordId) {
+            if (!formName) return;
+
+            // Formular-Wechsel loggen
+            if (typeof Logger !== 'undefined' && Logger.log) {
+                Logger.log('FORM_OPEN', formName, null, { id: recordId || null, fromShell: true });
+            }
+
+            // Active button aktualisieren
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.querySelector(`[data-form="${formName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+
+            // Content Header aktualisieren
+            document.getElementById('contentHeader').textContent = FORM_TITLES[formName] || formName;
+
+            showLoading();
+
+            ShellState.currentForm = formName;
+
+            // URL mit shell=1 Parameter
+            let formUrl = formName + '.html?shell=1';
+            if (recordId) {
+                formUrl += '&id=' + recordId;
+            }
+
+            ShellState.iframe.src = formUrl;
+
+            // Browser History
+            if (window.history && window.history.pushState) {
+                const historyUrl = recordId
+                    ? `?form=${formName}&id=${recordId}`
+                    : `?form=${formName}`;
+                window.history.pushState({form: formName, id: recordId}, '', historyUrl);
+            }
+
+            // WebView2 informieren
+            if (ShellState.isWebView2 && window.Bridge) {
+                Bridge.sendEvent('navigate', { form: formName, id: recordId || null });
+            }
+        }
+
+        // =====================================================
+        // IFRAME MESSAGE HANDLER
+        // =====================================================
+        function handleIframeMessage(event) {
+            const data = event.data;
+            if (!data || typeof data !== 'object') return;
+
+            console.log('[Shell] iframe Message:', data.type);
+
+            switch (data.type) {
+                case 'NAVIGATE':
+                    closeMenuPopup();
+                    loadForm(data.formName, data.id);
+                    break;
+
+                case 'CLOSE_MENU':
+                    closeMenuPopup();
+                    break;
+
+                case 'CLOSE':
+                    loadForm('frm_Menuefuehrung1');
+                    break;
+
+                case 'REFRESH':
+                    ShellState.iframe.contentWindow.location.reload();
+                    break;
+
+                case 'SAVE':
+                case 'DELETE':
+                case 'LOAD_DATA':
+                case 'SEARCH':
+                    if (ShellState.isWebView2 && window.Bridge) {
+                        Bridge.sendEvent(data.type.toLowerCase(), data);
+                    }
+                    break;
+            }
+        }
+
+        // =====================================================
+        // UI HELPERS
+        // =====================================================
+        let loadingTimeout = null;
+
+        function showLoading() {
+            loadingTimeout = setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('active');
+            }, 150);
+        }
+
+        function hideLoading() {
+            if (loadingTimeout) {
+                clearTimeout(loadingTimeout);
+                loadingTimeout = null;
+            }
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        // =====================================================
+        // MENU POPUP (Menu 2)
+        // =====================================================
+        function openMenuPopup() {
+            const overlay = document.getElementById('menuPopupOverlay');
+            const frame = document.getElementById('menuPopupFrame');
+
+            frame.src = 'frm_Menuefuehrung1.html';
+            overlay.classList.add('active');
+            document.getElementById('btnMenu2').classList.add('active');
+
+            console.log('[Shell] Menu Popup geöffnet');
+        }
+
+        function closeMenuPopup(event) {
+            if (event && event.target.id !== 'menuPopupOverlay') {
+                return;
+            }
+
+            const overlay = document.getElementById('menuPopupOverlay');
+            const frame = document.getElementById('menuPopupFrame');
+
+            overlay.classList.remove('active');
+            frame.src = 'about:blank';
+            document.getElementById('btnMenu2').classList.remove('active');
+
+            console.log('[Shell] Menu Popup geschlossen');
+        }
+
+        // =====================================================
+        // INITIALIZATION
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            ShellState.iframe = document.getElementById('contentFrame');
+
+            // Menu Button Handler
+            document.querySelectorAll('.menu-btn[data-form]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    loadForm(this.dataset.form);
+                });
+            });
+
+            // iframe Messages
+            window.addEventListener('message', handleIframeMessage);
+
+            // iframe Load Event
+            ShellState.iframe.addEventListener('load', function() {
+                hideLoading();
+            });
+
+            // Browser Back/Forward
+            window.addEventListener('popstate', function(event) {
+                if (event.state && event.state.form) {
+                    loadForm(event.state.form, event.state.id);
+                }
+            });
+
+            // URL Parameter beim Start
+            const urlParams = new URLSearchParams(window.location.search);
+            const formParam = urlParams.get('form');
+            const idParam = urlParams.get('id');
+
+            if (formParam) {
+                loadForm(formParam, idParam);
+            }
+
+            // WebView2 Bridge initialisieren
+            initWebView2Bridge();
+
+            // ESC-Taste schliesst Menu Popup
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const overlay = document.getElementById('menuPopupOverlay');
+                    if (overlay.classList.contains('active')) {
+                        closeMenuPopup();
+                    }
+                }
+            });
+
+            console.log('[Shell] Initialisiert');
+        });
+    </script>
+</body>
+</html>

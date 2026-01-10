@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rückmeldestatistik - CONSYS</title>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        body { background-color: #8080c0; font-family: 'Segoe UI', sans-serif; font-size: 11px; margin: 0; }
+        .window-frame { height: 100vh; display: flex; flex-direction: column; }
+        .title-bar {
+            display: none; /* ausgeblendet gemaess Anforderung */
+        }
+        .toolbar { background: #c0c0c0; padding: 5px 10px; display: flex; gap: 10px; align-items: center; }
+        .toolbar button {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 2px outset #c0c0c0; padding: 4px 12px; cursor: pointer; font-size: 11px;
+        }
+        .content { flex: 1; padding: 10px; overflow: auto; }
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .stat-card { background: white; border: 2px solid #404080; padding: 15px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #000080; }
+        .stat-label { font-size: 11px; color: #606060; }
+        .stat-card.green .stat-value { color: #208020; }
+        .stat-card.red .stat-value { color: #c04040; }
+        .stat-card.yellow .stat-value { color: #c0a000; }
+        .data-table { width: 100%; border-collapse: collapse; background: white; }
+        .data-table th, .data-table td { border: 1px solid #808080; padding: 6px 10px; text-align: left; }
+        .data-table th { background: linear-gradient(to bottom, #e0e0e0, #c0c0c0); }
+        .data-table tbody tr:hover { background: #e0e0ff; }
+    </style>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body>
+    <div class="window-frame">
+        <div class="title-bar">
+            <span>ðŸ“Š Rückmeldestatistik</span>
+            <button onclick="window.close()" style="background:red;color:white;border:none;padding:2px 8px;cursor:pointer;">Ã—</button>
+        </div>
+        <div class="toolbar">
+            <span>Auftrag-ID: <strong id="va_id_display">-</strong></span>
+            <button onclick="loadStatistik()">ðŸ”„ Aktualisieren</button>
+            <button onclick="window.print()">ðŸ–¨ï¸ Drucken</button>
+        </div>
+        <div class="content">
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statGesamt">-</div>
+                    <div class="stat-label">Gesamt Anfragen</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-value" id="statZugesagt">-</div>
+                    <div class="stat-label">Zugesagt</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-value" id="statAbgesagt">-</div>
+                    <div class="stat-label">Abgesagt</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-value" id="statOffen">-</div>
+                    <div class="stat-label">Offen</div>
+                </div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mitarbeiter</th>
+                        <th>Angefragt am</th>
+                        <th>Rückmeldung</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="4" style="text-align:center;">Lade Daten...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const API = 'http://localhost:5000/api';
+        const params = new URLSearchParams(window.location.search);
+        const va_id = params.get('va_id');
+
+        document.getElementById('va_id_display').textContent = va_id || '-';
+
+        async function loadStatistik() {
+            if (!va_id) {
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="4">Keine Auftrags-ID</td></tr>';
+                return;
+            }
+            try {
+                const response = await fetch(`${API}/rueckmeldungen?va_id=${va_id}`);
+                const data = await response.json();
+                const items = data.data || data || [];
+
+                const zugesagt = items.filter(i => i.status === 'zugesagt').length;
+                const abgesagt = items.filter(i => i.status === 'abgesagt').length;
+                const offen = items.filter(i => !i.status || i.status === 'offen').length;
+
+                document.getElementById('statGesamt').textContent = items.length;
+                document.getElementById('statZugesagt').textContent = zugesagt;
+                document.getElementById('statAbgesagt').textContent = abgesagt;
+                document.getElementById('statOffen').textContent = offen;
+
+                document.getElementById('tableBody').innerHTML = items.length === 0
+                    ? '<tr><td colspan="4">Keine Rückmeldungen</td></tr>'
+                    : items.map(i => `<tr>
+                        <td>${i.mitarbeiter || '-'}</td>
+                        <td>${i.angefragt_am || '-'}</td>
+                        <td>${i.rueckmeldung_am || '-'}</td>
+                        <td>${i.status || 'offen'}</td>
+                    </tr>`).join('');
+            } catch (e) {
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="4">Fehler: ${e.message}</td></tr>`;
+            }
+        }
+
+        loadStatistik();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu 2 - Hauptmenu - CONSYS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: transparent;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Popup Overlay - erscheint ueber Sidebar (links) */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 9998;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 0;
+        }
+
+        /* Popup Window - exakt ueber Sidebar positioniert */
+        .window-frame {
+            background-color: #6060a0;
+            display: flex;
+            flex-direction: column;
+            width: 200px;
+            min-width: 185px;
+            max-height: 100vh;
+            z-index: 9999;
+            box-shadow: 4px 0 16px rgba(0,0,0,0.4);
+            border: none;
+            border-right: 2px solid #404080;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 2px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 22px;
+            flex-shrink: 0;
+            cursor: move;
+        }
+
+        .title-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .title-bar-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 20px;
+            height: 20px;
+            background: #ece9d8;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .title-btn.close {
+            background: #c75050;
+            color: white;
+        }
+
+        .title-btn.close:hover {
+            background: #e06060;
+        }
+
+        /* Menu Container */
+        .menu-container {
+            flex: 1;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+        }
+
+        /* Section Container */
+        .section {
+            background-color: #8080c0;
+            border: none;
+            border-bottom: 1px solid #505090;
+            padding: 4px 5px;
+        }
+
+        .section-title {
+            background: linear-gradient(to bottom, #000080, #4040a0);
+            color: white;
+            padding: 3px 6px;
+            font-weight: bold;
+            font-size: 9px;
+            margin: -4px -5px 4px -5px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Menu Button - kompakt wie Sidebar */
+        .menu-btn {
+            width: 100%;
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: none;
+            padding: 5px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            text-align: center;
+            margin-bottom: 2px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.1s;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:last-child {
+            margin-bottom: 0;
+        }
+
+        .menu-btn.highlight {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.highlight::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.highlight::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        /* Close Button */
+        .close-btn {
+            background: linear-gradient(to bottom, #c04040, #902020) !important;
+            color: white !important;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .close-btn::before {
+            background: #e06060 !important;
+        }
+
+        .close-btn::after {
+            background: #601010 !important;
+        }
+
+        .close-btn:hover {
+            background: linear-gradient(to bottom, #e05050, #b03030) !important;
+        }
+
+        /* Separator */
+        .separator {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #606090, transparent);
+            margin: 6px 0;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000080;
+            color: white;
+            padding: 10px 20px;
+            border: 2px solid;
+            border-color: #4040a0 #000040 #000040 #4040a0;
+            z-index: 10001;
+            display: none;
+            font-size: 11px;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .toast.success {
+            background: #308030;
+            border-color: #60c060 #205020 #205020 #60c060;
+        }
+
+        .toast.error {
+            background: #c04040;
+            border-color: #e06060 #802020 #802020 #e06060;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        /* Icon in buttons */
+        .menu-btn::before {
+            margin-right: 6px;
+        }
+
+        /* Vollbild-Button oben rechts */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #606060 #606060 #ffffff;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .fullscreen-btn:active {
+            border-color: #606060 #ffffff #ffffff #606060;
+        }
+
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body>
+    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">â›¶</button>
+    <div class="popup-overlay" onclick="closeOnOverlay(event)">
+        <div class="window-frame" onclick="event.stopPropagation()">
+            <!-- Title Bar -->
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <span>Menu 2 - Hauptmenu</span>
+                </div>
+                <div class="title-bar-buttons">
+                    <button class="title-btn close tiny-btn" title="Schliessen" onclick="closeForm()">X</button>
+                </div>
+            </div>
+
+            <!-- Menu Container -->
+            <div class="menu-container">
+                <!-- Section 1: Navigation (Dashboard) -->
+                <div class="section">
+                    <div class="section-title">Navigation</div>
+                    <button class="menu-btn highlight" onclick="navigateTo('frm_N_Dienstplanübersicht')">Dienstplanübersicht</button>
+                    <button class="menu-btn highlight" onclick="navigateTo('frm_VA_Planungsübersicht')">Planungsübersicht</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_va_Auftragstamm')">Auftragsverwaltung</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_MA_Mitarbeiterstamm')">Mitarbeiterverwaltung</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_KD_Kundenstamm')">Kundenverwaltung</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_OB_Objekt')">Objektverwaltung</button>
+                </div>
+
+                <!-- Section 2: Personal -->
+                <div class="section">
+                    <div class="section-title">Personal</div>
+                    <button class="menu-btn" onclick="navigateTo('frm_MA_Zeitkonten')">Zeitkonten</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_Abwesenheiten')">Abwesenheiten</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_N_Stundenauswertung')">Stundenauswertung</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_N_Lohnabrechnungen')">Lohnabrechnungen</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_Dienstausweis')">Dienstausweis</button>
+                </div>
+
+                <!-- Section 3: Extras -->
+                <div class="section">
+                    <div class="section-title">Extras & Tools</div>
+                    <button class="menu-btn" onclick="navigateTo('frm_MA_VA_Schnellauswahl')">Schnellauswahl / Mail-Anfragen</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_Verrechnungssaetze')">Verrechnungssaetze</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_SubRechnungen')">Sub Rechnungen</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_Email')">E-Mail</button>
+                    <button class="menu-btn" onclick="btn_mailvorlage_Click()">E-Mail Vorlagen</button>
+                    <div class="separator"></div>
+                    <button class="menu-btn" onclick="exportMAStamm()">Mitarbeiterstamm Excel</button>
+                    <button class="menu-btn" onclick="openReport('rpt_telefonliste')">Telefonliste drucken</button>
+                    <button class="menu-btn" onclick="openReport('rpt_monatsstunden')">Monatsstunden drucken</button>
+                    <button class="menu-btn" onclick="openReport('rpt_jahresübersicht_mitarbeiter')">Jahresübersicht MA</button>
+                    <button class="menu-btn" onclick="btnStundenMA_Click()">Stunden MA Kreuztabelle</button>
+                    <button class="menu-btn" onclick="btn_stunden_sub_Click()">Stunden Sub Export</button>
+                </div>
+
+                <!-- Section 4: Automatisierung -->
+                <div class="section">
+                    <div class="section-title">Automatisierung</div>
+                    <button class="menu-btn" onclick="btn_LoewensaalSync_Click()">Loewensaal Sync (Excel)</button>
+                    <button class="menu-btn" onclick="btn_Loewensaal_Sync_HP_Click()">Loewensaal Sync (Homepage)</button>
+                    <button class="menu-btn" onclick="btnAutoZuordnungSport_Click()">Auto-Zuordnung Minijobber</button>
+                    <button class="menu-btn" onclick="btn_FA_eintragen_Click()">Festangestellte zuordnen</button>
+                    <button class="menu-btn" onclick="btn_Stawa_Click()">E-Mail zu Auftrag</button>
+                    <button class="menu-btn" onclick="btn_Hirsch_Click()">Hirsch Import</button>
+                    <button class="menu-btn" onclick="btn_BOS_Click()">BOS Mail-Import</button>
+                </div>
+
+                <!-- Section 5: Spezial -->
+                <div class="section">
+                    <div class="section-title">Spezial</div>
+                    <button class="menu-btn" onclick="btnNamensliste_Click()">Namensliste Fuerth</button>
+                    <button class="menu-btn" onclick="btnFCN_Meldeliste_Click()">FCN Meldeliste</button>
+                    <button class="menu-btn" onclick="btn_weitere_Masken_Click()">Weitere Masken</button>
+                    <button class="menu-btn" onclick="btnLohnarten_Click()">Lohnarten / Zuschlaege</button>
+                    <button class="menu-btn" onclick="btn_Abwesenheiten_Click()">Abwesenheiten (Urlaub/Krank)</button>
+                    <button class="menu-btn" onclick="btnLetzterEinsatz_Click()">Letzter Einsatz MA</button>
+                    <button class="menu-btn" onclick="btnPositionslisten_Click()">Positionslisten (Objekte)</button>
+                </div>
+
+                <!-- Section 6: System -->
+                <div class="section">
+                    <div class="section-title">System</div>
+                    <button class="menu-btn" onclick="navigateTo('frm_SystemInfo')">System Info</button>
+                    <button class="menu-btn" onclick="navigateTo('frm_DBWechseln')">Datenbank wechseln</button>
+                    <button class="menu-btn" onclick="btn_masterbtn_Click()">Auswahl-Master</button>
+                </div>
+
+                <!-- Close Button -->
+                <button class="menu-btn close-btn" onclick="closeForm()">Menu schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- WebView2 Bridge -->
+    <script src="js/webview2-bridge.js"></script>
+    <!-- Global Handlers for FORM_MAP -->
+    <script src="js/global-handlers.js"></script>
+
+    <script>
+        // ============================================
+        // NAVIGATION - An Shell/Parent mitteilen
+        // ============================================
+        function navigateTo(formName) {
+            try {
+                // An Shell/Parent mitteilen
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'NAVIGATE',
+                        formName: formName
+                    }, '*');
+                    console.log('[Menu2] NAVIGATE gesendet:', formName);
+                }
+
+                // WebView2 Bridge falls verfügbar
+                if (window.Bridge) {
+                    Bridge.navigate(formName);
+                }
+
+                // Popup schließen
+                closeMenu();
+            } catch (error) {
+                console.error('Navigation-Fehler:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================
+        // CLOSE MENU - Popup schließen
+        // ============================================
+        function closeMenu() {
+            // An Shell/Parent mitteilen
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'CLOSE_MENU'
+                }, '*');
+                console.log('[Menu2] CLOSE_MENU gesendet');
+            }
+        }
+
+        // ============================================
+        // REPORT & QUERY FUNCTIONS
+        // ============================================
+        function openReport(reportName, view = 'acViewPreview') {
+            try {
+                if (window.Bridge) {
+                    Bridge.sendEvent('openReport', { report: reportName, view: view });
+                    showToast('Report wird geöffnet...', 'success');
+                } else {
+                    showToast(`Report ${reportName} - nur in Access verfügbar`, 'info');
+                }
+            } catch (error) {
+                console.error('Report-Fehler:', error);
+                showToast(`Fehler: ${error.message}`, 'error');
+            }
+        }
+
+        // ============================================
+        // EXPORT FUNCTIONS
+        // ============================================
+        async function exportMAStamm() {
+            const datum = new Date().toISOString().split('T')[0];
+            const dateiname = `Mitarbeiterstamm_${datum}.xlsx`;
+
+            try {
+                if (window.Bridge) {
+                    Bridge.sendEvent('export', { type: 'MAStamm', dateiname: dateiname });
+                    showToast('Export wird erstellt...', 'success');
+                } else {
+                    showToast('Export nur in Access verfügbar', 'info');
+                }
+            } catch (error) {
+                console.error('Export-Fehler:', error);
+                showToast('Export-Funktion nur in Access verfügbar', 'error');
+            }
+        }
+
+
+        // ============================================
+        // SYNC FUNCTIONS
+        // ============================================
+        function syncLoewensaal() {
+            try {
+                if (window.Bridge) {
+                    Bridge.sendEvent('sync', { type: 'Loewensaal' });
+                    showToast('Synchronisation gestartet...', 'success');
+                } else {
+                    showToast('Sync nur in Access verfügbar', 'info');
+                }
+            } catch (error) {
+                console.error('Sync-Fehler:', error);
+                showToast(`Fehler: ${error.message}`, 'error');
+            }
+        }
+
+        // ============================================
+        // CLOSE FORM (Alias für closeMenu)
+        // ============================================
+        function closeForm() {
+            closeMenu();
+        }
+
+        function closeOnOverlay(event) {
+            // Nur schließen wenn direkt auf Overlay geklickt
+            if (event.target.classList.contains('popup-overlay')) {
+                closeMenu();
+            }
+        }
+
+        // ============================================
+        // UI HELPERS
+        // ============================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeForm();
+            }
+        });
+
+        // ============================================
+        // VBA BUTTON EVENTS (aus Form_frm_Menuefuehrung1.bas)
+        // ============================================
+
+        // btn_mailvorlage_Click - E-Mail Vorlagen öffnen
+        function btn_mailvorlage_Click() {
+            navigateTo('frm_ma_serien_email_vorlage');
+        }
+
+        // btnStundenMA_Click - Kreuztabelle Stunden MA öffnen
+        function btnStundenMA_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openQuery', { query: 'zqry_MA_VA_Stunden_Plan_Ist_aktJahr_Kreuztabelle' });
+                showToast('Kreuztabelle wird geöffnet...', 'success');
+            } else {
+                showToast('Nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btn_stunden_sub_Click - Sub-Stunden Export
+        function btn_stunden_sub_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('exportToExcel', {
+                    query: 'zqry_MA_VA_ZUO_PLAN_SUB',
+                    filename: 'Stunden_Sub_' + new Date().toISOString().split('T')[0] + '.xlsx'
+                });
+                showToast('Export wird erstellt...', 'success');
+            } else {
+                showToast('Export nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btn_LoewensaalSync_Click - Loewensaal Sync (Excel/Web)
+        function btn_LoewensaalSync_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'RunLoewensaalSync_WithWebScan' });
+                showToast('Synchronisation gestartet...', 'success');
+            } else {
+                showToast('Sync nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btn_Loewensaal_Sync_HP_Click - Loewensaal Homepage Sync
+        function btn_Loewensaal_Sync_HP_Click() {
+            if (!confirm('Loewensaal-Events von der Homepage synchronisieren?\n\nDies kann einige Sekunden dauern.')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'mod_N_Loewensaal_HP.SyncLoewensaalEventsFromHomepage' });
+                showToast('Homepage-Synchronisation gestartet...', 'success');
+            } else {
+                showToast('Sync nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btnAutoZuordnungSport_Click - Auto-Zuordnung Minijobber
+        function btnAutoZuordnungSport_Click() {
+            if (!confirm('Minijobber für Auftragsanfragen vorbereiten?')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Auto_MA_Zuordnung_Sport_Venues' });
+                showToast('Auto-Zuordnung gestartet...', 'success');
+            } else {
+                showToast('Nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btn_FA_eintragen_Click - Festangestellte zuordnen
+        function btn_FA_eintragen_Click() {
+            if (!confirm('Festangestellte Mitarbeiter automatisch zuordnen?')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Auto_Festangestellte_Zuordnen' });
+                showToast('Auto-Zuordnung Festangestellte...', 'success');
+            } else {
+                showToast('Nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btn_Stawa_Click - E-Mail zu Auftrag
+        function btn_Stawa_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Email_Zu_Auftrag' });
+                showToast('E-Mail zu Auftrag...', 'success');
+            } else {
+                showToast('Nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btn_Hirsch_Click - Hirsch Import
+        function btn_Hirsch_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'HirschImport_Starten' });
+                showToast('Hirsch Import gestartet...', 'success');
+            } else {
+                showToast('Nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btn_BOS_Click - BOS Mail zu Auftrag
+        function btn_BOS_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'MailToAuftrag_FromMailText' });
+                showToast('BOS Mail-Import...', 'success');
+            } else {
+                showToast('Nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btnNamensliste_Click - Namensliste Fuerth (Excel)
+        function btnNamensliste_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'btnNamensliste_Click' });
+                showToast('Namensliste wird erstellt...', 'success');
+            } else {
+                showToast('Nur in Access verfügbar (benoetigt offenen Auftragstamm)', 'info');
+            }
+            closeForm();
+        }
+
+        // btnFCN_Meldeliste_Click - FCN Meldeliste
+        function btnFCN_Meldeliste_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'btnFCN_Meldeliste_Click' });
+                showToast('FCN Meldeliste wird erstellt...', 'success');
+            } else {
+                showToast('Nur in Access verfügbar (benoetigt offenen Auftragstamm)', 'info');
+            }
+            closeForm();
+        }
+
+        // btn_weitere_Masken_Click - Weitere Masken
+        function btn_weitere_Masken_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openForm', { form: '__frmHlpMenu_Weitere_Masken' });
+            } else {
+                showToast('Nur in Access verfügbar', 'info');
+            }
+        }
+
+        // btnLohnarten_Click - Lohnarten / Zuschlaege
+        function btnLohnarten_Click() {
+            navigateTo('zfrm_ZK_Lohnarten_Zuschlag');
+        }
+
+        // btn_Abwesenheiten_Click - Abwesenheiten
+        function btn_Abwesenheiten_Click() {
+            const jahr = prompt('Jahr eingeben (leer = aktuelles Jahr):', '');
+            if (jahr === null) return; // Abgebrochen
+
+            if (jahr === '' || jahr === new Date().getFullYear().toString()) {
+                navigateTo('frm_MA_Abwesenheiten_Urlaub_Gueni');
+            } else {
+                if (window.Bridge) {
+                    Bridge.sendEvent('openForm', { form: 'frm_MA_Abwesenheiten_krank_gueni_' + jahr });
+                } else {
+                    showToast('Jahresliste nur in Access verfügbar', 'info');
+                }
+            }
+        }
+
+        // btnLetzterEinsatz_Click - Letzter Einsatz MA
+        function btnLetzterEinsatz_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openQuery', { query: 'qry_MA_letzter _Einsatz_Gueni' });
+                showToast('Abfrage wird geöffnet...', 'success');
+            } else {
+                showToast('Nur in Access verfügbar', 'info');
+            }
+            closeForm();
+        }
+
+        // btnPositionslisten_Click - Positionslisten (Objekte)
+        function btnPositionslisten_Click() {
+            navigateTo('frm_OB_Objekt');
+        }
+
+        // btn_masterbtn_Click - Auswahl-Master
+        function btn_masterbtn_Click() {
+            navigateTo('frm_N_AuswahlMaster');
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[Menu2] frm_Menuefuehrung1 als Popup initialisiert');
+            console.log('[Menu2] VBA-Events synchronisiert: 20+ Buttons aktiv');
+
+            // Bridge Event Handler
+            if (window.Bridge) {
+                Bridge.on('onDataReceived', (data) => {
+                    console.log('[Menu2] Daten empfangen:', data);
+                });
+            }
+        });
+
+        // ============================================
+        // VOLLBILD-FUNKTION (Browser Fullscreen API)
+        // ============================================
+        function toggleFullscreen() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.title = 'Vollbild beenden';
+                }).catch(err => console.error('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen().then(() => {
+                    btn.title = 'Vollbild';
+                }).catch(err => console.error('Exit fullscreen error:', err));
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+    </script>
+
+    <!-- Shell-Detector (muss vor </body>) -->
+    <script src="js/shell-detector.js"></script>
+</body>
+</html>
+
+
