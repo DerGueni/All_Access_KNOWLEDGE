@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahnung erstellen - CONSYS</title>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        body {
+            background-color: #8080c0;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 11px;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            padding: 20px;
+        }
+
+        .header {
+            border-bottom: 2px solid #dc3545;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #dc3545;
+            margin: 0;
+            font-size: 24px; /* +8px gemäß Anforderung */
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            color: #dc3545;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 10px 15px;
+            align-items: center;
+        }
+
+        .form-label {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .form-input {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        select.form-input {
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #dc3545;
+        }
+
+        .form-input:disabled {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .invoices-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .invoices-table th {
+            background: #dc3545;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+        }
+
+        .invoices-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .invoices-table tr.overdue-30 {
+            background: #fff3cd;
+        }
+
+        .invoices-table tr.overdue-60 {
+            background: #f8d7da;
+        }
+
+        .invoices-table tr.selected {
+            background: #d4edda;
+            font-weight: bold;
+        }
+
+        .invoices-table tr:hover {
+            background: #e9ecef;
+            cursor: pointer;
+        }
+
+        .invoices-table .col-select { width: 30px; text-align: center; }
+        .invoices-table .col-rechnr { width: 100px; }
+        .invoices-table .col-kunde { width: 30%; }
+        .invoices-table .col-datum { width: 100px; }
+        .invoices-table .col-betrag { width: 120px; text-align: right; }
+        .invoices-table .col-tage { width: 80px; text-align: center; }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #4316B2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3412a0;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .actions {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .summary-label {
+            font-weight: bold;
+        }
+
+        .summary-value {
+            font-family: 'Courier New', monospace;
+        }
+
+        .summary-total {
+            font-size: 14px;
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .status-message {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #dc3545;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 11px;
+        }
+
+        .info-box strong {
+            color: #004085;
+        }
+    </style>
+    <link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-form="frm_Mahnung">
+    <div class="container">
+        <div class="header">
+            <h1>Mahnung erstellen</h1>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Mahnungskopf -->
+        <div class="section">
+            <div class="section-title">Mahnungskopf</div>
+            <div class="form-grid">
+                <label class="form-label">Mahnungsnummer:</label>
+                <input type="text" id="mahnungsnummer" class="form-input" disabled>
+
+                <label class="form-label">Mahnstufe:</label>
+                <select id="mahnstufe" class="form-input" onchange="updateMahngebuehr()">
+                    <option value="1">1. Mahnung</option>
+                    <option value="2">2. Mahnung</option>
+                    <option value="3">3. Mahnung</option>
+                </select>
+
+                <label class="form-label">Mahndatum:</label>
+                <input type="date" id="mahndatum" class="form-input">
+
+                <label class="form-label">Mahngebühr:</label>
+                <input type="number" id="mahngebuehr" class="form-input" step="0.01" min="0" value="5.00">
+            </div>
+        </div>
+
+        <!-- Info-Box -->
+        <div class="info-box">
+            <strong>Hinweis:</strong> Klicken Sie auf eine Rechnung, um sie für die Mahnung auszuwählen.
+            Farbcodierung: <span style="background:#fff3cd; padding:2px 6px;">Gelb</span> = 30+ Tage überfällig,
+            <span style="background:#f8d7da; padding:2px 6px;">Rot</span> = 60+ Tage überfällig
+        </div>
+
+        <!-- Offene Rechnungen -->
+        <div class="section">
+            <div class="section-title">Offene Rechnungen</div>
+            <table class="invoices-table">
+                <thead>
+                    <tr>
+                        <th class="col-select">✓</th>
+                        <th class="col-rechnr">Rech-Nr.</th>
+                        <th class="col-kunde">Kunde</th>
+                        <th class="col-datum">Datum</th>
+                        <th class="col-betrag">Betrag (€)</th>
+                        <th class="col-tage">Tage</th>
+                    </tr>
+                </thead>
+                <tbody id="invoicesTableBody">
+                    <!-- Wird dynamisch gefüllt -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Zusammenfassung -->
+        <div class="summary" id="summary" style="display: none;">
+            <div class="summary-row">
+                <span class="summary-label">Ausgewählte Rechnungen:</span>
+                <span class="summary-value" id="summaryCount">0</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Rechnungsbetrag gesamt:</span>
+                <span class="summary-value" id="summaryInvoices">0,00 €</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Mahngebühr:</span>
+                <span class="summary-value" id="summaryFee">0,00 €</span>
+            </div>
+            <div class="summary-row summary-total">
+                <span class="summary-label">Forderung gesamt:</span>
+                <span class="summary-value" id="summaryTotal">0,00 €</span>
+            </div>
+        </div>
+
+        <!-- Aktionen -->
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="deselectAll()">Auswahl aufheben</button>
+            <button class="btn btn-danger" onclick="createReminder()">Mahnung erstellen (Word)</button>
+            <button class="btn btn-primary" onclick="createReminderAndPDF()">Mahnung erstellen (PDF)</button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <div>Mahnung wird erstellt...</div>
+        </div>
+    </div>
+
+    <script src="logic/frm_Mahnung.logic.js"></script>
+</body>
+</html>
