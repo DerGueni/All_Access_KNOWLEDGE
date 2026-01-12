@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter-Tabelle - CONSYS</title>
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; font-size: 11px; }
+        body {
+            background-color: #8080c0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border-bottom: 2px solid #808080;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 {
+            color: #000080;
+            font-size: 19px; /* Formulartitel +8px gemaess Anforderung */
+            font-weight: bold;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 6px 16px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: #d0d0e0;
+            border-bottom: 1px solid #808080;
+            padding: 8px 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .toolbar label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .toolbar input[type="text"] {
+            padding: 4px 8px;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            background: white;
+            font-size: 11px;
+        }
+        .toolbar select {
+            padding: 4px 8px;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            background: white;
+            font-size: 11px;
+        }
+        .toolbar input[type="checkbox"] {
+            margin-right: 4px;
+        }
+
+        /* Container */
+        .container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            background-color: #8080c0;
+        }
+
+        /* Table Wrapper */
+        .table-wrapper {
+            flex: 1;
+            overflow: auto;
+            background: white;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        /* Table */
+        table {
+            width: max-content;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        /* Thead */
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #d0d0e0;
+        }
+        thead th {
+            padding: 6px 10px;
+            text-align: left;
+            border-right: 1px solid #c0c0c0;
+            border-bottom: 2px solid #808080;
+            font-weight: bold;
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+        }
+        thead th:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+        thead th.sortable::after {
+            content: ' ⇅';
+            opacity: 0.3;
+        }
+        thead th.sorted-asc::after {
+            content: ' ▲';
+            opacity: 1;
+        }
+        thead th.sorted-desc::after {
+            content: ' ▼';
+            opacity: 1;
+        }
+
+        /* Tbody */
+        tbody tr {
+            background: white;
+        }
+        tbody tr:nth-child(even) {
+            background: #f5f5f5;
+        }
+        tbody tr:hover {
+            background: #e0e8ff;
+        }
+        tbody td {
+            padding: 4px 10px;
+            border-right: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+            white-space: nowrap;
+        }
+
+        /* Checkbox columns */
+        td.checkbox-cell {
+            text-align: center;
+        }
+        td.checkbox-cell input[type="checkbox"] {
+            cursor: not-allowed;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #d0d0e0;
+            border-top: 2px solid #ffffff;
+            padding: 6px 15px;
+            font-size: 11px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Loading */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px 40px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+    </style>
+    <script src="js/webview2-bridge.js"></script>
+    <link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-form="frm_MA_Tabelle">
+    <div class="header">
+        <h1>Mitarbeiter-Tabelle</h1>
+        <div class="header-actions">
+            <button class="btn" onclick="window.print()">Drucken</button>
+            <button class="btn" onclick="exportToCSV()">Export CSV</button>
+            <button class="btn" onclick="location.reload()">Neu laden</button>
+            <button class="btn" onclick="history.back()">Zurück</button>
+            <button class="btn" onclick="Bridge.close()">Schließen</button>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <label>
+            <input type="checkbox" id="chkAktiv" checked>
+            Nur aktive MA
+        </label>
+        <label>Suche:
+            <input type="text" id="txtSearch" placeholder="Nachname/Vorname...">
+        </label>
+        <label>Anstellungsart:
+            <select id="selAnstellung">
+                <option value="">Alle</option>
+                <option value="3,5" selected>Festangestellt + Minijob</option>
+                <option value="3">Nur Festangestellt</option>
+                <option value="5">Nur Minijob</option>
+                <option value="11">Nur Subunternehmer</option>
+            </select>
+        </label>
+        <button class="btn" onclick="loadData()">Filtern</button>
+    </div>
+
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="loading" id="loading">Lade Daten...</div>
+            <table id="tblMitarbeiter">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-field="ID">ID</th>
+                        <th class="sortable" data-field="LEXWare_ID">LEXWare</th>
+                        <th class="sortable" data-field="Nachname">Nachname</th>
+                        <th class="sortable" data-field="Vorname">Vorname</th>
+                        <th class="sortable" data-field="Geschlecht">Geschlecht</th>
+                        <th class="sortable" data-field="Geb_Dat">Geb. Datum</th>
+                        <th class="sortable" data-field="Geb_Ort">Geb. Ort</th>
+                        <th class="sortable" data-field="Staatsang">Staatsang.</th>
+                        <th class="sortable" data-field="Strasse">Straße</th>
+                        <th class="sortable" data-field="Nr">Nr</th>
+                        <th class="sortable" data-field="PLZ">PLZ</th>
+                        <th class="sortable" data-field="Ort">Ort</th>
+                        <th class="sortable" data-field="Tel_Mobil">Tel. Mobil</th>
+                        <th class="sortable" data-field="Tel_Festnetz">Tel. Festnetz</th>
+                        <th class="sortable" data-field="Email">E-Mail</th>
+                        <th class="sortable" data-field="Eintrittsdatum">Eintritt</th>
+                        <th class="sortable" data-field="Austrittsdatum">Austritt</th>
+                        <th class="sortable" data-field="Auszahlungsart">Auszahlung</th>
+                        <th class="sortable" data-field="Bankname">Bankname</th>
+                        <th class="sortable" data-field="Kontoinhaber">Kontoinhaber</th>
+                        <th class="sortable" data-field="IBAN">IBAN</th>
+                        <th class="sortable" data-field="BIC">BIC</th>
+                        <th class="sortable" data-field="Anstellungsart_ID">Anstellung</th>
+                        <th class="sortable" data-field="IstAktiv">Aktiv</th>
+                        <th class="sortable" data-field="IstSubunternehmer">Subunt.</th>
+                        <th class="sortable" data-field="HatSachkunde">Sachkunde</th>
+                        <th class="sortable" data-field="Hat_keine_34a">Keine 34a</th>
+                        <th class="sortable" data-field="Kostenstelle">Kostenstelle</th>
+                        <th data-field="Bemerkungen">Bemerkungen</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    <!-- Wird dynamisch gefüllt -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span id="statusLeft">Bereit</span>
+        <span id="statusRight">0 Datensätze</span>
+    </div>
+
+    <script src="logic/frm_MA_Tabelle.logic.js" type="module"></script>
+</body>
+</html>

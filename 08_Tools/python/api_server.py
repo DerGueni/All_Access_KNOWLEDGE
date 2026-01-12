@@ -1006,6 +1006,8 @@ def get_mitarbeiter():
     - search: Suche in Nachname/Vorname
     - anstellung: Filter Anstellungsart_ID (Komma-separiert, z.B. "3,5")
     - filter_anstellung: true = Default-Filter (3,5), false = alle
+    - view: 'table' = Alle Felder für Tabellenansicht (27+ Felder)
+    - sort: Custom Sortierung (default: Nachname,Vorname)
     """
     try:
         conn = get_connection()
@@ -1018,10 +1020,29 @@ def get_mitarbeiter():
         search = request.args.get('search', '')
         anstellung = request.args.get('anstellung', '')
         filter_anstellung = request.args.get('filter_anstellung', 'true')
+        view = request.args.get('view', 'compact')  # 'compact' oder 'table'
+        sort = request.args.get('sort', '')
+
+        # Feldauswahl basierend auf View
+        if view == 'table':
+            # Alle relevanten Felder für Tabellenansicht (27+ Felder wie in Access)
+            fields = """
+                ID, LEXWare_ID, Nachname, Vorname, Geschlecht,
+                Geb_Dat, Geb_Ort, Staatsang,
+                Strasse, Nr, PLZ, Ort,
+                Tel_Mobil, Tel_Festnetz, Email,
+                Eintrittsdatum, Austrittsdatum,
+                Auszahlungsart, Bankname, Kontoinhaber, IBAN, BIC,
+                Anstellungsart_ID, IstAktiv, IstSubunternehmer,
+                HatSachkunde, Hat_keine_34a,
+                Bemerkungen, Kostenstelle
+            """
+        else:
+            # Kompakte Ansicht (Standard)
+            fields = "ID, Nachname, Vorname, IstAktiv, Tel_Mobil, Strasse, PLZ, Ort, Anstellungsart_ID"
 
         query = f"""
-            SELECT TOP {limit} ID, Nachname, Vorname, IstAktiv,
-                   Tel_Mobil, Strasse, PLZ, Ort, Anstellungsart_ID
+            SELECT TOP {limit} {fields}
             FROM tbl_MA_Mitarbeiterstamm
             WHERE IstAktiv = ?
         """
@@ -1042,7 +1063,16 @@ def get_mitarbeiter():
             query += " AND (Nachname LIKE ? OR Vorname LIKE ?)"
             params.extend([f'%{search}%', f'%{search}%'])
 
-        query += " ORDER BY Nachname, Vorname"
+        # Sortierung
+        if sort:
+            # Custom Sortierung, z.B. "IstAktiv,Nachname"
+            query += f" ORDER BY {sort}"
+        elif view == 'table':
+            # Access-Standard Sortierung für Tabellenansicht
+            query += " ORDER BY IstAktiv DESC, Nachname, IstSubunternehmer DESC, HatSachkunde DESC, Hat_keine_34a DESC"
+        else:
+            # Standard-Sortierung
+            query += " ORDER BY Nachname, Vorname"
 
         cursor.execute(query, params)
         rows = cursor.fetchall()
