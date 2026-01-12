@@ -6085,6 +6085,676 @@ def create_dienstplan_email_html(mitarbeiter, einsaetze, betreff, nachricht, von
 
 
 # ============================================
+# Voting-System
+# ============================================
+
+import secrets
+import html as html_escape
+
+
+@app.route('/api/email/auftragsanfrage', methods=['POST'])
+def send_auftragsanfrage_email():
+    """
+    Erstellt E-Mail für Auftragsanfrage mit Voting-Buttons
+
+    POST Body:
+    {
+        "ma_id": 852,
+        "va_id": 12345,
+        "vastart_id": 67890,
+        "betreff": "Auftragsanfrage...",
+        "nachricht": "Hallo...",
+        "mit_voting": true  // Optional, default true
+    }
+
+    Returns:
+    {
+        "success": true,
+        "email_data": {
+            "to": "mitarbeiter@email.de",
+            "subject": "...",
+            "body": "HTML...",
+            "token": "...",
+            "vote_url_zusage": "...",
+            "vote_url_absage": "..."
+        }
+    }
+    """
+    try:
+        data = request.json
+        ma_id = data.get('ma_id')
+        va_id = data.get('va_id')
+        vastart_id = data.get('vastart_id')
+        betreff = data.get('betreff', 'Auftragsanfrage')
+        nachricht = data.get('nachricht', '')
+        mit_voting = data.get('mit_voting', True)
+
+        if not ma_id:
+            return jsonify({'success': False, 'error': 'ma_id fehlt'}), 400
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Lade Mitarbeiter-Daten
+        cursor.execute("""
+            SELECT ID, Nachname, Vorname, eMail, Geschlecht
+            FROM tbl_MA_Mitarbeiterstamm
+            WHERE ID = ?
+        """, [ma_id])
+
+        ma_row = cursor.fetchone()
+        if not ma_row:
+            release_connection(conn)
+            return jsonify({'success': False, 'error': 'Mitarbeiter nicht gefunden'}), 404
+
+        geschlecht = ma_row[4]
+        anrede = 'Sehr geehrter Herr' if geschlecht == 'männlich' else 'Sehr geehrte Frau' if geschlecht == 'weiblich' else 'Hallo'
+
+        mitarbeiter = {
+            'ID': ma_row[0],
+            'Nachname': ma_row[1],
+            'Vorname': ma_row[2],
+            'eMail': ma_row[3],
+            'Anrede': anrede
+        }
+
+        if not mitarbeiter['eMail']:
+            release_connection(conn)
+            return jsonify({'success': False, 'error': 'Mitarbeiter hat keine E-Mail-Adresse'}), 400
+
+        # Lade Auftragsdaten
+        auftrag_info = ""
+        if va_id:
+            cursor.execute("""
+                SELECT Auftrag, Objekt, Ort FROM tbl_VA_Auftragstamm WHERE ID = ?
+            """, [va_id])
+            va_row = cursor.fetchone()
+            if va_row:
+                auftrag = va_row[0] or va_row[1] or 'Auftrag'
+                ort = va_row[2] or ''
+                auftrag_info = f"<p><strong>Auftrag:</strong> {html_escape.escape(auftrag)}</p>"
+                if ort:
+                    auftrag_info += f"<p><strong>Ort:</strong> {html_escape.escape(ort)}</p>"
+
+        # Lade Schicht-Daten
+        schicht_info = ""
+        if vastart_id:
+            cursor.execute("""
+                SELECT VADatum, VA_Start, VA_Ende FROM tbl_VA_Start WHERE ID = ?
+            """, [vastart_id])
+            schicht_row = cursor.fetchone()
+            if schicht_row:
+                datum = schicht_row[0].strftime('%d.%m.%Y') if schicht_row[0] else ''
+                start = schicht_row[1] or ''
+                ende = schicht_row[2] or ''
+                schicht_info = f"<p><strong>Datum:</strong> {datum}</p>"
+                schicht_info += f"<p><strong>Zeit:</strong> {start} - {ende}</p>"
+
+        release_connection(conn)
+
+        # Erstelle Voting-Buttons
+        voting_html = ""
+        vote_token = None
+        vote_url_zusage = None
+        vote_url_absage = None
+
+        if mit_voting:
+            voting_data = create_voting_buttons_html(ma_id, va_id, vastart_id)
+            voting_html = voting_data['html']
+            vote_token = voting_data['token']
+            vote_url_zusage = voting_data['vote_url_zusage']
+            vote_url_absage = voting_data['vote_url_absage']
+
+        # Nachricht formatieren
+        nachricht_formatted = nachricht.replace('\n', '<br>') if nachricht else ''
+
+        # HTML Email zusammenbauen
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .header {{ background-color: #4316B2; color: white; padding: 20px; }}
+                .content {{ padding: 20px; }}
+                .info-box {{ background: #f9f9f9; padding: 15px; border-left: 4px solid #4316B2; margin: 20px 0; }}
+                .footer {{ background-color: #f4f4f4; padding: 15px; margin-top: 30px; font-size: 12px; color: #666; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1 style="margin:0;">CONSEC Security</h1>
+                <p style="margin:5px 0 0 0;">{betreff}</p>
+            </div>
+            <div class="content">
+                <p>{mitarbeiter['Anrede']} {mitarbeiter['Vorname']} {mitarbeiter['Nachname']},</p>
+                <p>{nachricht_formatted}</p>
+
+                <div class="info-box">
+                    {auftrag_info}
+                    {schicht_info}
+                </div>
+
+                {voting_html}
+
+                <p style="margin-top:30px;">Mit freundlichen Grüßen<br>CONSEC Security Nürnberg</p>
+            </div>
+            <div class="footer">
+                <p>CONSEC Veranstaltungsservice & Sicherheitsdienst oHG<br>
+                Vogelweiherstr. 70, 90441 Nürnberg<br>
+                Tel: 0911 - 40 99 77 99 | Fax: 0911 - 40 99 77 92<br>
+                E-Mail: info@consec-nuernberg.de | Web: www.consec-nuernberg.de</p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return jsonify({
+            'success': True,
+            'email_data': {
+                'to': mitarbeiter['eMail'],
+                'subject': betreff,
+                'body': html_body,
+                'token': vote_token,
+                'vote_url_zusage': vote_url_zusage,
+                'vote_url_absage': vote_url_absage
+            },
+            'hinweis': 'SMTP-Versand muss noch konfiguriert werden'
+        })
+
+    except Exception as e:
+        logger.error(f"Fehler beim Erstellen der Auftragsanfrage-E-Mail: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+def create_voting_buttons_html(ma_id, va_id=None, vastart_id=None, vadatum_id=None):
+    """
+    Erstellt Voting-Buttons HTML für E-Mails
+
+    Args:
+        ma_id: Mitarbeiter-ID
+        va_id: Optional - Auftrag-ID
+        vastart_id: Optional - Schicht-ID
+        vadatum_id: Optional - Datum-ID
+
+    Returns:
+        dict mit:
+        - token: Der generierte Token
+        - html: HTML-String mit den Voting-Buttons
+        - vote_url_zusage: Direkt-URL für Zusage
+        - vote_url_absage: Direkt-URL für Absage
+    """
+    try:
+        # Generiere Token
+        token = secrets.token_urlsafe(32)
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Speichere Token in DB
+        cursor.execute("""
+            INSERT INTO tbl_MA_Voting_Responses
+            (Token, VA_ID, VAStart_ID, VADatum_ID, MA_ID, EmailSentTimestamp)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, [token, va_id, vastart_id, vadatum_id, ma_id, datetime.now()])
+
+        conn.commit()
+        release_connection(conn)
+
+        # Erstelle Voting-URLs
+        base_url = "http://localhost:5000"  # TODO: Von Config oder Request ableiten
+        vote_url_zusage = f"{base_url}/api/voting/vote/{token}/zusage"
+        vote_url_absage = f"{base_url}/api/voting/vote/{token}/absage"
+
+        # HTML Buttons
+        buttons_html = f"""
+        <div style="text-align:center; margin:30px 0; padding:20px; background:#f9f9f9; border-radius:8px;">
+            <p style="font-size:16px; font-weight:bold; margin-bottom:15px; color:#333;">
+                Können Sie diesen Einsatz übernehmen?
+            </p>
+            <a href="{vote_url_zusage}" style="display:inline-block; margin:0 10px; padding:15px 40px; background:#5cb85c; color:white; text-decoration:none; border-radius:5px; font-size:16px; font-weight:bold; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+                ✅ JA - Zusage
+            </a>
+            <a href="{vote_url_absage}" style="display:inline-block; margin:0 10px; padding:15px 40px; background:#d9534f; color:white; text-decoration:none; border-radius:5px; font-size:16px; font-weight:bold; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+                ❌ NEIN - Absage
+            </a>
+            <p style="font-size:12px; color:#666; margin-top:15px;">
+                Bitte klicken Sie auf eine der beiden Optionen, um Ihre Antwort zu senden.
+            </p>
+        </div>
+        """
+
+        return {
+            'token': token,
+            'html': buttons_html,
+            'vote_url_zusage': vote_url_zusage,
+            'vote_url_absage': vote_url_absage
+        }
+
+    except Exception as e:
+        logger.error(f"Fehler beim Erstellen der Voting-Buttons: {e}")
+        return {
+            'token': None,
+            'html': '<p style="color:red;">Fehler beim Erstellen der Abstimmung.</p>',
+            'vote_url_zusage': None,
+            'vote_url_absage': None
+        }
+
+
+
+
+@app.route('/api/voting/create-token', methods=['POST'])
+def create_voting_token():
+    """
+    Erstellt einen neuen Voting-Token für E-Mail-Anfragen
+
+    POST Body:
+    {
+        "va_id": 123,
+        "vastart_id": 456,
+        "vadatum_id": 789,  // optional
+        "ma_id": 852
+    }
+
+    Returns:
+    {
+        "success": true,
+        "token": "xyz123...",
+        "vote_url_zusage": "http://localhost:5000/api/voting/vote/xyz123.../zusage",
+        "vote_url_absage": "http://localhost:5000/api/voting/vote/xyz123.../absage"
+    }
+    """
+    try:
+        data = request.json
+        va_id = data.get('va_id')
+        vastart_id = data.get('vastart_id')
+        vadatum_id = data.get('vadatum_id')
+        ma_id = data.get('ma_id')
+
+        if not ma_id:
+            return jsonify({'success': False, 'error': 'ma_id fehlt'}), 400
+
+        # Generiere eindeutigen Token
+        token = secrets.token_urlsafe(32)
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Speichere Token in DB
+        cursor.execute("""
+            INSERT INTO tbl_MA_Voting_Responses
+            (Token, VA_ID, VAStart_ID, VADatum_ID, MA_ID, EmailSentTimestamp)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, [token, va_id, vastart_id, vadatum_id, ma_id, datetime.now()])
+
+        conn.commit()
+        release_connection(conn)
+
+        # Erstelle Voting-URLs
+        base_url = request.host_url.rstrip('/')
+        vote_url_zusage = f"{base_url}/api/voting/vote/{token}/zusage"
+        vote_url_absage = f"{base_url}/api/voting/vote/{token}/absage"
+
+        return jsonify({
+            'success': True,
+            'token': token,
+            'vote_url_zusage': vote_url_zusage,
+            'vote_url_absage': vote_url_absage
+        })
+
+    except Exception as e:
+        logger.error(f"Fehler beim Erstellen des Voting-Tokens: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/voting/vote/<token>/<option>', methods=['GET'])
+def vote(token, option):
+    """
+    Verarbeitet eine Voting-Antwort per Link-Click
+
+    URL: /api/voting/vote/{token}/{option}
+    option: "zusage" oder "absage"
+
+    Returns: HTML-Seite mit Bestätigung
+    """
+    try:
+        # Validiere Option
+        option_lower = option.lower()
+        if option_lower not in ['zusage', 'absage']:
+            return """
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"><title>Ungültige Option</title></head>
+            <body style="font-family:Arial; text-align:center; padding:50px;">
+                <h1 style="color:#d9534f;">❌ Ungültige Option</h1>
+                <p>Bitte verwenden Sie einen gültigen Link aus Ihrer E-Mail.</p>
+            </body>
+            </html>
+            """, 400
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Prüfe ob Token existiert
+        cursor.execute("""
+            SELECT ID, MA_ID, VoteOption, VoteTimestamp, VA_ID, VAStart_ID
+            FROM tbl_MA_Voting_Responses
+            WHERE Token = ?
+        """, [token])
+
+        row = cursor.fetchone()
+        if not row:
+            release_connection(conn)
+            return """
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"><title>Token ungültig</title></head>
+            <body style="font-family:Arial; text-align:center; padding:50px;">
+                <h1 style="color:#d9534f;">❌ Ungültiger Token</h1>
+                <p>Dieser Link ist ungültig oder abgelaufen.</p>
+            </body>
+            </html>
+            """, 404
+
+        vote_id = row[0]
+        ma_id = row[1]
+        existing_vote = row[2]
+        vote_timestamp = row[3]
+        va_id = row[4]
+        vastart_id = row[5]
+
+        # Prüfe ob bereits abgestimmt
+        if existing_vote:
+            # Bereits abgestimmt - zeige vorherige Antwort
+            cursor.execute("""
+                SELECT Nachname, Vorname FROM tbl_MA_Mitarbeiterstamm WHERE ID = ?
+            """, [ma_id])
+            ma_row = cursor.fetchone()
+            ma_name = f"{ma_row[1]} {ma_row[0]}" if ma_row else "Mitarbeiter"
+
+            release_connection(conn)
+
+            return f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Bereits abgestimmt</title>
+                <style>
+                    body {{ font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }}
+                    .container {{ background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; max-width: 500px; }}
+                    h1 {{ color: #f0ad4e; margin-bottom: 20px; }}
+                    .info {{ background: #fcf8e3; border: 1px solid #f0ad4e; padding: 15px; border-radius: 5px; margin: 20px 0; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>ℹ️ Bereits abgestimmt</h1>
+                    <p>Hallo {html_escape.escape(ma_name)},</p>
+                    <div class="info">
+                        <p><strong>Sie haben bereits abgestimmt:</strong></p>
+                        <p style="font-size:24px; margin:10px 0;">
+                            {' ✅ Zusage' if existing_vote.lower() == 'zusage' else '❌ Absage'}
+                        </p>
+                        <p style="font-size:12px; color:#666;">
+                            Abgestimmt am: {vote_timestamp.strftime('%d.%m.%Y %H:%M') if vote_timestamp else 'unbekannt'}
+                        </p>
+                    </div>
+                    <p>Ihre Antwort wurde bereits registriert. Vielen Dank!</p>
+                </div>
+            </body>
+            </html>
+            """, 200
+
+        # Speichere Vote
+        vote_option = 'Zusage' if option_lower == 'zusage' else 'Absage'
+        ip_address = request.remote_addr
+        user_agent = request.headers.get('User-Agent', '')[:255]
+
+        cursor.execute("""
+            UPDATE tbl_MA_Voting_Responses
+            SET VoteOption = ?, VoteTimestamp = ?, IPAddress = ?, UserAgent = ?
+            WHERE ID = ?
+        """, [vote_option, datetime.now(), ip_address, user_agent, vote_id])
+
+        conn.commit()
+
+        # Lade Mitarbeiter-Name für Bestätigungs-Seite
+        cursor.execute("""
+            SELECT Nachname, Vorname FROM tbl_MA_Mitarbeiterstamm WHERE ID = ?
+        """, [ma_id])
+        ma_row = cursor.fetchone()
+        ma_name = f"{ma_row[1]} {ma_row[0]}" if ma_row else "Mitarbeiter"
+
+        # Optional: Lade Auftragsdaten für Anzeige
+        auftrag_info = ""
+        if va_id:
+            cursor.execute("""
+                SELECT Auftrag, Objekt, Ort FROM tbl_VA_Auftragstamm WHERE ID = ?
+            """, [va_id])
+            va_row = cursor.fetchone()
+            if va_row:
+                auftrag = va_row[0] or va_row[1] or 'Auftrag'
+                auftrag_info = f"<p style='color:#666;'>für: {html_escape.escape(auftrag)}</p>"
+
+        release_connection(conn)
+
+        # Erfolgreiche Bestätigungs-Seite
+        success_color = "#5cb85c" if option_lower == 'zusage' else "#d9534f"
+        success_icon = "✅" if option_lower == 'zusage' else "❌"
+        success_text = "Zusage" if option_lower == 'zusage' else "Absage"
+
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Vielen Dank!</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }}
+                .container {{ background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; max-width: 500px; }}
+                h1 {{ color: {success_color}; margin-bottom: 20px; }}
+                .vote-display {{ font-size: 48px; margin: 30px 0; }}
+                .footer {{ margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Vielen Dank!</h1>
+                <p>Hallo {html_escape.escape(ma_name)},</p>
+                <div class="vote-display">{success_icon}</div>
+                <p style="font-size:20px; color:{success_color}; font-weight:bold;">
+                    Ihre {success_text} wurde registriert
+                </p>
+                {auftrag_info}
+                <p style="margin-top:30px;">
+                    Wir haben Ihre Rückmeldung erhalten und werden Sie entsprechend einplanen.
+                </p>
+                <div class="footer">
+                    <p><strong>CONSEC Security Nürnberg</strong></p>
+                    <p>Vogelweiherstr. 70 | 90441 Nürnberg<br>
+                    Tel: 0911 - 40 99 77 99</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """, 200
+
+    except Exception as e:
+        logger.error(f"Fehler beim Voting: {e}")
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"><title>Fehler</title></head>
+        <body style="font-family:Arial; text-align:center; padding:50px;">
+            <h1 style="color:#d9534f;">❌ Fehler</h1>
+            <p>Es ist ein Fehler aufgetreten. Bitte kontaktieren Sie uns direkt.</p>
+            <p style="font-size:12px; color:#999;">Fehler: {html_escape.escape(str(e))}</p>
+        </body>
+        </html>
+        """, 500
+
+
+@app.route('/api/voting/status/<token>', methods=['GET'])
+def get_voting_status(token):
+    """
+    Prüft den Status eines Voting-Tokens
+
+    Returns:
+    {
+        "success": true,
+        "voted": true/false,
+        "vote_option": "Zusage"/"Absage" (if voted),
+        "vote_timestamp": "2026-01-13 12:34:56" (if voted)
+    }
+    """
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT VoteOption, VoteTimestamp, MA_ID, VA_ID, VAStart_ID
+            FROM tbl_MA_Voting_Responses
+            WHERE Token = ?
+        """, [token])
+
+        row = cursor.fetchone()
+        release_connection(conn)
+
+        if not row:
+            return jsonify({'success': False, 'error': 'Token nicht gefunden'}), 404
+
+        vote_option = row[0]
+        vote_timestamp = row[1]
+        ma_id = row[2]
+        va_id = row[3]
+        vastart_id = row[4]
+
+        result = {
+            'success': True,
+            'voted': vote_option is not None,
+            'ma_id': ma_id,
+            'va_id': va_id,
+            'vastart_id': vastart_id
+        }
+
+        if vote_option:
+            result['vote_option'] = vote_option
+            result['vote_timestamp'] = vote_timestamp.strftime('%Y-%m-%d %H:%M:%S') if vote_timestamp else None
+
+        return jsonify(result)
+
+    except Exception as e:
+        logger.error(f"Fehler beim Abrufen des Voting-Status: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/voting/responses', methods=['GET'])
+def get_voting_responses():
+    """
+    Listet alle Voting-Responses
+
+    Query-Parameter:
+    - va_id: Filter nach Auftrag
+    - vastart_id: Filter nach Schicht
+    - ma_id: Filter nach Mitarbeiter
+    - only_voted: Nur Responses mit Vote (true/false)
+
+    Returns:
+    {
+        "success": true,
+        "responses": [
+            {
+                "id": 1,
+                "token": "xyz...",
+                "ma_id": 852,
+                "ma_name": "Ediz Akcay",
+                "va_id": 123,
+                "vastart_id": 456,
+                "vote_option": "Zusage",
+                "vote_timestamp": "2026-01-13 12:34:56",
+                "email_sent_timestamp": "2026-01-13 10:00:00"
+            }
+        ]
+    }
+    """
+    try:
+        va_id = request.args.get('va_id')
+        vastart_id = request.args.get('vastart_id')
+        ma_id = request.args.get('ma_id')
+        only_voted = request.args.get('only_voted', 'false').lower() == 'true'
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT
+                v.ID,
+                v.Token,
+                v.MA_ID,
+                m.Nachname,
+                m.Vorname,
+                v.VA_ID,
+                v.VAStart_ID,
+                v.VoteOption,
+                v.VoteTimestamp,
+                v.EmailSentTimestamp
+            FROM tbl_MA_Voting_Responses v
+            LEFT JOIN tbl_MA_Mitarbeiterstamm m ON v.MA_ID = m.ID
+            WHERE 1=1
+        """
+        params = []
+
+        if va_id:
+            query += " AND v.VA_ID = ?"
+            params.append(va_id)
+
+        if vastart_id:
+            query += " AND v.VAStart_ID = ?"
+            params.append(vastart_id)
+
+        if ma_id:
+            query += " AND v.MA_ID = ?"
+            params.append(ma_id)
+
+        if only_voted:
+            query += " AND v.VoteOption IS NOT NULL"
+
+        query += " ORDER BY v.EmailSentTimestamp DESC"
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+
+        responses = []
+        for row in rows:
+            response = {
+                'id': row[0],
+                'token': row[1],
+                'ma_id': row[2],
+                'ma_name': f"{row[4]} {row[3]}" if row[3] and row[4] else None,
+                'va_id': row[5],
+                'vastart_id': row[6],
+                'vote_option': row[7],
+                'vote_timestamp': row[8].strftime('%Y-%m-%d %H:%M:%S') if row[8] else None,
+                'email_sent_timestamp': row[9].strftime('%Y-%m-%d %H:%M:%S') if row[9] else None
+            }
+            responses.append(response)
+
+        release_connection(conn)
+
+        return jsonify({
+            'success': True,
+            'responses': responses,
+            'count': len(responses)
+        })
+
+    except Exception as e:
+        logger.error(f"Fehler beim Abrufen der Voting-Responses: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============================================
 # Server starten
 # ============================================
 
