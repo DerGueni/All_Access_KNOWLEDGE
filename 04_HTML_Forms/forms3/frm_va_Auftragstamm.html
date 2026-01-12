@@ -9,7 +9,14 @@
         (function() {
             const inShell = window.location.search.includes('shell=1') || window.parent !== window;
             if (!inShell && window.location.protocol !== 'file:') {
-                window.location.href = 'shell.html?form=frm_va_Auftragstamm';
+                // ID aus aktueller URL uebernehmen (damit Navigation mit ID funktioniert)
+                const urlParams = new URLSearchParams(window.location.search);
+                const id = urlParams.get('id') || urlParams.get('va_id');
+                let redirectUrl = 'shell.html?form=frm_va_Auftragstamm';
+                if (id) {
+                    redirectUrl += '&id=' + id;
+                }
+                window.location.href = redirectUrl;
             }
         })();
     </script>
@@ -466,16 +473,18 @@
             background: #e0e0e0;
         }
 
-        /* Form Section - Schriftgroesse +3px und fett gemaess Anforderung */
+        /* Form Section - CSS GRID fuer stabiles 3-Spalten-Layout */
+        /* WICHTIG: !important noetig um app-layout.css zu ueberschreiben */
         .form-section {
             background-color: #b8b8d8;
             border: 1px solid #606090;
             padding: 8px 12px;
-            display: flex;
-            gap: 30px;
+            display: grid !important;
+            grid-template-columns: auto auto auto !important; /* 3 Spalten: left, right, middle */
+            flex-direction: row !important; /* Ueberschreibt column aus app-layout.css */
+            gap: 20px;
             flex-shrink: 0;
-            flex-wrap: wrap;
-            align-items: flex-start;
+            align-items: start;
             font-size: calc(var(--base-font-size) + 3px); /* +3px fuer bessere Lesbarkeit */
             font-weight: bold; /* Fett gemaess Anforderung */
         }
@@ -515,19 +524,18 @@
             text-align: right;
         }
 
-        /* Header-Layout Anpassungen - sauberes Layout ohne Überlappung */
+        /* Grid-Spalten Reihenfolge: left (1), right (2), middle (3) */
         .form-column.left {
-            flex: 0 0 auto;
+            order: 1;
         }
 
         .form-column.right {
-            flex: 1 1 auto;
+            order: 2; /* Treffpunkt etc. in der Mitte */
         }
 
         .form-column.middle {
-            flex: 0 0 auto;
             order: 3; /* PKW/Fahrtkosten ganz rechts */
-            margin-left: auto; /* Rechtsbündig */
+            justify-self: end; /* Rechtsbündig in Grid */
         }
 
         /* Einheitliche Feldbreiten gemaess Anforderung - ALLE Felder gleich breit */
@@ -1339,13 +1347,13 @@
                     <div class="left-work-panel">
                         <div class="tab-container">
                             <div class="tab-header">
-                                <!-- Sichtbare Tabs (wie in Access) -->
+                                <!-- Tabs in Access-Reihenfolge (5 sichtbar wie in Access) -->
                                 <button class="tab-btn active" data-tab="einsatzliste" data-testid="auftrag-tab-einsatzliste">Einsatzliste</button>
                                 <button class="tab-btn" data-tab="antworten" data-testid="auftrag-tab-antworten">Antworten ausstehend</button>
+                                <button class="tab-btn" data-tab="zusatzdateien" data-testid="auftrag-tab-zusatzdateien">Zusatzdateien</button>
                                 <button class="tab-btn" data-tab="rechnung" data-testid="auftrag-tab-rechnung">Rechnung</button>
-                                <!-- Versteckte Tabs (in Access nicht sichtbar) -->
-                                <button class="tab-btn" data-tab="zusatzdateien" data-testid="auftrag-tab-zusatzdateien" hidden>Zusatzdateien</button>
-                                <button class="tab-btn" data-tab="bemerkungen" data-testid="auftrag-tab-bemerkungen" hidden>Bemerkungen</button>
+                                <button class="tab-btn" data-tab="bemerkungen" data-testid="auftrag-tab-bemerkungen">Bemerkungen</button>
+                                <!-- Versteckte Tabs (nur in HTML, nicht in Access) -->
                                 <button class="tab-btn" data-tab="eventdaten" data-testid="auftrag-tab-eventdaten" hidden>Eventdaten</button>
                             </div>
                             <div class="tab-content">
@@ -1394,29 +1402,14 @@
                                             </div>
                                         </div>
 
-                                        <!-- Right Subform: MA-Zuordnungen -->
+                                        <!-- Right Subform: MA-Zuordnungen (iframe) -->
                                         <div class="subform-right">
-                                            <div class="grid-wrapper">
-                                                <table class="data-grid" id="gridZuordnungen" data-testid="auftrag-table-zuordnungen" style="table-layout: fixed;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="width: 30px; text-align: right;" class="col-lfd">Lfd</th>
-                                                            <th style="width: 70px;" class="col-ma">Mitarbeiter</th>
-                                                            <th style="width: 45px; text-align: center;" class="col-von">von</th>
-                                                            <th style="width: 45px; text-align: center;" class="col-bis">bis</th>
-                                                            <th style="width: 45px; text-align: right;" class="col-std">Std</th>
-                                                            <th style="width: 120px; text-align: center;" class="col-bemerkung">Bemerkungen</th>
-                                                            <th style="width: 28px; text-align: center;" class="col-fraglich" title="Ist Fraglich">?</th>
-                                                            <th style="width: 38px; text-align: center;" class="col-pkw" title="PKW Kosten">PKW</th>
-                                                            <th style="width: 28px; text-align: center;" class="col-el" title="Einsatzleitung">EL</th>
-                                                            <th style="width: 28px; text-align: center;" class="col-re" title="Rechnung erstellt">RE</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="zuordnungenBody">
-                                                        <!-- Wird dynamisch gefullt -->
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                            <iframe
+                                                id="iframe_Einsatzliste"
+                                                src="sub_MA_VA_Zuordnung.html?v=20260112_2255"
+                                                style="width: 100%; height: 100%; border: none; display: block;"
+                                                data-testid="auftrag-iframe-einsatzliste">
+                                            </iframe>
                                         </div>
                                     </div>
                                 </div>
@@ -1605,6 +1598,17 @@
                         <div class="date-nav">
                             <span>Auftrage ab:</span>
                             <input type="date" class="date-input" id="Auftraege_ab" onchange="filterAuftraege()" data-testid="auftrag-date-auftraege-ab">
+
+                            <span style="margin-left: 10px;">Status:</span>
+                            <select id="IstStatus" onchange="filterAuftraege()" data-testid="auftrag-select-status-filter" style="padding: 2px 5px; font-size: 11px;">
+                                <option value="0">Alle</option>
+                                <option value="1" selected>Offen</option>
+                                <option value="2">Abgeschlossen</option>
+                            </select>
+
+                            <span style="margin-left: 10px;">ID:</span>
+                            <input type="text" id="cboID" placeholder="ID" oninput="handleAuftragIDSearch()" data-testid="auftrag-input-id-search" style="width: 60px; padding: 2px 5px; font-size: 11px;">
+
                             <button class="nav-btn tiny-btn" onclick="filterAuftraege()" data-testid="auftrag-btn-filter-go">Go</button>
                             <button class="nav-btn" onclick="tageZurueck()" data-testid="auftrag-btn-tage-zurueck">&#60;&#60;</button>
                             <button class="nav-btn" onclick="tageVor()" data-testid="auftrag-btn-tage-vor">&#62;&#62;</button>
@@ -1697,8 +1701,58 @@
             },
             filterStatus: null,
             sortColumn: 'datum',
-            sortDir: 'asc'  // Aufsteigend: nächster/aktuellster Auftrag zuerst
+            sortDir: 'asc',  // Aufsteigend: nächster/aktuellster Auftrag zuerst
+            einsatzlisteReady: false,  // Flag: iframe sub_MA_VA_Zuordnung bereit
+            pendingSubformData: null   // Wartende Daten für iframe
         };
+
+        // Message-Listener für iframe-Kommunikation
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            if (!data || !data.type) return;
+
+            console.log('[Parent] Message von iframe empfangen:', data.type);
+
+            switch (data.type) {
+                case 'subform_ready':
+                    if (data.name === 'sub_MA_VA_Zuordnung') {
+                        console.log('[Parent] Einsatzliste-iframe ist bereit');
+                        state.einsatzlisteReady = true;
+                        // Falls Daten warten, jetzt senden
+                        if (state.pendingSubformData) {
+                            sendToEinsatzliste(state.pendingSubformData.VA_ID, state.pendingSubformData.VADatum_ID);
+                            state.pendingSubformData = null;
+                        }
+                    }
+                    break;
+
+                case 'subform_changed':
+                    // Subform hat Daten geändert - neu laden
+                    console.log('[Parent] Subform hat Daten geändert:', data.name);
+                    if (state.currentAuftragId) {
+                        loadSubformData(state.currentAuftragId, state.currentVADatumId);
+                    }
+                    break;
+
+                case 'subform_recalc_request':
+                    // Subform fordert Neuberechnung an
+                    console.log('[Parent] Subform fordert Recalc an:', data.name);
+                    break;
+            }
+        });
+
+        // Hilfsfunktion: Daten an Einsatzliste-iframe senden
+        function sendToEinsatzliste(vaId, vadatumId) {
+            const iframeEinsatzliste = document.getElementById('iframe_Einsatzliste');
+            if (iframeEinsatzliste && iframeEinsatzliste.contentWindow) {
+                iframeEinsatzliste.contentWindow.postMessage({
+                    type: 'set_link_params',
+                    VA_ID: vaId,
+                    VADatum_ID: vadatumId
+                }, '*');
+                console.log('[sendToEinsatzliste] PostMessage gesendet:', { VA_ID: vaId, VADatum_ID: vadatumId });
+            }
+        }
 
         // ============================================
         // INITIALISIERUNG
@@ -1930,31 +1984,60 @@
             }
         }
 
-        async function loadSubformData() {
-            const vaId = state.currentAuftragId;
-            const vadatumId = state.currentVADatumId;
-            if (!vaId) return;
+        async function loadSubformData(paramVaId, paramVadatumId) {
+            // Verwende Parameter falls übergeben, sonst state
+            const vaId = paramVaId || state.currentAuftragId;
+            let vadatumId = paramVadatumId || state.currentVADatumId;
+            if (!vaId) {
+                console.log('[loadSubformData] Abbruch: keine vaId');
+                return;
+            }
+
+            // FIX: vadatumId kann ISO-Datetime sein (2026-01-14T00:00:00) - nur Datum extrahieren
+            if (vadatumId && typeof vadatumId === 'string' && vadatumId.includes('T')) {
+                vadatumId = vadatumId.split('T')[0];
+            }
+
+            console.log('[loadSubformData] Lade Subforms für VA_ID:', vaId, 'VADatum_ID:', vadatumId);
+
+            // State auch aktualisieren wenn Parameter übergeben wurden
+            if (paramVaId) state.currentAuftragId = paramVaId;
+            if (paramVadatumId) state.currentVADatumId = vadatumId;
 
             try {
                 // Parallel laden
                 const [schichtenRes, zuordRes, absagenRes] = await Promise.all([
-                    apiCall(`/auftraege/${vaId}/schichten${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(() => ({ data: [] })),
-                    apiCall(`/auftraege/${vaId}/zuordnungen${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(() => ({ data: [] })),
-                    apiCall(`/auftraege/${vaId}/absagen${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(() => ({ data: [] }))
+                    apiCall(`/auftraege/${vaId}/schichten${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(e => { console.error('[loadSubformData] Schichten-Fehler:', e); return { data: [] }; }),
+                    apiCall(`/auftraege/${vaId}/zuordnungen${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(e => { console.error('[loadSubformData] Zuordnungen-Fehler:', e); return { data: [] }; }),
+                    apiCall(`/auftraege/${vaId}/absagen${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(e => { console.error('[loadSubformData] Absagen-Fehler:', e); return { data: [] }; })
                 ]);
 
                 state.schichten = schichtenRes.data || [];
                 state.zuordnungen = zuordRes.data || [];
                 state.absagen = absagenRes.data || [];
 
+                console.log('[loadSubformData] Ergebnis - Schichten:', state.schichten.length, 'Zuordnungen:', state.zuordnungen.length, 'Absagen:', state.absagen.length);
+
                 renderSchichten();
                 renderZuordnungen();
                 renderAbsagen();
+
+                // Einsatzliste-iframe benachrichtigen
+                if (state.einsatzlisteReady) {
+                    // iframe ist bereit - direkt senden
+                    sendToEinsatzliste(vaId, vadatumId);
+                } else {
+                    // iframe noch nicht bereit - Daten zwischenspeichern
+                    console.log('[loadSubformData] iframe noch nicht bereit - Daten werden gespeichert');
+                    state.pendingSubformData = { VA_ID: vaId, VADatum_ID: vadatumId };
+                }
 
             } catch (e) {
                 console.error('Subform-Daten laden fehlgeschlagen:', e);
             }
         }
+        // Global exportieren fuer Logic-Modul
+        window.loadSubformData = loadSubformData;
 
         // ============================================
         // RENDERING-FUNKTIONEN
@@ -2022,6 +2105,12 @@
 
         function renderZuordnungen() {
             const tbody = document.getElementById('zuordnungenBody');
+            // SKIP: zuordnungenBody existiert nicht im Hauptdokument
+            // Die Einsatzliste wird vom iframe sub_MA_VA_Zuordnung.html gerendert
+            if (!tbody) {
+                console.log('[renderZuordnungen] tbody nicht gefunden - wird vom iframe gehandelt');
+                return;
+            }
             tbody.innerHTML = '';
 
             // Gruppiere Zuordnungen nach Schicht (VA_Start/VA_Ende)
@@ -2419,35 +2508,77 @@
         }
 
         // Auftragsliste-Filter
-        function filterAuftraege() {
-            loadAuftraegeListe();
+        // WICHTIG: Nach jedem Filter-Vorgang den ersten Auftrag laden!
+        async function filterAuftraege() {
+            // IstStatus-Filter übernehmen
+            const istStatus = parseInt(document.getElementById('IstStatus').value);
+            if (istStatus === 0) {
+                state.filterStatus = null; // Alle
+            } else if (istStatus === 1) {
+                state.filterStatus = 'offen'; // Offen
+            } else if (istStatus === 2) {
+                state.filterStatus = 'abgeschlossen'; // Abgeschlossen
+            }
+
+            await loadAuftraegeListe();
+            // Nach Filtern den ersten Auftrag laden damit Schichten/Einsatzliste angezeigt werden
+            if (state.auftraege && state.auftraege.length > 0) {
+                await loadAuftrag(state.auftraege[0].ID);
+            }
         }
 
-        function filterByStatus(status) {
+        /**
+         * Auftrag-ID Direktsuche
+         * Access: cboID_AfterUpdate
+         */
+        function handleAuftragIDSearch() {
+            const idValue = document.getElementById('cboID').value.trim();
+            if (idValue === '') return;
+
+            const id = parseInt(idValue);
+            if (isNaN(id)) return;
+
+            // Auftrag direkt laden
+            loadAuftrag(id);
+        }
+
+        async function filterByStatus(status) {
             state.filterStatus = status;
-            loadAuftraegeListe();
+            await loadAuftraegeListe();
+            if (state.auftraege && state.auftraege.length > 0) {
+                await loadAuftrag(state.auftraege[0].ID);
+            }
         }
 
-        function tageZurueck() {
+        async function tageZurueck() {
             const input = document.getElementById('Auftraege_ab');
             const date = new Date(input.value);
             date.setDate(date.getDate() - 7);
             input.value = formatDateISO(date);
-            loadAuftraegeListe();
+            await loadAuftraegeListe();
+            if (state.auftraege && state.auftraege.length > 0) {
+                await loadAuftrag(state.auftraege[0].ID);
+            }
         }
 
-        function tageVor() {
+        async function tageVor() {
             const input = document.getElementById('Auftraege_ab');
             const date = new Date(input.value);
             date.setDate(date.getDate() + 7);
             input.value = formatDateISO(date);
-            loadAuftraegeListe();
+            await loadAuftraegeListe();
+            if (state.auftraege && state.auftraege.length > 0) {
+                await loadAuftrag(state.auftraege[0].ID);
+            }
         }
 
-        function abHeute() {
+        async function abHeute() {
             document.getElementById('Auftraege_ab').value = formatDateISO(new Date());
             state.filterStatus = null;
-            loadAuftraegeListe();
+            await loadAuftraegeListe();
+            if (state.auftraege && state.auftraege.length > 0) {
+                await loadAuftrag(state.auftraege[0].ID);
+            }
         }
 
         function sortAuftraege(column) {
@@ -2604,25 +2735,61 @@
             showToast('BWN wird gesendet...', 'info');
         }
 
-        function openMitarbeiterauswahl() {
+        async function openMitarbeiterauswahl() {
             if (!state.currentAuftragId) {
                 alert('Bitte zuerst einen Auftrag auswählen!');
                 return;
             }
+
+            // VBA Bridge Server pruefen und ggf. starten (fuer E-Mail-Anfragen)
+            let vbaBridgeOk = false;
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    const healthCheck = await fetch('http://localhost:5002/api/health', {
+                        method: 'GET',
+                        signal: AbortSignal.timeout(2000)
+                    });
+                    if (healthCheck.ok) {
+                        vbaBridgeOk = true;
+                        console.log('[Auftragstamm] VBA Bridge Server erreichbar');
+                        break;
+                    }
+                } catch (e) {
+                    if (attempt === 0) {
+                        console.warn('[Auftragstamm] VBA Bridge nicht erreichbar, starte Server...');
+                        // Versuche Server via Shell zu starten
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({ type: 'START_VBA_BRIDGE' }, '*');
+                        }
+                    }
+                    // Warten und erneut versuchen
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+
+            // Warnung nur wenn nach allen Versuchen nicht erreichbar
+            if (!vbaBridgeOk) {
+                console.warn('[Auftragstamm] VBA Bridge Server nicht gestartet - E-Mail-Funktion evtl. eingeschränkt');
+            }
+
             // Schnellauswahl in Shell öffnen mit Auftragsdaten
-            // Korrektur: vadatum_id statt vadatum, currentVADatumId statt currentVADatum
-            const url = 'frm_MA_VA_Schnellauswahl.html?va_id=' + state.currentAuftragId +
-                       '&vadatum_id=' + (state.currentVADatumId || '') +
-                       '&shell=1';
+            // Shell erwartet: type: 'NAVIGATE', formName, id, params
             if (window.parent && window.parent !== window) {
-                // Im iframe - an Shell senden
+                // Im iframe - an Shell senden mit allen relevanten Parametern
                 window.parent.postMessage({
-                    type: 'navigate',
-                    form: 'frm_MA_VA_Schnellauswahl',
-                    params: { va_id: state.currentAuftragId, vadatum_id: state.currentVADatumId }
+                    type: 'NAVIGATE',
+                    formName: 'frm_MA_VA_Schnellauswahl',
+                    id: state.currentAuftragId,
+                    params: {
+                        vadatum_id: state.currentVADatumId || null,
+                        vastart_id: state.currentVAStartId || null
+                    }
                 }, '*');
             } else {
-                // Direkt öffnen
+                // Standalone-Modus: Direkt öffnen mit URL-Parametern
+                const url = 'frm_MA_VA_Schnellauswahl.html?va_id=' + state.currentAuftragId +
+                           '&vadatum_id=' + (state.currentVADatumId || '') +
+                           '&shell=1';
                 window.location.href = url;
             }
         }

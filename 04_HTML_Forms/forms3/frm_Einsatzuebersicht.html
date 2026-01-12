@@ -1,0 +1,664 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einsatzuebersicht</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* ============================================ */
+        /* LEFT SIDEBAR MENU                           */
+        /* ============================================ */
+
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            font-size: 12px;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #4040a0, #6060c0);
+            color: white;
+        }
+
+        /* ============================================ */
+        /* MAIN CONTENT                                */
+        /* ============================================ */
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .header-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 8px 15px;
+            font-size: 22px; /* Formulartitel +8px (war 14px) gemaess Anforderung */
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-bar .header-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #lbl_Version {
+            font-size: 9px;
+            opacity: 0.7;
+        }
+
+        #lbl_Datum {
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .btn-close {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-close:hover {
+            background: #f0f0f0;
+        }
+
+        /* ============================================ */
+        /* FILTER BAR                                  */
+        /* ============================================ */
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            background: #d0d0e0;
+            padding: 8px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar label {
+            font-weight: bold;
+        }
+
+        .filter-bar input[type="date"],
+        .filter-bar select {
+            padding: 3px 5px;
+            border: 1px solid #808080;
+            font-size: 10px;
+        }
+
+        .filter-bar input[type="date"] {
+            width: 110px;
+        }
+
+        .filter-bar button {
+            padding: 4px 12px;
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .filter-bar button:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .filter-bar button.primary {
+            background: #95B3D7;
+        }
+
+        .filter-bar button.primary:hover {
+            background: #a5c3e7;
+        }
+
+        .filter-bar button.success {
+            background: linear-gradient(to bottom, #90c090, #60a060);
+            color: white;
+        }
+
+        .filter-bar button.success:hover {
+            background: linear-gradient(to bottom, #a0d0a0, #70b070);
+        }
+
+        /* Datum Bereich */
+        .date-section {
+            background-color: rgba(0,0,0,0.05);
+            border: 1px solid #5c0000;
+            border-radius: 3px;
+            padding: 5px 10px;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        /* Checkbox Filter */
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+            margin: 0;
+        }
+
+        /* Filter Gruppe */
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-separator {
+            width: 1px;
+            height: 24px;
+            background: #808080;
+            margin: 0 5px;
+        }
+
+        /* ============================================ */
+        /* EINSATZ GRID / TABELLE                      */
+        /* ============================================ */
+
+        .einsatz-grid {
+            flex: 1;
+            background: white;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            overflow: auto;
+        }
+
+        .einsatz-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        .einsatz-table th {
+            background: #000080;
+            color: white;
+            padding: 8px 6px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .einsatz-table th:hover {
+            background: #0000a0;
+        }
+
+        .einsatz-table th.sortable::after {
+            content: ' \25B4\25BE';
+            font-size: 8px;
+            opacity: 0.5;
+        }
+
+        .einsatz-table th.sort-asc::after {
+            content: ' \25B2';
+            opacity: 1;
+        }
+
+        .einsatz-table th.sort-desc::after {
+            content: ' \25BC';
+            opacity: 1;
+        }
+
+        .einsatz-table td {
+            padding: 6px;
+            border-bottom: 1px solid #d0d0d0;
+            font-size: 10px;
+            vertical-align: middle;
+        }
+
+        .einsatz-table tr {
+            cursor: pointer;
+        }
+
+        .einsatz-table tr:hover {
+            background: #e0e0ff;
+        }
+
+        .einsatz-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .einsatz-table tr:nth-child(even):hover {
+            background: #e0e0ff;
+        }
+
+        .einsatz-table tr.selected {
+            background: #b0b0ff !important;
+        }
+
+        /* Spaltenbreiten */
+        .col-datum { width: 80px; }
+        .col-posnr { width: 60px; text-align: center; }
+        .col-auftrag { width: 180px; }
+        .col-objekt { width: 150px; }
+        .col-ort { width: 120px; }
+        .col-schicht { width: 100px; }
+        .col-ma-namen { width: 150px; font-size: 9px; }
+        .col-ma { width: 70px; text-align: center; }
+        .col-stunden { width: 70px; text-align: right; }
+        .col-status { width: 100px; }
+
+        /* Status-Farben */
+        .status-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .status-offen {
+            background: #ffcccc;
+            color: #c00000;
+        }
+
+        .status-teilbesetzt {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-besetzt {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-abgesagt {
+            background: #e2e3e5;
+            color: #6c757d;
+            text-decoration: line-through;
+        }
+
+        .status-inplanung {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        /* MA Soll/Ist Anzeige */
+        .ma-count {
+            font-weight: bold;
+        }
+
+        .ma-count.ok {
+            color: #155724;
+        }
+
+        .ma-count.warn {
+            color: #856404;
+        }
+
+        .ma-count.err {
+            color: #c00000;
+        }
+
+        /* Gruppierung Header */
+        .group-header {
+            background: #d0d0e0 !important;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .group-header td {
+            padding: 8px 6px;
+            border-bottom: 2px solid #808080;
+        }
+
+        .group-header .toggle-icon {
+            display: inline-block;
+            width: 16px;
+            text-align: center;
+        }
+
+        .group-collapsed .group-row {
+            display: none;
+        }
+
+        /* ============================================ */
+        /* FOOTER BAR                                  */
+        /* ============================================ */
+
+        .footer-bar {
+            background: #d0d0e0;
+            padding: 5px 10px;
+            margin-top: 10px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bar .status-text {
+            font-weight: bold;
+        }
+
+        .footer-bar .record-info {
+            color: #666;
+        }
+
+        /* ============================================ */
+        /* LOADING OVERLAY                             */
+        /* ============================================ */
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 20px 40px;
+            border: 2px solid #000080;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .loading-spinner::before {
+            content: '';
+            width: 24px;
+            height: 24px;
+            border: 3px solid #ddd;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================ */
+        /* TOAST CONTAINER                             */
+        /* ============================================ */
+
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: #333;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            min-width: 250px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.success { background-color: #28a745; }
+        .toast.error { background-color: #dc3545; }
+        .toast.warning { background-color: #ffc107; color: #000; }
+        .toast.info { background-color: #17a2b8; }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ============================================ */
+        /* SCHNELLFILTER BUTTONS                       */
+        /* ============================================ */
+
+        .quick-filters {
+            display: flex;
+            gap: 3px;
+            margin-left: 10px;
+        }
+
+        .quick-filter-btn {
+            padding: 3px 8px;
+            font-size: 9px;
+            background: #e0e0e0;
+            border: 1px solid #999;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .quick-filter-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .quick-filter-btn.active {
+            background: #95B3D7;
+            border-color: #6090b0;
+        }
+    </style>
+    <script src="js/webview2-bridge.js"></script>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-active-menu="einsatzuebersicht" data-form="frm_Einsatzuebersicht">
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- LEFT SIDEBAR MENU -->
+    <div class="left-menu">
+        <div class="menu-header">HAUPTMENUE</div>
+        <button class="menu-btn" onclick="navigateToForm('frm_N_Dienstplanuebersicht')">Dienstplanuebersicht</button>
+        <button class="menu-btn" onclick="navigateToForm('frm_VA_Planungsuebersicht')">Planungsuebersicht</button>
+        <button class="menu-btn" onclick="navigateToForm('frm_va_Auftragstamm')">Auftragsverwaltung</button>
+        <button class="menu-btn" onclick="navigateToForm('frm_MA_Mitarbeiterstamm')">Mitarbeiterverwaltung</button>
+        <button class="menu-btn" onclick="navigateToForm('frm_MA_VA_Schnellauswahl')">Offene Anfragen</button>
+        <button class="menu-btn active">Einsatzuebersicht</button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header-bar">
+            <span id="lblFormTitle">Einsatzuebersicht - Alle Auftraege</span>
+            <div class="header-right">
+                <span id="lbl_Version">Version</span>
+                <span id="lbl_Datum"></span>
+                <button class="btn-close" id="btnClose" onclick="closeForm()" title="Schliessen">X</button>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <!-- Datum Bereich -->
+            <div class="date-section">
+                <label>Von:</label>
+                <input type="date" id="dtVonDatum">
+                <label>Bis:</label>
+                <input type="date" id="dtBisDatum">
+                <button id="btnAktualisieren" onclick="btnAktualisieren_Click()">Aktualisieren</button>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="filter-group">
+                <button id="btnZurueck" onclick="btnZurueck_Click()" title="Zeitraum zurueck">&lt;&lt;</button>
+                <button id="btnHeute" onclick="btnHeute_Click()" class="primary">Heute</button>
+                <button id="btnVor" onclick="btnVor_Click()" title="Zeitraum vor">&gt;&gt;</button>
+            </div>
+
+            <!-- Schnellfilter -->
+            <div class="quick-filters">
+                <button class="quick-filter-btn active" id="btnFilterHeute" onclick="setQuickFilter('heute')">Heute</button>
+                <button class="quick-filter-btn" id="btnFilterWoche" onclick="setQuickFilter('woche')">Diese Woche</button>
+                <button class="quick-filter-btn" id="btnFilterMonat" onclick="setQuickFilter('monat')">Dieser Monat</button>
+            </div>
+
+            <div class="filter-separator"></div>
+
+            <!-- Filter Optionen -->
+            <div class="filter-checkbox">
+                <input type="checkbox" id="chkNurAktive" checked onchange="chkNurAktive_Change()">
+                <label for="chkNurAktive">Nur aktive Auftraege</label>
+            </div>
+
+            <div class="filter-group">
+                <label>Gruppierung:</label>
+                <select id="cboGruppierung" onchange="cboGruppierung_Change()">
+                    <option value="none">Keine</option>
+                    <option value="objekt">Nach Objekt</option>
+                    <option value="ma">Nach Mitarbeiter</option>
+                    <option value="datum">Nach Datum</option>
+                </select>
+            </div>
+
+            <div class="filter-separator"></div>
+
+            <!-- Export Buttons -->
+            <button id="btnExportExcel" onclick="btnExportExcel_Click()" title="Excel-Export">Export Excel</button>
+            <button id="btnDrucken" onclick="btnDrucken_Click()" title="Drucken">Drucken</button>
+        </div>
+
+        <!-- Einsatz Grid -->
+        <div class="einsatz-grid">
+            <table class="einsatz-table" id="tblEinsaetze">
+                <thead>
+                    <tr>
+                        <th class="col-datum sortable" data-sort="datum" onclick="sortTable('datum')">Datum</th>
+                        <th class="col-posnr sortable" data-sort="posnr" onclick="sortTable('posnr')">Pos</th>
+                        <th class="col-auftrag sortable" data-sort="auftrag" onclick="sortTable('auftrag')">Auftrag / Veranstaltung</th>
+                        <th class="col-objekt sortable" data-sort="objekt" onclick="sortTable('objekt')">Objekt</th>
+                        <th class="col-ort sortable" data-sort="ort" onclick="sortTable('ort')">Ort</th>
+                        <th class="col-schicht sortable" data-sort="schicht" onclick="sortTable('schicht')">Schicht</th>
+                        <th class="col-ma-namen sortable" data-sort="ma_namen" onclick="sortTable('ma_namen')">Mitarbeiter</th>
+                        <th class="col-ma sortable" data-sort="ma" onclick="sortTable('ma')">MA Soll/Ist</th>
+                        <th class="col-stunden sortable" data-sort="stunden_brutto" onclick="sortTable('stunden_brutto')">Std (B)</th>
+                        <th class="col-stunden sortable" data-sort="stunden_netto" onclick="sortTable('stunden_netto')">Std (N)</th>
+                        <th class="col-status sortable" data-sort="status" onclick="sortTable('status')">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyEinsaetze">
+                    <tr><td colspan="11" style="text-align:center; padding:40px;">Lade Daten...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-bar">
+            <span class="status-text" id="lblStatus">Bereit</span>
+            <span class="record-info" id="lblRecordInfo">0 Eintraege</span>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">Lade Einsatzdaten...</div>
+    </div>
+
+    <script src="logic/frm_Einsatzuebersicht.logic.js"></script>
+    <script src="logic/frm_Einsatzuebersicht.webview2.js"></script>
+    <script src="js/shell-detector.js"></script>
+</body>
+</html>
+
+

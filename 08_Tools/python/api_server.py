@@ -2152,6 +2152,98 @@ def get_dienstplan_uebersicht():
 
 
 # ============================================
+# API: E-Mail Versand via Mailjet SMTP
+# ============================================
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+# Mailjet SMTP Credentials (aus Access zmd_Const.bas)
+MAILJET_USER = "97455f0f699bcd3a1cb8602299c3dadd"
+MAILJET_PASSWORD = "1dd9946e4f632343405471b1b700c52f"
+MAILJET_SERVER = "in-v3.mailjet.com"
+MAILJET_PORT = 587  # TLS Port
+
+@app.route('/api/email/send', methods=['POST'])
+def send_email():
+    """E-Mail über Mailjet SMTP senden
+    
+    POST Body (JSON):
+    {
+        "to": "empfaenger@email.de",
+        "subject": "Betreff",
+        "html_body": "<html>...</html>",
+        "plain_body": "Klartext..."
+    }
+    """
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'success': False, 'error': 'Keine Daten übergeben'}), 400
+        
+        to_email = data.get('to')
+        subject = data.get('subject', 'CONSEC Anfrage')
+        html_body = data.get('html_body', '')
+        plain_body = data.get('plain_body', '')
+        
+        if not to_email:
+            return jsonify({'success': False, 'error': 'Empfänger-E-Mail fehlt'}), 400
+        
+        # E-Mail erstellen
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = 'Consec Auftragsplanung <siegert@consec-nuernberg.de>'
+        msg['To'] = to_email
+        
+        # Plain Text und HTML hinzufügen
+        if plain_body:
+            part1 = MIMEText(plain_body, 'plain', 'utf-8')
+            msg.attach(part1)
+        
+        if html_body:
+            part2 = MIMEText(html_body, 'html', 'utf-8')
+            msg.attach(part2)
+        
+        # Über SMTP senden
+        with smtplib.SMTP(MAILJET_SERVER, MAILJET_PORT) as server:
+            server.starttls()  # TLS aktivieren
+            server.login(MAILJET_USER, MAILJET_PASSWORD)
+            server.sendmail(
+                'siegert@consec-nuernberg.de',
+                to_email,
+                msg.as_string()
+            )
+        
+        # In Log-Tabelle schreiben (optional)
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO tbl_Log_eMail_Sent (SendDate, Absender, Betreff, MailText, BCC, IstHTML)
+                VALUES (Now(), ?, ?, ?, ?, -1)
+            """, [os.environ.get('USERNAME', 'api_server'), subject, 'API_SEND', to_email])
+            conn.commit()
+            conn.close()
+        except Exception as log_error:
+            print(f"Log-Fehler (ignoriert): {log_error}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'E-Mail an {to_email} gesendet'
+        })
+        
+    except smtplib.SMTPAuthenticationError as e:
+        return jsonify({'success': False, 'error': f'SMTP Auth Fehler: {str(e)}'}), 500
+    except smtplib.SMTPException as e:
+        return jsonify({'success': False, 'error': f'SMTP Fehler: {str(e)}'}), 500
+    except Exception as e:
+        import traceback
+        return jsonify({'success': False, 'error': str(e), 'trace': traceback.format_exc()}), 500
+
+
+# ============================================
 # Server starten
 # ============================================
 

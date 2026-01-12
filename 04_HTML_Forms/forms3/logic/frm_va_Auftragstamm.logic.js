@@ -5,6 +5,19 @@
  */
 import { Bridge } from '../api/bridgeClient.js';
 
+// ╔═══════════════════════════════════════════════════════════════════════════════╗
+// ║  GESCHÜTZTE LADE-LOGIK - NICHT ÄNDERN!                                        ║
+// ║  Die Lade-Funktionen sind in auftragstamm-loader.js ausgelagert.             ║
+// ║  Diese funktionieren korrekt und sollten NICHT modifiziert werden.           ║
+// ╚═══════════════════════════════════════════════════════════════════════════════╝
+import { 
+    loadInitialDataProtected,
+    loadAuftraegeWithFilterProtected,
+    loadFirstVisibleAuftragProtected,
+    highlightAuftragInListProtected,
+    LOADER_VERSION 
+} from './auftragstamm-loader.js';
+
 // ============ STATE ============
 const state = {
     currentRecord: null,
@@ -372,9 +385,23 @@ function sendLinkParamsToSubform(subformName) {
 function updateAllSubforms() {
     const params = buildLinkParams();
 
+    // PostMessage an iframe-Subforms (falls vorhanden)
     subformIds.forEach(id => {
         sendToSubform(id, params);
     });
+
+    // Inline HTML-Tabellen aktualisieren (Schichten, Einsatzliste, Absagen)
+    // Verwendet kurzes Timeout damit cboVADatum Zeit hat sich zu aktualisieren
+    setTimeout(() => {
+        if (typeof window.loadSubformData === 'function') {
+            const vaId = state.currentVA_ID;
+            const vadatumId = document.getElementById('cboVADatum')?.value || state.currentVADatum_ID;
+            if (vaId) {
+                console.log('[Auftragstamm] updateAllSubforms -> loadSubformData mit VA_ID:', vaId, 'VADatum_ID:', vadatumId);
+                window.loadSubformData(vaId, vadatumId);
+            }
+        }
+    }, 350);
 }
 
 function updateMASubforms() {
@@ -383,6 +410,15 @@ function updateMASubforms() {
 
     sendToSubform('sub_MA_VA_Zuordnung', params);
     sendToSubform('sub_MA_VA_Planung_Absage', params);
+
+    // WICHTIG: Auch die inline HTML-Tabellen aktualisieren (Schichten, Einsatzliste, Absagen)
+    // Diese Funktion wird im setTimeout aufgerufen NACHDEM das korrekte Datum gesetzt wurde
+    if (typeof window.loadSubformData === 'function') {
+        const vaId = state.currentVA_ID;
+        const vadatumId = document.getElementById('cboVADatum')?.value || state.currentVADatum_ID;
+        console.log('[Auftragstamm] updateMASubforms -> loadSubformData mit VA_ID:', vaId, 'VADatum_ID:', vadatumId);
+        window.loadSubformData(vaId, vadatumId);
+    }
 }
 
 function handleSubformSelection(data) {
@@ -395,70 +431,66 @@ function handleSubformSelection(data) {
 }
 
 // ============ DATA LOADING ============
+// ╔═══════════════════════════════════════════════════════════════════════════════╗
+// ║  ACHTUNG: Die folgenden Lade-Funktionen sind GESCHÜTZT!                        ║
+// ║  Sie rufen die Logik aus auftragstamm-loader.js auf.                         ║
+// ║  BEI PROBLEMEN: NICHT die Logik hier ändern, sondern Claude fragen!          ║
+// ║  Letzte funktionierende Version: 11.01.2026                                   ║
+// ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+/**
+ * Haupt-Initialisierung - Ruft geschützte Lade-Logik auf
+ * NICHT ÄNDERN! Bei Problemen: auftragstamm-loader.js prüfen
+ */
 async function loadInitialData() {
-    try {
-        // Combo-Boxen fuellen
-        await loadCombos();
-
-        // Auftragsliste laden (Filter auf heute setzen)
-        setAuftraegeFilterToday();
-
-        // AUTO-LOAD: Aktuellsten Auftrag laden (zeitlich neuester)
-        // Anforderung: Beim Oeffnen IMMER den aktuellsten Auftrag mit ALLEN Details anzeigen
-        await loadLatestAuftrag();
-
-    } catch (error) {
-        console.error('[Auftragstamm] Init-Fehler:', error);
-    }
+    console.log('[Auftragstamm] Loader-Version:', LOADER_VERSION.version, LOADER_VERSION.status);
+    
+    // Abhängigkeiten für die geschützte Logik bereitstellen
+    const dependencies = {
+        Bridge,
+        state,
+        loadCombos,
+        loadAuftrag,
+        highlightAuftragInList,
+        renderAuftragsliste,
+        setStatus,
+        updateAllSubforms
+    };
+    
+    // Geschützte Logik aufrufen
+    await loadInitialDataProtected(dependencies);
 }
 
 /**
- * AUTO-LOAD: Laedt den zeitlich neuesten Auftrag beim Start
- * Anforderung: Beim Oeffnen muss IMMER der aktuellste Auftrag angezeigt werden
+ * Lädt Auftragsliste mit Filter - Wrapper für geschützte Logik
+ * NICHT ÄNDERN!
  */
-async function loadLatestAuftrag() {
-    try {
-        console.log('[Auftragstamm] Auto-Load: Lade aktuellsten Auftrag...');
+async function loadAuftraegeWithFilter() {
+    const dependencies = { Bridge, state, renderAuftragsliste };
+    await loadAuftraegeWithFilterProtected(dependencies);
+}
 
-        // API-Call: Hole den neuesten Auftrag (sortiert nach Datum absteigend, limit 1)
-        const result = await Bridge.execute('getAuftragListe', {
-            sort: 'datum_desc',
-            limit: 1,
-            include_future: true  // Auch zukuenftige Auftraege beruecksichtigen
-        });
+/**
+ * Lädt ersten sichtbaren Auftrag - Wrapper für geschützte Logik
+ * NICHT ÄNDERN!
+ */
+async function loadFirstVisibleAuftrag() {
+    const dependencies = {
+        state,
+        loadAuftrag,
+        highlightAuftragInList,
+        renderAuftragsliste,
+        setStatus
+    };
+    await loadFirstVisibleAuftragProtected(dependencies);
+}
 
-        if (result.data && result.data.length > 0) {
-            const latestAuftrag = result.data[0];
-            const auftragId = latestAuftrag.VA_ID || latestAuftrag.ID;
-
-            console.log('[Auftragstamm] Auto-Load: Aktuellster Auftrag gefunden:', auftragId, latestAuftrag.VA_Bezeichnung || latestAuftrag.Auftrag);
-
-            // Auftrag mit allen Details laden (Einsatztage, Schichten, etc.)
-            await loadAuftrag(auftragId);
-
-            // Records-Array setzen fuer Navigation
-            state.records = result.data;
-            state.recordIndex = 0;
-
-            setStatus('Aktuellster Auftrag geladen');
-        } else {
-            console.log('[Auftragstamm] Auto-Load: Keine Auftraege gefunden');
-            setStatus('Keine Auftraege vorhanden');
-        }
-
-    } catch (error) {
-        console.error('[Auftragstamm] Auto-Load fehlgeschlagen:', error);
-        // Fallback: Versuche Auftraege normal zu laden
-        try {
-            await loadAuftraege();
-            if (state.records && state.records.length > 0) {
-                const firstId = state.records[0].VA_ID || state.records[0].ID;
-                await loadAuftrag(firstId);
-            }
-        } catch (fallbackError) {
-            console.error('[Auftragstamm] Fallback fehlgeschlagen:', fallbackError);
-        }
-    }
+/**
+ * Markiert Auftrag in der Liste - Wrapper für geschützte Logik
+ * NICHT ÄNDERN!
+ */
+function highlightAuftragInList(auftragId) {
+    highlightAuftragInListProtected(auftragId);
 }
 
 async function loadCombos() {
@@ -527,6 +559,8 @@ function fillCombo(comboId, data, valueField, textField) {
 
 async function loadAuftrag(id) {
     try {
+        console.log('[Auftragstamm] loadAuftrag:', id);
+        
         const result = await Bridge.execute('getAuftrag', { id: id });
         // API gibt { data: { auftrag: {...}, einsatztage: [...], ... } }
         const auftrag = result.data?.auftrag || result.data;
@@ -541,6 +575,9 @@ async function loadAuftrag(id) {
             } else {
                 await loadVADatumCombo(state.currentVA_ID);
             }
+
+            // Markierung in der Auftragsliste synchronisieren
+            highlightAuftragInList(state.currentVA_ID);
 
             // Subforms aktualisieren
             updateAllSubforms();
@@ -598,16 +635,31 @@ async function loadVADatumCombo(va_id) {
 function displayRecord(rec) {
     if (!rec) return;
 
+    console.log('[Auftragstamm] displayRecord - Rohdaten:', rec);
+
     // API-Felder haben VA_* Präfix
     setFieldValue('ID', rec.VA_ID || rec.ID);
-    setFieldValue('Dat_VA_Von', formatDate(rec.VA_DatumVon || rec.Dat_VA_Von));
-    setFieldValue('Dat_VA_Bis', formatDate(rec.VA_DatumBis || rec.Dat_VA_Bis));
-    setFieldValue('Kombinationsfeld656', rec.VA_Bezeichnung || rec.Auftrag);
+    
+    // Datum-Felder: HTML date-input braucht ISO-Format (YYYY-MM-DD)
+    setDateFieldValue('Dat_VA_Von', rec.VA_DatumVon || rec.Dat_VA_Von);
+    setDateFieldValue('Dat_VA_Bis', rec.VA_DatumBis || rec.Dat_VA_Bis);
+    
+    // Auftrag-Feld (HTML-ID ist 'Auftrag', nicht 'Kombinationsfeld656')
+    setFieldValue('Auftrag', rec.VA_Bezeichnung || rec.Auftrag);
+    
+    // Ort und Objekt
     setFieldValue('Ort', rec.VA_Ort || rec.Ort);
     setFieldValue('Objekt', rec.VA_Objekt || rec.Objekt);
     setFieldValue('Objekt_ID', rec.VA_Objekt_ID || rec.Objekt_ID);
-    setFieldValue('Treffp_Zeit', rec.VA_Treffp_Zeit || rec.Treffp_Zeit);
+    
+    // VA_ID_Display (Auftragsnummer-Anzeige)
+    setFieldValue('VA_ID_Display', rec.VA_ID || rec.ID);
+    
+    // Treffpunkt: Zeit im Format HH:MM fuer time-input
+    setTimeFieldValue('Treffp_Zeit', rec.VA_Treffp_Zeit || rec.Treffp_Zeit);
     setFieldValue('Treffpunkt', rec.VA_Treffpunkt || rec.Treffpunkt);
+    
+    // Weitere Felder
     setFieldValue('PKW_Anzahl', rec.VA_PKW_Anzahl || rec.PKW_Anzahl);
     setFieldValue('Fahrtkosten', rec.VA_Fahrtkosten || rec.Fahrtkosten);
     setFieldValue('Dienstkleidung', rec.VA_Dienstkleidung || rec.Dienstkleidung);
@@ -649,6 +701,81 @@ function setFieldValue(id, value) {
     } else {
         el.textContent = value || '';
     }
+}
+
+/**
+ * Setzt Datum-Feld (type="date") - konvertiert verschiedene Formate zu ISO (YYYY-MM-DD)
+ */
+function setDateFieldValue(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    
+    if (!value) {
+        el.value = '';
+        return;
+    }
+    
+    let isoDate = '';
+    
+    // Bereits ISO-Format?
+    if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+        isoDate = value.substring(0, 10);
+    }
+    // Deutsches Format (DD.MM.YYYY)?
+    else if (/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(value)) {
+        const parts = value.split('.');
+        isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+    // Date-Objekt oder Timestamp?
+    else {
+        const d = new Date(value);
+        if (!isNaN(d.getTime())) {
+            isoDate = d.toISOString().substring(0, 10);
+        }
+    }
+    
+    el.value = isoDate;
+    console.log(`[setDateFieldValue] ${id}: "${value}" -> "${isoDate}"`);
+}
+
+/**
+ * Setzt Zeit-Feld (type="time") - konvertiert verschiedene Formate zu HH:MM
+ */
+function setTimeFieldValue(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    
+    if (!value) {
+        el.value = '';
+        return;
+    }
+    
+    let timeStr = String(value).trim();
+    
+    // Bereits HH:MM Format?
+    if (/^\d{1,2}:\d{2}$/.test(timeStr)) {
+        const [h, m] = timeStr.split(':');
+        el.value = `${h.padStart(2, '0')}:${m}`;
+        return;
+    }
+    
+    // HH:MM:SS Format?
+    if (/^\d{1,2}:\d{2}:\d{2}$/.test(timeStr)) {
+        el.value = timeStr.substring(0, 5);
+        return;
+    }
+    
+    // Nur Ziffern (HHMM oder HMM)?
+    if (/^\d{3,4}$/.test(timeStr)) {
+        const h = timeStr.length === 3 ? timeStr[0] : timeStr.substring(0, 2);
+        const m = timeStr.length === 3 ? timeStr.substring(1) : timeStr.substring(2);
+        el.value = `${h.padStart(2, '0')}:${m}`;
+        return;
+    }
+    
+    // Fallback
+    el.value = timeStr;
+    console.log(`[setTimeFieldValue] ${id}: "${value}" -> "${el.value}"`);
 }
 
 // ============ NAVIGATION ============
@@ -703,12 +830,14 @@ function shiftAuftraegeFilter(days) {
     }
 }
 
-function setAuftraegeFilterToday() {
+async function setAuftraegeFilterToday() {
     const datumInput = document.getElementById('Auftraege_ab');
     if (datumInput) {
         datumInput.value = formatDate(new Date());
-        applyAuftraegeFilter();
     }
+    // Liste neu laden und ersten Eintrag auswaehlen
+    await loadAuftraegeWithFilter();
+    await loadFirstVisibleAuftrag();
 }
 
 // ============ BRIDGE CALLS ============

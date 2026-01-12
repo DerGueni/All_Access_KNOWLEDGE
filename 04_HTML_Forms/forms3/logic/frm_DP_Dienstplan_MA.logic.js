@@ -326,30 +326,63 @@ async function loadDienstplan() {
     setStatus('Lade Dienstpläne...');
 
     try {
-        // Mitarbeiter neu laden (mit aktuellem Filter)
-        await loadMitarbeiter();
-
         const startStr = formatDateForInput(state.startDate);
         const endDate = new Date(state.startDate);
         endDate.setDate(endDate.getDate() + 6);
         const endStr = formatDateForInput(endDate);
 
         // WebView2 Bridge: Dienstpläne laden
-        if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
+        if (typeof Bridge !== 'undefined' && Bridge.sendEvent && Bridge.isWebView2) {
+            // Mitarbeiter neu laden (mit aktuellem Filter)
+            await loadMitarbeiter();
             Bridge.sendEvent('loadDienstplan', {
                 von: startStr,
                 bis: endStr,
                 filter: state.filter
             });
         } else {
+            // REST-API Fallback für Browser-Modus
+            const API_BASE = 'http://localhost:5000';
+
+            // Mitarbeiter laden
+            const maResponse = await fetch(`${API_BASE}/api/mitarbeiter?filter=${state.filter}`);
+            const maJson = await maResponse.json();
+            if (Array.isArray(maJson)) {
+                state.mitarbeiter = maJson;
+            } else if (maJson && Array.isArray(maJson.data)) {
+                state.mitarbeiter = maJson.data;
+            } else {
+                state.mitarbeiter = [];
+            }
+
+            // Dienstpläne/Zuordnungen laden
+            const dpResponse = await fetch(`${API_BASE}/api/zuordnungen?von=${startStr}&bis=${endStr}`);
+            const dpJson = await dpResponse.json();
+            let dienstplanDaten = [];
+            if (Array.isArray(dpJson)) {
+                dienstplanDaten = dpJson;
+            } else if (dpJson && Array.isArray(dpJson.data)) {
+                dienstplanDaten = dpJson.data;
+            }
+
+            // Dienstplandaten nach MA_ID gruppieren
             state.dienstplaene = {};
+            dienstplanDaten.forEach(eintrag => {
+                const maId = eintrag.MA_ID || eintrag.ID;
+                if (!state.dienstplaene[maId]) {
+                    state.dienstplaene[maId] = [];
+                }
+                state.dienstplaene[maId].push(eintrag);
+            });
+
             renderWochenansicht();
+            setStatus(`${state.mitarbeiter.length} Mitarbeiter, ${dienstplanDaten.length} Einträge geladen`);
         }
 
     } catch (error) {
         console.error('[DP-MA] Fehler beim Laden:', error);
         setStatus('Fehler: ' + error.message);
-        elements.sub_DP_Grund.innerHTML = '<div class="loading" style="color: red;">Fehler beim Laden der Daten</div>';
+        elements.sub_DP_Grund.innerHTML = '<div class="loading" style="color: red;">Fehler beim Laden: ' + error.message + '</div>';
     }
 }
 
@@ -386,7 +419,7 @@ function renderWochenansicht() {
     }
 
     // MA Zeilen
-    for (const ma of state.mitarbeiter.slice(0, 100)) {
+    for (const ma of state.mitarbeiter) {
         html += '<div class="calendar-row">';
 
         const maId = ma.MA_ID || ma.ID;
@@ -402,10 +435,12 @@ function renderWochenansicht() {
             const dateKey = formatDateForInput(date);
             const isWeekend = date.getDay() === 0 || date.getDay() === 6;
             const isToday = formatDateForInput(date) === formatDateForInput(new Date());
+            const isFeiertag = istFeiertag(date);
 
             let cellClass = 'calendar-cell';
             if (isWeekend) cellClass += ' weekend';
             if (isToday) cellClass += ' today';
+            if (isFeiertag) cellClass += ' feiertag';
 
             html += `<div class="${cellClass}">`;
 
@@ -529,7 +564,7 @@ function exportExcel() {
 
         const rows = [headers];
 
-        for (const ma of state.mitarbeiter.slice(0, 100)) {
+        for (const ma of state.mitarbeiter) {
             const maId = ma.MA_ID || ma.ID;
             const maName = `${ma.MA_Nachname || ma.Nachname}, ${ma.MA_Vorname || ma.Vorname}`;
             const row = [maName];
@@ -634,7 +669,7 @@ function generateCSVData() {
 
     const rows = [headers];
 
-    for (const ma of state.mitarbeiter.slice(0, 100)) {
+    for (const ma of state.mitarbeiter) {
         const maId = ma.MA_ID || ma.ID;
         const maName = `${ma.MA_Nachname || ma.Nachname}, ${ma.MA_Vorname || ma.Vorname}`;
         const row = [maName];
