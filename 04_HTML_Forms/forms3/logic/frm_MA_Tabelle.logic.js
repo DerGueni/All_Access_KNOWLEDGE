@@ -13,10 +13,20 @@ const API_BASE = 'http://localhost:5000/api';
 
 // State
 let allMitarbeiter = [];
+let originalMitarbeiter = []; // Backup für Cancel
 let currentSort = {
     field: null,
     direction: null
 };
+let editMode = false;
+let changedRows = new Map(); // MA_ID -> { fieldName: newValue }
+let editableFields = [
+    'Nachname', 'Vorname', 'Geschlecht', 'Geb_Ort', 'Staatsang',
+    'Strasse', 'Nr', 'PLZ', 'Ort',
+    'Tel_Mobil', 'Tel_Festnetz', 'Email',
+    'Bankname', 'Kontoinhaber', 'IBAN', 'BIC',
+    'Kostenstelle', 'Bemerkungen'
+]; // Read-only: ID, LEXWare_ID, Geb_Dat, Eintrittsdatum, Austrittsdatum, Anstellungsart_ID, IstAktiv, IstSubunternehmer, HatSachkunde, Hat_keine_34a, Auszahlungsart
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
@@ -81,6 +91,7 @@ async function loadData() {
         }
 
         allMitarbeiter = data.data || [];
+        originalMitarbeiter = JSON.parse(JSON.stringify(allMitarbeiter)); // Deep copy
 
         // Rendere Tabelle
         renderTable(allMitarbeiter);
@@ -111,37 +122,104 @@ function renderTable(mitarbeiter) {
 
     mitarbeiter.forEach(ma => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${ma.ID || ''}</td>
-            <td>${ma.LEXWare_ID || ''}</td>
-            <td>${ma.Nachname || ''}</td>
-            <td>${ma.Vorname || ''}</td>
-            <td>${ma.Geschlecht || ''}</td>
-            <td>${formatDate(ma.Geb_Dat)}</td>
-            <td>${ma.Geb_Ort || ''}</td>
-            <td>${ma.Staatsang || ''}</td>
-            <td>${ma.Strasse || ''}</td>
-            <td>${ma.Nr || ''}</td>
-            <td>${ma.PLZ || ''}</td>
-            <td>${ma.Ort || ''}</td>
-            <td>${ma.Tel_Mobil || ''}</td>
-            <td>${ma.Tel_Festnetz || ''}</td>
-            <td>${ma.Email || ''}</td>
-            <td>${formatDate(ma.Eintrittsdatum)}</td>
-            <td>${formatDate(ma.Austrittsdatum)}</td>
-            <td>${ma.Auszahlungsart || ''}</td>
-            <td>${ma.Bankname || ''}</td>
-            <td>${ma.Kontoinhaber || ''}</td>
-            <td>${ma.IBAN || ''}</td>
-            <td>${ma.BIC || ''}</td>
-            <td>${ma.Anstellungsart_ID || ''}</td>
-            <td class="checkbox-cell"><input type="checkbox" ${ma.IstAktiv ? 'checked' : ''} disabled></td>
-            <td class="checkbox-cell"><input type="checkbox" ${ma.IstSubunternehmer ? 'checked' : ''} disabled></td>
-            <td class="checkbox-cell"><input type="checkbox" ${ma.HatSachkunde ? 'checked' : ''} disabled></td>
-            <td class="checkbox-cell"><input type="checkbox" ${ma.Hat_keine_34a ? 'checked' : ''} disabled></td>
-            <td>${ma.Kostenstelle || ''}</td>
-            <td>${ma.Bemerkungen || ''}</td>
-        `;
+        tr.dataset.maId = ma.ID;
+
+        // Helper: Erstellt TD mit optionalem contenteditable
+        const createTd = (value, fieldName) => {
+            const td = document.createElement('td');
+            const displayValue = value != null ? value : '';
+            td.textContent = displayValue;
+
+            if (editMode && editableFields.includes(fieldName)) {
+                td.classList.add('editable');
+                td.contentEditable = 'true';
+                td.dataset.field = fieldName;
+                td.dataset.original = displayValue;
+
+                // Track changes
+                td.addEventListener('blur', function() {
+                    const newValue = this.textContent.trim();
+                    const originalValue = this.dataset.original;
+
+                    if (newValue !== originalValue) {
+                        trackChange(ma.ID, fieldName, newValue);
+                        this.classList.add('changed');
+                    } else {
+                        untrackChange(ma.ID, fieldName);
+                        this.classList.remove('changed');
+                    }
+                });
+            }
+
+            return td;
+        };
+
+        // ID (read-only)
+        tr.appendChild(createTd(ma.ID, 'ID'));
+
+        // LEXWare_ID (read-only)
+        tr.appendChild(createTd(ma.LEXWare_ID, 'LEXWare_ID'));
+
+        // Editable Text Fields
+        tr.appendChild(createTd(ma.Nachname, 'Nachname'));
+        tr.appendChild(createTd(ma.Vorname, 'Vorname'));
+        tr.appendChild(createTd(ma.Geschlecht, 'Geschlecht'));
+
+        // Geb_Dat (read-only)
+        tr.appendChild(createTd(formatDate(ma.Geb_Dat), 'Geb_Dat'));
+
+        // Editable
+        tr.appendChild(createTd(ma.Geb_Ort, 'Geb_Ort'));
+        tr.appendChild(createTd(ma.Staatsang, 'Staatsang'));
+        tr.appendChild(createTd(ma.Strasse, 'Strasse'));
+        tr.appendChild(createTd(ma.Nr, 'Nr'));
+        tr.appendChild(createTd(ma.PLZ, 'PLZ'));
+        tr.appendChild(createTd(ma.Ort, 'Ort'));
+        tr.appendChild(createTd(ma.Tel_Mobil, 'Tel_Mobil'));
+        tr.appendChild(createTd(ma.Tel_Festnetz, 'Tel_Festnetz'));
+        tr.appendChild(createTd(ma.Email, 'Email'));
+
+        // Dates (read-only)
+        tr.appendChild(createTd(formatDate(ma.Eintrittsdatum), 'Eintrittsdatum'));
+        tr.appendChild(createTd(formatDate(ma.Austrittsdatum), 'Austrittsdatum'));
+
+        // Auszahlungsart (read-only)
+        tr.appendChild(createTd(ma.Auszahlungsart, 'Auszahlungsart'));
+
+        // Editable Bank Fields
+        tr.appendChild(createTd(ma.Bankname, 'Bankname'));
+        tr.appendChild(createTd(ma.Kontoinhaber, 'Kontoinhaber'));
+        tr.appendChild(createTd(ma.IBAN, 'IBAN'));
+        tr.appendChild(createTd(ma.BIC, 'BIC'));
+
+        // Anstellungsart_ID (read-only)
+        tr.appendChild(createTd(ma.Anstellungsart_ID, 'Anstellungsart_ID'));
+
+        // Checkboxes (read-only)
+        const tdAktiv = document.createElement('td');
+        tdAktiv.className = 'checkbox-cell';
+        tdAktiv.innerHTML = `<input type="checkbox" ${ma.IstAktiv ? 'checked' : ''} disabled>`;
+        tr.appendChild(tdAktiv);
+
+        const tdSubunt = document.createElement('td');
+        tdSubunt.className = 'checkbox-cell';
+        tdSubunt.innerHTML = `<input type="checkbox" ${ma.IstSubunternehmer ? 'checked' : ''} disabled>`;
+        tr.appendChild(tdSubunt);
+
+        const tdSachkunde = document.createElement('td');
+        tdSachkunde.className = 'checkbox-cell';
+        tdSachkunde.innerHTML = `<input type="checkbox" ${ma.HatSachkunde ? 'checked' : ''} disabled>`;
+        tr.appendChild(tdSachkunde);
+
+        const tdKeine34a = document.createElement('td');
+        tdKeine34a.className = 'checkbox-cell';
+        tdKeine34a.innerHTML = `<input type="checkbox" ${ma.Hat_keine_34a ? 'checked' : ''} disabled>`;
+        tr.appendChild(tdKeine34a);
+
+        // Editable
+        tr.appendChild(createTd(ma.Kostenstelle, 'Kostenstelle'));
+        tr.appendChild(createTd(ma.Bemerkungen, 'Bemerkungen'));
+
         tbody.appendChild(tr);
     });
 }
@@ -318,6 +396,176 @@ function debounce(func, wait) {
     };
 }
 
+/**
+ * Toggle Edit Mode
+ */
+function toggleEditMode() {
+    editMode = !editMode;
+
+    const btnEdit = document.getElementById('btnEdit');
+    const btnSave = document.getElementById('btnSave');
+    const btnCancel = document.getElementById('btnCancel');
+    const editModeInfo = document.getElementById('editModeInfo');
+
+    if (editMode) {
+        btnEdit.style.display = 'none';
+        btnSave.style.display = 'inline-block';
+        btnCancel.style.display = 'inline-block';
+        editModeInfo.classList.add('active');
+    } else {
+        btnEdit.style.display = 'inline-block';
+        btnSave.style.display = 'none';
+        btnCancel.style.display = 'none';
+        editModeInfo.classList.remove('active');
+    }
+
+    // Re-render table with contenteditable
+    renderTable(allMitarbeiter);
+    updateChangesCount();
+}
+
+/**
+ * Track Changes
+ */
+function trackChange(maId, fieldName, newValue) {
+    if (!changedRows.has(maId)) {
+        changedRows.set(maId, {});
+    }
+    changedRows.get(maId)[fieldName] = newValue;
+    updateChangesCount();
+}
+
+/**
+ * Untrack Changes
+ */
+function untrackChange(maId, fieldName) {
+    if (changedRows.has(maId)) {
+        delete changedRows.get(maId)[fieldName];
+        if (Object.keys(changedRows.get(maId)).length === 0) {
+            changedRows.delete(maId);
+        }
+    }
+    updateChangesCount();
+}
+
+/**
+ * Update Changes Counter
+ */
+function updateChangesCount() {
+    const count = changedRows.size;
+    document.getElementById('changesCount').textContent = `${count} Änderung${count !== 1 ? 'en' : ''}`;
+}
+
+/**
+ * Save Changes
+ */
+async function saveChanges() {
+    if (changedRows.size === 0) {
+        alert('Keine Änderungen vorhanden');
+        return;
+    }
+
+    const statusLeft = document.getElementById('statusLeft');
+    const loading = document.getElementById('loading');
+
+    if (!confirm(`${changedRows.size} Mitarbeiter speichern?`)) {
+        return;
+    }
+
+    loading.style.display = 'block';
+    statusLeft.textContent = 'Speichere Änderungen...';
+
+    let successCount = 0;
+    let errorCount = 0;
+    const errors = [];
+
+    for (const [maId, changes] of changedRows.entries()) {
+        try {
+            const response = await fetch(`${API_BASE}/mitarbeiter/${maId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(changes)
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Unbekannter Fehler');
+            }
+
+            successCount++;
+
+            // Update allMitarbeiter with saved values
+            const ma = allMitarbeiter.find(m => m.ID == maId);
+            if (ma) {
+                Object.assign(ma, changes);
+            }
+
+        } catch (error) {
+            console.error(`[saveChanges] Fehler für MA ${maId}:`, error);
+            errorCount++;
+            errors.push(`MA ${maId}: ${error.message}`);
+
+            // Mark row as error
+            const row = document.querySelector(`tr[data-ma-id="${maId}"]`);
+            if (row) {
+                row.querySelectorAll('.changed').forEach(td => {
+                    td.classList.remove('changed');
+                    td.classList.add('error');
+                });
+            }
+        }
+    }
+
+    loading.style.display = 'none';
+
+    if (errorCount === 0) {
+        // All saved successfully
+        statusLeft.textContent = `${successCount} Mitarbeiter gespeichert`;
+        changedRows.clear();
+        originalMitarbeiter = JSON.parse(JSON.stringify(allMitarbeiter)); // Update backup
+        updateChangesCount();
+
+        // Exit edit mode
+        editMode = false;
+        toggleEditMode();
+    } else {
+        // Some errors
+        statusLeft.textContent = `${successCount} gespeichert, ${errorCount} Fehler`;
+        alert(`Fehler beim Speichern:\n\n${errors.join('\n')}\n\nFehlerhafte Zeilen sind rot markiert.`);
+
+        // Remove successfully saved from changedRows
+        for (const [maId] of changedRows.entries()) {
+            if (!errors.some(e => e.startsWith(`MA ${maId}`))) {
+                changedRows.delete(maId);
+            }
+        }
+        updateChangesCount();
+    }
+}
+
+/**
+ * Cancel Edit Mode
+ */
+function cancelEdit() {
+    if (changedRows.size > 0) {
+        if (!confirm(`${changedRows.size} ungespeicherte Änderungen verwerfen?`)) {
+            return;
+        }
+    }
+
+    // Restore original data
+    allMitarbeiter = JSON.parse(JSON.stringify(originalMitarbeiter));
+    changedRows.clear();
+
+    // Exit edit mode
+    editMode = false;
+    toggleEditMode();
+}
+
 // Expose für HTML onclick
 window.loadData = loadData;
 window.exportToCSV = exportToCSV;
+window.toggleEditMode = toggleEditMode;
+window.saveChanges = saveChanges;
+window.cancelEdit = cancelEdit;

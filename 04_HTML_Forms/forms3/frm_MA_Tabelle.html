@@ -161,6 +161,51 @@
             cursor: not-allowed;
         }
 
+        /* Editable Mode */
+        tbody td.editable {
+            cursor: text;
+            position: relative;
+        }
+        tbody td.editable:hover {
+            background: #fff8dc !important;
+            outline: 1px dashed #ffa500;
+        }
+        tbody td.editable[contenteditable="true"] {
+            background: white !important;
+            outline: 2px solid #4a90e2;
+        }
+        tbody td.changed {
+            background: #ffffcc !important;
+            border-left: 3px solid #ffa500 !important;
+        }
+        tbody td.error {
+            background: #ffe0e0 !important;
+            border-left: 3px solid #ff0000 !important;
+        }
+
+        /* Edit-Mode Toolbar Info */
+        .edit-mode-info {
+            background: #ffffcc;
+            border: 1px solid #ffa500;
+            padding: 8px 15px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            font-size: 11px;
+        }
+        .edit-mode-info.active {
+            display: flex;
+        }
+        .edit-mode-info .info-text {
+            flex: 1;
+            font-weight: bold;
+            color: #666;
+        }
+        .edit-mode-info .changes-count {
+            color: #ff6600;
+            font-weight: bold;
+        }
+
         /* Status Bar */
         .status-bar {
             background: #d0d0e0;
@@ -193,12 +238,20 @@
     <div class="header">
         <h1>Mitarbeiter-Tabelle</h1>
         <div class="header-actions">
+            <button class="btn" onclick="toggleEditMode()" id="btnEdit">Bearbeiten</button>
+            <button class="btn" onclick="saveChanges()" id="btnSave" style="display:none;">Speichern</button>
+            <button class="btn" onclick="cancelEdit()" id="btnCancel" style="display:none;">Abbrechen</button>
             <button class="btn" onclick="window.print()">Drucken</button>
             <button class="btn" onclick="exportToCSV()">Export CSV</button>
             <button class="btn" onclick="location.reload()">Neu laden</button>
             <button class="btn" onclick="history.back()">Zurück</button>
             <button class="btn" onclick="Bridge.close()">Schließen</button>
         </div>
+    </div>
+
+    <div class="edit-mode-info" id="editModeInfo">
+        <span class="info-text">✏️ Bearbeitungsmodus: Klicken Sie in eine Zelle zum Bearbeiten</span>
+        <span class="changes-count" id="changesCount">0 Änderungen</span>
     </div>
 
     <div class="toolbar">
