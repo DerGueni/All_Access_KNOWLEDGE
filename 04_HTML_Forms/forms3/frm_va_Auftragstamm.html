@@ -5,20 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auftragsverwaltung</title>
     <script>
-        // Redirect zur Shell wenn nicht im iframe geladen
-        (function() {
-            const inShell = window.location.search.includes('shell=1') || window.parent !== window;
-            if (!inShell && window.location.protocol !== 'file:') {
-                // ID aus aktueller URL uebernehmen (damit Navigation mit ID funktioniert)
-                const urlParams = new URLSearchParams(window.location.search);
-                const id = urlParams.get('id') || urlParams.get('va_id');
-                let redirectUrl = 'shell.html?form=frm_va_Auftragstamm';
-                if (id) {
-                    redirectUrl += '&id=' + id;
+    // Auto-Load in Shell (Sidebar-Integration)
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isInShell = urlParams.has('shell') || window.SHELL_PARAMS;
+        const isInIframe = window.self !== window.top;
+        if (!isInShell && !isInIframe) {
+            const formName = window.location.pathname.split('/').pop();
+            const recordId = urlParams.get('id') || urlParams.get('ma_id') || urlParams.get('kd_id') || urlParams.get('va_id');
+            let shellUrl = 'shell.html?form=' + formName;
+            if (recordId) shellUrl += '&id=' + recordId;
+            for (const [key, value] of urlParams.entries()) {
+                if (!['shell', 'id', 'ma_id', 'kd_id', 'va_id', '_t'].includes(key)) {
+                    shellUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
                 }
-                window.location.href = redirectUrl;
             }
-        })();
+            console.log('[Auto-Redirect] Lade mit Sidebar:', shellUrl);
+            window.location.replace(shellUrl);
+        }
+    })();
     </script>
     <style>
         :root {
@@ -3586,6 +3591,8 @@
     </script>
     <!-- API-Server Lifecycle (Auto-Start/Stop) -->
     <script src="js/api-lifecycle.js"></script>
+    <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
+    <script src="js/server-watchdog.js"></script>
     <!-- Formular-Logik (Button-Handler, API-Calls) -->
     <script type="module" src="logic/frm_va_Auftragstamm.logic.js"></script>
 </body>

@@ -1,7 +1,28 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <script>
+    // Auto-Load in Shell (Sidebar-Integration)
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isInShell = urlParams.has('shell') || window.SHELL_PARAMS;
+        const isInIframe = window.self !== window.top;
+        if (!isInShell && !isInIframe) {
+            const formName = window.location.pathname.split('/').pop();
+            const recordId = urlParams.get('id') || urlParams.get('ma_id') || urlParams.get('kd_id') || urlParams.get('va_id');
+            let shellUrl = 'shell.html?form=' + formName;
+            if (recordId) shellUrl += '&id=' + recordId;
+            for (const [key, value] of urlParams.entries()) {
+                if (!['shell', 'id', 'ma_id', 'kd_id', 'va_id', '_t'].includes(key)) {
+                    shellUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                }
+            }
+            console.log('[Auto-Redirect] Lade mit Sidebar:', shellUrl);
+            window.location.replace(shellUrl);
+        }
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mitarbeiter-Zeitkonten - CONSYS</title>
     <link rel="stylesheet" href="css/design-system.css">
@@ -364,7 +385,7 @@
     <link rel="stylesheet" href="css/fonts_override.css">
 <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body data-active-menu="zeitkonten">
+<body data-active-menu="zeitkonten" data-form="frm_MA_Zeitkonten">
     <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">&#x26F6;</button>
 
     <div class="app-container">
@@ -1400,7 +1421,10 @@
     <script src="js/webview2-bridge.js"></script>
     <!-- API-Server Lifecycle -->
     <script src="js/api-lifecycle.js"></script>
+    <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
+    <script src="js/server-watchdog.js"></script>
 </body>
 </html>
+
 
 

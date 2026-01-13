@@ -1,2302 +1,4630 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Objektstamm - CONSYS</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: #8080c0;
-            overflow: hidden;
-            height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 11px;
-        }
-
-        .window-frame {
-            background-color: #8080c0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Title Bar - ausgeblendet gemaess Anforderung */
-        .title-bar {
-            display: none;
-        }
-
-        .title-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .title-bar-buttons {
-            display: flex;
-            gap: 2px;
-        }
-
-        .title-btn {
-            width: 21px;
-            height: 21px;
-            background: #ece9d8;
-            border: 1px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            font-size: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .title-btn.close {
-            background: #c75050;
-            color: white;
-        }
-
-        /* Main Container */
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* Left Menu */
-        .left-menu {
-            width: 185px;
-            background-color: #6060a0;
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-
-        .menu-header {
-            background-color: #000080;
-            color: white;
-            padding: 6px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 11px;
-            margin-bottom: 8px;
-        }
-
-        .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            justify-content: space-between;
-        }
-
-        .menu-btn {
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            padding: 8px 10px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 11px;
-            color: #000;
-            font-weight: 500;
-            position: relative;
-            border: none;
-            margin: 1px 0;
-            overflow: visible;
-        }
-
-        /* Obere helle Kante - 4px nach rechts versetzt */
-        .menu-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: calc(100% - 4px);
-            height: 2px;
-            background: #ffffff;
-            z-index: 1;
-        }
-
-        /* Untere dunkle Kante - 4px nach links versetzt */
-        .menu-btn::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: calc(100% - 4px);
-            height: 2px;
-            background: #404070;
-            z-index: 1;
-        }
-
-        .menu-btn:hover {
-            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
-        }
-
-        .menu-btn:active {
-            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
-        }
-
-        .menu-btn:active::before {
-            background: #404070;
-            left: 4px;
-            width: calc(100% - 4px);
-        }
-
-        .menu-btn:active::after {
-            background: #ffffff;
-            right: 4px;
-            width: calc(100% - 4px);
-        }
-
-        .menu-btn.active {
-            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
-        }
-
-        .menu-btn.active::before {
-            background: #505080;
-            left: 4px;
-            width: calc(100% - 4px);
-        }
-
-        .menu-btn.active::after {
-            background: #c0c0d8;
-            right: 4px;
-            width: calc(100% - 4px);
-        }
-
-        /* Content Area */
-        .content-area {
-            flex: 1;
-            background-color: #8080c0;
-            padding: 3px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow: hidden;
-        }
-
-        /* Header Row */
-        .header-row {
-            background-color: #9090c0;
-            border: 1px solid #606090;
-            padding: 4px 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .logo-box {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #4040a0, #8080c0);
-            border: 2px solid #404080;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .title-text {
-            font-size: 23px !important; /* Formulartitel +8px gemaess Anforderung */
-            font-weight: bold !important;
-            color: #000080;
-        }
-
-        .header-links {
-            display: flex;
-            gap: 8px;
-            margin-left: 5px;
-        }
-
-        .header-link {
-            color: #000080;
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: 10px;
-        }
-
-        .btn {
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            border: none;
-            padding: 4px 12px;
-            font-size: 11px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .btn:hover {
-            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-green, .btn.btn-green {
-            background: linear-gradient(to bottom, #90c090, #60a060);
-            color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
-        }
-
-        .btn-yellow {
-            background: linear-gradient(to bottom, #e0e080, #c0c040);
-            /* Gelb ist hell genug - schwarze Schrift OK */
-        }
-
-        .btn-red, .btn.btn-red {
-            background: linear-gradient(to bottom, #c09090, #a06060);
-            color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
-        }
-
-        .btn-blue, .btn.btn-blue {
-            background: linear-gradient(to bottom, #9090c0, #6060a0);
-            color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
-        }
-
-        /* Button Row */
-        .button-row {
-            background-color: #9090c0;
-            border: 1px solid #606090;
-            padding: 3px 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-        }
-
-        .nav-btn {
-            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 2px 6px;
-            cursor: pointer;
-            font-size: 11px;
-            min-width: 24px;
-            text-align: center;
-        }
-
-        .nav-btn:hover {
-            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
-        }
-
-        .nav-group {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .record-info {
-            font-size: 10px;
-            padding: 0 8px;
-            color: #000080;
-            font-weight: bold;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            font-size: 10px;
-        }
-
-        .form-label {
-            font-size: 10px;
-        }
-
-        .form-select, .form-input {
-            border: 1px solid #808080;
-            padding: 1px 3px;
-            font-size: 10px;
-            background: white;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #000080;
-            box-shadow: 0 0 2px #000080;
-        }
-
-        .form-input.readonly {
-            background: #e0e0e0;
-        }
-
-        /* Main Content Split */
-        .main-content {
-            display: flex;
-            flex: 1;
-            gap: 2px;
-            overflow: hidden;
-        }
-
-        /* Left Panel - Object Details */
-        .left-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Form Section */
-        .form-section {
-            background-color: #b8b8d8;
-            border: 1px solid #606090;
-            padding: 8px 12px;
-            display: flex;
-            gap: 30px;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-        }
-
-        .form-column {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .form-row {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .form-row label {
-            width: 80px;
-            font-size: 10px;
-            text-align: right;
-        }
-
-        .form-row input[type="text"],
-        .form-row input[type="email"],
-        .form-row select,
-        .form-row textarea {
-            border: 1px solid #808080;
-            padding: 2px 4px;
-            font-size: 10px;
-            background: white;
-        }
-
-        .form-row input[type="text"]:focus,
-        .form-row input[type="email"]:focus,
-        .form-row select:focus,
-        .form-row textarea:focus {
-            outline: none;
-            border-color: #000080;
-            box-shadow: 0 0 2px #000080;
-        }
-
-        /* Tab Container */
-        .tab-container {
-            background-color: #c0c0e0;
-            border: 1px solid #606090;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .tab-header {
-            display: flex;
-            background-color: #9090c0;
-            border-bottom: 1px solid #606090;
-        }
-
-        .tab-btn {
-            padding: 4px 12px;
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            border: 1px solid #606090;
-            border-bottom: none;
-            cursor: pointer;
-            font-size: 10px;
-            color: #000;
-            margin-right: 2px;
-            margin-top: 3px;
-        }
-
-        .tab-btn:hover {
-            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(to bottom, #c0c0e0, #c0c0e0);
-            border-bottom: 1px solid #c0c0e0;
-            margin-bottom: -1px;
-            font-weight: bold;
-        }
-
-        .tab-content {
-            flex: 1;
-            overflow: auto;
-            padding: 8px;
-            background-color: #c0c0e0;
-        }
-
-        .tab-pane {
-            display: none;
-            height: 100%;
-        }
-
-        .tab-pane.active {
-            display: block;
-        }
-
-        /* Right Panel - Object List */
-        .right-panel {
-            width: 320px;
-            background-color: #c0c0e0;
-            border: 1px solid #606090;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .panel-header {
-            background: linear-gradient(to bottom, #9090c0, #7070a0);
-            color: #000080;
-            padding: 4px 8px;
-            font-weight: bold;
-            font-size: 11px;
-            border-bottom: 1px solid #606090;
-        }
-
-        .search-box {
-            padding: 4px;
-            background-color: #b0b0d0;
-            border-bottom: 1px solid #808080;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 3px 5px;
-            border: 1px solid #808080;
-            font-size: 10px;
-        }
-
-        .list-container {
-            flex: 1;
-            overflow: auto;
-        }
-
-        /* Data Grid */
-        .data-grid {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10px;
-        }
-
-        .data-grid th {
-            background: linear-gradient(to bottom, #c0c0e0, #a0a0c0);
-            border: 1px solid #808080;
-            padding: 3px 5px;
-            text-align: left;
-            font-weight: bold;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-
-        .data-grid td {
-            border: 1px solid #c0c0c0;
-            padding: 2px 5px;
-            background: white;
-        }
-
-        .data-grid tr:hover td {
-            background-color: #e0e0ff;
-        }
-
-        .data-grid tr.selected td {
-            background-color: #000080;
-            color: white;
-        }
-
-        .data-grid tr {
-            cursor: pointer;
-        }
-
-        /* Positionen Table */
-        .positionen-grid {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10px;
-        }
-
-        .positionen-grid th {
-            background: linear-gradient(to bottom, #d0d0e0, #b0b0c0);
-            border: 1px solid #808080;
-            padding: 4px 6px;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .positionen-grid td {
-            border: 1px solid #c0c0c0;
-            padding: 3px 6px;
-            background: white;
-        }
-
-        .positionen-grid tr:hover td {
-            background-color: #e8e8ff;
-        }
-
-        .positionen-grid tr.selected td {
-            background-color: #000080;
-            color: white;
-        }
-
-        /* Fieldset */
-        .fieldset {
-            border: 1px solid #808080;
-            padding: 8px;
-            margin-bottom: 8px;
-            background-color: #d0d0e8;
-        }
-
-        .fieldset-legend {
-            background: linear-gradient(to bottom, #9090c0, #7070a0);
-            color: #000080;
-            padding: 2px 10px;
-            font-weight: bold;
-            font-size: 10px;
-            margin: -16px 0 8px 8px;
-            display: inline-block;
-        }
-
-        /* Status Bar */
-        .status-bar {
-            background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
-            border: 1px solid #808080;
-            padding: 2px 8px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            flex-shrink: 0;
-        }
-
-        .status-section {
-            display: flex;
-            gap: 20px;
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-box {
-            background: #ece9d8;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 20px 40px;
-            text-align: center;
-        }
-
-        .loading-spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid #c0c0c0;
-            border-top-color: #000080;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Toast Container */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1001;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .toast {
-            background: #000080;
-            color: white;
-            padding: 10px 20px;
-            border: 2px solid;
-            border-color: #4040a0 #000040 #000040 #4040a0;
-            font-size: 11px;
-            border-radius: 3px;
-        }
-
-        .toast-success {
-            background: #308030;
-            border-color: #60c060 #205020 #205020 #60c060;
-        }
-
-        .toast-error {
-            background: #c04040;
-            border-color: #e06060 #802020 #802020 #e06060;
-        }
-
-        /* Buttons in Tab */
-        .tab-buttons {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 8px;
-        }
-
-        /* Vollbild-Button oben rechts */
-        .fullscreen-btn {
-            position: fixed;
-            top: 5px;
-            right: 5px;
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            border: none;
-            cursor: pointer;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: #000080;
-        }
-
-        .fullscreen-btn:hover {
-            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
-        }
-
-        .fullscreen-btn:active {
-            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
-        }
-
-        /* Pflichtfeld-Markierung */
-        .required { color: #cc0000; font-weight: bold; }
-        input:required:invalid { border-color: #cc0000; }
-        input:required:valid { border-color: #008000; }
-        input.invalid { border-color: #cc0000 !important; background-color: #fff8f8 !important; }
-
-    </style>
-    <link rel="stylesheet" href="consys-common.css">
-    <link rel="stylesheet" href="css/fonts_override.css">
-    <script src="js/performance-init.js"></script>
-<link rel="stylesheet" href="css/visbug_overrides.css">
-</head>
-<body>
-    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild" data-testid="objekt-btn-vollbild">â›¶</button>
-    <div class="window-frame">
-        <!-- Title Bar -->
-        <div class="title-bar">
-            <div class="title-bar-left">
-                <span>Objektstammdaten - CONSYS Security</span>
-            </div>
-            <div class="title-bar-buttons">
-                <button class="title-btn tiny-btn" title="Minimieren" data-testid="objekt-btn-minimieren">_</button>
-                <button class="title-btn tiny-btn" title="Maximieren" data-testid="objekt-btn-maximieren">[]</button>
-                <button class="title-btn close tiny-btn" title="Schliessen" onclick="closeForm()" data-testid="objekt-btn-schliessen">X</button>
-            </div>
-        </div>
-
-        <!-- Main Container -->
-        <div class="main-container">
-            <!-- Left Menu -->
-
-            <!-- Content Area -->
-            <div class="content-area">
-                <!-- Header Row -->
-                <div class="header-row">
-                    <div class="logo-box">OB</div>
-                    <div class="title-text">Objektstammdaten</div>
-                    <div class="header-links">
-                        <span class="header-link" onclick="openAufträge()" data-testid="objekt-link-auftraege">Aufträge zu Objekt</span>
-                        <span class="header-link" onclick="openPositionen()" data-testid="objekt-link-positionen">Positionen</span>
-                    </div>
-                    <div style="flex:1"></div>
-                    <span id="lblDatum" style="font-size:10px;color:#000080;"></span>
-                </div>
-
-                <!-- Button Row -->
-                <div class="button-row">
-                    <div class="nav-group">
-                        <button class="nav-btn" onclick="goFirst()" title="Erster" data-testid="objekt-btn-erste">|&lt;</button>
-                        <button class="nav-btn tiny-btn" onclick="goPrev()" title="Zurück" data-testid="objekt-btn-vorige">&lt;</button>
-                        <span class="record-info" id="recordInfo">0 / 0</span>
-                        <button class="nav-btn tiny-btn" onclick="goNext()" title="Vor" data-testid="objekt-btn-naechste">&gt;</button>
-                        <button class="nav-btn" onclick="goLast()" title="Letzter" data-testid="objekt-btn-letzte">&gt;|</button>
-                    </div>
-                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-                    <button class="btn btn-green" onclick="newRecord()" data-testid="objekt-btn-neu">+ Neu</button>
-                    <button class="btn btn-yellow" onclick="saveRecord()" data-testid="objekt-btn-speichern">Speichern</button>
-                    <button class="btn btn-red" onclick="deleteRecord()" data-testid="objekt-btn-loeschen">Löschen</button>
-                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-                    <button class="btn" onclick="printReport()" data-testid="objekt-btn-bericht">Bericht</button>
-                    <button class="btn" onclick="openNewVeranstalter()" data-testid="objekt-btn-neuer-veranstalter">Neuer Veranstalter</button>
-                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="chkNurAktive" checked onchange="loadObjekte()" data-testid="objekt-checkbox-nuraktive">
-                        <label for="chkNurAktive">Nur aktive</label>
-                    </div>
-                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-                    <button class="btn" onclick="geocodeAdresse()" title="Adresse geocodieren (OSM)" data-testid="objekt-btn-geocode">Geocode</button>
-                    <button class="btn" onclick="showHelp()" title="Hilfe anzeigen" data-testid="objekt-btn-hilfe">?</button>
-                    <button class="btn" id="btnBackToList" onclick="backToAktPosList()" style="display:none;" data-testid="objekt-btn-zurueck">Zurück zur Liste</button>
-                </div>
-
-                <!-- Main Content Split -->
-                <div class="main-content">
-                    <!-- Left Panel - Object Details -->
-                    <div class="left-panel">
-                        <!-- Form Section -->
-                        <div class="form-section">
-                            <div class="form-column">
-                                <div class="form-row">
-                                    <label>Objekt-ID:</label>
-                                    <input type="text" id="ID" data-field="ID" class="input-xs readonly" readonly data-testid="objekt-input-id">
-                                    <input type="hidden" id="TabellenNr" data-field="TabellenNr" value="42">
-                                </div>
-                                <div class="form-row">
-                                    <label>Objekt: <span class="required">*</span></label>
-                                    <input type="text" id="Objekt" data-field="Objekt" class="input-lg" required data-testid="objekt-input-name">
-                                </div>
-                                <div class="form-row">
-                                    <label>Strasse:</label>
-                                    <input type="text" id="Strasse" data-field="Strasse" class="input-lg" data-testid="objekt-input-strasse">
-                                </div>
-                                <div class="form-row">
-                                    <label>PLZ / Ort:</label>
-                                    <input type="text" id="PLZ" data-field="PLZ" class="input-xs" pattern="[0-9]{5}" title="5-stellige PLZ eingeben" data-testid="objekt-input-plz">
-                                    <input type="text" id="Ort" data-field="Ort" class="input-lg" data-testid="objekt-input-ort">
-                                </div>
-                                <div class="form-row">
-                                    <label>Geo-Lat:</label>
-                                    <input type="text" id="txtLat" data-field="Geo_Lat" class="input-sm readonly" readonly placeholder="Breitengrad">
-                                    <label style="width:auto; margin-left:5px;">Lon:</label>
-                                    <input type="text" id="txtLon" data-field="Geo_Lon" class="input-sm readonly" readonly placeholder="Laengengrad">
-                                </div>
-                            </div>
-                            <div class="form-column">
-                                <div class="form-row">
-                                    <label>Treffpunkt:</label>
-                                    <input type="text" id="Treffpunkt" data-field="Treffpunkt" style="width:180px;">
-                                    <input type="text" id="Treffp_Zeit" data-field="Treffp_Zeit" style="width:50px;" placeholder="HH:MM">
-                                </div>
-                                <div class="form-row">
-                                    <label>Anfahrt:</label>
-                                    <textarea id="txtAnfahrt" data-field="Anfahrt" style="width:235px; height:40px; resize:vertical; font-size:10px;"></textarea>
-                                </div>
-                                <div class="form-row">
-                                    <label>Dienstkleidung:</label>
-                                    <input type="text" id="Dienstkleidung" data-field="Dienstkleidung" style="width:180px;">
-                                </div>
-                                <div class="form-row">
-                                    <label>Ansprechpartner:</label>
-                                    <input type="text" id="Ansprechpartner" data-field="Ansprechpartner" style="width:180px;">
-                                </div>
-                                <div class="form-row">
-                                    <label>Telefon:</label>
-                                    <input type="tel" id="Text435" data-field="Text435" style="width:180px;" pattern="[0-9+\-\s/()]+" title="Telefonnummer eingeben">
-                                </div>
-                                <div class="form-row">
-                                    <label>Veranstalter:</label>
-                                    <select id="cboVeranstalter" data-field="Veranstalter_ID" style="width:180px;" data-testid="objekt-select-veranstalter">
-                                        <option value="">-- Kunde waehlen --</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tab Container -->
-                        <div class="tab-container">
-                            <div class="tab-header">
-                                <button class="tab-btn active" data-tab="tabPositionen" onclick="switchTab('tabPositionen', this)" data-testid="objekt-tab-positionen">Positionen</button>
-                                <button class="tab-btn" data-tab="tabAttach" onclick="switchTab('tabAttach', this)" data-testid="objekt-tab-zusatzdateien">Zusatzdateien</button>
-                                <button class="tab-btn" data-tab="tabBemerkungen" onclick="switchTab('tabBemerkungen', this)" data-testid="objekt-tab-bemerkungen">Bemerkungen</button>
-                                <button class="tab-btn" data-tab="tabAufträge" onclick="switchTab('tabAufträge', this)" data-testid="objekt-tab-auftraege">Aufträge</button>
-                            </div>
-                            <div class="tab-content">
-                                <!-- Tab Positionen -->
-                                <div class="tab-pane active" id="tabPositionen">
-                                    <div class="tab-buttons">
-                                        <button class="btn" onclick="newPosition()" data-testid="objekt-btn-neue-position">+ Neue Position</button>
-                                        <button class="btn btn-red" onclick="deletePosition()" data-testid="objekt-btn-position-loeschen">Position löschen</button>
-                                        <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-                                        <button class="btn" onclick="movePositionUp()" title="Position nach oben">&#9650;</button>
-                                        <button class="btn" onclick="movePositionDown()" title="Position nach unten">&#9660;</button>
-                                        <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-                                        <button class="btn" onclick="uploadPositionen()" title="Positionsliste importieren">Import</button>
-                                        <button class="btn" onclick="exportPositionenExcel()" title="Nach Excel exportieren">Excel</button>
-                                        <button class="btn" onclick="kopierePositionen()" title="Positionen kopieren">Kopieren</button>
-                                        <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-                                        <button class="btn" onclick="speichereVorlage()" title="Als Vorlage speichern">Vorlage speichern</button>
-                                        <button class="btn" onclick="ladeVorlage()" title="Vorlage laden">Vorlage laden</button>
-                                    </div>
-                                    <table class="positionen-grid">
-                                        <thead>
-                                            <tr>
-                                                <th style="width:40px;">Sort</th>
-                                                <th style="width:100px;">Bereich</th>
-                                                <th style="width:150px;">Info</th>
-                                                <th style="width:50px;">Anzahl</th>
-                                                <th style="width:60px;">Geschl.</th>
-                                                <th style="width:70px;">Beginn</th>
-                                                <th style="width:70px;">Ende</th>
-                                                <th style="width:60px;">Tagesart</th>
-                                                <th style="width:50px;">Tag-Nr</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="positionenBody">
-                                            <tr><td colspan="9" style="text-align:center;padding:20px;color:#666;">Lade Positionen...</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Tab Zusatzdateien -->
-                                <div class="tab-pane" id="tabAttach">
-                                    <div class="tab-buttons">
-                                        <button class="btn" onclick="addAttachment()">+ Datei hinzufügen</button>
-                                        <button class="btn" onclick="newAttachment()">Neue Anlage</button>
-                                        <button class="btn btn-red" onclick="deleteAttachment()">Datei löschen</button>
-                                    </div>
-                                    <table class="positionen-grid">
-                                        <thead>
-                                            <tr>
-                                                <th>Dateiname</th>
-                                                <th style="width:80px;">Typ</th>
-                                                <th style="width:100px;">Datum</th>
-                                                <th style="width:60px;">Aktion</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="attachBody">
-                                            <tr><td colspan="4" style="text-align:center;padding:20px;color:#666;">Keine Dateien vorhanden</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Tab Bemerkungen -->
-                                <div class="tab-pane" id="tabBemerkungen">
-                                    <div class="fieldset">
-                                        <div class="fieldset-legend">Bemerkungen zum Objekt</div>
-                                        <textarea id="Bemerkung" data-field="Bemerkung" style="width:100%;height:200px;font-size:11px;padding:5px;border:1px solid #808080;" data-testid="objekt-textarea-bemerkung"></textarea>
-                                    </div>
-                                </div>
-
-                                <!-- Tab Aufträge -->
-                                <div class="tab-pane" id="tabAufträge">
-                                    <table class="positionen-grid">
-                                        <thead>
-                                            <tr>
-                                                <th style="width:60px;">VA-ID</th>
-                                                <th>Auftrag</th>
-                                                <th style="width:100px;">Datum</th>
-                                                <th style="width:80px;">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="auftraegeBody">
-                                            <tr><td colspan="4" style="text-align:center;padding:20px;color:#666;">Lade Aufträge...</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Panel - Object List -->
-                    <div class="right-panel">
-                        <div class="panel-header">Objektliste</div>
-                        <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="Objekt suchen..." onkeyup="filterList()" data-testid="objekt-input-suche">
-                        </div>
-                        <div class="list-container">
-                            <table class="data-grid">
-                                <thead>
-                                    <tr>
-                                        <th style="width:40px;">ID</th>
-                                        <th>Objekt</th>
-                                        <th style="width:100px;">Ort</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="objekteBody">
-                                    <tr><td colspan="3" style="text-align:center;padding:20px;">Lade...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Status Bar -->
-                <div class="status-bar">
-                    <div class="status-section">
-                        <span id="statusText">Bereit</span>
-                    </div>
-                    <div class="status-section">
-                        <span>Erst.v: <span id="Erst_von" data-field="Erst_von">-</span></span>
-                        <span>am: <span id="Erst_am" data-field="Erst_am">-</span></span>
-                        <span>Aend.v: <span id="Aend_von" data-field="Aend_von">-</span></span>
-                        <span>am: <span id="Aend_am" data-field="Aend_am">-</span></span>
-                    </div>
-                    <div class="status-section">
-                        <span id="objekteCount">0 Objekte</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-box">
-            <div class="loading-spinner"></div>
-            <div>Lade Daten...</div>
-        </div>
-    </div>
-
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- WebView2 Bridge -->
-    <script src="js/webview2-bridge.js"></script>
-
-    <!-- WebView2 Integration -->
-    <script type="module" src="logic/frm_OB_Objekt.webview2.js"></script>
-
-    <!-- Global Button Handlers -->
-    <script src="js/global-handlers.js"></script>
-
-    <script>
-        // ============================================
-        // STATE MANAGEMENT
-        // ============================================
-        // API_BASE wird bereits von webview2-bridge.js bereitgestellt
-
-        const state = {
-            objekteList: [],
-            filteredList: [],
-            positionenList: [],
-            currentIndex: 0,
-            currentRecord: null,
-            isDirty: false,
-            selectedPositionId: null,
-            selectedAttachment: null
-        };
-
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('lblDatum').textContent = new Date().toLocaleDateString('de-DE');
-
-            // Bridge Event Handler
-            if (window.Bridge) {
-                Bridge.on('onDataReceived', (data) => {
-                    if (data.objekt) {
-                        displayRecord(data.objekt);
-                    }
-                });
-
-                Bridge.on('onLoad', (data) => {
-                    if (data.objekt) {
-                        displayRecord(data.objekt);
-                    }
-                });
-            }
-
-            // Load data
-            await loadKunden();
-            await loadObjekte();
-
-            // Mark form fields for change tracking
-            document.querySelectorAll('[data-field]').forEach(el => {
-                el.addEventListener('change', () => { state.isDirty = true; });
-                el.addEventListener('input', () => { state.isDirty = true; });
-            });
-        });
-
-        // ============================================
-        // API FUNCTIONS
-        // ============================================
-        async function apiCall(endpoint, method = 'GET', data = null) {
-            const options = {
-                method,
-                headers: { 'Content-Type': 'application/json' }
-            };
-            if (data && method !== 'GET') {
-                options.body = JSON.stringify(data);
-            }
-            try {
-                const response = await fetch(`${API_BASE}${endpoint}`, options);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                return await response.json();
-            } catch (error) {
-                console.error('API Error:', error);
-                throw error;
-            }
-        }
-
-        // ============================================
-        // KUNDENLISTE LADEN (fuer Veranstalter-Dropdown)
-        // ============================================
-        async function loadKunden() {
-            try {
-                const result = await apiCall('/kunden');
-                const kunden = result.data || result || [];
-                const cboVeranstalter = document.getElementById('cboVeranstalter');
-
-                if (cboVeranstalter) {
-                    // Bestehende Optionen behalten (erste Option)
-                    cboVeranstalter.innerHTML = '<option value="">-- Kunde waehlen --</option>';
-
-                    kunden.forEach(kunde => {
-                        const option = document.createElement('option');
-                        option.value = kunde.kun_Id || kunde.ID;
-                        option.textContent = kunde.kun_Firma || kunde.Firma || `Kunde ${kunde.kun_Id}`;
-                        cboVeranstalter.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.log('Kundenliste nicht geladen:', error);
-            }
-        }
-
-        // ============================================
-        // DATA LOADING
-        // ============================================
-        async function loadObjekte() {
-            showLoading(true);
-            setStatus('Lade Objekte...');
-
-            try {
-                const nurAktive = document.getElementById('chkNurAktive').checked;
-                let url = '/objekte';
-                if (nurAktive) {
-                    url += '?aktiv=true';
-                }
-
-                const result = await apiCall(url);
-                state.objekteList = result.data || result || [];
-                state.filteredList = [...state.objekteList];
-
-                renderObjekteListe();
-                document.getElementById('objekteCount').textContent = `${state.objekteList.length} Objekte`;
-
-                if (state.objekteList.length > 0) {
-                    state.currentIndex = 0;
-                    await loadRecord(state.objekteList[0].ID);
-                } else {
-                    clearForm();
-                }
-
-                setStatus('Bereit');
-            } catch (error) {
-                console.error('Fehler beim Laden:', error);
-                showToast('Fehler beim Laden der Objekte', 'error');
-                setStatus('Fehler beim Laden');
-
-                // Fallback: Demo-Daten
-                state.objekteList = [
-                    { ID: 1, Objekt: 'Arena Nuernberg', Ort: 'Nuernberg', Strasse: 'Kurt-Leucht-Weg 11', PLZ: '90471' },
-                    { ID: 2, Objekt: 'Meistersingerhalle', Ort: 'Nuernberg', Strasse: 'Muenchener Str. 21', PLZ: '90478' },
-                    { ID: 3, Objekt: 'Messezentrum', Ort: 'Nuernberg', Strasse: 'Messezentrum 1', PLZ: '90471' }
-                ];
-                state.filteredList = [...state.objekteList];
-                renderObjekteListe();
-
-                if (state.objekteList.length > 0) {
-                    displayRecord(state.objekteList[0]);
-                }
-            }
-
-            showLoading(false);
-        }
-
-        async function loadRecord(id) {
-            try {
-                const result = await apiCall(`/objekte/${id}`);
-                const record = result.data || result;
-                displayRecord(record);
-
-                // Load related data
-                await loadPositionen(id);
-                await loadAufträge(id);
-            } catch (error) {
-                console.error('Fehler beim Laden des Datensatzes:', error);
-            }
-        }
-
-        async function loadPositionen(objektId) {
-            try {
-                const result = await apiCall(`/objekte/${objektId}/positionen`);
-                state.positionenList = result.data || result || [];
-                renderPositionen();
-                updateSummenAnzeige(); // Access: UpdateSummenAnzeige
-            } catch (error) {
-                console.log('Positionen nicht geladen:', error);
-                state.positionenList = [];
-                renderPositionen();
-            }
-        }
-
-        async function loadAufträge(objektId) {
-            try {
-                const result = await apiCall(`/objekte/${objektId}/auftraege`);
-                const auftraege = result.data || result || [];
-                renderAufträge(auftraege);
-            } catch (error) {
-                console.log('Aufträge nicht geladen:', error);
-                renderAufträge([]);
-            }
-        }
-
-        // ============================================
-        // RENDERING
-        // ============================================
-        function renderObjekteListe() {
-            const tbody = document.getElementById('objekteBody');
-
-            if (state.filteredList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;">Keine Objekte gefunden</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = state.filteredList.map((obj, idx) => `
-                <tr class="${idx === state.currentIndex ? 'selected' : ''}"
-                    onclick="selectObjekt(${idx})"
-                    ondblclick="selectObjekt(${idx})">
-                    <td>${obj.ID}</td>
-                    <td>${obj.Objekt || ''}</td>
-                    <td>${obj.Ort || ''}</td>
-                </tr>
-            `).join('');
-        }
-
-        function renderPositionen() {
-            const tbody = document.getElementById('positionenBody');
-
-            if (state.positionenList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:#666;">Keine Positionen vorhanden</td></tr>';
-                return;
-            }
-
-            // Tagesart-Mapping (analog Access)
-            const tagesArtMap = { 1: 'Tag', 2: 'Woche', 3: 'Monat', 4: 'Alle' };
-
-            tbody.innerHTML = state.positionenList.map((pos, idx) => `
-                <tr class="${pos.ID === state.selectedPositionId ? 'selected' : ''}"
-                    onclick="selectPosition(${pos.ID})">
-                    <td>${pos.Sort || (idx + 1)}</td>
-                    <td>${pos.Gruppe || ''}</td>
-                    <td>${pos.Zusatztext || ''}</td>
-                    <td style="text-align:center;">${pos.Anzahl || 1}</td>
-                    <td>${pos.Geschlecht || '-'}</td>
-                    <td>${pos.Rel_Beginn ? formatTime(pos.Rel_Beginn) : '-'}</td>
-                    <td>${pos.Rel_Ende ? formatTime(pos.Rel_Ende) : '-'}</td>
-                    <td>${tagesArtMap[pos.TagesArt] || '-'}</td>
-                    <td style="text-align:center;">${pos.TagesNr || '-'}</td>
-                </tr>
-            `).join('');
-        }
-
-        function formatTime(dateStr) {
-            if (!dateStr) return '-';
-            try {
-                const d = new Date(dateStr);
-                return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-            } catch (e) {
-                return dateStr;
-            }
-        }
-
-        function renderAufträge(auftraege) {
-            const tbody = document.getElementById('auftraegeBody');
-
-            if (auftraege.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#666;">Keine Aufträge vorhanden</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = auftraege.map(a => `
-                <tr ondblclick="openAuftrag(${a.VA_ID})">
-                    <td>${a.VA_ID}</td>
-                    <td>${a.Auftrag || ''}</td>
-                    <td>${a.Datum ? new Date(a.Datum).toLocaleDateString('de-DE') : ''}</td>
-                    <td>${a.Status || ''}</td>
-                </tr>
-            `).join('');
-        }
-
-        function displayRecord(record) {
-            state.currentRecord = record;
-            state.isDirty = false;
-
-            // Fill form fields
-            document.querySelectorAll('[data-field]').forEach(el => {
-                const field = el.getAttribute('data-field');
-                let value = record[field];
-
-                if (value !== undefined && value !== null) {
-                    // Format dates
-                    if (field.includes('_am') && value) {
-                        value = new Date(value).toLocaleString('de-DE');
-                    }
-                    // Format time
-                    if (field === 'Treffp_Zeit' && value) {
-                        value = value.substring(11, 16); // Extract HH:MM
-                    }
-
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-                        el.value = value;
-                    } else {
-                        el.textContent = value;
-                    }
-                } else {
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-                        el.value = '';
-                    } else {
-                        el.textContent = '-';
-                    }
-                }
-            });
-
-            updateRecordInfo();
-
-            // Highlight in list
-            const idx = state.filteredList.findIndex(o => o.ID === record.ID);
-            if (idx >= 0) {
-                state.currentIndex = idx;
-                renderObjekteListe();
-            }
-        }
-
-        function clearForm() {
-            document.querySelectorAll('[data-field]').forEach(el => {
-                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-                    el.value = '';
-                } else {
-                    el.textContent = '-';
-                }
-            });
-            state.currentRecord = null;
-            state.isDirty = false;
-            updateRecordInfo();
-        }
-
-        function updateRecordInfo() {
-            const total = state.filteredList.length;
-            const current = total > 0 ? state.currentIndex + 1 : 0;
-            document.getElementById('recordInfo').textContent = `${current} / ${total}`;
-        }
-
-        // ============================================
-        // NAVIGATION
-        // ============================================
-        async function selectObjekt(index) {
-            if (state.isDirty) {
-                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
-                    return;
-                }
-            }
-
-            state.currentIndex = index;
-            const objekt = state.filteredList[index];
-            if (objekt) {
-                await loadRecord(objekt.ID);
-            }
-        }
-
-        async function goFirst() {
-            if (state.filteredList.length > 0) {
-                await selectObjekt(0);
-            }
-        }
-
-        async function goPrev() {
-            if (state.currentIndex > 0) {
-                await selectObjekt(state.currentIndex - 1);
-            }
-        }
-
-        async function goNext() {
-            if (state.currentIndex < state.filteredList.length - 1) {
-                await selectObjekt(state.currentIndex + 1);
-            }
-        }
-
-        async function goLast() {
-            if (state.filteredList.length > 0) {
-                await selectObjekt(state.filteredList.length - 1);
-            }
-        }
-
-        function filterList() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-
-            if (!term) {
-                state.filteredList = [...state.objekteList];
-            } else {
-                state.filteredList = state.objekteList.filter(o =>
-                    (o.Objekt && o.Objekt.toLowerCase().includes(term)) ||
-                    (o.Ort && o.Ort.toLowerCase().includes(term)) ||
-                    (o.ID && o.ID.toString().includes(term))
-                );
-            }
-
-            state.currentIndex = 0;
-            renderObjekteListe();
-
-            if (state.filteredList.length > 0 && state.filteredList[0]) {
-                displayRecord(state.filteredList[0]);
-            }
-        }
-
-        // ============================================
-        // CRUD OPERATIONS
-        // ============================================
-        function collectFormData() {
-            const data = {};
-            document.querySelectorAll('[data-field]').forEach(el => {
-                const field = el.getAttribute('data-field');
-                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-                    if (!el.classList.contains('readonly') && !el.readOnly) {
-                        data[field] = el.value || null;
-                    }
-                }
-            });
-            return data;
-        }
-
-        async function newRecord() {
-            if (state.isDirty) {
-                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
-                    return;
-                }
-            }
-
-            clearForm();
-            document.getElementById('Objekt').focus();
-            setStatus('Neues Objekt');
-            showToast('Neues Objekt - Daten eingeben', 'info');
-        }
-
-        async function saveRecord() {
-            const data = collectFormData();
-
-            if (!data.Objekt) {
-                showToast('Bitte Objektname eingeben', 'error');
-                return;
-            }
-
-            showLoading(true);
-            setStatus('Speichere...');
-
-            try {
-                let result;
-                if (state.currentRecord && state.currentRecord.ID) {
-                    // Update
-                    result = await apiCall(`/objekte/${state.currentRecord.ID}`, 'PUT', data);
-                    showToast('Objekt gespeichert', 'success');
-                } else {
-                    // Create
-                    result = await apiCall('/objekte', 'POST', data);
-                    showToast('Objekt erstellt', 'success');
-                }
-
-                state.isDirty = false;
-                await loadObjekte();
-
-                // Bridge notification
-                if (window.Bridge) {
-                    Bridge.sendEvent('save', { formData: data });
-                }
-            } catch (error) {
-                console.error('Fehler beim Speichern:', error);
-                showToast('Fehler beim Speichern', 'error');
-            }
-
-            showLoading(false);
-            setStatus('Bereit');
-        }
-
-        async function deleteRecord() {
-            if (!state.currentRecord || !state.currentRecord.ID) {
-                showToast('Kein Datensatz ausgewählt', 'error');
-                return;
-            }
-
-            if (!confirm(`Objekt "${state.currentRecord.Objekt}" wirklich löschen?`)) {
-                return;
-            }
-
-            showLoading(true);
-            setStatus('Lösche...');
-
-            try {
-                await apiCall(`/objekte/${state.currentRecord.ID}`, 'DELETE');
-                showToast('Objekt gelöscht', 'success');
-
-                // Bridge notification
-                if (window.Bridge) {
-                    Bridge.sendEvent('delete', { id: state.currentRecord.ID });
-                }
-
-                await loadObjekte();
-            } catch (error) {
-                console.error('Fehler beim Löschen:', error);
-                showToast('Fehler beim Löschen', 'error');
-            }
-
-            showLoading(false);
-            setStatus('Bereit');
-        }
-
-        // ============================================
-        // POSITION FUNCTIONS
-        // ============================================
-        function selectPosition(id) {
-            state.selectedPositionId = id;
-            renderPositionen();
-        }
-
-        async function newPosition() {
-            if (!state.currentRecord || !state.currentRecord.ID) {
-                showToast('Erst Objekt auswählen', 'error');
-                return;
-            }
-
-            const bezeichnung = prompt('Bezeichnung der Position:');
-            if (!bezeichnung) return;
-
-            const maSoll = prompt('MA Soll-Anzahl:', '1');
-
-            try {
-                await apiCall(`/objekte/${state.currentRecord.ID}/positionen`, 'POST', {
-                    Bezeichnung: bezeichnung,
-                    MA_Soll: parseInt(maSoll) || 1
-                });
-                showToast('Position erstellt', 'success');
-                await loadPositionen(state.currentRecord.ID);
-            } catch (error) {
-                showToast('Fehler beim Erstellen der Position', 'error');
-            }
-        }
-
-        async function deletePosition() {
-            if (!state.selectedPositionId) {
-                showToast('Bitte Position auswählen', 'error');
-                return;
-            }
-
-            if (!confirm('Position wirklich löschen?')) return;
-
-            try {
-                await apiCall(`/objekte/positionen/${state.selectedPositionId}`, 'DELETE');
-                showToast('Position gelöscht', 'success');
-                state.selectedPositionId = null;
-                await loadPositionen(state.currentRecord.ID);
-            } catch (error) {
-                showToast('Fehler beim Löschen', 'error');
-            }
-        }
-
-        // ============================================
-        // TAB SWITCHING
-        // ============================================
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-
-            btn.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-
-            // Daten bei Tab-Wechsel laden
-            if (tabId === 'tabAttach' && state.currentRecord) {
-                loadAttachments();
-            }
-        }
-
-        // ============================================
-        // NAVIGATION TO OTHER FORMS
-        // ============================================
-        function navigateTo(formName) {
-            if (state.isDirty) {
-                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
-                    return;
-                }
-            }
-
-            if (window.Bridge) {
-                Bridge.navigate(formName);
-            } else {
-                window.location.href = `${formName}.html`;
-            }
-        }
-
-        function openAuftrag(vaId) {
-            if (window.Bridge) {
-                Bridge.navigate('frm_va_Auftragstamm', vaId);
-            } else {
-                window.location.href = `frm_va_Auftragstamm.html?id=${vaId}`;
-            }
-        }
-
-        function openAufträge() {
-            switchTab('tabAufträge', document.querySelector('[data-tab="tabAufträge"]'));
-        }
-
-        function openPositionen() {
-            switchTab('tabPositionen', document.querySelector('[data-tab="tabPositionen"]'));
-        }
-
-        function printReport() {
-            if (window.Bridge) {
-                Bridge.sendEvent('print', { report: 'rpt_OB_Objekt', id: state.currentRecord?.ID });
-            } else {
-                window.print();
-            }
-        }
-
-        function openNewVeranstalter() {
-            if (window.Bridge) {
-                Bridge.navigate('frm_KD_Kundenstamm');
-            } else {
-                window.location.href = 'frm_KD_Kundenstamm.html';
-            }
-        }
-
-        function newAttachment() {
-            if (!state.currentRecord || !state.currentRecord.ID) {
-                showToast('Erst Objekt auswählen', 'error');
-                return;
-            }
-            showToast('Neue Anlage: Funktion in WebView2 verfügbar', 'info');
-        }
-
-        function closeForm() {
-            if (state.isDirty) {
-                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
-                    return;
-                }
-            }
-
-            if (window.Bridge) {
-                Bridge.close();
-            } else {
-                window.close();
-            }
-        }
-
-        // ============================================
-        // ATTACHMENT FUNCTIONS
-        // ============================================
-        async function addAttachment() {
-            if (!state.currentRecord?.ID) {
-                showToast('Erst Objekt auswählen', 'error');
-                return;
-            }
-
-            // Fallback: File-Input Dialog
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '*/*';
-            input.style.display = 'none';
-
-            input.onchange = async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-
-                try {
-                    setStatus(`Lade ${file.name} hoch...`);
-                    showLoading(true);
-
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('objekt_id', state.currentRecord.ID);
-                    formData.append('tabellen_nr', 41); // TabellenNr für Objekt
-
-                    const response = await fetch('http://localhost:5000/api/attachments/upload', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        showToast('Datei hinzugefügt', 'success');
-                        setStatus('Datei hinzugefügt');
-                        loadAttachments();
-                    } else {
-                        throw new Error('Upload fehlgeschlagen');
-                    }
-                } catch (err) {
-                    showToast('Fehler beim Hochladen', 'error');
-                    console.error('[Objekt] Upload-Fehler:', err);
-                } finally {
-                    showLoading(false);
-                    input.remove();
-                }
-            };
-
-            document.body.appendChild(input);
-            input.click();
-        }
-
-        async function deleteAttachment() {
-            if (!state.selectedAttachment) {
-                showToast('Bitte Datei auswählen', 'error');
-                return;
-            }
-
-            if (!confirm(`Datei "${state.selectedAttachment.Dateiname}" wirklich löschen?`)) {
-                return;
-            }
-
-            try {
-                setStatus('Lösche Datei...');
-                showLoading(true);
-
-                const response = await fetch(`http://localhost:5000/api/attachments/${state.selectedAttachment.ZusatzNr}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    showToast('Datei gelöscht', 'success');
-                    setStatus('Datei gelöscht');
-                    state.selectedAttachment = null;
-                    loadAttachments();
-                } else {
-                    throw new Error('Löschen fehlgeschlagen');
-                }
-            } catch (err) {
-                showToast('Fehler beim Löschen', 'error');
-                console.error('[Objekt] Löschen-Fehler:', err);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function loadAttachments() {
-            if (!state.currentRecord?.ID) return;
-
-            try {
-                const result = await apiCall(`/attachments?objekt_id=${state.currentRecord.ID}&tabellen_nr=41`);
-                const attachments = result.data || [];
-
-                const tbody = document.getElementById('attachmentsTbody');
-                if (!tbody) return;
-
-                tbody.innerHTML = '';
-                attachments.forEach(att => {
-                    const tr = document.createElement('tr');
-                    tr.dataset.id = att.ZusatzNr;
-                    tr.innerHTML = `
-                        <td>${att.Dateiname || ''}</td>
-                        <td>${formatDate(att.DFiledate)}</td>
-                        <td style="text-align:right">${formatSize(att.DLaenge)}</td>
-                        <td>${att.Texttyp || ''}</td>
-                    `;
-                    tr.addEventListener('click', () => {
-                        tbody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
-                        tr.classList.add('selected');
-                        state.selectedAttachment = att;
-                    });
-                    tr.addEventListener('dblclick', () => openAttachment(att));
-                    tbody.appendChild(tr);
-                });
-            } catch (e) {
-                console.error('[Objekt] Attachments laden fehlgeschlagen:', e);
-            }
-        }
-
-        function openAttachment(att) {
-            if (!att?.Dateiname) return;
-            // Datei öffnen via API
-            window.open(`http://localhost:5000/api/attachments/${att.ZusatzNr}/download`, '_blank');
-        }
-
-        function formatSize(bytes) {
-            if (!bytes) return '';
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
-            return (bytes/1024/1024).toFixed(1) + ' MB';
-        }
-
-        // ============================================
-        // UI HELPERS
-        // ============================================
-        function showLoading(show) {
-            document.getElementById('loadingOverlay').classList.toggle('active', show);
-        }
-
-        function setStatus(text) {
-            document.getElementById('statusText').textContent = text;
-        }
-
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.textContent = message;
-            toast.style.cssText = 'background:#000080;color:white;padding:10px 20px;margin-bottom:5px;border-radius:3px;';
-            if (type === 'success') toast.style.background = '#308030';
-            if (type === 'error') toast.style.background = '#c04040';
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Vollbild-Toggle Funktion (Browser Fullscreen API)
-        function toggleFullscreen() {
-            const btn = document.getElementById('fullscreenBtn');
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().then(() => {
-                    btn.title = 'Vollbild beenden';
-                }).catch(err => console.error('Fullscreen error:', err));
-            } else {
-                document.exitFullscreen().then(() => {
-                    btn.title = 'Vollbild';
-                }).catch(err => console.error('Exit fullscreen error:', err));
-            }
-        }
-
-        document.addEventListener('fullscreenchange', () => {
-            const btn = document.getElementById('fullscreenBtn');
-            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
-        });
-
-        // ============================================
-        // POSITION MOVE FUNCTIONS (Access: btnMoveUp/btnMoveDown)
-        // ============================================
-        async function movePositionUp() {
-            if (!state.selectedPositionId) {
-                showToast('Bitte Position auswählen', 'error');
-                return;
-            }
-
-            const currentIdx = state.positionenList.findIndex(p => p.ID === state.selectedPositionId);
-            if (currentIdx <= 0) {
-                showToast('Position ist bereits ganz oben', 'info');
-                return;
-            }
-
-            const currentPos = state.positionenList[currentIdx];
-            const prevPos = state.positionenList[currentIdx - 1];
-
-            try {
-                setStatus('Verschiebe Position...');
-                // Swap Sort-Werte
-                await apiCall(`/objekte/positionen/${currentPos.ID}/sort`, 'PUT', {
-                    newSort: prevPos.Sort || (currentIdx)
-                });
-                await apiCall(`/objekte/positionen/${prevPos.ID}/sort`, 'PUT', {
-                    newSort: currentPos.Sort || (currentIdx + 1)
-                });
-
-                showToast('Position nach oben verschoben', 'success');
-                await loadPositionen(state.currentRecord.ID);
-                setStatus('Bereit');
-            } catch (error) {
-                console.error('Fehler beim Verschieben:', error);
-                showToast('Fehler beim Verschieben', 'error');
-            }
-        }
-
-        async function movePositionDown() {
-            if (!state.selectedPositionId) {
-                showToast('Bitte Position auswählen', 'error');
-                return;
-            }
-
-            const currentIdx = state.positionenList.findIndex(p => p.ID === state.selectedPositionId);
-            if (currentIdx < 0 || currentIdx >= state.positionenList.length - 1) {
-                showToast('Position ist bereits ganz unten', 'info');
-                return;
-            }
-
-            const currentPos = state.positionenList[currentIdx];
-            const nextPos = state.positionenList[currentIdx + 1];
-
-            try {
-                setStatus('Verschiebe Position...');
-                // Swap Sort-Werte
-                await apiCall(`/objekte/positionen/${currentPos.ID}/sort`, 'PUT', {
-                    newSort: nextPos.Sort || (currentIdx + 2)
-                });
-                await apiCall(`/objekte/positionen/${nextPos.ID}/sort`, 'PUT', {
-                    newSort: currentPos.Sort || (currentIdx + 1)
-                });
-
-                showToast('Position nach unten verschoben', 'success');
-                await loadPositionen(state.currentRecord.ID);
-                setStatus('Bereit');
-            } catch (error) {
-                console.error('Fehler beim Verschieben:', error);
-                showToast('Fehler beim Verschieben', 'error');
-            }
-        }
-
-        // ============================================
-        // POSITION IMPORT/EXPORT (Access: btnUploadPositionen/btnExportExcel)
-        // ============================================
-        async function uploadPositionen() {
-            if (!state.currentRecord?.ID) {
-                showToast('Erst Objekt auswählen', 'error');
-                return;
-            }
-
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.xlsx,.xls,.csv';
-            input.style.display = 'none';
-
-            input.onchange = async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-
-                try {
-                    setStatus(`Importiere ${file.name}...`);
-                    showLoading(true);
-
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('objekt_id', state.currentRecord.ID);
-
-                    const response = await fetch(`${API_BASE}/objekte/${state.currentRecord.ID}/positionen/import`, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        showToast(`${result.count || 0} Positionen importiert`, 'success');
-                        await loadPositionen(state.currentRecord.ID);
-                    } else {
-                        throw new Error('Import fehlgeschlagen');
-                    }
-                } catch (err) {
-                    console.error('[Objekt] Import-Fehler:', err);
-                    showToast('Fehler beim Import', 'error');
-                } finally {
-                    showLoading(false);
-                    setStatus('Bereit');
-                    input.remove();
-                }
-            };
-
-            document.body.appendChild(input);
-            input.click();
-        }
-
-        async function exportPositionenExcel() {
-            if (!state.currentRecord?.ID) {
-                showToast('Erst Objekt auswählen', 'error');
-                return;
-            }
-
-            if (state.positionenList.length === 0) {
-                showToast('Keine Positionen zum Exportieren', 'info');
-                return;
-            }
-
-            try {
-                setStatus('Exportiere nach Excel...');
-                showLoading(true);
-
-                // Download via API
-                const response = await fetch(`${API_BASE}/objekte/${state.currentRecord.ID}/positionen/export`);
-
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `Positionen_${state.currentRecord.Objekt || state.currentRecord.ID}.xlsx`;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                    showToast('Excel-Export erfolgreich', 'success');
-                } else {
-                    throw new Error('Export fehlgeschlagen');
-                }
-            } catch (err) {
-                console.error('[Objekt] Export-Fehler:', err);
-                showToast('Fehler beim Export', 'error');
-            } finally {
-                showLoading(false);
-                setStatus('Bereit');
-            }
-        }
-
-        // ============================================
-        // POSITION KOPIEREN (Access: btnKopierePositionen)
-        // ============================================
-        async function kopierePositionen() {
-            if (!state.currentRecord?.ID) {
-                showToast('Erst Objekt auswählen', 'error');
-                return;
-            }
-
-            // Zeige Dialog zur Auswahl des Quell-Objekts
-            const quellId = prompt('Objekt-ID von dem Positionen kopiert werden sollen:');
-            if (!quellId || isNaN(parseInt(quellId))) {
-                return;
-            }
-
-            if (!confirm(`Positionen von Objekt ${quellId} kopieren? Bestehende Positionen bleiben erhalten.`)) {
-                return;
-            }
-
-            try {
-                setStatus('Kopiere Positionen...');
-                showLoading(true);
-
-                const response = await apiCall(`/objekte/${state.currentRecord.ID}/positionen/copy`, 'POST', {
-                    quellObjektId: parseInt(quellId)
-                });
-
-                showToast(`${response.count || 0} Positionen kopiert`, 'success');
-                await loadPositionen(state.currentRecord.ID);
-            } catch (err) {
-                console.error('[Objekt] Kopieren-Fehler:', err);
-                showToast('Fehler beim Kopieren', 'error');
-            } finally {
-                showLoading(false);
-                setStatus('Bereit');
-            }
-        }
-
-        // ============================================
-        // VORLAGEN-FUNKTIONEN (Access: btnVorlageSpeichern/btnVorlageLaden)
-        // ============================================
-        async function speichereVorlage() {
-            if (!state.currentRecord?.ID) {
-                showToast('Erst Objekt auswählen', 'error');
-                return;
-            }
-
-            if (state.positionenList.length === 0) {
-                showToast('Keine Positionen zum Speichern', 'info');
-                return;
-            }
-
-            const vorlageName = prompt('Name der Vorlage:');
-            if (!vorlageName || !vorlageName.trim()) {
-                return;
-            }
-
-            try {
-                setStatus('Speichere Vorlage...');
-                showLoading(true);
-
-                await apiCall('/objekte/vorlagen', 'POST', {
-                    name: vorlageName.trim(),
-                    objektId: state.currentRecord.ID,
-                    positionen: state.positionenList
-                });
-
-                showToast('Vorlage gespeichert', 'success');
-            } catch (err) {
-                console.error('[Objekt] Vorlage speichern Fehler:', err);
-                showToast('Fehler beim Speichern der Vorlage', 'error');
-            } finally {
-                showLoading(false);
-                setStatus('Bereit');
-            }
-        }
-
-        async function ladeVorlage() {
-            if (!state.currentRecord?.ID) {
-                showToast('Erst Objekt auswählen', 'error');
-                return;
-            }
-
-            try {
-                setStatus('Lade Vorlagen...');
-                showLoading(true);
-
-                // Vorlagenliste laden
-                const result = await apiCall('/objekte/vorlagen');
-                const vorlagen = result.data || result || [];
-
-                if (vorlagen.length === 0) {
-                    showToast('Keine Vorlagen vorhanden', 'info');
-                    return;
-                }
-
-                // Einfacher Auswahl-Dialog
-                const vorlageList = vorlagen.map((v, i) => `${i + 1}. ${v.name}`).join('\n');
-                const selection = prompt(`Vorlage auswählen:\n${vorlageList}\n\nNummer eingeben:`);
-
-                if (!selection || isNaN(parseInt(selection))) {
-                    return;
-                }
-
-                const idx = parseInt(selection) - 1;
-                if (idx < 0 || idx >= vorlagen.length) {
-                    showToast('Ungültige Auswahl', 'error');
-                    return;
-                }
-
-                const vorlage = vorlagen[idx];
-
-                if (!confirm(`Vorlage "${vorlage.name}" laden? Bestehende Positionen bleiben erhalten.`)) {
-                    return;
-                }
-
-                // Vorlage anwenden
-                await apiCall(`/objekte/${state.currentRecord.ID}/positionen/vorlage`, 'POST', {
-                    vorlageId: vorlage.id
-                });
-
-                showToast('Vorlage geladen', 'success');
-                await loadPositionen(state.currentRecord.ID);
-            } catch (err) {
-                console.error('[Objekt] Vorlage laden Fehler:', err);
-                showToast('Fehler beim Laden der Vorlage', 'error');
-            } finally {
-                showLoading(false);
-                setStatus('Bereit');
-            }
-        }
-
-        // ============================================
-        // GEOCODIERUNG (Access: cmdGeocode - OSM)
-        // ============================================
-        async function geocodeAdresse() {
-            if (!state.currentRecord?.ID) {
-                showToast('Erst Objekt auswählen', 'error');
-                return;
-            }
-
-            const strasse = document.getElementById('Strasse')?.value || '';
-            const plz = document.getElementById('PLZ')?.value || '';
-            const ort = document.getElementById('Ort')?.value || '';
-
-            if (!strasse && !plz && !ort) {
-                showToast('Bitte zuerst Adresse eingeben', 'error');
-                return;
-            }
-
-            try {
-                setStatus('Geocodiere Adresse...');
-                showLoading(true);
-
-                // OpenStreetMap Nominatim API
-                const address = encodeURIComponent(`${strasse}, ${plz} ${ort}, Germany`);
-                const response = await fetch(
-                    `https://nominatim.openstreetmap.org/search?format=json&q=${address}&limit=1`,
-                    { headers: { 'User-Agent': 'CONSYS-Security-App' } }
-                );
-
-                const data = await response.json();
-
-                if (!data || data.length === 0) {
-                    showToast('Adresse konnte nicht gefunden werden', 'info');
-                    return;
-                }
-
-                const result = data[0];
-                const lat = parseFloat(result.lat);
-                const lon = parseFloat(result.lon);
-
-                // Koordinaten in Felder eintragen
-                const txtLat = document.getElementById('txtLat');
-                const txtLon = document.getElementById('txtLon');
-                if (txtLat) txtLat.value = lat.toFixed(6);
-                if (txtLon) txtLon.value = lon.toFixed(6);
-
-                // Koordinaten speichern via API
-                try {
-                    await apiCall(`/objekte/${state.currentRecord.ID}/geo`, 'PUT', {
-                        lat: lat,
-                        lon: lon,
-                        strasse: strasse,
-                        plz: plz,
-                        ort: ort,
-                        land: 'Germany'
-                    });
-                    showToast(`Koordinaten gespeichert: ${lat.toFixed(6)}, ${lon.toFixed(6)}`, 'success');
-                } catch (saveErr) {
-                    // Auch wenn Speichern fehlschlägt, Koordinaten anzeigen
-                    showToast(`Gefunden: Lat ${lat.toFixed(6)}, Lon ${lon.toFixed(6)} (nicht gespeichert)`, 'info');
-                }
-            } catch (err) {
-                console.error('[Objekt] Geocoding-Fehler:', err);
-                showToast('Fehler bei der Geocodierung', 'error');
-            } finally {
-                showLoading(false);
-                setStatus('Bereit');
-            }
-        }
-
-        // ============================================
-        // HILFE-FUNKTION (Access: btnHilfe)
-        // ============================================
-        function showHelp() {
-            const helpText = `
-OBJEKTSTAMMDATEN - HILFE
-
-Navigation:
-- |< Erster Datensatz
-- < Vorheriger Datensatz
-- > Nächster Datensatz
-- >| Letzter Datensatz
-
-Aktionen:
-- Neu: Neues Objekt anlegen
-- Speichern: Änderungen speichern
-- Löschen: Objekt löschen
-- Bericht: Objektbericht drucken
-
-Positionen-Tab:
-- Import: Excel/CSV-Datei importieren
-- Excel: Positionen exportieren
-- Kopieren: Positionen von anderem Objekt kopieren
-- Vorlage speichern/laden: Positionsvorlagen verwalten
-- Pfeile: Position nach oben/unten verschieben
-
-Geocode:
-- Ermittelt GPS-Koordinaten aus der Adresse via OpenStreetMap
-
-Zusatzdateien-Tab:
-- Dokumente zum Objekt anhängen
-
-Tastenkürzel:
-- Strg+S: Speichern
-- Esc: Formular schließen
-            `;
-
-            alert(helpText);
-        }
-
-        // ============================================
-        // ZURÜCK-BUTTON (Access: btn_Back_akt_Pos_List)
-        // ============================================
-        function backToAktPosList() {
-            // Zurück zur Auftragspositionsliste
-            if (state.isDirty) {
-                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
-                    return;
-                }
-            }
-
-            const openArgs = new URLSearchParams(window.location.search).get('openArgs');
-            if (window.Bridge) {
-                Bridge.navigate('frmTop_VA_Akt_Objekt_Kopf', openArgs);
-            } else if (openArgs) {
-                window.location.href = `frmTop_VA_Akt_Objekt_Kopf.html?id=${openArgs}`;
-            }
-        }
-
-        // ============================================
-        // SUMMEN-ANZEIGE (Access: UpdateSummenAnzeige)
-        // ============================================
-        function updateSummenAnzeige() {
-            if (!state.positionenList || state.positionenList.length === 0) {
-                return;
-            }
-
-            let summeMA = 0;
-            let summeStunden = 0;
-
-            state.positionenList.forEach(pos => {
-                summeMA += parseInt(pos.MA_Soll) || 0;
-                if (pos.Stundensatz && pos.MA_Soll) {
-                    summeStunden += (parseFloat(pos.Stundensatz) || 0) * (parseInt(pos.MA_Soll) || 0);
-                }
-            });
-
-            // Optional: Summe in Status anzeigen
-            setStatus(`${state.positionenList.length} Positionen, ${summeMA} MA gesamt`);
-        }
-
-        // ============================================
-        // TASTATUR-SHORTCUTS
-        // ============================================
-        document.addEventListener('keydown', (e) => {
-            // Strg+S = Speichern
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                saveRecord();
-            }
-            // Escape = Schließen
-            if (e.key === 'Escape') {
-                closeForm();
-            }
-        });
-
-        // ============================================
-        // FORM OPEN HANDLER (Access: Form_Open)
-        // ============================================
-        function handleFormOpen() {
-            // Prüfe ob OpenArgs vorhanden (von anderem Formular aufgerufen)
-            const openArgs = new URLSearchParams(window.location.search).get('openArgs');
-            const btnBack = document.getElementById('btnBackToList');
-
-            if (openArgs && btnBack) {
-                btnBack.style.display = 'inline-block';
-            }
-
-            // Prüfe auf übergebene Objekt-ID
-            const objektId = new URLSearchParams(window.location.search).get('id');
-            if (objektId) {
-                // Nach Laden der Liste zum entsprechenden Objekt navigieren
-                setTimeout(async () => {
-                    const idx = state.objekteList.findIndex(o => o.ID == objektId);
-                    if (idx >= 0) {
-                        await selectObjekt(idx);
-                    }
-                }, 500);
-            }
-        }
-
-        // Form Open nach DOM ready ausführen
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(handleFormOpen, 100);
-        });
-
-        // ============================================
-        // DATUM FORMATIERUNG (Helper)
-        // ============================================
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            try {
-                const d = new Date(dateStr);
-                return d.toLocaleDateString('de-DE');
-            } catch {
-                return dateStr;
-            }
-        }
-
-    </script>
-    <!-- Debug Logger -->
-    <script src="js/debug-logger.js"></script>
-    <!-- Event Logger (erweitert debug-logger) -->
-    <script src="js/logger.js"></script>
-    <!-- Toast Notification System -->
-    <script src="js/toast-system.js"></script>
-    <!-- Shell-Detector: Versteckt Sidebar im iframe-Modus -->
-    <script src="js/shell-detector.js"></script>
-    <!-- API-Server Lifecycle (Auto-Start/Stop) -->
-    <script src="js/api-lifecycle.js"></script>
-</body>
-</html>
-
-
+﻿<!DOCTYPE html>
+
+<html lang="de">
+
+<head>
+
+    <meta charset="UTF-8">
+    <script>
+    // Auto-Load in Shell (Sidebar-Integration)
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isInShell = urlParams.has('shell') || window.SHELL_PARAMS;
+        const isInIframe = window.self !== window.top;
+        if (!isInShell && !isInIframe) {
+            const formName = window.location.pathname.split('/').pop();
+            const recordId = urlParams.get('id') || urlParams.get('ma_id') || urlParams.get('kd_id') || urlParams.get('va_id');
+            let shellUrl = 'shell.html?form=' + formName;
+            if (recordId) shellUrl += '&id=' + recordId;
+            for (const [key, value] of urlParams.entries()) {
+                if (!['shell', 'id', 'ma_id', 'kd_id', 'va_id', '_t'].includes(key)) {
+                    shellUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                }
+            }
+            console.log('[Auto-Redirect] Lade mit Sidebar:', shellUrl);
+            window.location.replace(shellUrl);
+        }
+    })();
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Objektstamm - CONSYS</title>
+
+    <style>
+
+        * {
+
+            margin: 0;
+
+            padding: 0;
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        body {
+
+            background-color: #8080c0;
+
+            overflow: hidden;
+
+            height: 100vh;
+
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+            font-size: 11px;
+
+        }
+
+
+
+        .window-frame {
+
+            background-color: #8080c0;
+
+            height: 100vh;
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+
+        /* Title Bar - ausgeblendet gemaess Anforderung */
+
+        .title-bar {
+
+            display: none;
+
+        }
+
+
+
+        .title-bar-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+        }
+
+
+
+        .title-bar-buttons {
+
+            display: flex;
+
+            gap: 2px;
+
+        }
+
+
+
+        .title-btn {
+
+            width: 21px;
+
+            height: 21px;
+
+            background: #ece9d8;
+
+            border: 1px solid;
+
+            border-color: #ffffff #808080 #808080 #ffffff;
+
+            font-size: 10px;
+
+            cursor: pointer;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+        }
+
+
+
+        .title-btn.close {
+
+            background: #c75050;
+
+            color: white;
+
+        }
+
+
+
+        /* Main Container */
+
+        .main-container {
+
+            display: flex;
+
+            flex: 1;
+
+            overflow: hidden;
+
+        }
+
+
+
+        /* Left Menu */
+
+        .left-menu {
+
+            width: 185px;
+
+            background-color: #6060a0;
+
+            padding: 5px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: space-between;
+
+            flex-shrink: 0;
+
+        }
+
+
+
+        .menu-header {
+
+            background-color: #000080;
+
+            color: white;
+
+            padding: 6px;
+
+            text-align: center;
+
+            font-weight: bold;
+
+            font-size: 11px;
+
+            margin-bottom: 8px;
+
+        }
+
+
+
+        .menu-buttons {
+
+            display: flex;
+
+            flex-direction: column;
+
+            flex: 1;
+
+            justify-content: space-between;
+
+        }
+
+
+
+        .menu-btn {
+
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+
+            padding: 8px 10px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            font-size: 11px;
+
+            color: #000;
+
+            font-weight: 500;
+
+            position: relative;
+
+            border: none;
+
+            margin: 1px 0;
+
+            overflow: visible;
+
+        }
+
+
+
+        /* Obere helle Kante - 4px nach rechts versetzt */
+
+        .menu-btn::before {
+
+            content: '';
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: calc(100% - 4px);
+
+            height: 2px;
+
+            background: #ffffff;
+
+            z-index: 1;
+
+        }
+
+
+
+        /* Untere dunkle Kante - 4px nach links versetzt */
+
+        .menu-btn::after {
+
+            content: '';
+
+            position: absolute;
+
+            bottom: 0;
+
+            right: 0;
+
+            width: calc(100% - 4px);
+
+            height: 2px;
+
+            background: #404070;
+
+            z-index: 1;
+
+        }
+
+
+
+        .menu-btn:hover {
+
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+
+        }
+
+
+
+        .menu-btn:active {
+
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+
+        }
+
+
+
+        .menu-btn:active::before {
+
+            background: #404070;
+
+            left: 4px;
+
+            width: calc(100% - 4px);
+
+        }
+
+
+
+        .menu-btn:active::after {
+
+            background: #ffffff;
+
+            right: 4px;
+
+            width: calc(100% - 4px);
+
+        }
+
+
+
+        .menu-btn.active {
+
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+
+        }
+
+
+
+        .menu-btn.active::before {
+
+            background: #505080;
+
+            left: 4px;
+
+            width: calc(100% - 4px);
+
+        }
+
+
+
+        .menu-btn.active::after {
+
+            background: #c0c0d8;
+
+            right: 4px;
+
+            width: calc(100% - 4px);
+
+        }
+
+
+
+        /* Content Area */
+
+        .content-area {
+
+            flex: 1;
+
+            background-color: #8080c0;
+
+            padding: 3px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 2px;
+
+            overflow: hidden;
+
+        }
+
+
+
+        /* Header Row */
+
+        .header-row {
+
+            background-color: #9090c0;
+
+            border: 1px solid #606090;
+
+            padding: 4px 8px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            flex-shrink: 0;
+
+        }
+
+
+
+        .logo-box {
+
+            width: 36px;
+
+            height: 36px;
+
+            background: linear-gradient(135deg, #4040a0, #8080c0);
+
+            border: 2px solid #404080;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            color: white;
+
+            font-weight: bold;
+
+            font-size: 16px;
+
+        }
+
+
+
+        .title-text {
+
+            font-size: 23px !important; /* Formulartitel +8px gemaess Anforderung */
+
+            font-weight: bold !important;
+
+            color: #000080;
+
+        }
+
+
+
+        .header-links {
+
+            display: flex;
+
+            gap: 8px;
+
+            margin-left: 5px;
+
+        }
+
+
+
+        .header-link {
+
+            color: #000080;
+
+            text-decoration: underline;
+
+            cursor: pointer;
+
+            font-size: 10px;
+
+        }
+
+
+
+        .btn {
+
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+
+            border: none;
+
+            padding: 4px 12px;
+
+            font-size: 11px;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+        }
+
+
+
+        .btn:hover {
+
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+
+        }
+
+
+
+        .btn:disabled {
+
+            opacity: 0.6;
+
+            cursor: not-allowed;
+
+        }
+
+
+
+        .btn-green, .btn.btn-green {
+
+            background: linear-gradient(to bottom, #90c090, #60a060);
+
+            color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
+
+        }
+
+
+
+        .btn-yellow {
+
+            background: linear-gradient(to bottom, #e0e080, #c0c040);
+
+            /* Gelb ist hell genug - schwarze Schrift OK */
+
+        }
+
+
+
+        .btn-red, .btn.btn-red {
+
+            background: linear-gradient(to bottom, #c09090, #a06060);
+
+            color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
+
+        }
+
+
+
+        .btn-blue, .btn.btn-blue {
+
+            background: linear-gradient(to bottom, #9090c0, #6060a0);
+
+            color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
+
+        }
+
+
+
+        /* Button Row */
+
+        .button-row {
+
+            background-color: #9090c0;
+
+            border: 1px solid #606090;
+
+            padding: 3px 8px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            flex-shrink: 0;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .nav-btn {
+
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+
+            border: 2px solid;
+
+            border-color: #ffffff #808080 #808080 #ffffff;
+
+            padding: 2px 6px;
+
+            cursor: pointer;
+
+            font-size: 11px;
+
+            min-width: 24px;
+
+            text-align: center;
+
+        }
+
+
+
+        .nav-btn:hover {
+
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+
+        }
+
+
+
+        .nav-group {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 3px;
+
+        }
+
+
+
+        .record-info {
+
+            font-size: 10px;
+
+            padding: 0 8px;
+
+            color: #000080;
+
+            font-weight: bold;
+
+        }
+
+
+
+        .checkbox-group {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 3px;
+
+            font-size: 10px;
+
+        }
+
+
+
+        .form-label {
+
+            font-size: 10px;
+
+        }
+
+
+
+        .form-select, .form-input {
+
+            border: 1px solid #808080;
+
+            padding: 1px 3px;
+
+            font-size: 10px;
+
+            background: white;
+
+        }
+
+
+
+        .form-input:focus, .form-select:focus {
+
+            outline: none;
+
+            border-color: #000080;
+
+            box-shadow: 0 0 2px #000080;
+
+        }
+
+
+
+        .form-input.readonly {
+
+            background: #e0e0e0;
+
+        }
+
+
+
+        /* Main Content Split */
+
+        .main-content {
+
+            display: flex;
+
+            flex: 1;
+
+            gap: 2px;
+
+            overflow: hidden;
+
+        }
+
+
+
+        /* Left Panel - Object Details */
+
+        .left-panel {
+
+            flex: 1;
+
+            display: flex;
+
+            flex-direction: column;
+
+            overflow: hidden;
+
+        }
+
+
+
+        /* Form Section */
+
+        .form-section {
+
+            background-color: #b8b8d8;
+
+            border: 1px solid #606090;
+
+            padding: 8px 12px;
+
+            display: flex;
+
+            gap: 30px;
+
+            flex-shrink: 0;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .form-column {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 4px;
+
+        }
+
+
+
+        .form-row {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+        }
+
+
+
+        .form-row label {
+
+            width: 80px;
+
+            font-size: 10px;
+
+            text-align: right;
+
+        }
+
+
+
+        .form-row input[type="text"],
+
+        .form-row input[type="email"],
+
+        .form-row select,
+
+        .form-row textarea {
+
+            border: 1px solid #808080;
+
+            padding: 2px 4px;
+
+            font-size: 10px;
+
+            background: white;
+
+        }
+
+
+
+        .form-row input[type="text"]:focus,
+
+        .form-row input[type="email"]:focus,
+
+        .form-row select:focus,
+
+        .form-row textarea:focus {
+
+            outline: none;
+
+            border-color: #000080;
+
+            box-shadow: 0 0 2px #000080;
+
+        }
+
+
+
+        /* Tab Container */
+
+        .tab-container {
+
+            background-color: #c0c0e0;
+
+            border: 1px solid #606090;
+
+            flex: 1;
+
+            display: flex;
+
+            flex-direction: column;
+
+            overflow: hidden;
+
+        }
+
+
+
+        .tab-header {
+
+            display: flex;
+
+            background-color: #9090c0;
+
+            border-bottom: 1px solid #606090;
+
+        }
+
+
+
+        .tab-btn {
+
+            padding: 4px 12px;
+
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+
+            border: 1px solid #606090;
+
+            border-bottom: none;
+
+            cursor: pointer;
+
+            font-size: 10px;
+
+            color: #000;
+
+            margin-right: 2px;
+
+            margin-top: 3px;
+
+        }
+
+
+
+        .tab-btn:hover {
+
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+
+        }
+
+
+
+        .tab-btn.active {
+
+            background: linear-gradient(to bottom, #c0c0e0, #c0c0e0);
+
+            border-bottom: 1px solid #c0c0e0;
+
+            margin-bottom: -1px;
+
+            font-weight: bold;
+
+        }
+
+
+
+        .tab-content {
+
+            flex: 1;
+
+            overflow: auto;
+
+            padding: 8px;
+
+            background-color: #c0c0e0;
+
+        }
+
+
+
+        .tab-pane {
+
+            display: none;
+
+            height: 100%;
+
+        }
+
+
+
+        .tab-pane.active {
+
+            display: block;
+
+        }
+
+
+
+        /* Right Panel - Object List */
+
+        .right-panel {
+
+            width: 320px;
+
+            background-color: #c0c0e0;
+
+            border: 1px solid #606090;
+
+            display: flex;
+
+            flex-direction: column;
+
+            overflow: hidden;
+
+        }
+
+
+
+        .panel-header {
+
+            background: linear-gradient(to bottom, #9090c0, #7070a0);
+
+            color: #000080;
+
+            padding: 4px 8px;
+
+            font-weight: bold;
+
+            font-size: 11px;
+
+            border-bottom: 1px solid #606090;
+
+        }
+
+
+
+        .search-box {
+
+            padding: 4px;
+
+            background-color: #b0b0d0;
+
+            border-bottom: 1px solid #808080;
+
+        }
+
+
+
+        .search-box input {
+
+            width: 100%;
+
+            padding: 3px 5px;
+
+            border: 1px solid #808080;
+
+            font-size: 10px;
+
+        }
+
+
+
+        .list-container {
+
+            flex: 1;
+
+            overflow: auto;
+
+        }
+
+
+
+        /* Data Grid */
+
+        .data-grid {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            font-size: 10px;
+
+        }
+
+
+
+        .data-grid th {
+
+            background: linear-gradient(to bottom, #c0c0e0, #a0a0c0);
+
+            border: 1px solid #808080;
+
+            padding: 3px 5px;
+
+            text-align: left;
+
+            font-weight: bold;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1;
+
+        }
+
+
+
+        .data-grid td {
+
+            border: 1px solid #c0c0c0;
+
+            padding: 2px 5px;
+
+            background: white;
+
+        }
+
+
+
+        .data-grid tr:hover td {
+
+            background-color: #e0e0ff;
+
+        }
+
+
+
+        .data-grid tr.selected td {
+
+            background-color: #000080;
+
+            color: white;
+
+        }
+
+
+
+        .data-grid tr {
+
+            cursor: pointer;
+
+        }
+
+
+
+        /* Positionen Table */
+
+        .positionen-grid {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            font-size: 10px;
+
+        }
+
+
+
+        .positionen-grid th {
+
+            background: linear-gradient(to bottom, #d0d0e0, #b0b0c0);
+
+            border: 1px solid #808080;
+
+            padding: 4px 6px;
+
+            text-align: left;
+
+            font-weight: bold;
+
+        }
+
+
+
+        .positionen-grid td {
+
+            border: 1px solid #c0c0c0;
+
+            padding: 3px 6px;
+
+            background: white;
+
+        }
+
+
+
+        .positionen-grid tr:hover td {
+
+            background-color: #e8e8ff;
+
+        }
+
+
+
+        .positionen-grid tr.selected td {
+
+            background-color: #000080;
+
+            color: white;
+
+        }
+
+
+
+        /* Fieldset */
+
+        .fieldset {
+
+            border: 1px solid #808080;
+
+            padding: 8px;
+
+            margin-bottom: 8px;
+
+            background-color: #d0d0e8;
+
+        }
+
+
+
+        .fieldset-legend {
+
+            background: linear-gradient(to bottom, #9090c0, #7070a0);
+
+            color: #000080;
+
+            padding: 2px 10px;
+
+            font-weight: bold;
+
+            font-size: 10px;
+
+            margin: -16px 0 8px 8px;
+
+            display: inline-block;
+
+        }
+
+
+
+        /* Status Bar */
+
+        .status-bar {
+
+            background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+
+            border: 1px solid #808080;
+
+            padding: 2px 8px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            font-size: 10px;
+
+            flex-shrink: 0;
+
+        }
+
+
+
+        .status-section {
+
+            display: flex;
+
+            gap: 20px;
+
+        }
+
+
+
+        /* Loading Overlay */
+
+        .loading-overlay {
+
+            display: none;
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            bottom: 0;
+
+            background: rgba(0, 0, 0, 0.5);
+
+            z-index: 1000;
+
+            justify-content: center;
+
+            align-items: center;
+
+        }
+
+
+
+        .loading-overlay.active {
+
+            display: flex;
+
+        }
+
+
+
+        .loading-box {
+
+            background: #ece9d8;
+
+            border: 2px solid;
+
+            border-color: #ffffff #808080 #808080 #ffffff;
+
+            padding: 20px 40px;
+
+            text-align: center;
+
+        }
+
+
+
+        .loading-spinner {
+
+            width: 30px;
+
+            height: 30px;
+
+            border: 3px solid #c0c0c0;
+
+            border-top-color: #000080;
+
+            border-radius: 50%;
+
+            animation: spin 1s linear infinite;
+
+            margin: 0 auto 10px;
+
+        }
+
+
+
+        @keyframes spin {
+
+            to { transform: rotate(360deg); }
+
+        }
+
+
+
+        /* Toast Container */
+
+        .toast-container {
+
+            position: fixed;
+
+            top: 20px;
+
+            right: 20px;
+
+            z-index: 1001;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 5px;
+
+        }
+
+
+
+        .toast {
+
+            background: #000080;
+
+            color: white;
+
+            padding: 10px 20px;
+
+            border: 2px solid;
+
+            border-color: #4040a0 #000040 #000040 #4040a0;
+
+            font-size: 11px;
+
+            border-radius: 3px;
+
+        }
+
+
+
+        .toast-success {
+
+            background: #308030;
+
+            border-color: #60c060 #205020 #205020 #60c060;
+
+        }
+
+
+
+        .toast-error {
+
+            background: #c04040;
+
+            border-color: #e06060 #802020 #802020 #e06060;
+
+        }
+
+
+
+        /* Buttons in Tab */
+
+        .tab-buttons {
+
+            display: flex;
+
+            gap: 5px;
+
+            margin-bottom: 8px;
+
+        }
+
+
+
+        /* Vollbild-Button oben rechts */
+
+        .fullscreen-btn {
+
+            position: fixed;
+
+            top: 5px;
+
+            right: 5px;
+
+            width: 24px;
+
+            height: 24px;
+
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+
+            border: none;
+
+            cursor: pointer;
+
+            z-index: 9999;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 14px;
+
+            color: #000080;
+
+        }
+
+
+
+        .fullscreen-btn:hover {
+
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+
+        }
+
+
+
+        .fullscreen-btn:active {
+
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+
+        }
+
+
+
+        /* Pflichtfeld-Markierung */
+
+        .required { color: #cc0000; font-weight: bold; }
+
+        input:required:invalid { border-color: #cc0000; }
+
+        input:required:valid { border-color: #008000; }
+
+        input.invalid { border-color: #cc0000 !important; background-color: #fff8f8 !important; }
+
+
+
+    </style>
+
+    <link rel="stylesheet" href="consys-common.css">
+
+    <link rel="stylesheet" href="css/fonts_override.css">
+
+    <script src="js/performance-init.js"></script>
+
+<link rel="stylesheet" href="css/visbug_overrides.css">
+
+</head>
+
+<body data-form="frm_OB_Objekt">
+
+    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild" data-testid="objekt-btn-vollbild">Ã¢â€ºÂ¶</button>
+
+    <div class="window-frame">
+
+        <!-- Title Bar -->
+
+        <div class="title-bar">
+
+            <div class="title-bar-left">
+
+                <span>Objektstammdaten - CONSYS Security</span>
+
+            </div>
+
+            <div class="title-bar-buttons">
+
+                <button class="title-btn tiny-btn" title="Minimieren" data-testid="objekt-btn-minimieren">_</button>
+
+                <button class="title-btn tiny-btn" title="Maximieren" data-testid="objekt-btn-maximieren">[]</button>
+
+                <button class="title-btn close tiny-btn" title="Schliessen" onclick="closeForm()" data-testid="objekt-btn-schliessen">X</button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Main Container -->
+
+        <div class="main-container">
+
+            <!-- Left Menu -->
+
+
+
+            <!-- Content Area -->
+
+            <div class="content-area">
+
+                <!-- Header Row -->
+
+                <div class="header-row">
+
+                    <div class="logo-box">OB</div>
+
+                    <div class="title-text">Objektstammdaten</div>
+
+                    <div class="header-links">
+
+                        <span class="header-link" onclick="openAufträge()" data-testid="objekt-link-auftraege">Aufträge zu Objekt</span>
+
+                        <span class="header-link" onclick="openPositionen()" data-testid="objekt-link-positionen">Positionen</span>
+
+                    </div>
+
+                    <div style="flex:1"></div>
+
+                    <span id="lblDatum" style="font-size:10px;color:#000080;"></span>
+
+                </div>
+
+
+
+                <!-- Button Row -->
+
+                <div class="button-row">
+
+                    <div class="nav-group">
+
+                        <button class="nav-btn" onclick="goFirst()" title="Erster" data-testid="objekt-btn-erste">|&lt;</button>
+
+                        <button class="nav-btn tiny-btn" onclick="goPrev()" title="Zurück" data-testid="objekt-btn-vorige">&lt;</button>
+
+                        <span class="record-info" id="recordInfo">0 / 0</span>
+
+                        <button class="nav-btn tiny-btn" onclick="goNext()" title="Vor" data-testid="objekt-btn-naechste">&gt;</button>
+
+                        <button class="nav-btn" onclick="goLast()" title="Letzter" data-testid="objekt-btn-letzte">&gt;|</button>
+
+                    </div>
+
+                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
+
+                    <button class="btn btn-green" onclick="newRecord()" data-testid="objekt-btn-neu">+ Neu</button>
+
+                    <button class="btn btn-yellow" onclick="saveRecord()" data-testid="objekt-btn-speichern">Speichern</button>
+
+                    <button class="btn btn-red" onclick="deleteRecord()" data-testid="objekt-btn-loeschen">Löschen</button>
+
+                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
+
+                    <button class="btn" onclick="printReport()" data-testid="objekt-btn-bericht">Bericht</button>
+
+                    <button class="btn" onclick="openNewVeranstalter()" data-testid="objekt-btn-neuer-veranstalter">Neuer Veranstalter</button>
+
+                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
+
+                    <div class="checkbox-group">
+
+                        <input type="checkbox" id="chkNurAktive" checked onchange="loadObjekte()" data-testid="objekt-checkbox-nuraktive">
+
+                        <label for="chkNurAktive">Nur aktive</label>
+
+                    </div>
+
+                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
+
+                    <button class="btn" onclick="geocodeAdresse()" title="Adresse geocodieren (OSM)" data-testid="objekt-btn-geocode">Geocode</button>
+
+                    <button class="btn" onclick="showHelp()" title="Hilfe anzeigen" data-testid="objekt-btn-hilfe">?</button>
+
+                    <button class="btn" id="btnBackToList" onclick="backToAktPosList()" style="display:none;" data-testid="objekt-btn-zurueck">Zurück zur Liste</button>
+
+                </div>
+
+
+
+                <!-- Main Content Split -->
+
+                <div class="main-content">
+
+                    <!-- Left Panel - Object Details -->
+
+                    <div class="left-panel">
+
+                        <!-- Form Section -->
+
+                        <div class="form-section">
+
+                            <div class="form-column">
+
+                                <div class="form-row">
+
+                                    <label>Objekt-ID:</label>
+
+                                    <input type="text" id="ID" data-field="ID" class="input-xs readonly" readonly data-testid="objekt-input-id">
+
+                                    <input type="hidden" id="TabellenNr" data-field="TabellenNr" value="42">
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>Objekt: <span class="required">*</span></label>
+
+                                    <input type="text" id="Objekt" data-field="Objekt" class="input-lg" required data-testid="objekt-input-name">
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>Strasse:</label>
+
+                                    <input type="text" id="Strasse" data-field="Strasse" class="input-lg" data-testid="objekt-input-strasse">
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>PLZ / Ort:</label>
+
+                                    <input type="text" id="PLZ" data-field="PLZ" class="input-xs" pattern="[0-9]{5}" title="5-stellige PLZ eingeben" data-testid="objekt-input-plz">
+
+                                    <input type="text" id="Ort" data-field="Ort" class="input-lg" data-testid="objekt-input-ort">
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>Geo-Lat:</label>
+
+                                    <input type="text" id="txtLat" data-field="Geo_Lat" class="input-sm readonly" readonly placeholder="Breitengrad">
+
+                                    <label style="width:auto; margin-left:5px;">Lon:</label>
+
+                                    <input type="text" id="txtLon" data-field="Geo_Lon" class="input-sm readonly" readonly placeholder="Laengengrad">
+
+                                </div>
+
+                            </div>
+
+                            <div class="form-column">
+
+                                <div class="form-row">
+
+                                    <label>Treffpunkt:</label>
+
+                                    <input type="text" id="Treffpunkt" data-field="Treffpunkt" style="width:180px;">
+
+                                    <input type="text" id="Treffp_Zeit" data-field="Treffp_Zeit" style="width:50px;" placeholder="HH:MM">
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>Anfahrt:</label>
+
+                                    <textarea id="txtAnfahrt" data-field="Anfahrt" style="width:235px; height:40px; resize:vertical; font-size:10px;"></textarea>
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>Dienstkleidung:</label>
+
+                                    <input type="text" id="Dienstkleidung" data-field="Dienstkleidung" style="width:180px;">
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>Ansprechpartner:</label>
+
+                                    <input type="text" id="Ansprechpartner" data-field="Ansprechpartner" style="width:180px;">
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>Telefon:</label>
+
+                                    <input type="tel" id="Text435" data-field="Text435" style="width:180px;" pattern="[0-9+\-\s/()]+" title="Telefonnummer eingeben">
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>Veranstalter:</label>
+
+                                    <select id="cboVeranstalter" data-field="Veranstalter_ID" style="width:180px;" data-testid="objekt-select-veranstalter">
+
+                                        <option value="">-- Kunde waehlen --</option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Tab Container -->
+
+                        <div class="tab-container">
+
+                            <div class="tab-header">
+
+                                <button class="tab-btn active" data-tab="tabPositionen" onclick="switchTab('tabPositionen', this)" data-testid="objekt-tab-positionen">Positionen</button>
+
+                                <button class="tab-btn" data-tab="tabAttach" onclick="switchTab('tabAttach', this)" data-testid="objekt-tab-zusatzdateien">Zusatzdateien</button>
+
+                                <button class="tab-btn" data-tab="tabBemerkungen" onclick="switchTab('tabBemerkungen', this)" data-testid="objekt-tab-bemerkungen">Bemerkungen</button>
+
+                                <button class="tab-btn" data-tab="tabAufträge" onclick="switchTab('tabAufträge', this)" data-testid="objekt-tab-auftraege">Aufträge</button>
+
+                            </div>
+
+                            <div class="tab-content">
+
+                                <!-- Tab Positionen -->
+
+                                <div class="tab-pane active" id="tabPositionen">
+
+                                    <div class="tab-buttons">
+
+                                        <button class="btn" onclick="newPosition()" data-testid="objekt-btn-neue-position">+ Neue Position</button>
+
+                                        <button class="btn btn-red" onclick="deletePosition()" data-testid="objekt-btn-position-loeschen">Position löschen</button>
+
+                                        <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
+
+                                        <button class="btn" onclick="movePositionUp()" title="Position nach oben">&#9650;</button>
+
+                                        <button class="btn" onclick="movePositionDown()" title="Position nach unten">&#9660;</button>
+
+                                        <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
+
+                                        <button class="btn" onclick="uploadPositionen()" title="Positionsliste importieren">Import</button>
+
+                                        <button class="btn" onclick="exportPositionenExcel()" title="Nach Excel exportieren">Excel</button>
+
+                                        <button class="btn" onclick="kopierePositionen()" title="Positionen kopieren">Kopieren</button>
+
+                                        <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
+
+                                        <button class="btn" onclick="speichereVorlage()" title="Als Vorlage speichern">Vorlage speichern</button>
+
+                                        <button class="btn" onclick="ladeVorlage()" title="Vorlage laden">Vorlage laden</button>
+
+                                    </div>
+
+                                    <table class="positionen-grid">
+
+                                        <thead>
+
+                                            <tr>
+
+                                                <th style="width:40px;">Sort</th>
+
+                                                <th style="width:100px;">Bereich</th>
+
+                                                <th style="width:150px;">Info</th>
+
+                                                <th style="width:50px;">Anzahl</th>
+
+                                                <th style="width:60px;">Geschl.</th>
+
+                                                <th style="width:70px;">Beginn</th>
+
+                                                <th style="width:70px;">Ende</th>
+
+                                                <th style="width:60px;">Tagesart</th>
+
+                                                <th style="width:50px;">Tag-Nr</th>
+
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="positionenBody">
+
+                                            <tr><td colspan="9" style="text-align:center;padding:20px;color:#666;">Lade Positionen...</td></tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+
+
+                                <!-- Tab Zusatzdateien -->
+
+                                <div class="tab-pane" id="tabAttach">
+
+                                    <div class="tab-buttons">
+
+                                        <button class="btn" onclick="addAttachment()">+ Datei hinzufügen</button>
+
+                                        <button class="btn" onclick="newAttachment()">Neue Anlage</button>
+
+                                        <button class="btn btn-red" onclick="deleteAttachment()">Datei löschen</button>
+
+                                    </div>
+
+                                    <table class="positionen-grid">
+
+                                        <thead>
+
+                                            <tr>
+
+                                                <th>Dateiname</th>
+
+                                                <th style="width:80px;">Typ</th>
+
+                                                <th style="width:100px;">Datum</th>
+
+                                                <th style="width:60px;">Aktion</th>
+
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="attachBody">
+
+                                            <tr><td colspan="4" style="text-align:center;padding:20px;color:#666;">Keine Dateien vorhanden</td></tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+
+
+                                <!-- Tab Bemerkungen -->
+
+                                <div class="tab-pane" id="tabBemerkungen">
+
+                                    <div class="fieldset">
+
+                                        <div class="fieldset-legend">Bemerkungen zum Objekt</div>
+
+                                        <textarea id="Bemerkung" data-field="Bemerkung" style="width:100%;height:200px;font-size:11px;padding:5px;border:1px solid #808080;" data-testid="objekt-textarea-bemerkung"></textarea>
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <!-- Tab Aufträge -->
+
+                                <div class="tab-pane" id="tabAufträge">
+
+                                    <table class="positionen-grid">
+
+                                        <thead>
+
+                                            <tr>
+
+                                                <th style="width:60px;">VA-ID</th>
+
+                                                <th>Auftrag</th>
+
+                                                <th style="width:100px;">Datum</th>
+
+                                                <th style="width:80px;">Status</th>
+
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="auftraegeBody">
+
+                                            <tr><td colspan="4" style="text-align:center;padding:20px;color:#666;">Lade Aufträge...</td></tr>
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Right Panel - Object List -->
+
+                    <div class="right-panel">
+
+                        <div class="panel-header">Objektliste</div>
+
+                        <div class="search-box">
+
+                            <input type="text" id="searchInput" placeholder="Objekt suchen..." onkeyup="filterList()" data-testid="objekt-input-suche">
+
+                        </div>
+
+                        <div class="list-container">
+
+                            <table class="data-grid">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th style="width:40px;">ID</th>
+
+                                        <th>Objekt</th>
+
+                                        <th style="width:100px;">Ort</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="objekteBody">
+
+                                    <tr><td colspan="3" style="text-align:center;padding:20px;">Lade...</td></tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Status Bar -->
+
+                <div class="status-bar">
+
+                    <div class="status-section">
+
+                        <span id="statusText">Bereit</span>
+
+                    </div>
+
+                    <div class="status-section">
+
+                        <span>Erst.v: <span id="Erst_von" data-field="Erst_von">-</span></span>
+
+                        <span>am: <span id="Erst_am" data-field="Erst_am">-</span></span>
+
+                        <span>Aend.v: <span id="Aend_von" data-field="Aend_von">-</span></span>
+
+                        <span>am: <span id="Aend_am" data-field="Aend_am">-</span></span>
+
+                    </div>
+
+                    <div class="status-section">
+
+                        <span id="objekteCount">0 Objekte</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Loading Overlay -->
+
+    <div class="loading-overlay" id="loadingOverlay">
+
+        <div class="loading-box">
+
+            <div class="loading-spinner"></div>
+
+            <div>Lade Daten...</div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Toast Container -->
+
+    <div class="toast-container" id="toastContainer"></div>
+
+
+
+    <!-- WebView2 Bridge -->
+
+    <script src="js/webview2-bridge.js"></script>
+
+
+
+    <!-- WebView2 Integration -->
+
+    <script type="module" src="logic/frm_OB_Objekt.webview2.js"></script>
+
+
+
+    <!-- Global Button Handlers -->
+
+    <script src="js/global-handlers.js"></script>
+
+
+
+    <script>
+
+        // ============================================
+
+        // STATE MANAGEMENT
+
+        // ============================================
+
+        // API_BASE wird bereits von webview2-bridge.js bereitgestellt
+
+
+
+        const state = {
+
+            objekteList: [],
+
+            filteredList: [],
+
+            positionenList: [],
+
+            currentIndex: 0,
+
+            currentRecord: null,
+
+            isDirty: false,
+
+            selectedPositionId: null,
+
+            selectedAttachment: null
+
+        };
+
+
+
+        // ============================================
+
+        // INITIALIZATION
+
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+
+            document.getElementById('lblDatum').textContent = new Date().toLocaleDateString('de-DE');
+
+
+
+            // Bridge Event Handler
+
+            if (window.Bridge) {
+
+                Bridge.on('onDataReceived', (data) => {
+
+                    if (data.objekt) {
+
+                        displayRecord(data.objekt);
+
+                    }
+
+                });
+
+
+
+                Bridge.on('onLoad', (data) => {
+
+                    if (data.objekt) {
+
+                        displayRecord(data.objekt);
+
+                    }
+
+                });
+
+            }
+
+
+
+            // Load data
+
+            await loadKunden();
+
+            await loadObjekte();
+
+
+
+            // Mark form fields for change tracking
+
+            document.querySelectorAll('[data-field]').forEach(el => {
+
+                el.addEventListener('change', () => { state.isDirty = true; });
+
+                el.addEventListener('input', () => { state.isDirty = true; });
+
+            });
+
+        });
+
+
+
+        // ============================================
+
+        // API FUNCTIONS
+
+        // ============================================
+
+        async function apiCall(endpoint, method = 'GET', data = null) {
+
+            const options = {
+
+                method,
+
+                headers: { 'Content-Type': 'application/json' }
+
+            };
+
+            if (data && method !== 'GET') {
+
+                options.body = JSON.stringify(data);
+
+            }
+
+            try {
+
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+
+                if (!response.ok) {
+
+                    throw new Error(`HTTP ${response.status}`);
+
+                }
+
+                return await response.json();
+
+            } catch (error) {
+
+                console.error('API Error:', error);
+
+                throw error;
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // KUNDENLISTE LADEN (fuer Veranstalter-Dropdown)
+
+        // ============================================
+
+        async function loadKunden() {
+
+            try {
+
+                const result = await apiCall('/kunden');
+
+                const kunden = result.data || result || [];
+
+                const cboVeranstalter = document.getElementById('cboVeranstalter');
+
+
+
+                if (cboVeranstalter) {
+
+                    // Bestehende Optionen behalten (erste Option)
+
+                    cboVeranstalter.innerHTML = '<option value="">-- Kunde waehlen --</option>';
+
+
+
+                    kunden.forEach(kunde => {
+
+                        const option = document.createElement('option');
+
+                        option.value = kunde.kun_Id || kunde.ID;
+
+                        option.textContent = kunde.kun_Firma || kunde.Firma || `Kunde ${kunde.kun_Id}`;
+
+                        cboVeranstalter.appendChild(option);
+
+                    });
+
+                }
+
+            } catch (error) {
+
+                console.log('Kundenliste nicht geladen:', error);
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // DATA LOADING
+
+        // ============================================
+
+        async function loadObjekte() {
+
+            showLoading(true);
+
+            setStatus('Lade Objekte...');
+
+
+
+            try {
+
+                const nurAktive = document.getElementById('chkNurAktive').checked;
+
+                let url = '/objekte';
+
+                if (nurAktive) {
+
+                    url += '?aktiv=true';
+
+                }
+
+
+
+                const result = await apiCall(url);
+
+                state.objekteList = result.data || result || [];
+
+                state.filteredList = [...state.objekteList];
+
+
+
+                renderObjekteListe();
+
+                document.getElementById('objekteCount').textContent = `${state.objekteList.length} Objekte`;
+
+
+
+                if (state.objekteList.length > 0) {
+
+                    state.currentIndex = 0;
+
+                    await loadRecord(state.objekteList[0].ID);
+
+                } else {
+
+                    clearForm();
+
+                }
+
+
+
+                setStatus('Bereit');
+
+            } catch (error) {
+
+                console.error('Fehler beim Laden:', error);
+
+                showToast('Fehler beim Laden der Objekte', 'error');
+
+                setStatus('Fehler beim Laden');
+
+
+
+                // Fallback: Demo-Daten
+
+                state.objekteList = [
+
+                    { ID: 1, Objekt: 'Arena Nuernberg', Ort: 'Nuernberg', Strasse: 'Kurt-Leucht-Weg 11', PLZ: '90471' },
+
+                    { ID: 2, Objekt: 'Meistersingerhalle', Ort: 'Nuernberg', Strasse: 'Muenchener Str. 21', PLZ: '90478' },
+
+                    { ID: 3, Objekt: 'Messezentrum', Ort: 'Nuernberg', Strasse: 'Messezentrum 1', PLZ: '90471' }
+
+                ];
+
+                state.filteredList = [...state.objekteList];
+
+                renderObjekteListe();
+
+
+
+                if (state.objekteList.length > 0) {
+
+                    displayRecord(state.objekteList[0]);
+
+                }
+
+            }
+
+
+
+            showLoading(false);
+
+        }
+
+
+
+        async function loadRecord(id) {
+
+            try {
+
+                const result = await apiCall(`/objekte/${id}`);
+
+                const record = result.data || result;
+
+                displayRecord(record);
+
+
+
+                // Load related data
+
+                await loadPositionen(id);
+
+                await loadAufträge(id);
+
+            } catch (error) {
+
+                console.error('Fehler beim Laden des Datensatzes:', error);
+
+            }
+
+        }
+
+
+
+        async function loadPositionen(objektId) {
+
+            try {
+
+                const result = await apiCall(`/objekte/${objektId}/positionen`);
+
+                state.positionenList = result.data || result || [];
+
+                renderPositionen();
+
+                updateSummenAnzeige(); // Access: UpdateSummenAnzeige
+
+            } catch (error) {
+
+                console.log('Positionen nicht geladen:', error);
+
+                state.positionenList = [];
+
+                renderPositionen();
+
+            }
+
+        }
+
+
+
+        async function loadAufträge(objektId) {
+
+            try {
+
+                const result = await apiCall(`/objekte/${objektId}/auftraege`);
+
+                const auftraege = result.data || result || [];
+
+                renderAufträge(auftraege);
+
+            } catch (error) {
+
+                console.log('Aufträge nicht geladen:', error);
+
+                renderAufträge([]);
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // RENDERING
+
+        // ============================================
+
+        function renderObjekteListe() {
+
+            const tbody = document.getElementById('objekteBody');
+
+
+
+            if (state.filteredList.length === 0) {
+
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;">Keine Objekte gefunden</td></tr>';
+
+                return;
+
+            }
+
+
+
+            tbody.innerHTML = state.filteredList.map((obj, idx) => `
+
+                <tr class="${idx === state.currentIndex ? 'selected' : ''}"
+
+                    onclick="selectObjekt(${idx})"
+
+                    ondblclick="selectObjekt(${idx})">
+
+                    <td>${obj.ID}</td>
+
+                    <td>${obj.Objekt || ''}</td>
+
+                    <td>${obj.Ort || ''}</td>
+
+                </tr>
+
+            `).join('');
+
+        }
+
+
+
+        function renderPositionen() {
+
+            const tbody = document.getElementById('positionenBody');
+
+
+
+            if (state.positionenList.length === 0) {
+
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:#666;">Keine Positionen vorhanden</td></tr>';
+
+                return;
+
+            }
+
+
+
+            // Tagesart-Mapping (analog Access)
+
+            const tagesArtMap = { 1: 'Tag', 2: 'Woche', 3: 'Monat', 4: 'Alle' };
+
+
+
+            tbody.innerHTML = state.positionenList.map((pos, idx) => `
+
+                <tr class="${pos.ID === state.selectedPositionId ? 'selected' : ''}"
+
+                    onclick="selectPosition(${pos.ID})">
+
+                    <td>${pos.Sort || (idx + 1)}</td>
+
+                    <td>${pos.Gruppe || ''}</td>
+
+                    <td>${pos.Zusatztext || ''}</td>
+
+                    <td style="text-align:center;">${pos.Anzahl || 1}</td>
+
+                    <td>${pos.Geschlecht || '-'}</td>
+
+                    <td>${pos.Rel_Beginn ? formatTime(pos.Rel_Beginn) : '-'}</td>
+
+                    <td>${pos.Rel_Ende ? formatTime(pos.Rel_Ende) : '-'}</td>
+
+                    <td>${tagesArtMap[pos.TagesArt] || '-'}</td>
+
+                    <td style="text-align:center;">${pos.TagesNr || '-'}</td>
+
+                </tr>
+
+            `).join('');
+
+        }
+
+
+
+        function formatTime(dateStr) {
+
+            if (!dateStr) return '-';
+
+            try {
+
+                const d = new Date(dateStr);
+
+                return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+            } catch (e) {
+
+                return dateStr;
+
+            }
+
+        }
+
+
+
+        function renderAufträge(auftraege) {
+
+            const tbody = document.getElementById('auftraegeBody');
+
+
+
+            if (auftraege.length === 0) {
+
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#666;">Keine Aufträge vorhanden</td></tr>';
+
+                return;
+
+            }
+
+
+
+            tbody.innerHTML = auftraege.map(a => `
+
+                <tr ondblclick="openAuftrag(${a.VA_ID})">
+
+                    <td>${a.VA_ID}</td>
+
+                    <td>${a.Auftrag || ''}</td>
+
+                    <td>${a.Datum ? new Date(a.Datum).toLocaleDateString('de-DE') : ''}</td>
+
+                    <td>${a.Status || ''}</td>
+
+                </tr>
+
+            `).join('');
+
+        }
+
+
+
+        function displayRecord(record) {
+
+            state.currentRecord = record;
+
+            state.isDirty = false;
+
+
+
+            // Fill form fields
+
+            document.querySelectorAll('[data-field]').forEach(el => {
+
+                const field = el.getAttribute('data-field');
+
+                let value = record[field];
+
+
+
+                if (value !== undefined && value !== null) {
+
+                    // Format dates
+
+                    if (field.includes('_am') && value) {
+
+                        value = new Date(value).toLocaleString('de-DE');
+
+                    }
+
+                    // Format time
+
+                    if (field === 'Treffp_Zeit' && value) {
+
+                        value = value.substring(11, 16); // Extract HH:MM
+
+                    }
+
+
+
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+
+                        el.value = value;
+
+                    } else {
+
+                        el.textContent = value;
+
+                    }
+
+                } else {
+
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+
+                        el.value = '';
+
+                    } else {
+
+                        el.textContent = '-';
+
+                    }
+
+                }
+
+            });
+
+
+
+            updateRecordInfo();
+
+
+
+            // Highlight in list
+
+            const idx = state.filteredList.findIndex(o => o.ID === record.ID);
+
+            if (idx >= 0) {
+
+                state.currentIndex = idx;
+
+                renderObjekteListe();
+
+            }
+
+        }
+
+
+
+        function clearForm() {
+
+            document.querySelectorAll('[data-field]').forEach(el => {
+
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+
+                    el.value = '';
+
+                } else {
+
+                    el.textContent = '-';
+
+                }
+
+            });
+
+            state.currentRecord = null;
+
+            state.isDirty = false;
+
+            updateRecordInfo();
+
+        }
+
+
+
+        function updateRecordInfo() {
+
+            const total = state.filteredList.length;
+
+            const current = total > 0 ? state.currentIndex + 1 : 0;
+
+            document.getElementById('recordInfo').textContent = `${current} / ${total}`;
+
+        }
+
+
+
+        // ============================================
+
+        // NAVIGATION
+
+        // ============================================
+
+        async function selectObjekt(index) {
+
+            if (state.isDirty) {
+
+                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
+
+                    return;
+
+                }
+
+            }
+
+
+
+            state.currentIndex = index;
+
+            const objekt = state.filteredList[index];
+
+            if (objekt) {
+
+                await loadRecord(objekt.ID);
+
+            }
+
+        }
+
+
+
+        async function goFirst() {
+
+            if (state.filteredList.length > 0) {
+
+                await selectObjekt(0);
+
+            }
+
+        }
+
+
+
+        async function goPrev() {
+
+            if (state.currentIndex > 0) {
+
+                await selectObjekt(state.currentIndex - 1);
+
+            }
+
+        }
+
+
+
+        async function goNext() {
+
+            if (state.currentIndex < state.filteredList.length - 1) {
+
+                await selectObjekt(state.currentIndex + 1);
+
+            }
+
+        }
+
+
+
+        async function goLast() {
+
+            if (state.filteredList.length > 0) {
+
+                await selectObjekt(state.filteredList.length - 1);
+
+            }
+
+        }
+
+
+
+        function filterList() {
+
+            const term = document.getElementById('searchInput').value.toLowerCase();
+
+
+
+            if (!term) {
+
+                state.filteredList = [...state.objekteList];
+
+            } else {
+
+                state.filteredList = state.objekteList.filter(o =>
+
+                    (o.Objekt && o.Objekt.toLowerCase().includes(term)) ||
+
+                    (o.Ort && o.Ort.toLowerCase().includes(term)) ||
+
+                    (o.ID && o.ID.toString().includes(term))
+
+                );
+
+            }
+
+
+
+            state.currentIndex = 0;
+
+            renderObjekteListe();
+
+
+
+            if (state.filteredList.length > 0 && state.filteredList[0]) {
+
+                displayRecord(state.filteredList[0]);
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // CRUD OPERATIONS
+
+        // ============================================
+
+        function collectFormData() {
+
+            const data = {};
+
+            document.querySelectorAll('[data-field]').forEach(el => {
+
+                const field = el.getAttribute('data-field');
+
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+
+                    if (!el.classList.contains('readonly') && !el.readOnly) {
+
+                        data[field] = el.value || null;
+
+                    }
+
+                }
+
+            });
+
+            return data;
+
+        }
+
+
+
+        async function newRecord() {
+
+            if (state.isDirty) {
+
+                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
+
+                    return;
+
+                }
+
+            }
+
+
+
+            clearForm();
+
+            document.getElementById('Objekt').focus();
+
+            setStatus('Neues Objekt');
+
+            showToast('Neues Objekt - Daten eingeben', 'info');
+
+        }
+
+
+
+        async function saveRecord() {
+
+            const data = collectFormData();
+
+
+
+            if (!data.Objekt) {
+
+                showToast('Bitte Objektname eingeben', 'error');
+
+                return;
+
+            }
+
+
+
+            showLoading(true);
+
+            setStatus('Speichere...');
+
+
+
+            try {
+
+                let result;
+
+                if (state.currentRecord && state.currentRecord.ID) {
+
+                    // Update
+
+                    result = await apiCall(`/objekte/${state.currentRecord.ID}`, 'PUT', data);
+
+                    showToast('Objekt gespeichert', 'success');
+
+                } else {
+
+                    // Create
+
+                    result = await apiCall('/objekte', 'POST', data);
+
+                    showToast('Objekt erstellt', 'success');
+
+                }
+
+
+
+                state.isDirty = false;
+
+                await loadObjekte();
+
+
+
+                // Bridge notification
+
+                if (window.Bridge) {
+
+                    Bridge.sendEvent('save', { formData: data });
+
+                }
+
+            } catch (error) {
+
+                console.error('Fehler beim Speichern:', error);
+
+                showToast('Fehler beim Speichern', 'error');
+
+            }
+
+
+
+            showLoading(false);
+
+            setStatus('Bereit');
+
+        }
+
+
+
+        async function deleteRecord() {
+
+            if (!state.currentRecord || !state.currentRecord.ID) {
+
+                showToast('Kein Datensatz ausgewählt', 'error');
+
+                return;
+
+            }
+
+
+
+            if (!confirm(`Objekt "${state.currentRecord.Objekt}" wirklich löschen?`)) {
+
+                return;
+
+            }
+
+
+
+            showLoading(true);
+
+            setStatus('Lösche...');
+
+
+
+            try {
+
+                await apiCall(`/objekte/${state.currentRecord.ID}`, 'DELETE');
+
+                showToast('Objekt gelöscht', 'success');
+
+
+
+                // Bridge notification
+
+                if (window.Bridge) {
+
+                    Bridge.sendEvent('delete', { id: state.currentRecord.ID });
+
+                }
+
+
+
+                await loadObjekte();
+
+            } catch (error) {
+
+                console.error('Fehler beim Löschen:', error);
+
+                showToast('Fehler beim Löschen', 'error');
+
+            }
+
+
+
+            showLoading(false);
+
+            setStatus('Bereit');
+
+        }
+
+
+
+        // ============================================
+
+        // POSITION FUNCTIONS
+
+        // ============================================
+
+        function selectPosition(id) {
+
+            state.selectedPositionId = id;
+
+            renderPositionen();
+
+        }
+
+
+
+        async function newPosition() {
+
+            if (!state.currentRecord || !state.currentRecord.ID) {
+
+                showToast('Erst Objekt auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            const bezeichnung = prompt('Bezeichnung der Position:');
+
+            if (!bezeichnung) return;
+
+
+
+            const maSoll = prompt('MA Soll-Anzahl:', '1');
+
+
+
+            try {
+
+                await apiCall(`/objekte/${state.currentRecord.ID}/positionen`, 'POST', {
+
+                    Bezeichnung: bezeichnung,
+
+                    MA_Soll: parseInt(maSoll) || 1
+
+                });
+
+                showToast('Position erstellt', 'success');
+
+                await loadPositionen(state.currentRecord.ID);
+
+            } catch (error) {
+
+                showToast('Fehler beim Erstellen der Position', 'error');
+
+            }
+
+        }
+
+
+
+        async function deletePosition() {
+
+            if (!state.selectedPositionId) {
+
+                showToast('Bitte Position auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            if (!confirm('Position wirklich löschen?')) return;
+
+
+
+            try {
+
+                await apiCall(`/objekte/positionen/${state.selectedPositionId}`, 'DELETE');
+
+                showToast('Position gelöscht', 'success');
+
+                state.selectedPositionId = null;
+
+                await loadPositionen(state.currentRecord.ID);
+
+            } catch (error) {
+
+                showToast('Fehler beim Löschen', 'error');
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // TAB SWITCHING
+
+        // ============================================
+
+        function switchTab(tabId, btn) {
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+
+
+            btn.classList.add('active');
+
+            document.getElementById(tabId).classList.add('active');
+
+
+
+            // Daten bei Tab-Wechsel laden
+
+            if (tabId === 'tabAttach' && state.currentRecord) {
+
+                loadAttachments();
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // NAVIGATION TO OTHER FORMS
+
+        // ============================================
+
+        function navigateTo(formName) {
+
+            if (state.isDirty) {
+
+                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
+
+                    return;
+
+                }
+
+            }
+
+
+
+            if (window.Bridge) {
+
+                Bridge.navigate(formName);
+
+            } else {
+
+                window.location.href = `${formName}.html`;
+
+            }
+
+        }
+
+
+
+        function openAuftrag(vaId) {
+
+            if (window.Bridge) {
+
+                Bridge.navigate('frm_va_Auftragstamm', vaId);
+
+            } else {
+
+                window.location.href = `frm_va_Auftragstamm.html?id=${vaId}`;
+
+            }
+
+        }
+
+
+
+        function openAufträge() {
+
+            switchTab('tabAufträge', document.querySelector('[data-tab="tabAufträge"]'));
+
+        }
+
+
+
+        function openPositionen() {
+
+            switchTab('tabPositionen', document.querySelector('[data-tab="tabPositionen"]'));
+
+        }
+
+
+
+        function printReport() {
+
+            if (window.Bridge) {
+
+                Bridge.sendEvent('print', { report: 'rpt_OB_Objekt', id: state.currentRecord?.ID });
+
+            } else {
+
+                window.print();
+
+            }
+
+        }
+
+
+
+        function openNewVeranstalter() {
+
+            if (window.Bridge) {
+
+                Bridge.navigate('frm_KD_Kundenstamm');
+
+            } else {
+
+                window.location.href = 'frm_KD_Kundenstamm.html';
+
+            }
+
+        }
+
+
+
+        function newAttachment() {
+
+            if (!state.currentRecord || !state.currentRecord.ID) {
+
+                showToast('Erst Objekt auswählen', 'error');
+
+                return;
+
+            }
+
+            showToast('Neue Anlage: Funktion in WebView2 verfügbar', 'info');
+
+        }
+
+
+
+        function closeForm() {
+
+            if (state.isDirty) {
+
+                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
+
+                    return;
+
+                }
+
+            }
+
+
+
+            if (window.Bridge) {
+
+                Bridge.close();
+
+            } else {
+
+                window.close();
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // ATTACHMENT FUNCTIONS
+
+        // ============================================
+
+        async function addAttachment() {
+
+            if (!state.currentRecord?.ID) {
+
+                showToast('Erst Objekt auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            // Fallback: File-Input Dialog
+
+            const input = document.createElement('input');
+
+            input.type = 'file';
+
+            input.accept = '*/*';
+
+            input.style.display = 'none';
+
+
+
+            input.onchange = async (e) => {
+
+                const file = e.target.files?.[0];
+
+                if (!file) return;
+
+
+
+                try {
+
+                    setStatus(`Lade ${file.name} hoch...`);
+
+                    showLoading(true);
+
+
+
+                    const formData = new FormData();
+
+                    formData.append('file', file);
+
+                    formData.append('objekt_id', state.currentRecord.ID);
+
+                    formData.append('tabellen_nr', 41); // TabellenNr für Objekt
+
+
+
+                    const response = await fetch('http://localhost:5000/api/attachments/upload', {
+
+                        method: 'POST',
+
+                        body: formData
+
+                    });
+
+
+
+                    if (response.ok) {
+
+                        showToast('Datei hinzugefügt', 'success');
+
+                        setStatus('Datei hinzugefügt');
+
+                        loadAttachments();
+
+                    } else {
+
+                        throw new Error('Upload fehlgeschlagen');
+
+                    }
+
+                } catch (err) {
+
+                    showToast('Fehler beim Hochladen', 'error');
+
+                    console.error('[Objekt] Upload-Fehler:', err);
+
+                } finally {
+
+                    showLoading(false);
+
+                    input.remove();
+
+                }
+
+            };
+
+
+
+            document.body.appendChild(input);
+
+            input.click();
+
+        }
+
+
+
+        async function deleteAttachment() {
+
+            if (!state.selectedAttachment) {
+
+                showToast('Bitte Datei auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            if (!confirm(`Datei "${state.selectedAttachment.Dateiname}" wirklich löschen?`)) {
+
+                return;
+
+            }
+
+
+
+            try {
+
+                setStatus('Lösche Datei...');
+
+                showLoading(true);
+
+
+
+                const response = await fetch(`http://localhost:5000/api/attachments/${state.selectedAttachment.ZusatzNr}`, {
+
+                    method: 'DELETE'
+
+                });
+
+
+
+                if (response.ok) {
+
+                    showToast('Datei gelöscht', 'success');
+
+                    setStatus('Datei gelöscht');
+
+                    state.selectedAttachment = null;
+
+                    loadAttachments();
+
+                } else {
+
+                    throw new Error('Löschen fehlgeschlagen');
+
+                }
+
+            } catch (err) {
+
+                showToast('Fehler beim Löschen', 'error');
+
+                console.error('[Objekt] Löschen-Fehler:', err);
+
+            } finally {
+
+                showLoading(false);
+
+            }
+
+        }
+
+
+
+        async function loadAttachments() {
+
+            if (!state.currentRecord?.ID) return;
+
+
+
+            try {
+
+                const result = await apiCall(`/attachments?objekt_id=${state.currentRecord.ID}&tabellen_nr=41`);
+
+                const attachments = result.data || [];
+
+
+
+                const tbody = document.getElementById('attachmentsTbody');
+
+                if (!tbody) return;
+
+
+
+                tbody.innerHTML = '';
+
+                attachments.forEach(att => {
+
+                    const tr = document.createElement('tr');
+
+                    tr.dataset.id = att.ZusatzNr;
+
+                    tr.innerHTML = `
+
+                        <td>${att.Dateiname || ''}</td>
+
+                        <td>${formatDate(att.DFiledate)}</td>
+
+                        <td style="text-align:right">${formatSize(att.DLaenge)}</td>
+
+                        <td>${att.Texttyp || ''}</td>
+
+                    `;
+
+                    tr.addEventListener('click', () => {
+
+                        tbody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+
+                        tr.classList.add('selected');
+
+                        state.selectedAttachment = att;
+
+                    });
+
+                    tr.addEventListener('dblclick', () => openAttachment(att));
+
+                    tbody.appendChild(tr);
+
+                });
+
+            } catch (e) {
+
+                console.error('[Objekt] Attachments laden fehlgeschlagen:', e);
+
+            }
+
+        }
+
+
+
+        function openAttachment(att) {
+
+            if (!att?.Dateiname) return;
+
+            // Datei öffnen via API
+
+            window.open(`http://localhost:5000/api/attachments/${att.ZusatzNr}/download`, '_blank');
+
+        }
+
+
+
+        function formatSize(bytes) {
+
+            if (!bytes) return '';
+
+            if (bytes < 1024) return bytes + ' B';
+
+            if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+
+            return (bytes/1024/1024).toFixed(1) + ' MB';
+
+        }
+
+
+
+        // ============================================
+
+        // UI HELPERS
+
+        // ============================================
+
+        function showLoading(show) {
+
+            document.getElementById('loadingOverlay').classList.toggle('active', show);
+
+        }
+
+
+
+        function setStatus(text) {
+
+            document.getElementById('statusText').textContent = text;
+
+        }
+
+
+
+        function showToast(message, type = 'info') {
+
+            const container = document.getElementById('toastContainer');
+
+            const toast = document.createElement('div');
+
+            toast.className = `toast toast-${type}`;
+
+            toast.textContent = message;
+
+            toast.style.cssText = 'background:#000080;color:white;padding:10px 20px;margin-bottom:5px;border-radius:3px;';
+
+            if (type === 'success') toast.style.background = '#308030';
+
+            if (type === 'error') toast.style.background = '#c04040';
+
+            container.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 3000);
+
+        }
+
+
+
+        // Vollbild-Toggle Funktion (Browser Fullscreen API)
+
+        function toggleFullscreen() {
+
+            const btn = document.getElementById('fullscreenBtn');
+
+            if (!document.fullscreenElement) {
+
+                document.documentElement.requestFullscreen().then(() => {
+
+                    btn.title = 'Vollbild beenden';
+
+                }).catch(err => console.error('Fullscreen error:', err));
+
+            } else {
+
+                document.exitFullscreen().then(() => {
+
+                    btn.title = 'Vollbild';
+
+                }).catch(err => console.error('Exit fullscreen error:', err));
+
+            }
+
+        }
+
+
+
+        document.addEventListener('fullscreenchange', () => {
+
+            const btn = document.getElementById('fullscreenBtn');
+
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+
+        });
+
+
+
+        // ============================================
+
+        // POSITION MOVE FUNCTIONS (Access: btnMoveUp/btnMoveDown)
+
+        // ============================================
+
+        async function movePositionUp() {
+
+            if (!state.selectedPositionId) {
+
+                showToast('Bitte Position auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            const currentIdx = state.positionenList.findIndex(p => p.ID === state.selectedPositionId);
+
+            if (currentIdx <= 0) {
+
+                showToast('Position ist bereits ganz oben', 'info');
+
+                return;
+
+            }
+
+
+
+            const currentPos = state.positionenList[currentIdx];
+
+            const prevPos = state.positionenList[currentIdx - 1];
+
+
+
+            try {
+
+                setStatus('Verschiebe Position...');
+
+                // Swap Sort-Werte
+
+                await apiCall(`/objekte/positionen/${currentPos.ID}/sort`, 'PUT', {
+
+                    newSort: prevPos.Sort || (currentIdx)
+
+                });
+
+                await apiCall(`/objekte/positionen/${prevPos.ID}/sort`, 'PUT', {
+
+                    newSort: currentPos.Sort || (currentIdx + 1)
+
+                });
+
+
+
+                showToast('Position nach oben verschoben', 'success');
+
+                await loadPositionen(state.currentRecord.ID);
+
+                setStatus('Bereit');
+
+            } catch (error) {
+
+                console.error('Fehler beim Verschieben:', error);
+
+                showToast('Fehler beim Verschieben', 'error');
+
+            }
+
+        }
+
+
+
+        async function movePositionDown() {
+
+            if (!state.selectedPositionId) {
+
+                showToast('Bitte Position auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            const currentIdx = state.positionenList.findIndex(p => p.ID === state.selectedPositionId);
+
+            if (currentIdx < 0 || currentIdx >= state.positionenList.length - 1) {
+
+                showToast('Position ist bereits ganz unten', 'info');
+
+                return;
+
+            }
+
+
+
+            const currentPos = state.positionenList[currentIdx];
+
+            const nextPos = state.positionenList[currentIdx + 1];
+
+
+
+            try {
+
+                setStatus('Verschiebe Position...');
+
+                // Swap Sort-Werte
+
+                await apiCall(`/objekte/positionen/${currentPos.ID}/sort`, 'PUT', {
+
+                    newSort: nextPos.Sort || (currentIdx + 2)
+
+                });
+
+                await apiCall(`/objekte/positionen/${nextPos.ID}/sort`, 'PUT', {
+
+                    newSort: currentPos.Sort || (currentIdx + 1)
+
+                });
+
+
+
+                showToast('Position nach unten verschoben', 'success');
+
+                await loadPositionen(state.currentRecord.ID);
+
+                setStatus('Bereit');
+
+            } catch (error) {
+
+                console.error('Fehler beim Verschieben:', error);
+
+                showToast('Fehler beim Verschieben', 'error');
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // POSITION IMPORT/EXPORT (Access: btnUploadPositionen/btnExportExcel)
+
+        // ============================================
+
+        async function uploadPositionen() {
+
+            if (!state.currentRecord?.ID) {
+
+                showToast('Erst Objekt auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            const input = document.createElement('input');
+
+            input.type = 'file';
+
+            input.accept = '.xlsx,.xls,.csv';
+
+            input.style.display = 'none';
+
+
+
+            input.onchange = async (e) => {
+
+                const file = e.target.files?.[0];
+
+                if (!file) return;
+
+
+
+                try {
+
+                    setStatus(`Importiere ${file.name}...`);
+
+                    showLoading(true);
+
+
+
+                    const formData = new FormData();
+
+                    formData.append('file', file);
+
+                    formData.append('objekt_id', state.currentRecord.ID);
+
+
+
+                    const response = await fetch(`${API_BASE}/objekte/${state.currentRecord.ID}/positionen/import`, {
+
+                        method: 'POST',
+
+                        body: formData
+
+                    });
+
+
+
+                    if (response.ok) {
+
+                        const result = await response.json();
+
+                        showToast(`${result.count || 0} Positionen importiert`, 'success');
+
+                        await loadPositionen(state.currentRecord.ID);
+
+                    } else {
+
+                        throw new Error('Import fehlgeschlagen');
+
+                    }
+
+                } catch (err) {
+
+                    console.error('[Objekt] Import-Fehler:', err);
+
+                    showToast('Fehler beim Import', 'error');
+
+                } finally {
+
+                    showLoading(false);
+
+                    setStatus('Bereit');
+
+                    input.remove();
+
+                }
+
+            };
+
+
+
+            document.body.appendChild(input);
+
+            input.click();
+
+        }
+
+
+
+        async function exportPositionenExcel() {
+
+            if (!state.currentRecord?.ID) {
+
+                showToast('Erst Objekt auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            if (state.positionenList.length === 0) {
+
+                showToast('Keine Positionen zum Exportieren', 'info');
+
+                return;
+
+            }
+
+
+
+            try {
+
+                setStatus('Exportiere nach Excel...');
+
+                showLoading(true);
+
+
+
+                // Download via API
+
+                const response = await fetch(`${API_BASE}/objekte/${state.currentRecord.ID}/positionen/export`);
+
+
+
+                if (response.ok) {
+
+                    const blob = await response.blob();
+
+                    const url = window.URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+
+                    a.href = url;
+
+                    a.download = `Positionen_${state.currentRecord.Objekt || state.currentRecord.ID}.xlsx`;
+
+                    document.body.appendChild(a);
+
+                    a.click();
+
+                    a.remove();
+
+                    window.URL.revokeObjectURL(url);
+
+                    showToast('Excel-Export erfolgreich', 'success');
+
+                } else {
+
+                    throw new Error('Export fehlgeschlagen');
+
+                }
+
+            } catch (err) {
+
+                console.error('[Objekt] Export-Fehler:', err);
+
+                showToast('Fehler beim Export', 'error');
+
+            } finally {
+
+                showLoading(false);
+
+                setStatus('Bereit');
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // POSITION KOPIEREN (Access: btnKopierePositionen)
+
+        // ============================================
+
+        async function kopierePositionen() {
+
+            if (!state.currentRecord?.ID) {
+
+                showToast('Erst Objekt auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            // Zeige Dialog zur Auswahl des Quell-Objekts
+
+            const quellId = prompt('Objekt-ID von dem Positionen kopiert werden sollen:');
+
+            if (!quellId || isNaN(parseInt(quellId))) {
+
+                return;
+
+            }
+
+
+
+            if (!confirm(`Positionen von Objekt ${quellId} kopieren? Bestehende Positionen bleiben erhalten.`)) {
+
+                return;
+
+            }
+
+
+
+            try {
+
+                setStatus('Kopiere Positionen...');
+
+                showLoading(true);
+
+
+
+                const response = await apiCall(`/objekte/${state.currentRecord.ID}/positionen/copy`, 'POST', {
+
+                    quellObjektId: parseInt(quellId)
+
+                });
+
+
+
+                showToast(`${response.count || 0} Positionen kopiert`, 'success');
+
+                await loadPositionen(state.currentRecord.ID);
+
+            } catch (err) {
+
+                console.error('[Objekt] Kopieren-Fehler:', err);
+
+                showToast('Fehler beim Kopieren', 'error');
+
+            } finally {
+
+                showLoading(false);
+
+                setStatus('Bereit');
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // VORLAGEN-FUNKTIONEN (Access: btnVorlageSpeichern/btnVorlageLaden)
+
+        // ============================================
+
+        async function speichereVorlage() {
+
+            if (!state.currentRecord?.ID) {
+
+                showToast('Erst Objekt auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            if (state.positionenList.length === 0) {
+
+                showToast('Keine Positionen zum Speichern', 'info');
+
+                return;
+
+            }
+
+
+
+            const vorlageName = prompt('Name der Vorlage:');
+
+            if (!vorlageName || !vorlageName.trim()) {
+
+                return;
+
+            }
+
+
+
+            try {
+
+                setStatus('Speichere Vorlage...');
+
+                showLoading(true);
+
+
+
+                await apiCall('/objekte/vorlagen', 'POST', {
+
+                    name: vorlageName.trim(),
+
+                    objektId: state.currentRecord.ID,
+
+                    positionen: state.positionenList
+
+                });
+
+
+
+                showToast('Vorlage gespeichert', 'success');
+
+            } catch (err) {
+
+                console.error('[Objekt] Vorlage speichern Fehler:', err);
+
+                showToast('Fehler beim Speichern der Vorlage', 'error');
+
+            } finally {
+
+                showLoading(false);
+
+                setStatus('Bereit');
+
+            }
+
+        }
+
+
+
+        async function ladeVorlage() {
+
+            if (!state.currentRecord?.ID) {
+
+                showToast('Erst Objekt auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            try {
+
+                setStatus('Lade Vorlagen...');
+
+                showLoading(true);
+
+
+
+                // Vorlagenliste laden
+
+                const result = await apiCall('/objekte/vorlagen');
+
+                const vorlagen = result.data || result || [];
+
+
+
+                if (vorlagen.length === 0) {
+
+                    showToast('Keine Vorlagen vorhanden', 'info');
+
+                    return;
+
+                }
+
+
+
+                // Einfacher Auswahl-Dialog
+
+                const vorlageList = vorlagen.map((v, i) => `${i + 1}. ${v.name}`).join('\n');
+
+                const selection = prompt(`Vorlage auswählen:\n${vorlageList}\n\nNummer eingeben:`);
+
+
+
+                if (!selection || isNaN(parseInt(selection))) {
+
+                    return;
+
+                }
+
+
+
+                const idx = parseInt(selection) - 1;
+
+                if (idx < 0 || idx >= vorlagen.length) {
+
+                    showToast('Ungültige Auswahl', 'error');
+
+                    return;
+
+                }
+
+
+
+                const vorlage = vorlagen[idx];
+
+
+
+                if (!confirm(`Vorlage "${vorlage.name}" laden? Bestehende Positionen bleiben erhalten.`)) {
+
+                    return;
+
+                }
+
+
+
+                // Vorlage anwenden
+
+                await apiCall(`/objekte/${state.currentRecord.ID}/positionen/vorlage`, 'POST', {
+
+                    vorlageId: vorlage.id
+
+                });
+
+
+
+                showToast('Vorlage geladen', 'success');
+
+                await loadPositionen(state.currentRecord.ID);
+
+            } catch (err) {
+
+                console.error('[Objekt] Vorlage laden Fehler:', err);
+
+                showToast('Fehler beim Laden der Vorlage', 'error');
+
+            } finally {
+
+                showLoading(false);
+
+                setStatus('Bereit');
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // GEOCODIERUNG (Access: cmdGeocode - OSM)
+
+        // ============================================
+
+        async function geocodeAdresse() {
+
+            if (!state.currentRecord?.ID) {
+
+                showToast('Erst Objekt auswählen', 'error');
+
+                return;
+
+            }
+
+
+
+            const strasse = document.getElementById('Strasse')?.value || '';
+
+            const plz = document.getElementById('PLZ')?.value || '';
+
+            const ort = document.getElementById('Ort')?.value || '';
+
+
+
+            if (!strasse && !plz && !ort) {
+
+                showToast('Bitte zuerst Adresse eingeben', 'error');
+
+                return;
+
+            }
+
+
+
+            try {
+
+                setStatus('Geocodiere Adresse...');
+
+                showLoading(true);
+
+
+
+                // OpenStreetMap Nominatim API
+
+                const address = encodeURIComponent(`${strasse}, ${plz} ${ort}, Germany`);
+
+                const response = await fetch(
+
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${address}&limit=1`,
+
+                    { headers: { 'User-Agent': 'CONSYS-Security-App' } }
+
+                );
+
+
+
+                const data = await response.json();
+
+
+
+                if (!data || data.length === 0) {
+
+                    showToast('Adresse konnte nicht gefunden werden', 'info');
+
+                    return;
+
+                }
+
+
+
+                const result = data[0];
+
+                const lat = parseFloat(result.lat);
+
+                const lon = parseFloat(result.lon);
+
+
+
+                // Koordinaten in Felder eintragen
+
+                const txtLat = document.getElementById('txtLat');
+
+                const txtLon = document.getElementById('txtLon');
+
+                if (txtLat) txtLat.value = lat.toFixed(6);
+
+                if (txtLon) txtLon.value = lon.toFixed(6);
+
+
+
+                // Koordinaten speichern via API
+
+                try {
+
+                    await apiCall(`/objekte/${state.currentRecord.ID}/geo`, 'PUT', {
+
+                        lat: lat,
+
+                        lon: lon,
+
+                        strasse: strasse,
+
+                        plz: plz,
+
+                        ort: ort,
+
+                        land: 'Germany'
+
+                    });
+
+                    showToast(`Koordinaten gespeichert: ${lat.toFixed(6)}, ${lon.toFixed(6)}`, 'success');
+
+                } catch (saveErr) {
+
+                    // Auch wenn Speichern fehlschlägt, Koordinaten anzeigen
+
+                    showToast(`Gefunden: Lat ${lat.toFixed(6)}, Lon ${lon.toFixed(6)} (nicht gespeichert)`, 'info');
+
+                }
+
+            } catch (err) {
+
+                console.error('[Objekt] Geocoding-Fehler:', err);
+
+                showToast('Fehler bei der Geocodierung', 'error');
+
+            } finally {
+
+                showLoading(false);
+
+                setStatus('Bereit');
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // HILFE-FUNKTION (Access: btnHilfe)
+
+        // ============================================
+
+        function showHelp() {
+
+            const helpText = `
+
+OBJEKTSTAMMDATEN - HILFE
+
+
+
+Navigation:
+
+- |< Erster Datensatz
+
+- < Vorheriger Datensatz
+
+- > Nächster Datensatz
+
+- >| Letzter Datensatz
+
+
+
+Aktionen:
+
+- Neu: Neues Objekt anlegen
+
+- Speichern: Änderungen speichern
+
+- Löschen: Objekt löschen
+
+- Bericht: Objektbericht drucken
+
+
+
+Positionen-Tab:
+
+- Import: Excel/CSV-Datei importieren
+
+- Excel: Positionen exportieren
+
+- Kopieren: Positionen von anderem Objekt kopieren
+
+- Vorlage speichern/laden: Positionsvorlagen verwalten
+
+- Pfeile: Position nach oben/unten verschieben
+
+
+
+Geocode:
+
+- Ermittelt GPS-Koordinaten aus der Adresse via OpenStreetMap
+
+
+
+Zusatzdateien-Tab:
+
+- Dokumente zum Objekt anhängen
+
+
+
+Tastenkürzel:
+
+- Strg+S: Speichern
+
+- Esc: Formular schließen
+
+            `;
+
+
+
+            alert(helpText);
+
+        }
+
+
+
+        // ============================================
+
+        // ZURÜCK-BUTTON (Access: btn_Back_akt_Pos_List)
+
+        // ============================================
+
+        function backToAktPosList() {
+
+            // Zurück zur Auftragspositionsliste
+
+            if (state.isDirty) {
+
+                if (!confirm('Ungespeicherte Änderungen verwerfen?')) {
+
+                    return;
+
+                }
+
+            }
+
+
+
+            const openArgs = new URLSearchParams(window.location.search).get('openArgs');
+
+            if (window.Bridge) {
+
+                Bridge.navigate('frmTop_VA_Akt_Objekt_Kopf', openArgs);
+
+            } else if (openArgs) {
+
+                window.location.href = `frmTop_VA_Akt_Objekt_Kopf.html?id=${openArgs}`;
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // SUMMEN-ANZEIGE (Access: UpdateSummenAnzeige)
+
+        // ============================================
+
+        function updateSummenAnzeige() {
+
+            if (!state.positionenList || state.positionenList.length === 0) {
+
+                return;
+
+            }
+
+
+
+            let summeMA = 0;
+
+            let summeStunden = 0;
+
+
+
+            state.positionenList.forEach(pos => {
+
+                summeMA += parseInt(pos.MA_Soll) || 0;
+
+                if (pos.Stundensatz && pos.MA_Soll) {
+
+                    summeStunden += (parseFloat(pos.Stundensatz) || 0) * (parseInt(pos.MA_Soll) || 0);
+
+                }
+
+            });
+
+
+
+            // Optional: Summe in Status anzeigen
+
+            setStatus(`${state.positionenList.length} Positionen, ${summeMA} MA gesamt`);
+
+        }
+
+
+
+        // ============================================
+
+        // TASTATUR-SHORTCUTS
+
+        // ============================================
+
+        document.addEventListener('keydown', (e) => {
+
+            // Strg+S = Speichern
+
+            if (e.ctrlKey && e.key === 's') {
+
+                e.preventDefault();
+
+                saveRecord();
+
+            }
+
+            // Escape = Schließen
+
+            if (e.key === 'Escape') {
+
+                closeForm();
+
+            }
+
+        });
+
+
+
+        // ============================================
+
+        // FORM OPEN HANDLER (Access: Form_Open)
+
+        // ============================================
+
+        function handleFormOpen() {
+
+            // Prüfe ob OpenArgs vorhanden (von anderem Formular aufgerufen)
+
+            const openArgs = new URLSearchParams(window.location.search).get('openArgs');
+
+            const btnBack = document.getElementById('btnBackToList');
+
+
+
+            if (openArgs && btnBack) {
+
+                btnBack.style.display = 'inline-block';
+
+            }
+
+
+
+            // Prüfe auf übergebene Objekt-ID
+
+            const objektId = new URLSearchParams(window.location.search).get('id');
+
+            if (objektId) {
+
+                // Nach Laden der Liste zum entsprechenden Objekt navigieren
+
+                setTimeout(async () => {
+
+                    const idx = state.objekteList.findIndex(o => o.ID == objektId);
+
+                    if (idx >= 0) {
+
+                        await selectObjekt(idx);
+
+                    }
+
+                }, 500);
+
+            }
+
+        }
+
+
+
+        // Form Open nach DOM ready ausführen
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            setTimeout(handleFormOpen, 100);
+
+        });
+
+
+
+        // ============================================
+
+        // DATUM FORMATIERUNG (Helper)
+
+        // ============================================
+
+        function formatDate(dateStr) {
+
+            if (!dateStr) return '';
+
+            try {
+
+                const d = new Date(dateStr);
+
+                return d.toLocaleDateString('de-DE');
+
+            } catch {
+
+                return dateStr;
+
+            }
+
+        }
+
+
+
+    </script>
+
+    <!-- Debug Logger -->
+
+    <script src="js/debug-logger.js"></script>
+
+    <!-- Event Logger (erweitert debug-logger) -->
+
+    <script src="js/logger.js"></script>
+
+    <!-- Toast Notification System -->
+
+    <script src="js/toast-system.js"></script>
+
+    <!-- Shell-Detector: Versteckt Sidebar im iframe-Modus -->
+
+    <script src="js/shell-detector.js"></script>
+
+    <!-- API-Server Lifecycle (Auto-Start/Stop) -->
+
+    <script src="js/api-lifecycle.js"></script>
+
+    <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
+
+    <script src="js/server-watchdog.js"></script>
+
+</body>
+
+</html>
+
+
+
+
+
+

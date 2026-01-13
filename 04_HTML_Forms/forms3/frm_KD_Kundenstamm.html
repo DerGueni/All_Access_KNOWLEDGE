@@ -1,0 +1,3393 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <script>
+    // Auto-Load in Shell (Sidebar-Integration)
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isInShell = urlParams.has('shell') || window.SHELL_PARAMS;
+        const isInIframe = window.self !== window.top;
+        if (!isInShell && !isInIframe) {
+            const formName = window.location.pathname.split('/').pop();
+            const recordId = urlParams.get('id') || urlParams.get('ma_id') || urlParams.get('kd_id') || urlParams.get('va_id');
+            let shellUrl = 'shell.html?form=' + formName;
+            if (recordId) shellUrl += '&id=' + recordId;
+            for (const [key, value] of urlParams.entries()) {
+                if (!['shell', 'id', 'ma_id', 'kd_id', 'va_id', '_t'].includes(key)) {
+                    shellUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                }
+            }
+            console.log('[Auto-Redirect] Lade mit Sidebar:', shellUrl);
+            window.location.replace(shellUrl);
+        }
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenstammblatt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .window-frame {
+            background-color: #8080c0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Title Bar - ausgeblendet gemaess Anforderung */
+        .title-bar {
+            display: none;
+        }
+
+        .title-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .title-bar-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 21px;
+            height: 21px;
+            background: #ece9d8;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-btn.close {
+            background: #c75050;
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+            overflow: visible;
+        }
+
+        /* Obere helle Kante - 4px nach rechts versetzt */
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        /* Untere dunkle Kante - 4px nach links versetzt */
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:active::before {
+            background: #404070;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn:active::after {
+            background: #ffffff;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.active::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            background-color: #8080c0;
+            padding: 3px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Header Row */
+        .header-row {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4040a0, #8080c0);
+            border: 2px solid #404080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .title-text {
+            font-size: 23px !important; /* Formulartitel +8px gemaess Anforderung */
+            font-weight: bold !important;
+            color: #000080;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: none;
+            padding: 4px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-green, .btn.btn-green {
+            background: linear-gradient(to bottom, #90c090, #60a060);
+            color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
+        }
+
+        .btn-blue, .btn.btn-blue {
+            background: linear-gradient(to bottom, #b8b8d8, #6060a0);
+            color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
+        }
+
+        .btn-red, .btn.btn-red {
+            background: linear-gradient(to bottom, #c09090, #a06060);
+            color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
+        }
+
+        .gpt-box {
+            display: none; /* Deaktiviert - blockierte Speichern-Button */
+            background: #ffe0e0;
+            border: 1px solid #a00000;
+            padding: 2px 6px;
+            font-size: 9px;
+            text-align: center;
+            line-height: 1.2;
+            position: absolute;
+            right: 10px;
+            top: 28px;
+            pointer-events: none; /* Falls wieder aktiviert: Klicks durchlassen */
+        }
+
+        .header-row-wrapper {
+            position: relative;
+        }
+
+        .header-kd-nr {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        .header-kd-nr input {
+            width: 60px;
+            height: 18px;
+            border: 1px solid #808080;
+            text-align: center;
+            font-size: 11px;
+            background: #e0e0e0;
+        }
+
+        /* Customer Info Row */
+        .customer-info {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 6px 12px;
+            flex-shrink: 0;
+        }
+
+        .customer-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .customer-address {
+            font-size: 11px;
+            color: #333;
+        }
+
+        /* Work Area */
+        .work-area {
+            display: flex;
+            flex: 1;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        /* Left Work Panel */
+        .left-work-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Tab Container */
+        .tab-container {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #8080b0;
+            border-bottom: 1px solid #606090;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 4px 12px;
+            background: #a0a0c0;
+            border: 1px solid #808080;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: -1px;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: #b8b8d8;
+            border-bottom: 1px solid #b8b8d8;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-content {
+            padding: 8px;
+            flex: 1;
+            overflow: auto;
+            background: #b8b8d8;
+        }
+
+        .tab-page {
+            display: none;
+        }
+
+        .tab-page.active {
+            display: block;
+        }
+
+        /* Form Layout */
+        .form-columns {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .form-column {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-label {
+            min-width: 100px;
+            text-align: right;
+            font-size: 11px;
+        }
+
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 11px;
+            background: white;
+            height: 18px;
+            width: 150px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #000080;
+            box-shadow: 0 0 2px #000080;
+        }
+
+        .form-input.readonly {
+            background: #e0e0e0;
+        }
+
+        .form-input.small { width: 60px; }
+        .form-input.medium { width: 150px; }
+        .form-input.wide { width: 200px; }  /* Fix: war 150px wie medium */
+
+        .form-textarea {
+            border: 1px solid #808080;
+            padding: 3px;
+            font-size: 11px;
+            background: white;
+            resize: vertical;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 105px;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: 13px;
+            height: 13px;
+        }
+
+        .checkbox-row label {
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 5px;
+            background: #a0a0c0;
+            border: 1px solid #808080;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-group .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Right Panel: Customer List */
+        .right-panel {
+            width: 320px;
+            background: #b8b8d8;
+            border: 1px solid #606090;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .right-header {
+            padding: 5px;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .search-box label {
+            font-size: 11px;
+        }
+
+        .search-box input {
+            flex: 1;
+            height: 18px;
+            border: 1px solid #808080;
+            padding: 1px 4px;
+            font-size: 11px;
+        }
+
+        .filter-box {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .filter-box label {
+            font-size: 11px;
+        }
+
+        .filter-box input[type="checkbox"] {
+            width: 13px;
+            height: 13px;
+        }
+
+        .list-wrapper {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .data-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .data-grid th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 3px 5px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+
+        .data-grid td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 4px;
+            background: white;
+        }
+
+        .data-grid tr:hover td {
+            background: #e0e0ff;
+        }
+
+        .data-grid tr.selected td {
+            background: #000080;
+            color: white;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 2px 5px;
+            display: flex;
+            gap: 10px;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .status-section {
+            border: 1px inset #808080;
+            padding: 1px 8px;
+            background: #e0e0e0;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 30px;
+            right: 10px;
+            z-index: 1002;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+        .toast.warning { background: #f57f17; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+
+        /* Vollbild-Button oben rechts */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: none;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .fullscreen-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        /* Pflichtfeld-Markierung */
+        .required { color: #cc0000; font-weight: bold; }
+        input:required:invalid { border-color: #cc0000; }
+        input:required:valid { border-color: #008000; }
+        input.invalid { border-color: #cc0000 !important; background-color: #fff8f8 !important; }
+
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <script src="js/performance-init.js"></script>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-form="frm_KD_Kundenstamm">
+    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild" data-testid="kd-btn-vollbild">&#x26F6;</button>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <span>&#127970;</span>
+                <span>Kundenstammblatt</span>
+            </div>
+            <div class="title-bar-buttons">
+                <button class="title-btn tiny-btn" onclick="Bridge.sendEvent('minimize')" data-testid="kd-btn-minimieren">_</button>
+                <button class="title-btn" data-testid="kd-btn-maximieren">&#9633;</button>
+                <button class="title-btn close" onclick="closeForm()" data-testid="kd-btn-schliessen">&#10005;</button>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Header Row 1 -->
+                <div class="header-row-wrapper">
+                    <div class="header-row">
+                        <div class="logo-box">K</div>
+                        <span class="title-text">Kundenstammblatt</span>
+
+                        <button class="btn" id="btnAktualisieren" onclick="refreshData()" data-testid="kd-btn-aktualisieren">Aktualisieren</button>
+                        <button class="btn btn-blue" id="btnVerrechnungssaetze" onclick="openVerrechnungssaetze()" data-testid="kd-btn-verrechnungssaetze">Verrechnungssätze</button>
+                        <button class="btn btn-blue" id="btnUmsatzauswertung" onclick="openUmsatzauswertung()" data-testid="kd-btn-umsatzauswertung">Umsatzauswertung</button>
+                        <!-- Office-Buttons aus Access (btnOutlook, btnWord) -->
+                        <button class="btn" id="btnOutlook" onclick="openOutlook()" title="E-Mail senden" data-testid="kd-btn-outlook">&#9993; Outlook</button>
+                        <button class="btn" id="btnWord" onclick="openWord()" title="Brief erstellen" data-testid="kd-btn-word">&#128196; Word</button>
+                        <button class="btn btn-green" id="btnNeuKunde" onclick="neuerKunde()" data-testid="kd-btn-neu">Neuer Kunde</button>
+                        <button class="btn btn-red" id="btnLoeschen" onclick="kundeLoeschen()" data-testid="kd-btn-loeschen">Kunde löschen</button>
+
+                        <!-- cboKDNrSuche: Direkte Kunden-Nummer Suche -->
+                        <div class="header-kd-nr">
+                            <span>KD-Nr Suche:</span>
+                            <input type="text" id="cboKDNrSuche" class="input-xs" placeholder="Nr..." onkeydown="if(event.key==='Enter') sucheKundeNr()" data-testid="kd-input-nrsuche">
+                            <button class="btn" onclick="sucheKundeNr()" title="Kunde nach Nr. suchen" data-testid="kd-btn-nrsuche">&#128269;</button>
+                            <span style="margin-left: 8px;">Akt. Nr.:</span>
+                            <input type="text" id="kdNr" readonly style="background: #e0e0e0;" data-testid="kd-input-id">
+                        </div>
+
+                        <button class="btn" id="btnSpeichern" onclick="speichern()" data-testid="kd-btn-speichern">Speichern</button>
+                    </div>
+                    <!-- Navigations-Buttons (Befehl39-43 aus Access) -->
+                    <div style="display: flex; gap: 2px; position: absolute; right: 120px; top: 4px;">
+                        <button class="btn" onclick="gotoFirstRecord()" title="Erster Datensatz" data-testid="kd-btn-erste">|&lt;</button>
+                        <button class="btn" onclick="gotoPrevRecord()" title="Vorheriger Datensatz" data-testid="kd-btn-vorige">&lt;</button>
+                        <button class="btn" onclick="gotoNextRecord()" title="Nächster Datensatz" data-testid="kd-btn-naechste">&gt;</button>
+                        <button class="btn" onclick="gotoLastRecord()" title="Letzter Datensatz" data-testid="kd-btn-letzte">&gt;|</button>
+                    </div>
+                    <div class="gpt-box">GPT | TEST<br><span id="lblDatum"></span></div>
+                </div>
+
+                <!-- Customer Info -->
+                <div class="customer-info">
+                    <span class="customer-name" id="displayFirma">-</span>
+                    <span class="customer-address" id="displayAddress"></span>
+                </div>
+
+                <!-- Work Area -->
+                <div class="work-area">
+                    <!-- Left Work Panel -->
+                    <div class="left-work-panel">
+                        <div class="tab-container">
+                            <div class="tab-header">
+                                <!-- Sichtbare Tabs (wie in Access) -->
+                                <button class="tab-btn active" data-tab="stammdaten" data-testid="kd-tab-stammdaten">Stammdaten</button>
+                                <button class="tab-btn" data-tab="objekte" data-testid="kd-tab-objekte">Objekte</button>
+                                <button class="tab-btn" data-tab="konditionen" data-testid="kd-tab-konditionen">Konditionen</button>
+                                <button class="tab-btn" data-tab="zusatzdateien" data-testid="kd-tab-zusatzdateien">Zusatzdateien</button>
+                                <button class="tab-btn" data-tab="bemerkungen" data-testid="kd-tab-bemerkungen">Bemerkungen</button>
+                                <button class="tab-btn" data-tab="preise" data-testid="kd-tab-preise">Preise</button>
+                                <!-- Versteckte Tabs (in Access nicht sichtbar) -->
+                                <button class="tab-btn" data-tab="auftraguebersicht" data-testid="kd-tab-auftragsuebersicht" hidden>Auftragsübersicht</button>
+                                <button class="tab-btn" data-tab="ansprechpartner" data-testid="kd-tab-ansprechpartner" hidden>Ansprechpartner</button>
+                                <button class="tab-btn" data-tab="angebote" data-testid="kd-tab-angebote" hidden>Angebote</button>
+                                <button class="tab-btn" data-tab="statistik" data-testid="kd-tab-statistik" hidden>Statistik</button>
+                            </div>
+                            <div class="tab-content">
+                                <!-- Tab 1: Stammdaten -->
+                                <div class="tab-page active" id="tab-stammdaten">
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="kun_IstAktiv" data-field="kun_IstAktiv" checked data-testid="kd-checkbox-istaktiv">
+                                            <label for="kun_IstAktiv">Ist aktiv</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="kun_IstSammelRechnung" data-field="kun_IstSammelRechnung">
+                                            <label for="kun_IstSammelRechnung">Sammelrechnung</label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="kun_ans_manuell" data-field="kun_ans_manuell">
+                                            <label for="kun_ans_manuell">Anschrift manuell</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-columns">
+                                        <!-- Column 1: Adressdaten -->
+                                        <div class="form-column">
+                                            <div class="form-row">
+                                                <span class="form-label">Firma: <span class="required">*</span></span>
+                                                <input type="text" class="form-input wide" id="kun_Firma" data-field="kun_Firma" required data-testid="kd-input-firma">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Bezeichnung:</span>
+                                                <input type="text" class="form-input wide" id="kun_bezeichnung" data-field="kun_bezeichnung">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Kunden-Kurzel:</span>
+                                                <input type="text" class="form-input wide" id="kun_Matchcode" data-field="kun_Matchcode">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Strase:</span>
+                                                <input type="text" class="form-input wide" id="kun_Strasse" data-field="kun_Strasse" data-testid="kd-input-strasse">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">PLZ:</span>
+                                                <input type="text" class="form-input medium" id="kun_PLZ" data-field="kun_PLZ" pattern="[0-9]{5}" title="5-stellige PLZ eingeben" data-testid="kd-input-plz">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Ort:</span>
+                                                <input type="text" class="form-input wide" id="kun_Ort" data-field="kun_Ort" data-testid="kd-input-ort">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Land:</span>
+                                                <select class="form-select input-sm" id="kun_LKZ" data-field="kun_LKZ">
+                                                    <option value="DE">DE</option>
+                                                    <option value="AT">AT</option>
+                                                    <option value="CH">CH</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Telefon:</span>
+                                                <input type="tel" class="form-input wide" id="kun_telefon" data-field="kun_telefon" pattern="[0-9+\-\s/()]+" title="Telefonnummer eingeben" data-testid="kd-input-telefon">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Mobil:</span>
+                                                <input type="tel" class="form-input wide" id="kun_mobil" data-field="kun_mobil" pattern="[0-9+\-\s/()]+" title="Telefonnummer eingeben">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Telefax:</span>
+                                                <input type="tel" class="form-input wide" id="kun_telefax" data-field="kun_telefax" pattern="[0-9+\-\s/()]+" title="Telefaxnummer eingeben">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">E-Mail:</span>
+                                                <input type="email" class="form-input wide" id="kun_email" data-field="kun_email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Gueltige E-Mail-Adresse eingeben" data-testid="kd-input-email">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Homepage:</span>
+                                                <input type="text" class="form-input wide" id="kun_URL" data-field="kun_URL">
+                                            </div>
+                                            <!-- kun_IDF_PersonID: Haupt-Ansprechpartner Dropdown -->
+                                            <div class="form-row" style="margin-top: 10px; border-top: 1px solid #808080; padding-top: 8px;">
+                                                <span class="form-label">Haupt-AP:</span>
+                                                <select class="form-select input-lg" id="kun_IDF_PersonID" data-field="kun_IDF_PersonID" onchange="onHauptAnsprechpartnerChange()">
+                                                    <option value="">-- Ansprechpartner waehlen --</option>
+                                                </select>
+                                            </div>
+                                            <!-- Ansprechpartner-Kontaktdaten (werden bei Auswahl aktualisiert) -->
+                                            <div class="form-row">
+                                                <span class="form-label">AP Telefon:</span>
+                                                <input type="tel" class="form-input wide" id="adr_telefon" readonly style="background: #f0f0f0;">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">AP Mobil:</span>
+                                                <input type="tel" class="form-input wide" id="adr_mobil" readonly style="background: #f0f0f0;">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">AP E-Mail:</span>
+                                                <input type="email" class="form-input wide" id="adr_email_haupt" readonly style="background: #f0f0f0;">
+                                            </div>
+                                        </div>
+
+                                        <!-- Column 2: Bankdaten -->
+                                        <div class="form-column">
+                                            <div class="form-row">
+                                                <span class="form-label">Kreditinstitut:</span>
+                                                <input type="text" class="form-input wide" id="kun_kreditinstitut" data-field="kun_kreditinstitut">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">BLZ:</span>
+                                                <input type="text" class="form-input medium" id="kun_blz" data-field="kun_blz">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Kontonummer:</span>
+                                                <input type="text" class="form-input wide" id="kun_kontonummer" data-field="kun_kontonummer">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">IBAN:</span>
+                                                <input type="text" class="form-input wide" id="kun_iban" data-field="kun_iban" pattern="[A-Z]{2}[0-9]{2}[A-Z0-9]{4}[0-9]{7}([A-Z0-9]?){0,16}" title="IBAN Format: DE12345678901234567890">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">BIC:</span>
+                                                <input type="text" class="form-input wide" id="kun_bic" data-field="kun_bic" pattern="[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?" title="BIC Format: ABCDEFGH oder ABCDEFGHIJK">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">UStIDNr.:</span>
+                                                <input type="text" class="form-input wide" id="kun_ustidnr" data-field="kun_ustidnr">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Zahlungsbed.:</span>
+                                                <select class="form-select input-md" id="kun_Zahlbed" data-field="kun_Zahlbed">
+                                                    <option value="6">Netto 6 Tage</option>
+                                                    <option value="7">Netto 7 Tage</option>
+                                                    <option value="14">Netto 14 Tage</option>
+                                                    <option value="30">Netto 30 Tage</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 2: Objekte (sub_KD_Objekte) -->
+                                <div class="tab-page" id="tab-objekte">
+                                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                        <button class="btn btn-green" onclick="neuesObjekt()">+ Neues Objekt</button>
+                                        <button class="btn" onclick="loadObjekte()">Aktualisieren</button>
+                                        <button class="btn" onclick="openObjekt()">Objekt öffnen</button>
+                                    </div>
+                                    <div class="list-wrapper" style="height: 320px;">
+                                        <table class="data-grid" id="objekteTable" data-testid="kd-table-objekte">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 50px;">ID</th>
+                                                    <th>Objektname</th>
+                                                    <th>Ort</th>
+                                                    <th style="width: 60px;">Aktiv</th>
+                                                    <th style="width: 80px;">Aufträge</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="objekteBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 3: Konditionen -->
+                                <div class="tab-page" id="tab-konditionen">
+                                    <div class="form-column" style="max-width: 400px;">
+                                        <div class="form-row">
+                                            <span class="form-label">Rabatt %:</span>
+                                            <input type="number" class="form-input small" id="kun_rabatt" data-field="kun_rabatt" step="0.01">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Skonto %:</span>
+                                            <input type="number" class="form-input small" id="kun_skonto" data-field="kun_skonto" step="0.01">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Skonto Tage:</span>
+                                            <input type="number" class="form-input small" id="kun_skonto_tage" data-field="kun_skonto_tage">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 3: Auftraguebersicht -->
+                                <div class="tab-page" id="tab-auftraguebersicht">
+                                    <!-- Umsatz-Statistik (aus Access Form_Current / pg_Rch_Kopf) -->
+                                    <div style="display: flex; gap: 15px; margin-bottom: 10px; padding: 5px; background: #a0a0c0; border: 1px solid #808080;">
+                                        <div><span style="font-size: 9px;">Gesamt:</span><br><span id="KD_Ges" style="font-weight: bold;">0,00 EUR</span></div>
+                                        <div><span style="font-size: 9px;">Vorjahr:</span><br><span id="KD_VJ" style="font-weight: bold;">0,00 EUR</span></div>
+                                        <div><span style="font-size: 9px;">Lfd. Jahr:</span><br><span id="KD_LJ" style="font-weight: bold;">0,00 EUR</span></div>
+                                        <div><span style="font-size: 9px;">Akt. Monat:</span><br><span id="KD_LM" style="font-weight: bold;">0,00 EUR</span></div>
+                                        <!-- Button fuer detaillierte Statistik -->
+                                        <button class="btn btn-blue" onclick="switchTab('statistik')" style="margin-left: auto;">Detaillierte Statistik</button>
+                                    </div>
+                                    <div class="form-row" style="margin-bottom: 10px;">
+                                        <span class="form-label">Von:</span>
+                                        <input type="date" class="form-input medium" id="datAufträgeVon">
+                                        <span class="form-label" style="min-width: 30px;">bis:</span>
+                                        <input type="date" class="form-input medium" id="datAufträgeBis">
+                                        <button class="btn" onclick="loadAufträge()">Filtern</button>
+                                        <button class="btn" onclick="activateDatumsfilter()">Datum</button>
+                                        <!-- PDF-Buttons aus Access (btnAufRchPDF, btnAufRchPosPDF, btnAufEinsPDF) -->
+                                        <button class="btn btn-blue" onclick="openRechnungPDF()">Rechnung</button>
+                                        <button class="btn btn-blue" onclick="openBerechnungslistePDF()">Berechnungsliste</button>
+                                        <button class="btn btn-blue" onclick="openEinsatzlistePDF()">Einsatzliste</button>
+                                        <button class="btn btn-green" onclick="openNeuerAuftrag()">+ Neuer Auftrag</button>
+                                    </div>
+                                    <div class="list-wrapper" style="height: 200px;">
+                                        <table class="data-grid" id="auftraegeTable" data-testid="kd-table-auftraege">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nr</th>
+                                                    <th>Bezeichnung</th>
+                                                    <th>Datum</th>
+                                                    <th>Objekt</th>
+                                                    <th>Status</th>
+                                                    <th>Betrag</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="auftraegeBody"></tbody>
+                                        </table>
+                                    </div>
+                                    <!-- PosGesamtsumme: Summenzeile unter Auftrags-Tabelle -->
+                                    <div style="display: flex; justify-content: flex-end; padding: 5px; background: #b0b0d0; border: 1px solid #808080; margin-top: -1px;">
+                                        <span style="font-weight: bold;">Gesamtsumme:</span>
+                                        <span id="PosGesamtsumme" style="font-weight: bold; margin-left: 10px; min-width: 100px; text-align: right;">0,00 EUR</span>
+                                    </div>
+
+                                    <!-- sub_KD_Rch_Auftragspos: Rechnungspositionen des ausgewaehlten Auftrags -->
+                                    <div style="margin-top: 10px; border: 1px solid #808080; background: #f0f0f0; padding: 5px;">
+                                        <div style="font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+                                            <span>Positionen des ausgewaehlten Auftrags: <span id="selectedAuftragNr">-</span></span>
+                                            <button class="btn" onclick="loadAuftragsPositionen()" style="font-size: 9px;">Aktualisieren</button>
+                                        </div>
+                                        <div class="list-wrapper" style="height: 120px; overflow-y: auto;">
+                                            <table class="data-grid" id="auftragspositionenTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 40px;">Pos</th>
+                                                        <th>Bezeichnung</th>
+                                                        <th style="width: 60px;">Menge</th>
+                                                        <th style="width: 80px;">Einzelpreis</th>
+                                                        <th style="width: 80px;">Gesamt</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="auftragspositionenBody">
+                                                    <tr><td colspan="5" style="text-align:center; color:#666; padding:10px;">Auftrag auswaehlen um Positionen zu sehen</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div style="display: flex; justify-content: flex-end; padding: 3px; background: #c0c0d0; margin-top: 2px;">
+                                            <span style="font-weight: bold;">Positionen-Summe:</span>
+                                            <span id="PositionenSumme" style="font-weight: bold; margin-left: 10px; min-width: 80px; text-align: right;">0,00 EUR</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 4: Ansprechpartner -->
+                                <div class="tab-page" id="tab-ansprechpartner">
+                                    <div style="padding: 8px;">
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                            <button class="btn btn-green" onclick="neuerAnsprechpartner()">+ Neu</button>
+                                            <button class="btn btn-red" onclick="loescheAnsprechpartner()">Löschen</button>
+                                            <button class="btn" onclick="loadAnsprechpartner()">Aktualisieren</button>
+                                        </div>
+                                        <div style="height: 200px; overflow-y: auto; border: 1px solid #808080; margin-bottom: 10px;">
+                                            <table class="data-grid" id="ansprechpartnerTable" data-testid="kd-table-ansprechpartner">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 150px;">Nachname</th>
+                                                        <th style="width: 100px;">Vorname</th>
+                                                        <th style="width: 100px;">Position</th>
+                                                        <th style="width: 120px;">Telefon</th>
+                                                        <th style="width: 120px;">Handy</th>
+                                                        <th style="width: 180px;">E-Mail</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="ansprechpartnerTbody"></tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Detail-Formular für ausgewaehlten Ansprechpartner -->
+                                        <div style="border: 1px solid #808080; padding: 10px; background: #f0f0f0;">
+                                            <div style="font-weight: bold; margin-bottom: 8px;">Ansprechpartner Details:</div>
+                                            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                                <div class="form-column" style="min-width: 250px;">
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">Nachname:</span>
+                                                        <input type="text" class="form-input input-md" id="adr_Nachname" data-ap-field="adr_Nachname">
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">Vorname:</span>
+                                                        <input type="text" class="form-input input-md" id="adr_Vorname" data-ap-field="adr_Vorname">
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">Anrede:</span>
+                                                        <select class="form-select input-md" id="adr_AnredeID" data-ap-field="adr_AnredeID">
+                                                            <option value="">-- Bitte waehlen --</option>
+                                                            <option value="1">Herr</option>
+                                                            <option value="2">Frau</option>
+                                                            <option value="3">Firma</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">Akad. Grad:</span>
+                                                        <input type="text" class="form-input input-md" id="adr_akad_Grad" data-ap-field="adr_akad_Grad">
+                                                    </div>
+                                                </div>
+                                                <div class="form-column" style="min-width: 250px;">
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">Telefon:</span>
+                                                        <input type="tel" class="form-input input-md" id="adr_Tel" data-ap-field="adr_Tel" pattern="[0-9+\-\s/()]+" title="Telefonnummer eingeben">
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">Handy:</span>
+                                                        <input type="tel" class="form-input input-md" id="adr_Handy" data-ap-field="adr_Handy" pattern="[0-9+\-\s/()]+" title="Telefonnummer eingeben">
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">E-Mail:</span>
+                                                        <input type="email" class="form-input input-lg" id="adr_eMail" data-ap-field="adr_eMail" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Gueltige E-Mail-Adresse eingeben">
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">Fax:</span>
+                                                        <input type="tel" class="form-input input-md" id="adr_Fax" data-ap-field="adr_Fax" pattern="[0-9+\-\s/()]+" title="Faxnummer eingeben">
+                                                    </div>
+                                                </div>
+                                                <div class="form-column" style="min-width: 250px;">
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">Geburtstag:</span>
+                                                        <input type="date" class="form-input" id="adr_Geburtstag" data-ap-field="adr_Geburtstag" style="width: 130px;">
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <span class="form-label" style="min-width: 80px;">Bemerkung:</span>
+                                                        <textarea class="form-input" id="adr_Bemerkung" data-ap-field="adr_Bemerkung" style="width: 200px; height: 60px;"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="margin-top: 10px;">
+                                                <button class="btn btn-green" onclick="speichereAnsprechpartner()">Speichern</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 5: Zusatzdateien -->
+                                <div class="tab-page" id="tab-zusatzdateien">
+                                    <div style="margin-bottom: 10px;">
+                                        <button class="btn btn-blue" onclick="dateiHinzufuegen()">Datei hinzufugen</button>
+                                    </div>
+                                    <div class="list-wrapper" style="height: 300px;">
+                                        <table class="data-grid" id="dateienTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Dateiname</th>
+                                                    <th>Datum</th>
+                                                    <th>Grose</th>
+                                                    <th>Typ</th>
+                                                    <th>Beschreibung</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="dateienBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 6: Bemerkungen -->
+                                <div class="tab-page" id="tab-bemerkungen">
+                                    <div class="form-column">
+                                        <div style="margin-bottom: 10px;">
+                                            <span style="font-weight: bold;">Anschreiben:</span>
+                                            <textarea class="form-textarea" id="kun_Anschreiben" data-field="kun_Anschreiben" rows="3" style="width: 100%; margin-top: 4px;"></textarea>
+                                        </div>
+                                        <div style="margin-bottom: 10px;">
+                                            <span style="font-weight: bold;">Briefkopf:</span>
+                                            <textarea class="form-textarea" id="kun_BriefKopf" data-field="kun_BriefKopf" rows="4" style="width: 100%; margin-top: 4px;"></textarea>
+                                        </div>
+                                        <div>
+                                            <span style="font-weight: bold;">Memo:</span>
+                                            <textarea class="form-textarea" id="kun_memo" data-field="kun_memo" rows="8" style="width: 100%; margin-top: 4px;"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 7: Angebote (pg_Ang / sub_Rch_Kopf_Ang) -->
+                                <div class="tab-page" id="tab-angebote">
+                                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                        <button class="btn btn-green" onclick="neuesAngebot()">+ Neues Angebot</button>
+                                        <button class="btn" onclick="loadAngebote()">Aktualisieren</button>
+                                        <button class="btn btn-blue" onclick="openAngebotPDF()">Angebot PDF</button>
+                                    </div>
+                                    <div class="list-wrapper" style="height: 320px;">
+                                        <table class="data-grid" id="angeboteTable" data-testid="kd-table-angebote">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 80px;">Datum</th>
+                                                    <th style="width: 100px;">Angebot-Nr</th>
+                                                    <th>Bezeichnung</th>
+                                                    <th style="width: 100px;">Betrag</th>
+                                                    <th style="width: 80px;">Status</th>
+                                                    <th style="width: 80px;">Gueltig bis</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="angeboteBody">
+                                                <tr><td colspan="6" style="text-align:center; color:#666; padding:20px;">Angebote werden geladen...</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Angebots-Summe -->
+                                    <div style="display: flex; justify-content: flex-end; padding: 5px; background: #b0b0d0; border: 1px solid #808080; margin-top: -1px;">
+                                        <span>Anzahl Angebote: <span id="angeboteAnzahl" style="font-weight: bold;">0</span></span>
+                                        <span style="margin-left: 20px;">Gesamtwert:</span>
+                                        <span id="angeboteGesamtwert" style="font-weight: bold; margin-left: 10px; min-width: 100px; text-align: right;">0,00 EUR</span>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 8: Statistik (pg_Rch_Kopf - Detaillierte Umsatzstatistik) -->
+                                <div class="tab-page" id="tab-statistik">
+                                    <div style="font-weight: bold; margin-bottom: 10px; font-size: 12px;">Detaillierte Umsatzstatistik - Jahresvergleich</div>
+                                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                        <!-- Jahresuebersicht Grid -->
+                                        <table class="data-grid" style="width: auto; min-width: 600px;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 150px;">Kategorie</th>
+                                                    <th style="width: 120px; text-align: right;" id="statJahr1Header">2024</th>
+                                                    <th style="width: 120px; text-align: right;" id="statJahr2Header">2023</th>
+                                                    <th style="width: 120px; text-align: right;" id="statJahr3Header">2022</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="font-weight: bold;">Umsatz Netto</td>
+                                                    <td style="text-align: right;" id="UmsNGes1">0,00 EUR</td>
+                                                    <td style="text-align: right;" id="UmsNGes2">0,00 EUR</td>
+                                                    <td style="text-align: right;" id="UmsNGes3">0,00 EUR</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-weight: bold;">Umsatz Brutto</td>
+                                                    <td style="text-align: right;" id="UmsGes1">0,00 EUR</td>
+                                                    <td style="text-align: right;" id="UmsGes2">0,00 EUR</td>
+                                                    <td style="text-align: right;" id="UmsGes3">0,00 EUR</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-weight: bold;">Stunden gesamt</td>
+                                                    <td style="text-align: right;" id="StdGes1">0</td>
+                                                    <td style="text-align: right;" id="StdGes2">0</td>
+                                                    <td style="text-align: right;" id="StdGes3">0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-weight: bold;">Auftraege</td>
+                                                    <td style="text-align: right;" id="AufAnz1">0</td>
+                                                    <td style="text-align: right;" id="AufAnz2">0</td>
+                                                    <td style="text-align: right;" id="AufAnz3">0</td>
+                                                </tr>
+                                                <tr style="background: #e0e0f0;">
+                                                    <td style="font-weight: bold;">Personal/Tage</td>
+                                                    <td style="text-align: right;" id="PersGes1">0</td>
+                                                    <td style="text-align: right;" id="PersGes2">0</td>
+                                                    <td style="text-align: right;" id="PersGes3">0</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <!-- KW-basierte Stunden (letzte Wochen) -->
+                                        <div style="border: 1px solid #808080; padding: 8px; background: #f0f0f0;">
+                                            <div style="font-weight: bold; margin-bottom: 5px;">Stunden letzte Wochen</div>
+                                            <table class="data-grid" style="width: auto;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>KW</th>
+                                                        <th style="text-align: right;">Std</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td>KW 51</td><td style="text-align: right;" id="Std51">0</td></tr>
+                                                    <tr><td>KW 52</td><td style="text-align: right;" id="Std52">0</td></tr>
+                                                    <tr><td>KW 53</td><td style="text-align: right;" id="Std53">0</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <!-- Personal/Tage letzte Wochen -->
+                                        <div style="border: 1px solid #808080; padding: 8px; background: #f0f0f0;">
+                                            <div style="font-weight: bold; margin-bottom: 5px;">Personal/Tage letzte Wochen</div>
+                                            <table class="data-grid" style="width: auto;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>KW</th>
+                                                        <th style="text-align: right;">Pers</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td>KW 51</td><td style="text-align: right;" id="Pers51">0</td></tr>
+                                                    <tr><td>KW 52</td><td style="text-align: right;" id="Pers52">0</td></tr>
+                                                    <tr><td>KW 53</td><td style="text-align: right;" id="Pers53">0</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Buttons -->
+                                    <div style="margin-top: 15px; display: flex; gap: 8px;">
+                                        <button class="btn" onclick="loadStatistik()">Aktualisieren</button>
+                                        <button class="btn btn-blue" onclick="exportStatistikExcel()">Export Excel</button>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 9: Preise (pgPreise / sub_KD_Standardpreise) -->
+                                <div class="tab-page" id="tab-preise">
+                                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                        <button class="btn btn-green" onclick="standardpreiseAnlegen()">Standardpreise anlegen</button>
+                                        <button class="btn" onclick="loadKundenpreise()">Aktualisieren</button>
+                                        <button class="btn btn-green" onclick="neuerPreis()">+ Neuer Preis</button>
+                                        <button class="btn btn-red" onclick="preisLoeschen()">Preis loeschen</button>
+                                    </div>
+                                    <div class="list-wrapper" style="height: 320px;">
+                                        <table class="data-grid" id="kundenpreiseTable">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 50px;">Pos</th>
+                                                    <th style="width: 200px;">Bezeichnung</th>
+                                                    <th style="width: 100px;">Preis/Std</th>
+                                                    <th style="width: 100px;">Preis/Tag</th>
+                                                    <th style="width: 100px;">Nachtzuschlag</th>
+                                                    <th>Bemerkung</th>
+                                                    <th style="width: 120px;">Geaendert am</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="kundenpreiseBody"></tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Detail-Formular fuer Preis-Bearbeitung -->
+                                    <div style="border: 1px solid #808080; padding: 10px; background: #f0f0f0; margin-top: 10px;">
+                                        <div style="font-weight: bold; margin-bottom: 8px;">Preis bearbeiten:</div>
+                                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                            <div class="form-column" style="min-width: 250px;">
+                                                <div class="form-row">
+                                                    <span class="form-label" style="min-width: 80px;">Preisart:</span>
+                                                    <select class="form-select" id="preis_Preisart_ID" data-preis-field="Preisart_ID" style="width: 200px;">
+                                                        <option value="">-- Bitte waehlen --</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-row">
+                                                    <span class="form-label" style="min-width: 80px;">Bemerkung:</span>
+                                                    <input type="text" class="form-input" id="preis_Bemerkung" data-preis-field="Bemerkung" style="width: 200px;">
+                                                </div>
+                                            </div>
+                                            <div class="form-column" style="min-width: 200px;">
+                                                <div class="form-row">
+                                                    <span class="form-label" style="min-width: 80px;">Preis/Std:</span>
+                                                    <input type="number" class="form-input" id="preis_StdPreis" data-preis-field="StdPreis" style="width: 100px;" step="0.01">
+                                                    <span style="font-size: 11px; margin-left: 4px;">EUR</span>
+                                                </div>
+                                                <div class="form-row">
+                                                    <span class="form-label" style="min-width: 80px;">Preis/Tag:</span>
+                                                    <input type="number" class="form-input" id="preis_TagPreis" data-preis-field="TagPreis" style="width: 100px;" step="0.01">
+                                                    <span style="font-size: 11px; margin-left: 4px;">EUR</span>
+                                                </div>
+                                                <div class="form-row">
+                                                    <span class="form-label" style="min-width: 80px;">Nachtzuschlag:</span>
+                                                    <input type="number" class="form-input" id="preis_Nachtzuschlag" data-preis-field="Nachtzuschlag" style="width: 100px;" step="0.01">
+                                                    <span style="font-size: 11px; margin-left: 4px;">%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-top: 10px;">
+                                            <button class="btn btn-green" onclick="speicherePreis()">Preis speichern</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Customer List -->
+                    <div class="right-panel">
+                        <div class="right-header">
+                            <div class="filter-box" style="margin-bottom: 4px;">
+                                <input type="checkbox" id="chkNurAktive" checked onchange="loadKunden()">
+                                <label for="chkNurAktive">Nur Aktive</label>
+                                <button class="btn" onclick="resetAuswahlfilter()" style="margin-left: 8px; font-size: 9px;">Filter Reset</button>
+                            </div>
+                            <div class="search-box">
+                                <label>Suche:</label>
+                                <input type="text" id="searchInput" placeholder="Firma eingeben...">
+                            </div>
+                            <!-- Filter-Comboboxen aus Access (cboSuchPLZ, cboSuchOrt) -->
+                            <div style="display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;">
+                                <select id="cboSuchPLZ" onchange="filterByPLZ(this.value)" style="width: 70px; height: 18px; font-size: 11px;">
+                                    <option value="_ALLE">PLZ</option>
+                                    <option value="90">90xxx</option>
+                                    <option value="91">91xxx</option>
+                                    <option value="80">80xxx</option>
+                                    <option value="81">81xxx</option>
+                                </select>
+                                <select id="cboSuchOrt" onchange="filterByOrt(this.value)" style="width: 100px; height: 18px; font-size: 11px;">
+                                    <option value="_ALLE">Ort</option>
+                                    <option value="Nuernberg">Nuernberg</option>
+                                    <option value="Fuerth">Fuerth</option>
+                                    <option value="Erlangen">Erlangen</option>
+                                    <option value="Muenchen">Muenchen</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="list-wrapper" id="listWrapper">
+                            <table class="data-grid" id="kundenTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nr</th>
+                                        <th>Firma</th>
+                                        <th>Kontaktname</th>
+                                        <th>Vorname</th>
+                                        <th>Ort</th>
+                                        <th>Telefon</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="kundenBody">
+                                    <!-- Wird dynamisch gefullt -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-section" id="lblRecordInfo">Datensatz: - / -</span>
+            <span class="status-section" id="lblStatus">Bereit</span>
+            <span class="status-section">Erstellt</span>
+            <span class="status-section" id="erstelltAm">-</span>
+            <span class="status-section" id="erstelltVon">-</span>
+            <span class="status-section">Geandert</span>
+            <span class="status-section" id="geaendertAm">-</span>
+            <span class="status-section" id="geaendertVon">-</span>
+        </div>
+    </div>
+
+    <!-- WebView2 Bridge -->
+    <script src="js/webview2-bridge.js"></script>
+    <!-- Global Button Handlers -->
+    <script src="js/global-handlers.js"></script>
+
+    <script>
+        'use strict';
+
+        // State
+        const state = {
+            kundenList: [],
+            currentIndex: 0,
+            currentRecord: null,
+            selectedObjekt: null,
+            selectedDatei: null,
+            isDirty: false,
+            // Umsatz-Statistik (aus Access Form_Current)
+            KD_Ges: 0,
+            KD_VJ: 0,
+            KD_LJ: 0,
+            KD_LM: 0
+        };
+
+        // ============================================
+        // INITIALISIERUNG
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            document.getElementById('lblDatum').textContent = formatDate(new Date());
+
+            // Tab-Wechsel
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Menu-Navigation
+            document.querySelectorAll('.menu-btn[data-form]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    navigateToForm(this.dataset.form);
+                });
+            });
+
+            // Search
+            document.getElementById('searchInput').addEventListener('input', renderKundenList);
+
+            // Keyboard Navigation
+            document.getElementById('listWrapper').addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    showRecord(Math.min(state.currentIndex + 1, state.kundenList.length - 1));
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    showRecord(Math.max(state.currentIndex - 1, 0));
+                }
+            });
+
+            // Bridge-Events
+            Bridge.on('onDataReceived', function(data) {
+                // Kundenliste empfangen (von Bridge: type='kunden', records=... ODER kundenList=...)
+                if (data.type === 'kunden' && data.records) {
+                    state.kundenList = data.records;
+                    renderKundenList();
+                    document.getElementById('lblRecordInfo').textContent = `Datensatz: ${state.currentIndex + 1} / ${state.kundenList.length}`;
+                    if (state.kundenList.length > 0) {
+                        showRecord(0);
+                    }
+                    hideLoading();
+                } else if (data.kundenList) {
+                    // Alternative Event-Struktur
+                    state.kundenList = data.kundenList;
+                    renderKundenList();
+                    document.getElementById('lblRecordInfo').textContent = `Datensatz: ${state.currentIndex + 1} / ${state.kundenList.length}`;
+                    if (state.kundenList.length > 0) {
+                        showRecord(0);
+                    }
+                    hideLoading();
+                } else if (data.kunde) {
+                    // Einzeldatensatz empfangen
+                    loadKundeData(data.kunde);
+                    hideLoading();
+                }
+                if (data.action === 'load' && data.kd_id) {
+                    loadKundeById(data.kd_id);
+                }
+            });
+
+            // Daten laden
+            await loadKunden();
+
+            // URL-Parameter prüfen
+            const params = new URLSearchParams(window.location.search);
+            const kdId = params.get('kd_id');
+            if (kdId) {
+                await loadKundeById(parseInt(kdId));
+            }
+
+            hideLoading();
+        });
+
+        // ============================================
+        // DATA LOADING via WebView2 Bridge
+        // ============================================
+        async function loadKunden() {
+            showLoading();
+            try {
+                const nurAktive = document.getElementById('chkNurAktive').checked;
+
+                // Bridge.loadData ist Promise-basiert und feuert auch onDataReceived
+                // Die Verarbeitung erfolgt im Event-Handler (oben)
+                await Bridge.loadData('kunden', null, { aktiv: nurAktive });
+
+                // Falls die Daten direkt zurueckkommen (REST-API Fallback verarbeitet im Event-Handler)
+                // Hier nur warten, die eigentliche Verarbeitung geschieht im onDataReceived Handler
+            } catch (e) {
+                console.error('Kunden laden fehlgeschlagen:', e);
+                hideLoading();
+            }
+        }
+
+        async function loadKundeById(kdId) {
+            const index = state.kundenList.findIndex(k => k.kun_Id === kdId);
+            if (index >= 0) {
+                await showRecord(index);
+            } else {
+                Bridge.loadData('kunde', kdId);
+            }
+        }
+
+        // ============================================
+        // RENDERING-FUNKTIONEN
+        // ============================================
+        function renderKundenList() {
+            const tbody = document.getElementById('kundenBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            state.kundenList.forEach((kunde, index) => {
+                const firma = kunde.kun_Firma || '';
+                if (search && !firma.toLowerCase().includes(search)) return;
+
+                const tr = document.createElement('tr');
+                tr.dataset.index = index;
+                if (index === state.currentIndex) {
+                    tr.classList.add('selected');
+                }
+                tr.innerHTML = `
+                    <td>${kunde.kun_Id || ''}</td>
+                    <td>${escapeHtml(kunde.kun_Firma || '')}</td>
+                    <td>${escapeHtml(kunde.adr_name || '')}</td>
+                    <td>${escapeHtml(kunde.adr_vorname || '')}</td>
+                    <td>${escapeHtml(kunde.kun_Ort || '')}</td>
+                    <td>${escapeHtml(kunde.kun_telefon || '')}</td>
+                `;
+                tr.addEventListener('click', () => showRecord(index));
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function showRecord(index) {
+            if (index < 0 || index >= state.kundenList.length) return;
+            state.currentIndex = index;
+            const kdId = state.kundenList[index].kun_Id;
+
+            // Load full record via Bridge
+            Bridge.loadData('kunde', kdId);
+
+            // Vorläufig Listendaten anzeigen
+            state.currentRecord = state.kundenList[index];
+            loadKundeData(state.currentRecord);
+            markSelectedRow(index);
+
+            document.getElementById('lblRecordInfo').textContent = `Datensatz: ${index + 1} / ${state.kundenList.length}`;
+        }
+
+        function loadKundeData(kunde) {
+            document.getElementById('displayFirma').textContent = kunde.kun_Firma || '-';
+            document.getElementById('displayAddress').textContent = kunde.kun_Ort ? ` - ${kunde.kun_PLZ} ${kunde.kun_Ort}` : '';
+            document.getElementById('kdNr').value = kunde.kun_Id || '';
+
+            // Alle Felder mit data-field befuellen
+            document.querySelectorAll('[data-field]').forEach(el => {
+                const field = el.dataset.field;
+                let value = kunde[field];
+
+                if (value === undefined || value === null) {
+                    value = '';
+                }
+
+                if (el.type === 'checkbox') {
+                    el.checked = !!value;
+                } else {
+                    el.value = value;
+                }
+            });
+
+            // Audit-Felder
+            if (kunde.Erst_am) {
+                document.getElementById('erstelltAm').textContent = formatDateTime(kunde.Erst_am);
+            }
+            document.getElementById('erstelltVon').textContent = kunde.Erst_von || '-';
+            if (kunde.Aend_am) {
+                document.getElementById('geaendertAm').textContent = formatDateTime(kunde.Aend_am);
+            }
+            document.getElementById('geaendertVon').textContent = kunde.Aend_von || '-';
+
+            Bridge.setFormValue('kd_id', kunde.kun_Id);
+        }
+
+        function markSelectedRow(index) {
+            document.querySelectorAll('#kundenBody tr').forEach((tr) => {
+                tr.classList.toggle('selected', parseInt(tr.dataset.index) === index);
+            });
+            document.querySelector(`#kundenBody tr[data-index="${index}"]`)?.scrollIntoView({ block: 'nearest' });
+        }
+
+        // ============================================
+        // AKTIONS-FUNKTIONEN
+        // ============================================
+        async function neuerKunde() {
+            showLoading();
+            Bridge.sendEvent('save', {
+                type: 'kunde',
+                action: 'create',
+                data: {
+                    kun_Firma: 'Neuer Kunde',
+                    kun_IstAktiv: true
+                }
+            });
+        }
+
+        async function kundeLoeschen() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Kein Kunde ausgewahlt', 'warning');
+                return;
+            }
+            if (!confirm('Kunde wirklich loschen?')) return;
+
+            showLoading();
+            Bridge.sendEvent('delete', {
+                type: 'kunde',
+                id: state.currentRecord.kun_Id
+            });
+        }
+
+        async function speichern() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Kein Kunde ausgewahlt', 'warning');
+                return;
+            }
+
+            const data = {};
+            document.querySelectorAll('[data-field]').forEach(el => {
+                const field = el.dataset.field;
+                if (el.type === 'checkbox') {
+                    data[field] = el.checked;
+                } else {
+                    data[field] = el.value;
+                }
+            });
+
+            showLoading();
+            Bridge.sendEvent('save', {
+                type: 'kunde',
+                id: state.currentRecord.kun_Id,
+                data: data
+            });
+        }
+
+        async function refreshData() {
+            await loadKunden();
+            showToast('Daten aktualisiert', 'success');
+        }
+
+        async function loadAufträge() {
+            if (!state.currentRecord?.kun_Id) return;
+
+            const von = document.getElementById('datAufträgeVon').value;
+            const bis = document.getElementById('datAufträgeBis').value;
+
+            Bridge.loadData('auftraege', null, {
+                kunde_id: state.currentRecord.kun_Id,
+                von: von,
+                bis: bis
+            });
+        }
+
+        Bridge.on('onAufträgeReceived', function(data) {
+            const auftraege = data.auftraege || [];
+            const tbody = document.getElementById('auftraegeBody');
+            tbody.innerHTML = '';
+
+            auftraege.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${a.ID || ''}</td>
+                    <td>${escapeHtml(a.Auftrag || '')}</td>
+                    <td>${formatDateShort(a.Dat_VA_Von)}</td>
+                    <td>${escapeHtml(a.Objekt || '')}</td>
+                    <td>${a.Veranst_Status_ID || ''}</td>
+                    <td style="text-align: right;">${formatCurrency(a.Betrag)}</td>
+                `;
+                tr.addEventListener('click', () => {
+                    Bridge.navigate('frm_va_Auftragstamm', a.ID);
+                });
+                tbody.appendChild(tr);
+            });
+        });
+
+        function openVerrechnungssaetze() {
+            if (state.currentRecord?.kun_Id) {
+                Bridge.navigate('frm_KD_Verrechnungssaetze', state.currentRecord.kun_Id);
+            }
+        }
+
+        function openUmsatzauswertung() {
+            if (state.currentRecord?.kun_Id) {
+                Bridge.navigate('frm_KD_Umsatzauswertung', state.currentRecord.kun_Id);
+            }
+        }
+
+        // ============================================
+        // OBJEKTE-TAB FUNKTIONEN (sub_KD_Objekte)
+        // ============================================
+        async function loadObjekte() {
+            if (!state.currentRecord?.kun_Id) return;
+            Bridge.loadData('objekte', null, { kunde_id: state.currentRecord.kun_Id });
+        }
+
+        Bridge.on('onObjekteReceived', function(data) {
+            const objekte = data.objekte || [];
+            const tbody = document.getElementById('objekteBody');
+            tbody.innerHTML = '';
+
+            objekte.forEach(obj => {
+                const tr = document.createElement('tr');
+                tr.dataset.id = obj.ob_id;
+                tr.innerHTML = `
+                    <td>${obj.ob_id || ''}</td>
+                    <td>${escapeHtml(obj.ob_Objektname || '')}</td>
+                    <td>${escapeHtml(obj.ob_Ort || '')}</td>
+                    <td>${obj.ob_IstAktiv ? 'Ja' : 'Nein'}</td>
+                    <td>${obj.anzahl_auftraege || 0}</td>
+                `;
+                tr.addEventListener('click', () => {
+                    document.querySelectorAll('#objekteBody tr').forEach(r => r.classList.remove('selected'));
+                    tr.classList.add('selected');
+                    state.selectedObjekt = obj;
+                });
+                tr.addEventListener('dblclick', () => {
+                    openObjekt();
+                });
+                tbody.appendChild(tr);
+            });
+
+            // Anzahl aktualisieren
+            const countEl = document.getElementById('objekteCount');
+            if (countEl) countEl.textContent = `(${objekte.length})`;
+        });
+
+        function neuesObjekt() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Bitte zuerst Kunde auswählen', 'error');
+                return;
+            }
+            // Neues Objekt mit vorausgefüllter Kunden-ID öffnen
+            Bridge.navigate('frm_OB_Objekt', { kunde_id: state.currentRecord.kun_Id, mode: 'new' });
+        }
+
+        function openObjekt() {
+            if (state.selectedObjekt?.ob_id) {
+                Bridge.navigate('frm_OB_Objekt', state.selectedObjekt.ob_id);
+            } else {
+                showToast('Bitte zuerst Objekt auswählen', 'info');
+            }
+        }
+
+        // ============================================
+        // ANSPRECHPARTNER-TAB FUNKTIONEN
+        // ============================================
+        let selectedAnsprechpartnerId = null;
+        let ansprechpartnerList = [];
+
+        async function loadAnsprechpartner() {
+            const kunId = state.currentRecord?.kun_Id;
+            if (!kunId) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/kunden/${kunId}/ansprechpartner`);
+                const result = await response.json();
+                ansprechpartnerList = result.data || result || [];
+                renderAnsprechpartner(ansprechpartnerList);
+            } catch (error) {
+                console.error('Fehler beim Laden der Ansprechpartner:', error);
+                // Bridge-Fallback
+                Bridge.loadData('ansprechpartner', kunId);
+            }
+        }
+
+        function renderAnsprechpartner(records) {
+            const tbody = document.getElementById('ansprechpartnerTbody');
+            tbody.innerHTML = '';
+            if (!records || records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#666;">Keine Ansprechpartner vorhanden</td></tr>';
+                clearAnsprechpartnerForm();
+                return;
+            }
+            records.forEach(ap => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${ap.adr_Nachname || ''}</td>
+                    <td>${ap.adr_Vorname || ''}</td>
+                    <td>${ap.adr_Name1 || ''}</td>
+                    <td>${ap.adr_Tel || ''}</td>
+                    <td>${ap.adr_Handy || ''}</td>
+                    <td>${ap.adr_eMail || ''}</td>
+                `;
+                tr.onclick = () => selectAnsprechpartner(ap, tr);
+                if (ap.adr_ID === selectedAnsprechpartnerId) tr.classList.add('selected');
+                tbody.appendChild(tr);
+            });
+        }
+
+        function selectAnsprechpartner(ap, tr) {
+            selectedAnsprechpartnerId = ap.adr_ID;
+            document.querySelectorAll('#ansprechpartnerTbody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+
+            // Detail-Formular fuellen
+            const fields = ['adr_Nachname', 'adr_Vorname', 'adr_AnredeID', 'adr_akad_Grad',
+                           'adr_Tel', 'adr_Handy', 'adr_eMail', 'adr_Fax', 'adr_Geburtstag', 'adr_Bemerkung'];
+            fields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) {
+                    if (field === 'adr_Geburtstag' && ap[field]) {
+                        el.value = ap[field].split('T')[0];
+                    } else {
+                        el.value = ap[field] || '';
+                    }
+                }
+            });
+        }
+
+        function clearAnsprechpartnerForm() {
+            selectedAnsprechpartnerId = null;
+            const fields = ['adr_Nachname', 'adr_Vorname', 'adr_AnredeID', 'adr_akad_Grad',
+                           'adr_Tel', 'adr_Handy', 'adr_eMail', 'adr_Fax', 'adr_Geburtstag', 'adr_Bemerkung'];
+            fields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) el.value = '';
+            });
+        }
+
+        function neuerAnsprechpartner() {
+            clearAnsprechpartnerForm();
+            document.querySelectorAll('#ansprechpartnerTbody tr').forEach(r => r.classList.remove('selected'));
+            document.getElementById('adr_Nachname').focus();
+        }
+
+        async function speichereAnsprechpartner() {
+            const kunId = state.currentRecord?.kun_Id;
+            if (!kunId) {
+                showToast('Erst Kunde auswählen', 'error');
+                return;
+            }
+
+            const data = {
+                kun_Id: kunId,
+                adr_Nachname: document.getElementById('adr_Nachname')?.value || '',
+                adr_Vorname: document.getElementById('adr_Vorname')?.value || '',
+                adr_AnredeID: parseInt(document.getElementById('adr_AnredeID')?.value) || null,
+                adr_akad_Grad: document.getElementById('adr_akad_Grad')?.value || '',
+                adr_Tel: document.getElementById('adr_Tel')?.value || '',
+                adr_Handy: document.getElementById('adr_Handy')?.value || '',
+                adr_eMail: document.getElementById('adr_eMail')?.value || '',
+                adr_Fax: document.getElementById('adr_Fax')?.value || '',
+                adr_Geburtstag: document.getElementById('adr_Geburtstag')?.value || null,
+                adr_Bemerkung: document.getElementById('adr_Bemerkung')?.value || ''
+            };
+
+            try {
+                let url, method;
+                if (selectedAnsprechpartnerId) {
+                    url = `http://localhost:5000/api/kunden/${kunId}/ansprechpartner/${selectedAnsprechpartnerId}`;
+                    method = 'PUT';
+                } else {
+                    url = `http://localhost:5000/api/kunden/${kunId}/ansprechpartner`;
+                    method = 'POST';
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showToast('Ansprechpartner gespeichert', 'success');
+                    loadAnsprechpartner();
+                } else {
+                    throw new Error('Speichern fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('Fehler:', error);
+                // Bridge-Fallback
+                Bridge.sendEvent('saveAnsprechpartner', { id: selectedAnsprechpartnerId, ...data });
+                setTimeout(loadAnsprechpartner, 500);
+            }
+        }
+
+        function loescheAnsprechpartner() {
+            if (!selectedAnsprechpartnerId) {
+                showToast('Bitte erst Ansprechpartner auswählen', 'info');
+                return;
+            }
+            if (!confirm('Ansprechpartner wirklich löschen?')) return;
+
+            const kunId = state.currentRecord?.kun_Id;
+            fetch(`http://localhost:5000/api/kunden/${kunId}/ansprechpartner/${selectedAnsprechpartnerId}`, {
+                method: 'DELETE'
+            }).then(() => {
+                showToast('Ansprechpartner gelöscht', 'success');
+                clearAnsprechpartnerForm();
+                loadAnsprechpartner();
+            }).catch(() => {
+                Bridge.sendEvent('deleteAnsprechpartner', { id: selectedAnsprechpartnerId });
+                setTimeout(() => {
+                    clearAnsprechpartnerForm();
+                    loadAnsprechpartner();
+                }, 500);
+            });
+        }
+
+        // ============================================
+        // ZUSATZDATEIEN-TAB FUNKTIONEN
+        // ============================================
+        async function dateiHinzufuegen() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Erst Kunde auswählen', 'error');
+                return;
+            }
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '*/*';
+            input.style.display = 'none';
+
+            input.onchange = async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                try {
+                    showLoading();
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('kd_id', state.currentRecord.kun_Id);
+                    formData.append('tabellen_nr', 40); // TabellenNr für Kunde
+
+                    const response = await fetch('http://localhost:5000/api/attachments/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        showToast('Datei hinzugefuegt', 'success');
+                        loadZusatzdateien();
+                    } else {
+                        throw new Error('Upload fehlgeschlagen');
+                    }
+                } catch (err) {
+                    showToast('Fehler beim Hochladen', 'error');
+                    console.error('[Kundenstamm] Upload-Fehler:', err);
+                } finally {
+                    hideLoading();
+                    input.remove();
+                }
+            };
+
+            document.body.appendChild(input);
+            input.click();
+        }
+
+        async function loadZusatzdateien() {
+            if (!state.currentRecord?.kun_Id) return;
+
+            try {
+                const result = await apiCall(`/attachments?kd_id=${state.currentRecord.kun_Id}&tabellen_nr=40`);
+                const dateien = result.data || [];
+
+                const tbody = document.getElementById('zusatzdateienBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+                dateien.forEach(dat => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.id = dat.ZusatzNr;
+                    tr.innerHTML = `
+                        <td>${dat.Dateiname || ''}</td>
+                        <td>${formatDateShort(dat.DFiledate)}</td>
+                        <td style="text-align:right">${formatFileSize(dat.DLaenge)}</td>
+                    `;
+                    tr.addEventListener('click', () => {
+                        tbody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+                        tr.classList.add('selected');
+                        state.selectedDatei = dat;
+                    });
+                    tr.addEventListener('dblclick', () => {
+                        window.open(`http://localhost:5000/api/attachments/${dat.ZusatzNr}/download`, '_blank');
+                    });
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.error('[Kundenstamm] Zusatzdateien laden fehlgeschlagen:', e);
+            }
+        }
+
+        async function dateiLöschen() {
+            if (!state.selectedDatei) {
+                showToast('Bitte Datei auswählen', 'error');
+                return;
+            }
+
+            if (!confirm(`Datei "${state.selectedDatei.Dateiname}" wirklich löschen?`)) return;
+
+            try {
+                showLoading();
+                const response = await fetch(`http://localhost:5000/api/attachments/${state.selectedDatei.ZusatzNr}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showToast('Datei gelöscht', 'success');
+                    state.selectedDatei = null;
+                    loadZusatzdateien();
+                } else {
+                    throw new Error('Löschen fehlgeschlagen');
+                }
+            } catch (err) {
+                showToast('Fehler beim Löschen', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return '';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+            return (bytes/1024/1024).toFixed(1) + ' MB';
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-page').forEach(page => {
+                page.classList.toggle('active', page.id === 'tab-' + tabName);
+            });
+
+            // Daten laden wenn Tab gewechselt wird
+            if (state.currentRecord) {
+                if (tabName === 'auftraguebersicht') {
+                    loadAufträge();
+                } else if (tabName === 'objekte') {
+                    loadObjekte();
+                } else if (tabName === 'zusatzdateien') {
+                    loadZusatzdateien();
+                } else if (tabName === 'ansprechpartner') {
+                    loadAnsprechpartner();
+                } else if (tabName === 'preise') {
+                    loadKundenpreise();
+                    loadPreisarten();
+                }
+            }
+        }
+
+        function navigateToForm(formName, recordId) {
+            // WebView2 Modus
+            if (window.chrome && window.chrome.webview && typeof Bridge !== 'undefined') {
+                Bridge.navigate(formName, recordId);
+                return;
+            }
+            // Verwende shell-detector.js Funktion wenn verfuegbar
+            if (typeof window._shellNavigateToForm === 'function') {
+                window._shellNavigateToForm(formName, recordId);
+            } else if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'NAVIGATE', formName: formName, id: recordId }, '*');
+            } else {
+                var url = formName + '.html';
+                if (recordId) url += '?id=' + recordId;
+                window.location.href = url;
+            }
+        }
+
+        function closeForm() {
+            Bridge.close();
+            if (!window.chrome || !window.chrome.webview) {
+                window.close();
+            }
+        }
+
+        // ============================================
+        // HELPER-FUNKTIONEN
+        // ============================================
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            return d.toLocaleDateString('de-DE');
+        }
+
+        function formatDateShort(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleString('de-DE');
+        }
+
+        function formatCurrency(value) {
+            if (!value) return '';
+            const num = parseFloat(value);
+            return num.toFixed(2).replace('.', ',') + ' EUR';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Vollbild-Toggle Funktion (Browser Fullscreen API)
+        function toggleFullscreen() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.title = 'Vollbild beenden';
+                }).catch(err => console.error('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen().then(() => {
+                    btn.title = 'Vollbild';
+                }).catch(err => console.error('Exit fullscreen error:', err));
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+
+        console.log('[Kundenstammblatt] Script geladen');
+
+        // ============================================
+        // FEHLENDE ACCESS VBA EVENT-HANDLER
+        // Implementiert basierend auf frm_KD_Kundenstamm.txt
+        // ============================================
+
+        // --- Form_Current equivalent: Umsatz-Statistiken laden ---
+        async function loadKundenStatistik() {
+            if (!state.currentRecord?.kun_Id) return;
+
+            try {
+                Bridge.loadData('kundenStatistik', state.currentRecord.kun_Id);
+            } catch (e) {
+                console.warn('[Kundenstamm] Statistik-Laden fehlgeschlagen:', e);
+            }
+        }
+
+        Bridge.on('onKundenStatistikReceived', function(data) {
+            // KD_Ges = Gesamt-Umsatz
+            state.KD_Ges = data.KD_Ges || 0;
+            // KD_VJ = Vorjahr
+            state.KD_VJ = data.KD_VJ || 0;
+            // KD_LJ = Laufendes Jahr
+            state.KD_LJ = data.KD_LJ || 0;
+            // KD_LM = Laufender Monat
+            state.KD_LM = data.KD_LM || 0;
+
+            // UI aktualisieren wenn Elemente vorhanden
+            updateStatistikDisplay();
+        });
+
+        function updateStatistikDisplay() {
+            const kdGesEl = document.getElementById('KD_Ges');
+            const kdVJEl = document.getElementById('KD_VJ');
+            const kdLJEl = document.getElementById('KD_LJ');
+            const kdLMEl = document.getElementById('KD_LM');
+
+            if (kdGesEl) kdGesEl.textContent = formatCurrency(state.KD_Ges);
+            if (kdVJEl) kdVJEl.textContent = formatCurrency(state.KD_VJ);
+            if (kdLJEl) kdLJEl.textContent = formatCurrency(state.KD_LJ);
+            if (kdLMEl) kdLMEl.textContent = formatCurrency(state.KD_LM);
+        }
+
+        // --- kun_IstAktiv_AfterUpdate: Automatisches Speichern bei Aktiv-Änderung ---
+        function onKunIstAktivChange() {
+            if (!state.currentRecord?.kun_Id) return;
+
+            // Automatisch speichern wie in VBA: DoCmd.RunCommand acCmdSaveRecord
+            speichern();
+        }
+
+        // --- IstAlle_AfterUpdate: Alle/Nur Aktive Toggle ---
+        function toggleAlleAnzeigen() {
+            const checkbox = document.getElementById('chkNurAktive');
+            const isAlle = !checkbox.checked;
+
+            // Label aktualisieren (wie in VBA)
+            const label = document.querySelector('label[for="chkNurAktive"]');
+            if (label) {
+                label.textContent = isAlle ? 'Alle anzeigen' : 'Nur Aktive';
+            }
+
+            loadKunden();
+        }
+
+        // --- btnAlle_Click: Auswahlfilter zurücksetzen ---
+        function resetAuswahlfilter() {
+            // Alle Filter zurücksetzen (wie in VBA: btnAlle_Click)
+            const cboSuchOrt = document.getElementById('cboSuchOrt');
+            const cboSuchPLZ = document.getElementById('cboSuchPLZ');
+            const searchInput = document.getElementById('searchInput');
+
+            if (cboSuchOrt) cboSuchOrt.value = '_ALLE';
+            if (cboSuchPLZ) cboSuchPLZ.value = '_ALLE';
+            if (searchInput) searchInput.value = '';
+
+            loadKunden();
+            showToast('Filter zurückgesetzt', 'info');
+        }
+
+        // --- cboSuchOrt_AfterUpdate: Filter nach Ort ---
+        function filterByOrt(ort) {
+            if (!ort || ort === '_ALLE') {
+                loadKunden();
+                return;
+            }
+
+            // Lokale Filterung
+            const filtered = state.kundenList.filter(k =>
+                (k.kun_Ort || '').toLowerCase() === ort.toLowerCase()
+            );
+
+            if (filtered.length > 0) {
+                renderFilteredList(filtered);
+                showToast(`${filtered.length} Kunden in ${ort}`, 'info');
+            } else {
+                showToast('Keine Kunden in ' + ort, 'warning');
+            }
+        }
+
+        // --- cboSuchPLZ_AfterUpdate: Filter nach PLZ ---
+        function filterByPLZ(plz) {
+            if (!plz || plz === '_ALLE') {
+                loadKunden();
+                return;
+            }
+
+            const filtered = state.kundenList.filter(k =>
+                (k.kun_PLZ || '').startsWith(plz)
+            );
+
+            if (filtered.length > 0) {
+                renderFilteredList(filtered);
+                showToast(`${filtered.length} Kunden mit PLZ ${plz}`, 'info');
+            } else {
+                showToast('Keine Kunden mit PLZ ' + plz, 'warning');
+            }
+        }
+
+        function renderFilteredList(filteredList) {
+            const tbody = document.getElementById('kundenBody');
+            tbody.innerHTML = '';
+
+            filteredList.forEach((kunde, index) => {
+                const tr = document.createElement('tr');
+                tr.dataset.index = index;
+                tr.innerHTML = `
+                    <td>${kunde.kun_Id || ''}</td>
+                    <td>${escapeHtml(kunde.kun_Firma || '')}</td>
+                    <td>${escapeHtml(kunde.kun_Ort || '')}</td>
+                    <td>${escapeHtml(kunde.kun_telefon || '')}</td>
+                `;
+                tr.addEventListener('click', () => {
+                    state.currentIndex = state.kundenList.findIndex(k => k.kun_Id === kunde.kun_Id);
+                    showRecord(state.currentIndex);
+                });
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('lblRecordInfo').textContent =
+                `Gefiltert: ${filteredList.length} von ${state.kundenList.length}`;
+        }
+
+        // --- btnAuftrag_Click: Neue Auftragserfassung öffnen ---
+        function openNeuerAuftrag() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Bitte zuerst Kunde auswählen', 'warning');
+                return;
+            }
+
+            // OpenArgs wie in VBA: "Kde" & kun_ID
+            Bridge.navigate('frmHlp_AuftragsErfassung', {
+                openArgs: 'Kde' + state.currentRecord.kun_Id,
+                kunde_id: state.currentRecord.kun_Id
+            });
+        }
+
+        // --- btnOutlook_Click: Outlook öffnen ---
+        function openOutlook() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Bitte zuerst Kunde auswählen', 'warning');
+                return;
+            }
+
+            Bridge.navigate('frmOff_Outlook_aufrufen', {
+                openArgs: 'frm_KD_Kundenstamm',
+                email: state.currentRecord.kun_email || ''
+            });
+        }
+
+        // --- btnWord_Click: Word öffnen ---
+        function openWord() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Bitte zuerst Kunde auswählen', 'warning');
+                return;
+            }
+
+            Bridge.navigate('frmOff_WinWord_aufrufen', {
+                openArgs: 'frm_KD_Kundenstamm'
+            });
+        }
+
+        // --- btnPersonUebernehmen_Click: Ansprechpartner uebernehmen ---
+        function personUebernehmen() {
+            const cboPerson = document.getElementById('cboPerson');
+            if (!cboPerson || !cboPerson.value) {
+                showToast('Bitte Person auswählen', 'warning');
+                return;
+            }
+
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Kein Kunde ausgewaehlt', 'warning');
+                return;
+            }
+
+            Bridge.sendEvent('personUebernehmen', {
+                kunde_id: state.currentRecord.kun_Id,
+                person_id: cboPerson.value,
+                tabellen_nr: 40 // TabellenNr für Kunde
+            });
+
+            showToast('Person wird zugeordnet...', 'info');
+        }
+
+        Bridge.on('onPersonUebernommen', function() {
+            showToast('Person zugeordnet', 'success');
+            loadAnsprechpartner();
+        });
+
+        // --- kun_AdressArt_DblClick: Adressart-Dialog öffnen ---
+        function openAdressartDialog() {
+            Bridge.navigate('frmTop_KD_Adressart');
+        }
+
+        // --- IstAuftragsArt_AfterUpdate: Auftragsfilter ändern ---
+        function filterAuftragsart(art) {
+            if (!state.currentRecord?.kun_Id) return;
+
+            // Art: 1=Alle, 2=Miete, 3=Verkauf, 4=Reparatur, 5=Datum
+            Bridge.loadData('auftraege', null, {
+                kunde_id: state.currentRecord.kun_Id,
+                auftragsart: art
+            });
+        }
+
+        // --- btnDate_Click: Datumsfilter aktivieren ---
+        function activateDatumsfilter() {
+            const datVon = document.getElementById('datAufträgeVon');
+            const datBis = document.getElementById('datAufträgeBis');
+
+            if (datVon) datVon.focus();
+
+            // Setze Auftragsart auf "Datum" (5)
+            filterAuftragsart(5);
+        }
+
+        // --- fReadDoc: PDF-Dokumente öffnen (Rechnung, Berechnungsliste, Einsatzliste) ---
+        function openRechnungPDF() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Kein Kunde ausgewaehlt', 'warning');
+                return;
+            }
+            Bridge.sendEvent('openDocument', { type: 'rechnung', kunde_id: state.currentRecord.kun_Id });
+        }
+
+        function openBerechnungslistePDF() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Kein Kunde ausgewaehlt', 'warning');
+                return;
+            }
+            Bridge.sendEvent('openDocument', { type: 'berechnungsliste', kunde_id: state.currentRecord.kun_Id });
+        }
+
+        function openEinsatzlistePDF() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Kein Kunde ausgewaehlt', 'warning');
+                return;
+            }
+            Bridge.sendEvent('openDocument', { type: 'einsatzliste', kunde_id: state.currentRecord.kun_Id });
+        }
+
+        // --- Form_BeforeUpdate: Änderungsdatum setzen ---
+        function setÄnderungsdaten() {
+            // Wird automatisch beim Speichern aufgerufen
+            const now = new Date();
+            document.getElementById('geaendertAm').textContent = formatDateTime(now);
+
+            // Benutzer wird vom Backend gesetzt
+        }
+
+        // --- Navigation Buttons (Befehl39-43) ---
+        function gotoFirstRecord() {
+            if (state.kundenList.length > 0) {
+                showRecord(0);
+            }
+        }
+
+        function gotoPrevRecord() {
+            if (state.currentIndex > 0) {
+                showRecord(state.currentIndex - 1);
+            }
+        }
+
+        function gotoNextRecord() {
+            if (state.currentIndex < state.kundenList.length - 1) {
+                showRecord(state.currentIndex + 1);
+            }
+        }
+
+        function gotoLastRecord() {
+            if (state.kundenList.length > 0) {
+                showRecord(state.kundenList.length - 1);
+            }
+        }
+
+        // --- Ansprechpartner laden (sub_Ansprechpartner) ---
+        async function loadAnsprechpartner() {
+            if (!state.currentRecord?.kun_Id) return;
+
+            Bridge.loadData('ansprechpartner', null, {
+                kunde_id: state.currentRecord.kun_Id
+            });
+        }
+
+        Bridge.on('onAnsprechpartnerReceived', function(data) {
+            const partner = data.ansprechpartner || [];
+            // Hier koennte eine Ansprechpartner-Tabelle befuellt werden
+            console.log('[Kundenstamm] Ansprechpartner geladen:', partner.length);
+        });
+
+        // --- Standardleistungen anlegen (wie in VBA) ---
+        function standardleistungenAnlegen() {
+            if (!state.currentRecord?.kun_Id) return;
+
+            Bridge.sendEvent('standardleistungenAnlegen', {
+                kunde_id: state.currentRecord.kun_Id
+            });
+        }
+
+        // ============================================
+        // KUNDENPREISE-TAB FUNKTIONEN (pgPreise / sub_KD_Standardpreise)
+        // ============================================
+        let selectedPreisId = null;
+        let kundenpreiseList = [];
+        let preisartenList = [];
+
+        // Kundenpreise laden
+        async function loadKundenpreise() {
+            const kunId = state.currentRecord?.kun_Id;
+            if (!kunId) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/kunden/${kunId}/preise`);
+                const result = await response.json();
+                kundenpreiseList = result.data || result || [];
+                renderKundenpreise(kundenpreiseList);
+            } catch (error) {
+                console.error('Fehler beim Laden der Kundenpreise:', error);
+                // Bridge-Fallback
+                Bridge.loadData('kundenpreise', kunId);
+            }
+        }
+
+        // Preisarten fuer Dropdown laden (aus tbl_KD_Artikelbeschreibung)
+        async function loadPreisarten() {
+            try {
+                const response = await fetch('http://localhost:5000/api/preisarten');
+                const result = await response.json();
+                preisartenList = result.data || result || [];
+                renderPreisartenDropdown();
+            } catch (error) {
+                console.error('Fehler beim Laden der Preisarten:', error);
+                // Bridge-Fallback
+                Bridge.loadData('preisarten');
+            }
+        }
+
+        function renderPreisartenDropdown() {
+            const select = document.getElementById('preis_Preisart_ID');
+            if (!select) return;
+
+            // Bestehende Optionen (ausser erste) entfernen
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+
+            preisartenList.forEach(art => {
+                const option = document.createElement('option');
+                option.value = art.ID;
+                option.textContent = art.Beschreibung || art.Bezeichnung || `Art ${art.ID}`;
+                select.appendChild(option);
+            });
+        }
+
+        Bridge.on('onPreisartenReceived', function(data) {
+            preisartenList = data.preisarten || [];
+            renderPreisartenDropdown();
+        });
+
+        function renderKundenpreise(records) {
+            const tbody = document.getElementById('kundenpreiseBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+            if (!records || records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#666;">Keine Kundenpreise vorhanden. Klicken Sie auf "Standardpreise anlegen" um Preise zu erstellen.</td></tr>';
+                clearPreisForm();
+                return;
+            }
+
+            records.forEach((preis, index) => {
+                const tr = document.createElement('tr');
+                tr.dataset.id = preis.ID;
+                tr.innerHTML = `
+                    <td style="text-align: center;">${index + 1}</td>
+                    <td>${escapeHtml(preis.Bezeichnung || getPreisartBezeichnung(preis.Preisart_ID) || '')}</td>
+                    <td style="text-align: right;">${formatEuro(preis.StdPreis)}</td>
+                    <td style="text-align: right;">${formatEuro(preis.TagPreis)}</td>
+                    <td style="text-align: right;">${preis.Nachtzuschlag ? preis.Nachtzuschlag + ' %' : '-'}</td>
+                    <td>${escapeHtml(preis.Bemerkung || '')}</td>
+                    <td>${formatDateShort(preis.GeaendertAm)}</td>
+                `;
+                tr.onclick = () => selectPreis(preis, tr);
+                tr.ondblclick = () => editPreisInline(preis, tr);
+                if (preis.ID === selectedPreisId) tr.classList.add('selected');
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getPreisartBezeichnung(preisartId) {
+            if (!preisartId) return '';
+            const art = preisartenList.find(a => a.ID === preisartId);
+            return art ? (art.Beschreibung || art.Bezeichnung) : '';
+        }
+
+        function formatEuro(value) {
+            if (value === null || value === undefined || value === '') return '-';
+            const num = parseFloat(value);
+            if (isNaN(num)) return '-';
+            return num.toFixed(2).replace('.', ',') + ' EUR';
+        }
+
+        Bridge.on('onKundenpreiseReceived', function(data) {
+            kundenpreiseList = data.kundenpreise || data.preise || [];
+            renderKundenpreise(kundenpreiseList);
+        });
+
+        function selectPreis(preis, tr) {
+            selectedPreisId = preis.ID;
+            document.querySelectorAll('#kundenpreiseBody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+
+            // Detail-Formular befuellen
+            const preisartSelect = document.getElementById('preis_Preisart_ID');
+            if (preisartSelect) preisartSelect.value = preis.Preisart_ID || '';
+
+            document.getElementById('preis_Bemerkung').value = preis.Bemerkung || '';
+            document.getElementById('preis_StdPreis').value = preis.StdPreis || '';
+            document.getElementById('preis_TagPreis').value = preis.TagPreis || '';
+            document.getElementById('preis_Nachtzuschlag').value = preis.Nachtzuschlag || '';
+        }
+
+        function clearPreisForm() {
+            selectedPreisId = null;
+            document.getElementById('preis_Preisart_ID').value = '';
+            document.getElementById('preis_Bemerkung').value = '';
+            document.getElementById('preis_StdPreis').value = '';
+            document.getElementById('preis_TagPreis').value = '';
+            document.getElementById('preis_Nachtzuschlag').value = '';
+        }
+
+        function neuerPreis() {
+            clearPreisForm();
+            document.querySelectorAll('#kundenpreiseBody tr').forEach(r => r.classList.remove('selected'));
+            document.getElementById('preis_Preisart_ID').focus();
+        }
+
+        async function speicherePreis() {
+            const kunId = state.currentRecord?.kun_Id;
+            if (!kunId) {
+                showToast('Erst Kunde auswaehlen', 'error');
+                return;
+            }
+
+            const preisartId = document.getElementById('preis_Preisart_ID')?.value;
+            if (!preisartId) {
+                showToast('Bitte Preisart auswaehlen', 'warning');
+                return;
+            }
+
+            const data = {
+                kun_ID: kunId,
+                Preisart_ID: parseInt(preisartId),
+                Bemerkung: document.getElementById('preis_Bemerkung')?.value || '',
+                StdPreis: parseFloat(document.getElementById('preis_StdPreis')?.value) || null,
+                TagPreis: parseFloat(document.getElementById('preis_TagPreis')?.value) || null,
+                Nachtzuschlag: parseFloat(document.getElementById('preis_Nachtzuschlag')?.value) || null,
+                GeaendertAm: new Date().toISOString(),
+                Aenderer: 'HTML-Form'
+            };
+
+            try {
+                let url, method;
+                if (selectedPreisId) {
+                    url = `http://localhost:5000/api/kunden/${kunId}/preise/${selectedPreisId}`;
+                    method = 'PUT';
+                } else {
+                    url = `http://localhost:5000/api/kunden/${kunId}/preise`;
+                    method = 'POST';
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showToast('Preis gespeichert', 'success');
+                    loadKundenpreise();
+                } else {
+                    throw new Error('Speichern fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('Fehler:', error);
+                // Bridge-Fallback
+                Bridge.sendEvent('saveKundenpreis', { id: selectedPreisId, ...data });
+                showToast('Preis wird gespeichert...', 'info');
+                setTimeout(loadKundenpreise, 500);
+            }
+        }
+
+        async function preisLoeschen() {
+            if (!selectedPreisId) {
+                showToast('Bitte erst Preis auswaehlen', 'info');
+                return;
+            }
+            if (!confirm('Preis wirklich loeschen?')) return;
+
+            const kunId = state.currentRecord?.kun_Id;
+            try {
+                const response = await fetch(`http://localhost:5000/api/kunden/${kunId}/preise/${selectedPreisId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showToast('Preis geloescht', 'success');
+                    clearPreisForm();
+                    loadKundenpreise();
+                } else {
+                    throw new Error('Loeschen fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('Fehler:', error);
+                Bridge.sendEvent('deleteKundenpreis', { id: selectedPreisId });
+                setTimeout(() => {
+                    clearPreisForm();
+                    loadKundenpreise();
+                }, 500);
+            }
+        }
+
+        // Standardpreise aus tbl_KD_Artikelbeschreibung fuer diesen Kunden anlegen
+        async function standardpreiseAnlegen() {
+            const kunId = state.currentRecord?.kun_Id;
+            if (!kunId) {
+                showToast('Erst Kunde auswaehlen', 'error');
+                return;
+            }
+
+            if (!confirm('Standardpreise fuer diesen Kunden anlegen? Bestehende Preise bleiben erhalten.')) return;
+
+            showLoading();
+            try {
+                const response = await fetch(`http://localhost:5000/api/kunden/${kunId}/preise/standard`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast(`${result.count || 'Standardpreise'} Preise angelegt`, 'success');
+                    loadKundenpreise();
+                } else {
+                    throw new Error('Standardpreise anlegen fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('Fehler:', error);
+                // Bridge-Fallback
+                Bridge.sendEvent('standardpreiseAnlegen', { kunde_id: kunId });
+                showToast('Standardpreise werden angelegt...', 'info');
+                setTimeout(loadKundenpreise, 1000);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        Bridge.on('onStandardpreiseAngelegt', function(data) {
+            showToast('Standardpreise angelegt', 'success');
+            loadKundenpreise();
+        });
+
+        // Inline-Editing fuer Preise (Doppelklick)
+        function editPreisInline(preis, tr) {
+            // Preis auswaehlen und Focus auf StdPreis setzen
+            selectPreis(preis, tr);
+            document.getElementById('preis_StdPreis').focus();
+            document.getElementById('preis_StdPreis').select();
+        }
+
+        // --- Dirty-State tracken ---
+        function setupDirtyTracking() {
+            document.querySelectorAll('[data-field]').forEach(el => {
+                el.addEventListener('change', () => {
+                    state.isDirty = true;
+                });
+                if (el.type !== 'checkbox') {
+                    el.addEventListener('input', () => {
+                        state.isDirty = true;
+                    });
+                }
+            });
+        }
+
+        // --- Keyboard Shortcuts (wie in Access) ---
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey) {
+                    switch(e.key.toLowerCase()) {
+                        case 's':
+                            e.preventDefault();
+                            speichern();
+                            break;
+                        case 'n':
+                            e.preventDefault();
+                            neuerKunde();
+                            break;
+                        case 'f':
+                            e.preventDefault();
+                            document.getElementById('searchInput')?.focus();
+                            break;
+                    }
+                }
+
+                // Navigation ohne Ctrl
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    refreshData();
+                }
+            });
+        }
+
+        // --- Init erweitern ---
+        (function extendInit() {
+            const originalOnLoad = window.onload || function(){};
+            window.addEventListener('load', function() {
+                setupDirtyTracking();
+                setupKeyboardShortcuts();
+
+                // Event-Listener für kun_IstAktiv Checkbox
+                const kunIstAktiv = document.getElementById('kun_IstAktiv');
+                if (kunIstAktiv) {
+                    kunIstAktiv.addEventListener('change', onKunIstAktivChange);
+                }
+            });
+        })();
+
+        // ============================================
+        // GLOBALE FUNKTIONEN FUER BUTTON ONCLICK
+        // ============================================
+        window.gotoFirstRecord = gotoFirstRecord;
+        window.gotoPrevRecord = gotoPrevRecord;
+        window.gotoNextRecord = gotoNextRecord;
+        window.gotoLastRecord = gotoLastRecord;
+        window.resetAuswahlfilter = resetAuswahlfilter;
+        window.openNeuerAuftrag = openNeuerAuftrag;
+        window.openOutlook = openOutlook;
+        window.openWord = openWord;
+        window.personUebernehmen = personUebernehmen;
+        window.openAdressartDialog = openAdressartDialog;
+        window.activateDatumsfilter = activateDatumsfilter;
+        window.openRechnungPDF = openRechnungPDF;
+        window.openBerechnungslistePDF = openBerechnungslistePDF;
+        window.openEinsatzlistePDF = openEinsatzlistePDF;
+        window.filterByOrt = filterByOrt;
+        window.filterByPLZ = filterByPLZ;
+        window.filterAuftragsart = filterAuftragsart;
+        window.dateiLöschen = dateiLöschen;
+        // Kundenpreise-Funktionen
+        window.loadKundenpreise = loadKundenpreise;
+        window.standardpreiseAnlegen = standardpreiseAnlegen;
+        window.neuerPreis = neuerPreis;
+        window.speicherePreis = speicherePreis;
+        window.preisLoeschen = preisLoeschen;
+
+        // ============================================
+        // cboKDNrSuche: Direkte Kunden-Nummer Suche
+        // ============================================
+        function sucheKundeNr() {
+            const input = document.getElementById('cboKDNrSuche');
+            const kdNr = parseInt(input?.value);
+
+            if (!kdNr || isNaN(kdNr)) {
+                showToast('Bitte gueltige Kunden-Nr. eingeben', 'warning');
+                input?.focus();
+                return;
+            }
+
+            // In der Liste suchen
+            const index = state.kundenList.findIndex(k => k.kun_Id === kdNr);
+
+            if (index >= 0) {
+                showRecord(index);
+                showToast(`Kunde ${kdNr} gefunden`, 'success');
+            } else {
+                // Versuche direkt vom Server zu laden
+                Bridge.loadData('kunde', kdNr);
+                showToast(`Suche Kunde ${kdNr}...`, 'info');
+            }
+
+            input.value = '';
+        }
+
+        window.sucheKundeNr = sucheKundeNr;
+
+        // ============================================
+        // Haupt-Ansprechpartner Dropdown (kun_IDF_PersonID)
+        // ============================================
+        let hauptAnsprechpartnerList = [];
+
+        async function loadHauptAnsprechpartnerDropdown() {
+            const kunId = state.currentRecord?.kun_Id;
+            if (!kunId) return;
+
+            const select = document.getElementById('kun_IDF_PersonID');
+            if (!select) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/kunden/${kunId}/ansprechpartner`);
+                const result = await response.json();
+                hauptAnsprechpartnerList = result.data || result || [];
+
+                // Dropdown befuellen
+                select.innerHTML = '<option value="">-- Ansprechpartner waehlen --</option>';
+                hauptAnsprechpartnerList.forEach(ap => {
+                    const option = document.createElement('option');
+                    option.value = ap.adr_ID;
+                    option.textContent = `${ap.adr_Nachname || ''} ${ap.adr_Vorname || ''}`.trim() || `AP ${ap.adr_ID}`;
+                    select.appendChild(option);
+                });
+
+                // Aktuellen Wert setzen falls vorhanden
+                if (state.currentRecord?.kun_IDF_PersonID) {
+                    select.value = state.currentRecord.kun_IDF_PersonID;
+                    // Kontaktdaten laden
+                    updateHauptAnsprechpartnerFelder(state.currentRecord.kun_IDF_PersonID);
+                }
+            } catch (error) {
+                console.error('Fehler beim Laden der Ansprechpartner fuer Dropdown:', error);
+                // Bridge-Fallback
+                Bridge.loadData('ansprechpartner', null, { kunde_id: kunId });
+            }
+        }
+
+        function onHauptAnsprechpartnerChange() {
+            const select = document.getElementById('kun_IDF_PersonID');
+            const personId = select?.value ? parseInt(select.value) : null;
+
+            updateHauptAnsprechpartnerFelder(personId);
+            state.isDirty = true;
+        }
+
+        function updateHauptAnsprechpartnerFelder(personId) {
+            const adrTelefon = document.getElementById('adr_telefon');
+            const adrMobil = document.getElementById('adr_mobil');
+            const adrEmail = document.getElementById('adr_email_haupt');
+
+            if (!personId) {
+                if (adrTelefon) adrTelefon.value = '';
+                if (adrMobil) adrMobil.value = '';
+                if (adrEmail) adrEmail.value = '';
+                return;
+            }
+
+            const ap = hauptAnsprechpartnerList.find(a => a.adr_ID === personId);
+            if (ap) {
+                if (adrTelefon) adrTelefon.value = ap.adr_Tel || '';
+                if (adrMobil) adrMobil.value = ap.adr_Handy || '';
+                if (adrEmail) adrEmail.value = ap.adr_eMail || '';
+            }
+        }
+
+        window.onHauptAnsprechpartnerChange = onHauptAnsprechpartnerChange;
+
+        // ============================================
+        // ANGEBOTE-TAB FUNKTIONEN (pg_Ang / sub_Rch_Kopf_Ang)
+        // ============================================
+        let angeboteList = [];
+        let selectedAngebotId = null;
+
+        async function loadAngebote() {
+            const kunId = state.currentRecord?.kun_Id;
+            if (!kunId) return;
+
+            const tbody = document.getElementById('angeboteBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:20px;">Lade Angebote...</td></tr>';
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/kunden/${kunId}/angebote`);
+                const result = await response.json();
+                angeboteList = result.data || result || [];
+                renderAngebote(angeboteList);
+            } catch (error) {
+                console.error('Fehler beim Laden der Angebote:', error);
+                // Bridge-Fallback
+                Bridge.loadData('angebote', null, { kunde_id: kunId });
+
+                // Demo-Daten als Fallback
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999; padding:20px;">API nicht erreichbar - keine Angebote verfuegbar</td></tr>';
+                }
+            }
+        }
+
+        function renderAngebote(records) {
+            const tbody = document.getElementById('angeboteBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            if (!records || records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:20px;">Keine Angebote vorhanden</td></tr>';
+                updateAngeboteSummen(0, 0);
+                return;
+            }
+
+            let gesamtwert = 0;
+
+            records.forEach(ang => {
+                const tr = document.createElement('tr');
+                tr.dataset.id = ang.ID || ang.ang_ID;
+                tr.innerHTML = `
+                    <td>${formatDateShort(ang.Datum || ang.ang_Datum)}</td>
+                    <td>${escapeHtml(ang.Nummer || ang.ang_Nummer || '')}</td>
+                    <td>${escapeHtml(ang.Bezeichnung || ang.ang_Bezeichnung || '')}</td>
+                    <td style="text-align: right;">${formatEuro(ang.Betrag || ang.ang_Betrag)}</td>
+                    <td>${getAngebotStatusText(ang.Status || ang.ang_Status)}</td>
+                    <td>${formatDateShort(ang.GueltigBis || ang.ang_GueltigBis)}</td>
+                `;
+                tr.onclick = () => selectAngebot(ang, tr);
+                tr.ondblclick = () => openAngebot(ang);
+                if ((ang.ID || ang.ang_ID) === selectedAngebotId) tr.classList.add('selected');
+                tbody.appendChild(tr);
+
+                gesamtwert += parseFloat(ang.Betrag || ang.ang_Betrag || 0);
+            });
+
+            updateAngeboteSummen(records.length, gesamtwert);
+        }
+
+        function getAngebotStatusText(status) {
+            const statusMap = {
+                0: 'Offen',
+                1: 'Angenommen',
+                2: 'Abgelehnt',
+                3: 'Abgelaufen'
+            };
+            return statusMap[status] || status || 'Offen';
+        }
+
+        function updateAngeboteSummen(anzahl, gesamtwert) {
+            const anzahlEl = document.getElementById('angeboteAnzahl');
+            const gesamtwertEl = document.getElementById('angeboteGesamtwert');
+
+            if (anzahlEl) anzahlEl.textContent = anzahl;
+            if (gesamtwertEl) gesamtwertEl.textContent = formatEuro(gesamtwert);
+        }
+
+        function selectAngebot(ang, tr) {
+            selectedAngebotId = ang.ID || ang.ang_ID;
+            document.querySelectorAll('#angeboteBody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+        }
+
+        function openAngebot(ang) {
+            const angId = ang?.ID || ang?.ang_ID || selectedAngebotId;
+            if (angId) {
+                Bridge.navigate('frm_Angebot', angId);
+            } else {
+                showToast('Bitte Angebot auswaehlen', 'info');
+            }
+        }
+
+        function neuesAngebot() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Bitte zuerst Kunde auswaehlen', 'warning');
+                return;
+            }
+            Bridge.navigate('frm_Angebot', { kunde_id: state.currentRecord.kun_Id, mode: 'new' });
+        }
+
+        function openAngebotPDF() {
+            if (!selectedAngebotId) {
+                showToast('Bitte Angebot auswaehlen', 'warning');
+                return;
+            }
+            Bridge.sendEvent('openDocument', { type: 'angebot', id: selectedAngebotId });
+        }
+
+        Bridge.on('onAngeboteReceived', function(data) {
+            angeboteList = data.angebote || [];
+            renderAngebote(angeboteList);
+        });
+
+        window.loadAngebote = loadAngebote;
+        window.neuesAngebot = neuesAngebot;
+        window.openAngebotPDF = openAngebotPDF;
+
+        // ============================================
+        // RECHNUNGSPOSITIONEN SUBFORM (sub_KD_Rch_Auftragspos)
+        // ============================================
+        let selectedAuftragId = null;
+        let auftragspositionenList = [];
+
+        function selectAuftrag(auftrag, tr) {
+            selectedAuftragId = auftrag.ID || auftrag.VA_ID;
+            document.querySelectorAll('#auftraegeBody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+
+            // Auftragsnummer anzeigen
+            const selectedLabel = document.getElementById('selectedAuftragNr');
+            if (selectedLabel) {
+                selectedLabel.textContent = auftrag.VA_Nummer || auftrag.Auftrag || `#${selectedAuftragId}`;
+            }
+
+            // Positionen laden
+            loadAuftragsPositionen();
+        }
+
+        async function loadAuftragsPositionen() {
+            if (!selectedAuftragId) {
+                const tbody = document.getElementById('auftragspositionenBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#666; padding:10px;">Auftrag auswaehlen um Positionen zu sehen</td></tr>';
+                }
+                return;
+            }
+
+            const tbody = document.getElementById('auftragspositionenBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#666; padding:10px;">Lade Positionen...</td></tr>';
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/auftraege/${selectedAuftragId}/positionen`);
+                const result = await response.json();
+                auftragspositionenList = result.data || result || [];
+                renderAuftragsPositionen(auftragspositionenList);
+            } catch (error) {
+                console.error('Fehler beim Laden der Auftragspositionen:', error);
+                // Bridge-Fallback
+                Bridge.loadData('auftragspositionen', selectedAuftragId);
+
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999; padding:10px;">Positionen konnten nicht geladen werden</td></tr>';
+                }
+            }
+        }
+
+        function renderAuftragsPositionen(records) {
+            const tbody = document.getElementById('auftragspositionenBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            if (!records || records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#666; padding:10px;">Keine Positionen vorhanden</td></tr>';
+                updatePositionenSumme(0);
+                return;
+            }
+
+            let summe = 0;
+
+            records.forEach((pos, index) => {
+                const einzelpreis = parseFloat(pos.Einzelpreis || pos.pos_Einzelpreis || 0);
+                const menge = parseFloat(pos.Menge || pos.pos_Menge || 1);
+                const gesamt = einzelpreis * menge;
+                summe += gesamt;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="text-align: center;">${pos.PosNr || index + 1}</td>
+                    <td>${escapeHtml(pos.Bezeichnung || pos.pos_Bezeichnung || '')}</td>
+                    <td style="text-align: right;">${menge}</td>
+                    <td style="text-align: right;">${formatEuro(einzelpreis)}</td>
+                    <td style="text-align: right;">${formatEuro(gesamt)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updatePositionenSumme(summe);
+        }
+
+        function updatePositionenSumme(summe) {
+            const summeEl = document.getElementById('PositionenSumme');
+            if (summeEl) summeEl.textContent = formatEuro(summe);
+        }
+
+        Bridge.on('onAuftragspositionenReceived', function(data) {
+            auftragspositionenList = data.positionen || [];
+            renderAuftragsPositionen(auftragspositionenList);
+        });
+
+        window.loadAuftragsPositionen = loadAuftragsPositionen;
+
+        // ============================================
+        // PosGesamtsumme: Auftraege-Summe berechnen
+        // ============================================
+        function updatePosGesamtsumme(auftraege) {
+            let summe = 0;
+            if (auftraege && auftraege.length > 0) {
+                auftraege.forEach(a => {
+                    summe += parseFloat(a.Betrag || a.VA_Betrag || 0);
+                });
+            }
+            const summeEl = document.getElementById('PosGesamtsumme');
+            if (summeEl) summeEl.textContent = formatEuro(summe);
+        }
+
+        // ============================================
+        // DETAILLIERTE STATISTIK (pg_Rch_Kopf)
+        // ============================================
+        let statistikData = {};
+
+        async function loadStatistik() {
+            const kunId = state.currentRecord?.kun_Id;
+            if (!kunId) {
+                showToast('Bitte zuerst Kunde auswaehlen', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/kunden/${kunId}/statistik`);
+                const result = await response.json();
+                statistikData = result.data || result || {};
+                renderStatistik(statistikData);
+            } catch (error) {
+                console.error('Fehler beim Laden der Statistik:', error);
+                Bridge.loadData('kundenStatistikDetail', kunId);
+            }
+        }
+
+        function renderStatistik(data) {
+            // Jahre-Header aktualisieren
+            const currentYear = new Date().getFullYear();
+            document.getElementById('statJahr1Header').textContent = currentYear;
+            document.getElementById('statJahr2Header').textContent = currentYear - 1;
+            document.getElementById('statJahr3Header').textContent = currentYear - 2;
+
+            // Umsaetze
+            setStatField('UmsNGes1', data.UmsNGes1, 'euro');
+            setStatField('UmsNGes2', data.UmsNGes2, 'euro');
+            setStatField('UmsNGes3', data.UmsNGes3, 'euro');
+            setStatField('UmsGes1', data.UmsGes1, 'euro');
+            setStatField('UmsGes2', data.UmsGes2, 'euro');
+            setStatField('UmsGes3', data.UmsGes3, 'euro');
+
+            // Stunden
+            setStatField('StdGes1', data.StdGes1);
+            setStatField('StdGes2', data.StdGes2);
+            setStatField('StdGes3', data.StdGes3);
+
+            // Auftraege
+            setStatField('AufAnz1', data.AufAnz1);
+            setStatField('AufAnz2', data.AufAnz2);
+            setStatField('AufAnz3', data.AufAnz3);
+
+            // Personal/Tage
+            setStatField('PersGes1', data.PersGes1);
+            setStatField('PersGes2', data.PersGes2);
+            setStatField('PersGes3', data.PersGes3);
+
+            // KW-Daten
+            setStatField('Std51', data.Std51);
+            setStatField('Std52', data.Std52);
+            setStatField('Std53', data.Std53);
+            setStatField('Pers51', data.Pers51);
+            setStatField('Pers52', data.Pers52);
+            setStatField('Pers53', data.Pers53);
+        }
+
+        function setStatField(id, value, type) {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            if (type === 'euro') {
+                el.textContent = formatEuro(value || 0);
+            } else {
+                el.textContent = value || 0;
+            }
+        }
+
+        function exportStatistikExcel() {
+            if (!state.currentRecord?.kun_Id) {
+                showToast('Bitte zuerst Kunde auswaehlen', 'warning');
+                return;
+            }
+
+            Bridge.sendEvent('exportStatistik', {
+                kunde_id: state.currentRecord.kun_Id,
+                format: 'excel'
+            });
+            showToast('Excel-Export wird erstellt...', 'info');
+        }
+
+        Bridge.on('onKundenStatistikDetailReceived', function(data) {
+            statistikData = data;
+            renderStatistik(data);
+        });
+
+        window.loadStatistik = loadStatistik;
+        window.exportStatistikExcel = exportStatistikExcel;
+
+        // ============================================
+        // Tab-Wechsel erweitern fuer neue Tabs
+        // ============================================
+        const originalSwitchTab = switchTab;
+        switchTab = function(tabName) {
+            // Original aufrufen
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-page').forEach(page => {
+                page.classList.toggle('active', page.id === 'tab-' + tabName);
+            });
+
+            // Daten laden wenn Tab gewechselt wird
+            if (state.currentRecord) {
+                if (tabName === 'auftraguebersicht') {
+                    loadAufträge();
+                } else if (tabName === 'objekte') {
+                    loadObjekte();
+                } else if (tabName === 'zusatzdateien') {
+                    loadZusatzdateien();
+                } else if (tabName === 'ansprechpartner') {
+                    loadAnsprechpartner();
+                } else if (tabName === 'preise') {
+                    loadKundenpreise();
+                    loadPreisarten();
+                } else if (tabName === 'angebote') {
+                    loadAngebote();
+                } else if (tabName === 'statistik') {
+                    loadStatistik();
+                } else if (tabName === 'stammdaten') {
+                    loadHauptAnsprechpartnerDropdown();
+                }
+            }
+        };
+
+        // ============================================
+        // Auftraege-Rendering erweitern fuer Auswahl
+        // ============================================
+        const originalOnAufträgeReceived = Bridge._handlers?.onAufträgeReceived;
+        Bridge.on('onAufträgeReceived', function(data) {
+            const auftraege = data.auftraege || [];
+            const tbody = document.getElementById('auftraegeBody');
+            tbody.innerHTML = '';
+
+            auftraege.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.dataset.id = a.ID;
+                tr.innerHTML = `
+                    <td>${a.ID || ''}</td>
+                    <td>${escapeHtml(a.Auftrag || '')}</td>
+                    <td>${formatDateShort(a.Dat_VA_Von)}</td>
+                    <td>${escapeHtml(a.Objekt || '')}</td>
+                    <td>${a.Veranst_Status_ID || ''}</td>
+                    <td style="text-align: right;">${formatCurrency(a.Betrag)}</td>
+                `;
+                // Klick fuer Positionen-Anzeige
+                tr.addEventListener('click', () => selectAuftrag(a, tr));
+                // Doppelklick fuer Navigation
+                tr.addEventListener('dblclick', () => {
+                    Bridge.navigate('frm_va_Auftragstamm', a.ID);
+                });
+                tbody.appendChild(tr);
+            });
+
+            // Gesamtsumme aktualisieren
+            updatePosGesamtsumme(auftraege);
+        });
+
+        // ============================================
+        // showRecord erweitern fuer Haupt-AP Dropdown
+        // ============================================
+        const originalShowRecord = showRecord;
+        const extendedShowRecord = async function(index) {
+            await originalShowRecord(index);
+            // Haupt-Ansprechpartner Dropdown laden
+            loadHauptAnsprechpartnerDropdown();
+        };
+        // Nicht ueberschreiben da showRecord schon async ist
+
+    </script>
+    <!-- Debug Logger -->
+    <script src="js/debug-logger.js"></script>
+    <!-- Event Logger (erweitert debug-logger) -->
+    <script src="js/logger.js"></script>
+    <!-- Toast Notification System -->
+    <script src="js/toast-system.js"></script>
+    <!-- Shell-Detector: Versteckt Sidebar im iframe-Modus -->
+    <script src="js/shell-detector.js"></script>
+    <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
+    <script src="js/server-watchdog.js"></script>
+</body>
+</html>
+
+
+
