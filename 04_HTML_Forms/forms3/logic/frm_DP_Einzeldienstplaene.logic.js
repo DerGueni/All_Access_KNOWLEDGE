@@ -190,8 +190,9 @@ async function generatePreview() {
         // Render Vorschau
         renderPreview();
 
-        // Enable Drucken button
+        // Enable Drucken + PDF buttons
         document.getElementById('btnDrucken').disabled = false;
+        document.getElementById('btnPDF').disabled = false;
 
         statusLeft.textContent = 'Vorschau erstellt';
 
@@ -363,7 +364,69 @@ function formatDateDE(date) {
     return date.toLocaleDateString('de-DE');
 }
 
+/**
+ * Exportiert Dienstpläne als PDF
+ */
+async function exportToPDF() {
+    if (state.selectedMAIds.size === 0) {
+        alert('Bitte erst Vorschau generieren');
+        return;
+    }
+
+    const loading = document.getElementById('loading');
+    const statusLeft = document.getElementById('statusLeft');
+    const previewArea = document.getElementById('previewArea');
+
+    loading.style.display = 'block';
+    statusLeft.textContent = 'Generiere PDF...';
+
+    try {
+        // html2pdf.js Optionen
+        const opt = {
+            margin: 0, // Kein Margin, da A4-Seiten bereits Padding haben
+            filename: `Einzeldienstplaene_${formatDateISO(new Date())}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                letterRendering: true
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            },
+            pagebreak: {
+                mode: ['css', 'legacy'],
+                avoid: ['.dp-table tr', '.dp-header']
+            }
+        };
+
+        // Clone preview area (damit UI nicht flackert)
+        const clone = previewArea.cloneNode(true);
+
+        // Entferne "preview-empty" falls vorhanden
+        const emptyDiv = clone.querySelector('.preview-empty');
+        if (emptyDiv) {
+            emptyDiv.remove();
+        }
+
+        // Generiere PDF
+        await html2pdf().set(opt).from(clone).save();
+
+        statusLeft.textContent = 'PDF erfolgreich erstellt';
+
+    } catch (error) {
+        console.error('[EinzelDP] Fehler bei PDF-Export:', error);
+        statusLeft.textContent = `Fehler: ${error.message}`;
+        alert(`Fehler beim PDF-Export:\n${error.message}`);
+    } finally {
+        loading.style.display = 'none';
+    }
+}
+
 // Expose für HTML onclick
 window.generatePreview = generatePreview;
 window.selectAllMA = selectAllMA;
 window.selectNoneMA = selectNoneMA;
+window.exportToPDF = exportToPDF;
