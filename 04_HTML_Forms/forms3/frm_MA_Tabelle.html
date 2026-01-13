@@ -232,6 +232,7 @@
         }
     </style>
     <script src="js/webview2-bridge.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
 <body data-form="frm_MA_Tabelle">
@@ -242,6 +243,7 @@
             <button class="btn" onclick="saveChanges()" id="btnSave" style="display:none;">Speichern</button>
             <button class="btn" onclick="cancelEdit()" id="btnCancel" style="display:none;">Abbrechen</button>
             <button class="btn" onclick="window.print()">Drucken</button>
+            <button class="btn" onclick="exportToExcel()">Export Excel</button>
             <button class="btn" onclick="exportToCSV()">Export CSV</button>
             <button class="btn" onclick="location.reload()">Neu laden</button>
             <button class="btn" onclick="history.back()">Zurück</button>

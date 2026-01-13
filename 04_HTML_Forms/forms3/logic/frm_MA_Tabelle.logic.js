@@ -563,9 +563,110 @@ function cancelEdit() {
     toggleEditMode();
 }
 
+/**
+ * Exportiert zu Excel mit Formatierung (via SheetJS)
+ */
+function exportToExcel() {
+    if (allMitarbeiter.length === 0) {
+        alert('Keine Daten zum Exportieren');
+        return;
+    }
+
+    // Header-Zeile
+    const headers = [
+        'ID', 'LEXWare_ID', 'Nachname', 'Vorname', 'Geschlecht',
+        'Geb_Dat', 'Geb_Ort', 'Staatsang',
+        'Strasse', 'Nr', 'PLZ', 'Ort',
+        'Tel_Mobil', 'Tel_Festnetz', 'Email',
+        'Eintrittsdatum', 'Austrittsdatum',
+        'Auszahlungsart', 'Bankname', 'Kontoinhaber', 'IBAN', 'BIC',
+        'Anstellungsart_ID', 'IstAktiv', 'IstSubunternehmer',
+        'HatSachkunde', 'Hat_keine_34a',
+        'Kostenstelle', 'Bemerkungen'
+    ];
+
+    // Daten-Zeilen
+    const data = allMitarbeiter.map(ma => headers.map(field => {
+        const value = ma[field];
+        if (value == null) return '';
+        if (typeof value === 'boolean') return value ? 1 : 0;
+        if (field === 'Geb_Dat' || field === 'Eintrittsdatum' || field === 'Austrittsdatum') {
+            return formatDate(value); // Formatiere Datum als DD.MM.YYYY
+        }
+        return value;
+    }));
+
+    // Erstelle Workbook
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+
+    // Spaltenbreiten setzen
+    const colWidths = [
+        { wch: 6 },  // ID
+        { wch: 10 }, // LEXWare_ID
+        { wch: 15 }, // Nachname
+        { wch: 15 }, // Vorname
+        { wch: 10 }, // Geschlecht
+        { wch: 12 }, // Geb_Dat
+        { wch: 15 }, // Geb_Ort
+        { wch: 10 }, // Staatsang
+        { wch: 20 }, // Strasse
+        { wch: 5 },  // Nr
+        { wch: 6 },  // PLZ
+        { wch: 15 }, // Ort
+        { wch: 15 }, // Tel_Mobil
+        { wch: 15 }, // Tel_Festnetz
+        { wch: 25 }, // Email
+        { wch: 12 }, // Eintrittsdatum
+        { wch: 12 }, // Austrittsdatum
+        { wch: 12 }, // Auszahlungsart
+        { wch: 20 }, // Bankname
+        { wch: 20 }, // Kontoinhaber
+        { wch: 22 }, // IBAN
+        { wch: 12 }, // BIC
+        { wch: 12 }, // Anstellungsart_ID
+        { wch: 8 },  // IstAktiv
+        { wch: 8 },  // IstSubunternehmer
+        { wch: 10 }, // HatSachkunde
+        { wch: 10 }, // Hat_keine_34a
+        { wch: 12 }, // Kostenstelle
+        { wch: 30 }  // Bemerkungen
+    ];
+    ws['!cols'] = colWidths;
+
+    // Header-Zeile formatieren (Bold + Hintergrundfarbe)
+    const headerRange = XLSX.utils.decode_range(ws['!ref']);
+    for (let col = headerRange.s.c; col <= headerRange.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+        if (!ws[cellAddress]) continue;
+
+        ws[cellAddress].s = {
+            font: { bold: true, color: { rgb: 'FFFFFF' } },
+            fill: { fgColor: { rgb: '000080' } },
+            alignment: { horizontal: 'center', vertical: 'center' }
+        };
+    }
+
+    // Freeze Panes (Erste Zeile fixiert)
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+
+    // AutoFilter aktivieren
+    ws['!autofilter'] = { ref: ws['!ref'] };
+
+    // Worksheet zum Workbook hinzufügen
+    XLSX.utils.book_append_sheet(wb, ws, 'Mitarbeiter');
+
+    // Datei herunterladen
+    const filename = `Mitarbeiter_Tabelle_${new Date().toISOString().slice(0,10)}.xlsx`;
+    XLSX.writeFile(wb, filename);
+
+    document.getElementById('statusLeft').textContent = `Excel-Export: ${filename}`;
+}
+
 // Expose für HTML onclick
 window.loadData = loadData;
 window.exportToCSV = exportToCSV;
+window.exportToExcel = exportToExcel;
 window.toggleEditMode = toggleEditMode;
 window.saveChanges = saveChanges;
 window.cancelEdit = cancelEdit;
