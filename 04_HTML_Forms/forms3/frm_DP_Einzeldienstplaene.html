@@ -4,41 +4,272 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Einzeldienstpläne - CONSYS</title>
-    <link rel="stylesheet" href="consys-common.css">
     <link rel="stylesheet" href="css/fonts_override.css">
     <style>
-        body { background-color: #8080c0; font-family: 'Segoe UI', sans-serif; font-size: 11px; }
-        .placeholder-container {
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; font-size: 11px; }
+        body {
+            background-color: #8080c0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border-bottom: 2px solid #808080;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 {
+            color: #000080;
+            font-size: 19px; /* Formulartitel +8px */
+            font-weight: bold;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 6px 16px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .btn:active { border-color: #808080 #ffffff #ffffff #808080; }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Main Container */
+        .container {
+            flex: 1;
+            overflow: auto;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 15px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #d0d0e0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .sidebar-section {
+            border-bottom: 1px solid #a0a0a0;
+            padding-bottom: 10px;
+        }
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+        .sidebar h3 {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #000080;
+        }
+        .sidebar label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        .sidebar input[type="date"],
+        .sidebar input[type="text"],
+        .sidebar select {
+            width: 100%;
+            padding: 4px;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            margin-bottom: 8px;
+        }
+        .sidebar select[multiple] {
+            height: 200px;
+        }
+        .ma-actions {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+        .ma-actions button {
+            flex: 1;
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+
+        /* Preview Area */
+        .preview-area {
+            background: white;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 20px;
+            overflow: auto;
+        }
+        .preview-empty {
+            display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: 100%;
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Dienstplan Print Layout */
+        .dienstplan-page {
+            background: white;
+            width: 21cm;  /* A4 width */
+            min-height: 29.7cm;  /* A4 height */
+            margin: 0 auto 20px auto;
+            padding: 1.5cm;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            page-break-after: always;
+        }
+        .dienstplan-page:last-child {
+            margin-bottom: 0;
+        }
+        .dp-header {
+            border-bottom: 2px solid #000080;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .dp-header h2 {
+            font-size: 18px;
+            color: #000080;
+            margin-bottom: 5px;
+        }
+        .dp-header .meta {
+            font-size: 10px;
+            color: #666;
+        }
+        .dp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .dp-table th {
+            background: #000080;
             color: white;
+            padding: 6px;
+            text-align: left;
+            border: 1px solid #000080;
         }
-        .placeholder-icon { font-size: 64px; margin-bottom: 20px; }
-        .placeholder-title { font-size: 32px; font-weight: bold; margin-bottom: 10px; } /* Formulartitel +8px gemaess Anforderung */
-        .placeholder-text { font-size: 14px; opacity: 0.8; }
-        .placeholder-params { margin-top: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; }
+        .dp-table td {
+            padding: 6px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+        }
+        .dp-table tr:nth-child(even) {
+            background: #f5f5f5;
+        }
+        .einsatz-detail {
+            font-size: 10px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #d0d0e0;
+            border-top: 2px solid #ffffff;
+            padding: 6px 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Print Styles */
+        @media print {
+            body { background: white; }
+            .header, .sidebar, .status-bar { display: none !important; }
+            .container { display: block; padding: 0; }
+            .preview-area { border: none; padding: 0; }
+            .dienstplan-page { box-shadow: none; margin-bottom: 0; }
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px 40px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
     </style>
-<link rel="stylesheet" href="css/visbug_overrides.css">
+    <script src="js/webview2-bridge.js"></script>
+    <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body>
-    <div class="placeholder-container">
-        <div class="placeholder-icon">ðŸ“‹</div>
-        <div class="placeholder-title">Einzeldienstpläne</div>
-        <div class="placeholder-text">Diese Ansicht wird noch implementiert.</div>
-        <div class="placeholder-params" id="params"></div>
+<body data-form="frm_DP_Einzeldienstplaene">
+    <div class="header">
+        <h1>Einzeldienstpläne</h1>
+        <div class="header-actions">
+            <button class="btn" onclick="generatePreview()" id="btnVorschau">Vorschau</button>
+            <button class="btn" onclick="window.print()" id="btnDrucken" disabled>Drucken</button>
+            <button class="btn" onclick="window.close()">Schließen</button>
+        </div>
     </div>
-    <script>
-        // Parse URL parameters
-        const params = new URLSearchParams(window.location.search);
-        const paramsDiv = document.getElementById('params');
-        if (params.toString()) {
-            paramsDiv.innerHTML = '<strong>Parameter:</strong><br>' +
-                Array.from(params.entries()).map(([k, v]) => `${k}: ${v}`).join('<br>');
-        }
-    </script>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3>Zeitraum</h3>
+                <label>Von:</label>
+                <input type="date" id="dtVon">
+                <label>Bis:</label>
+                <input type="date" id="dtBis">
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Mitarbeiter</h3>
+                <div class="ma-actions">
+                    <button class="btn" onclick="selectAllMA()">Alle</button>
+                    <button class="btn" onclick="selectNoneMA()">Keine</button>
+                </div>
+                <input type="text" id="txtMASearch" placeholder="Suche...">
+                <select multiple id="lstMitarbeiter" size="15">
+                    <option value="">Lade...</option>
+                </select>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Filter</h3>
+                <label>
+                    <input type="checkbox" id="chkNurBestaetigte">
+                    Nur bestätigte Einsätze
+                </label>
+            </div>
+        </div>
+
+        <!-- Preview Area -->
+        <div class="preview-area" id="previewArea">
+            <div class="preview-empty">
+                Bitte Mitarbeiter auswählen und "Vorschau" klicken
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span id="statusLeft">Bereit</span>
+        <span id="statusRight">0 Mitarbeiter ausgewählt</span>
+    </div>
+
+    <div class="loading" id="loading" style="display:none;">Lade Daten...</div>
+
+    <script src="logic/frm_DP_Einzeldienstplaene.logic.js" type="module"></script>
 </body>
 </html>
-
