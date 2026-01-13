@@ -16,7 +16,10 @@ const state = {
     mitarbeiter: [],
     filteredMA: [],
     selectedMAIds: new Set(),
-    dienstplaene: {}
+    dienstplaene: {},
+    objekte: [],
+    kunden: [],
+    positionen: []
 };
 
 // Init
@@ -42,6 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load data
     loadMitarbeiter();
+    loadObjekte();
+    loadKunden();
+    loadPositionen();
 });
 
 /**
@@ -80,6 +86,83 @@ async function loadMitarbeiter() {
         statusLeft.textContent = `Fehler: ${error.message}`;
     } finally {
         loading.style.display = 'none';
+    }
+}
+
+/**
+ * Lädt Objekte für Filter
+ */
+async function loadObjekte() {
+    try {
+        const response = await fetch(`${API_BASE}/objekte?aktiv=true`);
+        const data = await response.json();
+
+        if (data.success) {
+            state.objekte = data.data || [];
+
+            const select = document.getElementById('selObjekt');
+            select.innerHTML = '<option value="">Alle Objekte</option>';
+
+            state.objekte.forEach(obj => {
+                const option = document.createElement('option');
+                option.value = obj.Objekt_ID || obj.ID;
+                option.textContent = obj.Objekt || obj.Name;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.warn('[EinzelDP] Fehler beim Laden der Objekte:', error.message);
+    }
+}
+
+/**
+ * Lädt Kunden für Filter
+ */
+async function loadKunden() {
+    try {
+        const response = await fetch(`${API_BASE}/kunden?aktiv=true`);
+        const data = await response.json();
+
+        if (data.success) {
+            state.kunden = data.data || [];
+
+            const select = document.getElementById('selKunde');
+            select.innerHTML = '<option value="">Alle Kunden</option>';
+
+            state.kunden.forEach(kunde => {
+                const option = document.createElement('option');
+                option.value = kunde.kun_Id || kunde.ID;
+                option.textContent = kunde.kun_Firma || kunde.Name;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.warn('[EinzelDP] Fehler beim Laden der Kunden:', error.message);
+    }
+}
+
+/**
+ * Lädt Positionen für Filter
+ */
+async function loadPositionen() {
+    try {
+        // Annahme: Es gibt einen /api/positionen Endpoint oder wir extrahieren aus Dienstplan-Daten
+        // Falls nicht, nutzen wir Hardcoded-Liste
+        const hardcodedPositionen = [
+            'Ordner', 'Springer', 'Einlasser', 'Garderobe', 'Leiter', 'Koordinator'
+        ];
+
+        const select = document.getElementById('selPosition');
+        select.innerHTML = '<option value="">Alle Positionen</option>';
+
+        hardcodedPositionen.forEach(pos => {
+            const option = document.createElement('option');
+            option.value = pos;
+            option.textContent = pos;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.warn('[EinzelDP] Fehler beim Laden der Positionen:', error.message);
     }
 }
 
@@ -280,8 +363,38 @@ function createDienstplanPage(ma, dpData, vonDate, bisDate) {
     `;
     page.appendChild(header);
 
-    // Einsätze
-    const einsaetze = dpData.einsaetze || [];
+    // Einsätze mit Filter
+    let einsaetze = dpData.einsaetze || [];
+
+    // Filter anwenden
+    const objektFilter = document.getElementById('selObjekt').value;
+    const kundeFilter = document.getElementById('selKunde').value;
+    const positionFilter = document.getElementById('selPosition').value;
+    const nurBestaetigte = document.getElementById('chkNurBestaetigte').checked;
+
+    einsaetze = einsaetze.filter(einsatz => {
+        // Objekt-Filter
+        if (objektFilter && einsatz.Objekt_ID != objektFilter && einsatz.ObjektName != objektFilter) {
+            return false;
+        }
+
+        // Kunden-Filter
+        if (kundeFilter && einsatz.Veranstalter_ID != kundeFilter && einsatz.Veranstalter != kundeFilter) {
+            return false;
+        }
+
+        // Positions-Filter
+        if (positionFilter && einsatz.Position != positionFilter && einsatz.Positionsname != positionFilter) {
+            return false;
+        }
+
+        // Nur bestätigte
+        if (nurBestaetigte && einsatz.Status_ID != 3) { // Status_ID=3 = Zusage
+            return false;
+        }
+
+        return true;
+    });
 
     if (einsaetze.length === 0) {
         const empty = document.createElement('p');
