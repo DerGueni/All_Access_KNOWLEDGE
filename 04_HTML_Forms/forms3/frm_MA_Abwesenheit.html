@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -332,7 +332,7 @@
     <link rel="stylesheet" href="css/fonts_override.css">
 <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body data-active-menu="abwesenheit">
+<body data-active-menu="abwesenheit" data-form="frm_MA_Abwesenheit">
     <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">&#x26F6;</button>
 
     <!-- Left Menu -->
@@ -493,6 +493,7 @@
             fehlzeiten: [],         // tbltmp_Fehlzeiten
             maLookup: [],           // Mitarbeiter
             gruendeLookup: [],      // Abwesenheitsgruende
+            feiertage: [],          // Deutsche Feiertage (via API)
             selectedMA: null,
             selectedRows: new Set()
         };
@@ -528,7 +529,8 @@
             state.fehlzeiten = [];
 
             // VBA: Call create_Default_AlleTage(Get_Priv_Property("Default_Bundesland"))
-            // (Wird in JS nicht benoetigt - verwenden wir Feiertags-API oder lokale Berechnung)
+            // JS: Laden wir Feiertage via API
+            loadFeiertage(new Date().getFullYear());
 
             // VBA: Me.NurWerktags = False
             el.NurWerktags.checked = false;
@@ -930,6 +932,38 @@
             }
         }
 
+        /**
+         * Lädt Deutsche Feiertage von der API
+         */
+        async function loadFeiertage(jahr) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/feiertage?jahr=${jahr}&bundesland=BY`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    state.feiertage = (data.data || []).map(f => ({
+                        datum: f.datum,
+                        name: f.name,
+                        bundesland: f.bundesland
+                    }));
+                    console.log(`[Abwesenheit] ${state.feiertage.length} Feiertage für ${jahr} geladen`);
+                } else {
+                    state.feiertage = [];
+                }
+            } catch (error) {
+                console.error('[Abwesenheit] Fehler beim Laden der Feiertage:', error);
+                state.feiertage = [];
+            }
+        }
+
+        /**
+         * Prüft ob ein Datum ein Feiertag ist
+         */
+        function isFeiertag(dateStr) {
+            // dateStr im Format YYYY-MM-DD
+            return state.feiertage.find(f => f.datum === dateStr);
+        }
+
         async function saveAbwesenheit(fz) {
             try {
                 const response = await fetch('http://localhost:5000/api/abwesenheiten', {
@@ -1041,14 +1075,40 @@
 
             if (el.DatVon.value) {
                 const d = new Date(el.DatVon.value);
-                el.lblDatVonTag.textContent = days[d.getDay()];
+                let tagText = days[d.getDay()];
+
+                // Prüfe ob Feiertag
+                const feiertag = isFeiertag(el.DatVon.value);
+                if (feiertag) {
+                    tagText += ` 🎉 ${feiertag.name}`;
+                    el.lblDatVonTag.style.color = '#d00000';
+                    el.lblDatVonTag.style.fontWeight = 'bold';
+                } else {
+                    el.lblDatVonTag.style.color = '';
+                    el.lblDatVonTag.style.fontWeight = '';
+                }
+
+                el.lblDatVonTag.textContent = tagText;
             } else {
                 el.lblDatVonTag.textContent = '';
             }
 
             if (el.DatBis.value) {
                 const d = new Date(el.DatBis.value);
-                el.lblDatBisTag.textContent = days[d.getDay()];
+                let tagText = days[d.getDay()];
+
+                // Prüfe ob Feiertag
+                const feiertag = isFeiertag(el.DatBis.value);
+                if (feiertag) {
+                    tagText += ` 🎉 ${feiertag.name}`;
+                    el.lblDatBisTag.style.color = '#d00000';
+                    el.lblDatBisTag.style.fontWeight = 'bold';
+                } else {
+                    el.lblDatBisTag.style.color = '';
+                    el.lblDatBisTag.style.fontWeight = '';
+                }
+
+                el.lblDatBisTag.textContent = tagText;
             } else {
                 el.lblDatBisTag.textContent = '';
             }
@@ -1107,4 +1167,5 @@
     <script src="js/api-lifecycle.js"></script>
 </body>
 </html>
+
 
