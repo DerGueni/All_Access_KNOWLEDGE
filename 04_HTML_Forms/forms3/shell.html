@@ -1,6 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
+  <link rel="stylesheet" href="css/visbug_overrides.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CONSYS - Verwaltung</title>
@@ -11,7 +12,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         body {
@@ -26,14 +27,15 @@
             background-color: #8080c0;
         }
 
-        /* Left Sidebar - permanent, 182px breit (18px schmäler) */
+        /* Left Sidebar - permanent, responsive Breite (via responsive.css) */
         .sidebar {
-            width: 182px;
-            background-color: #6060a0;
+            width: 182px; /* Fallback für Browser ohne responsive.css */
+            background-color: #d3d3d3;  /* HELLGRAU */
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
             border-right: 2px solid #404080;
+            transition: width 0.3s ease; /* Sanfte Größenänderung */
         }
 
         /* Main Header - CONSYS PLANUNG */
@@ -42,7 +44,7 @@
             color: white;
             padding: 8px 10px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 13px;
             text-align: left;
         }
 
@@ -55,9 +57,9 @@
             padding: 5px 0;
         }
 
-        /* Kategorie-Block mit Abstand */
+        /* Kategorie-Block mit Abstand - entzerrt */
         .category-block {
-            margin-bottom: 10px;
+            margin-bottom: 14px;
         }
 
         .category-block:last-child {
@@ -69,19 +71,19 @@
             background-color: #000080;
             color: #c0c0ff;
             padding: 4px 10px;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* Menu-Buttons */
+        /* Menu-Buttons - entzerrt */
         .menu-btn {
             background: linear-gradient(to bottom, #c8c8e0, #a0a0c0);
-            padding: 6px 10px;
+            padding: 7px 10px;
             text-align: left;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             color: #000;
             font-weight: bold;
             border: none;
@@ -89,6 +91,7 @@
             border-bottom: 1px solid #606090;
             display: block;
             width: 100%;
+            margin-bottom: 1px;
         }
 
         .menu-btn:hover {
@@ -142,38 +145,126 @@
             z-index: 1000;
         }
 
-        /* Content Header - AUSGEBLENDET per User-Anfrage */
-        .content-header {
+        /* Tab Bar - Aktiv für Tab-Navigation, responsive via responsive.css */
+        .tab-bar {
+            display: flex;
+            background-color: #d3d3d3;  /* HELLGRAU */
+            border-bottom: 2px solid #404080;
+            min-height: 28px;
+            align-items: flex-end;
+            padding: 0 5px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            flex-wrap: nowrap; /* responsive.css aktiviert wrap bei Bedarf */
+        }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(to bottom, #a0a0c0, #8080a0);
+            border: 1px solid #606090;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            padding: 4px 8px;
+            margin-right: 2px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #000;
+            white-space: nowrap;
+            max-width: 180px;
+            min-width: 80px; /* Verhindert zu schmale Tabs */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: background 0.15s, font-size 0.3s, padding 0.3s; /* Responsive Transitions */
+            flex-shrink: 0; /* Tabs nicht zusammenquetschen */
+        }
+
+        .tab:hover {
+            background: linear-gradient(to bottom, #b8b8d8, #9898b8);
+        }
+
+        .tab.active {
+            background: linear-gradient(to bottom, #e0e0f0, #c0c0d8);
+            border-bottom: 1px solid #e0e0f0;
+            margin-bottom: -1px;
+            font-weight: bold;
+        }
+
+        .tab-title {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tab-close {
+            margin-left: 6px;
+            width: 14px;
+            height: 14px;
+            border: none;
+            background: transparent;
+            color: #606090;
+            font-size: 12px;
+            line-height: 12px;
+            cursor: pointer;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-close:hover {
+            background: #d04040;
+            color: white;
+        }
+
+        .tab.pinned .tab-close {
             display: none;
         }
 
-        /* Right Content Area */
+        /* Iframe Container für Tabs - 100% verfügbarer Raum */
+        .tabs-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 0; /* Wichtig für flex-Container mit absolut positionierten Kindern */
+        }
+
+        .tab-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+        }
+
+        .tab-iframe.active {
+            display: block;
+        }
+
+        /* Right Content Area - flexibel skalierend */
         .content-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            min-width: 0; /* Verhindert Overflow bei flex-Kindern */
         }
 
-        .content-iframe {
-            border: none;
-            width: 100%;
-            height: 100%;
-            flex: 1;
-        }
-
-        /* Loading Overlay */
+        /* Loading Overlay - responsive Position (via responsive.css) */
         .loading-overlay {
             position: fixed;
             top: 0;
-            left: 182px;
-            width: calc(100% - 182px);
+            left: 182px; /* Fallback */
+            width: calc(100% - 182px); /* Fallback */
             height: 100%;
             background: rgba(128, 128, 192, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            transition: left 0.3s ease, width 0.3s ease; /* Sanfte Anpassung */
         }
 
         .loading-overlay.active {
@@ -228,10 +319,11 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 182px;
+            width: 182px; /* Fallback, responsive.css überschreibt */
             height: 100%;
             border: none;
             background: transparent;
+            transition: width 0.3s ease; /* Sanfte Größenänderung */
         }
     </style>
 </head>
@@ -257,8 +349,8 @@
                 <!-- PLANUNG -->
                 <div class="category-block">
                     <div class="category-header">PLANUNG</div>
-                    <button class="menu-btn" data-form="frm_N_Dienstplanuebersicht" title="Dienstplan aller Mitarbeiter anzeigen">Dienstplanübersicht</button>
-                    <button class="menu-btn" data-form="frm_VA_Planungsuebersicht" title="Aufträge und Einsätze planen">Planungsübersicht</button>
+                    <button class="menu-btn" data-form="frm_DP_Dienstplan_MA" title="Dienstplan aller Mitarbeiter anzeigen">Dienstplan MA</button>
+                    <button class="menu-btn" data-form="frm_DP_Dienstplan_Objekt" title="Aufträge und Einsätze planen">Planung Objekt</button>
                 </div>
 
                 <!-- STAMMDATEN -->
@@ -276,7 +368,10 @@
                     <button class="menu-btn" data-form="frm_MA_Zeitkonten" title="Zeitkonten der Mitarbeiter einsehen">Zeitkonten</button>
                     <button class="menu-btn" data-form="frm_N_Stundenauswertung" title="Stundenauswertung und Statistik">Stundenauswertung</button>
                     <button class="menu-btn" data-form="frm_MA_Abwesenheit" title="Urlaub, Krankheit, Abwesenheiten">Abwesenheiten</button>
-                    <button class="menu-btn" data-form="frm_N_Lohnabrechnungen" title="Lohnabrechnungen erstellen">Lohn</button>
+                    <!-- Lohn entfernt (14.01.2026) -->
+                    <button class="menu-btn" data-action="telefonliste" title="Telefonliste drucken">Telefonliste</button>
+                    <button class="menu-btn" data-action="letzterEinsatz" title="Letzten Einsatz eines MA anzeigen">Letzter Einsatz</button>
+                    <button class="menu-btn" data-form="zfrm_ZK_Lohnarten_Zuschlag" title="Lohnarten verwalten">Lohnarten</button>
                 </div>
 
                 <!-- EXTRAS -->
@@ -284,15 +379,39 @@
                     <div class="category-header">EXTRAS</div>
                     <button class="menu-btn" data-form="frm_MA_VA_Schnellauswahl" title="Schnelle Mitarbeiter-Zuweisung">Schnellauswahl</button>
                     <button class="menu-btn" data-form="frm_Einsatzuebersicht" title="Alle Einsätze auf einen Blick">Einsatzübersicht</button>
-                    <button class="menu-btn" id="btnMenu2" onclick="openMenuPopup()" title="Weitere Menü-Optionen anzeigen">Menü 2</button>
+                    <button class="menu-btn" data-form="frmTop_neue_Vorlagen" title="Vorlagen verwalten">Vorlagen</button>
+                </div>
+
+                <!-- EXPORT -->
+                <div class="category-block">
+                    <div class="category-header">EXPORT</div>
+                    <button class="menu-btn" data-action="maStammExcel" title="Mitarbeiterstamm nach Excel exportieren">MA Stamm Excel</button>
+                    <button class="menu-btn" data-action="fcnMeldeliste" title="FCN Meldeliste exportieren">FCN Meldeliste</button>
+                    <button class="menu-btn" data-action="fuerthNamensliste" title="Fürth Namensliste exportieren">Fürth Namensliste</button>
+                    <button class="menu-btn" data-action="subStunden" title="Stunden-Export">Sub Stunden</button>
+                    <button class="menu-btn" data-action="stundenMA" title="Stunden pro Mitarbeiter">Stunden MA</button>
+                </div>
+
+                <!-- SYSTEM -->
+                <div class="category-block">
+                    <div class="category-header">SYSTEM</div>
+                    <button class="menu-btn" data-form="frm_Lex_Aktiv" title="Lexware Aktiv-Status">Lex Aktiv</button>
+                    <button class="menu-btn" data-action="loewensaalSync" title="Löwensaal Daten synchronisieren">Löwensaal Sync</button>
+                    <!-- Löwensaal HP entfernt (14.01.2026) -->
                 </div>
             </div>
         </div>
 
-        <!-- Content Area -->
+        <!-- Content Area mit Tabs -->
         <div class="content-container">
-            <div class="content-header" id="contentHeader">Auftragsverwaltung</div>
-            <iframe id="contentFrame" class="content-iframe" src="frm_va_Auftragstamm.html?shell=1"></iframe>
+            <!-- Tab Bar -->
+            <div class="tab-bar" id="tabBar">
+                <!-- Tabs werden dynamisch eingefügt -->
+            </div>
+            <!-- Iframe Container für alle Tabs -->
+            <div class="tabs-container" id="tabsContainer">
+                <!-- Iframes werden dynamisch erstellt -->
+            </div>
         </div>
     </div>
 
@@ -306,28 +425,34 @@
     <script>
         'use strict';
 
-        // Form-Namen zu Anzeige-Namen Mapping
+        // Form-Namen zu Anzeige-Namen Mapping (kurze Namen für Tabs)
         const FORM_TITLES = {
-            'frm_N_Dienstplanuebersicht': 'Dienstplanübersicht',
-            'frm_VA_Planungsuebersicht': 'Planungsübersicht',
-            'frm_va_Auftragstamm': 'Auftragsverwaltung',
-            'frm_MA_Mitarbeiterstamm': 'Mitarbeiterstamm',
-            'frm_KD_Kundenstamm': 'Kundenstamm',
-            'frm_OB_Objekt': 'Objektverwaltung',
+            'frm_DP_Dienstplan_MA': 'Dienstplan MA',
+            'frm_DP_Dienstplan_Objekt': 'Planung Objekt',
+            'frm_VA_Planungsuebersicht': 'Planung',
+            'frm_va_Auftragstamm': 'Aufträge',
+            'frm_MA_Mitarbeiterstamm': 'Mitarbeiter',
+            'frm_KD_Kundenstamm': 'Kunden',
+            'frm_OB_Objekt': 'Objekte',
             'frm_MA_Zeitkonten': 'Zeitkonten',
-            'frm_N_Stundenauswertung': 'Stundenauswertung',
+            'frm_N_Stundenauswertung': 'Stunden',
             'frm_MA_Abwesenheit': 'Abwesenheiten',
-            'frm_N_Lohnabrechnungen': 'Lohnabrechnungen',
+            'frm_N_Lohnabrechnungen': 'Lohn',
             'frm_MA_VA_Schnellauswahl': 'Schnellauswahl',
-            'frm_Einsatzuebersicht': 'Einsatzübersicht'
+            'frm_Einsatzuebersicht': 'Einsätze',
+            'frm_Menuefuehrung1': 'Menü',
+            'zfrm_ZK_Lohnarten_Zuschlag': 'Lohnarten',
+            'frmTop_neue_Vorlagen': 'Vorlagen',
+            'frm_Lex_Aktiv': 'Lex Aktiv'
         };
 
         // =====================================================
-        // SHELL STATE
+        // TAB STATE
         // =====================================================
-        const ShellState = {
-            currentForm: 'frm_va_Auftragstamm',
-            iframe: null,
+        const TabState = {
+            tabs: [],           // Array von { id, formName, recordId, title, iframe, tab, pinned }
+            activeTabId: null,
+            tabCounter: 0,
             isWebView2: false,
             initialData: null
         };
@@ -337,35 +462,37 @@
         // =====================================================
         function initWebView2Bridge() {
             if (window.chrome && window.chrome.webview) {
-                ShellState.isWebView2 = true;
+                TabState.isWebView2 = true;
 
                 if (window.Bridge) {
                     Bridge.on('onDataReceived', function(data) {
                         console.log('[Shell] Daten von Access:', data);
-                        ShellState.initialData = data;
+                        TabState.initialData = data;
 
                         if (data && data.form) {
-                            loadForm(data.form, data.id);
+                            openTab(data.form, data.id);
                         }
-                        sendDataToIframe(data);
+                        sendDataToActiveIframe(data);
                     });
 
                     Bridge.on('onRefresh', function() {
-                        if (ShellState.iframe) {
-                            ShellState.iframe.contentWindow.location.reload();
+                        const activeTab = TabState.tabs.find(t => t.id === TabState.activeTabId);
+                        if (activeTab && activeTab.iframe) {
+                            activeTab.iframe.contentWindow.location.reload();
                         }
                     });
                 }
 
                 console.log('[Shell] WebView2 Bridge aktiv');
             } else {
-                console.log('[Shell] Browser-Modus (REST API)');
+                console.log('[Shell] Browser-Modus (REST API) mit Tab-Navigation');
             }
         }
 
-        function sendDataToIframe(data) {
-            if (ShellState.iframe && ShellState.iframe.contentWindow) {
-                ShellState.iframe.contentWindow.postMessage({
+        function sendDataToActiveIframe(data) {
+            const activeTab = TabState.tabs.find(t => t.id === TabState.activeTabId);
+            if (activeTab && activeTab.iframe && activeTab.iframe.contentWindow) {
+                activeTab.iframe.contentWindow.postMessage({
                     type: 'LOAD_DATA',
                     ...data
                 }, '*');
@@ -373,17 +500,220 @@
         }
 
         // =====================================================
-        // NAVIGATION
+        // TAB MANAGEMENT
         // =====================================================
-        function loadForm(formName, recordId) {
+
+        // Tab erstellen oder zu bestehendem wechseln
+        // params: zusätzliche URL-Parameter als Objekt {vadatum_id: 123, vastart_id: 456}
+        function openTab(formName, recordId, params) {
             if (!formName) return;
+
+            console.log('[Shell] openTab:', formName, recordId, params);
+
+            // Prüfen ob Tab bereits existiert (gleicher formName UND recordId)
+            const existingTab = TabState.tabs.find(t =>
+                t.formName === formName &&
+                ((!t.recordId && !recordId) || String(t.recordId) === String(recordId))
+            );
+
+            if (existingTab) {
+                // Tab existiert - nur aktivieren
+                switchTab(existingTab.id);
+                return;
+            }
+
+            // Neuen Tab erstellen
+            const tabId = 'tab_' + (++TabState.tabCounter);
+            let title = FORM_TITLES[formName] || formName;
+
+            // Bei recordId: ID zum Titel hinzufügen
+            if (recordId) {
+                title += ' #' + recordId;
+            }
+
+            // URL erstellen (mit Cache-Buster fuer aktuelle Versionen)
+            let formUrl = formName + '.html?shell=1&_t=' + Date.now();
+            if (recordId) {
+                formUrl += '&id=' + recordId;
+            }
+
+            // Zusätzliche Parameter anhängen (z.B. vadatum_id, vastart_id)
+            if (params && typeof params === 'object') {
+                for (const [key, value] of Object.entries(params)) {
+                    if (value !== null && value !== undefined && value !== '') {
+                        formUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                    }
+                }
+            }
+
+            showLoading();
+
+            // Tab-Element erstellen
+            const tabElement = document.createElement('div');
+            tabElement.className = 'tab';
+            tabElement.id = tabId;
+            tabElement.innerHTML = `
+                <span class="tab-title" title="${title}">${title}</span>
+                <button class="tab-close" title="Tab schließen">Ã—</button>
+            `;
+
+            // Click auf Tab = aktivieren
+            tabElement.querySelector('.tab-title').addEventListener('click', () => {
+                switchTab(tabId);
+            });
+
+            // Click auf X = schließen
+            tabElement.querySelector('.tab-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeTab(tabId);
+            });
+
+            document.getElementById('tabBar').appendChild(tabElement);
+
+            // Iframe erstellen
+            const iframe = document.createElement('iframe');
+            iframe.className = 'tab-iframe';
+            iframe.id = tabId + '_frame';
+            // VisBug-Fix: Laden via srcdoc statt src
+            (async () => {
+                try {
+                    const response = await fetch(formUrl, { cache: 'no-store' });
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    let html = await response.text();
+                    // Base-Tag für relative Pfade
+                    const baseDir = formUrl.split('?')[0].replace(/[^/]*$/, '');
+                    if (!html.includes('<base')) {
+                        html = html.replace('<head>', '<head><base href="' + baseDir + '">');
+                    }
+
+                    // URL-Parameter als globale Variable injizieren (srcdoc verliert URL-Parameter)
+                    // Erstelle ein Objekt mit allen Parametern für das Formular
+                    const shellParams = {
+                        shell: '1',
+                        id: recordId || null,
+                        va_id: recordId || null,
+                        ...(params || {})
+                    };
+                    // Script-Tag aufteilen um vorzeitiges Schließen zu vermeiden
+                    const paramsScript = '<script>window.SHELL_PARAMS = ' + JSON.stringify(shellParams) + ';<\/script>';
+                    html = html.replace('<head>', '<head>' + paramsScript);
+
+                    iframe.srcdoc = html;
+                } catch(e) {
+                    console.error('[Shell] Ladefehler:', e);
+                    iframe.srcdoc = '<html><body><h2>Fehler</h2><p>' + e.message + '</p></body></html>';
+                }
+            })();
+            iframe.addEventListener('load', hideLoading);
+
+            document.getElementById('tabsContainer').appendChild(iframe);
+
+            // Tab-State speichern
+            const tabData = {
+                id: tabId,
+                formName: formName,
+                recordId: recordId,
+                title: title,
+                iframe: iframe,
+                tab: tabElement,
+                pinned: false
+            };
+            TabState.tabs.push(tabData);
+
+            // Tab aktivieren
+            switchTab(tabId);
 
             // Formular-Wechsel loggen
             if (typeof Logger !== 'undefined' && Logger.log) {
-                Logger.log('FORM_OPEN', formName, null, { id: recordId || null, fromShell: true });
+                Logger.log('TAB_OPEN', formName, null, { id: recordId || null, tabId: tabId });
             }
 
-            // Active button aktualisieren
+            // Menu-Button aktualisieren
+            updateActiveMenuButton(formName);
+
+            // Browser History
+            updateBrowserHistory(formName, recordId);
+
+            // WebView2 informieren
+            if (TabState.isWebView2 && window.Bridge) {
+                Bridge.sendEvent('navigate', { form: formName, id: recordId || null });
+            }
+        }
+
+        // Zu Tab wechseln
+        function switchTab(tabId) {
+            const tabData = TabState.tabs.find(t => t.id === tabId);
+            if (!tabData) return;
+
+            console.log('[Shell] switchTab:', tabId, tabData.formName);
+
+            // Alle Tabs deaktivieren
+            TabState.tabs.forEach(t => {
+                t.tab.classList.remove('active');
+                t.iframe.classList.remove('active');
+            });
+
+            // Gewählten Tab aktivieren
+            tabData.tab.classList.add('active');
+            tabData.iframe.classList.add('active');
+            TabState.activeTabId = tabId;
+
+            // Menu-Button aktualisieren
+            updateActiveMenuButton(tabData.formName);
+
+            // Browser History
+            updateBrowserHistory(tabData.formName, tabData.recordId);
+        }
+
+        // Tab schließen
+        function closeTab(tabId) {
+            const tabIndex = TabState.tabs.findIndex(t => t.id === tabId);
+            if (tabIndex === -1) return;
+
+            const tabData = TabState.tabs[tabIndex];
+
+            // Gepinnte Tabs können nicht geschlossen werden
+            if (tabData.pinned) {
+                console.log('[Shell] Tab ist gepinnt, kann nicht geschlossen werden');
+                return;
+            }
+
+            console.log('[Shell] closeTab:', tabId, tabData.formName);
+
+            // DOM-Elemente entfernen
+            tabData.tab.remove();
+            tabData.iframe.remove();
+
+            // Aus State entfernen
+            TabState.tabs.splice(tabIndex, 1);
+
+            // Falls aktiver Tab geschlossen wurde: anderen aktivieren
+            if (TabState.activeTabId === tabId) {
+                if (TabState.tabs.length > 0) {
+                    // Vorherigen Tab aktivieren, oder ersten
+                    const newActiveIndex = Math.min(tabIndex, TabState.tabs.length - 1);
+                    switchTab(TabState.tabs[newActiveIndex].id);
+                }
+            }
+        }
+
+        // Alle Tabs bis auf gepinnte schließen
+        function closeAllTabs() {
+            const unpinnedTabs = TabState.tabs.filter(t => !t.pinned);
+            unpinnedTabs.forEach(t => closeTab(t.id));
+        }
+
+        // Tab pinnen (nicht schließbar)
+        function pinTab(tabId) {
+            const tabData = TabState.tabs.find(t => t.id === tabId);
+            if (tabData) {
+                tabData.pinned = true;
+                tabData.tab.classList.add('pinned');
+            }
+        }
+
+        // Menu-Button hervorheben
+        function updateActiveMenuButton(formName) {
             document.querySelectorAll('.menu-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -391,35 +721,24 @@
             if (activeBtn) {
                 activeBtn.classList.add('active');
             }
+        }
 
-            // Content Header aktualisieren
-            document.getElementById('contentHeader').textContent = FORM_TITLES[formName] || formName;
-
-            showLoading();
-
-            ShellState.currentForm = formName;
-
-            // URL mit shell=1 Parameter
-            let formUrl = formName + '.html?shell=1';
-            if (recordId) {
-                formUrl += '&id=' + recordId;
-            }
-
-            ShellState.iframe.src = formUrl;
-
-            // Browser History
-            if (window.history && window.history.pushState) {
+        // Browser-URL aktualisieren
+        function updateBrowserHistory(formName, recordId) {
+            if (window.history && window.history.replaceState) {
                 const historyUrl = recordId
                     ? `?form=${formName}&id=${recordId}`
                     : `?form=${formName}`;
-                window.history.pushState({form: formName, id: recordId}, '', historyUrl);
-            }
-
-            // WebView2 informieren
-            if (ShellState.isWebView2 && window.Bridge) {
-                Bridge.sendEvent('navigate', { form: formName, id: recordId || null });
+                window.history.replaceState({form: formName, id: recordId}, '', historyUrl);
             }
         }
+
+        // Wrapper für alte API (loadForm -> openTab)
+        function loadForm(formName, recordId) {
+            openTab(formName, recordId);
+        }
+
+    
 
         // =====================================================
         // IFRAME MESSAGE HANDLER
@@ -433,7 +752,13 @@
             switch (data.type) {
                 case 'NAVIGATE':
                     closeMenuPopup();
-                    loadForm(data.formName, data.id);
+                    openTab(data.formName, data.id, data.params);
+                    break;
+
+                case 'START_VBA_BRIDGE':
+                    // VBA Bridge Server starten (unsichtbar)
+                    console.log('[Shell] START_VBA_BRIDGE angefordert');
+                    startVBABridgeServer();
                     break;
 
                 case 'CLOSE_MENU':
@@ -441,18 +766,24 @@
                     break;
 
                 case 'CLOSE':
-                    loadForm('frm_Menuefuehrung1');
+                    // Aktuellen Tab schließen
+                    if (TabState.activeTabId) {
+                        closeTab(TabState.activeTabId);
+                    }
                     break;
 
                 case 'REFRESH':
-                    ShellState.iframe.contentWindow.location.reload();
+                    const activeTab = TabState.tabs.find(t => t.id === TabState.activeTabId);
+                    if (activeTab && activeTab.iframe) {
+                        activeTab.iframe.contentWindow.location.reload();
+                    }
                     break;
 
                 case 'SAVE':
                 case 'DELETE':
                 case 'LOAD_DATA':
                 case 'SEARCH':
-                    if (ShellState.isWebView2 && window.Bridge) {
+                    if (TabState.isWebView2 && window.Bridge) {
                         Bridge.sendEvent(data.type.toLowerCase(), data);
                     }
                     break;
@@ -479,7 +810,105 @@
         }
 
         // =====================================================
-        // MENU POPUP (Menu 2)
+        // VBA ACTIONS (ehem. Menü 2 Funktionen)
+        // =====================================================
+        async function handleVBAAction(action) {
+            console.log('[Shell] VBA Action:', action);
+
+            // VBA Bridge Server URL
+            const VBA_BRIDGE = 'http://localhost:5002/api/vba/execute';
+
+            try {
+                let vbaFunc = '';
+                let args = [];
+
+                switch (action) {
+                    case 'telefonliste':
+                        // Öffnet Bericht rpt_telefonliste
+                        vbaFunc = 'DoCmd.OpenReport';
+                        args = ['rpt_telefonliste', 2]; // acViewPreview = 2
+                        break;
+
+                    case 'letzterEinsatz':
+                        // Öffnet Query qry_MA_letzter_Einsatz_Gueni
+                        vbaFunc = 'DoCmd.OpenQuery';
+                        args = ['qry_MA_letzter_Einsatz_Gueni'];
+                        break;
+
+                    case 'maStammExcel':
+                        // Mitarbeiterstamm nach Excel exportieren
+                        vbaFunc = 'btn_MAStamm_Excel_Click_FromHTML';
+                        break;
+
+                    case 'fcnMeldeliste':
+                        // FCN Meldeliste erstellen
+                        vbaFunc = 'btn_FCN_Meldeliste_Click_FromHTML';
+                        break;
+
+                    case 'fuerthNamensliste':
+                        // Fürth Namensliste erstellen
+                        vbaFunc = 'btn_FuerthNamensliste_Click_FromHTML';
+                        break;
+
+                    case 'subStunden':
+                        // Sub Stunden Export
+                        vbaFunc = 'btn_stunden_sub_Click_FromHTML';
+                        break;
+
+                    case 'stundenMA':
+                        // Stunden pro Mitarbeiter
+                        vbaFunc = 'btnStundenMA_Click_FromHTML';
+                        break;
+
+                    case 'loewensaalSync':
+                        // Löwensaal Daten synchronisieren
+                        vbaFunc = 'btn_LoewensaalSync_Click_FromHTML';
+                        break;
+
+                    case 'loewensaalSyncHP':
+                        // Löwensaal Homepage synchronisieren
+                        vbaFunc = 'btn_LoewensaalSyncHP_Click_FromHTML';
+                        break;
+
+                    default:
+                        console.warn('[Shell] Unbekannte Action:', action);
+                        alert('Funktion "' + action + '" ist noch nicht implementiert.');
+                        return;
+                }
+
+                // VBA Bridge aufrufen
+                const response = await fetch(VBA_BRIDGE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        function: vbaFunc,
+                        args: args
+                    }),
+                    signal: AbortSignal.timeout(30000) // 30 Sekunden Timeout
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('[Shell] VBA Ergebnis:', result);
+                    if (result.error) {
+                        alert('Fehler: ' + result.error);
+                    }
+                } else {
+                    console.error('[Shell] VBA Bridge Fehler:', response.status);
+                    alert('VBA Bridge Fehler (HTTP ' + response.status + ')');
+                }
+            } catch (e) {
+                console.error('[Shell] VBA Action Fehler:', e);
+                if (e.name === 'TimeoutError') {
+                    alert('Zeitüberschreitung - die Funktion dauert zu lange.');
+                } else {
+                    alert('VBA Bridge nicht erreichbar.\\nBitte Access öffnen und VBA Bridge starten.');
+                }
+            }
+        }
+
+        // =====================================================
+        // MENU POPUP (Menu 2) - Legacy, wird nicht mehr benötigt
         // =====================================================
         function openMenuPopup() {
             const overlay = document.getElementById('menuPopupOverlay');
@@ -492,17 +921,110 @@
             console.log('[Shell] Menu Popup geöffnet');
         }
 
+        // VBA Bridge Server starten (unsichtbar via VBS Script)
+        async function startVBABridgeServer() {
+            // Pruefen ob bereits laeuft (mit mehreren Versuchen)
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    const health = await fetch('http://localhost:5002/api/health', {
+                        method: 'GET',
+                        signal: AbortSignal.timeout(2000)
+                    });
+                    if (health.ok) {
+                        console.log('[Shell] VBA Bridge Server laeuft bereits');
+                        return true;
+                    }
+                } catch (e) {
+                    console.log('[Shell] VBA Bridge Health-Check Versuch ' + (attempt + 1) + ' fehlgeschlagen');
+                    if (attempt < 2) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+            }
+
+            console.log('[Shell] Starte VBA Bridge Server...');
+
+            // Falls WebView2: Ueber VBA starten
+            if (TabState.isWebView2 && window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage(JSON.stringify({
+                    action: 'START_VBA_BRIDGE',
+                    requestId: 'shell-start-vba-bridge-' + Date.now()
+                }));
+                // Warten und erneut pruefen
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                try {
+                    const retry = await fetch('http://localhost:5002/api/health', {
+                        method: 'GET',
+                        signal: AbortSignal.timeout(2000)
+                    });
+                    if (retry.ok) {
+                        console.log('[Shell] VBA Bridge Server erfolgreich gestartet');
+                        return true;
+                    }
+                } catch (e) {
+                    console.error('[Shell] VBA Bridge Server konnte nicht gestartet werden');
+                }
+            }
+
+            // Browser-Modus: Nicht-blockierender Hinweis, Navigation trotzdem fortsetzen
+            // VBA Bridge ist nur fuer E-Mail-Funktionen noetig, nicht fuer Navigation
+            console.warn('[Shell] VBA Bridge Server nicht erreichbar - E-Mail-Funktionen eingeschraenkt');
+            console.warn('[Shell] Zum Starten: start_vba_bridge.bat ausfuehren');
+            // Kein Alert - Navigation soll trotzdem funktionieren
+            return false;
+        }
+
+        // VBA Bridge Server beim Shell-Start im Hintergrund prüfen und starten
+        async function checkAndStartVBABridge() {
+            try {
+                const health = await fetch('http://localhost:5002/api/health', {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(2000)
+                });
+                if (health.ok) {
+                    console.log('[Shell] VBA Bridge Server bereits aktiv');
+                    return true;
+                }
+            } catch (e) {
+                console.log('[Shell] VBA Bridge Server nicht erreichbar, starte im Hintergrund...');
+            }
+
+            // Server nicht erreichbar - versuche zu starten (im Hintergrund, ohne Alert)
+            if (TabState.isWebView2 && window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage(JSON.stringify({
+                    action: 'START_VBA_BRIDGE',
+                    requestId: 'shell-auto-start-' + Date.now()
+                }));
+                // Retry nach 3 Sekunden (ohne Fehler-Alert)
+                setTimeout(async () => {
+                    try {
+                        const retry = await fetch('http://localhost:5002/api/health', {
+                            method: 'GET',
+                            signal: AbortSignal.timeout(2000)
+                        });
+                        if (retry.ok) {
+                            console.log('[Shell] VBA Bridge Server erfolgreich gestartet (Auto-Start)');
+                        }
+                    } catch (e) {
+                        console.warn('[Shell] VBA Bridge Auto-Start fehlgeschlagen - wird bei Bedarf erneut versucht');
+                    }
+                }, 3000);
+            }
+            return false;
+        }
+
         function closeMenuPopup(event) {
-            if (event && event.target.id !== 'menuPopupOverlay') {
+            if (event && event.target && event.target.id !== 'menuPopupOverlay') {
                 return;
             }
 
             const overlay = document.getElementById('menuPopupOverlay');
             const frame = document.getElementById('menuPopupFrame');
+            const btnMenu2 = document.getElementById('btnMenu2');
 
-            overlay.classList.remove('active');
-            frame.src = 'about:blank';
-            document.getElementById('btnMenu2').classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            if (frame) frame.src = 'about:blank';
+            if (btnMenu2) btnMenu2.classList.remove('active');
 
             console.log('[Shell] Menu Popup geschlossen');
         }
@@ -511,41 +1033,60 @@
         // INITIALIZATION
         // =====================================================
         document.addEventListener('DOMContentLoaded', function() {
-            ShellState.iframe = document.getElementById('contentFrame');
-
-            // Menu Button Handler
+            // Menu Button Handler für Formulare
             document.querySelectorAll('.menu-btn[data-form]').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    loadForm(this.dataset.form);
+                    openTab(this.dataset.form);
+                });
+            });
+
+            // Menu Button Handler für VBA-Actions (ehem. Menü 2)
+            document.querySelectorAll('.menu-btn[data-action]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    handleVBAAction(this.dataset.action);
                 });
             });
 
             // iframe Messages
             window.addEventListener('message', handleIframeMessage);
 
-            // iframe Load Event
-            ShellState.iframe.addEventListener('load', function() {
-                hideLoading();
-            });
-
             // Browser Back/Forward
             window.addEventListener('popstate', function(event) {
                 if (event.state && event.state.form) {
-                    loadForm(event.state.form, event.state.id);
+                    openTab(event.state.form, event.state.id);
                 }
             });
 
             // URL Parameter beim Start
             const urlParams = new URLSearchParams(window.location.search);
             const formParam = urlParams.get('form');
-            const idParam = urlParams.get('id');
+            // Unterstütze sowohl 'id' als auch 'va_id', 'ma_id', 'kd_id' (Kompatibilität)
+            const idParam = urlParams.get('id') || urlParams.get('va_id') || urlParams.get('ma_id') || urlParams.get('kd_id');
 
+            // Zusätzliche Parameter sammeln (z.B. vadatum_id, vastart_id)
+            const extraParams = {};
+            for (const [key, value] of urlParams.entries()) {
+                if (!['form', 'id', 'va_id', 'ma_id', 'kd_id', 'shell', '_t'].includes(key)) {
+                    extraParams[key] = value;
+                }
+            }
+
+            // Falls formParam vorhanden: Direkt öffnen ohne Default-Tab
             if (formParam) {
-                loadForm(formParam, idParam);
+                // .html-Endung entfernen falls vorhanden (openTab fügt sie wieder hinzu)
+                const formName = formParam.replace(/\.html$/, '');
+                openTab(formName, idParam, extraParams);
+            } else {
+                // Kein formParam: Default-Tab öffnen (Auftragsverwaltung, gepinnt)
+                openTab('frm_va_Auftragstamm');
+                pinTab(TabState.tabs[0].id);
             }
 
             // WebView2 Bridge initialisieren
             initWebView2Bridge();
+
+            // VBA Bridge Server beim Start prüfen (im Hintergrund)
+            checkAndStartVBABridge();
 
             // ESC-Taste schliesst Menu Popup
             document.addEventListener('keydown', function(e) {
@@ -557,8 +1098,19 @@
                 }
             });
 
-            console.log('[Shell] Initialisiert');
+            // Tastenkürzel für Tabs: Ctrl+W schließt Tab
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'w') {
+                    e.preventDefault();
+                    if (TabState.activeTabId) {
+                        closeTab(TabState.activeTabId);
+                    }
+                }
+            });
+
+            console.log('[Shell] Tab-Navigation initialisiert');
         });
     </script>
 </body>
 </html>
+

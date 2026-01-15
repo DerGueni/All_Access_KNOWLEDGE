@@ -18,6 +18,10 @@ import {
     LOADER_VERSION 
 } from './auftragstamm-loader.js';
 
+// ============ DEBUG: Shell-Parameter prüfen ============
+console.log('[Auftragstamm] DEBUG - Modul geladen, window.SHELL_PARAMS:', window.SHELL_PARAMS);
+console.log('[Auftragstamm] DEBUG - window.location.search:', window.location.search);
+
 // ============ STATE ============
 const state = {
     currentRecord: null,
@@ -132,7 +136,7 @@ function initButtons() {
     bindButton('btnHeute', () => setAuftraegeFilterToday());
 
     // Aktions-Buttons - Auftragsverwaltung
-    bindButton('btnSchnellPlan', openMitarbeiterauswahl);
+    // ENTFERNT: bindButton('btnSchnellPlan', openMitarbeiterauswahl); - HTML hat bereits onclick Handler
     bindButton('btn_Posliste_oeffnen', openPositionen);
     bindButton('btnmailpos', openZusatzdateien);
     bindButton('Befehl640', kopierenAuftrag);  // Auftrag komplett kopieren
@@ -444,7 +448,31 @@ function handleSubformSelection(data) {
  */
 async function loadInitialData() {
     console.log('[Auftragstamm] Loader-Version:', LOADER_VERSION.version, LOADER_VERSION.status);
-    
+
+    // CRITICAL FIX: Bei srcdoc iframes (Shell) die Parameter aus window.SHELL_PARAMS lesen
+    // Shell injiziert Parameter als window.SHELL_PARAMS, da srcdoc keine URL-Parameter hat
+    const shellParams = window.SHELL_PARAMS || {};
+    if (shellParams.id || shellParams.va_id) {
+        console.log('[Auftragstamm] Shell-Parameter erkannt:', shellParams);
+        const requestedId = shellParams.id || shellParams.va_id;
+        console.log('[Auftragstamm] Lade spezifischen Auftrag:', requestedId);
+
+        // Combos laden
+        await loadCombos();
+
+        // Auftragsliste laden
+        await loadAuftraegeWithFilter();
+
+        // Spezifischen Auftrag laden
+        await loadAuftrag(requestedId);
+
+        // Markierung in der Liste synchronisieren
+        highlightAuftragInList(requestedId);
+
+        setStatus('Auftrag geladen');
+        return;
+    }
+
     // Abhängigkeiten für die geschützte Logik bereitstellen
     const dependencies = {
         Bridge,
@@ -456,7 +484,7 @@ async function loadInitialData() {
         setStatus,
         updateAllSubforms
     };
-    
+
     // Geschützte Logik aufrufen
     await loadInitialDataProtected(dependencies);
 }
@@ -1160,18 +1188,35 @@ async function sendeEinsatzliste(typ) {
     setStatus(`Sende Einsatzliste an ${typ}...`);
 
     try {
-        const result = await Bridge.execute('sendEinsatzliste', {
-            va_id: state.currentVA_ID,
-            typ: typ
+        // VBA Bridge Server Call (Port 5002)
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                function: 'SendeEinsatzliste_MA',
+                args: [
+                    state.currentVA_ID,
+                    state.currentVADatum,
+                    state.currentVADatum_ID || 0,
+                    typ
+                ]
+            })
         });
+
+        const result = await response.json();
 
         if (result.success) {
             setStatus(`Einsatzliste an ${typ} gesendet`);
+            showToast(`Einsatzliste wurde erfolgreich an ${typ} versendet`, 'success');
         } else {
             throw new Error(result.error || 'Unbekannter Fehler');
         }
     } catch (error) {
         setStatus('Fehler beim Senden');
+        console.error('[Auftragstamm] Einsatzliste senden Fehler:', error);
+        showToast('Fehler beim Senden: ' + error.message, 'error');
         alert('Fehler beim Senden: ' + error.message);
     }
 }
@@ -1189,51 +1234,65 @@ async function druckeEinsatzliste() {
     try {
         setStatus('Erstelle Excel-Export...');
 
-        // 1. Excel-Export via API (wie Access fXL_Export_Auftrag)
-        const result = await Bridge.execute('exportAuftragExcel', {
-            va_id: state.currentVA_ID,
-            vadatum: state.currentVADatum
+        // VBA Bridge Server Call (Port 5002) - fXL_Export_Auftrag
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                function: 'fXL_Export_Auftrag',
+                args: [
+                    state.currentVA_ID,
+                    'C:\\temp\\',  // XLPfad - temporärer Pfad
+                    `Auftrag_${state.currentVA_ID}.xlsx`  // XLName
+                ]
+            })
         });
 
-        if (result.success && result.data?.download_url) {
-            // Download der erstellten Excel-Datei
-            const link = document.createElement('a');
-            link.href = result.data.download_url;
-            link.download = result.data.filename || `Auftrag_${state.currentVA_ID}.xlsx`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        const result = await response.json();
 
-            // 2. Status auf "Beendet" setzen (Veranst_Status_ID = 2) wie in Access
-            await Bridge.execute('setAuftragStatus', {
-                va_id: state.currentVA_ID,
-                status_id: 2  // Beendet
-            });
+        if (result.success) {
+            setStatus('Excel-Export erstellt');
+            showToast('Excel-Datei wurde erstellt und in Access geöffnet', 'success');
 
-            // Status-Dropdown aktualisieren
-            const statusDropdown = document.getElementById('Veranst_Status_ID');
-            if (statusDropdown) {
-                statusDropdown.value = '2';
-                state.previousStatus = 2;
+            // Optional: Status auf "Beendet" setzen (Veranst_Status_ID = 2) wie in Access
+            try {
+                await Bridge.execute('setAuftragStatus', {
+                    va_id: state.currentVA_ID,
+                    status_id: 2  // Beendet
+                });
+
+                // Status-Dropdown aktualisieren
+                const statusDropdown = document.getElementById('Veranst_Status_ID');
+                if (statusDropdown) {
+                    statusDropdown.value = '2';
+                    state.previousStatus = 2;
+                }
+
+                setStatus('Excel-Export erstellt, Status auf Beendet gesetzt');
+            } catch (statusError) {
+                console.warn('[Auftragstamm] Status-Update fehlgeschlagen:', statusError);
             }
 
-            setStatus('Excel-Export erstellt, Status auf Beendet gesetzt');
-            alert('Excel-Datei wurde erstellt und heruntergeladen.\nStatus wurde auf "Beendet" gesetzt.');
+            alert('Excel-Datei wurde erstellt und in Access geöffnet.\nDatei wird in Excel angezeigt.');
 
-        } else if (result.error) {
-            throw new Error(result.error);
         } else {
-            // Fallback: Browser-Druck wenn API nicht verfuegbar
-            console.warn('[Auftragstamm] Excel-Export API nicht verfuegbar, nutze Browser-Druck');
-            setStatus('Drucke Einsatzliste...');
-            window.print();
+            throw new Error(result.error || 'Excel-Export fehlgeschlagen');
         }
 
     } catch (error) {
         console.error('[Auftragstamm] Excel-Export Fehler:', error);
+        showToast('Excel-Export fehlgeschlagen: ' + error.message, 'error');
+
         // Fallback: Browser-Druck
-        setStatus('Excel-Export fehlgeschlagen, nutze Browser-Druck');
-        window.print();
+        const useFallback = confirm('Excel-Export via VBA fehlgeschlagen.\n\nMöchten Sie stattdessen den Browser-Druck verwenden?');
+        if (useFallback) {
+            setStatus('Verwende Browser-Druck als Fallback...');
+            window.print();
+        } else {
+            setStatus('Excel-Export abgebrochen');
+        }
     }
 }
 
@@ -1244,49 +1303,86 @@ async function druckeNamenlisteESS() {
     }
 
     try {
-        setStatus('Lade ESS Namensliste...');
+        setStatus('Erstelle ESS Namensliste...');
 
-        // Daten via Bridge laden
-        const result = await Bridge.execute('getNamenlisteESS', { va_id: state.currentVA_ID });
-
-        if (!result.success && !result.data) {
-            throw new Error(result.error || 'Keine Daten erhalten');
-        }
-
-        const auftrag = result.data?.auftrag || state.currentRecord || {};
-        const mitarbeiter = result.data?.mitarbeiter || [];
-
-        // CSV fuer Excel erstellen
-        let csv = '\uFEFF'; // BOM fuer UTF-8 in Excel
-        csv += `ESS Namensliste: ${auftrag.Auftrag || auftrag.VA_Bezeichnung || ''}\n`;
-        csv += `Objekt: ${auftrag.Objekt || auftrag.VA_Objekt || ''}\n`;
-        csv += `Ort: ${auftrag.Ort || auftrag.VA_Ort || ''}\n`;
-        csv += `Erstellt: ${new Date().toLocaleDateString('de-DE')}\n\n`;
-
-        // Header
-        csv += 'Nachname;Vorname;Kurzname;Geburtsdatum;Geburtsort;Nationalitaet;';
-        csv += 'Ausweis-Nr;Ausweis gueltig bis;IHK 34a Nr;IHK gueltig bis;Telefon;E-Mail\n';
-
-        // Daten
-        mitarbeiter.forEach(m => {
-            const gebdat = m.Geburtsdatum ? new Date(m.Geburtsdatum).toLocaleDateString('de-DE') : '';
-            const ausweisBis = m.Ausweis_Gueltig_Bis ? new Date(m.Ausweis_Gueltig_Bis).toLocaleDateString('de-DE') : '';
-            const ihkBis = m.IHK_34a_Gueltig_Bis ? new Date(m.IHK_34a_Gueltig_Bis).toLocaleDateString('de-DE') : '';
-
-            csv += `${m.Nachname || ''};${m.Vorname || ''};${m.Kurzname || ''};`;
-            csv += `${gebdat};${m.Geburtsort || ''};${m.Nationalitaet || ''};`;
-            csv += `${m.Ausweis_Nr || ''};${ausweisBis};${m.IHK_34a_Nr || ''};${ihkBis};`;
-            csv += `${m.Tel_Mobil || ''};${m.eMail || ''}\n`;
+        // VBA Bridge Server Call (Port 5002) - ESS Namensliste erstellen
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                function: 'ExportNamenlisteESS',
+                args: [
+                    state.currentVA_ID,
+                    state.currentVADatum || new Date().toISOString().split('T')[0],
+                    state.currentVADatum_ID || 0
+                ]
+            })
         });
 
-        // Download
-        downloadCSV(csv, `ESS_Namensliste_${state.currentVA_ID}.csv`);
-        setStatus(`ESS Namensliste mit ${mitarbeiter.length} Eintraegen exportiert`);
+        const result = await response.json();
+
+        if (result.success) {
+            setStatus('ESS Namensliste erstellt');
+            showToast('ESS Namensliste wurde erfolgreich erstellt', 'success');
+            alert('ESS Namensliste wurde erstellt und in Access geöffnet.');
+        } else {
+            throw new Error(result.error || 'ESS Namensliste Fehler');
+        }
 
     } catch (error) {
-        setStatus('Fehler beim Export der ESS Namensliste');
-        console.error('[Auftragstamm] ESS Namensliste Fehler:', error);
-        alert('Fehler beim Export: ' + error.message);
+        console.error('[Auftragstamm] ESS Namensliste VBA Fehler:', error);
+        showToast('VBA-Export fehlgeschlagen, verwende CSV-Fallback', 'warning');
+
+        // Fallback: CSV-Export (bestehende Implementierung)
+        try {
+            setStatus('Lade ESS Namensliste (CSV Fallback)...');
+
+            // Daten via REST-API laden
+            const result = await Bridge.execute('getNamenlisteESS', { va_id: state.currentVA_ID });
+
+            if (!result.success && !result.data) {
+                throw new Error(result.error || 'Keine Daten erhalten');
+            }
+
+            const auftrag = result.data?.auftrag || state.currentRecord || {};
+            const mitarbeiter = result.data?.mitarbeiter || [];
+
+            // CSV fuer Excel erstellen
+            let csv = '\uFEFF'; // BOM fuer UTF-8 in Excel
+            csv += `ESS Namensliste: ${auftrag.Auftrag || auftrag.VA_Bezeichnung || ''}\n`;
+            csv += `Objekt: ${auftrag.Objekt || auftrag.VA_Objekt || ''}\n`;
+            csv += `Ort: ${auftrag.Ort || auftrag.VA_Ort || ''}\n`;
+            csv += `Erstellt: ${new Date().toLocaleDateString('de-DE')}\n\n`;
+
+            // Header
+            csv += 'Nachname;Vorname;Kurzname;Geburtsdatum;Geburtsort;Nationalitaet;';
+            csv += 'Ausweis-Nr;Ausweis gueltig bis;IHK 34a Nr;IHK gueltig bis;Telefon;E-Mail\n';
+
+            // Daten
+            mitarbeiter.forEach(m => {
+                const gebdat = m.Geburtsdatum ? new Date(m.Geburtsdatum).toLocaleDateString('de-DE') : '';
+                const ausweisBis = m.Ausweis_Gueltig_Bis ? new Date(m.Ausweis_Gueltig_Bis).toLocaleDateString('de-DE') : '';
+                const ihkBis = m.IHK_34a_Gueltig_Bis ? new Date(m.IHK_34a_Gueltig_Bis).toLocaleDateString('de-DE') : '';
+
+                csv += `${m.Nachname || ''};${m.Vorname || ''};${m.Kurzname || ''};`;
+                csv += `${gebdat};${m.Geburtsort || ''};${m.Nationalitaet || ''};`;
+                csv += `${m.Ausweis_Nr || ''};${ausweisBis};${m.IHK_34a_Nr || ''};${ihkBis};`;
+                csv += `${m.Tel_Mobil || ''};${m.eMail || ''}\n`;
+            });
+
+            // Download
+            downloadCSV(csv, `ESS_Namensliste_${state.currentVA_ID}.csv`);
+            setStatus(`ESS Namensliste mit ${mitarbeiter.length} Eintraegen exportiert (CSV)`);
+            showToast(`CSV-Datei mit ${mitarbeiter.length} Einträgen heruntergeladen`, 'success');
+
+        } catch (fallbackError) {
+            setStatus('Fehler beim Export der ESS Namensliste');
+            console.error('[Auftragstamm] ESS Namensliste CSV Fallback Fehler:', fallbackError);
+            showToast('Fehler beim Export: ' + fallbackError.message, 'error');
+            alert('Fehler beim Export: ' + fallbackError.message);
+        }
     }
 }
 
@@ -1334,73 +1430,69 @@ function renderAuftragsliste() {
     const tbody = document.querySelector('#auftraegeTable tbody');
     if (!tbody) return;
 
-    // Auftraege tagesweise expandieren (mehrtaegige Auftraege als separate Zeilen)
-    const expandedRows = [];
+    console.log('[Auftragsliste] MEHRTAGES-VERSION AKTIV - Rendering', state.records.length, 'Aufträge');
+
+    // Mehrtages-Ansicht: Jeder Tag wird als separate Zeile angezeigt
+    const allDays = [];
+
     state.records.forEach(rec => {
         const dateVon = rec.VA_DatumVon || rec.Dat_VA_Von;
-        const dateBis = rec.VA_DatumBis || rec.Dat_VA_Bis;
+        const dateBis = rec.VA_DatumBis || rec.Dat_VA_Bis || dateVon;
+        console.log('[Auftragsliste]', rec.VA_Bezeichnung || rec.Auftrag, '- Von:', dateVon, 'Bis:', dateBis);
+
+        // Generiere alle Tage zwischen Von und Bis
         const days = generateDaysBetween(dateVon, dateBis);
 
-        if (days.length === 0) {
-            // Kein gueltiges Datum - trotzdem anzeigen
-            expandedRows.push({
-                ...rec,
-                displayDate: dateVon,
-                displayDateISO: dateVon,
-                isMultiDay: false
+        days.forEach(day => {
+            allDays.push({
+                date: day,
+                dateString: day.toISOString().split('T')[0], // YYYY-MM-DD
+                auftrag: rec.VA_Bezeichnung || rec.Auftrag || '',
+                ort: rec.VA_Ort || rec.Ort || '',
+                objekt: rec.VA_Objekt || rec.Objekt || '',
+                soll: rec.MA_Anzahl || 0,
+                ist: rec.MA_Anzahl_Ist || 0,
+                status: rec.Veranst_Status_ID || 0,
+                vaId: rec.VA_ID || rec.ID
             });
-        } else if (days.length === 1) {
-            // Eintaegiger Auftrag
-            expandedRows.push({
-                ...rec,
-                displayDate: days[0],
-                displayDateISO: days[0].toISOString().split('T')[0],
-                isMultiDay: false
-            });
-        } else {
-            // Mehrtaegiger Auftrag - jeden Tag als separate Zeile
-            days.forEach((day, idx) => {
-                expandedRows.push({
-                    ...rec,
-                    displayDate: day,
-                    displayDateISO: day.toISOString().split('T')[0],
-                    dayIndex: idx + 1,
-                    totalDays: days.length,
-                    isMultiDay: true
-                });
-            });
-        }
+        });
     });
 
-    // Nach displayDateISO sortieren
-    expandedRows.sort((a, b) => {
-        const aVal = a.displayDateISO || '';
-        const bVal = b.displayDateISO || '';
-        return aVal.localeCompare(bVal);
-    });
+    // Sortiere alle Tage nach Datum
+    allDays.sort((a, b) => a.date - b.date);
 
-    tbody.innerHTML = expandedRows.map((row, idx) => {
-        const datum = formatDate(row.displayDate);
-        const auftrag = row.VA_Bezeichnung || row.Auftrag || '';
-        const ort = row.VA_Ort || row.Ort || '';
-        const dayInfo = row.isMultiDay ? ` (${row.dayIndex}/${row.totalDays})` : '';
-        const vaId = row.VA_ID || row.ID;
+    tbody.innerHTML = allDays.map((day, idx) => {
+        const datum = formatDate(day.dateString);
 
-        // Markierung wenn aktueller Auftrag UND aktuelles Datum
-        const isSelected = vaId === state.currentVA_ID &&
-            (!state.currentVADatum || row.displayDateISO === state.currentVADatum);
+        // Markierung wenn aktueller Auftrag UND aktuelles Datum (15.01.2026 Fix)
+        const isSelected = (day.vaId === state.currentVA_ID) &&
+                          (day.dateString === state.currentVADatum ||
+                           day.dateString === state.currentVADatum_ID);
         const selectedClass = isSelected ? 'selected' : '';
 
         return `
-            <tr data-index="${idx}" data-id="${vaId}" data-display-date="${row.displayDateISO}" class="${selectedClass}">
+            <tr data-index="${idx}" data-id="${day.vaId}" data-display-date="${day.dateString}" class="${selectedClass}">
                 <td>${datum}</td>
-                <td>${auftrag}${dayInfo}</td>
-                <td>${ort}</td>
+                <td>${day.auftrag}</td>
+                <td>${day.objekt || day.ort}</td>
+                <td style="text-align: center;">${day.soll}</td>
+                <td style="text-align: center;">${day.ist}</td>
+                <td style="text-align: center;">${getStatusText(day.status)}</td>
             </tr>
         `;
     }).join('');
 
     setupAuftragslisteClickHandlerWithDate();
+}
+
+// Hilfsfunktion: Status-Text ermitteln
+function getStatusText(statusId) {
+    switch (parseInt(statusId)) {
+        case 1: return 'Plan';
+        case 2: return 'Beendet';
+        case 3: return 'Abrechnung';
+        default: return '';
+    }
 }
 
 // Erweiterter Click-Handler fuer tagesweise Auswahl
@@ -2010,25 +2102,11 @@ window.openAttachment = function(id) { console.log('[Auftragstamm] openAttachmen
 window.downloadAttachment = function(id) { console.log('[Auftragstamm] downloadAttachment:', id); window.location.href = `/api/attachments/${id}/download`; };
 window.deleteAttachment = function(id) { if (confirm('Anhang wirklich loeschen?')) console.log('[Auftragstamm] deleteAttachment:', id); };
 
-// Rechnungs-Funktionen
-window.rechnungPDF = function() {
-    if (typeof Toast !== 'undefined') Toast.info('PDF wird erstellt - bitte "Als PDF speichern" wählen');
-    if (typeof exportPDF === 'function') {
-        exportPDF();
-    } else {
-        window.print();
-    }
-};
-window.berechnungslistePDF = function() {
-    if (typeof Toast !== 'undefined') Toast.info('Berechnungsliste PDF wird erstellt...');
-    if (typeof printTable === 'function') {
-        printTable('tab-positionen');
-    } else {
-        window.print();
-    }
-};
-window.rechnungDatenLaden = function() { console.log('[Auftragstamm] rechnungDatenLaden'); };
-window.rechnungLexware = function() { if (typeof Toast !== 'undefined') Toast.info('Lexware-Export...'); console.log('[Auftragstamm] rechnungLexware'); };
+// Rechnungs-Funktionen (15.01.2026 - jetzt mit VBA-Bridge)
+window.rechnungPDF = rechnungPDF;
+window.berechnungslistePDF = berechnungslistePDF;
+window.rechnungDatenLaden = rechnungDatenLaden;
+window.rechnungLexware = rechnungLexware;
 
 // Event-Funktionen (Placeholder)
 window.loadEventInfoFromWeb = function() { console.log('[Auftragstamm] loadEventInfoFromWeb'); };
@@ -2075,6 +2153,15 @@ window.toggleMaximize = function() {
         document.documentElement.requestFullscreen();
     }
 };
+
+// ============ EINSATZLISTE-BEARBEITUNGS-FUNKTIONEN (15.01.2026 ergänzt) ============
+// Diese Funktionen rufen die VBA-Bridge auf Port 5002 auf
+
+window.sortiereZuordnungen = sortiereZuordnungen;
+window.erstelleZuordnungen = erstelleZuordnungen;
+window.stundenCheck = stundenCheck;
+window.openRueckmeldeAuswertung = openRueckmeldeAuswertung;
+window.openAbwesenheiten = openAbwesenheiten;
 
 // ============ ZUSAETZLICHE ALIASE (fuer Auftragsverwaltung2.html und frm_N_VA_Auftragstamm.html) ============
 
@@ -2124,6 +2211,588 @@ window.closeModal = function(modalId) {
     }
 };
 
+// ============ FEHLENDE HANDLER (14.01.2026) ============
+// Diese Funktionen werden von HTML onclick aufgerufen
+
+// Vollbild-Toggle
+window.toggleFullscreen = function() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log('[Auftragstamm] Vollbild nicht moeglich:', err);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+};
+
+// Filter-Funktionen (Auftragliste)
+window.filterAuftraege = typeof applyAuftraegeFilter === 'function' ? applyAuftraegeFilter : function() {
+    console.log('[Auftragstamm] filterAuftraege ausgefuehrt');
+    if (typeof loadAuftraegeWithFilter === 'function') loadAuftraegeWithFilter();
+};
+
+// Rueckmelde-Statistik oeffnen
+window.openRueckmeldStatistik = typeof openRueckmeldeStatistik === 'function' ? openRueckmeldeStatistik : function() {
+    const vaId = state?.currentVA_ID || new URLSearchParams(window.location.search).get('id');
+    if (vaId) {
+        const url = `frm_Rueckmeldestatistik.html?va_id=${vaId}`;
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'NAVIGATE', formName: 'frm_Rueckmeldestatistik', id: vaId }, '*');
+        } else {
+            window.open(url, '_blank', 'width=800,height=600');
+        }
+    } else {
+        alert('Bitte zuerst einen Auftrag auswaehlen');
+    }
+};
+
+// Eventdaten aus Web laden
+window.webDatenLaden = async function() {
+    console.log('[Auftragstamm] webDatenLaden gestartet');
+    const spinner = document.querySelector('.loading-spinner');
+    if (spinner) spinner.classList.add('active');
+
+    try {
+        // TODO: Implementierung Web-Scraper fuer Eventdaten
+        // Derzeit Platzhalter - zeigt Info-Meldung
+        if (typeof Toast !== 'undefined') {
+            Toast.info('Web-Daten werden geladen...');
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (typeof Toast !== 'undefined') {
+            Toast.warning('Eventdaten-Scraper noch nicht implementiert');
+        }
+    } catch (err) {
+        console.error('[Auftragstamm] Fehler beim Laden der Web-Daten:', err);
+        if (typeof Toast !== 'undefined') Toast.error('Fehler: ' + err.message);
+    } finally {
+        if (spinner) spinner.classList.remove('active');
+    }
+};
+
+// Eventdaten speichern
+window.eventdatenSpeichern = async function() {
+    console.log('[Auftragstamm] eventdatenSpeichern gestartet');
+    const vaId = state?.currentVA_ID;
+    if (!vaId) {
+        alert('Kein Auftrag ausgewaehlt');
+        return;
+    }
+
+    try {
+        // Sammle Eventdaten aus dem Formular
+        const eventdaten = {
+            va_id: vaId,
+            event_name: document.getElementById('EventName')?.value || '',
+            event_url: document.getElementById('EventURL')?.value || '',
+            event_beschreibung: document.getElementById('EventBeschreibung')?.value || ''
+        };
+
+        // API-Call zum Speichern
+        const response = await fetch(`http://localhost:5000/api/auftraege/${vaId}/eventdaten`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventdaten)
+        });
+
+        if (response.ok) {
+            if (typeof Toast !== 'undefined') Toast.success('Eventdaten gespeichert');
+        } else {
+            throw new Error('HTTP ' + response.status);
+        }
+    } catch (err) {
+        console.error('[Auftragstamm] Fehler beim Speichern der Eventdaten:', err);
+        if (typeof Toast !== 'undefined') Toast.error('Fehler beim Speichern');
+    }
+};
+
+// closeForm - Formular schliessen
+window.closeForm = typeof closeForm === 'function' ? closeForm : function() {
+    if (window.parent !== window) {
+        window.parent.postMessage({ type: 'CLOSE' }, '*');
+    } else {
+        window.close();
+    }
+};
+
+// ============ WRAPPER-FUNKTIONEN (Button-Kompatibilität) ============
+// Diese Funktionen sorgen dafür, dass die onclick-Handler im HTML
+// mit den definierten JS-Funktionen kompatibel sind
+
+// Aktualisierung
+function refreshData() { return requeryAll(); }
+
+// Auftrags-Aktionen
+function auftragKopieren() { return kopierenAuftrag(false); }
+function auftragLoeschen() { return loeschenAuftrag(); }
+
+// Einsatzlisten & Export
+function namenslisteESS() { return druckeNamenlisteESS(); }
+function einsatzlisteDrucken() { return druckeEinsatzliste(); }
+function sendeEinsatzlisteMA() { return sendeEinsatzliste('MA'); }
+function sendeEinsatzlisteBOS() { return sendeEinsatzliste('BOS'); }
+function sendeEinsatzlisteSUB() { return sendeEinsatzliste('SUB'); }
+
+// Datum-Navigation
+function datumNavLeft() { return navigateVADatum('left'); }
+function datumNavRight() { return navigateVADatum('right'); }
+
+// BWN
+function bwnDrucken() { return druckeBWN(); }
+function bwnSenden() { return cmdBWNSend(); }
+
+// Attachments
+function neuenAttachHinzufuegen() { return addNewAttachment(); }
+
+// Auftrags-Filter & Navigation
+function filterAuftraege() { return applyAuftraegeFilter(); }
+function tageZurueck() { return shiftAuftraegeFilter(-7); }
+function tageVor() { return shiftAuftraegeFilter(7); }
+function abHeute() { return setAuftraegeFilterToday(); }
+
+// Typo-Fix (Rückmeldestatistik)
+function openRueckmeldStatistik() { return openRueckmeldeStatistik(); }
+
+// Fenster-Steuerung
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.warn('[toggleFullscreen] Vollbild nicht möglich:', err);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function toggleMaximize() {
+    // Versuche über Bridge (falls in WebView2)
+    if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
+        Bridge.sendEvent('toggle-maximize');
+    } else {
+        // Fallback: Vollbild
+        toggleFullscreen();
+    }
+}
+
+// Modal-Management
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// EL-Gesendet-Modal
+function showELGesendet() {
+    const modal = document.getElementById('elGesendetModal');
+    if (modal) {
+        modal.style.display = 'block';
+    } else {
+        console.warn('[showELGesendet] Modal elGesendetModal nicht gefunden');
+    }
+}
+
+// Status-Filter
+function filterByStatus(statusId) {
+    console.log('[filterByStatus] Filtere nach Status:', statusId);
+    // Setze Filter und aktualisiere Liste
+    const filterVon = document.getElementById('filterVon');
+    const filterBis = document.getElementById('filterBis');
+    if (filterVon && filterBis) {
+        filterVon.value = formatDate(new Date());
+        filterBis.value = formatDate(new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)); // +1 Jahr
+    }
+    // Filter auf Status setzen (wird in applyAuftraegeFilter verwendet)
+    state.auftraegeFilter = state.auftraegeFilter || {};
+    state.auftraegeFilter.status = statusId;
+    return applyAuftraegeFilter();
+}
+
+// Sortierung
+function sortAuftraege(field) {
+    console.log('[sortAuftraege] Sortiere nach:', field);
+    if (!state.sortField || state.sortField !== field) {
+        state.sortField = field;
+        state.sortAsc = true;
+    } else {
+        state.sortAsc = !state.sortAsc;
+    }
+    renderAuftragsliste();
+}
+
+// Syncfehler-Link
+function openSyncfehler() {
+    if (typeof Bridge !== 'undefined' && Bridge.openForm) {
+        Bridge.openForm('frm_SyncError');
+    } else {
+        console.warn('[openSyncfehler] Bridge nicht verfügbar');
+    }
+}
+
+// Attachment-Funktionen (Platzhalter für zukünftige Implementierung)
+function openAttachment(attachId) {
+    console.log('[openAttachment] Öffne Attachment:', attachId);
+    // TODO: Implementierung über Bridge oder API
+    if (typeof Bridge !== 'undefined' && Bridge.executeVBA) {
+        Bridge.executeVBA('OpenAttachment', attachId);
+    }
+}
+
+function downloadAttachment(attachId) {
+    console.log('[downloadAttachment] Lade Attachment herunter:', attachId);
+    // TODO: Implementierung über API
+}
+
+function deleteAttachment(attachId) {
+    console.log('[deleteAttachment] Lösche Attachment:', attachId);
+    // TODO: Implementierung über API
+}
+
+// ============ RECHNUNGS-FUNKTIONEN (VBA Bridge) ============
+
+/**
+ * Erstellt Rechnungs-PDF via VBA.
+ * Entspricht btnPDFKopf_Click in Access.
+ */
+async function rechnungPDF() {
+    if (!state.currentVA_ID) {
+        alert('Bitte zuerst einen Auftrag auswählen');
+        return;
+    }
+
+    try {
+        setStatus('Erstelle Rechnungs-PDF...');
+
+        const response = await fetch('http://localhost:5002/api/vba/rechnung/pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ va_id: state.currentVA_ID })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            setStatus('Rechnungs-PDF erstellt');
+            showToast('Rechnungs-PDF wurde erstellt', 'success');
+            if (result.pdf_path) {
+                alert('PDF erstellt:\n' + result.pdf_path);
+            }
+        } else {
+            throw new Error(result.error || 'PDF-Erstellung fehlgeschlagen');
+        }
+    } catch (error) {
+        console.error('[Auftragstamm] Rechnungs-PDF Fehler:', error);
+        setStatus('Fehler bei PDF-Erstellung');
+        showToast('Fehler: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Erstellt Berechnungsliste-PDF via VBA.
+ * Entspricht btnPDFPos_Click in Access.
+ */
+async function berechnungslistePDF() {
+    if (!state.currentVA_ID) {
+        alert('Bitte zuerst einen Auftrag auswählen');
+        return;
+    }
+
+    try {
+        setStatus('Erstelle Berechnungsliste-PDF...');
+
+        const response = await fetch('http://localhost:5002/api/vba/berechnungsliste/pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ va_id: state.currentVA_ID })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            setStatus('Berechnungsliste-PDF erstellt');
+            showToast('Berechnungsliste wurde erstellt', 'success');
+            if (result.pdf_path) {
+                alert('PDF erstellt:\n' + result.pdf_path);
+            }
+        } else {
+            throw new Error(result.error || 'PDF-Erstellung fehlgeschlagen');
+        }
+    } catch (error) {
+        console.error('[Auftragstamm] Berechnungsliste-PDF Fehler:', error);
+        setStatus('Fehler bei PDF-Erstellung');
+        showToast('Fehler: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Lädt Rechnungsdaten (Berechnungsliste füllen) via VBA.
+ * Entspricht btnLoad_Click -> fill_Berechnungsliste() in Access.
+ */
+async function rechnungDatenLaden() {
+    if (!state.currentVA_ID) {
+        alert('Bitte zuerst einen Auftrag auswählen');
+        return;
+    }
+
+    try {
+        setStatus('Lade Rechnungsdaten...');
+
+        const response = await fetch('http://localhost:5002/api/vba/rechnung/daten-laden', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ va_id: state.currentVA_ID })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            setStatus('Rechnungsdaten geladen');
+            showToast('Rechnungsdaten wurden geladen', 'success');
+            // Subform aktualisieren
+            sendToSubform('sub_Berechnungsliste', { type: 'requery' });
+        } else {
+            throw new Error(result.error || 'Laden fehlgeschlagen');
+        }
+    } catch (error) {
+        console.error('[Auftragstamm] Rechnungsdaten Fehler:', error);
+        setStatus('Fehler beim Laden der Rechnungsdaten');
+        showToast('Fehler: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Erstellt Rechnung in Lexware via VBA.
+ * Entspricht btnRchLex_Click in Access.
+ */
+async function rechnungLexware() {
+    if (!state.currentVA_ID) {
+        alert('Bitte zuerst einen Auftrag auswählen');
+        return;
+    }
+
+    if (!confirm('Rechnung in Lexware erstellen?\n\nDies erstellt eine neue Rechnung im Lexware-System.')) {
+        return;
+    }
+
+    try {
+        setStatus('Erstelle Lexware-Rechnung...');
+
+        const response = await fetch('http://localhost:5002/api/vba/rechnung/lexware', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                va_id: state.currentVA_ID,
+                kun_id: state.currentRecord?.Veranstalter_ID || 0
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            setStatus('Lexware-Rechnung erstellt');
+            showToast('Rechnung in Lexware erstellt', 'success');
+            if (result.lexware_nr) {
+                alert('Lexware-Rechnungsnummer: ' + result.lexware_nr);
+            }
+        } else {
+            throw new Error(result.error || 'Lexware-Rechnung fehlgeschlagen');
+        }
+    } catch (error) {
+        console.error('[Auftragstamm] Lexware-Rechnung Fehler:', error);
+        setStatus('Fehler bei Lexware-Rechnung');
+        showToast('Fehler: ' + error.message, 'error');
+    }
+}
+
+// ============ WEITERE VBA-FUNKTIONEN ============
+
+/**
+ * Sortiert MA-Zuordnungen nach Zeit und Name.
+ * Entspricht btn_sortieren_Click -> sort_zuo_plan() in Access.
+ */
+async function sortiereZuordnungen() {
+    if (!state.currentVA_ID || !state.currentVADatum_ID) {
+        alert('Bitte zuerst einen Auftrag und ein Datum auswählen');
+        return;
+    }
+
+    try {
+        setStatus('Sortiere Zuordnungen...');
+
+        const response = await fetch('http://localhost:5002/api/vba/sortieren', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                va_id: state.currentVA_ID,
+                vadatum_id: state.currentVADatum_ID,
+                mode: 1  // 1=Zuordnung
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            setStatus('Zuordnungen sortiert');
+            showToast('MA-Zuordnungen wurden sortiert', 'success');
+            // Einsatzliste aktualisieren
+            updateMASubforms();
+        } else {
+            throw new Error(result.error || 'Sortierung fehlgeschlagen');
+        }
+    } catch (error) {
+        console.error('[Auftragstamm] Sortierung Fehler:', error);
+        setStatus('Fehler bei Sortierung');
+        showToast('Fehler: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Erstellt Zuordnungs-Slots für alle Schichten.
+ * Entspricht btnVAPlanCrea_Click -> Zuord_Fill() in Access.
+ */
+async function erstelleZuordnungen() {
+    if (!state.currentVA_ID || !state.currentVADatum_ID) {
+        alert('Bitte zuerst einen Auftrag und ein Datum auswählen');
+        return;
+    }
+
+    try {
+        setStatus('Erstelle Zuordnungen...');
+
+        const response = await fetch('http://localhost:5002/api/vba/zuordnung-fill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                va_id: state.currentVA_ID,
+                vadatum_id: state.currentVADatum_ID
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            setStatus('Zuordnungen erstellt');
+            showToast('Zuordnungs-Slots wurden erstellt', 'success');
+            // Subforms aktualisieren
+            updateAllSubforms();
+        } else {
+            throw new Error(result.error || 'Erstellung fehlgeschlagen');
+        }
+    } catch (error) {
+        console.error('[Auftragstamm] Zuordnung erstellen Fehler:', error);
+        setStatus('Fehler beim Erstellen');
+        showToast('Fehler: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Stunden-Check: Status auf Abrechnung + EL drucken.
+ * Entspricht btn_std_check_Click in Access.
+ */
+async function stundenCheck() {
+    if (!state.currentVA_ID) {
+        alert('Bitte zuerst einen Auftrag auswählen');
+        return;
+    }
+
+    if (!confirm('Stunden-Check durchführen?\n\nDies setzt den Status auf "Abrechnung" und erstellt die Einsatzliste.')) {
+        return;
+    }
+
+    try {
+        setStatus('Führe Stunden-Check durch...');
+
+        const response = await fetch('http://localhost:5002/api/vba/std-check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ va_id: state.currentVA_ID })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            setStatus('Stunden-Check abgeschlossen');
+            showToast('Status auf Abrechnung gesetzt', 'success');
+
+            // Status-Dropdown aktualisieren
+            const statusDropdown = document.getElementById('Veranst_Status_ID');
+            if (statusDropdown) {
+                statusDropdown.value = '3';
+                state.previousStatus = 3;
+            }
+
+            alert('Stunden-Check abgeschlossen:\n- Status: Abrechnung\n- Einsatzliste wurde erstellt');
+        } else {
+            throw new Error(result.error || 'Stunden-Check fehlgeschlagen');
+        }
+    } catch (error) {
+        console.error('[Auftragstamm] Stunden-Check Fehler:', error);
+        setStatus('Fehler beim Stunden-Check');
+        showToast('Fehler: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Öffnet Rückmelde-Auswertung.
+ * Entspricht btn_Rueckmeld_Click in Access.
+ */
+async function openRueckmeldeAuswertung() {
+    try {
+        const response = await fetch('http://localhost:5002/api/vba/rueckmeldungen', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ va_id: state.currentVA_ID || 0 })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Rückmelde-Formular geöffnet', 'info');
+        } else {
+            // Fallback: HTML-Formular öffnen
+            window.open('zfrm_Rueckmeldungen.html', '_blank');
+        }
+    } catch (error) {
+        console.error('[Auftragstamm] Rückmeldungen Fehler:', error);
+        // Fallback: HTML-Formular öffnen
+        window.open('zfrm_Rueckmeldungen.html', '_blank');
+    }
+}
+
+/**
+ * Öffnet Abwesenheitsübersicht.
+ * Entspricht btn_VA_Abwesenheiten_Click in Access.
+ */
+async function openAbwesenheiten() {
+    try {
+        const response = await fetch('http://localhost:5002/api/vba/abwesenheiten', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Abwesenheits-Formular geöffnet', 'info');
+        } else {
+            // Fallback: HTML-Formular öffnen
+            window.open('frm_abwesenheitsuebersicht.html', '_blank');
+        }
+    } catch (error) {
+        console.error('[Auftragstamm] Abwesenheiten Fehler:', error);
+        // Fallback: HTML-Formular öffnen
+        window.open('frm_abwesenheitsuebersicht.html', '_blank');
+    }
+}
+
+// Eventdaten-Funktionen
+function webDatenLaden() {
+    console.log('[webDatenLaden] Lade Web-Eventdaten');
+    // TODO: Implementierung - Scraping oder API-Import
+    showToast('Web-Eventdaten laden wird noch implementiert', 'info');
+}
+
 // ============ EXPORT ============
 window.Auftragstamm = {
     requery: requeryAll,
@@ -2143,5 +2812,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.ApiAutostart) {
         await window.ApiAutostart.init();
     }
+
+    // Scroll-Geschwindigkeit der Auftragsliste reduzieren (15.01.2026)
+    const auftraegeListeContainer = document.querySelector('.auftraege-liste');
+    if (auftraegeListeContainer) {
+        auftraegeListeContainer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY;
+            // Scroll-Geschwindigkeit auf 30% reduzieren (statt 100%)
+            auftraegeListeContainer.scrollTop += delta * 0.3;
+        }, { passive: false });
+    }
+
     init();
 });

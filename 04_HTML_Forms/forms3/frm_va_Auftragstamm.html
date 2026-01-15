@@ -1,9 +1,10 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
+﻿<!DOCTYPE html>
+<html lang="de" data-yd-content-ready="true"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auftragsverwaltung</title>
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <script>
     // Auto-Load in Shell (Sidebar-Integration)
     (function() {
@@ -30,7 +31,7 @@
             --base-font-size: 11px;
             --small-font-size: 10px;
             --header-font-size: 12px;
-            --title-font-size: 23px; /* Formulartitel +8px (war 15px) gemaess Anforderung */
+            --title-font-size: 24px; /* Einheitliche Titelgröße (15.01.2026) */
         }
 
         * {
@@ -233,7 +234,7 @@
         /* Content Area */
         .content-area {
             flex: 1;
-            background-color: #8080c0;
+            background-color: #d3d3d3;
             padding: 3px;
             display: flex;
             flex-direction: column;
@@ -243,7 +244,7 @@
 
         /* Header Row - ohne grauen Hintergrund gemaess Anforderung */
         .header-row {
-            background-color: #8080c0; /* Passt zum Body-Hintergrund */
+            background-color: #d3d3d3; /* Passt zum Body-Hintergrund */
             border: none;
             padding: 4px 8px;
             display: flex;
@@ -327,12 +328,16 @@
 
         /* Einheitliche Buttons im Header-Bereich - alle gleiche Hoehe/Padding */
         .unified-btn {
-            min-width: 85px;
+            min-width: 100px; /* 85+15=100px breiter (14.01.2026) */
             height: 26px;
-            padding: 4px 10px;
+            padding: 4px 12px; /* Mehr Padding */
             text-align: center;
             font-size: var(--base-font-size);
             line-height: 1.2;
+            /* Alle Buttons einheitlich grau (14.01.2026) */
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0) !important;
+            color: #000 !important;
+            border: 1px solid #808080 !important;
         }
 
         .unified-btn.btn-green {
@@ -419,11 +424,11 @@
         /* Buttons-Container fuer exakt 2 Reihen a 6 Spalten - ab Position "Positionen" */
         .header-row.combined-buttons .buttons-grid {
             display: grid;
-            grid-template-columns: repeat(6, minmax(90px, 1fr));
+            grid-template-columns: repeat(6, minmax(105px, 1fr)); /* Breiter (14.01.2026) */
             grid-template-rows: auto auto; /* Exakt 2 Reihen */
-            gap: 4px 5px;
+            gap: 6px 10px; /* Mehr Abstand zwischen Buttons (14.01.2026) */
             flex: 0 0 auto; /* Nicht flexen, feste Groesse */
-            max-width: 650px; /* Begrenzte Breite fuer 2x6 Grid */
+            max-width: 750px; /* Mehr Platz fuer breitere Buttons (14.01.2026) */
         }
 
         .header-row.combined-buttons .btn {
@@ -492,6 +497,8 @@
             align-items: start;
             font-size: calc(var(--base-font-size) + 3px); /* +3px fuer bessere Lesbarkeit */
             font-weight: bold; /* Fett gemaess Anforderung */
+            height: 130px; /* Reduzierte Höhe für kompakteren Bereich */
+            max-height: 130px;
         }
 
         .form-section .form-label,
@@ -504,7 +511,8 @@
         .form-column {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 4px; /* Vertikaler Abstand zwischen Feldern */
+            justify-content: flex-start;
         }
 
         .form-row {
@@ -536,6 +544,7 @@
 
         .form-column.right {
             order: 2; /* Treffpunkt etc. in der Mitte */
+            margin-left: -75px; /* 75px nach links verschoben (14.01.2026) */
         }
 
         .form-column.middle {
@@ -545,8 +554,8 @@
 
         /* Einheitliche Feldbreiten gemaess Anforderung - ALLE Felder gleich breit */
         .input-narrow { width: 80px; height: 22px; } /* Nur fuer Datums-/Zeitfelder */
-        .input-medium { width: 160px; height: 22px; } /* Standard-Breite fuer alle normalen Felder */
-        .input-wide { width: 210px; height: 22px; } /* Angepasst auf gleiche Breite wie medium! */
+        .input-medium { width: 195px; height: 22px; } /* 160+35=195px breiter (14.01.2026) */
+        .input-wide { width: 245px; height: 22px; } /* 210+35=245px breiter (14.01.2026) */
 
         /* Alle Eingabefelder im Formular-Bereich einheitlich */
         .form-section .form-input,
@@ -593,16 +602,20 @@
             background: #8080b0;
             border-bottom: 1px solid #606090;
             flex-shrink: 0;
+            height: 28px; /* Feste Höhe für kompaktere Tabs */
         }
 
         .tab-btn {
-            padding: 4px 12px;
+            padding: 2px 12px; /* Reduziertes Padding vertikal */
             background: #a0a0c0;
             border: 1px solid #808080;
             border-bottom: none;
             cursor: pointer;
             font-size: var(--base-font-size);
             margin-right: -1px;
+            color: white; /* Schriftfarbe weiß */
+            line-height: 24px; /* Angepasste Line-Height für vertikale Zentrierung */
+            height: 28px; /* Feste Höhe */
         }
 
         .tab-btn.active {
@@ -610,6 +623,7 @@
             border-bottom: 1px solid #9090c0;
             position: relative;
             top: 1px;
+            color: white; /* Schriftfarbe weiß */
         }
 
         .tab-content {
@@ -755,7 +769,7 @@
 
         /* Left Subform - Schichten kleiner, Absagen groesser */
         .subform-left {
-            width: 190px;
+            width: 200px; /* 160+40=200px - 40px breiter (14.01.2026) */
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
@@ -860,11 +874,11 @@
             background: white;
         }
 
-        /* Right Panel - 2cm breiter gemaess Anforderung (340 + 75 = 415px) */
+        /* Right Panel - breiter für Soll/Ist/Status Spalten */
         .right-panel {
-            width: 415px; /* 2cm breiter als vorher */
-            min-width: 380px;
-            max-width: 480px;
+            width: 530px; /* 500+30=530px - 30px breiter (14.01.2026) */
+            min-width: 480px;
+            max-width: 610px;
             background: #9090c0;
             border: 1px solid #606090;
             display: flex;
@@ -886,7 +900,7 @@
             top: 0;
             left: 0;
             right: 0;
-            background: #9090c0;
+            background: #b8b8d8; /* Hell-lila wie .form-section */
             z-index: 10;
         }
 
@@ -1190,8 +1204,38 @@
     <link rel="stylesheet" href="consys-common.css">
     <link rel="stylesheet" href="css/fonts_override.css">
     <link rel="stylesheet" href="css/visbug_overrides.css">
-</head>
-<body>
+<script src="chrome-extension://oglffgiaiekgeicdgkdlnlkhliajdlja/injectScript.js"></script><style>@keyframes loading {
+    0% {
+        transform: rotate(0);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar-thumb {
+    background: #dfdfdf;
+    border-radius: 4px;
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar-thumb:hover {
+    background: #d4d4d4;
+}
+</style><style>.translated-content .ytCoreImageHost {
+    visibility: visible;
+}
+</style><style>body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow:hidden}body.swal2-height-auto{height:auto !important}body.swal2-no-backdrop .swal2-container{background-color:rgba(0,0,0,0) !important;pointer-events:none}body.swal2-no-backdrop .swal2-container .swal2-popup{pointer-events:all}body.swal2-no-backdrop .swal2-container .swal2-modal{box-shadow:0 0 10px rgba(0,0,0,.4)}body.swal2-toast-shown .swal2-container{box-sizing:border-box;width:360px;max-width:100%;background-color:rgba(0,0,0,0);pointer-events:none}body.swal2-toast-shown .swal2-container.swal2-top{inset:0 auto auto 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-top-end,body.swal2-toast-shown .swal2-container.swal2-top-right{inset:0 0 auto auto}body.swal2-toast-shown .swal2-container.swal2-top-start,body.swal2-toast-shown .swal2-container.swal2-top-left{inset:0 auto auto 0}body.swal2-toast-shown .swal2-container.swal2-center-start,body.swal2-toast-shown .swal2-container.swal2-center-left{inset:50% auto auto 0;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-center{inset:50% auto auto 50%;transform:translate(-50%, -50%)}body.swal2-toast-shown .swal2-container.swal2-center-end,body.swal2-toast-shown .swal2-container.swal2-center-right{inset:50% 0 auto auto;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-start,body.swal2-toast-shown .swal2-container.swal2-bottom-left{inset:auto auto 0 0}body.swal2-toast-shown .swal2-container.swal2-bottom{inset:auto auto 0 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-end,body.swal2-toast-shown .swal2-container.swal2-bottom-right{inset:auto 0 0 auto}@media print{body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow-y:scroll !important}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown)>[aria-hidden=true]{display:none}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown) .swal2-container{position:static !important}}div:where(.swal2-container){display:grid;position:fixed;z-index:1060;inset:0;box-sizing:border-box;grid-template-areas:"top-start     top            top-end" "center-start  center         center-end" "bottom-start  bottom-center  bottom-end";grid-template-rows:minmax(min-content, auto) minmax(min-content, auto) minmax(min-content, auto);height:100%;padding:.625em;overflow-x:hidden;transition:background-color .1s;-webkit-overflow-scrolling:touch}div:where(.swal2-container).swal2-backdrop-show,div:where(.swal2-container).swal2-noanimation{background:rgba(0,0,0,.4)}div:where(.swal2-container).swal2-backdrop-hide{background:rgba(0,0,0,0) !important}div:where(.swal2-container).swal2-top-start,div:where(.swal2-container).swal2-center-start,div:where(.swal2-container).swal2-bottom-start{grid-template-columns:minmax(0, 1fr) auto auto}div:where(.swal2-container).swal2-top,div:where(.swal2-container).swal2-center,div:where(.swal2-container).swal2-bottom{grid-template-columns:auto minmax(0, 1fr) auto}div:where(.swal2-container).swal2-top-end,div:where(.swal2-container).swal2-center-end,div:where(.swal2-container).swal2-bottom-end{grid-template-columns:auto auto minmax(0, 1fr)}div:where(.swal2-container).swal2-top-start>.swal2-popup{align-self:start}div:where(.swal2-container).swal2-top>.swal2-popup{grid-column:2;place-self:start center}div:where(.swal2-container).swal2-top-end>.swal2-popup,div:where(.swal2-container).swal2-top-right>.swal2-popup{grid-column:3;place-self:start end}div:where(.swal2-container).swal2-center-start>.swal2-popup,div:where(.swal2-container).swal2-center-left>.swal2-popup{grid-row:2;align-self:center}div:where(.swal2-container).swal2-center>.swal2-popup{grid-column:2;grid-row:2;place-self:center center}div:where(.swal2-container).swal2-center-end>.swal2-popup,div:where(.swal2-container).swal2-center-right>.swal2-popup{grid-column:3;grid-row:2;place-self:center end}div:where(.swal2-container).swal2-bottom-start>.swal2-popup,div:where(.swal2-container).swal2-bottom-left>.swal2-popup{grid-column:1;grid-row:3;align-self:end}div:where(.swal2-container).swal2-bottom>.swal2-popup{grid-column:2;grid-row:3;place-self:end center}div:where(.swal2-container).swal2-bottom-end>.swal2-popup,div:where(.swal2-container).swal2-bottom-right>.swal2-popup{grid-column:3;grid-row:3;place-self:end end}div:where(.swal2-container).swal2-grow-row>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-column:1/4;width:100%}div:where(.swal2-container).swal2-grow-column>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-row:1/4;align-self:stretch}div:where(.swal2-container).swal2-no-transition{transition:none !important}div:where(.swal2-container) div:where(.swal2-popup){display:none;position:relative;box-sizing:border-box;grid-template-columns:minmax(0, 100%);width:32em;max-width:100%;padding:0 0 1.25em;border:none;border-radius:5px;background:#fff;color:hsl(0,0%,33%);font-family:inherit;font-size:1rem}div:where(.swal2-container) div:where(.swal2-popup):focus{outline:none}div:where(.swal2-container) div:where(.swal2-popup).swal2-loading{overflow-y:hidden}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable{cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable div:where(.swal2-icon){cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging{cursor:grabbing}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging div:where(.swal2-icon){cursor:grabbing}div:where(.swal2-container) h2:where(.swal2-title){position:relative;max-width:100%;margin:0;padding:.8em 1em 0;color:inherit;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;word-wrap:break-word;cursor:initial}div:where(.swal2-container) div:where(.swal2-actions){display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:center;width:auto;margin:1.25em auto 0;padding:0}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled[disabled]{opacity:.4}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled:hover{background-image:linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled:active{background-image:linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2))}div:where(.swal2-container) div:where(.swal2-loader){display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 rgba(0,0,0,0) #2778c4 rgba(0,0,0,0)}div:where(.swal2-container) button:where(.swal2-styled){margin:.3125em;padding:.625em 1.1em;transition:box-shadow .1s;box-shadow:0 0 0 3px rgba(0,0,0,0);font-weight:500}div:where(.swal2-container) button:where(.swal2-styled):not([disabled]){cursor:pointer}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm){border:0;border-radius:.25em;background:initial;background-color:#7066e0;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm):focus-visible{box-shadow:0 0 0 3px rgba(112,102,224,.5)}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny){border:0;border-radius:.25em;background:initial;background-color:#dc3741;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny):focus-visible{box-shadow:0 0 0 3px rgba(220,55,65,.5)}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel){border:0;border-radius:.25em;background:initial;background-color:#6e7881;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):focus-visible{box-shadow:0 0 0 3px rgba(110,120,129,.5)}div:where(.swal2-container) button:where(.swal2-styled).swal2-default-outline:focus-visible{box-shadow:0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) button:where(.swal2-styled):focus-visible{outline:none}div:where(.swal2-container) button:where(.swal2-styled)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-footer){margin:1em 0 0;padding:1em 1em 0;border-top:1px solid #eee;color:inherit;font-size:1em;text-align:center;cursor:initial}div:where(.swal2-container) .swal2-timer-progress-bar-container{position:absolute;right:0;bottom:0;left:0;grid-column:auto !important;overflow:hidden;border-bottom-right-radius:5px;border-bottom-left-radius:5px}div:where(.swal2-container) div:where(.swal2-timer-progress-bar){width:100%;height:.25em;background:rgba(0,0,0,.2)}div:where(.swal2-container) img:where(.swal2-image){max-width:100%;margin:2em auto 1em;cursor:initial}div:where(.swal2-container) button:where(.swal2-close){z-index:2;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin-top:0;margin-right:0;margin-bottom:-1.2em;padding:0;overflow:hidden;transition:color .1s,box-shadow .1s;border:none;border-radius:5px;background:rgba(0,0,0,0);color:#ccc;font-family:monospace;font-size:2.5em;cursor:pointer;justify-self:end}div:where(.swal2-container) button:where(.swal2-close):hover{transform:none;background:rgba(0,0,0,0);color:#f27474}div:where(.swal2-container) button:where(.swal2-close):focus-visible{outline:none;box-shadow:inset 0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) button:where(.swal2-close)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-html-container){z-index:1;justify-content:center;margin:0;padding:1em 1.6em .3em;overflow:auto;color:inherit;font-size:1.125em;font-weight:normal;line-height:normal;text-align:center;word-wrap:break-word;word-break:break-word;cursor:initial}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea),div:where(.swal2-container) select:where(.swal2-select),div:where(.swal2-container) div:where(.swal2-radio),div:where(.swal2-container) label:where(.swal2-checkbox){margin:1em 2em 3px}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea){box-sizing:border-box;width:auto;transition:border-color .1s,box-shadow .1s;border:1px solid hsl(0,0%,85%);border-radius:.1875em;background:rgba(0,0,0,0);box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(0,0,0,0);color:inherit;font-size:1.125em}div:where(.swal2-container) input:where(.swal2-input).swal2-inputerror,div:where(.swal2-container) input:where(.swal2-file).swal2-inputerror,div:where(.swal2-container) textarea:where(.swal2-textarea).swal2-inputerror{border-color:#f27474 !important;box-shadow:0 0 2px #f27474 !important}div:where(.swal2-container) input:where(.swal2-input):focus,div:where(.swal2-container) input:where(.swal2-file):focus,div:where(.swal2-container) textarea:where(.swal2-textarea):focus{border:1px solid #b4dbed;outline:none;box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) input:where(.swal2-input)::placeholder,div:where(.swal2-container) input:where(.swal2-file)::placeholder,div:where(.swal2-container) textarea:where(.swal2-textarea)::placeholder{color:#ccc}div:where(.swal2-container) .swal2-range{margin:1em 2em 3px;background:#fff}div:where(.swal2-container) .swal2-range input{width:80%}div:where(.swal2-container) .swal2-range output{width:20%;color:inherit;font-weight:600;text-align:center}div:where(.swal2-container) .swal2-range input,div:where(.swal2-container) .swal2-range output{height:2.625em;padding:0;font-size:1.125em;line-height:2.625em}div:where(.swal2-container) .swal2-input{height:2.625em;padding:0 .75em}div:where(.swal2-container) .swal2-file{width:75%;margin-right:auto;margin-left:auto;background:rgba(0,0,0,0);font-size:1.125em}div:where(.swal2-container) .swal2-textarea{height:6.75em;padding:.75em}div:where(.swal2-container) .swal2-select{min-width:50%;max-width:100%;padding:.375em .625em;background:rgba(0,0,0,0);color:inherit;font-size:1.125em}div:where(.swal2-container) .swal2-radio,div:where(.swal2-container) .swal2-checkbox{align-items:center;justify-content:center;background:#fff;color:inherit}div:where(.swal2-container) .swal2-radio label,div:where(.swal2-container) .swal2-checkbox label{margin:0 .6em;font-size:1.125em}div:where(.swal2-container) .swal2-radio input,div:where(.swal2-container) .swal2-checkbox input{flex-shrink:0;margin:0 .4em}div:where(.swal2-container) label:where(.swal2-input-label){display:flex;justify-content:center;margin:1em auto 0}div:where(.swal2-container) div:where(.swal2-validation-message){align-items:center;justify-content:center;margin:1em 0 0;padding:.625em;overflow:hidden;background:hsl(0,0%,94%);color:#666;font-size:1em;font-weight:300}div:where(.swal2-container) div:where(.swal2-validation-message)::before{content:"!";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}div:where(.swal2-container) .swal2-progress-steps{flex-wrap:wrap;align-items:center;max-width:100%;margin:1.25em auto;padding:0;background:rgba(0,0,0,0);font-weight:600}div:where(.swal2-container) .swal2-progress-steps li{display:inline-block;position:relative}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step{z-index:20;flex-shrink:0;width:2em;height:2em;border-radius:2em;background:#2778c4;color:#fff;line-height:2em;text-align:center}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step{background:#2778c4}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step{background:#add8e6;color:#fff}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line{background:#add8e6}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step-line{z-index:10;flex-shrink:0;width:2.5em;height:.4em;margin:0 -1px;background:#2778c4}div:where(.swal2-icon){position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:2.5em auto .6em;border:.25em solid rgba(0,0,0,0);border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;user-select:none}div:where(.swal2-icon) .swal2-icon-content{display:flex;align-items:center;font-size:3.75em}div:where(.swal2-icon).swal2-error{border-color:#f27474;color:#f27474}div:where(.swal2-icon).swal2-error .swal2-x-mark{position:relative;flex-grow:1}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line]{display:block;position:absolute;top:2.3125em;width:2.9375em;height:.3125em;border-radius:.125em;background-color:#f27474}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=left]{left:1.0625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=right]{right:1em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-error.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-error.swal2-icon-show .swal2-x-mark{animation:swal2-animate-error-x-mark .5s}div:where(.swal2-icon).swal2-warning{border-color:rgb(249.95234375,205.965625,167.74765625);color:#f8bb86}div:where(.swal2-icon).swal2-warning.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-warning.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .5s}div:where(.swal2-icon).swal2-info{border-color:rgb(156.7033492823,224.2822966507,246.2966507177);color:#3fc3ee}div:where(.swal2-icon).swal2-info.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-info.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .8s}div:where(.swal2-icon).swal2-question{border-color:rgb(200.8064516129,217.9677419355,225.1935483871);color:#87adbd}div:where(.swal2-icon).swal2-question.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-question.swal2-icon-show .swal2-icon-content{animation:swal2-animate-question-mark .8s}div:where(.swal2-icon).swal2-success{border-color:#a5dc86;color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line]{position:absolute;width:3.75em;height:7.5em;border-radius:50%}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.4375em;left:-2.0635em;transform:rotate(-45deg);transform-origin:3.75em 3.75em;border-radius:7.5em 0 0 7.5em}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.6875em;left:1.875em;transform:rotate(-45deg);transform-origin:0 3.75em;border-radius:0 7.5em 7.5em 0}div:where(.swal2-icon).swal2-success .swal2-success-ring{position:absolute;z-index:2;top:-0.25em;left:-0.25em;box-sizing:content-box;width:100%;height:100%;border:.25em solid rgba(165,220,134,.3);border-radius:50%}div:where(.swal2-icon).swal2-success .swal2-success-fix{position:absolute;z-index:1;top:.5em;left:1.625em;width:.4375em;height:5.625em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line]{display:block;position:absolute;z-index:2;height:.3125em;border-radius:.125em;background-color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=tip]{top:2.875em;left:.8125em;width:1.5625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=long]{top:2.375em;right:.5em;width:2.9375em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-animate-success-line-tip .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-animate-success-line-long .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-circular-line-right{animation:swal2-rotate-success-circular-line 4.25s ease-in}[class^=swal2]{-webkit-tap-highlight-color:rgba(0,0,0,0)}.swal2-show{animation:swal2-show .3s}.swal2-hide{animation:swal2-hide .15s forwards}.swal2-noanimation{transition:none}.swal2-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}.swal2-rtl .swal2-close{margin-right:initial;margin-left:0}.swal2-rtl .swal2-timer-progress-bar{right:0;left:auto}.swal2-toast{box-sizing:border-box;grid-column:1/4 !important;grid-row:1/4 !important;grid-template-columns:min-content auto min-content;padding:1em;overflow-y:hidden;background:#fff;box-shadow:0 0 1px rgba(0,0,0,.075),0 1px 2px rgba(0,0,0,.075),1px 2px 4px rgba(0,0,0,.075),1px 3px 8px rgba(0,0,0,.075),2px 4px 16px rgba(0,0,0,.075);pointer-events:all}.swal2-toast>*{grid-column:2}.swal2-toast h2:where(.swal2-title){margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-toast .swal2-loading{justify-content:center}.swal2-toast input:where(.swal2-input){height:2em;margin:.5em;font-size:1em}.swal2-toast .swal2-validation-message{font-size:1em}.swal2-toast div:where(.swal2-footer){margin:.5em 0 0;padding:.5em 0 0;font-size:.8em}.swal2-toast button:where(.swal2-close){grid-column:3/3;grid-row:1/99;align-self:center;width:.8em;height:.8em;margin:0;font-size:2em}.swal2-toast div:where(.swal2-html-container){margin:.5em 1em;padding:0;overflow:initial;font-size:1em;text-align:initial}.swal2-toast div:where(.swal2-html-container):empty{padding:0}.swal2-toast .swal2-loader{grid-column:1;grid-row:1/99;align-self:center;width:2em;height:2em;margin:.25em}.swal2-toast .swal2-icon{grid-column:1;grid-row:1/99;align-self:center;width:2em;min-width:2em;height:2em;margin:0 .5em 0 0}.swal2-toast .swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:1.8em;font-weight:bold}.swal2-toast .swal2-icon.swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line]{top:.875em;width:1.375em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:.3125em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:.3125em}.swal2-toast div:where(.swal2-actions){justify-content:flex-start;height:auto;margin:0;margin-top:.5em;padding:0 .5em}.swal2-toast button:where(.swal2-styled){margin:.25em .5em;padding:.4em .6em;font-size:1em}.swal2-toast .swal2-success{border-color:#a5dc86}.swal2-toast .swal2-success [class^=swal2-success-circular-line]{position:absolute;width:1.6em;height:3em;border-radius:50%}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.8em;left:-0.5em;transform:rotate(-45deg);transform-origin:2em 2em;border-radius:4em 0 0 4em}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.25em;left:.9375em;transform-origin:0 1.5em;border-radius:0 4em 4em 0}.swal2-toast .swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-success .swal2-success-fix{top:0;left:.4375em;width:.4375em;height:2.6875em}.swal2-toast .swal2-success [class^=swal2-success-line]{height:.3125em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=tip]{top:1.125em;left:.1875em;width:.75em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=long]{top:.9375em;right:.1875em;width:1.375em}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-toast-animate-success-line-tip .75s}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-toast-animate-success-line-long .75s}.swal2-toast.swal2-show{animation:swal2-toast-show .5s}.swal2-toast.swal2-hide{animation:swal2-toast-hide .1s forwards}@keyframes swal2-show{0%{transform:scale(0.7)}45%{transform:scale(1.05)}80%{transform:scale(0.95)}100%{transform:scale(1)}}@keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(0.5);opacity:0}}@keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-0.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(0.4);opacity:0}50%{margin-top:1.625em;transform:scale(0.4);opacity:0}80%{margin-top:-0.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0deg);opacity:1}}@keyframes swal2-rotate-loading{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes swal2-animate-question-mark{0%{transform:rotateY(-360deg)}100%{transform:rotateY(0)}}@keyframes swal2-animate-i-mark{0%{transform:rotateZ(45deg);opacity:0}25%{transform:rotateZ(-25deg);opacity:.4}50%{transform:rotateZ(15deg);opacity:.8}75%{transform:rotateZ(-5deg);opacity:1}100%{transform:rotateX(0);opacity:1}}@keyframes swal2-toast-show{0%{transform:translateY(-0.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(0.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0deg)}}@keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-0.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}</style></head>
+<body inmaintabuse="1">
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
@@ -1207,13 +1251,13 @@
         <!-- Title Bar -->
         <div class="title-bar">
             <div class="title-bar-left">
-                <span>&#128203;</span>
+                <span>📋</span>
                 <span>Auftragsverwaltung</span>
             </div>
             <div class="title-bar-buttons">
                 <button class="title-btn tiny-btn" onclick="Bridge.sendEvent('minimize')" data-testid="auftrag-btn-minimieren">_</button>
-                <button class="title-btn" onclick="toggleMaximize()" data-testid="auftrag-btn-maximieren">&#9633;</button>
-                <button class="title-btn close" onclick="closeForm()" data-testid="auftrag-btn-schliessen">&#10005;</button>
+                <button class="title-btn" onclick="toggleMaximize()" data-testid="auftrag-btn-maximieren">□</button>
+                <button class="title-btn close" onclick="closeForm()" data-testid="auftrag-btn-schliessen">✕</button>
             </div>
         </div>
 
@@ -1228,10 +1272,8 @@
                     <div class="header-row combined-buttons">
                         <div class="logo-box">C</div>
                         <span class="title-text">Auftragsverwaltung</span>
-                        <div class="header-links">
-                            <span class="header-link" onclick="openRueckmeldStatistik()" data-testid="auftrag-link-rueckmeldestatistik">Rückmelde-Statistik</span>
-                            <span class="header-link" onclick="openSyncfehler()" data-testid="auftrag-link-syncfehler">Syncfehler</span>
-                        </div>
+                        <!-- Aktualisieren links nach Titel (14.01.2026) -->
+                        <button class="btn unified-btn" id="btnAktualisieren" onclick="refreshData()" data-testid="auftrag-btn-aktualisieren" style="margin-left: 15px;">Aktualisieren</button>
                         <!-- Buttons in exakt 2 Reihen - Beginn ab "Positionen" gemaess Anforderung -->
                         <div class="buttons-grid">
                             <!-- Zeile 1: 6 Buttons -->
@@ -1252,22 +1294,13 @@
                             <button class="btn unified-btn" id="btnELGesendet" onclick="showELGesendet()" data-testid="auftrag-btn-el-gesendet">EL gesendet</button>
                             <span></span><!-- Platzhalter fuer symmetrisches 6-Spalten-Grid -->
                         </div>
-                        <!-- Zusaetzliche Buttons ausserhalb Grid -->
-                        <button class="btn unified-btn" id="btnAktualisieren" onclick="refreshData()" data-testid="auftrag-btn-aktualisieren" style="margin-left: auto;">Aktualisieren</button>
-                        <div class="status-group">
-                            <span class="form-label">Auftragsstatus:</span>
-                            <select class="form-select" id="Veranst_Status_ID" name="Veranst_Status_ID" style="width: 120px;" onchange="statusChanged()" data-testid="auftrag-select-status">
-                                <option value="1">In Planung</option>
-                                <option value="2">Bestätigt</option>
-                                <option value="3">Abgeschlossen</option>
-                                <option value="4">Abgerechnet</option>
-                                <option value="5">Storniert</option>
-                            </select>
-                            <span class="form-label" style="margin-left: 15px;">Rechnung Nr.:</span>
-                            <input type="text" class="form-input readonly" id="Rech_NR" name="Rech_NR" style="width: 100px;" readonly data-testid="auftrag-input-rechnungnr">
+                        <!-- Rückmelde-Statistik und Syncfehler ganz rechts (14.01.2026) -->
+                        <div class="header-links" style="margin-left: auto;">
+                            <span class="header-link" onclick="openRueckmeldStatistik()" data-testid="auftrag-link-rueckmeldestatistik">Rückmelde-Statistik</span>
+                            <span class="header-link" onclick="openSyncfehler()" data-testid="auftrag-link-syncfehler">Syncfehler</span>
                         </div>
                     </div>
-                    <div class="gpt-box">GPT | TEST<br><span id="lblDatum"></span></div>
+                    <div class="gpt-box">GPT | TEST<br><span id="lblDatum">15.1.2026</span></div>
                 </div>
 
                 <!-- Form Fields Section -->
@@ -1276,37 +1309,37 @@
                     <div class="form-column left">
                         <div class="form-row">
                             <span class="form-label">Datum:</span>
-                            <input type="date" class="form-input input-narrow" id="Dat_VA_Von" name="Dat_VA_Von" onchange="datumChanged()" data-testid="auftrag-date-von">
+                            <input type="date" class="form-input input-narrow" id="Dat_VA_Von" name="Dat_VA_Von" onchange="datumChanged()" data-testid="auftrag-date-von" style="width: 95px;">
                             <span>-</span>
-                            <input type="date" class="form-input input-narrow" id="Dat_VA_Bis" name="Dat_VA_Bis" onchange="datumBisChanged()" data-testid="auftrag-date-bis">
+                            <input type="date" class="form-input input-narrow" id="Dat_VA_Bis" name="Dat_VA_Bis" onchange="datumBisChanged()" data-testid="auftrag-date-bis" style="width: 95px;">
                             <!-- Nr.-Feld entfernt - jetzt bei Objekt -->
-                            <input type="hidden" id="ID" name="ID" data-testid="auftrag-input-id">
+                            <input type="hidden" id="ID" name="ID" data-testid="auftrag-input-id" value="9195">
                         </div>
                         <div class="form-row">
-                            <span class="form-label">Auftrag: <span class="required">*</span></span>
-                            <input type="text" class="form-input input-medium" id="Auftrag" name="Auftrag" list="auftragListe" onchange="auftragChanged()" onfocus="auftragGotFocus()" required data-testid="auftrag-input-auftrag">
-                            <datalist id="auftragListe"></datalist>
+                            <span class="form-label">Auftrag: <span class="required" style="display: none;">*</span></span>
+                            <input type="text" class="form-input input-medium" id="Auftrag" name="Auftrag" list="auftragListe" onchange="auftragChanged()" onfocus="auftragGotFocus()" required="" data-testid="auftrag-input-auftrag" style="width: 205px;">
+                            <datalist id="auftragListe"><option value="01.11. SSV Ulm Anfahrtspauschale"></option><option value="01099"></option><option value="1. FC Nürnberg -  1.FC Köln"></option><option value="1. FC Nürnberg -  Eintracht Braunschweig"></option><option value="1. FC Nürnberg -  FC St. Pauli"></option><option value="1. FC Nürnberg -  Hansa Rostock"></option><option value="1. FC Nürnberg -  Holstein Kiel"></option><option value="1. FC Nürnberg -  Karlsruher SC"></option><option value="1. FC Nürnberg -  SC Paderborn"></option><option value="1. FC Nürnberg -  SV 07 Elversberg"></option></datalist>
                         </div>
                         <div class="form-row">
                             <span class="form-label">Ort:</span>
-                            <input type="text" class="form-input input-medium" id="Ort" name="Ort" list="ortListe" onchange="ortChanged()" onfocus="ortGotFocus()" data-testid="auftrag-input-ort">
-                            <datalist id="ortListe"></datalist>
+                            <input type="text" class="form-input input-medium" id="Ort" name="Ort" list="ortListe" onchange="ortChanged()" onfocus="ortGotFocus()" data-testid="auftrag-input-ort" style="width: 205px;">
+                            <datalist id="ortListe"><option value="Abenberg"></option><option value="Allmannsdorf"></option><option value="Altdorf"></option><option value="Bamberg"></option><option value="Bammersdorf"></option><option value="Beilngries"></option><option value="Berching"></option><option value="Berg"></option><option value="Berlin"></option><option value="Berngau"></option><option value="Buch am Wald"></option><option value="Burgfarrnbach"></option><option value="Cadolzburg"></option><option value="Coburg"></option><option value="Deberndorf"></option><option value="Dietfurt"></option><option value="Diverse"></option><option value="Enderndorf"></option><option value="Erlangen"></option><option value="Feucht"></option><option value="Fiegenstall"></option><option value="Freystadt"></option><option value="Fürth"></option><option value="Geiselwind"></option><option value="Hersbruck"></option><option value="Höchstadt a.d. Aisch"></option><option value="Köln"></option><option value="Konstanz"></option><option value="Köstlbach"></option><option value="Ladenburg"></option><option value="Mannheim"></option><option value="Meckenhausen"></option><option value="Meiersberg"></option><option value="München"></option><option value="Neumarkt"></option><option value="Nuernberg"></option><option value="Nürnberg"></option><option value="Oberasbach"></option><option value="Pavelsbach"></option><option value="Pilsach"></option><option value="Pleinfeld"></option><option value="Postbauer Heng"></option><option value="Prölsdorf"></option><option value="Pyras"></option><option value="Raitersaich"></option><option value="Regensburg"></option><option value="Reichelsdorf"></option><option value="Röckersbühl"></option><option value="Roth"></option><option value="Röthenbach an der Pegnitz"></option><option value="Schwabach"></option><option value="Schwaig"></option><option value="Schwarzenbruck"></option><option value="Seitendorf"></option><option value="Seligenporten"></option><option value="Seukendorf"></option><option value="Stein"></option><option value="Titting"></option><option value="Ulm"></option><option value="Unterfarrnbach"></option><option value="Unterferrieden"></option><option value="Weiden"></option><option value="Weissenburg"></option><option value="Wendelstein"></option><option value="Würzburg"></option></datalist>
                         </div>
                         <div class="form-row">
                             <span class="form-label">Objekt:</span>
-                            <input type="text" class="form-input input-medium" id="Objekt" name="Objekt" list="objektListe" onchange="objektChanged()" data-testid="auftrag-input-objekt">
-                            <datalist id="objektListe"></datalist>
+                            <input type="text" class="form-input input-medium" id="Objekt" name="Objekt" list="objektListe" onchange="objektChanged()" data-testid="auftrag-input-objekt" style="width: 205px;">
+                            <datalist id="objektListe"><option value="11111111111111111111111111111111110"></option><option value="Arena Nürnberger Versicherungen"></option><option value="E-Werk"></option><option value="Frankenhalle"></option><option value="Grundig Stadion"></option><option value="Heinrich-Lades-Halle"></option><option value="Löwensaal"></option><option value="Messezentrum"></option><option value="Serenadenhof"></option><option value="Stadion am Laubenweg"></option><option value="Stadthalle"></option><option value="Terminal 90"></option></datalist>
                             <!-- Auftragsnummer an Stelle des entfernten Objekt-Kombos -->
-                            <span style="margin-left: 10px;">Nr.</span>
-                            <input type="text" class="form-input readonly input-xs" id="VA_ID_Display" name="VA_ID_Display" readonly data-testid="auftrag-input-vanr">
+                            <span style="margin-left: 10px; position: relative; right: -705px; left: 600px;">Nr.</span>
+                            <input type="text" class="form-input readonly input-xs" id="VA_ID_Display" name="VA_ID_Display" readonly="" data-testid="auftrag-input-vanr" style="width: 83px; position: relative; right: -890px; top: 0px; left: 615px;">
                         </div>
                     </div>
 
                     <!-- Middle Column - PKW/Fahrtkosten + Datums-Navigation -->
                     <div class="form-column middle">
                         <div class="form-row">
-                            <span class="form-label">PKW Anzahl:</span>
-                            <input type="number" class="form-input input-xs" id="PKW_Anzahl" name="PKW_Anzahl" value="0" min="0" data-testid="auftrag-input-pkwanzahl">
+                            <span class="form-label" style="position: relative; left: -675px;">PKW Anzahl:</span>
+                            <input type="number" class="form-input input-xs" id="PKW_Anzahl" name="PKW_Anzahl" value="0" min="0" data-testid="auftrag-input-pkwanzahl" autocomplete="off" style="position: relative; left: -675px;">
                         </div>
                         <div class="form-row">
                             <span class="form-label">Fahrtkosten:</span>
@@ -1314,9 +1347,9 @@
                         </div>
                         <!-- Datum Navigation fur Mehrtagesauftrage (verschoben) -->
                         <div class="form-row" style="margin-top: 4px;">
-                            <button class="nav-btn" id="btnDatumLeft" onclick="datumNavLeft()" style="padding: 1px 4px;" data-testid="auftrag-btn-datum-links">&#9664;</button>
-                            <select class="form-select" id="cboVADatum" style="width: 100px;" onchange="vaDatumChanged()" data-testid="auftrag-select-vadatum"></select>
-                            <button class="nav-btn" id="btnDatumRight" onclick="datumNavRight()" style="padding: 1px 4px;" data-testid="auftrag-btn-datum-rechts">&#9654;</button>
+                            <button class="nav-btn" id="btnDatumLeft" onclick="datumNavLeft()" style="padding: 1px 4px;" data-testid="auftrag-btn-datum-links">◀</button>
+                            <select class="form-select" id="cboVADatum" style="width: 100px;" onchange="vaDatumChanged()" data-testid="auftrag-select-vadatum"><option value="">-- Datum wählen --</option><option value="2026-01-16T00:00:00">16.01.2026</option></select>
+                            <button class="nav-btn" id="btnDatumRight" onclick="datumNavRight()" style="padding: 1px 4px;" data-testid="auftrag-btn-datum-rechts">▶</button>
                         </div>
                     </div>
 
@@ -1324,24 +1357,32 @@
                     <div class="form-column right">
                         <div class="form-row">
                             <!-- Treffpunkt: Uhrzeit und Ort in einer Zeile gemaess Anforderung -->
-                            <span class="form-label">Treffpunkt:</span>
-                            <input type="time" class="form-input input-xs" id="Treffp_Zeit" name="Treffp_Zeit" style="height: 20px;" onchange="saveField('Treffp_Zeit', this.value)" data-testid="auftrag-time-treffzeit">
-                            <input type="text" class="form-input input-wide" id="Treffpunkt" name="Treffpunkt" onchange="saveField('Treffpunkt', this.value)" data-testid="auftrag-input-treffpunkt">
+                            <span class="form-label" style="position: relative; left: -115px;">Treffpunkt:</span>
+                            <input type="time" class="form-input input-xs" id="Treffp_Zeit" name="Treffp_Zeit" style="height: 20px; position: relative; left: -115px;" onchange="saveField('Treffp_Zeit', this.value)" data-testid="auftrag-time-treffzeit">
+                            <input type="text" class="form-input input-wide" id="Treffpunkt" name="Treffpunkt" onchange="saveField('Treffpunkt', this.value)" data-testid="auftrag-input-treffpunkt" style="position: relative; left: -115px; width: 180px;">
                         </div>
                         <div class="form-row">
-                            <span class="form-label">Dienstkleidung:</span>
-                            <input type="text" class="form-input input-wide" id="Dienstkleidung" name="Dienstkleidung" list="kleidungListe" onchange="saveField('Dienstkleidung', this.value)" data-testid="auftrag-input-dienstkleidung">
-                            <datalist id="kleidungListe"></datalist>
+                            <span class="form-label" style="position: relative; left: -115px;">Dienstkleidung:</span>
+                            <input type="text" class="form-input input-wide" id="Dienstkleidung" name="Dienstkleidung" list="kleidungListe" onchange="saveField('Dienstkleidung', this.value)" data-testid="auftrag-input-dienstkleidung" style="position: relative; left: -115px;">
+                            <datalist id="kleidungListe"><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option></datalist>
                         </div>
                         <div class="form-row">
-                            <span class="form-label">Ansprechpartner:</span>
-                            <input type="text" class="form-input input-wide" id="Ansprechpartner" name="Ansprechpartner" onchange="saveField('Ansprechpartner', this.value)" data-testid="auftrag-input-ansprechpartner">
+                            <span class="form-label" style="position: relative; left: -115px;">Status:</span>
+                            <select class="form-select" id="Veranst_Status_ID" name="Veranst_Status_ID" style="width: 110px; font-size: 10px; position: relative; left: -115px;" onchange="statusChanged()" data-testid="auftrag-select-status"><option value="-1">Unbestätigt</option><option value=""></option><option value=""></option><option value=""></option><option value=""></option><option value=""></option></select>
+                            <span class="form-label" style="margin-left: 10px; position: relative; left: -115px;">Rech.Nr.:</span>
+                            <input type="text" class="form-input readonly is-hidden" id="Rech_NR" name="Rech_NR" style="width: 80px; font-size: 10px; position: relative; left: -115px;" readonly="" data-testid="auftrag-input-rechnungnr">
+                            <!-- Button: Daten in Folgetag kopieren (15.01.2026) -->
+                            <button class="btn unified-btn" id="btnPlan_Kopie" onclick="kopiereInFolgetag()" style="margin-left: 15px; font-size: 10px; padding: 4px 8px; position: relative; left: -115px;" data-testid="auftrag-btn-folgetag" title="Schichten und Zuordnungen in den nächsten Tag kopieren">→ Folgetag</button>
+                        </div>
+                        <div class="form-row" style="width: 714.688px;">
+                            <span class="form-label" style="width: 124.875px; position: relative; left: -150px; top: -5px;">Ansprechpartner:</span>
+                            <input type="text" class="form-input input-wide" id="Ansprechpartner" name="Ansprechpartner" onchange="saveField('Ansprechpartner', this.value)" data-testid="auftrag-input-ansprechpartner" style="height: 23px; position: relative; left: -150px; top: -5px;">
                             <!-- Mitarbeiterauswahl-Button hierher verschoben (100px Abstand) -->
-                            <button class="btn unified-btn" id="btnSchnellPlan" onclick="openMitarbeiterauswahl()" style="margin-left: 100px;" data-testid="auftrag-btn-mitarbeiterauswahl">Mitarbeiterauswahl</button>
+                            <button class="btn unified-btn" id="btnSchnellPlan" onclick="openMitarbeiterauswahl()" style="margin-left: 100px; width: 184.234px; position: relative; left: -214.387px; top: 25px;" data-testid="auftrag-btn-mitarbeiterauswahl">Mitarbeiterauswahl</button>
                         </div>
                         <div class="form-row">
-                            <span class="form-label">Auftraggeber:</span>
-                            <select class="form-select input-wide" id="Veranstalter_ID" name="Veranstalter_ID" onchange="veranstalterChanged()" data-testid="auftrag-select-auftraggeber"></select>
+                            <span class="form-label" style="position: relative; left: -115px; top: -5px; width: 90px; height: 21px;">Auftraggeber:</span>
+                            <select class="form-select input-wide" id="Veranstalter_ID" name="Veranstalter_ID" onchange="veranstalterChanged()" data-testid="auftrag-select-auftraggeber" style="position: relative; left: -115px; top: -5px; margin-top: 0px; padding: 2px; height: 27px;"><option value="">-- Wahlen --</option><option value="27">1 Agency</option><option value="20723">1 Agency</option><option value="20782">1. FC Röthenbach e.V.</option><option value="11155">A&amp;R</option><option value="20790">Ackermann Thomas</option><option value="10684">Ackermann Thomas</option><option value="10170">aktives Neumarkt e. V.</option><option value="10666">Albert-Schweitzer-Realschule Regensburg</option><option value="10667">Alpha Security Guards</option><option value="10686">Alte Mälzerei e.V.</option><option value="20818">Antonio Russo</option><option value="10740">APPINA TRAVEL GmbH</option><option value="20834">Arche Noris Seniorenwohnzentrum</option><option value="10688">ARGO Konzerte GmbH</option><option value="10690">ARNDT Sicherheit und Service GmbH &amp;</option><option value="20727">Arnold GmbH</option><option value="10692">Auinger Peter</option><option value="20731">B &amp; M Security</option><option value="10671">B.E.S.T. Veranstaltungsdienste GmbH</option><option value="10720">B.O.S. FRANKEN SECURITY GmbH</option><option value="20771">B.O.S. Fussball FCN</option><option value="20770">B.O.S. Kaufland</option><option value="20751">Bacham Event</option><option value="10189">Bauwagen Broidaloch e.V.</option><option value="10190">Bauwagen Munningen e.V.</option><option value="20718">Bavarian Gastro</option><option value="10194">Bayerischer Rundfunk</option><option value="10191">Bayerisches Fernsehen</option><option value="20732">Bayrisches Rotes Kreuz</option><option value="20787">BBS - Bertold-Brecht-Schule</option><option value="10695">Beilngries Tourismus GmbH</option><option value="20822">Berg GmbH</option><option value="10206">Bistro Graffiti</option><option value="20816">BKV</option><option value="10774">blackboxx GmbH</option><option value="20702">Blank Christian</option><option value="28">Blank Promotion Service</option><option value="10211">Bluepingu e.V.</option><option value="20119">BOS Sub</option><option value="10214">Brauerei Gutmann</option><option value="10215">Brauhaus Höchstadt</option><option value="20830">BSC Woffenbach 1950 e.V.</option><option value="10770">Burschenverein Köstlbach-Heng</option><option value="10219">C.O.P. - Concerts GbR</option><option value="10220">CA-Veranstaltungen</option><option value="20747">Cocktailbar Don Caribico</option><option value="10633">COFO Concertbüro Oliver Forster GmbH</option><option value="10233">Concertbüro Franken GmbH</option><option value="20700">CONSEC SECURITY NÜRNBERG</option><option value="10235">COSMOENERGY GmbH &amp; Co. KG</option><option value="10726">Crämer &amp; Co.</option><option value="10758">DÄNISCHES BETTENLAGER GmbH &amp; Co. KG</option><option value="20821">DATEV eG</option><option value="20743">D-B-S Sicherheitsdienst Straubing GmbH</option><option value="10241">Der Cult</option><option value="20721">Die Firma Bayreuth</option><option value="20742">Die Rakete Gastro GmbH</option><option value="20738">Dinkels Gastronomiebetriebe GbR</option><option value="10638">Discothek Constrast</option><option value="20777">DJK Fiegenstall e.V.</option><option value="20797">DJK SV Pilsach</option><option value="10645">DO IT! GmbH</option><option value="20744">Dominik Cobic</option><option value="20798">Dorfmusik Seligenporten</option><option value="10727">DPolG</option><option value="10255">Eat &amp; Fly Airport Gastronomie GmbH</option><option value="20793">Edgar Security</option><option value="10257">Egersdorfer Kärwaburschen und -madli e.V.</option><option value="10736">EH Sicherheit</option><option value="10259">Elektro-Glenk GmbH</option><option value="10741">ELJ Ohrenbach</option><option value="10262">ELJ Steinach</option><option value="20704">ELJ-Ohrenbach</option><option value="10719">Empire Event &amp; Support GmbH</option><option value="20740">Engelhardt &amp; Co Parkraummanagement</option><option value="10699">Engelhardt &amp; Co. GmbH Sicherheit</option><option value="10788">ESS</option><option value="20730">ESS 1 Bereichswachen</option><option value="20760">ESS 2 Standwachen</option><option value="20761">ESS 3 Standpartys</option><option value="10718">EUNOMIA Security GmbH</option><option value="10254">E-Werk</option><option value="10755">F&amp;S Security e.K.</option><option value="10274">Fachschaft</option><option value="10278">Faschingsfreunde Riedenburg e.V.</option><option value="20758">Faschingsgesellschaft Hechtonia Berching e.V</option><option value="20757">Faschingsverein Meckenhausen e.V.</option><option value="20774">FC Ezelsdorf 1923 e.V.</option><option value="20808">FC Möning 1949 e.V.</option><option value="10763">FF Röckersbühl-Mittelricht</option><option value="20703">FFW Müncherlbach</option><option value="10771">FFW Wilhermsdorf-Meiersberg</option><option value="20814">Fiege Health Care</option><option value="20794">Fischereiverein Rednitzhembach e.V.</option><option value="20765">Fledererverein Meiersberg e.V.</option><option value="10700">Förderkreis Historische Burg Abenberg e.V.</option><option value="10789">Förderverein Naturbad Postbauer-Heng e.V.</option><option value="20783">Franz Schattenhofer GmbH &amp; Co.KG</option><option value="10623">Franz Schattenhofer GmbH + Co.</option><option value="10296">Freunde der Fachschaft</option><option value="20803">FSV Berngau</option><option value="10298">Fun Events GbR</option><option value="20833">Garten- &amp; Landschaftsbau Weißmüller</option><option value="20728">Gemeinde Schwarzenbruck</option><option value="10307">Georg-Simon-Ohm-Hochschule</option><option value="10315">Gögelein Stefan</option><option value="10302">Green Goose</option><option value="20720">GSB</option><option value="20717">GSS</option><option value="10647">Gundel Joachim</option><option value="10322">Guniweb Moderne Medien GmbH</option><option value="10702">Gutmann am Dutzendteich</option><option value="20791">Gymnasium Beilngries</option><option value="20773">Gymnasium Stein</option><option value="20729">Hahn Sicherheit &amp; Schulung</option><option value="10325">HÄRTEIS Getränke-Weine-Zeltverleih</option><option value="20754">HDM Security</option><option value="10329">Headline</option><option value="10334">Herbst Günter</option><option value="20709">HerzoCity GmbH</option><option value="10337">HIRSCH GdbR</option><option value="10339">Historisches Festspiel</option><option value="10340">Holzinger Anja</option><option value="10650">IG Bergbau Chemie</option><option value="20750">Infinity</option><option value="10348">JDM Productions</option><option value="10349">Johannes-Scharrer-Realschule</option><option value="10350">Joke e. V.  Open Air am Berg</option><option value="20710">Jugendclub Orange</option><option value="20775">Jugendclub Orange e.V.</option><option value="20827">Jugendkulturmanagement con-action/ Kopf und Kragen</option><option value="10357">Jugendtreff Wolpertshausen e.V.</option><option value="10358">Jugendzentrum Eschenau</option><option value="10359">Jukuf e.V.</option><option value="10716">K&amp;W</option><option value="20759">K.D.St.V. Ostmark im CV zu Nürnberg</option><option value="20719">K.D.St.V. Ostmark im CV zu Nürnberg</option><option value="10363">KammerEvents GmbH</option><option value="20832">Kärwaausschuss Unterfarrnbach e.V.</option><option value="20786">Kärwaboum Lindelburg e.V.</option><option value="20811">Kärwaboum Unterferrieden e.V.</option><option value="20748">Kärwaboumverein Seitendorf</option><option value="20792">Kärwaburschen Atzenhof</option><option value="20804">Kärwaverein Deberndorf e.V.</option><option value="20788">Kärwaverein Schwarzenbruck</option><option value="20749">Kirwaboum Schwarzach e.V.</option><option value="20713">KJB Deining</option><option value="20722">KKT GmbH</option><option value="20815">KKV &amp; GV Seukendorf</option><option value="20796">Klaragasse &amp; Freunde e.V.</option><option value="20781">KLJB Pelchenhofen</option><option value="20809">Knaus Campingpark Nürnberg</option><option value="20776">Konzertbüro Oberpfalz UG</option><option value="10382">Kreisjugendring Ostalb e.V.</option><option value="621">KS Security</option><option value="10387">Kulturagentur Alex Bolland</option><option value="20805">Kulturforum Fürth</option><option value="10074">Landjugend Schrozberg e.V.</option><option value="10395">Landwehr-Bräu</option><option value="20715">leer</option><option value="20716">leer 2</option><option value="10075">Leibniz Gymnasium Altdorf</option><option value="10707">Manfred Hertlein Veranstaltungs GmbH</option><option value="10626">Markt Allersberg</option><option value="10081">Markt Beratzhausen</option><option value="10725">Markt Schnaittach</option><option value="20826">Markt Wendelstein</option><option value="20741">Martin Kaiser &amp; David Lodhi Gbr</option><option value="10423">MC Rückwärts-Gang</option><option value="10424">MCT Agentur GmbH</option><option value="20725">Medical Park Bad Rodach</option><option value="10429">MEGAPRESS GmbH &amp; Co.KG</option><option value="20825">Metropol</option><option value="20746">Metropol Protect</option><option value="10769">Mittelschule Zirndorf</option><option value="10762">MKM MUSIC</option><option value="10440">MM Security</option><option value="10441">Mobile e.V.</option><option value="10442">mono bar</option><option value="10448">MUNICH SECURITY SERVICES GMBH</option><option value="10450">Musikbegegnungen e.V.</option><option value="10451">Musikinitiative Nürnberger Land e.V.</option><option value="10453">Nachtpalais GmbH</option><option value="20726">Nasty Entertainment GmbH</option><option value="10455">Naturwissenschaftlich-technologisches und</option><option value="10456">Navigator Productions</option><option value="20708">Neue Projekt GmbH &amp; Co. KG</option><option value="20707">Neues Museum Nürnberg, Staatliches Museum für Kunst und Design</option><option value="10458">Neumarkter Lammsbräu Gebr.Ehrnsperger e.K.</option><option value="10090">Neuzeit oHG</option><option value="10095">Nürnberg Musik GmbH</option><option value="20734">Nürnberger Tafel</option><option value="10760">NWS Alarmservice GmbH</option><option value="10759">NWS Sicherheitsservice GmbH</option><option value="20764">NWS Sonderdienst DHL Parkplatz</option><option value="20733">Optima</option><option value="20780">Ostmark</option><option value="10721">PA Security Service</option><option value="10475">Palazzo</option><option value="20755">Palazzo Produktionen</option><option value="20724">Palermo Security</option><option value="20745">Parkcafé Neumarkt</option><option value="10480">ParkGastro GmbH</option><option value="10481">Parvenue PR-Booking-Events</option><option value="10482">Pestalozzi-Hauptschule</option><option value="20789">Pfertner GmbH Immobilienverwaltung</option><option value="20701">Polsters Klosterhof</option><option value="20752">Power Concerts</option><option value="20735">POWER GmbH</option><option value="20812">PVS - Peter Vischer Schulen</option><option value="10495">Pyraser Landbrauerei</option><option value="10772">Raahner Club</option><option value="20829">Raiffeisenbank</option><option value="20714">Reformationsdekanade Luther 2017</option><option value="10507">Richard Bergner Holding GmbH &amp; Co. KG</option><option value="20819">Richter + Frenzel Nürnberg GmbH</option><option value="20785">RLH Agrar GmbH</option><option value="20769">Rockn Roll Catering</option><option value="10514">Rothenburger Festwirtegemeinschaft GbR</option><option value="20739">SC Prölsdorf</option><option value="20711">Schloß Thurn</option><option value="10159">Schwäbl Daniel</option><option value="9295">Sec Concept</option><option value="20712">Sec One</option><option value="10631">seibold promotions</option><option value="10527">Semmel Concerts GmbH</option><option value="20831">SF Event GmbH</option><option value="20817">ShowBro GmbH</option><option value="10529">ShowSEC Sicherheitsdienste GmbH</option><option value="20112">SJR Erlangen</option><option value="20800">SkyDai Gastronomie GmbH &amp; Co. KG</option><option value="20737">SPVGG Greuther Fürth GmbH &amp; Co. KGaA</option><option value="10656">St. Wolfgang-Mittelschule</option><option value="10115">Stadt Abenberg</option><option value="20807">Stadt Altdorf</option><option value="20763">Stadt Berching</option><option value="10753">Stadt Erlangen</option><option value="20813">Stadt Freystadt</option><option value="20784">Stadt Neumarkt i.d.Opf.</option><option value="10768">Stadt Nürnberg</option><option value="10680">Stadt Nürnberg</option><option value="20753">Stadt Roth</option><option value="20799">Stargarage AG</option><option value="10738">Stiftung Staatstheater Nürnberg</option><option value="10722">Streetlife</option><option value="20828">SV Raitersaich e.V.</option><option value="20810">SV Seligenporten 1949 e.V.</option><option value="20706">Tanzcentrum Neumarkt</option><option value="10642">THE COLOR RUN GmbH</option><option value="20823">The GOOD FOX Company</option><option value="20772">Timo Wachinger</option><option value="10754">TPL Erlangen S.à.r.l.</option><option value="20820">TSV 1846 Nbg e.V.</option><option value="20756">TSV Meckenhausen e.V.</option><option value="20767">TSV Pavelsbach</option><option value="10124">Ulrich Erich</option><option value="20111">United Security</option><option value="10715">V.I.P. GbR</option><option value="20705">Verein Musikbegegnungen e.V.</option><option value="10592">Verein zur Förderung Demokratie &amp; Menschenrechte</option><option value="20824">Wallenstein-Festpielverein Altdorf e.V.</option><option value="20795">Wasserwacht</option><option value="10605">Weitersdorfer KB</option><option value="10606">Wettig Stephanie</option><option value="10607">Wild 2000</option><option value="10640">World Network Agency</option><option value="20736">WSW</option><option value="10655">Zametzer &amp; Krohn GbR</option><option value="10135">Zitzmann Tom</option><option value="10757">Zum Rednitzgrund</option></select>
                         </div>
                     </div>
                 </div>
@@ -1353,20 +1394,24 @@
                         <div class="tab-container">
                             <div class="tab-header">
                                 <!-- Tabs in Access-Reihenfolge (5 sichtbar wie in Access) -->
-                                <button class="tab-btn active" data-tab="einsatzliste" data-testid="auftrag-tab-einsatzliste">Einsatzliste</button>
-                                <button class="tab-btn" data-tab="antworten" data-testid="auftrag-tab-antworten">Antworten ausstehend</button>
+                                <button class="tab-btn active" data-tab="einsatzliste" data-testid="auftrag-tab-einsatzliste" style="color: rgb(1, 15, 25); height: 33.5938px;">Einsatzliste</button>
+                                <button class="tab-btn" data-tab="antworten" data-testid="auftrag-tab-antworten" style="background-color: rgb(247, 247, 247); width: 158.688px; height: 33.5938px; position: relative; top: 0px;">Antworten ausstehend</button>
                                 <button class="tab-btn" data-tab="zusatzdateien" data-testid="auftrag-tab-zusatzdateien">Zusatzdateien</button>
                                 <button class="tab-btn" data-tab="rechnung" data-testid="auftrag-tab-rechnung">Rechnung</button>
                                 <button class="tab-btn" data-tab="bemerkungen" data-testid="auftrag-tab-bemerkungen">Bemerkungen</button>
                                 <!-- Versteckte Tabs (nur in HTML, nicht in Access) -->
-                                <button class="tab-btn" data-tab="eventdaten" data-testid="auftrag-tab-eventdaten" hidden>Eventdaten</button>
+                                <button class="tab-btn" data-tab="eventdaten" data-testid="auftrag-tab-eventdaten" hidden="">Eventdaten</button>
                             </div>
                             <div class="tab-content">
                                 <!-- Tab 1: Einsatzliste -->
                                 <div class="tab-page active" id="tab-einsatzliste">
                                     <div class="bwn-row">
-                                        <button class="btn bwn-btn" id="btn_BWN_Druck" onclick="bwnDrucken()" data-testid="auftrag-btn-bwn-drucken">BWN drucken</button>
-                                        <button class="btn bwn-btn" id="cmd_BWN_send" onclick="bwnSenden()" data-testid="auftrag-btn-bwn-senden">BWN senden</button>
+                                        <button class="btn bwn-btn is-hidden" id="btn_BWN_Druck" onclick="bwnDrucken()" data-testid="auftrag-btn-bwn-drucken">BWN drucken</button>
+                                        <button class="btn bwn-btn is-hidden" id="cmd_BWN_send" onclick="bwnSenden()" data-testid="auftrag-btn-bwn-senden" style="width: 78.9375px;">BWN senden</button>
+                                        <!-- Einsatzliste-Bearbeitungs-Buttons (15.01.2026 ergänzt) -->
+                                        <button class="btn bwn-btn" id="btnVAPlanCrea" onclick="erstelleZuordnungen()" data-testid="auftrag-btn-zuordnungen-erstellen" title="Erstellt leere Zuordnungs-Zeilen basierend auf MA-Anzahl der Schichten">Zuordnungen erstellen</button>
+                                        <button class="btn bwn-btn" id="btn_sortieren" onclick="sortiereZuordnungen()" data-testid="auftrag-btn-sortieren" title="Sortiert die Zuordnungen nach Zeit">Sortieren</button>
+                                        <button class="btn bwn-btn" id="btn_std_check" onclick="stundenCheck()" data-testid="auftrag-btn-std-check" title="Prüft Stunden und setzt Status auf berechnet">Std-Check</button>
                                         <span class="status-red" id="lblKeineEingabe" style="display: none;">Auftrag bereits berechnet</span>
                                     </div>
 
@@ -1382,9 +1427,19 @@
                                                             <th style="width: 49px; text-align: center;">bis</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody id="schichtenBody">
-                                                        <!-- Wird dynamisch gefullt -->
-                                                    </tbody>
+                                                    <tbody id="schichtenBody"><tr>
+                    <td style="text-align: right;">1</td>
+                    <td style="text-align: center;">17:30</td>
+                    <td style="text-align: center;" class="cell-blue">23:30</td>
+                </tr><tr>
+                    <td style="text-align: right;">1</td>
+                    <td style="text-align: center;">18:30</td>
+                    <td style="text-align: center;" class="cell-blue">23:30</td>
+                </tr><tr>
+                <td>*</td>
+                <td><input type="time" class="schicht-input" data-field="VA_Start"></td>
+                <td><input type="time" class="schicht-input" data-field="VA_Ende"></td>
+            </tr></tbody>
                                                 </table>
                                             </div>
                                             <!-- Absagen -->
@@ -1399,9 +1454,11 @@
                                                                 <th>Bemerkung</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody id="absagenBody">
-                                                            <!-- Wird dynamisch gefullt -->
-                                                        </tbody>
+                                                        <tbody id="absagenBody"><tr>
+                <td>*</td>
+                <td><select class="form-select" style="width: 100%;"></select></td>
+                <td><input type="text" style="width: 100%;"></td>
+            </tr></tbody>
                                                     </table>
                                                 </div>
                                             </div>
@@ -1409,11 +1466,7 @@
 
                                         <!-- Right Subform: MA-Zuordnungen (iframe) -->
                                         <div class="subform-right">
-                                            <iframe
-                                                id="iframe_Einsatzliste"
-                                                src="sub_MA_VA_Zuordnung.html?v=20260112_2255"
-                                                style="width: 100%; height: 100%; border: none; display: block;"
-                                                data-testid="auftrag-iframe-einsatzliste">
+                                            <iframe id="sub_MA_VA_Zuordnung" src="sub_MA_VA_Zuordnung.html?v=20260114_1710" style="width: 100%; height: 100%; border: none; display: block;" data-testid="auftrag-iframe-einsatzliste">
                                             </iframe>
                                         </div>
                                     </div>
@@ -1492,7 +1545,7 @@
                                     <div class="form-row" style="margin: 10px 0;">
                                         <span class="form-label">Berechnungsliste:</span>
                                         <span style="margin-left: auto;">Gesamtsumme Netto:</span>
-                                        <input type="text" class="form-input readonly" id="PosGesamtsumme" style="width: 100px; text-align: right;" readonly>
+                                        <input type="text" class="form-input readonly" id="PosGesamtsumme" style="width: 100px; text-align: right;" readonly="">
                                     </div>
                                     <div class="grid-wrapper" style="flex: 1;">
                                         <table class="data-grid" id="gridBerech" data-testid="auftrag-table-berechnung">
@@ -1522,23 +1575,23 @@
                                     <div class="event-form">
                                         <div class="event-row">
                                             <span class="event-label">Datum:</span>
-                                            <input type="text" class="event-input event-input-narrow readonly" id="eventDatum" readonly>
+                                            <input type="text" class="event-input event-input-narrow readonly" id="eventDatum" readonly="">
                                         </div>
                                         <div class="event-row">
                                             <span class="event-label">Auftrag:</span>
-                                            <input type="text" class="event-input event-input-medium readonly" id="eventAuftrag" readonly>
+                                            <input type="text" class="event-input event-input-medium readonly" id="eventAuftrag" readonly="">
                                         </div>
                                         <div class="event-row">
                                             <span class="event-label">Ort:</span>
-                                            <input type="text" class="event-input event-input-medium readonly" id="eventOrt" readonly>
+                                            <input type="text" class="event-input event-input-medium readonly" id="eventOrt" readonly="">
                                         </div>
                                         <div class="event-row">
                                             <span class="event-label">Objekt:</span>
-                                            <input type="text" class="event-input event-input-medium readonly" id="eventObjekt" readonly>
+                                            <input type="text" class="event-input event-input-medium readonly" id="eventObjekt" readonly="">
                                         </div>
                                         <div class="event-row">
                                             <span class="event-label">Adresse:</span>
-                                            <input type="text" class="event-input event-input-wide readonly" id="eventAdresse" readonly>
+                                            <input type="text" class="event-input event-input-wide readonly" id="eventAdresse" readonly="">
                                         </div>
                                         <div class="event-row">
                                             <span class="event-label">Einlass (Web):</span>
@@ -1577,14 +1630,14 @@
                     <div class="right-panel">
                         <div class="right-header">
                             <table class="status-table" id="statusOverview">
-                                <tr>
+                                <tbody><tr>
                                     <td><strong>Auftragsstatus</strong></td>
                                     <td class="count"><strong>Anzahl</strong></td>
                                     <td><strong>Aktion</strong></td>
                                 </tr>
                                 <tr data-status="1">
                                     <td>In Planung</td>
-                                    <td class="count" id="countPlanung">0</td>
+                                    <td class="count" id="countPlanung">100</td>
                                     <td><button class="anzeigen-btn" onclick="filterByStatus(1)">Anzeigen</button></td>
                                 </tr>
                                 <tr data-status="3">
@@ -1597,26 +1650,17 @@
                                     <td class="count" id="countVersendet">0</td>
                                     <td><button class="anzeigen-btn" onclick="filterByStatus(2)">Anzeigen</button></td>
                                 </tr>
-                            </table>
+                            </tbody></table>
+                            <!-- Status und Rech.Nr wurden in den Header-Block verschoben (15.01.2026) -->
                         </div>
 
                         <div class="date-nav">
-                            <span>Auftrage ab:</span>
+                            <span>Aufträge ab:</span>
                             <input type="date" class="date-input" id="Auftraege_ab" onchange="filterAuftraege()" data-testid="auftrag-date-auftraege-ab">
 
-                            <span style="margin-left: 10px;">Status:</span>
-                            <select id="IstStatus" onchange="filterAuftraege()" data-testid="auftrag-select-status-filter" style="padding: 2px 5px; font-size: 11px;">
-                                <option value="0">Alle</option>
-                                <option value="1" selected>Offen</option>
-                                <option value="2">Abgeschlossen</option>
-                            </select>
-
-                            <span style="margin-left: 10px;">ID:</span>
-                            <input type="text" id="cboID" placeholder="ID" oninput="handleAuftragIDSearch()" data-testid="auftrag-input-id-search" style="width: 60px; padding: 2px 5px; font-size: 11px;">
-
                             <button class="nav-btn tiny-btn" onclick="filterAuftraege()" data-testid="auftrag-btn-filter-go">Go</button>
-                            <button class="nav-btn" onclick="tageZurueck()" data-testid="auftrag-btn-tage-zurueck">&#60;&#60;</button>
-                            <button class="nav-btn" onclick="tageVor()" data-testid="auftrag-btn-tage-vor">&#62;&#62;</button>
+                            <button class="nav-btn" onclick="tageZurueck()" data-testid="auftrag-btn-tage-zurueck">&lt;&lt;</button>
+                            <button class="nav-btn" onclick="tageVor()" data-testid="auftrag-btn-tage-vor">&gt;&gt;</button>
                             <button class="nav-btn" onclick="abHeute()" data-testid="auftrag-btn-ab-heute">Ab Heute</button>
                         </div>
 
@@ -1624,18 +1668,849 @@
                             <table class="auftraege-table" id="auftraegeTable" data-testid="auftrag-table-auftragsliste">
                                 <thead>
                                     <tr>
-                                        <th onclick="sortAuftraege('datum')" style="width: 75px; text-align: center;">Datum</th>
-                                        <th onclick="sortAuftraege('auftrag')" style="width: 50px;">Auftrag</th>
+                                        <th onclick="sortAuftraege('datum')" style="width: 70px; text-align: center;">Datum</th>
+                                        <th onclick="sortAuftraege('auftrag')" style="width: 107px;">Auftrag</th>
                                         <th onclick="sortAuftraege('objekt')" style="width: 100px;">Objekt</th>
-                                        <th onclick="sortAuftraege('ort')" style="width: 120px;">Ort</th>
-                                        <th onclick="sortAuftraege('soll')" style="width: 45px; text-align: center;">Soll</th>
-                                        <th onclick="sortAuftraege('ist')" style="width: 45px; text-align: center;">Ist</th>
-                                        <th onclick="sortAuftraege('status')" style="width: 60px; text-align: center;">Status</th>
+                                        <th onclick="sortAuftraege('soll')" style="width: 35px; text-align: center;">Soll</th>
+                                        <th onclick="sortAuftraege('ist')" style="width: 35px; text-align: center;">Ist</th>
+                                        <th onclick="sortAuftraege('status')" style="width: 55px; text-align: center;">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="auftraegeBody">
-                                    <!-- Wird dynamisch gefullt -->
-                                </tbody>
+            <tr data-index="0" data-id="9195" class="selected">
+                <td>16.01.2026</td>
+                <td>Eva Karl Faltermeier</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="1" data-id="9377">
+                <td>17.01.2026</td>
+                <td>1. Fc Nürnberg - Sv Elversberg</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="2" data-id="9196">
+                <td>21.01.2026</td>
+                <td>Aymen &amp; Amo</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="3" data-id="9329">
+                <td>22.01.2026</td>
+                <td>Mord auf Ex</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="4" data-id="9316">
+                <td>24.01.2026</td>
+                <td>Spvgg Greuther Fürth - Eintracht Braunschweig</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="5" data-id="9197">
+                <td>24.01.2026</td>
+                <td>Helmut A. Binser</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="6" data-id="9037">
+                <td>24.01.2026</td>
+                <td>Fasching</td>
+                <td>Schwarzenbruck</td>
+            </tr>
+        
+            <tr data-index="7" data-id="9276">
+                <td>26.01.2026</td>
+                <td>Messeservice Jazwares GmbH</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="8" data-id="9389">
+                <td>27.01.2026</td>
+                <td>Spielwarenmesse Bereichswachen</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="9" data-id="9198">
+                <td>30.01.2026</td>
+                <td>Werner Schmidbauer</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="10" data-id="9388">
+                <td>31.01.2026</td>
+                <td>Fledererball</td>
+                <td>Meiersberg</td>
+            </tr>
+        
+            <tr data-index="11" data-id="9378">
+                <td>03.02.2026</td>
+                <td>Bernd Hackl</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="12" data-id="9390">
+                <td>04.02.2026</td>
+                <td>Roßmarkt Berching</td>
+                <td>Berching</td>
+            </tr>
+        
+            <tr data-index="13" data-id="9199">
+                <td>04.02.2026</td>
+                <td>Simon Stäblein</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="14" data-id="9239">
+                <td>05.02.2026</td>
+                <td>Tbs</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="15" data-id="9200">
+                <td>05.02.2026</td>
+                <td>Joe Di Nardo</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="16" data-id="9240">
+                <td>06.02.2026</td>
+                <td>Elvis Birthday Bash</td>
+                <td>Schwabach</td>
+            </tr>
+        
+            <tr data-index="17" data-id="9185">
+                <td>06.02.2026</td>
+                <td>Schulparty</td>
+                <td>Stein</td>
+            </tr>
+        
+            <tr data-index="18" data-id="9201">
+                <td>07.02.2026</td>
+                <td>Wizo</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="19" data-id="9317">
+                <td>08.02.2026</td>
+                <td>Spvgg Greuther Fürth - 1. Fc Magdeburg</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="20" data-id="9202">
+                <td>08.02.2026</td>
+                <td>Wizo</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="21" data-id="9013">
+                <td>08.02.2026</td>
+                <td>Greuther Fürth - 1.FC Magdeburg</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="22" data-id="9241">
+                <td>10.02.2026</td>
+                <td>Gzuz</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="23" data-id="9242">
+                <td>13.02.2026</td>
+                <td>Zartmann</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="24" data-id="9203">
+                <td>14.02.2026</td>
+                <td>Willkuer</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="25" data-id="9391">
+                <td>15.02.2026</td>
+                <td>Faschingssonntag</td>
+                <td>Berching</td>
+            </tr>
+        
+            <tr data-index="26" data-id="9366">
+                <td>15.02.2026</td>
+                <td>Faschingsumzug</td>
+                <td>Berching</td>
+            </tr>
+        
+            <tr data-index="27" data-id="9204">
+                <td>17.02.2026</td>
+                <td>Ritter Lean</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="28" data-id="9243">
+                <td>20.02.2026</td>
+                <td>Osan Yaran</td>
+                <td>Erlangen</td>
+            </tr>
+        
+            <tr data-index="29" data-id="9014">
+                <td>22.02.2026</td>
+                <td>Greuther Fürth - DSC Arminia Bielefeld</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="30" data-id="9205">
+                <td>25.02.2026</td>
+                <td>Brothers Of Metal</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="31" data-id="9244">
+                <td>26.02.2026</td>
+                <td>Viva Voce</td>
+                <td>Schwabach</td>
+            </tr>
+        
+            <tr data-index="32" data-id="9319">
+                <td>01.03.2026</td>
+                <td>Spvgg Greuther Fürth - Fc Schalke 04</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="33" data-id="9245">
+                <td>01.03.2026</td>
+                <td>Powerwolf</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="34" data-id="9206">
+                <td>05.03.2026</td>
+                <td>Kamrad</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="35" data-id="9207">
+                <td>06.03.2026</td>
+                <td>Yu</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="36" data-id="9208">
+                <td>07.03.2026</td>
+                <td>Talco</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="37" data-id="9209">
+                <td>08.03.2026</td>
+                <td>Heavysaurus</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="38" data-id="9210">
+                <td>14.03.2026</td>
+                <td>Stereoact</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="39" data-id="9320">
+                <td>15.03.2026</td>
+                <td>Spvgg Greuther Fürth - Sv Elversberg</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="40" data-id="9211">
+                <td>15.03.2026</td>
+                <td>Der W</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="41" data-id="9016">
+                <td>15.03.2026</td>
+                <td>Greuther Fürth - SV Elversberg</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="42" data-id="9363">
+                <td>16.03.2026</td>
+                <td>Palazzo</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="43" data-id="9246">
+                <td>20.03.2026</td>
+                <td>Conni - Das Musical!</td>
+                <td>Schwabach</td>
+            </tr>
+        
+            <tr data-index="44" data-id="9212">
+                <td>21.03.2026</td>
+                <td>Georg Ringsgwandl</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="45" data-id="9213">
+                <td>22.03.2026</td>
+                <td>Kasi &amp; Antonius</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="46" data-id="9247">
+                <td>28.03.2026</td>
+                <td>Eisi Gulp</td>
+                <td>Schwabach</td>
+            </tr>
+        
+            <tr data-index="47" data-id="9248">
+                <td>09.04.2026</td>
+                <td>Emmvee</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="48" data-id="9249">
+                <td>10.04.2026</td>
+                <td>Versengold</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="49" data-id="9250">
+                <td>12.04.2026</td>
+                <td>Jethro Tull</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="50" data-id="9251">
+                <td>15.04.2026</td>
+                <td>Olaf Schubert</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="51" data-id="9322">
+                <td>19.04.2026</td>
+                <td>Spvgg Greuther Fürth - Sv Darmstadt 98</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="52" data-id="9252">
+                <td>19.04.2026</td>
+                <td>Kaffkiez</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="53" data-id="9019">
+                <td>19.04.2026</td>
+                <td>Greuther Fürth - SV Darmstadt 98</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="54" data-id="9214">
+                <td>20.04.2026</td>
+                <td>Lacazette</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="55" data-id="9301">
+                <td>26.04.2026</td>
+                <td>Alex Stoldt</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="56" data-id="9253">
+                <td>30.04.2026</td>
+                <td>Herr Schröder</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="57" data-id="9302">
+                <td>01.05.2026</td>
+                <td>Willy Astor</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="58" data-id="9323">
+                <td>03.05.2026</td>
+                <td>Spvgg Greuther Fürth - 1. Fc Nürnberg</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="59" data-id="9020">
+                <td>03.05.2026</td>
+                <td>Greuther Fürth - 1.FC Nürnberg</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="60" data-id="9303">
+                <td>05.05.2026</td>
+                <td>Ennio</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="61" data-id="9304">
+                <td>07.05.2026</td>
+                <td>Couple Of Mit Iris Gavric &amp; Matthias Renger</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="62" data-id="9254">
+                <td>13.05.2026</td>
+                <td>Ines Procter</td>
+                <td>Schwabach</td>
+            </tr>
+        
+            <tr data-index="63" data-id="9255">
+                <td>16.05.2026</td>
+                <td>Mein Dschungel By Serdar Karibik</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="64" data-id="9324">
+                <td>17.05.2026</td>
+                <td>Spvgg Greuther Fürth - Fortuna Düsseldorf</td>
+                <td>Fürth</td>
+            </tr>
+        
+            <tr data-index="65" data-id="9305">
+                <td>22.05.2026</td>
+                <td>Mirja Regensburg</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="66" data-id="9256">
+                <td>29.05.2026</td>
+                <td>Chris Tall</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="67" data-id="9036">
+                <td>29.05.2026</td>
+                <td>Chris Tall</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="68" data-id="9300">
+                <td>31.05.2026</td>
+                <td>The Ten Tenors</td>
+                <td>Schwabach</td>
+            </tr>
+        
+            <tr data-index="69" data-id="9379">
+                <td>02.06.2026</td>
+                <td>Anthrax</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="70" data-id="9225">
+                <td>03.06.2026</td>
+                <td>Konstantin Wecker</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="71" data-id="9231">
+                <td>14.06.2026</td>
+                <td>Louis Philippson</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="72" data-id="9107">
+                <td>20.06.2026</td>
+                <td>Geländesicherung Die Böhsen Onkels</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="73" data-id="9109">
+                <td>27.06.2026</td>
+                <td>Die Böhsen Onkelz 4</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="74" data-id="9106">
+                <td>27.06.2026</td>
+                <td>Die Böhsen Onkelz 3</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="75" data-id="9105">
+                <td>27.06.2026</td>
+                <td>Die Böhsen Onkelz 2</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="76" data-id="9104">
+                <td>27.06.2026</td>
+                <td>Die Böhsen Onkelz 1</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="77" data-id="9298">
+                <td>28.06.2026</td>
+                <td>Wincent Weiss</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="78" data-id="9335">
+                <td>01.07.2026</td>
+                <td>Annenmaykantereit</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="79" data-id="9270">
+                <td>01.07.2026</td>
+                <td>Shamrock Castle</td>
+                <td>Bammersdorf</td>
+            </tr>
+        
+            <tr data-index="80" data-id="9035">
+                <td>01.07.2026</td>
+                <td>Annenmaykantereit</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="81" data-id="9337">
+                <td>02.07.2026</td>
+                <td>DTM Norisring</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="82" data-id="8969">
+                <td>02.07.2026</td>
+                <td>Broilers</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="83" data-id="9336">
+                <td>03.07.2026</td>
+                <td>Kirchweih Schwarzenbruck</td>
+                <td>Schwarzenbruck</td>
+            </tr>
+        
+            <tr data-index="84" data-id="9131">
+                <td>03.07.2026</td>
+                <td>90er Open Air</td>
+                <td>Unterfarrnbach</td>
+            </tr>
+        
+            <tr data-index="85" data-id="9042">
+                <td>04.07.2026</td>
+                <td>Save the Core</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="86" data-id="9284">
+                <td>05.07.2026</td>
+                <td>Montez</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="87" data-id="9232">
+                <td>06.07.2026</td>
+                <td>Moka Efti Orchestra X Benno Fürmann</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="88" data-id="9027">
+                <td>07.07.2026</td>
+                <td>DATEV Betriebsfest</td>
+                <td>Neumarkt</td>
+            </tr>
+        
+            <tr data-index="89" data-id="9342">
+                <td>09.07.2026</td>
+                <td>Krach am Bach</td>
+                <td>Prölsdorf</td>
+            </tr>
+        
+            <tr data-index="90" data-id="9306">
+                <td>09.07.2026</td>
+                <td>Jan Delay &amp; Disko No.1</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="91" data-id="9287">
+                <td>10.07.2026</td>
+                <td>Marillion</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="92" data-id="9288">
+                <td>11.07.2026</td>
+                <td>Tream</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="93" data-id="9043">
+                <td>18.07.2026</td>
+                <td>Hopfenpflücker-Festival</td>
+                <td>Pyras</td>
+            </tr>
+        
+            <tr data-index="94" data-id="9044">
+                <td>25.07.2026</td>
+                <td>Classic Rock Night</td>
+                <td>Pyras</td>
+            </tr>
+        
+            <tr data-index="95" data-id="9338">
+                <td>31.07.2026</td>
+                <td>Krach am Bach</td>
+                <td>Prölsdorf</td>
+            </tr>
+        
+            <tr data-index="96" data-id="9226">
+                <td>31.07.2026</td>
+                <td>Florian Künstler</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="97" data-id="9215">
+                <td>05.08.2026</td>
+                <td>Gerhard Polt &amp; Die Well-brüder</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="98" data-id="9380">
+                <td>06.08.2026</td>
+                <td>Gerhard Polt &amp; Die Well Brüder - Zusatztermin</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="99" data-id="9076">
+                <td>07.08.2026</td>
+                <td>Schlosshof Festival</td>
+                <td>Höchstadt a.d. Aisch</td>
+            </tr>
+        
+            <tr data-index="100" data-id="9216">
+                <td>09.08.2026</td>
+                <td>Best Of Austropop</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="101" data-id="9229">
+                <td>11.08.2026</td>
+                <td>Schiller</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="102" data-id="9230">
+                <td>12.08.2026</td>
+                <td>Die Feisten</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="103" data-id="9217">
+                <td>13.08.2026</td>
+                <td>Italo Pop Night</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="104" data-id="9218">
+                <td>16.08.2026</td>
+                <td>The Queen Tribute Show</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="105" data-id="9227">
+                <td>17.08.2026</td>
+                <td>Die Sommernacht Des Musicals</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="106" data-id="9219">
+                <td>18.08.2026</td>
+                <td>Carmina Burana - Carl Orff</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="107" data-id="9228">
+                <td>20.08.2026</td>
+                <td>Clockplay</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="108" data-id="9220">
+                <td>21.08.2026</td>
+                <td>Italienische Opernnacht</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="109" data-id="9221">
+                <td>22.08.2026</td>
+                <td>Pink Floyd Performed By Echoes</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="110" data-id="9222">
+                <td>23.08.2026</td>
+                <td>Abba Night</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="111" data-id="9223">
+                <td>28.08.2026</td>
+                <td>The Music Of Phil Collins &amp; Genesis</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="112" data-id="9224">
+                <td>05.09.2026</td>
+                <td>Salut Salon</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="113" data-id="9293">
+                <td>19.09.2026</td>
+                <td>Hazel Brugger</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="114" data-id="9034">
+                <td>20.09.2026</td>
+                <td>Jan Preuß</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="115" data-id="9307">
+                <td>29.09.2026</td>
+                <td>1986zig</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="116" data-id="9308">
+                <td>05.10.2026</td>
+                <td>Das Lumpenpack</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="117" data-id="9381">
+                <td>10.10.2026</td>
+                <td>Asp</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="118" data-id="9033">
+                <td>11.10.2026</td>
+                <td>Loi</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="119" data-id="9382">
+                <td>16.10.2026</td>
+                <td>Dikka</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="120" data-id="9309">
+                <td>16.10.2026</td>
+                <td>The Sweet</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="121" data-id="9291">
+                <td>17.10.2026</td>
+                <td>Günter Grünwald &amp; Rad Gumbo</td>
+                <td>Schwabach</td>
+            </tr>
+        
+            <tr data-index="122" data-id="9118">
+                <td>18.10.2026</td>
+                <td>Prinz Pi</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="123" data-id="9032">
+                <td>19.10.2026</td>
+                <td>Nena</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="124" data-id="9299">
+                <td>28.10.2026</td>
+                <td>Tahsim Durgun</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="125" data-id="9383">
+                <td>07.11.2026</td>
+                <td>Deep Purple</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="126" data-id="9029">
+                <td>08.11.2026</td>
+                <td>Tokio Hotel</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="127" data-id="9384">
+                <td>09.11.2026</td>
+                <td>The Witcher In Concert</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="128" data-id="9310">
+                <td>11.11.2026</td>
+                <td>Manuel Rubey &amp; Simon Schwarz</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="129" data-id="9311">
+                <td>13.11.2026</td>
+                <td>Dicht &amp; Ergreifend</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="130" data-id="9290">
+                <td>15.11.2026</td>
+                <td>Die Udo Jürgens Story</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="131" data-id="9312">
+                <td>21.11.2026</td>
+                <td>Swiss &amp; Die Andern</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="132" data-id="9385">
+                <td>28.11.2026</td>
+                <td>Dartagnan</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="133" data-id="9313">
+                <td>29.11.2026</td>
+                <td>Der Physiopath</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="134" data-id="9286">
+                <td>09.12.2026</td>
+                <td>Bap</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="135" data-id="9030">
+                <td>10.12.2026</td>
+                <td>Jan van Weyde</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="136" data-id="9386">
+                <td>12.12.2026</td>
+                <td>Mighty Oaks</td>
+                <td>Nürnberg</td>
+            </tr>
+        
+            <tr data-index="137" data-id="9292">
+                <td>17.12.2026</td>
+                <td>Markus Krebs</td>
+                <td>Schwabach</td>
+            </tr>
+        
+            <tr data-index="138" data-id="9314">
+                <td>19.12.2026</td>
+                <td>One Violin Orchestra</td>
+                <td>Nürnberg</td>
+            </tr>
+        </tbody>
                             </table>
                         </div>
                     </div>
@@ -1646,8 +2521,8 @@
         <!-- Status Bar -->
         <div class="status-bar">
             <span class="status-section">Erstellt</span>
-            <span class="status-section" id="Erst_von"></span>
-            <span class="status-section" id="Erst_am"></span>
+            <span class="status-section" id="Erst_von">Excel-Import</span>
+            <span class="status-section" id="Erst_am">3.12.2025, 15:42:20</span>
             <span class="status-section">Geandert</span>
             <span class="status-section" id="Aend_von"></span>
             <span class="status-section" id="Aend_am"></span>
@@ -1659,7 +2534,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <span id="confirmTitle">Bestatigung</span>
-                <button class="title-btn close" onclick="closeModal('confirmModal')">&#10005;</button>
+                <button class="title-btn close" onclick="closeModal('confirmModal')">✕</button>
             </div>
             <div class="modal-body">
                 <p id="confirmMessage"></p>
@@ -1692,6 +2567,7 @@
         const state = {
             currentAuftragId: null,
             currentVADatumId: null,
+            currentVAStartId: null,  // Fix: VA Start ID für Mitarbeiterauswahl
             auftraege: [],
             schichten: [],
             zuordnungen: [],
@@ -1748,7 +2624,7 @@
 
         // Hilfsfunktion: Daten an Einsatzliste-iframe senden
         function sendToEinsatzliste(vaId, vadatumId) {
-            const iframeEinsatzliste = document.getElementById('iframe_Einsatzliste');
+            const iframeEinsatzliste = document.getElementById('sub_MA_VA_Zuordnung');
             if (iframeEinsatzliste && iframeEinsatzliste.contentWindow) {
                 iframeEinsatzliste.contentWindow.postMessage({
                     type: 'set_link_params',
@@ -1756,8 +2632,46 @@
                     VADatum_ID: vadatumId
                 }, '*');
                 console.log('[sendToEinsatzliste] PostMessage gesendet:', { VA_ID: vaId, VADatum_ID: vadatumId });
+            } else {
+                console.warn('[sendToEinsatzliste] iframe nicht gefunden oder nicht bereit');
             }
         }
+
+        // iframe-Load Handler - Mehrfach-Retry für robuste Kommunikation
+        document.addEventListener('DOMContentLoaded', function() {
+            const iframeEinsatzliste = document.getElementById('sub_MA_VA_Zuordnung');
+            if (iframeEinsatzliste) {
+                iframeEinsatzliste.addEventListener('load', function() {
+                    console.log('[iframe] Einsatzliste geladen - starte Retry-Sequenz');
+
+                    // Retry-Sequenz: Mehrmals Daten senden falls iframe noch nicht bereit
+                    const retryDelays = [200, 500, 1000, 2000];
+                    let retryCount = 0;
+
+                    function retrySendData() {
+                        const vaId = state.currentAuftragId || (state.pendingSubformData && state.pendingSubformData.VA_ID);
+                        const vadatumId = state.currentVADatumId || (state.pendingSubformData && state.pendingSubformData.VADatum_ID);
+
+                        if (vaId) {
+                            console.log(`[iframe] Retry #${retryCount + 1}: Sende Daten VA_ID=${vaId}, VADatum_ID=${vadatumId}`);
+                            state.einsatzlisteReady = true;
+                            sendToEinsatzliste(vaId, vadatumId);
+                        } else {
+                            console.log(`[iframe] Retry #${retryCount + 1}: Keine Daten vorhanden`);
+                        }
+
+                        // Weitere Retries falls noch ausstehend
+                        retryCount++;
+                        if (retryCount < retryDelays.length) {
+                            setTimeout(retrySendData, retryDelays[retryCount] - retryDelays[retryCount - 1]);
+                        }
+                    }
+
+                    // Erste Übertragung nach 200ms
+                    setTimeout(retrySendData, retryDelays[0]);
+                });
+            }
+        });
 
         // ============================================
         // INITIALISIERUNG
@@ -1777,6 +2691,11 @@
             // Auftraege ab aktuellem Datum filtern (aufsteigend, nächster zuerst)
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('Auftraege_ab').value = today;
+
+            // Status-Filter initial auf "Offen" (entspricht Dropdown-Default)
+            // WICHTIG: IMMER auf 1 setzen - Dropdown hat "Offen" als Default selected
+            state.filterStatus = 1; // Offen (Veranst_Status_ID = 1)
+            console.log('[Init] state.filterStatus initial gesetzt auf:', state.filterStatus);
 
             // Tab-Wechsel
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1813,7 +2732,7 @@
                 await loadAuftrag(parseInt(vaId));
             } else if (state.auftraege.length > 0) {
                 // Ersten (aktuellsten) Auftrag laden - API liefert ID
-                await loadAuftrag(state.auftraege[0].ID);
+                await loadAuftrag(getSortedAuftraege()[0].ID);
             }
 
             hideLoading();
@@ -1898,8 +2817,17 @@
                     url += `&status=${state.filterStatus}`;
                 }
 
+                console.log('[loadAuftraegeListe] API-URL:', url, 'filterStatus:', state.filterStatus);
+
                 const result = await apiCall(url);
                 state.auftraege = result.data || [];
+
+                console.log('[loadAuftraegeListe] Aufträge geladen:', state.auftraege.length);
+                if (state.auftraege.length > 0) {
+                    const sorted = getSortedAuftraege();
+                    console.log('[loadAuftraegeListe] Erster sortierter Auftrag:', sorted[0].ID, sorted[0].Auftrag);
+                }
+
                 renderAuftraegeListe();
                 updateStatusCounts();
             } catch (e) {
@@ -1909,7 +2837,11 @@
         }
 
         async function loadAuftrag(vaId, vadatumId = null) {
-            if (!vaId) return;
+            console.log('[loadAuftrag] Starte mit VA_ID:', vaId, 'VADatum_ID:', vadatumId);
+            if (!vaId) {
+                console.warn('[loadAuftrag] Abbruch: vaId ist leer');
+                return;
+            }
 
             // Kein Loading-Overlay bei Auftragswechsel (verhindert Blinken)
             state.currentAuftragId = vaId;
@@ -2047,11 +2979,10 @@
         // ============================================
         // RENDERING-FUNKTIONEN
         // ============================================
-        function renderAuftraegeListe() {
-            const tbody = document.getElementById('auftraegeBody');
-            tbody.innerHTML = '';
 
-            const sortedAuftraege = [...state.auftraege].sort((a, b) => {
+        // Hilfsfunktion: Sortiertes Aufträge-Array zurückgeben
+        function getSortedAuftraege() {
+            return [...state.auftraege].sort((a, b) => {
                 let aVal = a[state.sortColumn] || '';
                 let bVal = b[state.sortColumn] || '';
                 if (state.sortColumn === 'datum') {
@@ -2061,6 +2992,13 @@
                 const cmp = aVal.localeCompare(bVal);
                 return state.sortDir === 'asc' ? cmp : -cmp;
             });
+        }
+
+        function renderAuftraegeListe() {
+            const tbody = document.getElementById('auftraegeBody');
+            tbody.innerHTML = '';
+
+            const sortedAuftraege = getSortedAuftraege();
 
             sortedAuftraege.forEach(a => {
                 const tr = document.createElement('tr');
@@ -2073,10 +3011,9 @@
                     <td style="text-align: center;">${formatDateShort(a.Dat_VA_Von)}</td>
                     <td>${escapeHtml(a.Auftrag || '')}</td>
                     <td>${escapeHtml(a.Objekt || '')}</td>
-                    <td>${escapeHtml(a.Ort || '')}</td>
-                    <td style="text-align: center;">${a.MA_Anzahl_Soll || 0}</td>
-                    <td style="text-align: center;">${a.MA_Anzahl_Ist || 0}</td>
-                    <td style="text-align: center;">${a.Veranst_Status_ID || 1}</td>
+                    <td style="text-align: center;">${a.MA_Anzahl_Soll || a.MA_Soll || 0}</td>
+                    <td style="text-align: center;">${a.MA_Anzahl_Ist || a.MA_Ist || 0}</td>
+                    <td style="text-align: center;">${getStatusText(a.Veranst_Status_ID)}</td>
                 `;
                 tr.addEventListener('click', () => loadAuftrag(a.ID));
                 tbody.appendChild(tr);
@@ -2515,20 +3452,20 @@
         // Auftragsliste-Filter
         // WICHTIG: Nach jedem Filter-Vorgang den ersten Auftrag laden!
         async function filterAuftraege() {
-            // IstStatus-Filter übernehmen
+            // IstStatus-Filter übernehmen (numerische Werte für API)
             const istStatus = parseInt(document.getElementById('IstStatus').value);
             if (istStatus === 0) {
                 state.filterStatus = null; // Alle
             } else if (istStatus === 1) {
-                state.filterStatus = 'offen'; // Offen
+                state.filterStatus = 1; // Offen (Veranst_Status_ID = 1)
             } else if (istStatus === 2) {
-                state.filterStatus = 'abgeschlossen'; // Abgeschlossen
+                state.filterStatus = 3; // Abgeschlossen (Veranst_Status_ID >= 3)
             }
 
             await loadAuftraegeListe();
             // Nach Filtern den ersten Auftrag laden damit Schichten/Einsatzliste angezeigt werden
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(state.auftraege[0].ID);
+                await loadAuftrag(getSortedAuftraege()[0].ID);
             }
         }
 
@@ -2551,7 +3488,7 @@
             state.filterStatus = status;
             await loadAuftraegeListe();
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(state.auftraege[0].ID);
+                await loadAuftrag(getSortedAuftraege()[0].ID);
             }
         }
 
@@ -2562,7 +3499,7 @@
             input.value = formatDateISO(date);
             await loadAuftraegeListe();
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(state.auftraege[0].ID);
+                await loadAuftrag(getSortedAuftraege()[0].ID);
             }
         }
 
@@ -2573,7 +3510,7 @@
             input.value = formatDateISO(date);
             await loadAuftraegeListe();
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(state.auftraege[0].ID);
+                await loadAuftrag(getSortedAuftraege()[0].ID);
             }
         }
 
@@ -2582,7 +3519,7 @@
             state.filterStatus = null;
             await loadAuftraegeListe();
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(state.auftraege[0].ID);
+                await loadAuftrag(getSortedAuftraege()[0].ID);
             }
         }
 
@@ -2655,7 +3592,7 @@
                     state.currentAuftragId = null;
                     await loadAuftraegeListe();
                     if (state.auftraege.length > 0) {
-                        await loadAuftrag(state.auftraege[0].ID);
+                        await loadAuftrag(getSortedAuftraege()[0].ID);
                     }
                     showToast('Auftrag geloscht', 'success');
                 } catch (e) {
@@ -2704,40 +3641,143 @@
             showToast('Einsatzliste wird an SUB gesendet...', 'success');
         }
 
-        function einsatzlisteDrucken() {
-            Bridge.sendEvent('print', {
-                type: 'einsatzliste',
-                va_id: state.currentAuftragId,
-                vadatum_id: state.currentVADatumId
-            });
+        // ============================================
+        // VBA BRIDGE FUNCTIONS
+        // Ruft Access VBA-Funktionen via VBA Bridge Server auf
+        // ============================================
+
+        async function callVBAFunction(funcName, ...args) {
+            try {
+                const response = await fetch('http://localhost:5002/api/vba/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        function: funcName,
+                        args: args
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log(`[VBA] ${funcName} Ergebnis:`, result);
+                    return result;
+                } else {
+                    console.error(`[VBA] ${funcName} HTTP-Fehler:`, response.status);
+                    return { success: false, error: `HTTP ${response.status}` };
+                }
+            } catch (e) {
+                console.error(`[VBA] ${funcName} Fehler:`, e);
+                showToast('VBA Bridge nicht erreichbar!', 'error');
+                return { success: false, error: e.message };
+            }
         }
 
-        function namenslisteESS() {
-            Bridge.sendEvent('print', {
-                type: 'namensliste_ess',
-                va_id: state.currentAuftragId
-            });
-        }
-
-        function bwnDrucken() {
-            Bridge.sendEvent('print', {
-                type: 'bwn',
-                va_id: state.currentAuftragId,
-                vadatum_id: state.currentVADatumId
-            });
-        }
-
-        function bwnSenden() {
+        async function einsatzlisteDrucken() {
             if (!state.currentAuftragId) {
-                showToast('Bitte zuerst einen Auftrag auswaehlen', 'warning');
+                showToast('Bitte zuerst einen Auftrag auswählen', 'warning');
                 return;
             }
-            Bridge.sendEvent('send', {
-                type: 'bwn',
-                va_id: state.currentAuftragId,
-                vadatum_id: state.currentVADatumId
-            });
+
+            showToast('Einsatzliste wird erstellt...', 'info');
+
+            // VBA: fXL_Export_Auftrag(VA_ID, Pfad, Dateiname) - aber braucht Form-Referenz
+            // Alternativ: Wrapper-Funktion aufrufen
+            const result = await callVBAFunction('EinsatzlisteDruckenFromHTML',
+                state.currentAuftragId,
+                state.currentVADatumId || 0
+            );
+
+            if (result.success) {
+                showToast('Einsatzliste erfolgreich erstellt', 'success');
+            } else {
+                // Fallback: Bridge.sendEvent (wenn VBA Bridge nicht verfügbar)
+                Bridge.sendEvent('print', {
+                    type: 'einsatzliste',
+                    va_id: state.currentAuftragId,
+                    vadatum_id: state.currentVADatumId
+                });
+            }
+        }
+
+        async function namenslisteESS() {
+            if (!state.currentAuftragId) {
+                showToast('Bitte zuerst einen Auftrag auswählen', 'warning');
+                return;
+            }
+
+            showToast('Namensliste ESS wird erstellt...', 'info');
+
+            // VBA: Stundenliste_erstellen(VA_ID, MA_ID, kun_ID)
+            // Veranstalter_ID aus state.currentAuftrag holen
+            const kunId = state.currentAuftrag?.Veranstalter_ID || 0;
+
+            const result = await callVBAFunction('Stundenliste_erstellen',
+                state.currentAuftragId,
+                0,  // MA_ID (optional)
+                kunId
+            );
+
+            if (result.success) {
+                showToast('Namensliste ESS erfolgreich erstellt', 'success');
+            } else {
+                // Fallback
+                Bridge.sendEvent('print', {
+                    type: 'namensliste_ess',
+                    va_id: state.currentAuftragId
+                });
+            }
+        }
+
+        async function bwnDrucken() {
+            if (!state.currentAuftragId) {
+                showToast('Bitte zuerst einen Auftrag auswählen', 'warning');
+                return;
+            }
+
+            showToast('BWN wird gedruckt...', 'info');
+
+            // VBA: DruckeBewachungsnachweise erfordert Form-Referenz
+            // Wrapper-Funktion nutzen
+            const result = await callVBAFunction('DruckeBewachungsnachweiseFromHTML',
+                state.currentAuftragId,
+                state.currentVADatumId || 0
+            );
+
+            if (result.success) {
+                showToast('BWN erfolgreich gedruckt', 'success');
+            } else {
+                Bridge.sendEvent('print', {
+                    type: 'bwn',
+                    va_id: state.currentAuftragId,
+                    vadatum_id: state.currentVADatumId
+                });
+            }
+        }
+
+        async function bwnSenden() {
+            if (!state.currentAuftragId) {
+                showToast('Bitte zuerst einen Auftrag auswählen', 'warning');
+                return;
+            }
+
             showToast('BWN wird gesendet...', 'info');
+
+            // VBA: SendeBewachungsnachweise erfordert Form-Referenz
+            // Wrapper-Funktion nutzen
+            const result = await callVBAFunction('SendeBewachungsnachweiseFromHTML',
+                state.currentAuftragId,
+                state.currentVADatumId || 0
+            );
+
+            if (result.success) {
+                showToast('BWN erfolgreich gesendet', 'success');
+            } else {
+                Bridge.sendEvent('send', {
+                    type: 'bwn',
+                    va_id: state.currentAuftragId,
+                    vadatum_id: state.currentVADatumId
+                });
+            }
         }
 
         async function openMitarbeiterauswahl() {
@@ -3237,6 +4277,16 @@
             return days[d.getDay()] + '. ' + d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' });
         }
 
+        function getStatusText(statusId) {
+            const status = parseInt(statusId) || 1;
+            switch(status) {
+                case 1: return 'Planung';
+                case 2: return 'Vers.';
+                case 3: return 'Beendet';
+                default: return status;
+            }
+        }
+
         function formatDateTime(dateStr) {
             if (!dateStr) return '';
             const d = new Date(dateStr);
@@ -3318,6 +4368,12 @@
             state.selectedSchichtIdx = idx;
             const schicht = state.schichten[idx];
 
+            // Fix: VA Start ID für Mitarbeiterauswahl setzen
+            if (schicht && schicht.VAStart_ID) {
+                state.currentVAStartId = schicht.VAStart_ID;
+                console.log('[selectSchicht] VA Start ID gesetzt:', state.currentVAStartId);
+            }
+
             // Alle Zeilen deselektieren, aktuelle markieren
             document.querySelectorAll('#schichtenBody tr').forEach((tr, i) => {
                 tr.classList.toggle('selected', i === idx);
@@ -3362,7 +4418,26 @@
         function ortChanged() { saveField('Ort', document.getElementById('Ort').value); }
         function objektChanged() { saveField('Objekt', document.getElementById('Objekt').value); }
         // objektIdChanged entfernt - Objekt_ID-Select wurde entfernt
-        function veranstalterChanged() { saveField('Veranstalter_ID', document.getElementById('Veranstalter_ID').value); }
+        function veranstalterChanged() {
+            const veranstalterId = parseInt(document.getElementById('Veranstalter_ID').value) || 0;
+            saveField('Veranstalter_ID', veranstalterId);
+
+            // BWN-Buttons nur bei Kunde ID 20760 sichtbar (14.01.2026)
+            const isBWNKunde = veranstalterId === 20760;
+            const btnBWNDruck = document.getElementById('btn_BWN_Druck');
+            const btnBWNSend = document.getElementById('cmd_BWN_send');
+            if (btnBWNDruck) btnBWNDruck.style.display = isBWNKunde ? '' : 'none';
+            if (btnBWNSend) btnBWNSend.style.display = isBWNKunde ? '' : 'none';
+
+            // Einsatzliste: RE-Spalte nur bei ID 20760, PKW/EL versteckt bei ID 20760
+            const einsatzlisteFrame = document.querySelector('iframe[src*="sub_MA_VA_Zuordnung"]');
+            if (einsatzlisteFrame && einsatzlisteFrame.contentWindow) {
+                einsatzlisteFrame.contentWindow.postMessage({
+                    type: 'set_veranstalter',
+                    veranstalter_id: veranstalterId
+                }, '*');
+            }
+        }
 
         console.log('[Auftragsverwaltung] Script geladen');
 
@@ -3594,8 +4669,9 @@
     <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
     <script src="js/server-watchdog.js"></script>
     <!-- Formular-Logik (Button-Handler, API-Calls) -->
-    <script type="module" src="logic/frm_va_Auftragstamm.logic.js"></script>
-</body>
-</html>
+    <script type="module" src="logic/frm_va_Auftragstamm.logic.js?v=20260115_2220"></script>
 
 
+
+
+<script src="chrome-extension://lhannfkhjdhmibllojbbdjdbpegidojj/js/content/sm.js" data-pname="recorder-screenshot-v3" data-asset-path="chrome-extension://lhannfkhjdhmibllojbbdjdbpegidojj/"></script><div class="host-lopnbnfpjmgpbppclhclehhgafnifija" style="position: relative; z-index: 2147483647;"></div></body></html>
