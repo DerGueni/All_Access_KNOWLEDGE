@@ -135,9 +135,10 @@ function setupEventListeners() {
     elements.btnDelSelected?.addEventListener('click', entferneAusGeplant);
     elements.btnAktualisieren?.addEventListener('click', renderMitarbeiterListe);
 
-    // E-Mail Anfragen
-    elements.btnMailSelected?.addEventListener('click', () => versendeAnfragen(false));
-    elements.btnMail?.addEventListener('click', () => versendeAnfragen(true));
+    // E-Mail Anfragen - ENTFERNT: Wird bereits in HTML registriert (btnMail_Click, btnMailSelected_Click)
+    // Diese nutzen den korrekten Batch-Endpoint /api/vba/anfragen
+    // elements.btnMailSelected?.addEventListener('click', () => versendeAnfragen(false));
+    // elements.btnMail?.addEventListener('click', () => versendeAnfragen(true));
 
     // Navigation - Zurück zum Auftrag
     elements.btnAuftrag?.addEventListener('click', () => {
@@ -189,8 +190,28 @@ async function loadAuftraege() {
     try {
         setStatus('Lade Auftraege...');
 
-        // Bridge nutzen
-        Bridge.loadData('auftraege', null, { ab_datum: new Date().toISOString().split('T')[0], limit: 200 });
+        // REST-API direkt nutzen (Bridge.loadData mit 'auftraege' fired kein Event!)
+        const heute = new Date().toISOString().split('T')[0];
+        const response = await fetch(`http://localhost:5000/api/auftraege?ab_datum=${heute}&limit=200`);
+        const result = await response.json();
+
+        if (result.success && result.data) {
+            state.auftraege = result.data;
+
+            // Dropdown befuellen
+            if (elements.cboAuftrag) {
+                elements.cboAuftrag.innerHTML = '<option value="">-- Auftrag wählen --</option>';
+                state.auftraege.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a.ID || a.VA_ID;
+                    const datum = formatDate(a.Dat_VA_Von || a.VADatum);
+                    opt.textContent = `${datum} ${a.Auftrag || ''} ${a.Objekt || ''}`;
+                    elements.cboAuftrag.appendChild(opt);
+                });
+            }
+            setStatus(`${state.auftraege.length} Aufträge geladen`);
+            console.log('[Schnellauswahl] Aufträge geladen:', state.auftraege.length);
+        }
 
     } catch (error) {
         console.error('[Schnellauswahl] Fehler beim Laden Auftraege:', error);
@@ -485,7 +506,8 @@ function renderMitarbeiterListe() {
         `;
     }).join('');
 
-    // Event Listener
+    // Event Listener - NUR click, KEIN dblclick!
+    // dblclick wird in HTML via List_MA_DblClick behandelt (ruft addMAToPlanung auf)
     elements.maList.querySelectorAll('.listbox-row[data-id]').forEach(row => {
         const id = parseInt(row.dataset.id);
 
@@ -499,9 +521,11 @@ function renderMitarbeiterListe() {
             }
         });
 
-        row.addEventListener('dblclick', () => {
-            zuordneEinzelnenMA(id);
-        });
+        // ENTFERNT: dblclick-Handler verursacht Konflikt mit HTML List_MA_DblClick
+        // Die HTML-Version ist die korrekte - NICHT WIEDER AKTIVIEREN!
+        // row.addEventListener('dblclick', () => {
+        //     zuordneEinzelnenMA(id);
+        // });
     });
 }
 
@@ -921,7 +945,8 @@ function renderMitarbeiterListeMitEntfernung() {
         `;
     }).join('');
 
-    // Event Listener (wie in Standard-Ansicht)
+    // Event Listener - NUR click, KEIN dblclick!
+    // dblclick wird in HTML via List_MA_DblClick behandelt (ruft addMAToPlanung auf)
     elements.maList.querySelectorAll('.listbox-row[data-id]').forEach(row => {
         const id = parseInt(row.dataset.id);
 
@@ -935,9 +960,11 @@ function renderMitarbeiterListeMitEntfernung() {
             }
         });
 
-        row.addEventListener('dblclick', () => {
-            zuordneEinzelnenMA(id);
-        });
+        // ENTFERNT: dblclick-Handler verursacht Konflikt mit HTML List_MA_DblClick
+        // Die HTML-Version ist die korrekte - NICHT WIEDER AKTIVIEREN!
+        // row.addEventListener('dblclick', () => {
+        //     zuordneEinzelnenMA(id);
+        // });
     });
 }
 
@@ -1298,16 +1325,21 @@ function getEmailTemplate() {
  */
 async function sendAnfrageViaAccessVBA(maId, vaId, vaDatumId, vaStartId) {
     console.log(`[VBA] Anfragen aufrufen: MA=${maId}, VA=${vaId}, Datum=${vaDatumId}, Start=${vaStartId}`);
-    
+
     try {
-        const response = await fetch('http://localhost:5002/api/vba/anfragen', {
+        // Einzelnen MA-Aufruf über generischen /api/vba/execute Endpoint
+        // (Der /api/vba/anfragen Endpoint ist für Batch-Verarbeitung gedacht)
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                ma_id: maId,
-                va_id: vaId,
-                vadatum_id: vaDatumId,
-                vastart_id: vaStartId || 0
+                function: 'Anfragen',
+                args: [
+                    parseInt(maId),
+                    parseInt(vaId),
+                    parseInt(vaDatumId),
+                    parseInt(vaStartId || 0)
+                ]
             })
         });
         
