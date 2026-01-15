@@ -345,6 +345,51 @@ Der Button "Mitarbeiterauswahl" (`btnSchnellPlan`) im Formular `frm_va_Auftragst
 
 ---
 
+## GESCHÜTZT: Doppelklick auf Mitarbeiter in Schnellauswahl (KRITISCH!)
+
+**Letzte Änderung: 15.01.2026 - FUNKTIONIERT - NIEMALS ÄNDERN!**
+
+Der Doppelklick auf einen Mitarbeiter in der Liste (`List_MA`) fügt den MA zur Planung hinzu.
+
+### Geschützte Dateien und Code-Stellen:
+
+**1. `frm_MA_VA_Schnellauswahl.html` - List_MA_DblClick() (ca. Zeile 2635-2672):**
+- Wird bei Doppelklick auf MA-Liste aufgerufen
+- Ruft `addMAToPlanung()` auf
+- Event-Listener bei Zeile 2931: `document.getElementById('List_MA_Body')?.addEventListener('dblclick', List_MA_DblClick);`
+- DIES IST DIE KORREKTE IMPLEMENTATION!
+
+**2. `frm_MA_VA_Schnellauswahl.logic.js` - renderMitarbeiterListe() (ca. Zeile 509-527):**
+```javascript
+// ENTFERNT: dblclick-Handler verursacht Konflikt mit HTML List_MA_DblClick
+// Die HTML-Version ist die korrekte - NICHT WIEDER AKTIVIEREN!
+// row.addEventListener('dblclick', () => {
+//     zuordneEinzelnenMA(id);
+// });
+```
+- Dieser Code MUSS auskommentiert bleiben!
+- Die logic.js Version würde mit dem HTML-Handler konkurrieren
+
+**3. `frm_MA_VA_Schnellauswahl.logic.js` - renderMitarbeiterListeMitEntfernung() (ca. Zeile 945-963):**
+- Gleiche Regel: dblclick-Handler MUSS auskommentiert bleiben!
+- Die HTML-Version (`List_MA_DblClick` → `addMAToPlanung`) ist korrekt
+
+### WARUM GESCHÜTZT:
+- Doppelte Event-Handler (HTML + logic.js) führten zu Konflikten
+- Die logic.js Version rief `zuordneEinzelnenMA()` auf (falscher Pfad)
+- Die HTML-Version ruft `addMAToPlanung()` auf (korrekter Pfad)
+- Problem wurde mit Playwright-Tests verifiziert und behoben
+
+### NIEMALS ÄNDERN:
+- dblclick-Handler in `renderMitarbeiterListe()` MUSS auskommentiert bleiben
+- dblclick-Handler in `renderMitarbeiterListeMitEntfernung()` MUSS auskommentiert bleiben
+- `List_MA_DblClick` in HTML ist der EINZIGE dblclick-Handler für die MA-Liste
+
+⚠️ **DIESE FUNKTIONALITÄT WURDE AM 15.01.2026 GETESTET UND VOM BENUTZER BESTÄTIGT!** ⚠️
+⚠️ **BEI ÄNDERUNGSWUNSCH: EXPLIZITE GENEHMIGUNG DES BENUTZERS ERFORDERLICH!** ⚠️
+
+---
+
 ## QUALITÄTSSICHERUNG (PFLICHT!)
 
 ### VBA-Code IMMER kompilieren
