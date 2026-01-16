@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Einzeldienstpläne - CONSYS</title>
     <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; font-size: 11px; }
         body {
@@ -14,24 +16,7 @@
             flex-direction: column;
         }
 
-        /* Header */
-        .header {
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            border-bottom: 2px solid #808080;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .header h1 {
-            color: #000080;
-            font-size: 19px; /* Formulartitel +8px */
-            font-weight: bold;
-        }
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
+        /* Header - jetzt via unified-header.css */
         .btn {
             background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
             border: 2px solid;
@@ -190,7 +175,7 @@
         /* Print Styles */
         @media print {
             body { background: white; }
-            .header, .sidebar, .status-bar { display: none !important; }
+            .header-row-wrapper, .sidebar, .status-bar { display: none !important; }
             .container { display: block; padding: 0; }
             .preview-area { border: none; padding: 0; }
             .dienstplan-page { box-shadow: none; margin-bottom: 0; }
@@ -215,14 +200,18 @@
     <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
 <body data-form="frm_DP_Einzeldienstplaene">
-    <div class="header">
-        <h1>Einzeldienstpläne</h1>
-        <div class="header-actions">
-            <button class="btn" onclick="generatePreview()" id="btnVorschau">Vorschau</button>
-            <button class="btn" onclick="exportToPDF()" id="btnPDF" disabled>PDF Export</button>
-            <button class="btn" onclick="window.print()" id="btnDrucken" disabled>Drucken</button>
-            <button class="btn" onclick="window.close()">Schließen</button>
+    <div class="header-row-wrapper">
+        <div class="header-row combined-buttons">
+            <div class="logo-box">C</div>
+            <span class="title-text" style="font-size: 16px; font-weight: bold;">Einzeldienstpläne</span>
+            <div class="buttons-grid">
+                <button class="btn unified-btn" id="btnVorschau" onclick="generatePreview()">Vorschau</button>
+                <button class="btn unified-btn" id="btnPDF" onclick="exportToPDF()" disabled>PDF Export</button>
+                <button class="btn unified-btn" id="btnDrucken" onclick="window.print()" disabled>Drucken</button>
+                <button class="btn unified-btn" onclick="window.close()">Schließen</button>
+            </div>
         </div>
+        <div class="gpt-box">CONSYS<span>Web</span></div>
     </div>
 
     <div class="container">

@@ -1,6 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="de">
-<head>
+<html lang="de" data-yd-content-ready="true"><head>
     <meta charset="UTF-8">
     <script>
     // Auto-Load in Shell (Sidebar-Integration)
@@ -25,13 +24,21 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kundenstammblatt</title>
+    <link rel="stylesheet" href="css/unified-header.css">
     <style>
+        :root {
+            --base-font-size: 11px;
+            --small-font-size: 10px;
+            --header-font-size: 12px;
+            --title-font-size: 24px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 11px;
+            font-size: var(--base-font-size);
         }
 
         body {
@@ -86,7 +93,8 @@
             display: flex;
             flex: 1;
             overflow: hidden;
-        }
+        
+            min-width: 0;}
 
         /* Left Menu */
         .left-menu {
@@ -193,7 +201,7 @@
         /* Content Area */
         .content-area {
             flex: 1;
-            background-color: #8080c0;
+            background-color: #d3d3d3;
             padding: 3px;
             display: flex;
             flex-direction: column;
@@ -203,7 +211,7 @@
 
         /* Header Row */
         .header-row {
-            background-color: #b8b8d8;
+            background-color: #d3d3d3;
             border: 1px solid #606090;
             padding: 4px 8px;
             display: flex;
@@ -213,24 +221,7 @@
             flex-wrap: wrap;
         }
 
-        .logo-box {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #4040a0, #8080c0);
-            border: 2px solid #404080;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .title-text {
-            font-size: 23px !important; /* Formulartitel +8px gemaess Anforderung */
-            font-weight: bold !important;
-            color: #000080;
-        }
+        /* logo-box und title-text - Überschrieben durch unified-header.css */
 
         .btn {
             background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
@@ -265,23 +256,7 @@
             color: white; /* Fix: dunkler Hintergrund braucht weisse Schrift */
         }
 
-        .gpt-box {
-            display: none; /* Deaktiviert - blockierte Speichern-Button */
-            background: #ffe0e0;
-            border: 1px solid #a00000;
-            padding: 2px 6px;
-            font-size: 9px;
-            text-align: center;
-            line-height: 1.2;
-            position: absolute;
-            right: 10px;
-            top: 28px;
-            pointer-events: none; /* Falls wieder aktiviert: Klicks durchlassen */
-        }
-
-        .header-row-wrapper {
-            position: relative;
-        }
+        /* gpt-box und header-row-wrapper - Überschrieben durch unified-header.css */
 
         .header-kd-nr {
             display: flex;
@@ -690,11 +665,123 @@
     </style>
     <link rel="stylesheet" href="consys-common.css">
     <link rel="stylesheet" href="css/fonts_override.css">
-    <script src="js/performance-init.js"></script>
+    <script src="js/performance-init.js"></script><script src="chrome-extension://oglffgiaiekgeicdgkdlnlkhliajdlja/injectScript.js"></script>
 <link rel="stylesheet" href="css/visbug_overrides.css">
-</head>
-<body data-form="frm_KD_Kundenstamm">
-    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild" data-testid="kd-btn-vollbild">&#x26F6;</button>
+<style>
+            /* Shell-Modus: Sidebar versteckt */
+            body.shell-mode .left-menu {
+                display: none !important;
+            }
+            body.shell-mode .main-container {
+                margin-left: 0 !important;
+            
+            min-width: 0;}
+            body.shell-mode .content-area {
+                width: 100% !important;
+            }
+        </style><style id="perf-init-styles">
+        @keyframes skeleton-shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        .skeleton-loading {
+            pointer-events: none;
+        }
+
+        .skeleton-row {
+            display: flex;
+            gap: 8px;
+            padding: 6px 4px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .skeleton-cell {
+            height: 14px;
+            background: linear-gradient(90deg, #e8e8e8 25%, #f0f0f0 50%, #e8e8e8 75%);
+            background-size: 400px 100%;
+            animation: skeleton-shimmer 1.2s ease-in-out infinite;
+            border-radius: 3px;
+        }
+
+        .skeleton-cell.w-20 { width: 20%; }
+        .skeleton-cell.w-30 { width: 30%; }
+        .skeleton-cell.w-40 { width: 40%; }
+        .skeleton-cell.w-50 { width: 50%; }
+        .skeleton-cell.w-60 { width: 60%; }
+
+        .form-loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.7);
+            z-index: 100;
+        }
+
+        .form-loading::after {
+            content: 'Laden...';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 101;
+            font-size: 12px;
+            color: #666;
+        }
+
+        [data-lazy-src]:not(.lazy-loaded) {
+            background: #f5f5f5;
+            min-height: 50px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.2s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style><style>@keyframes loading {
+    0% {
+        transform: rotate(0);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar-thumb {
+    background: #dfdfdf;
+    border-radius: 4px;
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar-thumb:hover {
+    background: #d4d4d4;
+}
+</style><style>.translated-content .ytCoreImageHost {
+    visibility: visible;
+}
+</style><style>body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow:hidden}body.swal2-height-auto{height:auto !important}body.swal2-no-backdrop .swal2-container{background-color:rgba(0,0,0,0) !important;pointer-events:none}body.swal2-no-backdrop .swal2-container .swal2-popup{pointer-events:all}body.swal2-no-backdrop .swal2-container .swal2-modal{box-shadow:0 0 10px rgba(0,0,0,.4)}body.swal2-toast-shown .swal2-container{box-sizing:border-box;width:360px;max-width:100%;background-color:rgba(0,0,0,0);pointer-events:none}body.swal2-toast-shown .swal2-container.swal2-top{inset:0 auto auto 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-top-end,body.swal2-toast-shown .swal2-container.swal2-top-right{inset:0 0 auto auto}body.swal2-toast-shown .swal2-container.swal2-top-start,body.swal2-toast-shown .swal2-container.swal2-top-left{inset:0 auto auto 0}body.swal2-toast-shown .swal2-container.swal2-center-start,body.swal2-toast-shown .swal2-container.swal2-center-left{inset:50% auto auto 0;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-center{inset:50% auto auto 50%;transform:translate(-50%, -50%)}body.swal2-toast-shown .swal2-container.swal2-center-end,body.swal2-toast-shown .swal2-container.swal2-center-right{inset:50% 0 auto auto;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-start,body.swal2-toast-shown .swal2-container.swal2-bottom-left{inset:auto auto 0 0}body.swal2-toast-shown .swal2-container.swal2-bottom{inset:auto auto 0 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-end,body.swal2-toast-shown .swal2-container.swal2-bottom-right{inset:auto 0 0 auto}@media print{body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow-y:scroll !important}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown)>[aria-hidden=true]{display:none}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown) .swal2-container{position:static !important}}div:where(.swal2-container){display:grid;position:fixed;z-index:1060;inset:0;box-sizing:border-box;grid-template-areas:"top-start     top            top-end" "center-start  center         center-end" "bottom-start  bottom-center  bottom-end";grid-template-rows:minmax(min-content, auto) minmax(min-content, auto) minmax(min-content, auto);height:100%;padding:.625em;overflow-x:hidden;transition:background-color .1s;-webkit-overflow-scrolling:touch}div:where(.swal2-container).swal2-backdrop-show,div:where(.swal2-container).swal2-noanimation{background:rgba(0,0,0,.4)}div:where(.swal2-container).swal2-backdrop-hide{background:rgba(0,0,0,0) !important}div:where(.swal2-container).swal2-top-start,div:where(.swal2-container).swal2-center-start,div:where(.swal2-container).swal2-bottom-start{grid-template-columns:minmax(0, 1fr) auto auto}div:where(.swal2-container).swal2-top,div:where(.swal2-container).swal2-center,div:where(.swal2-container).swal2-bottom{grid-template-columns:auto minmax(0, 1fr) auto}div:where(.swal2-container).swal2-top-end,div:where(.swal2-container).swal2-center-end,div:where(.swal2-container).swal2-bottom-end{grid-template-columns:auto auto minmax(0, 1fr)}div:where(.swal2-container).swal2-top-start>.swal2-popup{align-self:start}div:where(.swal2-container).swal2-top>.swal2-popup{grid-column:2;place-self:start center}div:where(.swal2-container).swal2-top-end>.swal2-popup,div:where(.swal2-container).swal2-top-right>.swal2-popup{grid-column:3;place-self:start end}div:where(.swal2-container).swal2-center-start>.swal2-popup,div:where(.swal2-container).swal2-center-left>.swal2-popup{grid-row:2;align-self:center}div:where(.swal2-container).swal2-center>.swal2-popup{grid-column:2;grid-row:2;place-self:center center}div:where(.swal2-container).swal2-center-end>.swal2-popup,div:where(.swal2-container).swal2-center-right>.swal2-popup{grid-column:3;grid-row:2;place-self:center end}div:where(.swal2-container).swal2-bottom-start>.swal2-popup,div:where(.swal2-container).swal2-bottom-left>.swal2-popup{grid-column:1;grid-row:3;align-self:end}div:where(.swal2-container).swal2-bottom>.swal2-popup{grid-column:2;grid-row:3;place-self:end center}div:where(.swal2-container).swal2-bottom-end>.swal2-popup,div:where(.swal2-container).swal2-bottom-right>.swal2-popup{grid-column:3;grid-row:3;place-self:end end}div:where(.swal2-container).swal2-grow-row>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-column:1/4;width:100%}div:where(.swal2-container).swal2-grow-column>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-row:1/4;align-self:stretch}div:where(.swal2-container).swal2-no-transition{transition:none !important}div:where(.swal2-container) div:where(.swal2-popup){display:none;position:relative;box-sizing:border-box;grid-template-columns:minmax(0, 100%);width:32em;max-width:100%;padding:0 0 1.25em;border:none;border-radius:5px;background:#fff;color:hsl(0,0%,33%);font-family:inherit;font-size:1rem}div:where(.swal2-container) div:where(.swal2-popup):focus{outline:none}div:where(.swal2-container) div:where(.swal2-popup).swal2-loading{overflow-y:hidden}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable{cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable div:where(.swal2-icon){cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging{cursor:grabbing}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging div:where(.swal2-icon){cursor:grabbing}div:where(.swal2-container) h2:where(.swal2-title){position:relative;max-width:100%;margin:0;padding:.8em 1em 0;color:inherit;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;word-wrap:break-word;cursor:initial}div:where(.swal2-container) div:where(.swal2-actions){display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:center;width:auto;margin:1.25em auto 0;padding:0}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled[disabled]{opacity:.4}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled:hover{background-image:linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled:active{background-image:linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2))}div:where(.swal2-container) div:where(.swal2-loader){display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 rgba(0,0,0,0) #2778c4 rgba(0,0,0,0)}div:where(.swal2-container) button:where(.swal2-styled){margin:.3125em;padding:.625em 1.1em;transition:box-shadow .1s;box-shadow:0 0 0 3px rgba(0,0,0,0);font-weight:500}div:where(.swal2-container) button:where(.swal2-styled):not([disabled]){cursor:pointer}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm){border:0;border-radius:.25em;background:initial;background-color:#7066e0;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm):focus-visible{box-shadow:0 0 0 3px rgba(112,102,224,.5)}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny){border:0;border-radius:.25em;background:initial;background-color:#dc3741;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny):focus-visible{box-shadow:0 0 0 3px rgba(220,55,65,.5)}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel){border:0;border-radius:.25em;background:initial;background-color:#6e7881;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):focus-visible{box-shadow:0 0 0 3px rgba(110,120,129,.5)}div:where(.swal2-container) button:where(.swal2-styled).swal2-default-outline:focus-visible{box-shadow:0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) button:where(.swal2-styled):focus-visible{outline:none}div:where(.swal2-container) button:where(.swal2-styled)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-footer){margin:1em 0 0;padding:1em 1em 0;border-top:1px solid #eee;color:inherit;font-size:1em;text-align:center;cursor:initial}div:where(.swal2-container) .swal2-timer-progress-bar-container{position:absolute;right:0;bottom:0;left:0;grid-column:auto !important;overflow:hidden;border-bottom-right-radius:5px;border-bottom-left-radius:5px}div:where(.swal2-container) div:where(.swal2-timer-progress-bar){width:100%;height:.25em;background:rgba(0,0,0,.2)}div:where(.swal2-container) img:where(.swal2-image){max-width:100%;margin:2em auto 1em;cursor:initial}div:where(.swal2-container) button:where(.swal2-close){z-index:2;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin-top:0;margin-right:0;margin-bottom:-1.2em;padding:0;overflow:hidden;transition:color .1s,box-shadow .1s;border:none;border-radius:5px;background:rgba(0,0,0,0);color:#ccc;font-family:monospace;font-size:2.5em;cursor:pointer;justify-self:end}div:where(.swal2-container) button:where(.swal2-close):hover{transform:none;background:rgba(0,0,0,0);color:#f27474}div:where(.swal2-container) button:where(.swal2-close):focus-visible{outline:none;box-shadow:inset 0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) button:where(.swal2-close)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-html-container){z-index:1;justify-content:center;margin:0;padding:1em 1.6em .3em;overflow:auto;color:inherit;font-size:1.125em;font-weight:normal;line-height:normal;text-align:center;word-wrap:break-word;word-break:break-word;cursor:initial}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea),div:where(.swal2-container) select:where(.swal2-select),div:where(.swal2-container) div:where(.swal2-radio),div:where(.swal2-container) label:where(.swal2-checkbox){margin:1em 2em 3px}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea){box-sizing:border-box;width:auto;transition:border-color .1s,box-shadow .1s;border:1px solid hsl(0,0%,85%);border-radius:.1875em;background:rgba(0,0,0,0);box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(0,0,0,0);color:inherit;font-size:1.125em}div:where(.swal2-container) input:where(.swal2-input).swal2-inputerror,div:where(.swal2-container) input:where(.swal2-file).swal2-inputerror,div:where(.swal2-container) textarea:where(.swal2-textarea).swal2-inputerror{border-color:#f27474 !important;box-shadow:0 0 2px #f27474 !important}div:where(.swal2-container) input:where(.swal2-input):focus,div:where(.swal2-container) input:where(.swal2-file):focus,div:where(.swal2-container) textarea:where(.swal2-textarea):focus{border:1px solid #b4dbed;outline:none;box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) input:where(.swal2-input)::placeholder,div:where(.swal2-container) input:where(.swal2-file)::placeholder,div:where(.swal2-container) textarea:where(.swal2-textarea)::placeholder{color:#ccc}div:where(.swal2-container) .swal2-range{margin:1em 2em 3px;background:#fff}div:where(.swal2-container) .swal2-range input{width:80%}div:where(.swal2-container) .swal2-range output{width:20%;color:inherit;font-weight:600;text-align:center}div:where(.swal2-container) .swal2-range input,div:where(.swal2-container) .swal2-range output{height:2.625em;padding:0;font-size:1.125em;line-height:2.625em}div:where(.swal2-container) .swal2-input{height:2.625em;padding:0 .75em}div:where(.swal2-container) .swal2-file{width:75%;margin-right:auto;margin-left:auto;background:rgba(0,0,0,0);font-size:1.125em}div:where(.swal2-container) .swal2-textarea{height:6.75em;padding:.75em}div:where(.swal2-container) .swal2-select{min-width:50%;max-width:100%;padding:.375em .625em;background:rgba(0,0,0,0);color:inherit;font-size:1.125em}div:where(.swal2-container) .swal2-radio,div:where(.swal2-container) .swal2-checkbox{align-items:center;justify-content:center;background:#fff;color:inherit}div:where(.swal2-container) .swal2-radio label,div:where(.swal2-container) .swal2-checkbox label{margin:0 .6em;font-size:1.125em}div:where(.swal2-container) .swal2-radio input,div:where(.swal2-container) .swal2-checkbox input{flex-shrink:0;margin:0 .4em}div:where(.swal2-container) label:where(.swal2-input-label){display:flex;justify-content:center;margin:1em auto 0}div:where(.swal2-container) div:where(.swal2-validation-message){align-items:center;justify-content:center;margin:1em 0 0;padding:.625em;overflow:hidden;background:hsl(0,0%,94%);color:#666;font-size:1em;font-weight:300}div:where(.swal2-container) div:where(.swal2-validation-message)::before{content:"!";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}div:where(.swal2-container) .swal2-progress-steps{flex-wrap:wrap;align-items:center;max-width:100%;margin:1.25em auto;padding:0;background:rgba(0,0,0,0);font-weight:600}div:where(.swal2-container) .swal2-progress-steps li{display:inline-block;position:relative}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step{z-index:20;flex-shrink:0;width:2em;height:2em;border-radius:2em;background:#2778c4;color:#fff;line-height:2em;text-align:center}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step{background:#2778c4}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step{background:#add8e6;color:#fff}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line{background:#add8e6}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step-line{z-index:10;flex-shrink:0;width:2.5em;height:.4em;margin:0 -1px;background:#2778c4}div:where(.swal2-icon){position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:2.5em auto .6em;border:.25em solid rgba(0,0,0,0);border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;user-select:none}div:where(.swal2-icon) .swal2-icon-content{display:flex;align-items:center;font-size:3.75em}div:where(.swal2-icon).swal2-error{border-color:#f27474;color:#f27474}div:where(.swal2-icon).swal2-error .swal2-x-mark{position:relative;flex-grow:1}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line]{display:block;position:absolute;top:2.3125em;width:2.9375em;height:.3125em;border-radius:.125em;background-color:#f27474}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=left]{left:1.0625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=right]{right:1em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-error.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-error.swal2-icon-show .swal2-x-mark{animation:swal2-animate-error-x-mark .5s}div:where(.swal2-icon).swal2-warning{border-color:rgb(249.95234375,205.965625,167.74765625);color:#f8bb86}div:where(.swal2-icon).swal2-warning.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-warning.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .5s}div:where(.swal2-icon).swal2-info{border-color:rgb(156.7033492823,224.2822966507,246.2966507177);color:#3fc3ee}div:where(.swal2-icon).swal2-info.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-info.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .8s}div:where(.swal2-icon).swal2-question{border-color:rgb(200.8064516129,217.9677419355,225.1935483871);color:#87adbd}div:where(.swal2-icon).swal2-question.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-question.swal2-icon-show .swal2-icon-content{animation:swal2-animate-question-mark .8s}div:where(.swal2-icon).swal2-success{border-color:#a5dc86;color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line]{position:absolute;width:3.75em;height:7.5em;border-radius:50%}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.4375em;left:-2.0635em;transform:rotate(-45deg);transform-origin:3.75em 3.75em;border-radius:7.5em 0 0 7.5em}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.6875em;left:1.875em;transform:rotate(-45deg);transform-origin:0 3.75em;border-radius:0 7.5em 7.5em 0}div:where(.swal2-icon).swal2-success .swal2-success-ring{position:absolute;z-index:2;top:-0.25em;left:-0.25em;box-sizing:content-box;width:100%;height:100%;border:.25em solid rgba(165,220,134,.3);border-radius:50%}div:where(.swal2-icon).swal2-success .swal2-success-fix{position:absolute;z-index:1;top:.5em;left:1.625em;width:.4375em;height:5.625em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line]{display:block;position:absolute;z-index:2;height:.3125em;border-radius:.125em;background-color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=tip]{top:2.875em;left:.8125em;width:1.5625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=long]{top:2.375em;right:.5em;width:2.9375em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-animate-success-line-tip .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-animate-success-line-long .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-circular-line-right{animation:swal2-rotate-success-circular-line 4.25s ease-in}[class^=swal2]{-webkit-tap-highlight-color:rgba(0,0,0,0)}.swal2-show{animation:swal2-show .3s}.swal2-hide{animation:swal2-hide .15s forwards}.swal2-noanimation{transition:none}.swal2-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}.swal2-rtl .swal2-close{margin-right:initial;margin-left:0}.swal2-rtl .swal2-timer-progress-bar{right:0;left:auto}.swal2-toast{box-sizing:border-box;grid-column:1/4 !important;grid-row:1/4 !important;grid-template-columns:min-content auto min-content;padding:1em;overflow-y:hidden;background:#fff;box-shadow:0 0 1px rgba(0,0,0,.075),0 1px 2px rgba(0,0,0,.075),1px 2px 4px rgba(0,0,0,.075),1px 3px 8px rgba(0,0,0,.075),2px 4px 16px rgba(0,0,0,.075);pointer-events:all}.swal2-toast>*{grid-column:2}.swal2-toast h2:where(.swal2-title){margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-toast .swal2-loading{justify-content:center}.swal2-toast input:where(.swal2-input){height:2em;margin:.5em;font-size:1em}.swal2-toast .swal2-validation-message{font-size:1em}.swal2-toast div:where(.swal2-footer){margin:.5em 0 0;padding:.5em 0 0;font-size:.8em}.swal2-toast button:where(.swal2-close){grid-column:3/3;grid-row:1/99;align-self:center;width:.8em;height:.8em;margin:0;font-size:2em}.swal2-toast div:where(.swal2-html-container){margin:.5em 1em;padding:0;overflow:initial;font-size:1em;text-align:initial}.swal2-toast div:where(.swal2-html-container):empty{padding:0}.swal2-toast .swal2-loader{grid-column:1;grid-row:1/99;align-self:center;width:2em;height:2em;margin:.25em}.swal2-toast .swal2-icon{grid-column:1;grid-row:1/99;align-self:center;width:2em;min-width:2em;height:2em;margin:0 .5em 0 0}.swal2-toast .swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:1.8em;font-weight:bold}.swal2-toast .swal2-icon.swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line]{top:.875em;width:1.375em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:.3125em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:.3125em}.swal2-toast div:where(.swal2-actions){justify-content:flex-start;height:auto;margin:0;margin-top:.5em;padding:0 .5em}.swal2-toast button:where(.swal2-styled){margin:.25em .5em;padding:.4em .6em;font-size:1em}.swal2-toast .swal2-success{border-color:#a5dc86}.swal2-toast .swal2-success [class^=swal2-success-circular-line]{position:absolute;width:1.6em;height:3em;border-radius:50%}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.8em;left:-0.5em;transform:rotate(-45deg);transform-origin:2em 2em;border-radius:4em 0 0 4em}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.25em;left:.9375em;transform-origin:0 1.5em;border-radius:0 4em 4em 0}.swal2-toast .swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-success .swal2-success-fix{top:0;left:.4375em;width:.4375em;height:2.6875em}.swal2-toast .swal2-success [class^=swal2-success-line]{height:.3125em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=tip]{top:1.125em;left:.1875em;width:.75em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=long]{top:.9375em;right:.1875em;width:1.375em}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-toast-animate-success-line-tip .75s}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-toast-animate-success-line-long .75s}.swal2-toast.swal2-show{animation:swal2-toast-show .5s}.swal2-toast.swal2-hide{animation:swal2-toast-hide .1s forwards}@keyframes swal2-show{0%{transform:scale(0.7)}45%{transform:scale(1.05)}80%{transform:scale(0.95)}100%{transform:scale(1)}}@keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(0.5);opacity:0}}@keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-0.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(0.4);opacity:0}50%{margin-top:1.625em;transform:scale(0.4);opacity:0}80%{margin-top:-0.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0deg);opacity:1}}@keyframes swal2-rotate-loading{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes swal2-animate-question-mark{0%{transform:rotateY(-360deg)}100%{transform:rotateY(0)}}@keyframes swal2-animate-i-mark{0%{transform:rotateZ(45deg);opacity:0}25%{transform:rotateZ(-25deg);opacity:.4}50%{transform:rotateZ(15deg);opacity:.8}75%{transform:rotateZ(-5deg);opacity:1}100%{transform:rotateX(0);opacity:1}}@keyframes swal2-toast-show{0%{transform:translateY(-0.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(0.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0deg)}}@keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-0.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}</style></head>
+<body data-form="frm_KD_Kundenstamm" class="shell-mode" inmaintabuse="1">
+    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild" data-testid="kd-btn-vollbild">⛶</button>
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
@@ -707,70 +794,83 @@
         <!-- Title Bar -->
         <div class="title-bar">
             <div class="title-bar-left">
-                <span>&#127970;</span>
+                <span>🏢</span>
                 <span>Kundenstammblatt</span>
             </div>
             <div class="title-bar-buttons">
                 <button class="title-btn tiny-btn" onclick="Bridge.sendEvent('minimize')" data-testid="kd-btn-minimieren">_</button>
-                <button class="title-btn" data-testid="kd-btn-maximieren">&#9633;</button>
-                <button class="title-btn close" onclick="closeForm()" data-testid="kd-btn-schliessen">&#10005;</button>
+                <button class="title-btn" data-testid="kd-btn-maximieren">□</button>
+                <button class="title-btn close" onclick="closeForm()" data-testid="kd-btn-schliessen">✕</button>
             </div>
         </div>
 
         <!-- Main Container -->
-        <div class="main-container">
+        <div class="main-container" style="margin-left: 0px;">
             <!-- Left Menu -->
 
             <!-- Content Area -->
             <div class="content-area">
-                <!-- Header Row 1 -->
+                <!-- Header Row - Unified Design -->
                 <div class="header-row-wrapper">
-                    <div class="header-row">
+                    <div class="header-row combined-buttons">
+                        <!-- Logo-Box links -->
                         <div class="logo-box">K</div>
+
+                        <!-- Formulartitel -->
                         <span class="title-text">Kundenstammblatt</span>
 
-                        <button class="btn" id="btnAktualisieren" onclick="refreshData()" data-testid="kd-btn-aktualisieren">Aktualisieren</button>
-                        <button class="btn btn-blue" id="btnVerrechnungssaetze" onclick="openVerrechnungssaetze()" data-testid="kd-btn-verrechnungssaetze">Verrechnungssätze</button>
-                        <button class="btn btn-blue" id="btnUmsatzauswertung" onclick="openUmsatzauswertung()" data-testid="kd-btn-umsatzauswertung">Umsatzauswertung</button>
-                        <!-- Office-Buttons aus Access (btnOutlook, btnWord) -->
-                        <button class="btn" id="btnOutlook" onclick="openOutlook()" title="E-Mail senden" data-testid="kd-btn-outlook">&#9993; Outlook</button>
-                        <button class="btn" id="btnWord" onclick="openWord()" title="Brief erstellen" data-testid="kd-btn-word">&#128196; Word</button>
-                        <button class="btn btn-green" id="btnNeuKunde" onclick="neuerKunde()" data-testid="kd-btn-neu">Neuer Kunde</button>
-                        <button class="btn btn-red" id="btnLoeschen" onclick="kundeLoeschen()" data-testid="kd-btn-loeschen">Kunde löschen</button>
+                        <!-- Aktualisieren-Button direkt nach Titel -->
+                        <button class="btn unified-btn" id="btnAktualisieren" onclick="refreshData()" data-testid="kd-btn-aktualisieren" style="margin-left: 15px;">Aktualisieren</button>
 
-                        <!-- cboKDNrSuche: Direkte Kunden-Nummer Suche -->
-                        <div class="header-kd-nr">
-                            <span>KD-Nr Suche:</span>
-                            <input type="text" id="cboKDNrSuche" class="input-xs" placeholder="Nr..." onkeydown="if(event.key==='Enter') sucheKundeNr()" data-testid="kd-input-nrsuche">
-                            <button class="btn" onclick="sucheKundeNr()" title="Kunde nach Nr. suchen" data-testid="kd-btn-nrsuche">&#128269;</button>
-                            <span style="margin-left: 8px;">Akt. Nr.:</span>
-                            <input type="text" id="kdNr" readonly style="background: #e0e0e0;" data-testid="kd-input-id">
+                        <!-- Formular-spezifische Buttons in Grid -->
+                        <div class="buttons-grid">
+                            <!-- Zeile 1: 6 Buttons -->
+                            <button class="btn unified-btn btn-blue" id="btnVerrechnungssaetze" onclick="openVerrechnungssaetze()" data-testid="kd-btn-verrechnungssaetze">Verrechnungssätze</button>
+                            <button class="btn unified-btn btn-blue" id="btnUmsatzauswertung" onclick="openUmsatzauswertung()" data-testid="kd-btn-umsatzauswertung">Umsatzauswertung</button>
+                            <button class="btn unified-btn" id="btnOutlook" onclick="openOutlook()" title="E-Mail senden" data-testid="kd-btn-outlook">✉ Outlook</button>
+                            <button class="btn unified-btn" id="btnWord" onclick="openWord()" title="Brief erstellen" data-testid="kd-btn-word">📄 Word</button>
+                            <button class="btn unified-btn btn-green" id="btnNeuKunde" onclick="neuerKunde()" data-testid="kd-btn-neu">Neuer Kunde</button>
+                            <button class="btn unified-btn btn-red" id="btnLoeschen" onclick="kundeLoeschen()" data-testid="kd-btn-loeschen">Kunde löschen</button>
+
+                            <!-- Zeile 2: Navigation + KD-Nr Suche -->
+                            <button class="btn unified-btn" onclick="gotoFirstRecord()" title="Erster Datensatz" data-testid="kd-btn-erste">|&lt;</button>
+                            <button class="btn unified-btn" onclick="gotoPrevRecord()" title="Vorheriger Datensatz" data-testid="kd-btn-vorige">&lt;</button>
+                            <button class="btn unified-btn" onclick="gotoNextRecord()" title="Nächster Datensatz" data-testid="kd-btn-naechste">&gt;</button>
+                            <button class="btn unified-btn" onclick="gotoLastRecord()" title="Letzter Datensatz" data-testid="kd-btn-letzte">&gt;|</button>
+                            <div class="header-kd-nr" style="display: flex; align-items: center; gap: 4px;">
+                                <span>KD-Nr:</span>
+                                <input type="text" id="cboKDNrSuche" class="input-xs" placeholder="Suche..." onkeydown="if(event.key==='Enter') sucheKundeNr()" data-testid="kd-input-nrsuche" style="width: 60px; height: 22px;">
+                                <button class="btn unified-btn" onclick="sucheKundeNr()" title="Kunde nach Nr. suchen" data-testid="kd-btn-nrsuche" style="padding: 2px 6px;">🔍</button>
+                            </div>
+                            <button class="btn unified-btn" id="btnSpeichern" onclick="speichern()" data-testid="kd-btn-speichern">Speichern</button>
                         </div>
 
-                        <button class="btn" id="btnSpeichern" onclick="speichern()" data-testid="kd-btn-speichern">Speichern</button>
+                        <!-- Aktuelle KD-Nr Display rechts -->
+                        <div style="margin-left: 15px; display: flex; align-items: center; gap: 4px;">
+                            <span>Akt. Nr.:</span>
+                            <input type="text" id="kdNr" readonly style="width: 60px; height: 20px; background: #e0e0e0; font-size: var(--base-font-size);" data-testid="kd-input-id">
+                        </div>
                     </div>
-                    <!-- Navigations-Buttons (Befehl39-43 aus Access) -->
-                    <div style="display: flex; gap: 2px; position: absolute; right: 120px; top: 4px;">
-                        <button class="btn" onclick="gotoFirstRecord()" title="Erster Datensatz" data-testid="kd-btn-erste">|&lt;</button>
-                        <button class="btn" onclick="gotoPrevRecord()" title="Vorheriger Datensatz" data-testid="kd-btn-vorige">&lt;</button>
-                        <button class="btn" onclick="gotoNextRecord()" title="Nächster Datensatz" data-testid="kd-btn-naechste">&gt;</button>
-                        <button class="btn" onclick="gotoLastRecord()" title="Letzter Datensatz" data-testid="kd-btn-letzte">&gt;|</button>
+
+                    <!-- GPT/TEST Box rechts -->
+                    <div class="gpt-box">
+                        GPT | TEST<br>
+                        <span id="lblDatum">14.1.2026</span>
                     </div>
-                    <div class="gpt-box">GPT | TEST<br><span id="lblDatum"></span></div>
                 </div>
 
                 <!-- Customer Info -->
                 <div class="customer-info">
-                    <span class="customer-name" id="displayFirma">-</span>
-                    <span class="customer-address" id="displayAddress"></span>
+                    <span class="customer-name" id="displayFirma">1 Agency</span>
+                    <span class="customer-address" id="displayAddress"> - 90419 Nürnberg</span>
                 </div>
 
                 <!-- Work Area -->
                 <div class="work-area">
                     <!-- Left Work Panel -->
                     <div class="left-work-panel">
-                        <div class="tab-container">
-                            <div class="tab-header">
+                        <div class="tab-container" style="width: 1276px;">
+                            <div class="tab-header" style="flex-wrap: wrap;">
                                 <!-- Sichtbare Tabs (wie in Access) -->
                                 <button class="tab-btn active" data-tab="stammdaten" data-testid="kd-tab-stammdaten">Stammdaten</button>
                                 <button class="tab-btn" data-tab="objekte" data-testid="kd-tab-objekte">Objekte</button>
@@ -778,18 +878,18 @@
                                 <button class="tab-btn" data-tab="zusatzdateien" data-testid="kd-tab-zusatzdateien">Zusatzdateien</button>
                                 <button class="tab-btn" data-tab="bemerkungen" data-testid="kd-tab-bemerkungen">Bemerkungen</button>
                                 <button class="tab-btn" data-tab="preise" data-testid="kd-tab-preise">Preise</button>
-                                <!-- Versteckte Tabs (in Access nicht sichtbar) -->
-                                <button class="tab-btn" data-tab="auftraguebersicht" data-testid="kd-tab-auftragsuebersicht" hidden>Auftragsübersicht</button>
-                                <button class="tab-btn" data-tab="ansprechpartner" data-testid="kd-tab-ansprechpartner" hidden>Ansprechpartner</button>
-                                <button class="tab-btn" data-tab="angebote" data-testid="kd-tab-angebote" hidden>Angebote</button>
-                                <button class="tab-btn" data-tab="statistik" data-testid="kd-tab-statistik" hidden>Statistik</button>
+                                <!-- Weitere Tabs -->
+                                <button class="tab-btn" data-tab="auftraguebersicht" data-testid="kd-tab-auftragsuebersicht">Auftragsübersicht</button>
+                                <button class="tab-btn" data-tab="ansprechpartner" data-testid="kd-tab-ansprechpartner">Ansprechpartner</button>
+                                <button class="tab-btn" data-tab="angebote" data-testid="kd-tab-angebote">Angebote</button>
+                                <button class="tab-btn" data-tab="statistik" data-testid="kd-tab-statistik">Statistik</button>
                             </div>
-                            <div class="tab-content">
+                            <div class="tab-content" style="width: 1209px;">
                                 <!-- Tab 1: Stammdaten -->
-                                <div class="tab-page active" id="tab-stammdaten">
+                                <div class="tab-page active" id="tab-stammdaten" style="width: 1128px;">
                                     <div class="checkbox-group">
                                         <div class="checkbox-item">
-                                            <input type="checkbox" id="kun_IstAktiv" data-field="kun_IstAktiv" checked data-testid="kd-checkbox-istaktiv">
+                                            <input type="checkbox" id="kun_IstAktiv" data-field="kun_IstAktiv" checked="" data-testid="kd-checkbox-istaktiv">
                                             <label for="kun_IstAktiv">Ist aktiv</label>
                                         </div>
                                         <div class="checkbox-item">
@@ -802,12 +902,12 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-columns">
+                                    <div class="form-columns" style="left: -25px; width: 1133px;">
                                         <!-- Column 1: Adressdaten -->
-                                        <div class="form-column">
+                                        <div class="form-column" style="left: 0px; top: 0px;">
                                             <div class="form-row">
                                                 <span class="form-label">Firma: <span class="required">*</span></span>
-                                                <input type="text" class="form-input wide" id="kun_Firma" data-field="kun_Firma" required data-testid="kd-input-firma">
+                                                <input type="text" class="form-input wide" id="kun_Firma" data-field="kun_Firma" required="" data-testid="kd-input-firma">
                                             </div>
                                             <div class="form-row">
                                                 <span class="form-label">Bezeichnung:</span>
@@ -819,11 +919,11 @@
                                             </div>
                                             <div class="form-row">
                                                 <span class="form-label">Strase:</span>
-                                                <input type="text" class="form-input wide" id="kun_Strasse" data-field="kun_Strasse" data-testid="kd-input-strasse">
+                                                <input type="text" class="form-input wide" id="kun_Strasse" data-field="kun_Strasse" data-testid="kd-input-strasse" autocomplete="off">
                                             </div>
                                             <div class="form-row">
                                                 <span class="form-label">PLZ:</span>
-                                                <input type="text" class="form-input medium" id="kun_PLZ" data-field="kun_PLZ" pattern="[0-9]{5}" title="5-stellige PLZ eingeben" data-testid="kd-input-plz">
+                                                <input type="text" class="form-input medium" id="kun_PLZ" data-field="kun_PLZ" pattern="[0-9]{5}" title="5-stellige PLZ eingeben" data-testid="kd-input-plz" style="width: 200px;">
                                             </div>
                                             <div class="form-row">
                                                 <span class="form-label">Ort:</span>
@@ -831,7 +931,7 @@
                                             </div>
                                             <div class="form-row">
                                                 <span class="form-label">Land:</span>
-                                                <select class="form-select input-sm" id="kun_LKZ" data-field="kun_LKZ">
+                                                <select class="form-select input-sm" id="kun_LKZ" data-field="kun_LKZ" style="height: 18px; width: 95px;">
                                                     <option value="DE">DE</option>
                                                     <option value="AT">AT</option>
                                                     <option value="CH">CH</option>
@@ -858,7 +958,7 @@
                                                 <input type="text" class="form-input wide" id="kun_URL" data-field="kun_URL">
                                             </div>
                                             <!-- kun_IDF_PersonID: Haupt-Ansprechpartner Dropdown -->
-                                            <div class="form-row" style="margin-top: 10px; border-top: 1px solid #808080; padding-top: 8px;">
+                                            <div class="form-row" style="margin-top: 10px; border-top: 1px solid rgb(128, 128, 128); padding-top: 8px; top: 0px;">
                                                 <span class="form-label">Haupt-AP:</span>
                                                 <select class="form-select input-lg" id="kun_IDF_PersonID" data-field="kun_IDF_PersonID" onchange="onHauptAnsprechpartnerChange()">
                                                     <option value="">-- Ansprechpartner waehlen --</option>
@@ -867,20 +967,20 @@
                                             <!-- Ansprechpartner-Kontaktdaten (werden bei Auswahl aktualisiert) -->
                                             <div class="form-row">
                                                 <span class="form-label">AP Telefon:</span>
-                                                <input type="tel" class="form-input wide" id="adr_telefon" readonly style="background: #f0f0f0;">
+                                                <input type="tel" class="form-input wide" id="adr_telefon" readonly="" style="background: #f0f0f0;">
                                             </div>
                                             <div class="form-row">
                                                 <span class="form-label">AP Mobil:</span>
-                                                <input type="tel" class="form-input wide" id="adr_mobil" readonly style="background: #f0f0f0;">
+                                                <input type="tel" class="form-input wide" id="adr_mobil" readonly="" style="background: #f0f0f0;">
                                             </div>
                                             <div class="form-row">
                                                 <span class="form-label">AP E-Mail:</span>
-                                                <input type="email" class="form-input wide" id="adr_email_haupt" readonly style="background: #f0f0f0;">
+                                                <input type="email" class="form-input wide" id="adr_email_haupt" readonly="" style="background: #f0f0f0;">
                                             </div>
                                         </div>
 
                                         <!-- Column 2: Bankdaten -->
-                                        <div class="form-column">
+                                        <div class="form-column" style="left: -40px;">
                                             <div class="form-row">
                                                 <span class="form-label">Kreditinstitut:</span>
                                                 <input type="text" class="form-input wide" id="kun_kreditinstitut" data-field="kun_kreditinstitut">
@@ -936,7 +1036,7 @@
                                                     <th style="width: 80px;">Aufträge</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="objekteBody"></tbody>
+                                            <tbody id="objekteBody" class="skeleton-loading"><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div><div class="skeleton-row"><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div></div><div class="skeleton-row"><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div></div><div class="skeleton-row"><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div></div><div class="skeleton-row"><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div></div><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div></tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -995,7 +1095,7 @@
                                                     <th>Betrag</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="auftraegeBody"></tbody>
+                                            <tbody id="auftraegeBody" class="skeleton-loading"><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div><div class="skeleton-row"><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div></div><div class="skeleton-row"><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div></div><div class="skeleton-row"><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div></div><div class="skeleton-row"><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div></div><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div></tbody>
                                         </table>
                                     </div>
                                     <!-- PosGesamtsumme: Summenzeile unter Auftrags-Tabelle -->
@@ -1053,7 +1153,7 @@
                                                         <th style="width: 180px;">E-Mail</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="ansprechpartnerTbody"></tbody>
+                                                <tbody id="ansprechpartnerTbody" class="skeleton-loading"><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div><div class="skeleton-row"><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div></div><div class="skeleton-row"><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div></div><div class="skeleton-row"><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div></div><div class="skeleton-row"><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div></div><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div></tbody>
                                             </table>
                                         </div>
                                         <!-- Detail-Formular für ausgewaehlten Ansprechpartner -->
@@ -1135,7 +1235,7 @@
                                                     <th>Beschreibung</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="dateienBody"></tbody>
+                                            <tbody id="dateienBody" class="skeleton-loading"><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div><div class="skeleton-row"><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div></div><div class="skeleton-row"><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div></div><div class="skeleton-row"><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div></div><div class="skeleton-row"><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div></div><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div></tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -1303,7 +1403,7 @@
                                                     <th style="width: 120px;">Geaendert am</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="kundenpreiseBody"></tbody>
+                                            <tbody id="kundenpreiseBody" class="skeleton-loading"><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div><div class="skeleton-row"><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div></div><div class="skeleton-row"><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div></div><div class="skeleton-row"><div class="skeleton-cell w-50"></div><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div></div><div class="skeleton-row"><div class="skeleton-cell w-60"></div><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div></div><div class="skeleton-row"><div class="skeleton-cell w-30"></div><div class="skeleton-cell w-40"></div><div class="skeleton-cell w-20"></div><div class="skeleton-cell w-50"></div></div></tbody>
                                         </table>
                                     </div>
                                     <!-- Detail-Formular fuer Preis-Bearbeitung -->
@@ -1350,10 +1450,10 @@
                     </div>
 
                     <!-- Right Panel: Customer List -->
-                    <div class="right-panel">
+                    <div class="right-panel" style="width: 435px; left: -5px; height: 682px; top: 0px;">
                         <div class="right-header">
                             <div class="filter-box" style="margin-bottom: 4px;">
-                                <input type="checkbox" id="chkNurAktive" checked onchange="loadKunden()">
+                                <input type="checkbox" id="chkNurAktive" checked="" onchange="loadKunden()">
                                 <label for="chkNurAktive">Nur Aktive</label>
                                 <button class="btn" onclick="resetAuswahlfilter()" style="margin-left: 8px; font-size: 9px;">Filter Reset</button>
                             </div>
@@ -1362,7 +1462,7 @@
                                 <input type="text" id="searchInput" placeholder="Firma eingeben...">
                             </div>
                             <!-- Filter-Comboboxen aus Access (cboSuchPLZ, cboSuchOrt) -->
-                            <div style="display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;">
+                            <div style="display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; width: 423px;">
                                 <select id="cboSuchPLZ" onchange="filterByPLZ(this.value)" style="width: 70px; height: 18px; font-size: 11px;">
                                     <option value="_ALLE">PLZ</option>
                                     <option value="90">90xxx</option>
@@ -1391,9 +1491,910 @@
                                         <th>Telefon</th>
                                     </tr>
                                 </thead>
-                                <tbody id="kundenBody">
-                                    <!-- Wird dynamisch gefullt -->
-                                </tbody>
+                                <tbody id="kundenBody"><tr data-index="0" class="selected">
+                    <td>27</td>
+                    <td>1 Agency</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td>0911 27 43 74 70</td>
+                </tr><tr data-index="1">
+                    <td>11155</td>
+                    <td>A&amp;R</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="2">
+                    <td>20790</td>
+                    <td>Ackermann Thomas</td>
+                    <td></td>
+                    <td></td>
+                    <td>Höchstadt</td>
+                    <td>09193 - 508 688</td>
+                </tr><tr data-index="3">
+                    <td>10170</td>
+                    <td>aktives Neumarkt e. V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Neumarkt i. d. Opf.</td>
+                    <td>09181 - 8830070</td>
+                </tr><tr data-index="4">
+                    <td>20818</td>
+                    <td>Antonio Russo</td>
+                    <td></td>
+                    <td></td>
+                    <td>Stein</td>
+                    <td></td>
+                </tr><tr data-index="5">
+                    <td>20834</td>
+                    <td>Arche Noris Seniorenwohnzentrum</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="6">
+                    <td>10688</td>
+                    <td>ARGO Konzerte GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Würzburg</td>
+                    <td>0931 - 23000</td>
+                </tr><tr data-index="7">
+                    <td>20727</td>
+                    <td>Arnold GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="8">
+                    <td>10692</td>
+                    <td>Auinger Peter</td>
+                    <td></td>
+                    <td></td>
+                    <td>Marktsteft</td>
+                    <td>09332 - 3127</td>
+                </tr><tr data-index="9">
+                    <td>20731</td>
+                    <td>B &amp; M Security</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="10">
+                    <td>10720</td>
+                    <td>B.O.S. FRANKEN SECURITY GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Schwabach</td>
+                    <td>09122 - 1882210</td>
+                </tr><tr data-index="11">
+                    <td>20771</td>
+                    <td>B.O.S. Fussball FCN</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="12">
+                    <td>20770</td>
+                    <td>B.O.S. Kaufland</td>
+                    <td></td>
+                    <td></td>
+                    <td>Schwabach</td>
+                    <td></td>
+                </tr><tr data-index="13">
+                    <td>20718</td>
+                    <td>Bavarian Gastro</td>
+                    <td></td>
+                    <td></td>
+                    <td>Berching</td>
+                    <td></td>
+                </tr><tr data-index="14">
+                    <td>20787</td>
+                    <td>BBS - Bertold-Brecht-Schule</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="15">
+                    <td>10695</td>
+                    <td>Beilngries Tourismus GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Beilngries</td>
+                    <td></td>
+                </tr><tr data-index="16">
+                    <td>20822</td>
+                    <td>Berg GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="17">
+                    <td>20816</td>
+                    <td>BKV</td>
+                    <td></td>
+                    <td></td>
+                    <td>Berngau</td>
+                    <td></td>
+                </tr><tr data-index="18">
+                    <td>20702</td>
+                    <td>Blank Christian</td>
+                    <td></td>
+                    <td></td>
+                    <td>Wilhermsdorf</td>
+                    <td></td>
+                </tr><tr data-index="19">
+                    <td>28</td>
+                    <td>Blank Promotion Service</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="20">
+                    <td>20119</td>
+                    <td>BOS Sub</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="21">
+                    <td>10214</td>
+                    <td>Brauerei Gutmann</td>
+                    <td></td>
+                    <td></td>
+                    <td>Titting</td>
+                    <td>08423 -99660</td>
+                </tr><tr data-index="22">
+                    <td>10215</td>
+                    <td>Brauhaus Höchstadt</td>
+                    <td></td>
+                    <td></td>
+                    <td>Höchstadt a.d. Aisch</td>
+                    <td>09193 - 8367</td>
+                </tr><tr data-index="23">
+                    <td>20830</td>
+                    <td>BSC Woffenbach 1950 e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Neumarkt i..d.Opf.</td>
+                    <td>09181-290421</td>
+                </tr><tr data-index="24">
+                    <td>10770</td>
+                    <td>Burschenverein Köstlbach-Heng</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="25">
+                    <td>10220</td>
+                    <td>CA-Veranstaltungen</td>
+                    <td></td>
+                    <td></td>
+                    <td>Obertrubach</td>
+                    <td>09245 - 9830392</td>
+                </tr><tr data-index="26">
+                    <td>20747</td>
+                    <td>Cocktailbar Don Caribico</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="27">
+                    <td>10233</td>
+                    <td>Concertbüro Franken GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td>0911 - 414196</td>
+                </tr><tr data-index="28">
+                    <td>20821</td>
+                    <td>DATEV eG</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td>0911 - 319-564 99</td>
+                </tr><tr data-index="29">
+                    <td>10241</td>
+                    <td>Der Cult</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td> 0911 - 31 15 15</td>
+                </tr><tr data-index="30">
+                    <td>20777</td>
+                    <td>DJK Fiegenstall e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Höttingen</td>
+                    <td></td>
+                </tr><tr data-index="31">
+                    <td>20797</td>
+                    <td>DJK SV Pilsach</td>
+                    <td></td>
+                    <td></td>
+                    <td>Pilsach</td>
+                    <td></td>
+                </tr><tr data-index="32">
+                    <td>20744</td>
+                    <td>Dominik Cobic</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="33">
+                    <td>20798</td>
+                    <td>Dorfmusik Seligenporten</td>
+                    <td></td>
+                    <td></td>
+                    <td>Pyrbaum-Seligenporten</td>
+                    <td></td>
+                </tr><tr data-index="34">
+                    <td>20793</td>
+                    <td>Edgar Security</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td>0174 - 257 4643</td>
+                </tr><tr data-index="35">
+                    <td>10736</td>
+                    <td>EH Sicherheit</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="36">
+                    <td>20740</td>
+                    <td>Engelhardt &amp; Co Parkraummanagement</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td>0911- 98 11 88- 57</td>
+                </tr><tr data-index="37">
+                    <td>10788</td>
+                    <td>ESS</td>
+                    <td></td>
+                    <td></td>
+                    <td>Erlangen</td>
+                    <td></td>
+                </tr><tr data-index="38">
+                    <td>20730</td>
+                    <td>ESS 1 Bereichswachen</td>
+                    <td></td>
+                    <td></td>
+                    <td>Erlangen</td>
+                    <td></td>
+                </tr><tr data-index="39">
+                    <td>20760</td>
+                    <td>ESS 2 Standwachen</td>
+                    <td></td>
+                    <td></td>
+                    <td>Erlangen</td>
+                    <td></td>
+                </tr><tr data-index="40">
+                    <td>20761</td>
+                    <td>ESS 3 Standpartys</td>
+                    <td></td>
+                    <td></td>
+                    <td>Erlangen</td>
+                    <td></td>
+                </tr><tr data-index="41">
+                    <td>10254</td>
+                    <td>E-Werk</td>
+                    <td></td>
+                    <td></td>
+                    <td>Erlangen</td>
+                    <td>09131 - 80050</td>
+                </tr><tr data-index="42">
+                    <td>20758</td>
+                    <td>Faschingsgesellschaft Hechtonia Berching e.V</td>
+                    <td></td>
+                    <td></td>
+                    <td>Berching</td>
+                    <td></td>
+                </tr><tr data-index="43">
+                    <td>20757</td>
+                    <td>Faschingsverein Meckenhausen e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Hilpoltstein</td>
+                    <td></td>
+                </tr><tr data-index="44">
+                    <td>20774</td>
+                    <td>FC Ezelsdorf 1923 e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Ezelsdorf</td>
+                    <td></td>
+                </tr><tr data-index="45">
+                    <td>20808</td>
+                    <td>FC Möning 1949 e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="46">
+                    <td>20814</td>
+                    <td>Fiege Health Care</td>
+                    <td></td>
+                    <td></td>
+                    <td>Fürth</td>
+                    <td></td>
+                </tr><tr data-index="47">
+                    <td>20765</td>
+                    <td>Fledererverein Meiersberg e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Wilhermsdorf</td>
+                    <td></td>
+                </tr><tr data-index="48">
+                    <td>10789</td>
+                    <td>Förderverein Naturbad Postbauer-Heng e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="49">
+                    <td>20783</td>
+                    <td>Franz Schattenhofer GmbH &amp; Co.KG</td>
+                    <td></td>
+                    <td></td>
+                    <td>Beilngries</td>
+                    <td></td>
+                </tr><tr data-index="50">
+                    <td>20803</td>
+                    <td>FSV Berngau</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="51">
+                    <td>20833</td>
+                    <td>Garten- &amp; Landschaftsbau Weißmüller</td>
+                    <td></td>
+                    <td></td>
+                    <td>Berg</td>
+                    <td></td>
+                </tr><tr data-index="52">
+                    <td>20728</td>
+                    <td>Gemeinde Schwarzenbruck</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="53">
+                    <td>10647</td>
+                    <td>Gundel Joachim</td>
+                    <td></td>
+                    <td></td>
+                    <td>Burgbernheim</td>
+                    <td></td>
+                </tr><tr data-index="54">
+                    <td>10702</td>
+                    <td>Gutmann am Dutzendteich</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="55">
+                    <td>20791</td>
+                    <td>Gymnasium Beilngries</td>
+                    <td></td>
+                    <td></td>
+                    <td>Beilngires</td>
+                    <td>08461 - 6021-100</td>
+                </tr><tr data-index="56">
+                    <td>20773</td>
+                    <td>Gymnasium Stein</td>
+                    <td></td>
+                    <td></td>
+                    <td>Stein</td>
+                    <td>0911 - 255 6780</td>
+                </tr><tr data-index="57">
+                    <td>20729</td>
+                    <td>Hahn Sicherheit &amp; Schulung</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="58">
+                    <td>10337</td>
+                    <td>HIRSCH GdbR</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td>0911 - 429414</td>
+                </tr><tr data-index="59">
+                    <td>20827</td>
+                    <td>Jugendkulturmanagement con-action/ Kopf und Kragen</td>
+                    <td></td>
+                    <td></td>
+                    <td>Fürth</td>
+                    <td></td>
+                </tr><tr data-index="60">
+                    <td>20759</td>
+                    <td>K.D.St.V. Ostmark im CV zu Nürnberg</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="61">
+                    <td>20832</td>
+                    <td>Kärwaausschuss Unterfarrnbach e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="62">
+                    <td>20786</td>
+                    <td>Kärwaboum Lindelburg e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Lindelburg</td>
+                    <td></td>
+                </tr><tr data-index="63">
+                    <td>20811</td>
+                    <td>Kärwaboum Unterferrieden e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="64">
+                    <td>20748</td>
+                    <td>Kärwaboumverein Seitendorf</td>
+                    <td></td>
+                    <td></td>
+                    <td>Heilsbronn</td>
+                    <td></td>
+                </tr><tr data-index="65">
+                    <td>20792</td>
+                    <td>Kärwaburschen Atzenhof</td>
+                    <td></td>
+                    <td></td>
+                    <td>Fürth-Atzenhof</td>
+                    <td></td>
+                </tr><tr data-index="66">
+                    <td>20804</td>
+                    <td>Kärwaverein Deberndorf e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Deberndorf</td>
+                    <td>09103 - 717 717</td>
+                </tr><tr data-index="67">
+                    <td>20788</td>
+                    <td>Kärwaverein Schwarzenbruck</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="68">
+                    <td>20749</td>
+                    <td>Kirwaboum Schwarzach e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="69">
+                    <td>20722</td>
+                    <td>KKT GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="70">
+                    <td>20815</td>
+                    <td>KKV &amp; GV Seukendorf</td>
+                    <td></td>
+                    <td></td>
+                    <td>Seukendorf</td>
+                    <td></td>
+                </tr><tr data-index="71">
+                    <td>20796</td>
+                    <td>Klaragasse &amp; Freunde e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="72">
+                    <td>20776</td>
+                    <td>Konzertbüro Oberpfalz UG</td>
+                    <td></td>
+                    <td></td>
+                    <td>Parkstein</td>
+                    <td></td>
+                </tr><tr data-index="73">
+                    <td>621</td>
+                    <td>KS Security</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="74">
+                    <td>20826</td>
+                    <td>Markt Wendelstein</td>
+                    <td></td>
+                    <td></td>
+                    <td>Wendelstein</td>
+                    <td>09129 / 401-222</td>
+                </tr><tr data-index="75">
+                    <td>20741</td>
+                    <td>Martin Kaiser &amp; David Lodhi Gbr</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="76">
+                    <td>10423</td>
+                    <td>MC Rückwärts-Gang</td>
+                    <td></td>
+                    <td></td>
+                    <td>Buch am Wald</td>
+                    <td></td>
+                </tr><tr data-index="77">
+                    <td>20825</td>
+                    <td>Metropol</td>
+                    <td></td>
+                    <td></td>
+                    <td>Pyrbaum</td>
+                    <td></td>
+                </tr><tr data-index="78">
+                    <td>10448</td>
+                    <td>MUNICH SECURITY SERVICES GMBH</td>
+                    <td></td>
+                    <td></td>
+                    <td>München</td>
+                    <td></td>
+                </tr><tr data-index="79">
+                    <td>10451</td>
+                    <td>Musikinitiative Nürnberger Land e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Schnaittach</td>
+                    <td></td>
+                </tr><tr data-index="80">
+                    <td>20726</td>
+                    <td>Nasty Entertainment GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="81">
+                    <td>20707</td>
+                    <td>Neues Museum Nürnberg, Staatliches Museum für Kunst und Design</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="82">
+                    <td>10458</td>
+                    <td>Neumarkter Lammsbräu Gebr.Ehrnsperger e.K.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Neumarkt</td>
+                    <td></td>
+                </tr><tr data-index="83">
+                    <td>10759</td>
+                    <td>NWS Sicherheitsservice GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="84">
+                    <td>20764</td>
+                    <td>NWS Sonderdienst DHL Parkplatz</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="85">
+                    <td>20755</td>
+                    <td>Palazzo Produktionen</td>
+                    <td></td>
+                    <td></td>
+                    <td>Hamburg</td>
+                    <td></td>
+                </tr><tr data-index="86">
+                    <td>20724</td>
+                    <td>Palermo Security</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="87">
+                    <td>20745</td>
+                    <td>Parkcafé Neumarkt</td>
+                    <td></td>
+                    <td></td>
+                    <td>Neumarkt</td>
+                    <td></td>
+                </tr><tr data-index="88">
+                    <td>20789</td>
+                    <td>Pfertner GmbH Immobilienverwaltung</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="89">
+                    <td>20752</td>
+                    <td>Power Concerts</td>
+                    <td></td>
+                    <td></td>
+                    <td>Burglengenfeld</td>
+                    <td></td>
+                </tr><tr data-index="90">
+                    <td>20735</td>
+                    <td>POWER GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="91">
+                    <td>20812</td>
+                    <td>PVS - Peter Vischer Schulen</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="92">
+                    <td>10495</td>
+                    <td>Pyraser Landbrauerei</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="93">
+                    <td>10772</td>
+                    <td>Raahner Club</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="94">
+                    <td>20829</td>
+                    <td>Raiffeisenbank</td>
+                    <td></td>
+                    <td></td>
+                    <td>Altdorf</td>
+                    <td></td>
+                </tr><tr data-index="95">
+                    <td>20819</td>
+                    <td>Richter + Frenzel Nürnberg GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td>+49 911 9688-298</td>
+                </tr><tr data-index="96">
+                    <td>20785</td>
+                    <td>RLH Agrar GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Markt Erlbach</td>
+                    <td></td>
+                </tr><tr data-index="97">
+                    <td>20769</td>
+                    <td>Rockn Roll Catering</td>
+                    <td></td>
+                    <td></td>
+                    <td>Berching</td>
+                    <td></td>
+                </tr><tr data-index="98">
+                    <td>20739</td>
+                    <td>SC Prölsdorf</td>
+                    <td></td>
+                    <td></td>
+                    <td>Rauhenebrach</td>
+                    <td></td>
+                </tr><tr data-index="99">
+                    <td>9295</td>
+                    <td>Sec Concept</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="100">
+                    <td>10527</td>
+                    <td>Semmel Concerts GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Bayreuth</td>
+                    <td></td>
+                </tr><tr data-index="101">
+                    <td>20831</td>
+                    <td>SF Event GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Beilngries</td>
+                    <td></td>
+                </tr><tr data-index="102">
+                    <td>20817</td>
+                    <td>ShowBro GmbH</td>
+                    <td></td>
+                    <td></td>
+                    <td>Lauterach</td>
+                    <td></td>
+                </tr><tr data-index="103">
+                    <td>20800</td>
+                    <td>SkyDai Gastronomie GmbH &amp; Co. KG</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="104">
+                    <td>20737</td>
+                    <td>SPVGG Greuther Fürth GmbH &amp; Co. KGaA</td>
+                    <td></td>
+                    <td></td>
+                    <td>Fürth</td>
+                    <td></td>
+                </tr><tr data-index="105">
+                    <td>10656</td>
+                    <td>St. Wolfgang-Mittelschule</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="106">
+                    <td>10115</td>
+                    <td>Stadt Abenberg</td>
+                    <td></td>
+                    <td></td>
+                    <td>Abenberg</td>
+                    <td></td>
+                </tr><tr data-index="107">
+                    <td>20807</td>
+                    <td>Stadt Altdorf</td>
+                    <td></td>
+                    <td></td>
+                    <td>Altdorf</td>
+                    <td>+49 (0) 9187/807-1243</td>
+                </tr><tr data-index="108">
+                    <td>20763</td>
+                    <td>Stadt Berching</td>
+                    <td></td>
+                    <td></td>
+                    <td>Berching</td>
+                    <td></td>
+                </tr><tr data-index="109">
+                    <td>20813</td>
+                    <td>Stadt Freystadt</td>
+                    <td></td>
+                    <td></td>
+                    <td>Freystadt</td>
+                    <td></td>
+                </tr><tr data-index="110">
+                    <td>20784</td>
+                    <td>Stadt Neumarkt i.d.Opf.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Neumarkt</td>
+                    <td>09181-255 20 58</td>
+                </tr><tr data-index="111">
+                    <td>10768</td>
+                    <td>Stadt Nürnberg</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="112">
+                    <td>20753</td>
+                    <td>Stadt Roth</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="113">
+                    <td>20799</td>
+                    <td>Stargarage AG</td>
+                    <td></td>
+                    <td></td>
+                    <td>Olten</td>
+                    <td></td>
+                </tr><tr data-index="114">
+                    <td>20828</td>
+                    <td>SV Raitersaich e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Raitersaich</td>
+                    <td>+49 9127 5161</td>
+                </tr><tr data-index="115">
+                    <td>20810</td>
+                    <td>SV Seligenporten 1949 e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Seligenporten</td>
+                    <td></td>
+                </tr><tr data-index="116">
+                    <td>20706</td>
+                    <td>Tanzcentrum Neumarkt</td>
+                    <td></td>
+                    <td></td>
+                    <td>Neumarkt</td>
+                    <td>09181 - 222 46</td>
+                </tr><tr data-index="117">
+                    <td>20823</td>
+                    <td>The GOOD FOX Company</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="118">
+                    <td>20772</td>
+                    <td>Timo Wachinger</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="119">
+                    <td>20820</td>
+                    <td>TSV 1846 Nbg e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="120">
+                    <td>20756</td>
+                    <td>TSV Meckenhausen e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Hilpoltstein</td>
+                    <td></td>
+                </tr><tr data-index="121">
+                    <td>20767</td>
+                    <td>TSV Pavelsbach</td>
+                    <td></td>
+                    <td></td>
+                    <td>Postbauer-Heng</td>
+                    <td></td>
+                </tr><tr data-index="122">
+                    <td>20111</td>
+                    <td>United Security</td>
+                    <td></td>
+                    <td></td>
+                    <td>Ingolstadt</td>
+                    <td>0841 / 159 66-403</td>
+                </tr><tr data-index="123">
+                    <td>20824</td>
+                    <td>Wallenstein-Festpielverein Altdorf e.V.</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr><tr data-index="124">
+                    <td>20795</td>
+                    <td>Wasserwacht</td>
+                    <td></td>
+                    <td></td>
+                    <td>Berching</td>
+                    <td></td>
+                </tr><tr data-index="125">
+                    <td>10605</td>
+                    <td>Weitersdorfer KB</td>
+                    <td></td>
+                    <td></td>
+                    <td>Roßtal</td>
+                    <td></td>
+                </tr><tr data-index="126">
+                    <td>10606</td>
+                    <td>Wettig Stephanie</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="127">
+                    <td>10607</td>
+                    <td>Wild 2000</td>
+                    <td></td>
+                    <td></td>
+                    <td>Nürnberg</td>
+                    <td></td>
+                </tr><tr data-index="128">
+                    <td>10640</td>
+                    <td>World Network Agency</td>
+                    <td></td>
+                    <td></td>
+                    <td>Fürth</td>
+                    <td></td>
+                </tr></tbody>
                             </table>
                         </div>
                     </div>
@@ -1403,14 +2404,14 @@
 
         <!-- Status Bar -->
         <div class="status-bar">
-            <span class="status-section" id="lblRecordInfo">Datensatz: - / -</span>
+            <span class="status-section" id="lblRecordInfo">Datensatz: 1 / 129</span>
             <span class="status-section" id="lblStatus">Bereit</span>
             <span class="status-section">Erstellt</span>
-            <span class="status-section" id="erstelltAm">-</span>
-            <span class="status-section" id="erstelltVon">-</span>
+            <span class="status-section" id="erstelltAm">30.1.2023, 12:02:12</span>
+            <span class="status-section" id="erstelltVon">guenther.siegert</span>
             <span class="status-section">Geandert</span>
-            <span class="status-section" id="geaendertAm">-</span>
-            <span class="status-section" id="geaendertVon">-</span>
+            <span class="status-section" id="geaendertAm">14.1.2026, 15:15:29</span>
+            <span class="status-section" id="geaendertVon">guenther.siegert</span>
         </div>
     </div>
 
@@ -1632,37 +2633,71 @@
         }
 
         // ============================================
-        // AKTIONS-FUNKTIONEN
+        // AKTIONS-FUNKTIONEN (REST-API + WebView2 Fallback)
         // ============================================
         async function neuerKunde() {
             showLoading();
-            Bridge.sendEvent('save', {
-                type: 'kunde',
-                action: 'create',
-                data: {
-                    kun_Firma: 'Neuer Kunde',
-                    kun_IstAktiv: true
+            try {
+                // REST-API: POST /api/kunden
+                const response = await fetch('http://localhost:5000/api/kunden', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        kun_Firma: 'Neuer Kunde',
+                        kun_IstAktiv: true
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Neuer Kunde erstellt', 'success');
+                    await loadKunden();
+                    // Zum neuen Kunden navigieren
+                    if (result.id) {
+                        const newIndex = state.kunden.findIndex(k => k.kun_Id === result.id);
+                        if (newIndex >= 0) gotoKunde(newIndex);
+                    }
+                } else {
+                    throw new Error(result.error || 'Erstellen fehlgeschlagen');
                 }
-            });
+            } catch (error) {
+                console.error('Fehler beim Erstellen:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         async function kundeLoeschen() {
             if (!state.currentRecord?.kun_Id) {
-                showToast('Kein Kunde ausgewahlt', 'warning');
+                showToast('Kein Kunde ausgewählt', 'warning');
                 return;
             }
-            if (!confirm('Kunde wirklich loschen?')) return;
+            if (!confirm('Kunde wirklich löschen?')) return;
 
             showLoading();
-            Bridge.sendEvent('delete', {
-                type: 'kunde',
-                id: state.currentRecord.kun_Id
-            });
+            try {
+                // REST-API: DELETE /api/kunden/{id} (Soft-Delete)
+                const response = await fetch(`http://localhost:5000/api/kunden/${state.currentRecord.kun_Id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Kunde deaktiviert', 'success');
+                    await loadKunden();
+                } else {
+                    throw new Error(result.error || 'Löschen fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('Fehler beim Löschen:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         async function speichern() {
             if (!state.currentRecord?.kun_Id) {
-                showToast('Kein Kunde ausgewahlt', 'warning');
+                showToast('Kein Kunde ausgewählt', 'warning');
                 return;
             }
 
@@ -1677,11 +2712,26 @@
             });
 
             showLoading();
-            Bridge.sendEvent('save', {
-                type: 'kunde',
-                id: state.currentRecord.kun_Id,
-                data: data
-            });
+            try {
+                // REST-API: PUT /api/kunden/{id}
+                const response = await fetch(`http://localhost:5000/api/kunden/${state.currentRecord.kun_Id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Kunde gespeichert', 'success');
+                    await loadKunden();
+                } else {
+                    throw new Error(result.error || 'Speichern fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('Fehler beim Speichern:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         async function refreshData() {
@@ -3386,8 +4436,9 @@
     <script src="js/shell-detector.js"></script>
     <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
     <script src="js/server-watchdog.js"></script>
-</body>
-</html>
 
 
 
+
+
+<script src="chrome-extension://lhannfkhjdhmibllojbbdjdbpegidojj/js/content/sm.js" data-pname="recorder-screenshot-v3" data-asset-path="chrome-extension://lhannfkhjdhmibllojbbdjdbpegidojj/"></script><div class="host-lopnbnfpjmgpbppclhclehhgafnifija" style="position: relative; z-index: 2147483647;"></div></body></html>

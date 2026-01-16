@@ -1,10 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abwesenheitsübersicht</title>
         <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
         * {
             margin: 0;
@@ -65,14 +67,7 @@
             overflow: hidden;
         }
 
-        .header-bar {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 8px 15px;
-            font-size: 22px; /* Formulartitel +8px (war 14px) gemaess Anforderung */
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
+        /* unified-header.css ersetzt .header-bar */
 
         .filter-bar {
             display: flex;
@@ -189,7 +184,7 @@
     <script src="js/webview2-bridge.js"></script>
 <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body data-active-menu="abwesenheitsübersicht">
+<body data-active-menu="abwesenheitsübersicht" data-form="frm_abwesenheitsuebersicht">
     <div class="left-menu">
         <div class="menu-header">PERSONAL</div>
         <button class="menu-btn" onclick="Bridge.navigate('mitarbeiterstamm')">Mitarbeiterstamm</button>
@@ -200,7 +195,16 @@
     </div>
 
     <div class="main-content">
-        <div class="header-bar">Abwesenheitsübersicht</div>
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold;">Abwesenheitsübersicht</span>
+                <div class="buttons-grid">
+                    <!-- Keine Buttons in diesem Formular -->
+                </div>
+            </div>
+            <div class="gpt-box">CONSYS<span>Web</span></div>
+        </div>
 
         <div class="filter-bar">
             <label>Monat:</label>
@@ -347,4 +351,5 @@
     </script>
 </body>
 </html>
+
 

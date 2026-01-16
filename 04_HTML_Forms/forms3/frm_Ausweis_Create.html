@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -286,26 +286,26 @@
     </style>
     <link rel="stylesheet" href="consys-common.css">
     <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
 <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body>
+<body data-form="frm_Ausweis_Create">
     <div class="app-container">
         <!-- Left Menu -->
 
         <!-- Main Area -->
         <div class="app-main">
             <!-- Header -->
-            <div class="app-header">
-                <div class="header-left">
-                    <h1 class="app-title">Dienstausweis erstellen</h1>
+            <div class="header-row-wrapper">
+                <div class="header-row combined-buttons">
+                    <div class="logo-box">C</div>
+                    <span class="title-text" style="font-size: 16px; font-weight: bold;">Dienstausweis erstellen</span>
+                    <div class="buttons-grid">
+                        <button class="btn unified-btn" onclick="location.reload()">Aktualisieren</button>
+                    </div>
                 </div>
-                <div class="header-center">
-                    <button class="btn btn-primary" onclick="location.reload()">Aktualisieren</button>
-                </div>
-                <div class="header-right">
-                    <div class="version-info">CONSYS Web | GPT TEST</div>
-                    <div class="version-info" id="headerDate"></div>
-                </div>
+                <div class="gpt-box">CONSYS<span>Web</span></div>
             </div>
 
             <!-- Content -->
@@ -328,7 +328,7 @@
                         <button class="btn" id="btnAddAll" title="Alle hinzufügen">&gt;&gt;</button>
                         <button class="btn tiny-btn" id="btnDelSelected" title="Ausgewählte entfernen">&lt;</button>
                         <button class="btn" id="btnDelAll" title="Alle entfernen">&lt;&lt;</button>
-                        <button class="btn tiny-btn" id="btnDeselect" title="Auswahl aufheben">âœ•</button>
+                        <button class="btn tiny-btn" id="btnDeselect" title="Auswahl aufheben">Ã¢Å“â€¢</button>
                     </div>
 
                     <!-- Right: Selected Employees -->
@@ -378,8 +378,15 @@
                             <div class="section-title" style="grid-column: 1 / -1;">Karte drucken</div>
                             <button class="btn btn-card" id="btn_Karte_Sicherheit">Sicherheit</button>
                             <button class="btn btn-card" id="btn_Karte_Service">Service</button>
-                            <button class="btn btn-card" id="btn_Karte_Rück">Rückseite</button>
+                            <button class="btn btn-card" id="btn_Karte_Rueck">Rückseite</button>
                             <button class="btn btn-card" id="btn_Sonder">Sonder</button>
+                        </div>
+
+                        <!-- Extra Actions -->
+                        <div class="button-grid">
+                            <div class="section-title" style="grid-column: 1 / -1;">Weitere Aktionen</div>
+                            <button class="btn" id="btnDienstauswNr">Ausw.Nr. vergeben</button>
+                            <button class="btn" id="btnAusweisReport">Report öffnen</button>
                         </div>
                     </div>
                 </div>
@@ -406,5 +413,6 @@
     <script src="logic/frm_Ausweis_Create.logic.js"></script>
 </body>
 </html>
+
 
 

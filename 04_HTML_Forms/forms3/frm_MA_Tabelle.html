@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mitarbeiter-Tabelle - CONSYS</title>
     <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; font-size: 11px; }
         body {
@@ -14,24 +16,7 @@
             flex-direction: column;
         }
 
-        /* Header */
-        .header {
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            border-bottom: 2px solid #808080;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .header h1 {
-            color: #000080;
-            font-size: 19px; /* Formulartitel +8px gemaess Anforderung */
-            font-weight: bold;
-        }
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
+        /* Header - unified-header.css übernimmt */
         .btn {
             background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
             border: 2px solid;
@@ -236,19 +221,23 @@
     <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
 <body data-form="frm_MA_Tabelle">
-    <div class="header">
-        <h1>Mitarbeiter-Tabelle</h1>
-        <div class="header-actions">
-            <button class="btn" onclick="toggleEditMode()" id="btnEdit">Bearbeiten</button>
-            <button class="btn" onclick="saveChanges()" id="btnSave" style="display:none;">Speichern</button>
-            <button class="btn" onclick="cancelEdit()" id="btnCancel" style="display:none;">Abbrechen</button>
-            <button class="btn" onclick="window.print()">Drucken</button>
-            <button class="btn" onclick="exportToExcel()">Export Excel</button>
-            <button class="btn" onclick="exportToCSV()">Export CSV</button>
-            <button class="btn" onclick="location.reload()">Neu laden</button>
-            <button class="btn" onclick="history.back()">Zurück</button>
-            <button class="btn" onclick="Bridge.close()">Schließen</button>
+    <div class="header-row-wrapper">
+        <div class="header-row combined-buttons">
+            <div class="logo-box">C</div>
+            <span class="title-text" style="font-size: 16px; font-weight: bold;">Mitarbeiter-Tabelle</span>
+            <div class="buttons-grid">
+                <button class="btn unified-btn" id="btnEdit" onclick="toggleEditMode()">Bearbeiten</button>
+                <button class="btn unified-btn" id="btnSave" onclick="saveChanges()" style="display:none;">Speichern</button>
+                <button class="btn unified-btn" id="btnCancel" onclick="cancelEdit()" style="display:none;">Abbrechen</button>
+                <button class="btn unified-btn" onclick="window.print()">Drucken</button>
+                <button class="btn unified-btn" onclick="exportToExcel()">Export Excel</button>
+                <button class="btn unified-btn" onclick="exportToCSV()">Export CSV</button>
+                <button class="btn unified-btn" onclick="location.reload()">Neu laden</button>
+                <button class="btn unified-btn" onclick="history.back()">Zurück</button>
+                <button class="btn unified-btn" onclick="Bridge.close()">Schließen</button>
+            </div>
         </div>
+        <div class="gpt-box">CONSYS<span>Web</span></div>
     </div>
 
     <div class="edit-mode-info" id="editModeInfo">

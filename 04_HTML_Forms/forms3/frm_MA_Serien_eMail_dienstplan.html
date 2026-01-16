@@ -6,9 +6,11 @@
     <title>Serien-E-Mail Dienstplan - CONSYS</title>
     <link rel="stylesheet" href="css/app-layout.css">
     <link rel="stylesheet" href="theme/consys_theme.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
         :root { --accent-color: #6B1C23; }
-        .app-header { background: #4316B2; min-height: 95px; height: 95px; color: white; }
+        .app-header { background: transparent; min-height: auto; height: auto; padding: 0; }
         .app-footer { min-height: 19px; height: 19px; }
     </style>
     <link rel="stylesheet" href="consys-common.css">
@@ -21,11 +23,19 @@
 
         <main class="app-main">
             <header class="app-header">
-                <div class="header-left">
-                    <h1 class="app-title">Serien-E-Mail Dienstplan</h1>
-                </div>
-                <div class="header-right">
-                    <span id="header-date"></span>
+                <div class="header-row-wrapper">
+                    <div class="header-row combined-buttons">
+                        <div class="logo-box">C</div>
+                        <span class="title-text" style="font-size: 16px; font-weight: bold;">Serien-E-Mail Dienstplan</span>
+                        <div class="buttons-grid">
+                            <button class="btn unified-btn btn-primary" id="btnSenden">E-Mails senden</button>
+                            <button class="btn unified-btn" id="btnVorschau">Vorschau</button>
+                            <button class="btn unified-btn" id="btnAuftrag" onclick="openAuftrag()" title="Auftragstamm öffnen">Auftrag</button>
+                            <button class="btn unified-btn" id="btnSchnellPlan" onclick="openSchnellPlan()" title="MA-Schnellauswahl öffnen">Schnellplan</button>
+                            <button class="btn unified-btn" id="btnZuAbsage" onclick="openZuAbsage()" title="Zu-/Absage-Formular">Zu-/Absage</button>
+                        </div>
+                    </div>
+                    <div class="gpt-box">CONSYS<span>Web</span></div>
                 </div>
             </header>
 
@@ -42,11 +52,6 @@
                     <select id="cboVorlage" class="form-control" style="width:180px;">
                         <option value="">-- Vorlage wählen --</option>
                     </select>
-                </div>
-                <div class="toolbar-separator"></div>
-                <div class="toolbar-group">
-                    <button class="btn btn-primary" id="btnSenden">E-Mails senden</button>
-                    <button class="btn" id="btnVorschau">Vorschau</button>
                 </div>
             </div>
 
@@ -94,6 +99,20 @@ Mit freundlichen Grüßen
 CONSYS Security</textarea>
                         </div>
                     </fieldset>
+
+                    <!-- Attachment-Bereich (wie VBA sub_tbltmp_Attachfile) -->
+                    <fieldset class="fieldset">
+                        <legend>Anhaenge</legend>
+                        <div class="field-row" style="gap:8px;">
+                            <button class="btn btn-sm" id="btnAttachSuch" onclick="attachmentSuchen()" title="Datei suchen und anhängen">Datei hinzufügen</button>
+                            <button class="btn btn-sm" id="btnPDFCrea" onclick="pdfErstellen()" title="PDF-Zusage erstellen">PDF erstellen</button>
+                            <button class="btn btn-sm" id="btnPosListeAtt" onclick="positionslisteAnhaengen()" title="Positionsliste anhängen">Positionsliste</button>
+                            <button class="btn btn-sm btn-danger" id="btnAttLoesch" onclick="attachmentLoeschen()" title="Alle Anhänge entfernen">Alle entfernen</button>
+                        </div>
+                        <div id="attachmentList" style="margin-top:8px;min-height:40px;border:1px solid #ddd;padding:4px;background:#f9f9f9;">
+                            <span style="color:#999;font-size:11px;">Keine Anhänge</span>
+                        </div>
+                    </fieldset>
                 </div>
 
                 <div class="content-sidebar">
@@ -121,9 +140,6 @@ CONSYS Security</textarea>
     </div>
 
     <script src="js/sidebar.js"></script>
-    <script>
-        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
-    </script>
 
     <!-- WebView2 Bridge für Access-Integration -->
     <script src="js/webview2-bridge.js"></script>

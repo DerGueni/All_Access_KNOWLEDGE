@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -6,10 +6,10 @@
     <title>MA-VA Positionszuordnung - CONSYS</title>
     <link rel="stylesheet" href="css/app-layout.css">
     <link rel="stylesheet" href="theme/consys_theme.css">
+    <link rel="stylesheet" href="css/unified-header.css">
     <style>
         :root { --accent-color: #4316B2; }
         body { background-color: #8080c0; }
-        .app-header { background: #4316B2; min-height: 95px; height: 95px; }
         .zuordnung-grid { display: flex; gap: 16px; height: 100%; }
         .zuordnung-panel { flex: 1; display: flex; flex-direction: column; background: white; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
         .panel-header { padding: 8px 12px; background: #f5f5f5; border-bottom: 1px solid #ccc; font-weight: 600; }
@@ -31,40 +31,34 @@
     </style>
     <link rel="stylesheet" href="consys-common.css">
     <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/form-titles.css">
 <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body data-active-menu="planung" data-menu-style="access">
+<body data-active-menu="planung" data-menu-style="access" data-form="frm_MA_VA_Positionszuordnung">
     <div class="app-container">
         <aside class="app-sidebar"></aside>
 
         <main class="app-main">
-            <header class="app-header">
-                <div class="header-left">
-                    <h1 class="app-title">MA-VA Positionszuordnung</h1>
+            <!-- Unified Header -->
+            <div class="header-row-wrapper">
+                <div class="header-row combined-buttons">
+                    <div class="logo-box">C</div>
+                    <span class="title-text" style="font-size: 16px; font-weight: bold;">MA-VA Positionszuordnung</span>
+                    <div class="buttons-grid">
+                        <label class="toolbar-label" style="color:#fff; margin-right:4px;">Auftrag:</label>
+                        <select id="cboAuftrag" class="form-control" style="width:200px; height:26px;">
+                            <option value="">-- Auftrag wählen --</option>
+                        </select>
+                        <label class="toolbar-label" style="color:#fff; margin-left:12px; margin-right:4px;">Datum:</label>
+                        <select id="cboDatum" class="form-control" style="width:120px; height:26px;">
+                            <option value="">-- Datum --</option>
+                        </select>
+                        <button class="btn unified-btn btn-primary" id="btnSpeichern">Speichern</button>
+                        <button class="btn unified-btn" id="btnAktualisieren">Aktualisieren</button>
+                    </div>
+                    <span id="header-date" style="color:#fff; font-size:11px; margin-left:auto; margin-right:8px;"></span>
                 </div>
-                <div class="header-right">
-                    <span id="header-date"></span>
-                </div>
-            </header>
-
-            <div class="app-toolbar">
-                <div class="toolbar-group">
-                    <label class="toolbar-label">Auftrag:</label>
-                    <select id="cboAuftrag" class="form-control" style="width:250px;">
-                        <option value="">-- Auftrag wählen --</option>
-                    </select>
-                </div>
-                <div class="toolbar-group">
-                    <label class="toolbar-label">Datum:</label>
-                    <select id="cboDatum" class="form-control" style="width:120px;">
-                        <option value="">-- Datum --</option>
-                    </select>
-                </div>
-                <div class="toolbar-separator"></div>
-                <div class="toolbar-group">
-                    <button class="btn btn-primary" id="btnSpeichern">Speichern</button>
-                    <button class="btn" id="btnAktualisieren">Aktualisieren</button>
-                </div>
+                <div class="gpt-box">CONSYS<span>Web</span></div>
             </div>
 
             <div class="app-content" style="padding:12px;">
@@ -139,21 +133,202 @@
     <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:10000;"></div>
 
     <script src="js/sidebar.js"></script>
-    <script>
-        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
-
-        // Form Activation Handler
-        window.onFormActivated = function() {
-            console.log('Positionszuordnung aktiviert - Daten werden geladen');
-            // Hier könnten Daten geladen werden wenn das Formular in der Shell aktiviert wird
-        };
-    </script>
-
     <!-- WebView2 Bridge für Access-Integration -->
     <script src="js/webview2-bridge.js"></script>
     <script src="js/global-handlers.js"></script>
 
-    <!-- Form Logic -->
+    <script>
+        // ============================================================
+        // frm_MA_VA_Positionszuordnung - Inline Logic
+        // Access-Pendant: cbo_Akt_Objekt_Kopf_AfterUpdate, btnAddSelected_Click etc.
+        // ============================================================
+
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE', {
+            weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+
+        // Form Activation Handler (für Shell-Integration)
+        window.onFormActivated = function() {
+            console.log('[MA_VA_Positionszuordnung] Formular aktiviert');
+            updateCounters();
+        };
+
+        // DOM Ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[MA_VA_Positionszuordnung] Initialisierung...');
+
+            const cboAuftrag = document.getElementById('cboAuftrag');
+            const cboDatum = document.getElementById('cboDatum');
+            const btnSpeichern = document.getElementById('btnSpeichern');
+            const btnAktualisieren = document.getElementById('btnAktualisieren');
+            const panelPositionen = document.getElementById('panelPositionen');
+            const panelVerfuegbar = document.getElementById('panelVerfügbar');
+            const panelZugeordnet = document.getElementById('panelZugeordnet');
+            const lblStatus = document.getElementById('lblStatus');
+
+            // Auftrag-Dropdown Change (Access: cbo_Akt_Objekt_Kopf_AfterUpdate)
+            if (cboAuftrag) {
+                cboAuftrag.addEventListener('change', function() {
+                    const val = this.value;
+                    const txt = this.options[this.selectedIndex]?.text || '';
+                    updateStatus('Auftrag gewählt: ' + txt);
+                    console.log('[MA_VA_Positionszuordnung] Auftrag:', val);
+                    // TODO: Einsatztage für diesen Auftrag laden
+                });
+            }
+
+            // Datum-Dropdown Change (Access: cboVADatum)
+            if (cboDatum) {
+                cboDatum.addEventListener('change', function() {
+                    updateStatus('Datum gewählt: ' + this.value);
+                    console.log('[MA_VA_Positionszuordnung] Datum:', this.value);
+                });
+            }
+
+            // Speichern-Button
+            if (btnSpeichern) {
+                btnSpeichern.addEventListener('click', function() {
+                    updateStatus('Speichere...');
+                    console.log('[MA_VA_Positionszuordnung] Speichern geklickt');
+                    setTimeout(() => updateStatus('Gespeichert'), 500);
+                });
+            }
+
+            // Aktualisieren-Button
+            if (btnAktualisieren) {
+                btnAktualisieren.addEventListener('click', function() {
+                    updateStatus('Aktualisiere...');
+                    console.log('[MA_VA_Positionszuordnung] Aktualisieren geklickt');
+                    updateCounters();
+                    setTimeout(() => updateStatus('Aktualisiert'), 300);
+                });
+            }
+
+            // Position auswählen (Klick auf Position-Item)
+            if (panelPositionen) {
+                panelPositionen.addEventListener('click', function(e) {
+                    const item = e.target.closest('.position-item');
+                    if (item) {
+                        // Alle deselektieren, dann diese selektieren
+                        panelPositionen.querySelectorAll('.position-item').forEach(i => i.classList.remove('selected'));
+                        item.classList.add('selected');
+                        const posName = item.querySelector('.position-name')?.textContent || '';
+                        updateStatus('Position ausgewählt: ' + posName);
+                        console.log('[MA_VA_Positionszuordnung] Position geklickt:', posName);
+                    }
+                });
+            }
+
+            // MA zuordnen (Klick auf grünen Pfeil-Button)
+            if (panelVerfuegbar) {
+                panelVerfuegbar.addEventListener('click', function(e) {
+                    const btn = e.target.closest('button');
+                    if (btn) {
+                        const item = btn.closest('.position-item');
+                        if (item) {
+                            mitarbeiterZuordnen(item);
+                        }
+                    }
+                });
+            }
+
+            // MA entfernen (Klick auf roten X-Button)
+            if (panelZugeordnet) {
+                panelZugeordnet.addEventListener('click', function(e) {
+                    const btn = e.target.closest('button');
+                    if (btn) {
+                        const item = btn.closest('.position-item');
+                        if (item) {
+                            mitarbeiterEntfernen(item);
+                        }
+                    }
+                });
+            }
+
+            // Initial Counter update
+            updateCounters();
+        });
+
+        // MA vom verfügbar-Panel ins zugeordnet-Panel verschieben
+        function mitarbeiterZuordnen(maItem) {
+            const selectedPosition = document.querySelector('#panelPositionen .position-item.selected');
+            if (!selectedPosition) {
+                alert('Bitte zuerst eine Position auswählen');
+                return;
+            }
+
+            const maName = maItem.querySelector('.position-name')?.textContent || '';
+            const posName = selectedPosition.querySelector('.position-name')?.textContent || '';
+
+            // Item klonen und Button ändern
+            const clonedItem = maItem.cloneNode(true);
+            const btn = clonedItem.querySelector('button');
+            if (btn) {
+                btn.className = 'btn btn-sm btn-danger';
+                btn.innerHTML = '&#10006;';
+            }
+            const infoEl = clonedItem.querySelector('.position-info');
+            if (infoEl) {
+                infoEl.textContent = 'Position: ' + posName;
+            }
+
+            document.getElementById('panelZugeordnet')?.appendChild(clonedItem);
+            maItem.remove();
+
+            updateCounters();
+            updateStatus('Zugeordnet: ' + maName + ' → ' + posName);
+            console.log('[MA_VA_Positionszuordnung] Zugeordnet:', maName, 'zu', posName);
+        }
+
+        // MA vom zugeordnet-Panel zurück ins verfügbar-Panel
+        function mitarbeiterEntfernen(maItem) {
+            const maName = maItem.querySelector('.position-name')?.textContent || '';
+
+            // Item klonen und Button ändern
+            const clonedItem = maItem.cloneNode(true);
+            const btn = clonedItem.querySelector('button');
+            if (btn) {
+                btn.className = 'btn btn-sm btn-success';
+                btn.innerHTML = '&#10140;';
+            }
+            const infoEl = clonedItem.querySelector('.position-info');
+            if (infoEl) {
+                infoEl.textContent = 'Qualifikation: 34a';
+            }
+
+            document.getElementById('panelVerfügbar')?.appendChild(clonedItem);
+            maItem.remove();
+
+            updateCounters();
+            updateStatus('Entfernt: ' + maName);
+            console.log('[MA_VA_Positionszuordnung] Entfernt:', maName);
+        }
+
+        // Zähler aktualisieren
+        function updateCounters() {
+            const posCount = document.querySelectorAll('#panelPositionen .position-item').length;
+            const maCount = document.querySelectorAll('#panelVerfügbar .position-item').length;
+            const zugeordnetCount = document.querySelectorAll('#panelZugeordnet .position-item').length;
+
+            const lblPosAnzahl = document.getElementById('lblPosAnzahl');
+            const lblMAAnzahl = document.getElementById('lblMAAnzahl');
+            const lblZugeordnetAnzahl = document.getElementById('lblZugeordnetAnzahl');
+            const lblSumme = document.getElementById('lblSumme');
+
+            if (lblPosAnzahl) lblPosAnzahl.textContent = '(' + posCount + ')';
+            if (lblMAAnzahl) lblMAAnzahl.textContent = '(' + maCount + ')';
+            if (lblZugeordnetAnzahl) lblZugeordnetAnzahl.textContent = '(' + zugeordnetCount + ')';
+            if (lblSumme) lblSumme.textContent = posCount + ' Positionen | ' + zugeordnetCount + ' MA zugeordnet';
+        }
+
+        // Status-Label aktualisieren
+        function updateStatus(msg) {
+            const lblStatus = document.getElementById('lblStatus');
+            if (lblStatus) lblStatus.textContent = msg;
+        }
+    </script>
+
+    <!-- Form Logic (ES-Modul - lädt nur über HTTP, nicht file://) -->
     <script type="module" src="logic/frm_MA_VA_Positionszuordnung.logic.js"></script>
 
     <style>
@@ -164,5 +339,6 @@
     </style>
 </body>
 </html>
+
 
 

@@ -28,6 +28,8 @@
     <link rel="stylesheet" href="css/design-system.css">
     <link rel="stylesheet" href="css/app-layout.css">
     <link rel="stylesheet" href="theme/consys_theme.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
         /* CONSYS Standard: Body-Hintergrund */
         body {
@@ -110,16 +112,7 @@
             overflow: hidden;
         }
 
-        .app-header {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 8px 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .app-title { font-size: 23px !important; font-weight: bold !important; } /* +8px gemaess Anforderung */
+        /* Header-Styles werden von unified-header.css bereitgestellt */
 
         /* Toolbar - VBA: Form_Open setzt Anstellungsart */
         .app-toolbar {
@@ -405,18 +398,32 @@
 
         <!-- Main Content -->
         <main class="app-main">
-            <!-- Header -->
-            <header class="app-header">
-                <div class="header-left">
-                    <h1 class="app-title">Mitarbeiter-Zeitkonten</h1>
+            <!-- Unified Header -->
+            <div class="header-row-wrapper">
+                <div class="header-row combined-buttons">
+                    <div class="logo-box">C</div>
+                    <span class="title-text" style="font-size: 16px; font-weight: bold;">Mitarbeiter-Zeitkonten</span>
+                    <div class="buttons-grid">
+                        <!-- VBA: btnImport_Click -->
+                        <button class="btn unified-btn" id="btnImport" onclick="btnImport_Click()" title="Zeitkonten aus Excel importieren">Import ZK</button>
+                        <!-- VBA: btnImporteinzel_Click -->
+                        <button class="btn unified-btn" id="btnImporteinzel" onclick="btnImporteinzel_Click()" title="Einzelnes Zeitkonto importieren">Import Einzel</button>
+                        <!-- VBA: btnExport_Click -->
+                        <button class="btn unified-btn" id="btnExport" onclick="btnExport_Click()" title="Lexware Importdatei erstellen">Export Lexware</button>
+                        <!-- VBA: btnZKFest_Click -->
+                        <button class="btn unified-btn" id="btnZKFest" onclick="btnZKFest_Click()" title="Zeitkonten Festangestellte fortschreiben">ZK Fest</button>
+                        <!-- VBA: btnZKMini_Click -->
+                        <button class="btn unified-btn" id="btnZKMini" onclick="btnZKMini_Click()" title="Zeitkonten Minijobber fortschreiben">ZK Mini</button>
+                        <!-- VBA: btnZKeinzel_Click -->
+                        <button class="btn unified-btn" id="btnZKeinzel" onclick="btnZKeinzel_Click()" title="Selektiertes Zeitkonto fortschreiben">ZK Einzel</button>
+                        <!-- VBA: btnAbgleich_Click -->
+                        <button class="btn unified-btn" id="btnAbgleich" onclick="btnAbgleich_Click()" title="Stundenabgleich anzeigen">Abgleich</button>
+                        <!-- VBA: btnExportDiff_Click -->
+                        <button class="btn unified-btn" id="btnExportDiff" onclick="btnExportDiff_Click()" title="Differenzreport exportieren">Export Diff</button>
+                    </div>
                 </div>
-                <div class="header-center">
-                    <span id="lblRecordInfo">Zeitraum: - / -</span>
-                </div>
-                <div class="header-right">
-                    <span id="header-date"></span>
-                </div>
-            </header>
+                <div class="gpt-box">CONSYS<span>Web</span></div>
+            </div>
 
             <!-- Toolbar - VBA: Form_Open, cboZeitraum_AfterUpdate, cboAnstArt_AfterUpdate, cboMA_BeforeUpdate -->
             <div class="app-toolbar">
@@ -450,30 +457,6 @@
                     <input type="date" id="AU_von" class="form-control">
                     <span style="margin:0 4px;">bis</span>
                     <input type="date" id="AU_bis" class="form-control">
-                </div>
-                <div class="toolbar-separator"></div>
-                <div class="toolbar-group">
-                    <!-- VBA: btnImport_Click -->
-                    <button class="btn btn-primary" id="btnImport" title="Zeitkonten aus Excel importieren">Import ZK</button>
-                    <!-- VBA: btnImporteinzel_Click -->
-                    <button class="btn" id="btnImporteinzel" title="Einzelnes Zeitkonto importieren">Import Einzel</button>
-                    <!-- VBA: btnExport_Click -->
-                    <button class="btn btn-success" id="btnExport" title="Lexware Importdatei erstellen">Export Lexware</button>
-                </div>
-                <div class="toolbar-separator"></div>
-                <div class="toolbar-group">
-                    <!-- VBA: btnZKFest_Click, btnZKMini_Click -->
-                    <button class="btn" id="btnZKFest" title="Zeitkonten Festangestellte fortschreiben">ZK Fest</button>
-                    <button class="btn" id="btnZKMini" title="Zeitkonten Minijobber fortschreiben">ZK Mini</button>
-                    <!-- VBA: btnZKeinzel_Click -->
-                    <button class="btn" id="btnZKeinzel" title="Selektiertes Zeitkonto fortschreiben">ZK Einzel</button>
-                </div>
-                <div class="toolbar-separator"></div>
-                <div class="toolbar-group">
-                    <!-- VBA: btnAbgleich_Click -->
-                    <button class="btn" id="btnAbgleich" title="Stundenabgleich anzeigen">Abgleich</button>
-                    <!-- VBA: btnExportDiff_Click -->
-                    <button class="btn" id="btnExportDiff" title="Differenzreport exportieren">Export Diff</button>
                 </div>
             </div>
 
@@ -723,15 +706,7 @@
             el.AU_von.addEventListener('change', AU_von_BeforeUpdate);
             el.AU_bis.addEventListener('change', AU_bis_BeforeUpdate);
 
-            // Button Events
-            document.getElementById('btnImport').addEventListener('click', btnImport_Click);
-            document.getElementById('btnImporteinzel').addEventListener('click', btnImporteinzel_Click);
-            document.getElementById('btnExport').addEventListener('click', btnExport_Click);
-            document.getElementById('btnZKFest').addEventListener('click', btnZKFest_Click);
-            document.getElementById('btnZKMini').addEventListener('click', btnZKMini_Click);
-            document.getElementById('btnZKeinzel').addEventListener('click', btnZKeinzel_Click);
-            document.getElementById('btnAbgleich').addEventListener('click', btnAbgleich_Click);
-            document.getElementById('btnExportDiff').addEventListener('click', btnExportDiff_Click);
+            // Button Events - Handler werden via onclick im HTML aufgerufen (unified-header)
 
             // Tab switching
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -931,6 +906,7 @@
                     filtern();
                     alert('Einsaetze der Festangestellten wurden in die Zeitkonten uebertragen!');
                 })
+                .catch(err => setStatus('Fehler: ' + err.message))
                 .finally(() => disableButtons(false));
         }
 
@@ -950,6 +926,7 @@
                     filtern();
                     alert('Einsaetze der Minijobber wurden in die Zeitkonten uebertragen!');
                 })
+                .catch(err => setStatus('Fehler: ' + err.message))
                 .finally(() => disableButtons(false));
         }
 
@@ -1383,9 +1360,32 @@
                     resolve();
                 });
             } else {
-                // Fallback: API call
-                console.log(`[Zeitkonten] VBA Call: ${functionName}(${args.join(', ')})`);
-                return Promise.resolve();
+                // REST-API Fallback: VBA Bridge Server auf Port 5002
+                console.log(`[Zeitkonten] VBA Call via REST: ${functionName}(${args.join(', ')})`);
+                try {
+                    const response = await fetch('http://localhost:5002/api/vba/execute', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            function: functionName,
+                            arguments: args
+                        })
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`VBA Bridge Error: ${response.status} - ${errorText}`);
+                    }
+                    const result = await response.json();
+                    console.log(`[Zeitkonten] VBA Result:`, result);
+                    return result;
+                } catch (error) {
+                    console.error(`[Zeitkonten] VBA Bridge nicht erreichbar:`, error);
+                    // Fallback: Nur loggen wenn Server nicht laeuft
+                    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                        console.warn('[Zeitkonten] VBA Bridge Server (Port 5002) nicht gestartet. Funktion wird ignoriert.');
+                    }
+                    throw error;
+                }
             }
         }
 

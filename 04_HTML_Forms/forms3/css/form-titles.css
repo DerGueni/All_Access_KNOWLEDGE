@@ -1,0 +1,61 @@
+/* ==========================================================
+   CONSYS - Formulartitel Styling (Einheitlich)
+   ==========================================================
+   Erstellt: 2026-01-15
+   Zweck: Einheitliche Schriftgröße für alle Formulartitel
+
+   Basis: Sidebar-Buttons (12px) × 2 = 24px
+   Variable: --font-size-3xl (muss in variables.css definiert sein)
+
+   WICHTIG: Diese Datei NACH variables.css einbinden!
+   ========================================================== */
+
+/* ========================================================
+   HAUPTFORMULAR-TITEL (24px)
+   ======================================================== */
+
+.app-title,
+.form-title,
+.formular-titel,
+.page-title,
+.placeholder h1 {
+    font-size: 16px !important;  /* Geändert auf 16px - 2026-01-16 */
+    font-weight: var(--font-weight-bold, 700);
+    color: #000000 !important;  /* Geändert auf schwarz - 2026-01-16 */
+    line-height: var(--line-height-tight, 1.2);
+    margin: 0;
+    padding: 0;
+}
+
+/* ========================================================
+   SUBFORM-HEADER (14px - kleiner als Haupttitel)
+   ======================================================== */
+
+.subform-header,
+.form-header {
+    font-size: var(--font-size-lg, 14px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--color-text-title, #000080);
+    line-height: var(--line-height-tight, 1.2);
+}
+
+/* ========================================================
+   LOKALE --title-font-size ÜBERSCHREIBEN
+   ======================================================== */
+
+/* Falls Formulare noch lokale --title-font-size Definitionen haben,
+   diese durch die globale Variable ersetzen */
+:root {
+    --title-font-size: 16px;  /* Geändert auf 16px - 2026-01-16 */
+}
+
+/* ========================================================
+   HIERARCHIE-ÜBERSICHT (Dokumentation)
+   ========================================================
+
+   12px - Sidebar-Buttons (.menu-btn in shell.html)
+   14px - Subform-Header (.subform-header, .form-header)
+   24px - Hauptformular-Titel (.app-title, .form-title) ← DOPPELT SO GROSS
+
+   Verhältnis: Haupttitel ist 2× größer als Sidebar-Buttons
+   ========================================================== */

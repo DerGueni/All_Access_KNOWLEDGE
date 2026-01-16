@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <script>
+    // Auto-Load in Shell (Sidebar-Integration)
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isInShell = urlParams.has('shell') || window.SHELL_PARAMS;
+        const isInIframe = window.self !== window.top;
+
+        if (!isInShell && !isInIframe) {
+            const formName = window.location.pathname.split('/').pop();
+            const recordId = urlParams.get('id') || urlParams.get('ma_id');
+            let shellUrl = 'shell.html?form=' + formName;
+            if (recordId) shellUrl += '&id=' + recordId;
+
+            for (const [key, value] of urlParams.entries()) {
+                if (!['shell', 'id', 'ma_id', '_t'].includes(key)) {
+                    shellUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                }
+            }
+
+            console.log('[Auto-Redirect] Lade mit Sidebar:', shellUrl);
+            window.location.replace(shellUrl);
+        }
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter-Adressen</title>
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
+    <style>
+        :root {
+            --base-font-size: 11px;
+            --small-font-size: 10px;
+            --header-font-size: 12px;
+            --title-font-size: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: var(--base-font-size);
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .window-frame {
+            background-color: #8080c0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 192, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #d3d3d3;
+            border-top: 4px solid #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+        .toast.warning { background: #ffc107; color: #333; }
+        .toast.info { background: #17a2b8; }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            background-color: #d3d3d3;
+            padding: 3px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 1px solid #808080;
+            height: 26px;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+            line-height: 1.2;
+            vertical-align: middle;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-green {
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+        }
+
+        .btn-blue {
+            background: linear-gradient(to bottom, #6080d0, #4060a0);
+            color: white;
+        }
+
+        /* Employee Info Row */
+        .employee-info {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 6px 12px;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .employee-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        /* Work Area */
+        .work-area {
+            display: flex;
+            flex: 1;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        /* Left Work Panel */
+        .left-work-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+            background: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 15px;
+        }
+
+        /* Form Layout */
+        .form-columns {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-column {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-label {
+            min-width: 120px;
+            text-align: right;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: #cc0000;
+        }
+
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 3px 5px;
+            font-size: 11px;
+            background: white;
+            height: 22px;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #000080;
+            box-shadow: 0 0 2px #000080;
+        }
+
+        .form-input.readonly {
+            background: #e0e0e0;
+        }
+
+        .form-input.invalid {
+            border-color: #cc0000 !important;
+            background-color: #fff8f8 !important;
+        }
+
+        /* Right Panel: Employee List */
+        .right-panel {
+            width: 350px;
+            background: #9090c0;
+            border: 1px solid #606090;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .right-header {
+            padding: 5px;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .search-box label {
+            font-size: 10px;
+            color: white;
+        }
+
+        .search-box input {
+            flex: 1;
+            height: 20px;
+            border: 1px solid #606090;
+            padding: 2px 5px;
+            font-size: 10px;
+        }
+
+        .filter-box {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .filter-box label {
+            font-size: 10px;
+            color: white;
+        }
+
+        .filter-box select {
+            flex: 1;
+            height: 20px;
+            border: 1px solid #606090;
+            font-size: 10px;
+        }
+
+        .employee-list {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .employee-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .employee-list thead th {
+            background: #6060a0;
+            color: white;
+            padding: 4px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .employee-list tbody tr {
+            cursor: pointer;
+            border-bottom: 1px solid #d0d0d0;
+        }
+
+        .employee-list tbody tr:hover {
+            background: #e8e8ff;
+        }
+
+        .employee-list tbody tr.active {
+            background: #000080;
+            color: white;
+        }
+
+        .employee-list tbody td {
+            padding: 3px 4px;
+            font-size: 10px;
+        }
+
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: #6060a0;
+            color: white;
+            border: 1px solid #808080;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-form="frm_MA_Adressen">
+    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">⛶</button>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="window-frame">
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Header Row -->
+                <div class="header-row-wrapper">
+                    <div class="header-row combined-buttons">
+                        <!-- Logo-Box links -->
+                        <div class="logo-box">A</div>
+
+                        <!-- Formulartitel -->
+                        <span class="title-text" style="font-size: 16px; color: #000000;">Mitarbeiter-Adressen</span>
+
+                        <!-- Buttons -->
+                        <div class="buttons-grid">
+                            <button class="btn unified-btn" id="btnAktualisieren" onclick="loadMitarbeiterList()">Aktualisieren</button>
+                            <button class="btn unified-btn btn-green" id="btnSpeichern" onclick="saveMitarbeiter()">Speichern</button>
+                        </div>
+
+                        <!-- MA-ID Display rechts -->
+                        <div class="header-ma-nr" style="margin-left: auto;">
+                            <span>MA-ID:</span>
+                            <input type="text" id="maId" readonly style="width: 60px; height: 20px; font-size: var(--base-font-size);">
+                        </div>
+                    </div>
+
+                    <!-- GPT/TEST Box rechts -->
+                    <div class="gpt-box">
+                        GPT | TEST<br>
+                        <span id="lblDatum"></span>
+                    </div>
+                </div>
+
+                <!-- Employee Info -->
+                <div class="employee-info">
+                    <span class="employee-name"><span id="displayNachname">-</span> <span id="displayVorname">-</span></span>
+                </div>
+
+                <!-- Work Area -->
+                <div class="work-area">
+                    <!-- Left Work Panel: Address Form -->
+                    <div class="left-work-panel">
+                        <div class="form-columns">
+                            <!-- Column 1: Adresse -->
+                            <div class="form-column">
+                                <h3 style="margin-bottom: 10px; color: #000080;">Adressdaten</h3>
+
+                                <div class="form-row">
+                                    <label class="form-label required">Straße:</label>
+                                    <input type="text" class="form-input" id="strasse" data-field="Strasse" maxlength="100">
+                                </div>
+
+                                <div class="form-row">
+                                    <label class="form-label">Hausnummer:</label>
+                                    <input type="text" class="form-input" id="nr" data-field="Nr" maxlength="10" style="max-width: 80px;">
+                                </div>
+
+                                <div class="form-row">
+                                    <label class="form-label required">PLZ:</label>
+                                    <input type="text" class="form-input" id="plz" data-field="PLZ" maxlength="10" style="max-width: 100px;" pattern="[0-9]{5}">
+                                </div>
+
+                                <div class="form-row">
+                                    <label class="form-label required">Ort:</label>
+                                    <input type="text" class="form-input" id="ort" data-field="Ort" maxlength="100">
+                                </div>
+
+                                <div class="form-row">
+                                    <label class="form-label">Land:</label>
+                                    <input type="text" class="form-input" id="land" data-field="Land" maxlength="50" value="Deutschland">
+                                </div>
+
+                                <div class="form-row">
+                                    <label class="form-label">Bundesland:</label>
+                                    <select class="form-select" id="bundesland" data-field="Bundesland">
+                                        <option value="">-- Bitte wählen --</option>
+                                        <option value="Baden-Württemberg">Baden-Württemberg</option>
+                                        <option value="Bayern">Bayern</option>
+                                        <option value="Berlin">Berlin</option>
+                                        <option value="Brandenburg">Brandenburg</option>
+                                        <option value="Bremen">Bremen</option>
+                                        <option value="Hamburg">Hamburg</option>
+                                        <option value="Hessen">Hessen</option>
+                                        <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+                                        <option value="Niedersachsen">Niedersachsen</option>
+                                        <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                                        <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                                        <option value="Saarland">Saarland</option>
+                                        <option value="Sachsen">Sachsen</option>
+                                        <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
+                                        <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                                        <option value="Thüringen">Thüringen</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Column 2: Kontaktdaten -->
+                            <div class="form-column">
+                                <h3 style="margin-bottom: 10px; color: #000080;">Kontaktdaten</h3>
+
+                                <div class="form-row">
+                                    <label class="form-label">Telefon Festnetz:</label>
+                                    <input type="tel" class="form-input" id="telFestnetz" data-field="Tel_Festnetz" maxlength="50">
+                                </div>
+
+                                <div class="form-row">
+                                    <label class="form-label required">Telefon Mobil:</label>
+                                    <input type="tel" class="form-input" id="telMobil" data-field="Tel_Mobil" maxlength="50">
+                                </div>
+
+                                <div class="form-row">
+                                    <label class="form-label">E-Mail:</label>
+                                    <input type="email" class="form-input" id="email" data-field="Email" maxlength="100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Employee List -->
+                    <div class="right-panel">
+                        <div class="right-header">
+                            <div class="search-box">
+                                <label>Suche:</label>
+                                <input type="text" id="searchInput" placeholder="Name...">
+                            </div>
+                            <div class="filter-box">
+                                <label>Filter:</label>
+                                <select id="filterSelect">
+                                    <option value="aktiv">Nur aktive</option>
+                                    <option value="alle">Alle Mitarbeiter</option>
+                                    <option value="inaktiv">Nur inaktive</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="employee-list">
+                            <table id="maListTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nachname</th>
+                                        <th>Vorname</th>
+                                        <th>Ort</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="maListBody">
+                                    <tr><td colspan="4" style="text-align: center; padding: 20px;">Lade Mitarbeiter...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // STATE
+        // ============================================
+        const state = {
+            mitarbeiterList: [],
+            currentRecord: null,
+            currentIndex: -1,
+            isDirty: false
+        };
+
+        // ============================================
+        // BRIDGE - API CONNECTION
+        // ============================================
+        const API_BASE = 'http://localhost:5000/api';
+
+        const Bridge = {
+            async get(endpoint) {
+                try {
+                    const response = await fetch(`${API_BASE}${endpoint}`);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('[Bridge] GET Error:', error);
+                    showToast('Fehler beim Laden der Daten: ' + error.message, 'error');
+                    throw error;
+                }
+            },
+
+            async put(endpoint, data) {
+                try {
+                    const response = await fetch(`${API_BASE}${endpoint}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('[Bridge] PUT Error:', error);
+                    showToast('Fehler beim Speichern: ' + error.message, 'error');
+                    throw error;
+                }
+            }
+        };
+
+        // ============================================
+        // MITARBEITER LADEN
+        // ============================================
+        async function loadMitarbeiterList() {
+            showLoading();
+            try {
+                const filter = document.getElementById('filterSelect').value;
+                const data = await Bridge.get('/mitarbeiter');
+
+                // Filter anwenden
+                state.mitarbeiterList = data.filter(m => {
+                    if (filter === 'aktiv') return m.IstAktiv === true;
+                    if (filter === 'inaktiv') return m.IstAktiv === false;
+                    return true;
+                });
+
+                renderMitarbeiterList();
+
+                // Ersten MA auswählen wenn vorhanden
+                if (state.mitarbeiterList.length > 0) {
+                    selectMitarbeiter(0);
+                }
+
+                showToast(`${state.mitarbeiterList.length} Mitarbeiter geladen`, 'success');
+            } catch (error) {
+                console.error('Fehler beim Laden der Mitarbeiterliste:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function renderMitarbeiterList() {
+            const tbody = document.getElementById('maListBody');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            // Filter nach Suchbegriff
+            let filtered = state.mitarbeiterList;
+            if (searchTerm) {
+                filtered = state.mitarbeiterList.filter(m =>
+                    (m.Nachname || '').toLowerCase().includes(searchTerm) ||
+                    (m.Vorname || '').toLowerCase().includes(searchTerm) ||
+                    (m.Ort || '').toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Keine Mitarbeiter gefunden</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((m, idx) => `
+                <tr class="${state.currentRecord?.ID === m.ID ? 'active' : ''}"
+                    onclick="selectMitarbeiterByIndex(${state.mitarbeiterList.indexOf(m)})">
+                    <td>${m.ID}</td>
+                    <td>${escapeHtml(m.Nachname || '')}</td>
+                    <td>${escapeHtml(m.Vorname || '')}</td>
+                    <td>${escapeHtml(m.Ort || '')}</td>
+                </tr>
+            `).join('');
+        }
+
+        function selectMitarbeiterByIndex(index) {
+            if (index < 0 || index >= state.mitarbeiterList.length) return;
+
+            if (state.isDirty) {
+                if (!confirm('Ungespeicherte Änderungen gehen verloren. Fortfahren?')) {
+                    return;
+                }
+            }
+
+            selectMitarbeiter(index);
+        }
+
+        async function selectMitarbeiter(index) {
+            if (index < 0 || index >= state.mitarbeiterList.length) return;
+
+            showLoading();
+            try {
+                const ma = state.mitarbeiterList[index];
+
+                // Vollständige Daten laden
+                const fullData = await Bridge.get(`/mitarbeiter/${ma.ID}`);
+
+                state.currentRecord = fullData;
+                state.currentIndex = index;
+                state.isDirty = false;
+
+                displayMitarbeiter(fullData);
+                renderMitarbeiterList(); // Liste neu rendern für active-Klasse
+
+            } catch (error) {
+                console.error('Fehler beim Laden des Mitarbeiters:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayMitarbeiter(ma) {
+            // Header
+            document.getElementById('maId').value = ma.ID || '';
+            document.getElementById('displayNachname').textContent = ma.Nachname || '-';
+            document.getElementById('displayVorname').textContent = ma.Vorname || '-';
+
+            // Adressfelder
+            document.getElementById('strasse').value = ma.Strasse || '';
+            document.getElementById('nr').value = ma.Nr || '';
+            document.getElementById('plz').value = ma.PLZ || '';
+            document.getElementById('ort').value = ma.Ort || '';
+            document.getElementById('land').value = ma.Land || 'Deutschland';
+            document.getElementById('bundesland').value = ma.Bundesland || '';
+
+            // Kontaktdaten
+            document.getElementById('telFestnetz').value = ma.Tel_Festnetz || '';
+            document.getElementById('telMobil').value = ma.Tel_Mobil || '';
+            document.getElementById('email').value = ma.Email || '';
+        }
+
+        // ============================================
+        // SPEICHERN
+        // ============================================
+        async function saveMitarbeiter() {
+            if (!state.currentRecord) {
+                showToast('Kein Mitarbeiter ausgewählt', 'warning');
+                return;
+            }
+
+            // Validierung
+            const strasse = document.getElementById('strasse').value.trim();
+            const plz = document.getElementById('plz').value.trim();
+            const ort = document.getElementById('ort').value.trim();
+            const telMobil = document.getElementById('telMobil').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!strasse) {
+                showToast('Straße ist ein Pflichtfeld', 'error');
+                document.getElementById('strasse').classList.add('invalid');
+                return;
+            }
+
+            if (!plz) {
+                showToast('PLZ ist ein Pflichtfeld', 'error');
+                document.getElementById('plz').classList.add('invalid');
+                return;
+            }
+
+            if (plz && !/^\d{5}$/.test(plz)) {
+                showToast('PLZ muss 5 Ziffern haben', 'error');
+                document.getElementById('plz').classList.add('invalid');
+                return;
+            }
+
+            if (!ort) {
+                showToast('Ort ist ein Pflichtfeld', 'error');
+                document.getElementById('ort').classList.add('invalid');
+                return;
+            }
+
+            if (!telMobil) {
+                showToast('Telefon Mobil ist ein Pflichtfeld', 'error');
+                document.getElementById('telMobil').classList.add('invalid');
+                return;
+            }
+
+            if (email && !validateEmail(email)) {
+                showToast('E-Mail Format ungültig', 'error');
+                document.getElementById('email').classList.add('invalid');
+                return;
+            }
+
+            // Alle invalid-Klassen entfernen
+            document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+
+            // Daten sammeln
+            const data = {
+                Strasse: strasse,
+                Nr: document.getElementById('nr').value.trim(),
+                PLZ: plz,
+                Ort: ort,
+                Land: document.getElementById('land').value.trim() || 'Deutschland',
+                Bundesland: document.getElementById('bundesland').value,
+                Tel_Festnetz: document.getElementById('telFestnetz').value.trim(),
+                Tel_Mobil: telMobil,
+                Email: email
+            };
+
+            showLoading();
+            try {
+                await Bridge.put(`/mitarbeiter/${state.currentRecord.ID}`, data);
+
+                // State aktualisieren
+                Object.assign(state.currentRecord, data);
+                state.mitarbeiterList[state.currentIndex] = { ...state.currentRecord };
+                state.isDirty = false;
+
+                showToast('Adressdaten erfolgreich gespeichert', 'success');
+                renderMitarbeiterList();
+
+            } catch (error) {
+                console.error('Fehler beim Speichern:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ============================================
+        // HELPER FUNCTIONS
+        // ============================================
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        let loadingTimeout = null;
+
+        function showLoading() {
+            loadingTimeout = setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('active');
+            }, 150);
+        }
+
+        function hideLoading() {
+            if (loadingTimeout) {
+                clearTimeout(loadingTimeout);
+                loadingTimeout = null;
+            }
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function toggleFullscreen() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.title = 'Vollbild beenden';
+                }).catch(err => console.error('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen().then(() => {
+                    btn.title = 'Vollbild';
+                }).catch(err => console.error('Exit fullscreen error:', err));
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        document.getElementById('searchInput').addEventListener('input', () => {
+            renderMitarbeiterList();
+        });
+
+        document.getElementById('filterSelect').addEventListener('change', () => {
+            loadMitarbeiterList();
+        });
+
+        // Dirty-Tracking
+        const trackFields = ['strasse', 'nr', 'plz', 'ort', 'land', 'bundesland', 'telFestnetz', 'telMobil', 'email'];
+        trackFields.forEach(fieldId => {
+            const el = document.getElementById(fieldId);
+            if (el) {
+                el.addEventListener('input', () => {
+                    state.isDirty = true;
+                });
+            }
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('[frm_MA_Adressen] Initialisierung...');
+
+            // Datum anzeigen
+            document.getElementById('lblDatum').textContent = new Date().toLocaleDateString('de-DE');
+
+            // Mitarbeiter laden
+            loadMitarbeiterList();
+        });
+
+        console.log('[frm_MA_Adressen] Script geladen');
+    </script>
+
+    <!-- Server Watchdog -->
+    <script src="js/server-watchdog.js"></script>
+</body>
+</html>

@@ -6,6 +6,8 @@
     <title>Dienstplanübersicht</title>
     <link rel="stylesheet" href="css/app-layout.css">
     <link rel="stylesheet" href="theme/consys_theme.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
         * {
             margin: 0;
@@ -15,7 +17,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-            font-size: 11px;
+            font-size: 12px;
             background-color: #8080c0;
             overflow: hidden;
         }
@@ -47,270 +49,35 @@
             flex-direction: column;
         }
 
-        /* Header Section - 88px hoch (1314 twips), Dunkelrot */
-        .form-header {
-            position: relative;
-            height: 88px;
-            background-color: #8080c0;
-            border-bottom: 1px solid #6060a0;
-        }
-
-        /* Detail Section - 412px hoch (6182 twips), gleiche Hintergrundfarbe */
+        /* Detail Section - Anpassung für unified-header */
         .form-detail {
             position: relative;
-            height: calc(100% - 88px);
+            height: calc(100% - 50px); /* Angepasst an unified-header Höhe */
             background-color: #8080c0;
             flex: 1;
             overflow: auto;
         }
 
         /* ============================================ */
-        /* HEADER CONTROLS - Absolute Positionierung   */
+        /* UNIFIED HEADER OVERRIDES                    */
         /* ============================================ */
 
-        /* Schliessen Button */
-        #Befehl37 {
-            position: absolute;
-            left: 1871px;
-            top: 8px;
-            width: 20px;
-            height: 22px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        /* Titel: Dienstplanübersicht */
-        #Bezeichnungsfeld96 {
-            position: absolute;
-            left: 125px;
-            top: 30px;
-            width: 193px;
-            height: 27px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-        }
-
-        /* Ribbon Buttons (klein, versteckt) */
-        #btnRibbonAus { position: absolute; left: 49px; top: 23px; width: 20px; height: 14px; font-size: 8px; display: none; }
-        #btnDaBaAus { position: absolute; left: 30px; top: 34px; width: 20px; height: 14px; font-size: 8px; display: none; }
-        #btnDaBaEin { position: absolute; left: 68px; top: 34px; width: 20px; height: 14px; font-size: 8px; display: none; }
-        #btnRibbonEin { position: absolute; left: 49px; top: 45px; width: 20px; height: 14px; font-size: 8px; display: none; }
-
-        /* Startdatum Bereich */
-        #Rechteck108 {
-            position: absolute;
-            left: 488px;
-            top: 22px;
-            width: 167px;
-            height: 45px;
-            background-color: rgba(255,255,255,0.1);
-            border: 1px solid #6060a0;
-            border-radius: 3px;
-        }
-
-        /* KW-Dropdown neben Datum */
-        #cboKW {
-            position: absolute;
-            left: 595px;
-            top: 26px;
-            width: 55px;
-            height: 17px;
-            font-size: 10px;
-            font-weight: bold;
-            border: 1px solid #ccc;
-            background-color: #fff;
-        }
-
-        #lblKW {
-            position: absolute;
-            left: 597px;
-            top: 10px;
-            font-size: 9px;
-            color: #fff;
-        }
-
-        #dtStartdatum {
-            position: absolute;
-            left: 491px;
-            top: 26px;
-            width: 102px;
-            height: 17px;
-            font-size: 10px;
-            font-weight: bold;
-            border: 1px solid #ccc;
-            padding: 1px 4px;
-            background-color: #fff;
-        }
-
-        #btnVor {
-            position: absolute;
-            left: 653px;
-            top: 28px;
-            width: 38px;
-            height: 15px;
-            background-color: #95B3D7;
-            border: 1px solid #666;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        #btnStartdatum {
-            position: absolute;
-            left: 492px;
-            top: 45px;
-            width: 103px;
-            height: 19px;
-            background-color: #95B3D7;
-            border: 1px solid #666;
-            font-size: 9px;
-            cursor: pointer;
-        }
-
-        #btnrueck {
-            position: absolute;
-            left: 653px;
-            top: 47px;
-            width: 38px;
-            height: 15px;
-            background-color: #95B3D7;
-            border: 1px solid #666;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        #btn_Heute {
-            position: absolute;
-            left: 709px;
-            top: 34px;
-            width: 77px;
-            height: 18px;
-            background-color: #95B3D7;
-            border: 1px solid #666;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        /* MA Filter ComboBox */
-        #NurAktiveMA {
-            position: absolute;
-            left: 869px;
-            top: 30px;
-            width: 158px;
-            height: 23px;
-            font-size: 10px;
-            border: 1px solid #ccc;
-        }
-
-        /* Dienstpläne senden Button */
-        #btnDPSenden {
-            position: absolute;
-            left: 1119px;
-            top: 15px;
-            width: 146px;
-            height: 31px;
-            background-color: #95B3D7;
-            border: 1px solid #666;
-            font-weight: bold;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        /* Einzeldienstpläne Button */
-        #btnMADienstpl {
-            position: absolute;
-            left: 1274px;
-            top: 15px;
-            width: 146px;
-            height: 22px;
-            background-color: #D6DFEC;
-            border: 1px solid #666;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        /* Enddatum */
-        #dtEnddatum {
-            position: absolute;
-            left: 1142px;
-            top: 57px;
-            width: 102px;
-            height: 17px;
-            font-size: 10px;
-            font-weight: bold;
-            border: 1px solid #ccc;
-            padding: 1px 4px;
-            background-color: #fff;
-        }
-
-        /* Übersicht drucken Button */
-        #btnOutpExcel {
-            position: absolute;
-            left: 1274px;
-            top: 53px;
-            width: 146px;
-            height: 22px;
-            background-color: #D6DFEC;
-            border: 1px solid #666;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        /* Senden Button */
-        #Befehl20 {
-            position: absolute;
-            left: 1644px;
-            top: 15px;
-            width: 100px;
-            height: 21px;
-            background-color: #95B3D7;
-            border: 1px solid #666;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        /* Übersicht senden Button */
-        #btnOutpExcelSend {
-            position: absolute;
-            left: 1625px;
-            top: 49px;
-            width: 118px;
-            height: 22px;
-            background-color: #D6DFEC;
-            border: 1px solid #666;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
-        /* Version Label */
-        #lbl_Version {
-            position: absolute;
-            left: 1765px;
-            top: 15px;
-            width: 139px;
-            height: 18px;
-            font-size: 10px;
-            color: rgba(255,255,255,0.6);
-            display: flex;
-            align-items: center;
-        }
-
-        /* Datum Label rechts */
-        #lbl_Datum {
-            position: absolute;
-            left: 1769px;
-            top: 38px;
-            width: 96px;
-            height: 19px;
+        /* Input-Felder im Header */
+        .unified-input {
+            height: 24px;
             font-size: 11px;
-            font-weight: bold;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 2px 6px;
+        }
+
+        /* Select-Felder im Header */
+        .unified-select {
+            height: 24px;
+            font-size: 11px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 2px 4px;
         }
 
         /* ============================================ */
@@ -788,55 +555,54 @@
         <!-- Main Content -->
         <main class="app-main">
     <div class="form-container">
-        <!-- HEADER SECTION -->
-        <div class="form-header">
-            <!-- Titel -->
-            <span id="Bezeichnungsfeld96">Dienstplanübersicht</span>
+        <!-- HEADER SECTION - Unified Header -->
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold;">Dienstplanübersicht</span>
+                <div class="buttons-grid">
+                    <!-- Datums-Navigation (Event-Handler via Logic.js) -->
+                    <button class="btn unified-btn" id="btnrueck">&lt;</button>
+                    <input type="date" id="dtStartdatum" class="unified-input" style="width: 120px;">
+                    <select id="cboKW" class="unified-select" style="width: 60px;"></select>
+                    <button class="btn unified-btn" id="btnVor">&gt;</button>
+                    <button class="btn unified-btn" id="btn_Heute">Ab Heute</button>
 
-            <!-- Schliessen Button -->
-            <button id="Befehl37" title="Schließen">&times;</button>
+                    <!-- MA Filter -->
+                    <select id="NurAktiveMA" class="unified-select" style="width: 140px;">
+                        <option value="0">Alle anzeigen</option>
+                        <option value="1" selected>Alle aktiven</option>
+                        <option value="2">Festangestellte</option>
+                        <option value="3">Minijobber</option>
+                        <option value="4">Sub</option>
+                    </select>
 
-            <!-- Version -->
-            <span id="lbl_Version">1 | V1.55</span>
+                    <!-- Haupt-Aktionen (Event-Handler via Logic.js) -->
+                    <button class="btn unified-btn" id="btnDPSenden">Dienstpläne senden</button>
+                    <input type="date" id="dtEnddatum" class="unified-input" style="width: 120px;">
+                    <button class="btn unified-btn" id="btnMADienstpl">Einzeldienstpläne</button>
+                    <button class="btn unified-btn" id="btnOutpExcel">Übersicht drucken</button>
 
-            <!-- Datum rechts -->
-            <span id="lbl_Datum"></span>
-
-            <!-- Startdatum Bereich -->
-            <div id="Rechteck108"></div>
-            <input type="date" id="dtStartdatum">
-            <label id="lblKW">KW:</label>
-            <select id="cboKW"></select>
-            <button id="btnVor">&gt;</button>
-            <button id="btnStartdatum">Startdatum ändern</button>
-            <button id="btnrueck">&lt;</button>
-            <button id="btn_Heute">Ab Heute</button>
-
-            <!-- MA Filter -->
-            <select id="NurAktiveMA">
-                <option value="0">Alle anzeigen</option>
-                <option value="1" selected>Alle aktiven</option>
-                <option value="2">Festangestellte</option>
-                <option value="3">Minijobber</option>
-                <option value="4">Sub</option>
-            </select>
-
-            <!-- Senden Buttons -->
-            <button id="btnDPSenden">Dienstpläne senden bis</button>
-            <input type="date" id="dtEnddatum">
-
-            <button id="btnMADienstpl">Einzeldienstpläne</button>
-            <button id="btnOutpExcel">Übersicht drucken</button>
-
-            <button id="Befehl20">Senden</button>
-            <button id="btnOutpExcelSend">Übersicht senden</button>
-
-            <!-- Ribbon Buttons (versteckt) -->
-            <button id="btnRibbonAus">-</button>
-            <button id="btnDaBaAus">-</button>
-            <button id="btnDaBaEin">+</button>
-            <button id="btnRibbonEin">+</button>
+                    <!-- Versteckte Buttons -->
+                    <button class="btn unified-btn" id="Befehl20" style="display: none;">Senden</button>
+                    <button class="btn unified-btn" id="btnOutpExcelSend" style="display: none;">Übersicht senden</button>
+                    <button class="btn unified-btn" id="btnRibbonAus" style="display: none;">-</button>
+                    <button class="btn unified-btn" id="btnDaBaAus" style="display: none;">-</button>
+                    <button class="btn unified-btn" id="btnDaBaEin" style="display: none;">+</button>
+                    <button class="btn unified-btn" id="btnRibbonEin" style="display: none;">+</button>
+                </div>
+            </div>
+            <div class="gpt-box">CONSYS<span>Web</span></div>
         </div>
+
+        <!-- Versteckte Legacy-Elemente für Kompatibilität -->
+        <span id="Bezeichnungsfeld96" style="display: none;">Dienstplanübersicht</span>
+        <button id="Befehl37" style="display: none;" title="Schließen">&times;</button>
+        <span id="lbl_Version" style="display: none;">1 | V1.55</span>
+        <span id="lbl_Datum" style="display: none;"></span>
+        <div id="Rechteck108" style="display: none;"></div>
+        <label id="lblKW" style="display: none;">KW:</label>
+        <button id="btnStartdatum" style="display: none;">Startdatum ändern</button>
 
         <!-- DETAIL SECTION -->
         <div class="form-detail">
@@ -886,6 +652,11 @@
         }
         updateTimestamp();
         setInterval(updateTimestamp, 1000);
+
+        // DblClick auf Datums-Input: Datepicker öffnen
+        document.getElementById('dtStartdatum')?.addEventListener('dblclick', function() {
+            this.showPicker?.();
+        });
 
         // SIDEBAR NAVIGATION
         document.querySelectorAll('.menu-btn').forEach(btn => {

@@ -2,6 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <script>
     // Auto-Load in Shell (Sidebar-Integration)
     (function() {
@@ -45,66 +47,6 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-        }
-
-        /* Title Bar - Lila Header mit Formulartitel */
-        .title-bar {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 6px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        .title-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex: 1;
-        }
-
-        .title-bar-center {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .title-bar-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex: 1;
-            justify-content: flex-end;
-        }
-
-        .title-bar-title {
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .title-bar-buttons {
-            display: flex;
-            gap: 2px;
-        }
-
-        .title-btn {
-            width: 21px;
-            height: 21px;
-            background: #ece9d8;
-            border: 1px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            font-size: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .title-btn.close {
-            background: #c75050;
-            color: white;
         }
 
         /* Main Container */
@@ -212,7 +154,7 @@
         /* Content Area */
         .content-area {
             flex: 1;
-            background-color: #8080c0;
+            background-color: #d3d3d3;
             padding: 3px;
             display: flex;
             flex-direction: column;
@@ -220,14 +162,14 @@
             overflow: hidden;
         }
 
-        /* Header Row */
-        .header-row {
-            background-color: #9090c0;
-            border: 1px solid #606090;
-            padding: 4px 8px;
+        /* Auftrag-Auswahl Row (unterhalb unified-header) */
+        .auftrag-selection-row {
+            background-color: #d3d3d3;
+            border: none;
+            padding: 6px 8px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             flex-shrink: 0;
             flex-wrap: wrap;
         }
@@ -328,18 +270,18 @@
         }
 
         .list-panel.narrow {
-            width: 170px;
+            width: 200px; /* 170+30=200px breiter (14.01.2026) */
             flex-shrink: 0;
         }
 
         .list-panel.wide {
             flex: 1;
-            min-width: 280px;
-            max-width: 420px;
+            min-width: 430px; /* 280+150=430px breiter (14.01.2026) */
+            max-width: 570px; /* 420+150=570px breiter (14.01.2026) */
         }
 
         .list-panel.medium {
-            width: 220px;
+            width: 250px; /* 220+30=250px breiter (14.01.2026) */
             flex-shrink: 0;
         }
 
@@ -409,12 +351,31 @@
             color: white;
         }
 
+        /* Status-Farbcodierung wie in Access (Status_ID) */
         .listbox-row.geplant {
-            /* Kein Hintergrund - MA soll nicht hervorgehoben werden */
+            /* Status 1: Geplant - kein besonderer Hintergrund */
+        }
+
+        .listbox-row.benachrichtigt {
+            /* Status 2: Benachrichtigt/Angefragt - Gelb */
+            background-color: #fff3cd;
         }
 
         .listbox-row.zugesagt {
+            /* Status 3: Zugesagt - Gruen */
             background-color: #d4edda;
+        }
+
+        .listbox-row.abgesagt {
+            /* Status 4: Abgesagt - Rot */
+            background-color: #f8d7da;
+            text-decoration: line-through;
+        }
+
+        .listbox-row.krank, .listbox-row.urlaub {
+            /* Status 5/6: Krank/Urlaub - Grau */
+            background-color: #e2e3e5;
+            color: #6c757d;
         }
 
         /* Entfernungs-Farbcodierung */
@@ -649,18 +610,17 @@
 <body data-form="frm_MA_VA_Schnellauswahl">
     <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">â›¶</button>
     <div class="window-frame">
-        <!-- Title Bar - Lila Header mit Formulartitel -->
-        <div class="title-bar">
-            <div class="title-bar-left">
-                <!-- Platzhalter links -->
+        <!-- Unified Header -->
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold;">Mitarbeiterauswahl - Offene Mail Anfragen</span>
+                <div class="buttons-grid">
+                    <button class="btn unified-btn" id="btnAuftrag">Zurück zum Auftrag</button>
+                    <span id="lbl_Datum" style="font-size: 12px; color: white;"></span>
+                </div>
             </div>
-            <div class="title-bar-center">
-                <button class="btn" id="btnAuftrag">Zurück zum Auftrag</button>
-            </div>
-            <div class="title-bar-right">
-                <span class="title-bar-title">Mitarbeiterauswahl - Offene Mail Anfragen</span>
-                <span id="lbl_Datum" style="font-size: 12px;"></span>
-            </div>
+            <div class="gpt-box">CONSYS<span>Web</span></div>
         </div>
 
         <!-- Main Container -->
@@ -669,8 +629,8 @@
 
             <!-- Content Area -->
             <div class="content-area">
-                <!-- Header Row - Auftrag Info -->
-                <div class="header-row">
+                <!-- Auftrag-Auswahl Row -->
+                <div class="auftrag-selection-row">
                     <span class="auftrag-label">Auftrag:</span>
                     <select id="VA_ID" class="form-select" style="min-width: 280px; font-size: 12px;">
                         <option value="">-- Auftrag wählen --</option>
@@ -691,13 +651,13 @@
 
                 <!-- Form Section -->
                 <div class="form-section">
-                    <!-- Filter Zeile mit Checkboxen und Buttons -->
+                    <!-- Filter Zeile mit Checkboxen und Buttons (14.01.2026 neu angeordnet) -->
                     <div class="filter-row">
                         <span class="form-label">Mitarbeiter</span>
                         <span class="form-label">Gesamt:</span>
                         <input type="text" id="iGes_MA" class="form-input readonly" readonly value="0" style="width: 50px;">
-                        
-                        <!-- Checkbox-Blöcke untereinander, linksbündig über Mitarbeiterauswahl -->
+
+                        <!-- Checkbox-Blöcke links -->
                         <div style="display: flex; gap: 20px; margin-left: 20px;">
                             <div class="checkbox-block">
                                 <div class="checkbox-group">
@@ -709,42 +669,39 @@
                                     <label for="IstVerfuegbar">Nur freie anzeigen</label>
                                 </div>
                             </div>
+                            <!-- Aktiv/34a mit Anstellung/Kategorie zusammen -->
                             <div class="checkbox-block">
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="IstAktiv" checked>
-                                    <label for="IstAktiv">Nur aktive anzeigen</label>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="IstAktiv" checked>
+                                        <label for="IstAktiv">Nur aktive anzeigen</label>
+                                    </div>
+                                    <span class="form-label">Anstellung:</span>
+                                    <select id="cboAnstArt" class="form-select" style="width: 100px;">
+                                        <option value="13" selected>Alle aktiven</option>
+                                        <option value="3">Festangestellt</option>
+                                        <option value="5">Aushilfe</option>
+                                        <option value="9">Studenten</option>
+                                        <option value="11">Praktikanten</option>
+                                    </select>
                                 </div>
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="cbNur34a">
-                                    <label for="cbNur34a">Nur 34a</label>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="cbNur34a">
+                                        <label for="cbNur34a">Nur 34a</label>
+                                    </div>
+                                    <span class="form-label" style="margin-left: 40px;">Kategorie:</span>
+                                    <select id="cboQuali" class="form-select" style="width: 100px;">
+                                        <option value="">Alle</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Grüne Buttons rechts, untereinander -->
+
+                        <!-- Grüne Buttons über Block "Mitarbeiter geplant" -->
                         <div style="display: flex; flex-direction: column; gap: 4px; margin-left: auto;">
                             <button class="btn btn-green" id="btnMailSelected">Nur Selektierte anfragen</button>
                             <button class="btn btn-green" id="btnMail">Alle Mitarbeiter anfragen</button>
-                        </div>
-                        
-                        <!-- Anstellung und Kategorie ganz rechts -->
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <span class="form-label">Anstellung:</span>
-                                <select id="cboAnstArt" class="form-select" style="width: 100px;">
-                                    <option value="13" selected>Alle aktiven</option>
-                                    <option value="3">Festangestellt</option>
-                                    <option value="5">Aushilfe</option>
-                                    <option value="9">Studenten</option>
-                                    <option value="11">Praktikanten</option>
-                                </select>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <span class="form-label">Kategorie:</span>
-                                <select id="cboQuali" class="form-select" style="width: 100px;">
-                                    <option value="">Alle</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
 
@@ -763,7 +720,7 @@
                                 <div id="lstZeiten_Body"></div>
                             </div>
                             <span class="form-label">Endzeit:</span>
-                            <input type="time" id="DienstEnde" class="form-input readonly" readonly style="width: 70px;">
+                            <input type="time" id="DienstEnde" class="form-input" style="width: 70px;">
                             <span class="form-label">Parallele Einsätze:</span>
                             <div class="grid-wrapper" style="height: 150px;">
                                 <div id="Lst_Parallel_Einsatz"></div>
@@ -836,6 +793,13 @@
                                 <button class="btn" id="btnSortZugeord" style="margin-left: auto; display: none;">Sortieren</button>
                             </div>
                             <div class="grid-wrapper">
+                                <!-- Überschriften hinzugefügt (14.01.2026) -->
+                                <div class="listbox-header">
+                                    <span style="width: 25px;">Lfd</span>
+                                    <span style="flex: 1;">Nachname</span>
+                                    <span style="flex: 1;">Vorname</span>
+                                    <span style="width: 45px;">Beginn</span>
+                                </div>
                                 <div id="lstMA_Zusage"></div>
                             </div>
                         </div>
@@ -1436,11 +1400,24 @@
 
             lstPlan.innerHTML = '';
 
+            // Status_ID zu CSS-Klasse Mapping (wie in Access)
+            const statusClassMap = {
+                1: 'geplant',       // Geplant
+                2: 'benachrichtigt', // Benachrichtigt/Angefragt
+                3: 'zugesagt',       // Zugesagt
+                4: 'abgesagt',       // Abgesagt
+                5: 'krank',          // Krank
+                6: 'urlaub'          // Urlaub
+            };
+
             planungen.forEach((plan, index) => {
                 const row = document.createElement('div');
-                row.className = 'listbox-row geplant';
+                const statusId = plan.Status_ID || plan.status_id || 1;
+                const statusClass = statusClassMap[statusId] || 'geplant';
+                row.className = `listbox-row ${statusClass}`;
                 row.dataset.id = plan.MVA_ID || plan.id;
                 row.dataset.maid = plan.MA_ID;
+                row.dataset.statusId = statusId;
 
                 row.innerHTML = `
                     <span style="width: 25px;">${index + 1}</span>
@@ -2187,31 +2164,87 @@
             zf_MA_Selektion();
         }
 
+        // DienstEnde_AfterUpdate - Wie VBA: Ruft f_lstZeiten_upd auf
+        // Wird aufgerufen wenn der Benutzer die Dienstende-Zeit manuell aendert
+        function DienstEnde_AfterUpdate() {
+            console.log('[VBA] DienstEnde_AfterUpdate');
+            f_lstZeiten_upd();
+        }
+
+        // f_lstZeiten_upd - Vergleichszeiten aktualisieren (wie VBA Zeile 1099-1104)
+        function f_lstZeiten_upd() {
+            console.log('[VBA] f_lstZeiten_upd');
+            // In VBA: Call upd_Vergleichszeiten(Me.VA_ID, Me.lstZeiten.Column(2), Me.DienstEnde)
+            // Dann: Call zf_MA_Selektion
+            // Die Vergleichszeiten-Aktualisierung ist serverseitig komplex,
+            // hier aktualisieren wir die MA-Liste direkt
+            zf_MA_Selektion();
+        }
+
         // ============================================
         // zf_MA_Selektion - Mitarbeiter-Liste aktualisieren
+        // Wie Original Access: upd_qry_Verfuegbarkeit mit allen Filtern
         // ============================================
         async function zf_MA_Selektion() {
             console.log('[VBA] zf_MA_Selektion');
 
-            // Filter-Werte sammeln
+            // Filter-Werte sammeln (alle 6 Filter wie in Access)
             const istAktiv = document.getElementById('IstAktiv')?.checked !== false;
             const anstArt = document.getElementById('cboAnstArt')?.value || '';
+            const cboQuali = document.getElementById('cboQuali')?.value || '';
+            const istVerfuegbar = document.getElementById('IstVerfuegbar')?.checked || false;
+            const cbVerplantVerfuegbar = document.getElementById('cbVerplantVerfuegbar')?.checked || false;
+            const cbNur34a = document.getElementById('cbNur34a')?.checked || false;
+
+            console.log('[zf_MA_Selektion] Filter:', { istAktiv, anstArt, cboQuali, istVerfuegbar, cbVerplantVerfuegbar, cbNur34a });
 
             try {
-                // REST API aufrufen
-                let url = `http://localhost:5000/api/mitarbeiter?aktiv=${istAktiv}`;
-                if (anstArt) url += `&anstellungsart=${anstArt}`;
+                // REST API aufrufen mit verfügbaren Filtern + view=table für alle Felder
+                let url = `http://localhost:5000/api/mitarbeiter?aktiv=${istAktiv}&filter_anstellung=false&view=table`;
+
+                // Anstellungsart-Filter
+                if (anstArt && anstArt !== '' && anstArt !== 'Alle') {
+                    url += `&anstellung=${anstArt}`;
+                }
 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Mitarbeiter nicht gefunden');
 
                 const result = await response.json();
                 if (result.success && result.data) {
-                    populateMitarbeiterListe(result.data);
+                    let mitarbeiter = result.data;
+
+                    // Clientseitige Filter anwenden (Access-Logik nachbilden)
+
+                    // Filter: Nur 34a (HatSachkunde = True UND Hat_keine_34a = False)
+                    if (cbNur34a) {
+                        mitarbeiter = mitarbeiter.filter(m =>
+                            m.HatSachkunde === true && m.Hat_keine_34a !== true
+                        );
+                        console.log('[zf_MA_Selektion] Nach 34a-Filter:', mitarbeiter.length);
+                    }
+
+                    // Filter: Kategorie/Qualifikation (Kategorie_ID aus tbl_MA_Mitarbeiterstamm)
+                    if (cboQuali && cboQuali !== '' && cboQuali !== 'Alle') {
+                        const qualiId = parseInt(cboQuali);
+                        mitarbeiter = mitarbeiter.filter(m =>
+                            m.Kategorie_ID === qualiId || m.Kategorie === qualiId
+                        );
+                        console.log('[zf_MA_Selektion] Nach Quali-Filter:', mitarbeiter.length);
+                    }
+
+                    // Verfügbarkeit wird komplex in Access berechnet (upd_qry_Verfuegbarkeit)
+                    // Das erfordert Datumsprüfung gegen tbl_MA_NVerfuegZeiten und tbl_MA_VA_Zuordnung
+                    // Vorerst: Logging, komplexe Filterung müsste serverseitig erfolgen
+                    if (istVerfuegbar) {
+                        console.log('[zf_MA_Selektion] IstVerfuegbar-Filter aktiv (Serverseite erforderlich)');
+                    }
+
+                    populateMitarbeiterListe(mitarbeiter);
 
                     // Gesamt-Anzeige aktualisieren
                     const iGesMA = document.getElementById('iGes_MA');
-                    if (iGesMA) iGesMA.value = result.data.length;
+                    if (iGesMA) iGesMA.value = mitarbeiter.length;
                 }
             } catch (err) {
                 console.error('[zf_MA_Selektion] Fehler:', err);
@@ -2856,6 +2889,7 @@
             document.getElementById('IstAktiv')?.addEventListener('change', IstAktiv_AfterUpdate);
             document.getElementById('cbVerplantVerfuegbar')?.addEventListener('change', cbVerplantVerfuegbar_AfterUpdate);
             document.getElementById('cbNur34a')?.addEventListener('change', cbNur34a_AfterUpdate);
+            document.getElementById('DienstEnde')?.addEventListener('change', DienstEnde_AfterUpdate);
             document.getElementById('VA_ID')?.addEventListener('change', async function() {
                 // Guard: Nicht erneut VAOpen aufrufen wenn bereits am Laden
                 if (_isVAOpenLoading) return;

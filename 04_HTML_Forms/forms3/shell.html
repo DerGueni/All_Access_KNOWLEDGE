@@ -861,8 +861,8 @@
                         break;
 
                     case 'loewensaalSync':
-                        // Löwensaal Daten synchronisieren
-                        vbaFunc = 'btn_LoewensaalSync_Click_FromHTML';
+                        // Löwensaal Daten synchronisieren - Original Access Funktion
+                        vbaFunc = 'HTML_btn_LoewensaalSync_Click';
                         break;
 
                     case 'loewensaalSyncHP':
@@ -989,27 +989,52 @@
                 console.log('[Shell] VBA Bridge Server nicht erreichbar, starte im Hintergrund...');
             }
 
-            // Server nicht erreichbar - versuche zu starten (im Hintergrund, ohne Alert)
+            // Server nicht erreichbar - versuche zu starten
+            // Methode 1: WebView2 (wenn via Access geöffnet)
             if (TabState.isWebView2 && window.chrome && window.chrome.webview) {
+                console.log('[Shell] Starte VBA Bridge via WebView2...');
                 window.chrome.webview.postMessage(JSON.stringify({
                     action: 'START_VBA_BRIDGE',
                     requestId: 'shell-auto-start-' + Date.now()
                 }));
-                // Retry nach 3 Sekunden (ohne Fehler-Alert)
-                setTimeout(async () => {
-                    try {
-                        const retry = await fetch('http://localhost:5002/api/health', {
-                            method: 'GET',
-                            signal: AbortSignal.timeout(2000)
-                        });
-                        if (retry.ok) {
-                            console.log('[Shell] VBA Bridge Server erfolgreich gestartet (Auto-Start)');
-                        }
-                    } catch (e) {
-                        console.warn('[Shell] VBA Bridge Auto-Start fehlgeschlagen - wird bei Bedarf erneut versucht');
-                    }
-                }, 3000);
             }
+            // Methode 2: API Server (Browser-Modus) - NEU!
+            else {
+                console.log('[Shell] Browser-Modus: Starte VBA Bridge via API Server...');
+                try {
+                    const startResponse = await fetch('http://localhost:5000/api/start-vba-bridge', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: AbortSignal.timeout(5000)
+                    });
+                    if (startResponse.ok) {
+                        const result = await startResponse.json();
+                        console.log('[Shell] VBA Bridge Start-Anfrage:', result.status);
+                        if (result.status === 'already_running') {
+                            console.log('[Shell] VBA Bridge läuft bereits');
+                            return true;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[Shell] VBA Bridge Start via API Server fehlgeschlagen:', e.message);
+                }
+            }
+
+            // Retry nach 3 Sekunden (ohne Fehler-Alert)
+            setTimeout(async () => {
+                try {
+                    const retry = await fetch('http://localhost:5002/api/health', {
+                        method: 'GET',
+                        signal: AbortSignal.timeout(2000)
+                    });
+                    if (retry.ok) {
+                        console.log('[Shell] VBA Bridge Server erfolgreich gestartet (Auto-Start)');
+                    }
+                } catch (e) {
+                    console.warn('[Shell] VBA Bridge Auto-Start fehlgeschlagen - E-Mail-Funktionen evtl. eingeschränkt');
+                }
+            }, 3000);
+
             return false;
         }
 

@@ -1,0 +1,307 @@
+/**
+ * UNIFIED HEADER DESIGN - CSS
+ *
+ * Einheitliches Header-Design für alle Hauptformulare in forms3/
+ *
+ * Erstellt: 15.01.2026
+ * Version: 1.0
+ *
+ * Verwendung:
+ * <link rel="stylesheet" href="css/unified-header.css">
+ */
+
+/* ============================================================================
+   CSS-VARIABLEN
+   ============================================================================ */
+
+:root {
+    --base-font-size: 11px;
+    --small-font-size: 10px;
+    --header-font-size: 12px;
+    --title-font-size: 16px;  /* Geändert auf 16px - 2026-01-16 */
+
+    /* Farben */
+    --header-bg: #ece9d8;
+    --logo-bg: #999999;
+    --logo-text: #ffffff;
+    --gpt-bg: #00ff00;
+    --btn-bg: #ece9d8;
+    --btn-border: #808080;
+    --text-primary: #000000;
+    --border-color: #808080;
+}
+
+/* ============================================================================
+   HEADER-ROW-WRAPPER (Haupt-Container)
+   ============================================================================ */
+
+.header-row-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 5px 5px 3px 5px;
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border-color);
+    gap: 5px;
+}
+
+/* ============================================================================
+   HEADER-ROW (Linker Bereich mit Logo, Titel, Buttons)
+   ============================================================================ */
+
+.header-row.combined-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    flex-wrap: nowrap;
+}
+
+/* ============================================================================
+   LOGO-BOX
+   ============================================================================ */
+
+.logo-box {
+    width: 40px;
+    height: 40px;
+    background-color: var(--logo-bg);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--logo-text);
+    flex-shrink: 0;
+}
+
+/* ============================================================================
+   FORMULARTITEL
+   ============================================================================ */
+
+.title-text {
+    font-size: var(--title-font-size);
+    font-weight: bold;
+    color: var(--text-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ============================================================================
+   BUTTONS
+   ============================================================================ */
+
+.btn.unified-btn {
+    padding: 4px 8px;
+    background-color: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 0;
+    cursor: pointer;
+    font-size: var(--base-font-size);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-primary);
+    white-space: nowrap;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn.unified-btn:hover {
+    background-color: #d4d0c8;
+}
+
+.btn.unified-btn:active {
+    background-color: #c0c0c0;
+    border-style: inset;
+}
+
+.btn.unified-btn:disabled {
+    color: #808080;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Button-Farben (Varianten) */
+.btn.unified-btn.btn-red {
+    background-color: #ffcccc;
+}
+
+.btn.unified-btn.btn-green {
+    background-color: #ccffcc;
+}
+
+.btn.unified-btn.btn-yellow {
+    background-color: #ffffcc;
+}
+
+.btn.unified-btn.btn-blue {
+    background-color: #ccccff;
+}
+
+/* ============================================================================
+   BUTTONS-GRID (Matrix-Layout)
+   ============================================================================ */
+
+.buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(6, auto);
+    grid-template-rows: repeat(2, auto);
+    gap: 4px;
+    margin-left: 0;
+}
+
+/* Checkbox-Group in Grid integriert */
+.buttons-grid .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.buttons-grid .checkbox-group input[type="checkbox"] {
+    width: 13px;
+    height: 13px;
+    margin: 0;
+}
+
+.buttons-grid .checkbox-group label {
+    font-size: var(--base-font-size);
+    margin: 0;
+    cursor: pointer;
+}
+
+/* ============================================================================
+   HEADER-LINKS (Text-Links ganz rechts)
+   ============================================================================ */
+
+.header-links {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-left: auto;
+}
+
+.header-link {
+    color: #0000ff;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: var(--base-font-size);
+    white-space: nowrap;
+}
+
+.header-link:hover {
+    color: #ff0000;
+}
+
+/* ============================================================================
+   GPT-BOX (Info-Box rechts)
+   ============================================================================ */
+
+.gpt-box {
+    width: 70px;
+    height: 70px;
+    background-color: var(--gpt-bg);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--base-font-size);
+    font-weight: bold;
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+
+.gpt-box span {
+    font-size: var(--small-font-size);
+    font-weight: normal;
+}
+
+/* ============================================================================
+   RESPONSIVE ANPASSUNGEN
+   ============================================================================ */
+
+@media screen and (max-width: 1400px) {
+    .title-text {
+        font-size: 20px;
+    }
+
+    .buttons-grid {
+        grid-template-columns: repeat(3, auto);
+        grid-template-rows: repeat(4, auto);
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .header-row.combined-buttons {
+        flex-wrap: wrap;
+    }
+
+    .title-text {
+        font-size: 18px;
+    }
+
+    .logo-box {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+    }
+
+    .gpt-box {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .buttons-grid {
+        grid-template-columns: repeat(2, auto);
+        grid-template-rows: repeat(6, auto);
+    }
+
+    .header-links {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+/* ============================================================================
+   UTILITY-KLASSEN
+   ============================================================================ */
+
+.header-spacer {
+    flex-grow: 1;
+}
+
+.header-divider {
+    width: 1px;
+    height: 30px;
+    background-color: var(--border-color);
+    margin: 0 8px;
+}
+
+/* ============================================================================
+   FULLSCREEN-MODUS (Anpassungen)
+   ============================================================================ */
+
+body.fullscreen-mode .header-row-wrapper {
+    padding: 8px 8px 5px 8px;
+}
+
+body.fullscreen-mode .title-text {
+    font-size: 28px;
+}
+
+body.fullscreen-mode .logo-box {
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+}
+
+body.fullscreen-mode .gpt-box {
+    width: 80px;
+    height: 80px;
+    font-size: 12px;
+}

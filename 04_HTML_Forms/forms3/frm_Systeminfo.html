@@ -6,65 +6,216 @@
     <title>Systeminfo - CONSYS</title>
     <link rel="stylesheet" href="consys-common.css">
     <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
         body { background-color: #8080c0; font-family: 'Segoe UI', sans-serif; font-size: 11px; margin: 0; }
         .window-frame { height: 100vh; display: flex; flex-direction: column; }
-        .title-bar {
-            display: none; /* ausgeblendet gemaess Anforderung */
-        }
         .content { flex: 1; padding: 20px; overflow: auto; }
         .info-section { background: white; border: 2px solid #404080; padding: 15px; margin-bottom: 15px; }
         .info-section h3 { margin: 0 0 10px 0; color: #000080; border-bottom: 1px solid #c0c0c0; padding-bottom: 5px; }
         .info-row { display: flex; padding: 4px 0; border-bottom: 1px solid #f0f0f0; }
         .info-label { width: 200px; font-weight: bold; color: #404040; }
         .info-value { flex: 1; }
-        .btn-close {
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            border: 2px outset #c0c0c0; padding: 5px 20px; cursor: pointer;
-            font-size: 11px; margin-top: 10px;
-        }
+        .memory-bar { width: 200px; height: 16px; background: #e0e0e0; border: 1px solid #808080; position: relative; }
+        .memory-fill { height: 100%; transition: width 0.3s, background-color 0.3s; }
+        .memory-text { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 10px; }
     </style>
-<link rel="stylesheet" href="css/visbug_overrides.css">
+    <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body>
+<body data-form="frm_Systeminfo">
     <div class="window-frame">
-        <div class="title-bar">
-            <span>â„¹ï¸ Systeminfo - CONSYS</span>
-            <button onclick="window.close()" style="background:red;color:white;border:none;padding:2px 8px;cursor:pointer;">Ã—</button>
+        <!-- Unified Header -->
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold;">Systeminfo</span>
+                <div class="buttons-grid">
+                    <button class="btn unified-btn" id="btnHelp" onclick="btnHelp_Click()">Hilfe</button>
+                    <button class="btn unified-btn" id="cmdOK" onclick="cmdOK_Click()">Schliessen</button>
+                </div>
+            </div>
+            <div class="gpt-box">CONSYS<span>Web</span></div>
         </div>
         <div class="content">
             <div class="info-section">
-                <h3>ðŸ“Š System</h3>
+                <h3>System</h3>
+                <div class="info-row"><span class="info-label">Datum:</span><span class="info-value" id="datum"></span></div>
                 <div class="info-row"><span class="info-label">Browser:</span><span class="info-value" id="browser"></span></div>
                 <div class="info-row"><span class="info-label">Plattform:</span><span class="info-value" id="platform"></span></div>
                 <div class="info-row"><span class="info-label">Bildschirm:</span><span class="info-value" id="screen"></span></div>
                 <div class="info-row"><span class="info-label">Sprache:</span><span class="info-value" id="language"></span></div>
+                <div class="info-row"><span class="info-label">Public IP:</span><span class="info-value" id="publicIP">Ermittle...</span></div>
             </div>
             <div class="info-section">
-                <h3>ðŸŒ API Server</h3>
-                <div class="info-row"><span class="info-label">URL:</span><span class="info-value">http://localhost:5000</span></div>
-                <div class="info-row"><span class="info-label">Status:</span><span class="info-value" id="apiStatus">Prüfe...</span></div>
+                <h3>Speicher (Browser)</h3>
+                <div class="info-row">
+                    <span class="info-label">JS Heap:</span>
+                    <span class="info-value">
+                        <div class="memory-bar">
+                            <div class="memory-fill" id="memoryFill" style="width:0%;background:#00ff00;"></div>
+                            <span class="memory-text" id="memoryText">-</span>
+                        </div>
+                    </span>
+                </div>
+                <div class="info-row"><span class="info-label">Heap Limit:</span><span class="info-value" id="heapLimit">-</span></div>
             </div>
             <div class="info-section">
-                <h3>ðŸ“‚ Anwendung</h3>
+                <h3>API Server</h3>
+                <div class="info-row"><span class="info-label">REST API (Port 5000):</span><span class="info-value" id="apiStatus">Pruefe...</span></div>
+                <div class="info-row"><span class="info-label">VBA Bridge (Port 5002):</span><span class="info-value" id="vbaBridgeStatus">Pruefe...</span></div>
+            </div>
+            <div class="info-section">
+                <h3>Anwendung</h3>
                 <div class="info-row"><span class="info-label">Version:</span><span class="info-value">CONSYS HTML v1.0</span></div>
                 <div class="info-row"><span class="info-label">Forms-Pfad:</span><span class="info-value" id="formsPath"></span></div>
+                <div class="info-row"><span class="info-label">Frontend:</span><span class="info-value" id="frontendPath">-</span></div>
+                <div class="info-row"><span class="info-label">Backend:</span><span class="info-value" id="backendPath">-</span></div>
             </div>
-            <button class="btn-close" onclick="window.close()">Schließen</button>
         </div>
     </div>
     <script>
-        document.getElementById('browser').textContent = navigator.userAgent.split(' ').slice(-2).join(' ');
-        document.getElementById('platform').textContent = navigator.platform;
-        document.getElementById('screen').textContent = `${screen.width} x ${screen.height}`;
-        document.getElementById('language').textContent = navigator.language;
-        document.getElementById('formsPath').textContent = window.location.pathname;
+        // === Form_Open (Access: Form_Open) ===
+        function Form_Open() {
+            // Datum setzen (wie Access: Me!lbl_Datum.caption = Date)
+            const heute = new Date();
+            document.getElementById('datum').textContent = heute.toLocaleDateString('de-DE');
 
-        fetch('http://localhost:5000/api/tables')
-            .then(r => r.ok ? 'Online' : 'Fehler')
-            .then(s => document.getElementById('apiStatus').textContent = s)
-            .catch(() => document.getElementById('apiStatus').textContent = 'Offline');
+            // Public IP ermitteln (wie Access: Me!PublicIP = GetPublicIP())
+            getPublicIP();
+        }
+
+        // === Form_Load (Access: Form_Load) ===
+        function Form_Load() {
+            // Browser-Infos
+            document.getElementById('browser').textContent = navigator.userAgent.split(' ').slice(-2).join(' ');
+            document.getElementById('platform').textContent = navigator.platform;
+            document.getElementById('screen').textContent = `${screen.width} x ${screen.height}`;
+            document.getElementById('language').textContent = navigator.language;
+            document.getElementById('formsPath').textContent = window.location.pathname;
+
+            // Memory-Info (wie Access: api_UpdateSysResInfo)
+            updateMemoryInfo();
+
+            // API Status pruefen
+            checkAPIStatus();
+
+            // Frontend/Backend Pfade laden
+            loadDatabasePaths();
+        }
+
+        // === cmdOK_Click (Access: cmdOK_Click) ===
+        function cmdOK_Click() {
+            // DoCmd.Close - Fenster schliessen
+            if (window.parent && window.parent !== window) {
+                // In iframe - Parent benachrichtigen
+                window.parent.postMessage({ type: 'CLOSE_FORM', form: 'frm_Systeminfo' }, '*');
+            } else {
+                window.close();
+            }
+        }
+
+        // === btnHelp_Click (Access: btnHelp_Click) ===
+        function btnHelp_Click() {
+            // DoCmd.OpenForm "frm_Hilfe_Anzeige"
+            alert('Hilfe fuer Systeminfo:\n\nDieses Formular zeigt Systeminformationen an.\n- API Status zeigt ob Server erreichbar sind\n- Speicher zeigt Browser-Heap-Auslastung');
+        }
+
+        // === GetPublicIP (Access: GetPublicIP) ===
+        async function getPublicIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                document.getElementById('publicIP').textContent = data.ip;
+            } catch (e) {
+                document.getElementById('publicIP').textContent = 'Nicht ermittelbar';
+            }
+        }
+
+        // === api_UpdateSysResInfo (Access-Equivalent) ===
+        function updateMemoryInfo() {
+            if (performance && performance.memory) {
+                const used = performance.memory.usedJSHeapSize;
+                const total = performance.memory.jsHeapSizeLimit;
+                const percent = Math.round((used / total) * 100);
+
+                const fill = document.getElementById('memoryFill');
+                const text = document.getElementById('memoryText');
+
+                fill.style.width = percent + '%';
+                text.textContent = percent + '%';
+
+                // Farben wie in Access
+                if (percent < 15) {
+                    fill.style.backgroundColor = '#00ff00'; // Gruen
+                } else if (percent < 50) {
+                    fill.style.backgroundColor = '#ffff00'; // Gelb
+                } else {
+                    fill.style.backgroundColor = '#ff0000'; // Rot
+                }
+
+                document.getElementById('heapLimit').textContent =
+                    Math.round(total / 1024 / 1024) + ' MB';
+            } else {
+                document.getElementById('memoryText').textContent = 'N/A';
+                document.getElementById('heapLimit').textContent = 'Nicht verfuegbar (nur Chrome)';
+            }
+        }
+
+        // === API Status pruefen ===
+        async function checkAPIStatus() {
+            // REST API (Port 5000)
+            try {
+                const response = await fetch('http://localhost:5000/api/tables', {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(3000)
+                });
+                document.getElementById('apiStatus').textContent = response.ok ? 'Online' : 'Fehler';
+                document.getElementById('apiStatus').style.color = response.ok ? 'green' : 'red';
+            } catch (e) {
+                document.getElementById('apiStatus').textContent = 'Offline';
+                document.getElementById('apiStatus').style.color = 'red';
+            }
+
+            // VBA Bridge (Port 5002)
+            try {
+                const response = await fetch('http://localhost:5002/api/status', {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(3000)
+                });
+                document.getElementById('vbaBridgeStatus').textContent = response.ok ? 'Online' : 'Fehler';
+                document.getElementById('vbaBridgeStatus').style.color = response.ok ? 'green' : 'red';
+            } catch (e) {
+                document.getElementById('vbaBridgeStatus').textContent = 'Offline';
+                document.getElementById('vbaBridgeStatus').style.color = 'red';
+            }
+        }
+
+        // === Datenbank-Pfade laden (wie Access: Info_Frontend/Info_Backend) ===
+        async function loadDatabasePaths() {
+            try {
+                const response = await fetch('http://localhost:5000/api/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.frontend) {
+                        document.getElementById('frontendPath').textContent = data.frontend;
+                    }
+                    if (data.backend) {
+                        document.getElementById('backendPath').textContent = data.backend;
+                    }
+                }
+            } catch (e) {
+                document.getElementById('frontendPath').textContent = 'API nicht erreichbar';
+                document.getElementById('backendPath').textContent = 'API nicht erreichbar';
+            }
+        }
+
+        // === Initialisierung ===
+        Form_Open();
+        Form_Load();
+
+        // Speicher-Update alle 5 Sekunden (wie Access Timer)
+        setInterval(updateMemoryInfo, 5000);
     </script>
 </body>
 </html>
-

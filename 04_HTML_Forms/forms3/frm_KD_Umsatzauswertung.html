@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <script>
+    // Auto-Load in Shell (Sidebar-Integration)
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isInShell = urlParams.has('shell') || window.SHELL_PARAMS;
+        const isInIframe = window.self !== window.top;
+        if (!isInShell && !isInIframe) {
+            const formName = window.location.pathname.split('/').pop();
+            const recordId = urlParams.get('id') || urlParams.get('kd_id');
+            let shellUrl = 'shell.html?form=' + formName;
+            if (recordId) shellUrl += '&id=' + recordId;
+            for (const [key, value] of urlParams.entries()) {
+                if (!['shell', 'id', 'kd_id', '_t'].includes(key)) {
+                    shellUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                }
+            }
+            console.log('[Auto-Redirect] Lade mit Sidebar:', shellUrl);
+            window.location.replace(shellUrl);
+        }
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kunden-Umsatzauswertung</title>
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* ============================================ */
+        /* LEFT SIDEBAR MENU                           */
+        /* ============================================ */
+
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            font-size: 12px;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #4040a0, #6060c0);
+            color: white;
+        }
+
+        /* ============================================ */
+        /* MAIN CONTENT                                */
+        /* ============================================ */
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        /* Header-Styles werden via unified-header.css geladen */
+
+        /* ============================================ */
+        /* FILTER BAR                                  */
+        /* ============================================ */
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            background: #d0d0e0;
+            padding: 8px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar label {
+            font-weight: bold;
+        }
+
+        .filter-bar input[type="date"],
+        .filter-bar select {
+            padding: 3px 5px;
+            border: 1px solid #808080;
+            font-size: 10px;
+        }
+
+        .filter-bar input[type="date"] {
+            width: 110px;
+        }
+
+        .filter-bar select {
+            min-width: 200px;
+        }
+
+        .filter-bar button {
+            padding: 4px 12px;
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .filter-bar button:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .filter-bar button.primary {
+            background: #95B3D7;
+        }
+
+        .filter-bar button.primary:hover {
+            background: #a5c3e7;
+        }
+
+        .filter-bar button.success {
+            background: linear-gradient(to bottom, #90c090, #60a060);
+            color: white;
+        }
+
+        .filter-bar button.success:hover {
+            background: linear-gradient(to bottom, #a0d0a0, #70b070);
+        }
+
+        /* Datum Bereich */
+        .date-section {
+            background-color: rgba(0,0,0,0.05);
+            border: 1px solid #5c0000;
+            border-radius: 3px;
+            padding: 5px 10px;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        /* Filter Gruppe */
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-separator {
+            width: 1px;
+            height: 24px;
+            background: #808080;
+            margin: 0 5px;
+        }
+
+        /* ============================================ */
+        /* UMSATZ GRID / TABELLE                       */
+        /* ============================================ */
+
+        .umsatz-grid {
+            flex: 1;
+            background: white;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            overflow: auto;
+        }
+
+        .umsatz-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        .umsatz-table th {
+            background: #000080;
+            color: white;
+            padding: 8px 6px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .umsatz-table th:hover {
+            background: #0000a0;
+        }
+
+        .umsatz-table th.sortable::after {
+            content: ' \25B4\25BE';
+            font-size: 8px;
+            opacity: 0.5;
+        }
+
+        .umsatz-table th.sort-asc::after {
+            content: ' \25B2';
+            opacity: 1;
+        }
+
+        .umsatz-table th.sort-desc::after {
+            content: ' \25BC';
+            opacity: 1;
+        }
+
+        .umsatz-table td {
+            padding: 6px;
+            border-bottom: 1px solid #d0d0d0;
+            font-size: 10px;
+            vertical-align: middle;
+        }
+
+        .umsatz-table tr {
+            cursor: pointer;
+        }
+
+        .umsatz-table tr:hover {
+            background: #e0e0ff;
+        }
+
+        .umsatz-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .umsatz-table tr:nth-child(even):hover {
+            background: #e0e0ff;
+        }
+
+        .umsatz-table tr.selected {
+            background: #b0b0ff !important;
+        }
+
+        /* Summenzeile */
+        .umsatz-table tr.summe-row {
+            background: #d0d0e0 !important;
+            font-weight: bold;
+            border-top: 3px solid #000080;
+        }
+
+        .umsatz-table tr.summe-row:hover {
+            background: #d0d0e0 !important;
+        }
+
+        /* Spaltenbreiten */
+        .col-monat { width: 100px; }
+        .col-jahr { width: 80px; text-align: center; }
+        .col-umsatz { width: 120px; text-align: right; }
+        .col-anzahl { width: 100px; text-align: center; }
+        .col-durchschnitt { width: 120px; text-align: right; }
+
+        /* Zahlenformatierung */
+        .currency {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        .number {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* ============================================ */
+        /* FOOTER BAR                                  */
+        /* ============================================ */
+
+        .footer-bar {
+            background: #d0d0e0;
+            padding: 5px 10px;
+            margin-top: 10px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bar .status-text {
+            font-weight: bold;
+        }
+
+        .footer-bar .record-info {
+            color: #666;
+        }
+
+        /* ============================================ */
+        /* LOADING OVERLAY                             */
+        /* ============================================ */
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 20px 40px;
+            border: 2px solid #000080;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .loading-spinner::before {
+            content: '';
+            width: 24px;
+            height: 24px;
+            border: 3px solid #ddd;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================ */
+        /* TOAST CONTAINER                             */
+        /* ============================================ */
+
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: #333;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            min-width: 250px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.success { background-color: #28a745; }
+        .toast.error { background-color: #dc3545; }
+        .toast.warning { background-color: #ffc107; color: #000; }
+        .toast.info { background-color: #17a2b8; }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Statistik-Boxen */
+        .stats-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: white;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-box .label {
+            font-size: 9px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .stat-box .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000080;
+            margin-top: 5px;
+        }
+    </style>
+    <script src="js/webview2-bridge.js"></script>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-active-menu="umsatzauswertung" data-form="frm_KD_Umsatzauswertung">
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- LEFT SIDEBAR MENU -->
+    <div class="left-menu">
+        <div class="menu-header">HAUPTMENUE</div>
+        <button class="menu-btn" onclick="navigateToForm('frm_N_Dienstplanuebersicht')">Dienstplanübersicht</button>
+        <button class="menu-btn" onclick="navigateToForm('frm_VA_Planungsuebersicht')">Planungsübersicht</button>
+        <button class="menu-btn" onclick="navigateToForm('frm_va_Auftragstamm')">Auftragsverwaltung</button>
+        <button class="menu-btn" onclick="navigateToForm('frm_KD_Kundenstamm')">Kundenverwaltung</button>
+        <button class="menu-btn" onclick="navigateToForm('frm_MA_Mitarbeiterstamm')">Mitarbeiterverwaltung</button>
+        <button class="menu-btn active">Umsatzauswertung</button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Unified Header -->
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold;">Kunden-Umsatzauswertung</span>
+                <div class="buttons-grid">
+                    <span id="lbl_Version" style="font-size: 9px; opacity: 0.7; margin-right: 5px;">Version</span>
+                    <span id="lbl_Datum" style="font-size: 10px; font-weight: bold; margin-right: 10px;"></span>
+                    <button class="btn unified-btn" id="btnClose" onclick="closeForm()" title="Schliessen">X</button>
+                </div>
+            </div>
+            <div class="gpt-box">CONSYS<span>Web</span></div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <!-- Kunden Auswahl -->
+            <div class="filter-group">
+                <label for="cboKunde">Kunde:</label>
+                <select id="cboKunde" onchange="cboKunde_Change()">
+                    <option value="">-- Alle Kunden --</option>
+                </select>
+            </div>
+
+            <div class="filter-separator"></div>
+
+            <!-- Datum Bereich -->
+            <div class="date-section">
+                <label>Von:</label>
+                <input type="date" id="dtVonDatum">
+                <label>Bis:</label>
+                <input type="date" id="dtBisDatum">
+                <button id="btnAktualisieren" onclick="btnAktualisieren_Click()">Aktualisieren</button>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="filter-group">
+                <button id="btnJahrZurueck" onclick="btnJahrZurueck_Click()" title="Jahr zurück">&lt;&lt;</button>
+                <button id="btnHeute" onclick="btnHeute_Click()" class="primary">Aktuelles Jahr</button>
+                <button id="btnJahrVor" onclick="btnJahrVor_Click()" title="Jahr vor">&gt;&gt;</button>
+            </div>
+
+            <div class="filter-separator"></div>
+
+            <!-- Export Buttons -->
+            <button id="btnExportCSV" onclick="btnExportCSV_Click()" title="CSV-Export">Export CSV</button>
+            <button id="btnDrucken" onclick="btnDrucken_Click()" title="Drucken">Drucken</button>
+        </div>
+
+        <!-- Statistik-Boxen -->
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="label">Gesamtumsatz</div>
+                <div class="value" id="statGesamtumsatz">0,00 €</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">Anzahl Aufträge</div>
+                <div class="value" id="statAnzahlAuftraege">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">Durchschnitt/Monat</div>
+                <div class="value" id="statDurchschnitt">0,00 €</div>
+            </div>
+        </div>
+
+        <!-- Umsatz Grid -->
+        <div class="umsatz-grid">
+            <table class="umsatz-table" id="tblUmsatz">
+                <thead>
+                    <tr>
+                        <th class="col-jahr sortable" data-sort="jahr" onclick="sortTable('jahr')">Jahr</th>
+                        <th class="col-monat sortable" data-sort="monat" onclick="sortTable('monat')">Monat</th>
+                        <th class="col-umsatz sortable" data-sort="umsatz" onclick="sortTable('umsatz')">Umsatz</th>
+                        <th class="col-anzahl sortable" data-sort="anzahl" onclick="sortTable('anzahl')">Anzahl Aufträge</th>
+                        <th class="col-durchschnitt sortable" data-sort="durchschnitt" onclick="sortTable('durchschnitt')">Ø pro Auftrag</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyUmsatz">
+                    <tr><td colspan="5" style="text-align:center; padding:40px;">Lade Daten...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-bar">
+            <span class="status-text" id="lblStatus">Bereit</span>
+            <span class="record-info" id="lblRecordInfo">0 Einträge</span>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">Lade Umsatzdaten...</div>
+    </div>
+
+    <script>
+        // ============================================
+        // GLOBALE VARIABLEN
+        // ============================================
+        const API_BASE = 'http://localhost:5000/api';
+        let alleKunden = [];
+        let alleAuftraege = [];
+        let umsatzDaten = [];
+        let currentSort = { field: 'jahr', direction: 'desc' };
+
+        // ============================================
+        // INITIALISIERUNG
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('[frm_KD_Umsatzauswertung] Initialisiere...');
+
+            // Datum heute anzeigen
+            document.getElementById('lbl_Datum').textContent = new Date().toLocaleDateString('de-DE');
+            document.getElementById('lbl_Version').textContent = 'v1.0';
+
+            // Standard-Zeitraum: Aktuelles Jahr
+            setzeAktuellesJahr();
+
+            // Lade Kunden
+            await ladeKunden();
+
+            // URL-Parameter prüfen
+            const urlParams = new URLSearchParams(window.location.search);
+            const kdId = urlParams.get('id') || urlParams.get('kd_id');
+            if (kdId) {
+                document.getElementById('cboKunde').value = kdId;
+            }
+
+            // Lade initiale Daten
+            await ladeUmsatzDaten();
+        });
+
+        // ============================================
+        // KUNDEN LADEN
+        // ============================================
+        async function ladeKunden() {
+            try {
+                showLoading(true);
+                const response = await fetch(`${API_BASE}/kunden`);
+                if (!response.ok) throw new Error('Fehler beim Laden der Kunden');
+
+                alleKunden = await response.json();
+
+                const select = document.getElementById('cboKunde');
+                select.innerHTML = '<option value="">-- Alle Kunden --</option>';
+
+                alleKunden
+                    .filter(k => k.kun_IstAktiv)
+                    .sort((a, b) => (a.kun_Firma || '').localeCompare(b.kun_Firma || ''))
+                    .forEach(kunde => {
+                        const option = document.createElement('option');
+                        option.value = kunde.kun_Id;
+                        option.textContent = kunde.kun_Firma;
+                        select.appendChild(option);
+                    });
+
+                console.log(`[Kunden] ${alleKunden.length} Kunden geladen`);
+            } catch (error) {
+                console.error('[Kunden] Fehler:', error);
+                showToast('Fehler beim Laden der Kunden: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // ============================================
+        // UMSATZDATEN LADEN
+        // ============================================
+        async function ladeUmsatzDaten() {
+            try {
+                showLoading(true);
+                document.getElementById('lblStatus').textContent = 'Lade Daten...';
+
+                // Filter-Werte
+                const kundeId = document.getElementById('cboKunde').value;
+                const vonDatum = document.getElementById('dtVonDatum').value;
+                const bisDatum = document.getElementById('dtBisDatum').value;
+
+                // Lade Aufträge
+                let url = `${API_BASE}/auftraege`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Fehler beim Laden der Aufträge');
+
+                alleAuftraege = await response.json();
+                console.log(`[Aufträge] ${alleAuftraege.length} Aufträge geladen`);
+
+                // Filter Aufträge nach Kunde und Zeitraum
+                let gefiltert = alleAuftraege.filter(a => {
+                    // Kunden-Filter
+                    if (kundeId && a.Veranstalter_ID != kundeId) return false;
+
+                    // Zeitraum-Filter (basierend auf VADatum_Erste oder CreatedDate)
+                    const auftragDatum = a.VADatum_Erste || a.CreatedDate;
+                    if (auftragDatum) {
+                        const datum = new Date(auftragDatum);
+                        if (vonDatum && datum < new Date(vonDatum)) return false;
+                        if (bisDatum && datum > new Date(bisDatum)) return false;
+                    }
+
+                    return true;
+                });
+
+                console.log(`[Filter] ${gefiltert.length} Aufträge nach Filter`);
+
+                // Berechne Umsatz pro Monat
+                umsatzDaten = berechneMonatsumsatz(gefiltert);
+
+                // Anzeige aktualisieren
+                zeigeUmsatzDaten();
+                aktualisiereStatistik();
+
+                document.getElementById('lblStatus').textContent = 'Bereit';
+                document.getElementById('lblRecordInfo').textContent = `${umsatzDaten.length} Monate`;
+
+            } catch (error) {
+                console.error('[Umsatzauswertung] Fehler:', error);
+                showToast('Fehler beim Laden der Umsatzdaten: ' + error.message, 'error');
+                document.getElementById('lblStatus').textContent = 'Fehler';
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // ============================================
+        // UMSATZ PRO MONAT BERECHNEN
+        // ============================================
+        function berechneMonatsumsatz(auftraege) {
+            const monatMap = new Map();
+
+            auftraege.forEach(auftrag => {
+                const datum = new Date(auftrag.VADatum_Erste || auftrag.CreatedDate || Date.now());
+                const jahr = datum.getFullYear();
+                const monat = datum.getMonth() + 1;
+                const key = `${jahr}-${String(monat).padStart(2, '0')}`;
+
+                if (!monatMap.has(key)) {
+                    monatMap.set(key, {
+                        jahr: jahr,
+                        monat: monat,
+                        monatName: getMonatName(monat),
+                        umsatz: 0,
+                        anzahl: 0,
+                        auftraege: []
+                    });
+                }
+
+                const eintrag = monatMap.get(key);
+                eintrag.anzahl++;
+                eintrag.auftraege.push(auftrag);
+
+                // Umsatz berechnen (aus Gesamtsumme oder geschätzt)
+                const umsatz = auftrag.Gesamtsumme || auftrag.Gesamt_Netto || 0;
+                eintrag.umsatz += parseFloat(umsatz) || 0;
+            });
+
+            // Zu Array konvertieren
+            const result = Array.from(monatMap.values());
+
+            // Sortieren nach Jahr/Monat
+            result.sort((a, b) => {
+                if (a.jahr !== b.jahr) return b.jahr - a.jahr;
+                return b.monat - a.monat;
+            });
+
+            return result;
+        }
+
+        // ============================================
+        // UMSATZDATEN ANZEIGEN
+        // ============================================
+        function zeigeUmsatzDaten() {
+            const tbody = document.getElementById('tbodyUmsatz');
+            tbody.innerHTML = '';
+
+            if (umsatzDaten.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">Keine Daten im gewählten Zeitraum</td></tr>';
+                return;
+            }
+
+            // Sortierung anwenden
+            const sortiert = [...umsatzDaten].sort((a, b) => {
+                let valA = a[currentSort.field];
+                let valB = b[currentSort.field];
+
+                if (currentSort.field === 'durchschnitt') {
+                    valA = a.anzahl > 0 ? a.umsatz / a.anzahl : 0;
+                    valB = b.anzahl > 0 ? b.umsatz / b.anzahl : 0;
+                }
+
+                if (typeof valA === 'number') {
+                    return currentSort.direction === 'asc' ? valA - valB : valB - valA;
+                } else {
+                    return currentSort.direction === 'asc'
+                        ? String(valA).localeCompare(String(valB))
+                        : String(valB).localeCompare(String(valA));
+                }
+            });
+
+            // Zeilen erstellen
+            sortiert.forEach((zeile, idx) => {
+                const tr = document.createElement('tr');
+                tr.dataset.index = idx;
+
+                const durchschnitt = zeile.anzahl > 0 ? zeile.umsatz / zeile.anzahl : 0;
+
+                tr.innerHTML = `
+                    <td class="col-jahr">${zeile.jahr}</td>
+                    <td class="col-monat">${zeile.monatName}</td>
+                    <td class="col-umsatz currency">${formatCurrency(zeile.umsatz)}</td>
+                    <td class="col-anzahl number">${zeile.anzahl}</td>
+                    <td class="col-durchschnitt currency">${formatCurrency(durchschnitt)}</td>
+                `;
+
+                tr.onclick = () => selectRow(tr);
+                tbody.appendChild(tr);
+            });
+
+            // Summenzeile hinzufügen
+            const summe = {
+                umsatz: sortiert.reduce((sum, z) => sum + z.umsatz, 0),
+                anzahl: sortiert.reduce((sum, z) => sum + z.anzahl, 0)
+            };
+            const durchschnittGesamt = summe.anzahl > 0 ? summe.umsatz / summe.anzahl : 0;
+
+            const trSumme = document.createElement('tr');
+            trSumme.className = 'summe-row';
+            trSumme.innerHTML = `
+                <td colspan="2" style="text-align:right; padding-right:10px;">SUMME:</td>
+                <td class="col-umsatz currency">${formatCurrency(summe.umsatz)}</td>
+                <td class="col-anzahl number">${summe.anzahl}</td>
+                <td class="col-durchschnitt currency">${formatCurrency(durchschnittGesamt)}</td>
+            `;
+            tbody.appendChild(trSumme);
+        }
+
+        // ============================================
+        // STATISTIK AKTUALISIEREN
+        // ============================================
+        function aktualisiereStatistik() {
+            const gesamtumsatz = umsatzDaten.reduce((sum, z) => sum + z.umsatz, 0);
+            const anzahlAuftraege = umsatzDaten.reduce((sum, z) => sum + z.anzahl, 0);
+            const durchschnitt = umsatzDaten.length > 0 ? gesamtumsatz / umsatzDaten.length : 0;
+
+            document.getElementById('statGesamtumsatz').textContent = formatCurrency(gesamtumsatz);
+            document.getElementById('statAnzahlAuftraege').textContent = anzahlAuftraege;
+            document.getElementById('statDurchschnitt').textContent = formatCurrency(durchschnitt);
+        }
+
+        // ============================================
+        // SORTIERUNG
+        // ============================================
+        function sortTable(field) {
+            if (currentSort.field === field) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'asc';
+            }
+
+            // Header-Markierung aktualisieren
+            document.querySelectorAll('.umsatz-table th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (th.dataset.sort === field) {
+                    th.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                }
+            });
+
+            zeigeUmsatzDaten();
+        }
+
+        // ============================================
+        // ZEILEN-AUSWAHL
+        // ============================================
+        function selectRow(tr) {
+            document.querySelectorAll('.umsatz-table tbody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+        }
+
+        // ============================================
+        // EVENT HANDLER
+        // ============================================
+        function cboKunde_Change() {
+            ladeUmsatzDaten();
+        }
+
+        function btnAktualisieren_Click() {
+            ladeUmsatzDaten();
+        }
+
+        function btnHeute_Click() {
+            setzeAktuellesJahr();
+            ladeUmsatzDaten();
+        }
+
+        function btnJahrZurueck_Click() {
+            const vonDatum = new Date(document.getElementById('dtVonDatum').value);
+            vonDatum.setFullYear(vonDatum.getFullYear() - 1);
+            const bisDatum = new Date(document.getElementById('dtBisDatum').value);
+            bisDatum.setFullYear(bisDatum.getFullYear() - 1);
+
+            document.getElementById('dtVonDatum').value = formatDate(vonDatum);
+            document.getElementById('dtBisDatum').value = formatDate(bisDatum);
+            ladeUmsatzDaten();
+        }
+
+        function btnJahrVor_Click() {
+            const vonDatum = new Date(document.getElementById('dtVonDatum').value);
+            vonDatum.setFullYear(vonDatum.getFullYear() + 1);
+            const bisDatum = new Date(document.getElementById('dtBisDatum').value);
+            bisDatum.setFullYear(bisDatum.getFullYear() + 1);
+
+            document.getElementById('dtVonDatum').value = formatDate(vonDatum);
+            document.getElementById('dtBisDatum').value = formatDate(bisDatum);
+            ladeUmsatzDaten();
+        }
+
+        function btnExportCSV_Click() {
+            try {
+                let csv = 'Jahr;Monat;Umsatz;Anzahl Aufträge;Durchschnitt\n';
+
+                umsatzDaten.forEach(zeile => {
+                    const durchschnitt = zeile.anzahl > 0 ? zeile.umsatz / zeile.anzahl : 0;
+                    csv += `${zeile.jahr};${zeile.monatName};${zeile.umsatz.toFixed(2)};${zeile.anzahl};${durchschnitt.toFixed(2)}\n`;
+                });
+
+                // Summenzeile
+                const summeUmsatz = umsatzDaten.reduce((sum, z) => sum + z.umsatz, 0);
+                const summeAnzahl = umsatzDaten.reduce((sum, z) => sum + z.anzahl, 0);
+                const summeDurch = summeAnzahl > 0 ? summeUmsatz / summeAnzahl : 0;
+                csv += `SUMME;;${summeUmsatz.toFixed(2)};${summeAnzahl};${summeDurch.toFixed(2)}\n`;
+
+                // Download
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'umsatzauswertung_' + new Date().toISOString().split('T')[0] + '.csv';
+                link.click();
+
+                showToast('CSV-Export erfolgreich', 'success');
+            } catch (error) {
+                console.error('[Export] Fehler:', error);
+                showToast('Fehler beim CSV-Export: ' + error.message, 'error');
+            }
+        }
+
+        function btnDrucken_Click() {
+            window.print();
+            showToast('Druckdialog geöffnet', 'info');
+        }
+
+        function closeForm() {
+            if (window.parent && window.parent.closeCurrentForm) {
+                window.parent.closeCurrentForm();
+            } else {
+                window.close();
+            }
+        }
+
+        function navigateToForm(formName) {
+            if (window.parent && window.parent.navigateToForm) {
+                window.parent.navigateToForm(formName);
+            } else {
+                window.location.href = formName + '.html';
+            }
+        }
+
+        // ============================================
+        // HILFSFUNKTIONEN
+        // ============================================
+        function setzeAktuellesJahr() {
+            const heute = new Date();
+            const jahresAnfang = new Date(heute.getFullYear(), 0, 1);
+            const jahresEnde = new Date(heute.getFullYear(), 11, 31);
+
+            document.getElementById('dtVonDatum').value = formatDate(jahresAnfang);
+            document.getElementById('dtBisDatum').value = formatDate(jahresEnde);
+        }
+
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(value || 0);
+        }
+
+        function getMonatName(monat) {
+            const monate = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                           'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+            return monate[monat - 1] || '';
+        }
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+    <script src="js/shell-detector.js"></script>
+    <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
+    <script src="js/server-watchdog.js"></script>
+</body>
+</html>

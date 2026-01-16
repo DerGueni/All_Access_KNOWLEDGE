@@ -1,10 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bewerberverwaltung</title>
-        <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
         * {
             margin: 0;
@@ -63,16 +65,10 @@
             flex-direction: column;
             padding: 10px;
             overflow: hidden;
-        }
+        
+            min-width: 0;}
 
-        .header-bar {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 8px 15px;
-            font-size: 22px; /* Formulartitel +8px (war 14px) gemaess Anforderung */
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
+        /* header-bar durch unified-header ersetzt */
 
         .toolbar {
             display: flex;
@@ -83,7 +79,8 @@
             padding: 8px;
             border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
-        }
+        
+    flex-wrap: wrap;}
 
         .toolbar input { padding: 3px 5px; border: 1px solid #808080; flex: 1; max-width: 250px; }
         .toolbar select { padding: 3px 5px; border: 1px solid #808080; }
@@ -200,7 +197,7 @@
     <script src="js/webview2-bridge.js"></script>
 <link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body data-active-menu="bewerber">
+<body data-active-menu="bewerber" data-form="frm_N_Bewerber">
     <div class="left-menu">
         <div class="menu-header">PERSONAL</div>
         <button class="menu-btn" onclick="Bridge.navigate('mitarbeiterstamm')">Mitarbeiterstamm</button>
@@ -211,10 +208,19 @@
     </div>
 
     <div class="main-content">
-        <div class="header-bar">Bewerberverwaltung</div>
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold;">Bewerberverwaltung</span>
+                <div class="buttons-grid">
+                    <!-- Toolbar-Buttons werden unten im toolbar-Bereich belassen -->
+                </div>
+            </div>
+            <div class="gpt-box">CONSYS<span>Web</span></div>
+        </div>
 
         <div class="toolbar">
-            <input type="text" id="txtSuche" placeholder="Suche nach Name..." onkeyup="filterBewerber()">
+            <input type="text" id="txtSuche" placeholder="Suche nach Name..." onkeyup="filterBewerber()" style="flex: 1; min-width: 200px;">
             <select id="cboStatus" onchange="filterBewerber()">
                 <option value="">Alle Status</option>
                 <option value="Neu">Neu</option>
@@ -305,7 +311,9 @@
     <script>
         let bewerber = [];
         let selectedBewerber = null;
+        // API_BASE wird von webview2-bridge.js bereitgestellt
 
+        // REST-API Fallback fuer Browser-Modus
         Bridge.on('onDataReceived', function(data) {
             if (data.type === 'bewerber') {
                 bewerber = data.records || data.data || [];
@@ -330,7 +338,23 @@
                 return;
             }
 
-            tbody.innerHTML = data.map((b, idx) => {
+            // Normalisiere Feldnamen (API: BW_xxx vs HTML: xxx)
+            const normalizedData = data.map(b => ({
+                ID: b.ID,
+                Nachname: b.Nachname || b.BW_Nachname || '',
+                Vorname: b.Vorname || b.BW_Vorname || '',
+                Email: b.Email || b.BW_Email || '',
+                Telefon: b.Telefon || b.BW_Telefon || '',
+                Geburtsdatum: b.Geburtsdatum || b.BW_Geburtsdatum || '',
+                Eingangsdatum: b.Eingangsdatum || b.BW_Eingang || '',
+                Status: b.Status || b.BW_Status || 'Neu',
+                Bemerkungen: b.Bemerkungen || b.BW_Bemerkungen || ''
+            }));
+
+            // Speichere normalisierte Daten global
+            bewerber = normalizedData;
+
+            tbody.innerHTML = normalizedData.map((b, idx) => {
                 const statusClass = 'status-' + (b.Status || 'neu').toLowerCase();
                 return `<tr onclick="selectBewerber(${idx})" data-idx="${idx}">
                     <td>${b.Nachname}, ${b.Vorname}</td>
@@ -339,7 +363,7 @@
                 </tr>`;
             }).join('');
 
-            document.getElementById('lblRecordInfo').textContent = data.length + ' Bewerber';
+            document.getElementById('lblRecordInfo').textContent = normalizedData.length + ' Bewerber';
         }
 
         function selectBewerber(idx) {
@@ -391,7 +415,7 @@
             selectedBewerber = null;
         }
 
-        function saveBewerber() {
+        async function saveBewerber() {
             const data = {};
             document.querySelectorAll('[data-field]').forEach(el => {
                 data[el.dataset.field] = el.value;
@@ -402,33 +426,116 @@
                 return;
             }
 
-            if (selectedBewerber) {
-                data.ID = selectedBewerber.ID;
-            }
-
-            Bridge.sendEvent('saveBewerber', data);
             document.getElementById('lblStatus').textContent = 'Speichere...';
+
+            // REST-API Fallback fuer Browser-Modus
+            const isBrowserMode = !window.chrome?.webview;
+
+            if (isBrowserMode) {
+                try {
+                    const url = selectedBewerber
+                        ? `${API_BASE}/bewerber/${selectedBewerber.ID}`
+                        : `${API_BASE}/bewerber`;
+                    const method = selectedBewerber ? 'PUT' : 'POST';
+
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        document.getElementById('lblStatus').textContent = 'Gespeichert';
+                        loadData();
+                    } else {
+                        document.getElementById('lblStatus').textContent = 'Fehler: ' + (result.error || 'Unbekannt');
+                    }
+                } catch (err) {
+                    console.error('Speichern fehlgeschlagen:', err);
+                    document.getElementById('lblStatus').textContent = 'Fehler: ' + err.message;
+                }
+            } else {
+                // WebView2-Modus
+                if (selectedBewerber) {
+                    data.ID = selectedBewerber.ID;
+                }
+                Bridge.sendEvent('saveBewerber', data);
+            }
         }
 
-        function uebernehmenAlsMA() {
+        async function uebernehmenAlsMA() {
             if (!selectedBewerber) {
-                alert('Bitte Bewerber auswählen');
+                alert('Bitte Bewerber auswaehlen');
                 return;
             }
 
-            if (confirm('Bewerber als Mitarbeiter übernehmen?')) {
+            if (!confirm('Bewerber als Mitarbeiter uebernehmen?')) {
+                return;
+            }
+
+            document.getElementById('lblStatus').textContent = 'Uebernehme...';
+
+            // REST-API Fallback fuer Browser-Modus
+            const isBrowserMode = !window.chrome?.webview;
+
+            if (isBrowserMode) {
+                try {
+                    const response = await fetch(`${API_BASE}/bewerber/${selectedBewerber.ID}/accept`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        document.getElementById('lblStatus').textContent = 'Bewerber als MA uebernommen';
+                        alert('Bewerber wurde als Mitarbeiter uebernommen!');
+                        loadData();
+                    } else {
+                        document.getElementById('lblStatus').textContent = 'Fehler: ' + (result.error || 'Unbekannt');
+                    }
+                } catch (err) {
+                    console.error('Uebernahme fehlgeschlagen:', err);
+                    document.getElementById('lblStatus').textContent = 'Fehler: ' + err.message;
+                }
+            } else {
+                // WebView2-Modus
                 Bridge.sendEvent('bewerberZuMA', { id: selectedBewerber.ID });
-                document.getElementById('lblStatus').textContent = 'Übernehme...';
             }
         }
 
-        function loadData() {
+        async function loadData() {
             document.getElementById('lblStatus').textContent = 'Lade...';
-            Bridge.loadData('bewerber');
+
+            // REST-API Fallback fuer Browser-Modus
+            const isBrowserMode = !window.chrome?.webview;
+
+            if (isBrowserMode) {
+                try {
+                    const response = await fetch(`${API_BASE}/bewerber`);
+                    const result = await response.json();
+
+                    if (result.success && result.data) {
+                        bewerber = result.data;
+                        renderBewerber(bewerber);
+                        document.getElementById('lblStatus').textContent = 'Bereit';
+                    } else {
+                        document.getElementById('lblStatus').textContent = 'Fehler beim Laden';
+                        console.error('API Fehler:', result.error);
+                    }
+                } catch (err) {
+                    console.error('Laden fehlgeschlagen:', err);
+                    document.getElementById('lblStatus').textContent = 'API nicht erreichbar';
+                }
+            } else {
+                // WebView2-Modus
+                Bridge.loadData('bewerber');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
 </html>
+
 

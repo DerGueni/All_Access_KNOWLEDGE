@@ -31,7 +31,16 @@
 
     <title>Objektstamm - CONSYS</title>
 
+    <link rel="stylesheet" href="css/unified-header.css">
+
     <style>
+
+        :root {
+            --base-font-size: 11px;
+            --small-font-size: 10px;
+            --header-font-size: 12px;
+            --title-font-size: 24px;
+        }
 
         * {
 
@@ -153,7 +162,8 @@
 
             overflow: hidden;
 
-        }
+        
+            min-width: 0;}
 
 
 
@@ -367,7 +377,7 @@
 
             flex: 1;
 
-            background-color: #8080c0;
+            background-color: #d3d3d3;
 
             padding: 3px;
 
@@ -387,7 +397,7 @@
 
         .header-row {
 
-            background-color: #9090c0;
+            background-color: #d3d3d3;
 
             border: 1px solid #606090;
 
@@ -405,41 +415,7 @@
 
 
 
-        .logo-box {
-
-            width: 36px;
-
-            height: 36px;
-
-            background: linear-gradient(135deg, #4040a0, #8080c0);
-
-            border: 2px solid #404080;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            color: white;
-
-            font-weight: bold;
-
-            font-size: 16px;
-
-        }
-
-
-
-        .title-text {
-
-            font-size: 23px !important; /* Formulartitel +8px gemaess Anforderung */
-
-            font-weight: bold !important;
-
-            color: #000080;
-
-        }
+        /* logo-box und title-text - Überschrieben durch unified-header.css */
 
 
 
@@ -1469,80 +1445,58 @@
 
             <div class="content-area">
 
-                <!-- Header Row -->
+                <!-- Header Row - Unified Design -->
+                <div class="header-row-wrapper">
+                    <div class="header-row combined-buttons">
+                        <!-- Logo-Box links -->
+                        <div class="logo-box">OB</div>
 
-                <div class="header-row">
+                        <!-- Formulartitel -->
+                        <span class="title-text">Objektstammdaten</span>
 
-                    <div class="logo-box">OB</div>
+                        <!-- Navigation direkt nach Titel -->
+                        <div style="display: flex; align-items: center; gap: 4px; margin-left: 15px;">
+                            <button class="btn unified-btn" onclick="goFirst()" title="Erster" data-testid="objekt-btn-erste">|&lt;</button>
+                            <button class="btn unified-btn" onclick="goPrev()" title="Zurück" data-testid="objekt-btn-vorige">&lt;</button>
+                            <span class="record-info" id="recordInfo" style="font-size: var(--base-font-size); padding: 0 8px;">0 / 0</span>
+                            <button class="btn unified-btn" onclick="goNext()" title="Vor" data-testid="objekt-btn-naechste">&gt;</button>
+                            <button class="btn unified-btn" onclick="goLast()" title="Letzter" data-testid="objekt-btn-letzte">&gt;|</button>
+                        </div>
 
-                    <div class="title-text">Objektstammdaten</div>
+                        <!-- Formular-spezifische Buttons in Grid -->
+                        <div class="buttons-grid">
+                            <!-- Zeile 1: 6 Buttons -->
+                            <button class="btn unified-btn btn-green" onclick="newRecord()" data-testid="objekt-btn-neu">+ Neu</button>
+                            <button class="btn unified-btn btn-yellow" onclick="saveRecord()" data-testid="objekt-btn-speichern">Speichern</button>
+                            <button class="btn unified-btn btn-red" onclick="deleteRecord()" data-testid="objekt-btn-loeschen">Löschen</button>
+                            <button class="btn unified-btn" onclick="printReport()" data-testid="objekt-btn-bericht">Bericht</button>
+                            <button class="btn unified-btn" onclick="openNewVeranstalter()" data-testid="objekt-btn-neuer-veranstalter">Neuer Veranstalter</button>
+                            <button class="btn unified-btn" onclick="geocodeAdresse()" title="Adresse geocodieren (OSM)" data-testid="objekt-btn-geocode">Geocode</button>
 
-                    <div class="header-links">
+                            <!-- Zeile 2: Checkbox + Hilfe -->
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="chkNurAktive" checked onchange="loadObjekte()" data-testid="objekt-checkbox-nuraktive">
+                                <label for="chkNurAktive">Nur aktive</label>
+                            </div>
+                            <button class="btn unified-btn" onclick="showHelp()" title="Hilfe anzeigen" data-testid="objekt-btn-hilfe">?</button>
+                            <button class="btn unified-btn" id="btnBackToList" onclick="backToAktPosList()" style="display:none;" data-testid="objekt-btn-zurueck">Zurück zur Liste</button>
+                            <span></span><!-- Platzhalter -->
+                            <span></span><!-- Platzhalter -->
+                            <span></span><!-- Platzhalter -->
+                        </div>
 
-                        <span class="header-link" onclick="openAufträge()" data-testid="objekt-link-auftraege">Aufträge zu Objekt</span>
-
-                        <span class="header-link" onclick="openPositionen()" data-testid="objekt-link-positionen">Positionen</span>
-
+                        <!-- Header-Links ganz rechts -->
+                        <div class="header-links" style="margin-left: auto;">
+                            <span class="header-link" onclick="openAufträge()" data-testid="objekt-link-auftraege">Aufträge zu Objekt</span>
+                            <span class="header-link" onclick="openPositionen()" data-testid="objekt-link-positionen">Positionen</span>
+                        </div>
                     </div>
 
-                    <div style="flex:1"></div>
-
-                    <span id="lblDatum" style="font-size:10px;color:#000080;"></span>
-
-                </div>
-
-
-
-                <!-- Button Row -->
-
-                <div class="button-row">
-
-                    <div class="nav-group">
-
-                        <button class="nav-btn" onclick="goFirst()" title="Erster" data-testid="objekt-btn-erste">|&lt;</button>
-
-                        <button class="nav-btn tiny-btn" onclick="goPrev()" title="Zurück" data-testid="objekt-btn-vorige">&lt;</button>
-
-                        <span class="record-info" id="recordInfo">0 / 0</span>
-
-                        <button class="nav-btn tiny-btn" onclick="goNext()" title="Vor" data-testid="objekt-btn-naechste">&gt;</button>
-
-                        <button class="nav-btn" onclick="goLast()" title="Letzter" data-testid="objekt-btn-letzte">&gt;|</button>
-
+                    <!-- GPT/TEST Box rechts -->
+                    <div class="gpt-box">
+                        GPT | TEST<br>
+                        <span id="lblDatum"></span>
                     </div>
-
-                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-
-                    <button class="btn btn-green" onclick="newRecord()" data-testid="objekt-btn-neu">+ Neu</button>
-
-                    <button class="btn btn-yellow" onclick="saveRecord()" data-testid="objekt-btn-speichern">Speichern</button>
-
-                    <button class="btn btn-red" onclick="deleteRecord()" data-testid="objekt-btn-loeschen">Löschen</button>
-
-                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-
-                    <button class="btn" onclick="printReport()" data-testid="objekt-btn-bericht">Bericht</button>
-
-                    <button class="btn" onclick="openNewVeranstalter()" data-testid="objekt-btn-neuer-veranstalter">Neuer Veranstalter</button>
-
-                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-
-                    <div class="checkbox-group">
-
-                        <input type="checkbox" id="chkNurAktive" checked onchange="loadObjekte()" data-testid="objekt-checkbox-nuraktive">
-
-                        <label for="chkNurAktive">Nur aktive</label>
-
-                    </div>
-
-                    <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
-
-                    <button class="btn" onclick="geocodeAdresse()" title="Adresse geocodieren (OSM)" data-testid="objekt-btn-geocode">Geocode</button>
-
-                    <button class="btn" onclick="showHelp()" title="Hilfe anzeigen" data-testid="objekt-btn-hilfe">?</button>
-
-                    <button class="btn" id="btnBackToList" onclick="backToAktPosList()" style="display:none;" data-testid="objekt-btn-zurueck">Zurück zur Liste</button>
-
                 </div>
 
 
@@ -1677,7 +1631,7 @@
 
                         <div class="tab-container">
 
-                            <div class="tab-header">
+                            <div class="tab-header" style="flex-wrap: wrap;">
 
                                 <button class="tab-btn active" data-tab="tabPositionen" onclick="switchTab('tabPositionen', this)" data-testid="objekt-tab-positionen">Positionen</button>
 
@@ -1720,6 +1674,10 @@
                                         <button class="btn" onclick="speichereVorlage()" title="Als Vorlage speichern">Vorlage speichern</button>
 
                                         <button class="btn" onclick="ladeVorlage()" title="Vorlage laden">Vorlage laden</button>
+
+                                        <div style="width:1px;height:20px;background:#808080;margin:0 5px;"></div>
+
+                                        <button class="btn" onclick="bearbeiteZeitLabels()" title="Zeit-Labels bearbeiten (Access: btnZeitLabels)">Zeit-Labels</button>
 
                                     </div>
 
@@ -4308,6 +4266,64 @@
                 showLoading(false);
 
                 setStatus('Bereit');
+
+            }
+
+        }
+
+
+
+        // ============================================
+
+        // ZEIT-LABELS BEARBEITEN (Access: btnZeitLabels_Click)
+
+        // ============================================
+
+        function bearbeiteZeitLabels() {
+
+            // Access: BearbeiteZeitLabels Me
+
+            // Dialog zur Bearbeitung der 4 Zeit-Labels fuer Positionen
+
+            const zeit1 = prompt('Zeit 1 (Standard: 08:00):', '08:00');
+
+            const zeit2 = prompt('Zeit 2 (Standard: 12:00):', '12:00');
+
+            const zeit3 = prompt('Zeit 3 (Standard: 16:00):', '16:00');
+
+            const zeit4 = prompt('Zeit 4 (Standard: 20:00):', '20:00');
+
+
+
+            if (zeit1 && zeit2 && zeit3 && zeit4) {
+
+                // Speichere Zeit-Labels (lokal oder via API)
+
+                console.log('[Objekt] Zeit-Labels:', zeit1, zeit2, zeit3, zeit4);
+
+                showToast('Zeit-Labels aktualisiert', 'success');
+
+
+
+                // Optional: An Access Backend senden
+
+                if (window.Bridge) {
+
+                    Bridge.sendEvent('zeitLabels', {
+
+                        objektId: state.currentRecord?.ID,
+
+                        zeit1: zeit1,
+
+                        zeit2: zeit2,
+
+                        zeit3: zeit3,
+
+                        zeit4: zeit4
+
+                    });
+
+                }
 
             }
 
