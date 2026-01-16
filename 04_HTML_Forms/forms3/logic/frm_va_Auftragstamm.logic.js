@@ -144,8 +144,12 @@ function initButtons() {
     bindButton('btnneuveranst', neuerAuftrag);
     bindButton('mcobtnDelete', loeschenAuftrag);
     bindButton('cmd_Messezettel_NameEintragen', cmdMessezettelNameEintragen);
-    bindButton('cmd_BWN_send', cmdBWNSend);
-    bindButton('btn_BWN_Druck', druckeBWN);
+    // ENTFERNT: bindButton ueberschrieb korrekten HTML onclick Handler (VBA Bridge)
+    // HTML hat bereits onclick="bwnSenden()" der VBA Bridge korrekt aufruft
+    // bindButton('cmd_BWN_send', cmdBWNSend);
+    // ENTFERNT: bindButton ueberschrieb korrekten HTML onclick Handler (VBA Bridge)
+    // HTML hat bereits onclick="bwnDrucken()" der VBA Bridge korrekt aufruft
+    // bindButton('btn_BWN_Druck', druckeBWN);
 
     // Ribbon/DaBa Toggle Buttons
     bindButton('btnRibbonAus', toggleRibbonAus);
@@ -1029,36 +1033,62 @@ async function kopierenAuftrag(inkl_ma_zuordnungen = false) {
         return;
     }
 
-    // Dialog anzeigen mit Checkbox fuer MA-Zuordnungen
-    const msg = inkl_ma_zuordnungen
-        ? 'Auftrag mit MA-Zuordnungen (tbl_MA_VA_Planung) kopieren?'
-        : 'Auftrag kopieren?\n\nHinweis: Fuer Kopie mit MA-Zuordnungen nutzen Sie den Button im HTML-Formular.';
+    // Startdatum abfragen wie in Access (InputBox)
+    // Standard: Heute + 7 Tage
+    const heute = new Date();
+    const defaultDatum = new Date(heute.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const defaultStr = defaultDatum.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-    if (!confirm(msg)) return;
+    const neuesStartdatum = prompt(
+        'Neues Startdatum für die Kopie eingeben:\n\nFormat: TT.MM.JJJJ',
+        defaultStr
+    );
+
+    if (!neuesStartdatum) {
+        // Benutzer hat abgebrochen
+        return;
+    }
+
+    // Validierung des Datums
+    const datumParts = neuesStartdatum.split('.');
+    if (datumParts.length !== 3 || datumParts[0].length !== 2 || datumParts[1].length !== 2 || datumParts[2].length !== 4) {
+        alert('Ungültiges Datumsformat!\n\nBitte Format TT.MM.JJJJ verwenden (z.B. 27.01.2026)');
+        return;
+    }
 
     try {
-        setStatus(inkl_ma_zuordnungen ? 'Kopiere Auftrag mit MA-Zuordnungen...' : 'Kopiere Auftrag...');
+        setStatus('Kopiere Auftrag via VBA Bridge...');
 
-        // API-Call zum Kopieren mit Option fuer MA-Zuordnungen
-        const result = await Bridge.execute('copyAuftrag', {
-            id: state.currentVA_ID,
-            inkl_ma_zuordnungen: inkl_ma_zuordnungen
+        // VBA Bridge aufrufen - HTML_AuftragKopieren mit Startdatum
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                function: 'HTML_AuftragKopieren',
+                args: [state.currentVA_ID, neuesStartdatum]
+            })
         });
 
-        if (result.data?.new_id) {
-            const countInfo = result.data?.ma_count
-                ? ` (${result.data.ma_count} MA-Zuordnungen kopiert)`
-                : '';
-            setStatus('Auftrag kopiert' + countInfo);
+        const result = await response.json();
+        console.log('[Auftragstamm] VBA HTML_AuftragKopieren Ergebnis:', result);
 
-            await loadAuftrag(result.data.new_id);
+        // Ergebnis prüfen - Format: "OK:12345" mit neuer VA_ID
+        if (result.result && result.result.startsWith('OK:')) {
+            const newVaId = parseInt(result.result.split(':')[1], 10);
+            setStatus('Auftrag kopiert - Neue ID: ' + newVaId);
 
-            if (inkl_ma_zuordnungen && result.data?.ma_count > 0) {
-                alert(`Auftrag erfolgreich kopiert!\n\nNeue Auftrag-ID: ${result.data.new_id}\n${result.data.ma_count} MA-Zuordnungen wurden mitkopiert.`);
-            }
+            // Neuen Auftrag laden
+            await loadAuftrag(newVaId);
+
+            alert(`Auftrag erfolgreich kopiert!\n\nNeue Auftrag-ID: ${newVaId}\nStartdatum: ${neuesStartdatum}`);
+        } else if (result.result && result.result.startsWith('Fehler:')) {
+            throw new Error(result.result);
+        } else {
+            throw new Error(result.error || result.result || 'Unbekannter Fehler');
         }
     } catch (error) {
         setStatus('Fehler beim Kopieren');
+        console.error('[Auftragstamm] Fehler beim Kopieren:', error);
         alert('Fehler beim Kopieren: ' + error.message);
     }
 }
@@ -1164,17 +1194,34 @@ async function loeschenAuftrag() {
     }
 
     const auftrag = document.getElementById('cboAuftrag')?.value || '';
-    if (!confirm(`Auftrag "${auftrag}" wirklich löschen?`)) return;
+    if (!confirm(`Auftrag "${auftrag}" wirklich löschen?\n\nACHTUNG: Der Auftrag wird PERMANENT gelöscht!`)) return;
 
     try {
-        setStatus('Lösche Auftrag...');
-        await Bridge.auftraege.delete(state.currentVA_ID);
-        setStatus('Auftrag gelöscht');
+        setStatus('Lösche Auftrag via VBA Bridge...');
 
-        // Auftragsliste neu laden
-        await loadAuftraege();
+        // VBA Bridge aufrufen - ECHTES DELETE wie in Access!
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                function: 'HTML_AuftragLoeschen',
+                args: [state.currentVA_ID]
+            })
+        });
+
+        const result = await response.json();
+        console.log('[Auftragstamm] VBA HTML_AuftragLoeschen Ergebnis:', result);
+
+        if (result.success || (result.result && result.result.startsWith('OK'))) {
+            setStatus('Auftrag gelöscht');
+            // Auftragsliste neu laden
+            await loadAuftraege();
+        } else {
+            throw new Error(result.result || result.error || 'Unbekannter Fehler');
+        }
     } catch (error) {
         setStatus('Fehler beim Löschen');
+        console.error('[Auftragstamm] Fehler beim Löschen:', error);
         alert('Fehler beim Löschen: ' + error.message);
     }
 }
@@ -1185,9 +1232,44 @@ async function sendeEinsatzliste(typ) {
         return;
     }
 
+    if (!state.currentVADatum_ID) {
+        alert('Bitte zuerst ein Datum auswählen');
+        return;
+    }
+
     setStatus(`Sende Einsatzliste an ${typ}...`);
 
     try {
+        // Bestimme VBA-Funktion und Parameter basierend auf Typ
+        let vbaFunction = '';
+        let args = [];
+
+        switch (typ) {
+            case 'MA':
+                // btnMailEins_Click - Autosend Typ 2
+                vbaFunction = 'HTML_btnMailEins_Click';
+                args = [state.currentVA_ID, state.currentVADatum_ID];
+                break;
+
+            case 'BOS':
+                // btn_Autosend_BOS_Click - Autosend Typ 4 (nur fuer bestimmte Veranstalter)
+                vbaFunction = 'HTML_btn_Autosend_BOS_Click';
+                const veranstalterId = parseInt(document.getElementById('Veranstalter_ID')?.value) || 0;
+                args = [state.currentVA_ID, state.currentVADatum_ID, veranstalterId];
+                break;
+
+            case 'SUB':
+                // btnMailSub_Click - Autosend Typ 5
+                vbaFunction = 'HTML_btnMailSub_Click';
+                args = [state.currentVA_ID, state.currentVADatum_ID];
+                break;
+
+            default:
+                throw new Error('Unbekannter Typ: ' + typ);
+        }
+
+        console.log(`[Auftragstamm] Rufe ${vbaFunction} auf mit:`, args);
+
         // VBA Bridge Server Call (Port 5002)
         const response = await fetch('http://localhost:5002/api/vba/execute', {
             method: 'POST',
@@ -1195,13 +1277,8 @@ async function sendeEinsatzliste(typ) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                function: 'SendeEinsatzliste_MA',
-                args: [
-                    state.currentVA_ID,
-                    state.currentVADatum,
-                    state.currentVADatum_ID || 0,
-                    typ
-                ]
+                function: vbaFunction,
+                args: args
             })
         });
 
@@ -1209,7 +1286,8 @@ async function sendeEinsatzliste(typ) {
 
         if (result.success) {
             setStatus(`Einsatzliste an ${typ} gesendet`);
-            showToast(`Einsatzliste wurde erfolgreich an ${typ} versendet`, 'success');
+            showToast(result.result || `Einsatzliste wurde erfolgreich an ${typ} versendet`, 'success');
+            console.log(`[Auftragstamm] ${vbaFunction} Ergebnis:`, result.result);
         } else {
             throw new Error(result.error || 'Unbekannter Fehler');
         }
@@ -1222,8 +1300,8 @@ async function sendeEinsatzliste(typ) {
 }
 
 /**
- * FIX 1: btnDruckZusage - Excel-Export wie in Access
- * Access: Erstellt Excel-Datei via fXL_Export_Auftrag() und setzt Status auf "Beendet"
+ * btnDruckZusage - Excel-Export wie in Access (exakter Ablauf!)
+ * Ruft HTML_btnDruckZusage_Click auf - erzeugt Excel und setzt Status auf Beendet
  */
 async function druckeEinsatzliste() {
     if (!state.currentVA_ID) {
@@ -1234,18 +1312,27 @@ async function druckeEinsatzliste() {
     try {
         setStatus('Erstelle Excel-Export...');
 
-        // VBA Bridge Server Call (Port 5002) - fXL_Export_Auftrag
+        // Hole Formular-Daten fuer den Dateinamen (wie im Original Access)
+        const auftrag = document.getElementById('Auftrag')?.value || `VA${state.currentVA_ID}`;
+        const objekt = document.getElementById('Objekt')?.value || '';
+        const datVaVon = document.getElementById('Dat_VA_Von')?.value || '';
+
+        console.log('[Auftragstamm] Excel-Export mit:', { VA_ID: state.currentVA_ID, Auftrag: auftrag, Objekt: objekt, Dat_VA_Von: datVaVon });
+
+        // VBA Bridge Server Call (Port 5002) - HTML_btnDruckZusage_Click
+        // Dieser ruft fXL_Export_Auftrag UND setzt Status auf Beendet
         const response = await fetch('http://localhost:5002/api/vba/execute', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                function: 'fXL_Export_Auftrag',
+                function: 'HTML_btnDruckZusage_Click',
                 args: [
                     state.currentVA_ID,
-                    'C:\\temp\\',  // XLPfad - temporärer Pfad
-                    `Auftrag_${state.currentVA_ID}.xlsx`  // XLName
+                    auftrag,
+                    objekt,
+                    datVaVon
                 ]
             })
         });
@@ -1254,28 +1341,15 @@ async function druckeEinsatzliste() {
 
         if (result.success) {
             setStatus('Excel-Export erstellt');
-            showToast('Excel-Datei wurde erstellt und in Access geöffnet', 'success');
+            showToast(result.result || 'Excel-Datei wurde erstellt', 'success');
+            console.log('[Auftragstamm] HTML_btnDruckZusage_Click Ergebnis:', result.result);
 
-            // Optional: Status auf "Beendet" setzen (Veranst_Status_ID = 2) wie in Access
-            try {
-                await Bridge.execute('setAuftragStatus', {
-                    va_id: state.currentVA_ID,
-                    status_id: 2  // Beendet
-                });
-
-                // Status-Dropdown aktualisieren
-                const statusDropdown = document.getElementById('Veranst_Status_ID');
-                if (statusDropdown) {
-                    statusDropdown.value = '2';
-                    state.previousStatus = 2;
-                }
-
-                setStatus('Excel-Export erstellt, Status auf Beendet gesetzt');
-            } catch (statusError) {
-                console.warn('[Auftragstamm] Status-Update fehlgeschlagen:', statusError);
+            // Status-Dropdown im HTML aktualisieren (VBA hat bereits DB aktualisiert)
+            const statusDropdown = document.getElementById('Veranst_Status_ID');
+            if (statusDropdown) {
+                statusDropdown.value = '2';
+                state.previousStatus = 2;
             }
-
-            alert('Excel-Datei wurde erstellt und in Access geöffnet.\nDatei wird in Excel angezeigt.');
 
         } else {
             throw new Error(result.error || 'Excel-Export fehlgeschlagen');
@@ -1286,7 +1360,7 @@ async function druckeEinsatzliste() {
         showToast('Excel-Export fehlgeschlagen: ' + error.message, 'error');
 
         // Fallback: Browser-Druck
-        const useFallback = confirm('Excel-Export via VBA fehlgeschlagen.\n\nMöchten Sie stattdessen den Browser-Druck verwenden?');
+        const useFallback = confirm('Excel-Export via VBA fehlgeschlagen.\n\nMoechten Sie stattdessen den Browser-Druck verwenden?');
         if (useFallback) {
             setStatus('Verwende Browser-Druck als Fallback...');
             window.print();
@@ -1303,20 +1377,24 @@ async function druckeNamenlisteESS() {
     }
 
     try {
-        setStatus('Erstelle ESS Namensliste...');
+        setStatus('Erstelle ESS Namensliste/Stundenliste...');
 
-        // VBA Bridge Server Call (Port 5002) - ESS Namensliste erstellen
+        // Veranstalter_ID aus Formular holen
+        const veranstalterId = parseInt(document.getElementById('Veranstalter_ID')?.value) ||
+                               parseInt(state.currentRecord?.Veranstalter_ID) || 0;
+
+        // VBA Bridge Server Call (Port 5002) - Original Access Funktion
+        // Ruft HTML_btn_ListeStd_Click auf, welche Stundenliste_erstellen aufruft
         const response = await fetch('http://localhost:5002/api/vba/execute', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                function: 'ExportNamenlisteESS',
+                function: 'HTML_btn_ListeStd_Click',
                 args: [
                     state.currentVA_ID,
-                    state.currentVADatum || new Date().toISOString().split('T')[0],
-                    state.currentVADatum_ID || 0
+                    veranstalterId
                 ]
             })
         });
@@ -1699,7 +1777,24 @@ function validateRequired() {
     return valid;
 }
 
-function requeryAll() {
+async function requeryAll() {
+    // VBA Bridge aufrufen für echtes Access Form.Requery
+    try {
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                function: 'HTML_AuftragAktualisieren',
+                args: [state.currentVA_ID || 0]
+            })
+        });
+        const result = await response.json();
+        console.log('[Auftragstamm] VBA HTML_AuftragAktualisieren Ergebnis:', result);
+    } catch (error) {
+        console.log('[Auftragstamm] VBA Requery nicht verfügbar, verwende JS-Fallback');
+    }
+
+    // Daten im HTML neu laden
     if (state.currentVA_ID) {
         loadAuftrag(state.currentVA_ID);
     }
@@ -2091,9 +2186,10 @@ window.datumNavRight = function() {
     }
 };
 
-// BWN-Varianten
-window.bwnDrucken = typeof druckeBWN === 'function' ? druckeBWN : function() { alert('Funktion druckeBWN nicht verfuegbar'); };
-window.bwnSenden = typeof cmdBWNSend === 'function' ? cmdBWNSend : function() { alert('Funktion cmdBWNSend nicht verfuegbar'); };
+// BWN-Varianten - ENTFERNT: Diese ueberschrieben die korrekten HTML onclick Handler (VBA Bridge)
+// HTML definiert bwnDrucken() und bwnSenden() bereits korrekt mit VBA Bridge (Port 5002)
+// window.bwnDrucken = typeof druckeBWN === 'function' ? druckeBWN : function() { alert('Funktion druckeBWN nicht verfuegbar'); };
+// window.bwnSenden = typeof cmdBWNSend === 'function' ? cmdBWNSend : function() { alert('Funktion cmdBWNSend nicht verfuegbar'); };
 window.messezettelNameEintragen = typeof cmdMessezettelNameEintragen === 'function' ? cmdMessezettelNameEintragen : function() { alert('Funktion cmdMessezettelNameEintragen nicht verfuegbar'); };
 
 // Attachment-Funktionen
@@ -2337,9 +2433,10 @@ function sendeEinsatzlisteSUB() { return sendeEinsatzliste('SUB'); }
 function datumNavLeft() { return navigateVADatum('left'); }
 function datumNavRight() { return navigateVADatum('right'); }
 
-// BWN
-function bwnDrucken() { return druckeBWN(); }
-function bwnSenden() { return cmdBWNSend(); }
+// BWN - ENTFERNT: Diese ueberschrieben die korrekten HTML-Funktionen (VBA Bridge)
+// HTML definiert bwnDrucken() und bwnSenden() bereits korrekt mit VBA Bridge (Port 5002)
+// function bwnDrucken() { return druckeBWN(); }
+// function bwnSenden() { return cmdBWNSend(); }
 
 // Attachments
 function neuenAttachHinzufuegen() { return addNewAttachment(); }
