@@ -34,12 +34,29 @@ const FEIERTAGE_2025 = [
     '2025-12-26'  // 2. Weihnachtstag
 ];
 
+// Deutsche Feiertage 2026
+const FEIERTAGE_2026 = [
+    '2026-01-01', // Neujahr
+    '2026-01-06', // Heilige Drei Könige (Bayern)
+    '2026-04-03', // Karfreitag
+    '2026-04-06', // Ostermontag
+    '2026-05-01', // Tag der Arbeit
+    '2026-05-14', // Christi Himmelfahrt
+    '2026-05-25', // Pfingstmontag
+    '2026-06-04', // Fronleichnam (Bayern)
+    '2026-08-15', // Mariä Himmelfahrt (Bayern)
+    '2026-10-03', // Tag der Deutschen Einheit
+    '2026-11-01', // Allerheiligen (Bayern)
+    '2026-12-25', // 1. Weihnachtstag
+    '2026-12-26'  // 2. Weihnachtstag
+];
+
 /**
  * Prüft ob ein Datum ein Feiertag ist
  */
 function istFeiertag(datum) {
     const dateKey = formatDateForInput(datum);
-    return FEIERTAGE_2025.includes(dateKey);
+    return FEIERTAGE_2025.includes(dateKey) || FEIERTAGE_2026.includes(dateKey);
 }
 
 /**
@@ -202,9 +219,10 @@ function setupEventListeners() {
 
 /**
  * Navigation: Woche vor/zurück
+ * Angepasst auf Access-Original (3 Tage statt 7)
  */
 function navigateWeek(direction) {
-    state.startDate.setDate(state.startDate.getDate() + (direction * 7));
+    state.startDate.setDate(state.startDate.getDate() + (direction * 3));
     updateDateInputs();
     loadData();
 }
