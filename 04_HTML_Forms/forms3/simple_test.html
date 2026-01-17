@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <title>Simple Test</title>
+</head>
+<body style="background: #4CAF50; color: white; font-family: Arial; padding: 50px; text-align: center;">
+    <h1>WebView2 funktioniert!</h1>
+    <p>Wenn Sie diesen Text sehen, ist die HTML-Navigation erfolgreich.</p>
+    <p id="time"></p>
+    <script>
+        document.getElementById('time').textContent = 'Geladen um: ' + new Date().toLocaleTimeString();
+
+        // Prüfe WebView2
+        if (window.chrome && window.chrome.webview) {
+            document.body.innerHTML += '<p style="background:white;color:green;padding:10px;">✓ WebView2 Bridge verfügbar!</p>';
+        } else {
+            document.body.innerHTML += '<p style="background:white;color:red;padding:10px;">✗ WebView2 Bridge NICHT verfügbar (Browser-Modus)</p>';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Email API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 5px; white-space: pre-wrap; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 5px; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Email API Test</h1>
+    
+    <h2>1. Test API Verfügbarkeit</h2>
+    <button onclick="testApiAvailable()">API Ping Test</button>
+    <div id="pingResult" class="result">Klicke auf den Button...</div>
+    
+    <h2>2. Test Email Endpoint</h2>
+    <label>Empfänger Email:</label>
+    <input type="email" id="toEmail" value="siegert@consec-nuernberg.de">
+    
+    <label>Betreff:</label>
+    <input type="text" id="subject" value="CONSEC Test-Email vom HTML-Formular">
+    
+    <button onclick="testEmailEndpoint()">Email senden</button>
+    <div id="emailResult" class="result">Klicke auf den Button...</div>
+    
+    <h2>3. Konsolen-Log</h2>
+    <div id="log" class="result" style="height: 200px; overflow-y: auto;"></div>
+    
+    <script>
+        function log(msg) {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${time}] ${msg}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(msg);
+        }
+        
+        async function testApiAvailable() {
+            const resultDiv = document.getElementById('pingResult');
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Teste API...';
+            
+            try {
+                log('Teste http://localhost:5000/...');
+                const response = await fetch('http://localhost:5000/');
+                if (response.ok) {
+                    resultDiv.textContent = '✅ API Server läuft auf Port 5000';
+                    resultDiv.className = 'result success';
+                    log('API erreichbar!');
+                    
+                    // Test ob /api/email/send existiert
+                    log('Teste /api/email/send Endpoint...');
+                    const emailTest = await fetch('http://localhost:5000/api/email/send', {
+                        method: 'OPTIONS'
+                    });
+                    log('Email Endpoint Status: ' + emailTest.status);
+                } else {
+                    resultDiv.textContent = '❌ API antwortet nicht korrekt: ' + response.status;
+                    resultDiv.className = 'result error';
+                }
+            } catch (e) {
+                resultDiv.textContent = '❌ API nicht erreichbar: ' + e.message;
+                resultDiv.className = 'result error';
+                log('Fehler: ' + e.message);
+            }
+        }
+        
+        async function testEmailEndpoint() {
+            const resultDiv = document.getElementById('emailResult');
+            const toEmail = document.getElementById('toEmail').value;
+            const subject = document.getElementById('subject').value;
+            
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Sende Email...';
+            
+            const htmlBody = `
+                <html>
+                <body style="font-family: Arial, sans-serif;">
+                    <h1 style="color: #000080;">CONSEC Test-Email</h1>
+                    <p>Diese Email wurde vom HTML-Formular-Test gesendet.</p>
+                    <p>Zeitstempel: ${new Date().toLocaleString('de-DE')}</p>
+                    <hr>
+                    <p style="color: #666;">Gesendet via Mailjet SMTP API</p>
+                </body>
+                </html>
+            `;
+            
+            const plainBody = 'CONSEC Test-Email - Zeitstempel: ' + new Date().toLocaleString('de-DE');
+            
+            log('Sende an: ' + toEmail);
+            log('Betreff: ' + subject);
+            
+            // Versuche beide Ports
+            const endpoints = [
+                'http://localhost:5000/api/email/send',
+                'http://localhost:5001/api/email/send'
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    log('Versuche: ' + endpoint);
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            to: toEmail,
+                            subject: subject,
+                            html_body: htmlBody,
+                            plain_body: plainBody
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        log('Response: ' + JSON.stringify(result));
+                        
+                        if (result.success) {
+                            resultDiv.textContent = '✅ Email erfolgreich gesendet via ' + endpoint + '!\n\n' + JSON.stringify(result, null, 2);
+                            resultDiv.className = 'result success';
+                            return; // Erfolg - keine weiteren Versuche
+                        }
+                    } else if (response.status === 404) {
+                        log('Endpoint nicht gefunden: ' + endpoint);
+                    } else {
+                        log('HTTP Fehler ' + response.status + ' bei ' + endpoint);
+                    }
+                } catch (e) {
+                    log('Fehler bei ' + endpoint + ': ' + e.message);
+                }
+            }
+            
+            resultDiv.textContent = '❌ Kein Email-Server verfügbar!\n\nBitte starten Sie:\n1. restart_api.bat (Port 5000) ODER\n2. start_email_server.bat (Port 5001)\n\nPfad: C:\\Users\\guenther.siegert\\Documents\\0006_All_Access_KNOWLEDGE\\08_Tools\\python\\';
+            resultDiv.className = 'result error';
+        }
+        
+        // Auto-Test bei Laden
+        window.onload = () => {
+            log('Seite geladen - starte Auto-Test...');
+            testApiAvailable();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo-Verwaltung - CONSYS</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        body {
+            background: #8080c0;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 11px;
+        }
+
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+            overflow: visible;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        /* Main Content Area */
+        .app-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        #loadingOverlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 20px 40px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        /* Toast Container */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .toast {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            min-width: 250px;
+        }
+
+        .toast.success { border-left: 4px solid #28a745; }
+        .toast.error { border-left: 4px solid #dc3545; }
+        .toast.info { border-left: 4px solid #17a2b8; }
+
+        .dialog-container {
+            background: #8080c0;
+            border: 2px solid;
+            border-color: #e0e0f0 #606090 #606090 #e0e0f0;
+            width: 800px;
+            max-width: 95vw;
+        }
+
+        .dialog-header {
+            padding: 12px 16px;
+            background: #9090c0;
+            color: #000;
+            border: 1px solid #606090;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dialog-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .dialog-close {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            color: #000;
+        }
+
+        .dialog-content {
+            display: flex;
+            height: 500px;
+        }
+
+        /* Standort-Liste Links */
+        .standort-liste {
+            width: 280px;
+            border-right: 2px solid #606090;
+            display: flex;
+            flex-direction: column;
+            background: #c0c0d8;
+        }
+
+        .liste-header {
+            padding: 10px 12px;
+            background: #b8b8d8;
+            border-bottom: 1px solid #606090;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .liste-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .standort-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid #9090c0;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #c0c0d8;
+        }
+        .standort-item:hover { background: #d0d0e0; }
+        .standort-item.selected { background: #a0a0d0; border-left: 3px solid #000080; }
+
+        .standort-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e8e8e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .standort-info { flex: 1; }
+        .standort-name { font-weight: 500; font-size: 11px; }
+        .standort-adresse { font-size: 10px; color: #666; margin-top: 2px; }
+
+        /* Karten-Bereich Rechts */
+        .karten-bereich {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .karten-toolbar {
+            padding: 8px 12px;
+            background: #b8b8d8;
+            border-bottom: 1px solid #606090;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .karten-container {
+            flex: 1;
+            background: #e8e8e8;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .karte-placeholder {
+            text-align: center;
+            color: #666;
+        }
+        .karte-placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        .karte-placeholder-text {
+            font-size: 12px;
+        }
+
+        /* Detail-Panel unten */
+        .detail-panel {
+            border-top: 1px solid #606090;
+            padding: 12px;
+            background: #b8b8d8;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-label {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        .detail-value {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .dialog-footer {
+            padding: 12px 16px;
+            background: #b8b8d8;
+            border-top: 1px solid #606090;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .coord-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Standard Buttons */
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            color: #000;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+            font-weight: bold;
+        }
+
+        /* Form Controls */
+        .form-control {
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 2px 4px;
+            font-size: 10px;
+        }
+
+        /* Vollbild-Button oben rechts */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #606060 #606060 #ffffff;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+    </style>
+</head>
+<body data-active-menu="extras">
+    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">⛶</button>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="left-menu">
+            <div class="menu-header">CONSYS</div>
+            <nav class="menu-buttons">
+                <div>
+                    <button class="menu-btn" data-form="frm_Menuefuehrung1">Dashboard</button>
+                    <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiter</button>
+                    <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kunden</button>
+                    <button class="menu-btn" data-form="frm_OB_Objekt">Objekte</button>
+                    <button class="menu-btn" data-form="frm_va_Auftragstamm">Auftraege</button>
+                    <button class="menu-btn active">Geo-Verwaltung</button>
+                </div>
+                <div>
+                    <button class="menu-btn" onclick="closeForm()">Schliessen</button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-content">
+            <div class="dialog-container">
+                <div class="dialog-header">
+                    <span class="dialog-title">Geo-Verwaltung - Standorte</span>
+                    <button class="dialog-close" onclick="closeForm()">X</button>
+                </div>
+
+                <div class="dialog-content">
+                    <!-- Standort-Liste -->
+                    <div class="standort-liste">
+                        <div class="liste-header">
+                            <input type="text" class="form-control" placeholder="Suchen..." id="searchInput" style="flex:1">
+                            <select class="form-control" id="filterType">
+                                <option value="">Alle</option>
+                                <option value="kunde">Kunden</option>
+                                <option value="objekt">Objekte</option>
+                                <option value="ma">Mitarbeiter</option>
+                            </select>
+                        </div>
+                        <div class="liste-content" id="standortListe">
+                            <!-- Wird dynamisch gefuellt -->
+                            <div class="standort-item">
+                                <div class="standort-icon kunde">K</div>
+                                <div class="standort-info">
+                                    <div class="standort-name">Beispiel Kunde GmbH</div>
+                                    <div class="standort-adresse">Musterstr. 1, 90402 Nuernberg</div>
+                                </div>
+                            </div>
+                            <div class="standort-item">
+                                <div class="standort-icon objekt">O</div>
+                                <div class="standort-info">
+                                    <div class="standort-name">Arena Nuernberg</div>
+                                    <div class="standort-adresse">Dr.-Ingeborg-Bausenwein-Str. 1</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Karten-Bereich -->
+                    <div class="karten-bereich">
+                        <div class="karten-toolbar">
+                            <button class="btn" onclick="zoomIn()">+</button>
+                            <button class="btn" onclick="zoomOut()">-</button>
+                            <button class="btn" onclick="centerMap()">Zentrieren</button>
+                            <span style="margin-left:auto; font-size:10px;" id="coordDisplay">49.4521, 11.0767</span>
+                        </div>
+                        <div class="karten-container" id="mapContainer">
+                            <div class="karte-placeholder">
+                                <div class="karte-placeholder-icon">🗺️</div>
+                                <div class="karte-placeholder-text">Karten-Integration<br>(Google Maps / Leaflet)</div>
+                            </div>
+                        </div>
+                        <div class="detail-panel">
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Breitengrad</span>
+                                    <input type="text" class="form-control" id="latitude" value="49.4521">
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Laengengrad</span>
+                                    <input type="text" class="form-control" id="longitude" value="11.0767">
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Adresse</span>
+                                    <input type="text" class="form-control" id="address" value="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dialog-footer">
+                    <div class="coord-input">
+                        <button class="btn" onclick="geocodeAddress()">Adresse suchen</button>
+                        <button class="btn" onclick="reverseGeocode()">Koordinaten -> Adresse</button>
+                    </div>
+                    <div>
+                        <button class="btn" onclick="saveLocation()">Speichern</button>
+                        <button class="btn" onclick="closeForm()">Abbrechen</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="loading-spinner">Laden...</div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="js/sidebar.js"></script>
+    <script src="logic/frmTop_Geo_Verwaltung.logic.js"></script>
+
+    <script>
+        // Vollbild-Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Fullscreen error:', err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+
+        // Formular schliessen
+        function closeForm() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ action: 'close' });
+            } else {
+                window.close();
+            }
+        }
+
+        // Karten-Funktionen (Platzhalter)
+        function zoomIn() {
+            showToast('Zoom In (Karten-Integration erforderlich)', 'info');
+        }
+
+        function zoomOut() {
+            showToast('Zoom Out (Karten-Integration erforderlich)', 'info');
+        }
+
+        function centerMap() {
+            showToast('Karte zentriert', 'info');
+        }
+
+        function geocodeAddress() {
+            const address = document.getElementById('address').value;
+            if (!address) {
+                showToast('Bitte Adresse eingeben', 'error');
+                return;
+            }
+            showToast('Geocoding: ' + address + ' (API erforderlich)', 'info');
+        }
+
+        function reverseGeocode() {
+            const lat = document.getElementById('latitude').value;
+            const lng = document.getElementById('longitude').value;
+            showToast('Reverse Geocoding: ' + lat + ', ' + lng + ' (API erforderlich)', 'info');
+        }
+
+        function saveLocation() {
+            showToast('Standort gespeichert', 'success');
+        }
+
+        // Toast-Funktion
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

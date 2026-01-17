@@ -31,7 +31,7 @@
             --base-font-size: 11px;
             --small-font-size: 10px;
             --header-font-size: 12px;
-            --title-font-size: 24px; /* Einheitliche Titelgröße (15.01.2026) */
+            --title-font-size: 16px;
         }
 
         * {
@@ -1299,7 +1299,7 @@
                 <div class="header-row-wrapper">
                     <div class="header-row combined-buttons">
                         <div class="logo-box">C</div>
-                        <span class="title-text" style="width: 138.25px; position: relative; height: 31px; font-size: 13px; font-weight: bold; padding: 0px;">Auftragsverwaltung</span>
+                        <span class="title-text" style="width: 138.25px; position: relative; height: 31px; font-size: 16px; font-weight: bold; padding: 0px;">Auftragsverwaltung</span>
                         <!-- Aktualisieren links nach Titel (14.01.2026) -->
                         <button class="btn unified-btn" id="btnAktualisieren" onclick="refreshData()" data-testid="auftrag-btn-aktualisieren" style="margin-left: 15px; position: relative; left: 146.892px;">Aktualisieren</button>
                         <!-- Buttons in exakt 2 Reihen - Beginn ab "Positionen" gemaess Anforderung -->
@@ -3751,7 +3751,10 @@
             showLoading();
             try {
                 const today = formatDateISO(new Date());
+                // Veranstalter_ID ist Pflichtfeld - verwende aktuell ausgewählten Kunden oder Default (1)
+                const kundeId = document.getElementById('veranstalter_id')?.value || 1;
                 const result = await apiCall('/auftraege', 'POST', {
+                    Veranstalter_ID: parseInt(kundeId) || 1,
                     Auftrag: 'Neuer Auftrag',
                     Dat_VA_Von: today,
                     Dat_VA_Bis: today,
@@ -3859,19 +3862,41 @@
             showToast('Daten aktualisiert', 'success');
         }
 
-        // Email-Funktionen - GESCHÜTZT 16.01.2026 - VBA Bridge (Port 5002)!
+        // HELPER: Numerische VADatum_ID aus cboVADatum holen (keine Datum-Strings!)
+        function getNumericVADatumId() {
+            const cboValue = document.getElementById('cboVADatum').value;
+            // Nur numerische IDs akzeptieren, keine ISO-Datum-Strings
+            if (cboValue && !isNaN(parseInt(cboValue)) && !cboValue.includes('-') && !cboValue.includes('T')) {
+                return parseInt(cboValue);
+            }
+            // Fallback: Erstes Option-Element des Dropdowns (hat numerische ID)
+            const firstOption = document.getElementById('cboVADatum').options[0];
+            if (firstOption && !isNaN(parseInt(firstOption.value))) {
+                return parseInt(firstOption.value);
+            }
+            return null;
+        }
+
+        // Email-Funktionen - KORRIGIERT 16.01.2026 - Liest Daten aus DOM-Elementen!
         async function sendeEinsatzlisteMA() {
             if (!state.currentAuftragId) {
                 showToast('Bitte zuerst einen Auftrag auswählen', 'warning');
                 return;
             }
+            // FIX: Numerische VADatum_ID aus Dropdown (keine Datum-Strings!)
+            const vadatumId = getNumericVADatumId();
+            if (!vadatumId) {
+                showToast('Bitte zuerst einen Einsatztag auswählen', 'warning');
+                return;
+            }
 
             showToast('Einsatzliste wird an MA gesendet...', 'info');
+            console.log('[VBA] sendeEinsatzlisteMA - VA_ID:', state.currentAuftragId, 'VADatum_ID:', vadatumId);
 
             // VBA Bridge aufrufen: HTML_btnMailEins_Click(VA_ID, VADatum_ID)
             const result = await callVBAFunction('HTML_btnMailEins_Click',
                 state.currentAuftragId,
-                state.currentVADatumId || 0
+                vadatumId
             );
 
             if (result.success) {
@@ -3881,23 +3906,32 @@
             }
         }
 
-        // GESCHÜTZT 16.01.2026 - VBA Bridge (Port 5002)!
+        // KORRIGIERT 16.01.2026 - Liest Veranstalter_ID aus DOM!
         async function sendeEinsatzlisteBOS() {
             if (!state.currentAuftragId) {
                 showToast('Bitte zuerst einen Auftrag auswählen', 'warning');
                 return;
             }
-
-            // Veranstalter_ID aus aktuellem Auftrag holen
-            const currentAuftrag = state.auftraege.find(a => a.ID === state.currentAuftragId);
-            const veranstalterId = currentAuftrag?.Veranstalter_ID || 0;
+            // FIX: Numerische VADatum_ID aus Dropdown (keine Datum-Strings!)
+            const vadatumId = getNumericVADatumId();
+            if (!vadatumId) {
+                showToast('Bitte zuerst einen Einsatztag auswählen', 'warning');
+                return;
+            }
+            // FIX: Veranstalter_ID aus DOM-Element lesen (nicht aus state.auftraege)
+            const veranstalterId = parseInt(document.getElementById('Veranstalter_ID').value) || 0;
+            if (!veranstalterId) {
+                showToast('Kein Veranstalter zugeordnet', 'warning');
+                return;
+            }
 
             showToast('Einsatzliste wird an BOS gesendet...', 'info');
+            console.log('[VBA] sendeEinsatzlisteBOS - VA_ID:', state.currentAuftragId, 'VADatum_ID:', vadatumId, 'Veranstalter_ID:', veranstalterId);
 
             // VBA Bridge aufrufen: HTML_btn_Autosend_BOS_Click(VA_ID, VADatum_ID, Veranstalter_ID)
             const result = await callVBAFunction('HTML_btn_Autosend_BOS_Click',
                 state.currentAuftragId,
-                state.currentVADatumId || 0,
+                vadatumId,
                 veranstalterId
             );
 
@@ -3908,19 +3942,26 @@
             }
         }
 
-        // GESCHÜTZT 16.01.2026 - VBA Bridge (Port 5002)!
+        // KORRIGIERT 16.01.2026 - Liest Daten aus DOM-Elementen!
         async function sendeEinsatzlisteSUB() {
             if (!state.currentAuftragId) {
                 showToast('Bitte zuerst einen Auftrag auswählen', 'warning');
                 return;
             }
+            // FIX: Numerische VADatum_ID aus Dropdown (keine Datum-Strings!)
+            const vadatumId = getNumericVADatumId();
+            if (!vadatumId) {
+                showToast('Bitte zuerst einen Einsatztag auswählen', 'warning');
+                return;
+            }
 
             showToast('Einsatzliste wird an SUB gesendet...', 'info');
+            console.log('[VBA] sendeEinsatzlisteSUB - VA_ID:', state.currentAuftragId, 'VADatum_ID:', vadatumId);
 
             // VBA Bridge aufrufen: HTML_btnMailSub_Click(VA_ID, VADatum_ID)
             const result = await callVBAFunction('HTML_btnMailSub_Click',
                 state.currentAuftragId,
-                state.currentVADatumId || 0
+                vadatumId
             );
 
             if (result.success) {
@@ -3961,20 +4002,25 @@
             }
         }
 
-        // GESCHÜTZT 16.01.2026 - VBA Bridge (Port 5002)!
+        // KORRIGIERT 16.01.2026 - Liest Daten aus DOM-Elementen!
         async function einsatzlisteDrucken() {
             if (!state.currentAuftragId) {
                 showToast('Bitte zuerst einen Auftrag auswählen', 'warning');
                 return;
             }
 
-            // Auftragsdaten aus state holen
-            const currentAuftrag = state.auftraege.find(a => a.ID === state.currentAuftragId);
-            const auftrag = currentAuftrag?.Auftrag || '';
-            const objekt = currentAuftrag?.Objekt || '';
-            const datVaVon = currentAuftrag?.Dat_VA_Von || currentAuftrag?.VADatum || '';
+            // FIX: Auftragsdaten aus DOM-Elementen lesen (nicht aus state.auftraege)
+            const auftrag = document.getElementById('Auftrag').value || '';
+            const objekt = document.getElementById('Objekt').value || '';
+            const datVaVon = document.getElementById('Dat_VA_Von').value || '';
+
+            if (!auftrag || !objekt || !datVaVon) {
+                showToast('Auftragsdaten unvollständig (Auftrag, Objekt, Datum erforderlich)', 'warning');
+                return;
+            }
 
             showToast('Einsatzliste wird erstellt (Excel-Export + Status auf Beendet)...', 'info');
+            console.log('[VBA] einsatzlisteDrucken - VA_ID:', state.currentAuftragId, 'Auftrag:', auftrag, 'Objekt:', objekt, 'Dat_VA_Von:', datVaVon);
 
             // VBA Bridge aufrufen: HTML_btnDruckZusage_Click(VA_ID, Auftrag, Objekt, Dat_VA_Von)
             const result = await callVBAFunction('HTML_btnDruckZusage_Click',
@@ -5066,7 +5112,7 @@
     <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
     <script src="js/server-watchdog.js"></script>
     <!-- Formular-Logik (Button-Handler, API-Calls) -->
-    <script type="module" src="logic/frm_va_Auftragstamm.logic.js?v=20260115_2220"></script>
+    <script type="module" src="logic/frm_va_Auftragstamm.logic.js?v=20260116_2350"></script>
 
 
 

@@ -15,6 +15,12 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
             font-size: 12px;
@@ -53,6 +59,7 @@
         .form-detail {
             position: relative;
             height: calc(100% - 50px); /* Angepasst an unified-header Höhe */
+            min-height: 400px; /* Mindesthöhe für Grid-Sichtbarkeit im Shell-Modus */
             background-color: #8080c0;
             flex: 1;
             overflow: auto;
@@ -84,88 +91,42 @@
         /* DETAIL CONTROLS - Absolute Positionierung   */
         /* ============================================ */
 
-        /* Mitarbeiter Label */
+        /* Mitarbeiter Label - VERSTECKT da Calendar-Grid eigene Header hat */
         #lbl_Auftrag {
-            position: absolute;
-            left: 181px;
-            top: 0px;
-            width: 175px;
-            height: 28px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            background-color: #6060a0;
-            padding-left: 8px;
+            display: none;
         }
 
-        /* 7 Tages-Spalten Header - CYAN wie im Screenshot */
+        /* 7 Tages-Spalten Header - VERSTECKT da Calendar-Grid eigene Header hat */
         .day-header {
-            position: absolute;
-            top: 1px;
-            height: 28px;
-            font-size: 11px;
-            font-weight: bold;
-            color: #000000;
-            background-color: #00CED1;
-            border: 1px solid #008B8B;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: none;
         }
 
-        #lbl_Tag_1 {
-            left: 350px;
-            width: 226px;
-        }
-
-        #lbl_Tag_2 {
-            left: 574px;
-            width: 231px;
-        }
-
-        #lbl_Tag_3 {
-            left: 803px;
-            width: 225px;
-        }
-
-        #lbl_Tag_4 {
-            left: 1025px;
-            width: 212px;
-        }
-
-        #lbl_Tag_5 {
-            left: 1232px;
-            width: 225px;
-        }
-
-        /* Wochenende - ROT */
-        #lbl_Tag_6 {
-            left: 1445px;
-            width: 223px;
-            background-color: #8080c0;
-            color: #ffffff;
-            border-color: #6060a0;
-        }
-
-        #lbl_Tag_7 {
-            left: 1645px;
-            width: 227px;
-            background-color: #8080c0;
-            color: #ffffff;
-            border-color: #6060a0;
+        #lbl_Tag_1, #lbl_Tag_2, #lbl_Tag_3, #lbl_Tag_4, #lbl_Tag_5, #lbl_Tag_6, #lbl_Tag_7 {
+            display: none;
         }
 
         /* Subform DP_Grund (Kalender Grid) */
         #sub_DP_Grund {
             position: absolute;
-            left: 172px;
-            top: 26px;
-            width: 1732px;
-            height: 383px;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
             border: none;
             background-color: #ffffff;
+            overflow: auto;
+        }
+
+        /* Shell-Modus: Grid nimmt volle Breite */
+        body.shell-mode #sub_DP_Grund {
+            left: 0;
+            right: 0;
+        }
+
+        /* Standalone-Modus: Grid mit linkem Offset für MA-Spalte */
+        body:not(.shell-mode) #sub_DP_Grund {
+            left: 0;
+            right: 0;
         }
 
         /* ============================================ */

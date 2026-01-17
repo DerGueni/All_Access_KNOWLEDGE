@@ -30,7 +30,7 @@
             --base-font-size: 11px;
             --small-font-size: 10px;
             --header-font-size: 12px;
-            --title-font-size: 24px;
+            --title-font-size: 16px;
         }
 
         * {
@@ -1136,10 +1136,18 @@
                                 <!-- Tab 4: Ansprechpartner -->
                                 <div class="tab-page" id="tab-ansprechpartner">
                                     <div style="padding: 8px;">
-                                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center;">
                                             <button class="btn btn-green" onclick="neuerAnsprechpartner()">+ Neu</button>
                                             <button class="btn btn-red" onclick="loescheAnsprechpartner()">Löschen</button>
                                             <button class="btn" onclick="loadAnsprechpartner()">Aktualisieren</button>
+                                            <!-- btnPersonUebernehmen: Bestehende Person zuordnen (wie in VBA) -->
+                                            <span style="border-left: 1px solid #808080; padding-left: 8px; display: flex; gap: 4px; align-items: center;">
+                                                <label style="font-size: 11px;">Person:</label>
+                                                <select id="cboPerson" style="width: 180px; height: 22px; font-size: 11px;">
+                                                    <option value="">-- Person wählen --</option>
+                                                </select>
+                                                <button class="btn btn-blue" id="btnPersonUebernehmen" onclick="personUebernehmen()" title="Ausgewählte Person diesem Kunden zuordnen">Übernehmen</button>
+                                            </span>
                                         </div>
                                         <div style="height: 200px; overflow-y: auto; border: 1px solid #808080; margin-bottom: 10px;">
                                             <table class="data-grid" id="ansprechpartnerTable" data-testid="kd-table-ansprechpartner">
@@ -2864,6 +2872,35 @@
             }
         }
 
+        // --- cboPerson laden: Globale Personenliste fuer "Person uebernehmen" ---
+        let globalPersonList = [];
+        async function loadCboPerson() {
+            const select = document.getElementById('cboPerson');
+            if (!select) return;
+
+            try {
+                // Lade alle Personen aus der globalen Adresstabelle
+                const response = await fetch('http://localhost:5000/api/adressen?limit=500');
+                const result = await response.json();
+                globalPersonList = result.data || result || [];
+
+                // Dropdown befuellen
+                select.innerHTML = '<option value="">-- Person wählen --</option>';
+                globalPersonList.forEach(person => {
+                    const option = document.createElement('option');
+                    option.value = person.adr_ID;
+                    const name = [person.adr_Nachname, person.adr_Vorname].filter(Boolean).join(', ');
+                    option.textContent = name || `Person ${person.adr_ID}`;
+                    select.appendChild(option);
+                });
+                console.log('[Kundenstamm] cboPerson geladen:', globalPersonList.length, 'Personen');
+            } catch (error) {
+                console.error('Fehler beim Laden der Personenliste:', error);
+                // Fallback: Zeige Hinweis
+                select.innerHTML = '<option value="">-- Laden fehlgeschlagen --</option>';
+            }
+        }
+
         function renderAnsprechpartner(records) {
             const tbody = document.getElementById('ansprechpartnerTbody');
             tbody.innerHTML = '';
@@ -3137,6 +3174,7 @@
                     loadZusatzdateien();
                 } else if (tabName === 'ansprechpartner') {
                     loadAnsprechpartner();
+                    loadCboPerson(); // Globale Personenliste fuer "Uebernehmen"-Button
                 } else if (tabName === 'preise') {
                     loadKundenpreise();
                     loadPreisarten();
@@ -3423,7 +3461,8 @@
         }
 
         // --- btnPersonUebernehmen_Click: Ansprechpartner uebernehmen ---
-        function personUebernehmen() {
+        // VBA: INSERT INTO _tbl_AdrZuord (TabellenNr=40 fuer Kunde, Stamm_ID=kun_ID, Adr_ID=Person_ID)
+        async function personUebernehmen() {
             const cboPerson = document.getElementById('cboPerson');
             if (!cboPerson || !cboPerson.value) {
                 showToast('Bitte Person auswählen', 'warning');
@@ -3435,17 +3474,48 @@
                 return;
             }
 
-            Bridge.sendEvent('personUebernehmen', {
-                kunde_id: state.currentRecord.kun_Id,
-                person_id: cboPerson.value,
-                tabellen_nr: 40 // TabellenNr für Kunde
-            });
+            const kundeId = state.currentRecord.kun_Id;
+            const personId = parseInt(cboPerson.value);
+            const tabellenNr = 40; // TabellenNr fuer Kunde in _tbl_AdrZuord
 
             showToast('Person wird zugeordnet...', 'info');
+
+            try {
+                // REST-API: Adresszuordnung erstellen
+                const response = await fetch(`http://localhost:5000/api/kunden/${kundeId}/ansprechpartner`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        adr_id: personId,
+                        tabellen_nr: tabellenNr
+                    })
+                });
+
+                if (response.ok) {
+                    showToast('Person zugeordnet', 'success');
+                    cboPerson.value = ''; // Dropdown zuruecksetzen
+                    loadAnsprechpartner(); // Liste aktualisieren
+                } else {
+                    throw new Error('API-Fehler');
+                }
+            } catch (error) {
+                console.warn('[personUebernehmen] REST-API Fehler, verwende Bridge:', error);
+                // Fallback: Bridge fuer WebView2/Access
+                if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
+                    Bridge.sendEvent('personUebernehmen', {
+                        kunde_id: kundeId,
+                        person_id: personId,
+                        tabellen_nr: tabellenNr
+                    });
+                } else {
+                    showToast('Fehler beim Zuordnen der Person', 'error');
+                }
+            }
         }
 
         Bridge.on('onPersonUebernommen', function() {
             showToast('Person zugeordnet', 'success');
+            document.getElementById('cboPerson').value = '';
             loadAnsprechpartner();
         });
 
@@ -3899,6 +3969,7 @@
         window.openOutlook = openOutlook;
         window.openWord = openWord;
         window.personUebernehmen = personUebernehmen;
+        window.loadCboPerson = loadCboPerson;
         window.openAdressartDialog = openAdressartDialog;
         window.activateDatumsfilter = activateDatumsfilter;
         window.openRechnungPDF = openRechnungPDF;
@@ -4368,6 +4439,7 @@
                     loadZusatzdateien();
                 } else if (tabName === 'ansprechpartner') {
                     loadAnsprechpartner();
+                    loadCboPerson(); // Globale Personenliste fuer "Uebernehmen"-Button
                 } else if (tabName === 'preise') {
                     loadKundenpreise();
                     loadPreisarten();

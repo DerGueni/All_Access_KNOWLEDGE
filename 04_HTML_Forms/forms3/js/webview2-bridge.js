@@ -822,7 +822,11 @@ const Bridge = {
                 return await this.delete('auftrag', params.id);
             case 'copyAuftrag':
                 if (USE_WEBVIEW2) return await this.sendRequest('copyAuftrag', params);
-                return await apiFetch('/auftraege/copy', { method: 'POST', body: JSON.stringify(params) });
+                // Browser-Modus: POST zu /auftraege/<id>/kopieren
+                return await apiFetch(`/auftraege/${params.id}/kopieren`, {
+                    method: 'POST',
+                    body: JSON.stringify({ inkl_ma_zuordnungen: params.inkl_ma_zuordnungen || false })
+                });
 
             case 'getMitarbeiter':
                 return await this.loadData('mitarbeiter', params.id);
@@ -1015,6 +1019,29 @@ const Bridge = {
         create: async (data) => await Bridge.save('objekt', data),
         update: async (id, data) => await Bridge.save('objekt', { ...data, id }),
         delete: async (id) => await Bridge.delete('objekt', id)
+    },
+
+    abwesenheiten: {
+        list: async (params) => {
+            const queryParams = [];
+            if (params?.ma_id) queryParams.push(`ma_id=${params.ma_id}`);
+            if (params?.datum_von) queryParams.push(`datum_von=${params.datum_von}`);
+            if (params?.datum_bis) queryParams.push(`datum_bis=${params.datum_bis}`);
+            const qs = queryParams.length > 0 ? '?' + queryParams.join('&') : '';
+            return await apiFetch(`/abwesenheiten${qs}`);
+        },
+        get: async (id) => await apiFetch(`/abwesenheiten/${id}`),
+        create: async (data) => await apiFetch('/abwesenheiten', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        }),
+        update: async (id, data) => await apiFetch(`/abwesenheiten/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        }),
+        delete: async (id) => await apiFetch(`/abwesenheiten/${id}`, {
+            method: 'DELETE'
+        })
     },
 
     // Cache-Kontrolle

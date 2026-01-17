@@ -128,6 +128,8 @@ async function init() {
 
         // Buttons
         btnOutpExcel: document.getElementById('btnOutpExcel'),
+        btnOutpExcelSend: document.getElementById('btnOutpExcelSend'),
+        btnreq: document.getElementById('btnreq'),
         Befehl37: document.getElementById('Befehl37'),
 
         // Kalender
@@ -168,6 +170,26 @@ function setupEventListeners() {
     elements.btnVor.addEventListener('click', () => navigateWeek(1));
     elements.btnrueck.addEventListener('click', () => navigateWeek(-1));
     elements.btn_Heute.addEventListener('click', goToToday);
+
+    // dtStartdatum Exit Event (wie VBA dtStartdatum_Exit) - Refresh bei Verlassen
+    elements.dtStartdatum.addEventListener('change', () => {
+        const newDate = elements.dtStartdatum.value;
+        if (newDate) {
+            state.startDate = new Date(newDate);
+            updateDateInputs();
+            loadData();
+        }
+    });
+
+    // btnreq (Refresh-Button, falls vorhanden)
+    if (elements.btnreq) {
+        elements.btnreq.addEventListener('click', () => loadData());
+    }
+
+    // btnOutpExcelSend (Excel + E-Mail, falls vorhanden)
+    if (elements.btnOutpExcelSend) {
+        elements.btnOutpExcelSend.addEventListener('click', exportExcelAndSend);
+    }
 
     // KW-Dropdown Event: Bei Auswahl zur gewählten KW springen
     if (elements.cboKW) {
@@ -512,6 +534,89 @@ function renderCalendar() {
 }
 
 /**
+ * Excel-Export mit E-Mail-Versand (wie VBA btnOutpExcelSend_Click)
+ */
+async function exportExcelAndSend() {
+    setStatus('Exportiere nach Excel und sende per E-Mail...');
+
+    try {
+        // Zuerst Export erstellen
+        const csvContent = generateCSVContent();
+
+        // Via VBA Bridge an Access senden für E-Mail-Versand
+        if (typeof Bridge !== 'undefined' && Bridge.isWebView2) {
+            Bridge.sendEvent('FCreate_Dienstplan_Excel_Send', { mode: 1 });
+            setStatus('E-Mail-Versand gestartet');
+        } else {
+            // Fallback: Lokal speichern + Hinweis
+            downloadCSV(csvContent, `Planungsuebersicht_${formatDateForInput(state.startDate)}.csv`);
+            alert('CSV wurde heruntergeladen. E-Mail-Versand ist nur in Access/WebView2 verfügbar.');
+            setStatus('Export abgeschlossen (E-Mail nur via Access)');
+        }
+    } catch (error) {
+        console.error('[DP-Objekt] Fehler beim Export+Send:', error);
+        setStatus('Fehler beim Export');
+    }
+}
+
+/**
+ * CSV-Inhalt generieren (für Export-Funktionen)
+ */
+function generateCSVContent() {
+    const headers = ['Auftrag/Objekt'];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(state.startDate);
+        date.setDate(date.getDate() + i);
+        headers.push(`${WOCHENTAGE[date.getDay()]} ${date.toLocaleDateString('de-DE')}`);
+    }
+
+    const rows = [headers];
+
+    for (const auftrag of state.auftraege.slice(0, 50)) {
+        const vaId = auftrag.VA_ID || auftrag.ID;
+        const auftragName = auftrag.Auftrag || auftrag.VA_Bezeichnung || 'Unbekannt';
+        const row = [auftragName];
+
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(state.startDate);
+            date.setDate(date.getDate() + i);
+            const dateKey = formatDateForInput(date);
+            const key = `${vaId}_${dateKey}`;
+            const schichten = state.einsatztage[key] || [];
+
+            const cellParts = [];
+            for (const schicht of schichten) {
+                const schichtId = schicht.VADatum_ID;
+                const zuordnungen = state.zuordnungen[schichtId] || [];
+                for (const z of zuordnungen) {
+                    const maName = z.MAName || z.MA_Nachname || z.Nachname || 'MA';
+                    const von = formatTime(z.MA_Start);
+                    const bis = formatTime(z.MA_Ende);
+                    cellParts.push(`${maName} (${von}-${bis})`);
+                }
+            }
+            row.push(cellParts.join('; '));
+        }
+        rows.push(row);
+    }
+
+    return rows.map(row => row.map(cell => `"${cell}"`).join(';')).join('\n');
+}
+
+/**
+ * CSV herunterladen
+ */
+function downloadCSV(content, filename) {
+    const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+/**
  * Excel-Export
  */
 function exportExcel() {
@@ -673,6 +778,10 @@ window.DienstplanObjekt = {
     state,
     loadData,
     exportExcel,
+    exportExcelAndSend,
     renderCalendar,
     setStatus
 };
+
+// Globale loadData-Funktion für inline-Script Aufrufe
+window.loadData = loadData;

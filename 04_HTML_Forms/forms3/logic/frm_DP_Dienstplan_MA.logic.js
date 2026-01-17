@@ -213,7 +213,8 @@ function setupEventListeners() {
     elements.btnMADienstpl.addEventListener('click', openEinzeldienstplaene);
     elements.btnOutpExcel.addEventListener('click', exportExcel);
     elements.btnOutpExcelSend.addEventListener('click', sendExcel);
-    elements.Befehl20.addEventListener('click', sendDienstplaene);
+    // Access: Befehl20_Click öffnet Outlook (VBA Zeile 16-19)
+    elements.Befehl20.addEventListener('click', openOutlook);
 
     // Tag-Label DblClick Handler (Access: lbl_Tag_*_DblClick)
     // Ermöglicht schnelle Navigation zum gewählten Tag
@@ -221,38 +222,38 @@ function setupEventListeners() {
 }
 
 /**
- * Access: lbl_Tag_*_DblClick - Schnellnavigation zum Tag
- * VBA Original: Springt zur Einsatzübersicht für den geklickten Tag
+ * Access: lbl_Tag_*_DblClick - Setzt Startdatum auf geklickten Tag
+ * VBA Original (Zeile 224-257):
+ *   Me!dtStartdatum = Me!lbl_Tag_X
+ *   Call btnStartdatum_Click
+ *
+ * Setzt das Startdatum auf den geklickten Tag und aktualisiert die Ansicht.
  */
 function setupTagLabelDblClick() {
     for (let i = 1; i <= 7; i++) {
         const label = document.getElementById(`lbl_Tag_${i}`);
         if (label) {
             label.style.cursor = 'pointer';
-            label.title = 'Doppelklick: Zur Tagesübersicht springen';
+            label.title = 'Doppelklick: Startdatum auf diesen Tag setzen';
 
             label.addEventListener('dblclick', () => {
-                // Datum für diesen Tag berechnen
+                // Datum für diesen Tag berechnen (wie in Access: Me!dtStartdatum = Me!lbl_Tag_X)
                 const targetDate = new Date(state.startDate);
                 targetDate.setDate(targetDate.getDate() + (i - 1));
 
-                const dateStr = formatDateForInput(targetDate);
                 const dateDisplay = targetDate.toLocaleDateString('de-DE');
+                console.log(`[lbl_Tag_${i}_DblClick] Setze Startdatum auf:`, dateDisplay);
 
-                console.log(`[lbl_Tag_${i}_DblClick] Springe zu:`, dateDisplay);
+                // Startdatum setzen (wie VBA: Me!dtStartdatum = Me!lbl_Tag_X)
+                state.startDate = targetDate;
 
-                // Option 1: Zur Einsatzübersicht mit diesem Datum springen
-                if (window.parent?.ConsysShell?.showForm) {
-                    localStorage.setItem('consec_datum', dateStr);
-                    window.parent.ConsysShell.showForm('einsatzuebersicht');
-                } else {
-                    // Option 2: Fallback - Einsatzübersicht in neuem Fenster öffnen
-                    window.open(`frm_Einsatzuebersicht.html?datum=${dateStr}`, 'Einsatzuebersicht', 'width=1200,height=800');
-                }
+                // btnStartdatum_Click aufrufen (wie VBA: Call btnStartdatum_Click)
+                updateDateInputs();
+                loadDienstplan();
             });
         }
     }
-    console.log('[DP-MA] Tag-Label DblClick Handler registriert');
+    console.log('[DP-MA] Tag-Label DblClick Handler registriert (Access-Parität)');
 }
 
 /**
@@ -362,8 +363,35 @@ async function loadDienstplan() {
             // REST-API Fallback für Browser-Modus
             const API_BASE = 'http://localhost:5000';
 
-            // Mitarbeiter laden
-            const maResponse = await fetch(`${API_BASE}/api/mitarbeiter?filter=${state.filter}`);
+            // Mitarbeiter laden mit korrekten API-Parametern
+            // Filter: 0=Alle, 1=Alle aktiven, 2=Festangestellte, 3=Minijobber, 4=Sub
+            // Anstellungsart_IDs aus tbl_hlp_MA_Anstellungsart:
+            // 3=Festangestellter, 5=Minijobber, 11=Sub
+            let maUrl = `${API_BASE}/api/mitarbeiter`;
+            const params = ['filter_anstellung=false']; // Default-Filter deaktivieren
+
+            if (state.filter === 0) {
+                // Alle anzeigen (inkl. Inaktive) - kein aktiv-Filter
+            } else if (state.filter === 1) {
+                // Alle aktiven
+                params.push('aktiv=true');
+            } else if (state.filter === 2) {
+                // Festangestellte (Anstellungsart_ID = 3)
+                params.push('aktiv=true');
+                params.push('anstellung=3');
+            } else if (state.filter === 3) {
+                // Minijobber (Anstellungsart_ID = 5)
+                params.push('aktiv=true');
+                params.push('anstellung=5');
+            } else if (state.filter === 4) {
+                // Sub (Anstellungsart_ID = 11)
+                params.push('aktiv=true');
+                params.push('anstellung=11');
+            }
+
+            maUrl += '?' + params.join('&');
+
+            const maResponse = await fetch(maUrl);
             const maJson = await maResponse.json();
             if (Array.isArray(maJson)) {
                 state.mitarbeiter = maJson;
@@ -556,13 +584,43 @@ async function sendDienstplaene() {
 }
 
 /**
- * Einzeldienstpläne öffnen
+ * Access: Befehl20_Click - Öffnet Outlook
+ * VBA Original (Zeile 16-19):
+ *   DoCmd.OpenForm ("frmOff_Outlook_aufrufen")
+ */
+function openOutlook() {
+    console.log('[Befehl20_Click] Öffne Outlook-Formular');
+
+    // Im Shell-Modus: Navigation via Shell
+    if (window.parent?.ConsysShell?.showForm) {
+        window.parent.ConsysShell.showForm('frmOff_Outlook_aufrufen');
+    } else {
+        // Fallback: Neues Fenster
+        window.open('frmOff_Outlook_aufrufen.html', 'Outlook', 'width=800,height=600,menubar=no,toolbar=no,scrollbars=yes');
+    }
+}
+
+/**
+ * Access: btnMADienstpl_Click - Öffnet Mitarbeiterstamm mit Planungs-Tab
+ * VBA Original (Zeile 64-67):
+ *   DoCmd.OpenForm "frm_MA_Mitarbeiterstamm"
+ *   Forms!frm_MA_Mitarbeiterstamm!pgPlan.SetFocus
  */
 function openEinzeldienstplaene() {
-    // Einzeldienstplan-Formular öffnen
-    const startDatum = formatDateForInput(state.startDate);
-    const url = `frm_DP_Einzeldienstplaene.html?start=${startDatum}`;
-    window.open(url, 'Einzeldienstplaene', 'width=800,height=600,menubar=no,toolbar=no,scrollbars=yes');
+    console.log('[btnMADienstpl_Click] Öffne Mitarbeiterstamm mit Planungs-Tab');
+
+    // Wie VBA: DoCmd.OpenForm "frm_MA_Mitarbeiterstamm"
+    // und Forms!frm_MA_Mitarbeiterstamm!pgPlan.SetFocus
+    const url = 'frm_MA_Mitarbeiterstamm.html?tab=pgPlan';
+
+    // Im Shell-Modus: Navigation via Shell
+    if (window.parent?.ConsysShell?.showForm) {
+        localStorage.setItem('consec_ma_tab', 'pgPlan');
+        window.parent.ConsysShell.showForm('frm_MA_Mitarbeiterstamm');
+    } else {
+        // Fallback: Neues Fenster
+        window.open(url, 'Mitarbeiterstamm', 'width=1200,height=800,menubar=no,toolbar=no,scrollbars=yes');
+    }
 }
 
 /**

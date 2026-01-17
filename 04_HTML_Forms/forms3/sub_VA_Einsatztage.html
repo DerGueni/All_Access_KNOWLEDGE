@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einsatztage</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background: #9090c0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .subform-container {
+            background: #9090c0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 4px;
+        }
+
+        .subform-header {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 4px 8px;
+            border: 1px solid #606090;
+            font-weight: 600;
+            font-size: 10px;
+            color: #000080;
+            margin-bottom: 4px;
+        }
+
+        .days-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .day-item {
+            background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+            border: 1px solid #808080;
+            padding: 4px 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-item:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+        }
+
+        .day-item.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+            color: white;
+        }
+
+        .day-item.active .day-status {
+            color: white;
+        }
+
+        .day-date {
+            font-weight: 600;
+        }
+
+        .day-weekday {
+            font-size: 9px;
+            color: #666;
+        }
+
+        .day-item.active .day-weekday {
+            color: #ddd;
+        }
+
+        .day-status {
+            font-size: 9px;
+            color: #008000;
+        }
+
+        .day-status.incomplete {
+            color: #c00000;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            background: white;
+            border: 1px solid #999;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .toolbar-btn {
+            flex: 1;
+            padding: 3px 6px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 1px solid #808080;
+            cursor: pointer;
+            font-size: 9px;
+            text-align: center;
+        }
+
+        .toolbar-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">Einsatztage</div>
+        <div class="days-list" id="daysList">
+            <div class="empty-state">Keine Einsatztage</div>
+        </div>
+        <div class="toolbar">
+            <button class="toolbar-btn" onclick="addDay()">+ Tag</button>
+            <button class="toolbar-btn" onclick="removeDay()">- Tag</button>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        const WOCHENTAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+        let currentVA_ID = null;
+        let selectedDate = null;
+
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            if (data && data.type === 'LOAD_DATA') {
+                currentVA_ID = data.va_id || data.id;
+                loadData();
+            }
+        });
+
+        async function loadData() {
+            if (!currentVA_ID) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/einsatztage/${currentVA_ID}`);
+                if (!response.ok) throw new Error('API Fehler');
+
+                const data = await response.json();
+                renderDays(data);
+            } catch (error) {
+                console.log('[sub_VA_Einsatztage] Fehler:', error);
+            }
+        }
+
+        function renderDays(data) {
+            const container = document.getElementById('daysList');
+            const days = data.tage || data || [];
+
+            if (days.length === 0) {
+                container.innerHTML = '<div class="empty-state">Keine Einsatztage</div>';
+                return;
+            }
+
+            container.innerHTML = days.map(day => {
+                const d = new Date(day.VADatum || day.Datum);
+                const weekday = WOCHENTAGE[d.getDay()];
+                const dateStr = d.toLocaleDateString('de-DE');
+                const isComplete = day.MA_Anzahl_Ist >= day.MA_Anzahl;
+
+                return `
+                    <div class="day-item" data-date="${day.VADatum || day.Datum}" onclick="selectDay(this)">
+                        <div>
+                            <span class="day-date">${dateStr}</span>
+                            <span class="day-weekday">${weekday}</span>
+                        </div>
+                        <span class="day-status ${isComplete ? '' : 'incomplete'}">
+                            ${day.MA_Anzahl_Ist || 0}/${day.MA_Anzahl || 0}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+
+            // Select first day by default
+            const firstDay = container.querySelector('.day-item');
+            if (firstDay) selectDay(firstDay);
+        }
+
+        function selectDay(element) {
+            document.querySelectorAll('.day-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            selectedDate = element.dataset.date;
+
+            // Notify parent
+            window.parent.postMessage({
+                type: 'DAY_SELECTED',
+                date: selectedDate,
+                va_id: currentVA_ID
+            }, '*');
+        }
+
+        function addDay() {
+            window.parent.postMessage({ type: 'ADD_DAY', va_id: currentVA_ID }, '*');
+        }
+
+        function removeDay() {
+            if (selectedDate) {
+                window.parent.postMessage({ type: 'REMOVE_DAY', va_id: currentVA_ID, date: selectedDate }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

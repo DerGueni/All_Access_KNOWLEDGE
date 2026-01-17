@@ -70,6 +70,9 @@ function attachEventListeners() {
         state.validUntil = e.target.value;
     });
 
+    // Gültig bis Doppelklick -> Kalender (wie Access)
+    document.getElementById('GueltBis').addEventListener('dblclick', openDatePicker);
+
     // Badge print buttons
     document.getElementById('btn_ausweiseinsatzleitung').addEventListener('click', () => printBadge('Einsatzleitung'));
     document.getElementById('btn_ausweisBereichsleiter').addEventListener('click', () => printBadge('Bereichsleiter'));
@@ -79,14 +82,32 @@ function attachEventListeners() {
     document.getElementById('btn_ausweisstaff').addEventListener('click', () => printBadge('Staff'));
 
     // Card print buttons
-    document.getElementById('btn_Karte_Sicherheit').addEventListener('click', () => printCard('Sicherheit'));
-    document.getElementById('btn_Karte_Service').addEventListener('click', () => printCard('Service'));
-    document.getElementById('btn_Karte_Rueck').addEventListener('click', () => printCard('Rueckseite'));
-    document.getElementById('btn_Sonder').addEventListener('click', () => printCard('Sonder'));
+    document.getElementById('btn_Karte_Sicherheit').addEventListener('click', () => printCardSingle('Sicherheit'));
+    document.getElementById('btn_Karte_Service').addEventListener('click', () => printCardSingle('Service'));
+    document.getElementById('btn_Karte_Rueck').addEventListener('click', () => printCardSingle('Rueckseite'));
+    document.getElementById('btn_Sonder').addEventListener('click', printSonderausweis);
+
+    // Extra Actions (NEU wie Access)
+    const btnDienstauswNr = document.getElementById('btnDienstauswNr');
+    if (btnDienstauswNr) {
+        btnDienstauswNr.addEventListener('click', vergebeDienstausweisNr);
+    }
+
+    const btnAusweisReport = document.getElementById('btnAusweisReport');
+    if (btnAusweisReport) {
+        btnAusweisReport.addEventListener('click', openAusweisReport);
+    }
+
+    // Kartendrucker-Auswahl speichern (wie Access cbo_Kartendrucker_AfterUpdate)
+    document.getElementById('cbo_Kartendrucker').addEventListener('change', saveKartendrucker);
 
     // List selection changes
     document.getElementById('lstMA_Alle').addEventListener('change', updateCounters);
     document.getElementById('lstMA_Ausweis').addEventListener('change', updateCounters);
+
+    // DOPPELKLICK-HANDLER (wie Access lstMA_Alle_DblClick / lstMA_Ausweis_DblClick)
+    document.getElementById('lstMA_Alle').addEventListener('dblclick', lstMA_Alle_DblClick);
+    document.getElementById('lstMA_Ausweis').addEventListener('dblclick', lstMA_Ausweis_DblClick);
 }
 
 // ========================================
@@ -255,6 +276,233 @@ function removeAll() {
 function deselectAll() {
     document.getElementById('lstMA_Alle').selectedIndex = -1;
     document.getElementById('lstMA_Ausweis').selectedIndex = -1;
+}
+
+// ========================================
+// ACCESS-PARITÄT: DOPPELKLICK-HANDLER
+// ========================================
+
+/**
+ * lstMA_Alle_DblClick - Doppelklick auf Mitarbeiter in "Alle" Liste
+ * VBA: Löscht Auswahl, fügt aktuellen hinzu, druckt Sicherheitskarte
+ */
+function lstMA_Alle_DblClick() {
+    const listbox = document.getElementById('lstMA_Alle');
+    const selected = Array.from(listbox.selectedOptions);
+
+    if (selected.length === 0) return;
+
+    // Wie Access: btnDelAll_Click + btnAddSelected_Click + btn_Karte_Sicherheit_Click
+    state.selectedEmployees = [];
+
+    selected.forEach(option => {
+        const emp = JSON.parse(option.dataset.employee);
+        state.selectedEmployees.push(emp);
+    });
+
+    renderSelectedEmployees();
+
+    // Automatisch Sicherheitskarte drucken
+    printCardSingle('Sicherheit');
+}
+
+/**
+ * lstMA_Ausweis_DblClick - Doppelklick auf Mitarbeiter in "Für Ausweiserstellung" Liste
+ * VBA: Öffnet Servicepersonal-Karte
+ */
+function lstMA_Ausweis_DblClick() {
+    const listbox = document.getElementById('lstMA_Ausweis');
+    const selected = Array.from(listbox.selectedOptions);
+
+    if (selected.length === 0) return;
+
+    // Wie Access: btn_Karte_Service_Click
+    printCardSingle('Service');
+}
+
+/**
+ * Öffnet Kalender-Picker (wie Access GueltBis_DblClick)
+ */
+function openDatePicker() {
+    const input = document.getElementById('GueltBis');
+    // Browser-eigener Date-Picker wird bei click geöffnet
+    input.showPicker && input.showPicker();
+}
+
+// ========================================
+// ACCESS-PARITÄT: EXTRA AKTIONEN
+// ========================================
+
+/**
+ * btnDienstauswNr_Click - DienstausweisNr für alle MA ohne Nummer vergeben
+ * VBA: UPDATE ... SET DienstausweisNr = [ID] WHERE Len(trim(Nz(DienstausweisNr))) = 0
+ */
+async function vergebeDienstausweisNr() {
+    showLoading(true);
+
+    try {
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                function: 'DienstausweisNr_Vergeben',
+                args: []
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API-Fehler: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        showToast(`Dienstausweisnummern vergeben: ${data.count || 'OK'}`, 'success');
+
+        // Liste aktualisieren
+        await loadAllEmployees();
+
+    } catch (err) {
+        console.error('DienstausweisNr vergeben fehlgeschlagen:', err);
+        showToast(`Fehler: ${err.message}`, 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+/**
+ * btnAusweisReport_Click - Öffnet Report rpt_Ausweis
+ * VBA: DoCmd.OpenReport "rpt_Ausweis", acViewReport
+ */
+async function openAusweisReport() {
+    if (state.selectedEmployees.length === 0) {
+        showToast('Bitte zuerst Mitarbeiter auswählen', 'warning');
+        return;
+    }
+
+    const validUntil = state.validUntil || document.getElementById('GueltBis').value;
+
+    try {
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                function: 'OpenAusweisReport',
+                args: [state.selectedEmployees.map(e => e.ID), validUntil]
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API-Fehler: ${response.statusText}`);
+        }
+
+        showToast('Report wird geöffnet...', 'info');
+
+    } catch (err) {
+        console.error('Report öffnen fehlgeschlagen:', err);
+        // Fallback: Vorschau anzeigen
+        showPrintPreview('Ausweis-Report', state.selectedEmployees, validUntil);
+    }
+}
+
+/**
+ * cbo_Kartendrucker_AfterUpdate - Speichert Drucker-Einstellung
+ * VBA: Call Set_Priv_Property("prp_Kartendrucker", ...)
+ */
+async function saveKartendrucker() {
+    const drucker = document.getElementById('cbo_Kartendrucker').value;
+
+    if (!drucker) return;
+
+    try {
+        await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                function: 'Set_Priv_Property',
+                args: ['prp_Kartendrucker', drucker]
+            })
+        });
+
+        console.log('[Ausweis Create] Kartendrucker gespeichert:', drucker);
+        showToast(`Kartendrucker gesetzt: ${drucker}`, 'success');
+
+    } catch (err) {
+        console.warn('Kartendrucker speichern fehlgeschlagen (kein VBA-Bridge):', err);
+        // Lokal in localStorage speichern als Fallback
+        localStorage.setItem('prp_Kartendrucker', drucker);
+    }
+}
+
+/**
+ * printSonderausweis - Sonderausweis mit 2 Zeilen Text (wie Access InputBox)
+ */
+async function printSonderausweis() {
+    if (state.selectedEmployees.length !== 1) {
+        showToast('Sonderausweise bitte einzeln drucken!', 'warning');
+        return;
+    }
+
+    const printer = document.getElementById('cbo_Kartendrucker').value;
+    if (!printer || !printer.toLowerCase().includes('badgy')) {
+        showToast('Für Kartendruck nur Kartendrucker (Badgy) zulässig!', 'warning');
+        return;
+    }
+
+    // Zeile 1 und 2 abfragen (wie Access InputBox)
+    const zeile1 = prompt('Text Zeile1:', '');
+    if (zeile1 === null) return; // Abbruch
+
+    const zeile2 = prompt('Text Zeile2:', '');
+    if (zeile2 === null) return; // Abbruch
+
+    const sonderText = `${zeile1}/${zeile2}`;
+
+    try {
+        const emp = state.selectedEmployees[0];
+
+        const response = await fetch('http://localhost:5002/api/vba/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                function: 'Karte_Drucken_Sonder',
+                args: [emp.ID, sonderText, printer]
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Karten-Druck fehlgeschlagen: ${response.statusText}`);
+        }
+
+        showToast(`Sonderausweis gedruckt: ${sonderText}`, 'success');
+
+    } catch (err) {
+        console.error('Sonderausweis drucken fehlgeschlagen:', err);
+        showToast(`Fehler: ${err.message}`, 'error');
+    }
+}
+
+/**
+ * printCardSingle - Karte drucken mit Prüfung auf Einzelauswahl
+ * VBA: If TCount("MA_ID", "tbltmp_AusweisMA_ID") <> 1 Then MsgBox "Ausweiskarten bitte einzeln drucken!"
+ */
+async function printCardSingle(cardType) {
+    if (state.selectedEmployees.length !== 1) {
+        showToast('Ausweiskarten bitte einzeln drucken!', 'warning');
+        return;
+    }
+
+    const printer = document.getElementById('cbo_Kartendrucker').value;
+    if (!printer) {
+        showToast('Bitte Kartendrucker auswählen', 'warning');
+        return;
+    }
+
+    // Prüfung auf Kartendrucker (wie Access: InStr(lbl_Kartendrucker.caption, "Badgy"))
+    if (cardType !== 'Rueckseite' && !printer.toLowerCase().includes('badgy')) {
+        showToast('Für Kartendruck nur Kartendrucker (Badgy) zulässig!', 'warning');
+        return;
+    }
+
+    await printCard(cardType);
 }
 
 // ========================================

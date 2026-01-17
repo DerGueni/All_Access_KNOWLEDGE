@@ -1,0 +1,33 @@
+﻿<!doctype html>
+<html lang="de"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link rel="stylesheet" href="css/fonts_override.css">
+<title>CONSYS_TITLE_DIAG</title></head>
+<body style="font-family:Segoe UI,Arial,sans-serif;margin:16px">
+<h3>CONSYS Title-Diagnose</h3>
+<p>Schreibt Status in <b>document.title</b>.</p>
+<pre id="log" style="background:#f4f4f4;padding:12px;border-radius:8px;white-space:pre-wrap"></pre>
+<script>
+const $log=document.getElementById('log');
+let ping=0, msgIn=0, ld=0, err=0;
+function hasWV(){return !!(window.chrome&&window.chrome.webview);}
+function hasBR(){return typeof window.Bridge!=="undefined";}
+function stamp(){document.title=`CONSYS_DIAG WV=${hasWV()?1:0} BR=${hasBR()?1:0} PING=${ping} IN=${msgIn} LD=${ld} ERR=${err}`;}
+function log(m){$log.textContent+=`[${new Date().toISOString()}] ${m}\n`; stamp();}
+function sendPing(){
+ try{ if(hasWV()){ window.chrome.webview.postMessage({type:"diag_ping",t:Date.now()}); ping++; log("ping sent"); } else log("no webview"); }
+ catch(e){ err++; log("ping err "+e.message); }
+}
+function tryLoad(){
+ try{ if(window.Bridge&&typeof Bridge.loadData==="function"){ ld++; log("loadData(status)"); Bridge.loadData('status'); } else log("no loadData"); }
+ catch(e){ err++; log("load err "+e.message); }
+}
+(function init(){
+ stamp(); log("init");
+ if(hasWV()){
+  window.chrome.webview.addEventListener('message',(ev)=>{ msgIn++; log("msg "+JSON.stringify(ev.data)); });
+ }
+ setTimeout(sendPing,800);
+ setTimeout(tryLoad,1500);
+})();
+</script></body></html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplan Grund MA - Subform</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .subform-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+        }
+        .subform-title { font-weight: 600; color: #333; }
+        .subform-toolbar {
+            padding: 4px 8px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 4px;
+        }
+        .subform-content { flex: 1; overflow: auto; }
+
+        .ma-grund-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .ma-grund-item:hover { background: #f0f0f0; }
+        .ma-grund-item.selected { background: #e8e8e8; }
+
+        .ma-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-right: 10px;
+        }
+
+        .ma-info { flex: 1; }
+        .ma-name { font-weight: 500; font-size: 11px; }
+        .ma-detail { font-size: 10px; color: #666; margin-top: 2px; }
+
+        .grund-info {
+            text-align: right;
+        }
+        .grund-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 500;
+        }
+        .grund-urlaub { background: #d4edda; color: #155724; }
+        .grund-krank { background: #f8d7da; color: #721c24; }
+        .grund-frei { background: #fff3cd; color: #856404; }
+        .grund-zeitraum {
+            font-size: 9px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .btn-mini {
+            padding: 2px 6px;
+            font-size: 9px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        .btn-mini:hover { background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">
+            <span class="subform-title">MA mit Abwesenheitsgrund</span>
+            <span id="lblAnzahl">0 MA</span>
+        </div>
+
+        <div class="subform-toolbar">
+            <button class="btn-mini" id="btnFilter">Filter</button>
+            <select class="form-control form-control-sm" id="cboGrund" style="font-size:9px;padding:2px 4px;">
+                <option value="">Alle Gruende</option>
+                <option value="urlaub">Urlaub</option>
+                <option value="krank">Krank</option>
+                <option value="frei">Frei</option>
+            </select>
+        </div>
+
+        <div class="subform-content">
+            <table class="datasheet" id="tblGruendMA">
+                <thead>
+                    <tr>
+                        <th style="width:90px;">Datum</th>
+                        <th style="width:120px;">Grund</th>
+                        <th style="min-width:150px;">Bemerkung</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_Gruende_MA">
+                    <!-- Daten werden via JS geladen -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/webview2-bridge.js"></script>
+    <script type="module" src="logic/sub_DP_Grund_MA.logic.js"></script>
+</body>
+</html>
+

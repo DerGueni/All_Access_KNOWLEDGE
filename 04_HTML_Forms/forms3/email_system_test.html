@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>CONSEC Email System - Auto-Setup</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        h1 { color: #2c3e50; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .status-box {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+        }
+        .status-checking { background: #fff3cd; border: 1px solid #ffc107; }
+        .status-success { background: #d4edda; border: 1px solid #28a745; }
+        .status-error { background: #f8d7da; border: 1px solid #dc3545; }
+        .status-info { background: #cce5ff; border: 1px solid #007bff; }
+        .spinner {
+            width: 20px; height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .icon { font-size: 24px; }
+        .log-container {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+        .log-success { color: #4ec9b0; }
+        .log-error { color: #f14c4c; }
+        .log-info { color: #3794ff; }
+        .log-warn { color: #cca700; }
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102,126,234,0.4); }
+        .btn-success { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(17,153,142,0.4); }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .test-result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .progress-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        th { background: #f8f9fa; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1><span class="icon">📧</span> CONSEC Email System</h1>
+        <p>Automatische Einrichtung und Test des E-Mail-Versands via Mailjet SMTP</p>
+        
+        <div id="mainStatus" class="status-box status-checking">
+            <div class="spinner"></div>
+            <span>System wird initialisiert...</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📊 System-Status</h2>
+        <table>
+            <tr>
+                <th>Komponente</th>
+                <th>Status</th>
+                <th>Details</th>
+            </tr>
+            <tr>
+                <td>API Server (Port 5000)</td>
+                <td id="api5000Status">⏳ Prüfe...</td>
+                <td id="api5000Details">-</td>
+            </tr>
+            <tr>
+                <td>Email Endpoint (5000)</td>
+                <td id="email5000Status">⏳ Prüfe...</td>
+                <td id="email5000Details">-</td>
+            </tr>
+            <tr>
+                <td>Email Server (Port 5001)</td>
+                <td id="api5001Status">⏳ Prüfe...</td>
+                <td id="api5001Details">-</td>
+            </tr>
+        </table>
+        
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🧪 Email-Test</h2>
+        <p>Sende eine Test-Email an: <strong>siegert@consec-nuernberg.de</strong></p>
+        
+        <button id="btnTestEmail" class="btn btn-success" onclick="sendTestEmail()" disabled>
+            📨 Test-Email senden
+        </button>
+        <button id="btnRetry" class="btn btn-secondary" onclick="checkAllSystems()" style="margin-left: 10px;">
+            🔄 Erneut prüfen
+        </button>
+        
+        <div id="testResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="card">
+        <h2>📋 Protokoll</h2>
+        <div id="logContainer" class="log-container"></div>
+    </div>
+
+    <script>
+        let availableEndpoint = null;
+        let checkInterval = null;
+        
+        function log(message, type = 'info') {
+            const container = document.getElementById('logContainer');
+            const time = new Date().toLocaleTimeString('de-DE');
+            const className = 'log-' + type;
+            container.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            container.scrollTop = container.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function setStatus(elementId, status, icon) {
+            document.getElementById(elementId).innerHTML = icon + ' ' + status;
+        }
+        
+        function setDetails(elementId, details) {
+            document.getElementById(elementId).textContent = details;
+        }
+        
+        function setMainStatus(message, type) {
+            const el = document.getElementById('mainStatus');
+            el.className = 'status-box status-' + type;
+            if (type === 'checking') {
+                el.innerHTML = '<div class="spinner"></div><span>' + message + '</span>';
+            } else {
+                const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+                el.innerHTML = '<span class="icon">' + (icons[type] || '') + '</span><span>' + message + '</span>';
+            }
+        }
+        
+        function setProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+        
+        async function checkEndpoint(url, timeout = 5000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            
+            try {
+                const response = await fetch(url, { 
+                    signal: controller.signal,
+                    mode: 'cors'
+                });
+                clearTimeout(timeoutId);
+                return { ok: response.ok, status: response.status };
+            } catch (e) {
+                clearTimeout(timeoutId);
+                return { ok: false, error: e.message };
+            }
+        }
+        
+        async function checkEmailEndpoint(baseUrl) {
+            try {
+                const response = await fetch(baseUrl + '/api/email/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: 'test@test.de',
+                        subject: 'Connection Test',
+                        html_body: '<p>Test</p>'
+                    })
+                });
+                // 404 = Endpoint nicht vorhanden, andere Codes = Endpoint vorhanden
+                return { available: response.status !== 404, status: response.status };
+            } catch (e) {
+                return { available: false, error: e.message };
+            }
+        }
+        
+        async function checkAllSystems() {
+            log('Starte System-Überprüfung...', 'info');
+            setMainStatus('Prüfe Systeme...', 'checking');
+            setProgress(10);
+            availableEndpoint = null;
+            
+            // 1. Check Port 5000 (Main API)
+            log('Prüfe API Server auf Port 5000...', 'info');
+            const api5000 = await checkEndpoint('http://localhost:5000/');
+            setProgress(30);
+            
+            if (api5000.ok) {
+                setStatus('api5000Status', 'Online', '✅');
+                setDetails('api5000Details', 'Server antwortet');
+                log('API Server (5000) ist online', 'success');
+                
+                // Check Email Endpoint on 5000
+                log('Prüfe Email-Endpoint auf Port 5000...', 'info');
+                const email5000 = await checkEmailEndpoint('http://localhost:5000');
+                setProgress(50);
+                
+                if (email5000.available) {
+                    setStatus('email5000Status', 'Verfügbar', '✅');
+                    setDetails('email5000Details', 'Endpoint aktiv');
+                    log('Email-Endpoint (5000) ist verfügbar!', 'success');
+                    availableEndpoint = 'http://localhost:5000/api/email/send';
+                } else {
+                    setStatus('email5000Status', 'Nicht verfügbar', '❌');
+                    setDetails('email5000Details', 'Server-Neustart erforderlich');
+                    log('Email-Endpoint (5000) nicht verfügbar (404)', 'warn');
+                }
+            } else {
+                setStatus('api5000Status', 'Offline', '❌');
+                setDetails('api5000Details', api5000.error || 'Keine Verbindung');
+                setStatus('email5000Status', 'N/A', '⚪');
+                setDetails('email5000Details', '-');
+                log('API Server (5000) ist offline: ' + (api5000.error || 'Keine Verbindung'), 'error');
+            }
+            
+            // 2. Check Port 5001 (Standalone Email Server)
+            log('Prüfe Email Server auf Port 5001...', 'info');
+            const api5001 = await checkEndpoint('http://localhost:5001/');
+            setProgress(70);
+            
+            if (api5001.ok) {
+                setStatus('api5001Status', 'Online', '✅');
+                setDetails('api5001Details', 'Server antwortet');
+                log('Email Server (5001) ist online', 'success');
+                
+                if (!availableEndpoint) {
+                    availableEndpoint = 'http://localhost:5001/api/email/send';
+                    log('Verwende Email Server auf Port 5001', 'info');
+                }
+            } else {
+                setStatus('api5001Status', 'Offline', '⚪');
+                setDetails('api5001Details', 'Nicht gestartet');
+                log('Email Server (5001) ist offline', 'info');
+            }
+            
+            setProgress(100);
+            
+            // Final Status
+            if (availableEndpoint) {
+                setMainStatus('System bereit! Email-Versand über: ' + availableEndpoint, 'success');
+                document.getElementById('btnTestEmail').disabled = false;
+                log('✅ System ist bereit für Email-Versand', 'success');
+                
+                // Stop checking if we found an endpoint
+                if (checkInterval) {
+                    clearInterval(checkInterval);
+                    checkInterval = null;
+                }
+            } else {
+                setMainStatus('Kein Email-Endpoint verfügbar. Bitte Server starten.', 'error');
+                document.getElementById('btnTestEmail').disabled = true;
+                log('❌ Kein Email-Endpoint verfügbar', 'error');
+                log('Lösung: Starten Sie NEUSTART_API_SERVER.bat oder start_email_server.bat', 'warn');
+                
+                // Keep checking every 10 seconds
+                if (!checkInterval) {
+                    log('Automatische Wiederholung alle 10 Sekunden...', 'info');
+                    checkInterval = setInterval(checkAllSystems, 10000);
+                }
+            }
+        }
+        
+        async function sendTestEmail() {
+            if (!availableEndpoint) {
+                alert('Kein Email-Endpoint verfügbar!');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="status-box status-checking"><div class="spinner"></div> Sende Test-Email...</div>';
+            
+            log('Sende Test-Email an siegert@consec-nuernberg.de...', 'info');
+            
+            try {
+                const response = await fetch(availableEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: 'siegert@consec-nuernberg.de',
+                        subject: 'CONSEC Test - ' + new Date().toLocaleString('de-DE'),
+                        html_body: `
+                            <!DOCTYPE html>
+                            <html>
+                            <head><meta charset="UTF-8"></head>
+                            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                                    <h1 style="color: white; margin: 0;">✅ Test Erfolgreich!</h1>
+                                </div>
+                                <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;">
+                                    <p style="font-size: 16px; color: #333;">Diese Test-Email wurde erfolgreich über das CONSEC Email-System gesendet.</p>
+                                    <table style="width: 100%; margin: 20px 0;">
+                                        <tr><td style="padding: 8px; color: #666;">Zeitstempel:</td><td style="padding: 8px;"><strong>${new Date().toLocaleString('de-DE')}</strong></td></tr>
+                                        <tr><td style="padding: 8px; color: #666;">Endpoint:</td><td style="padding: 8px;"><code>${availableEndpoint}</code></td></tr>
+                                        <tr><td style="padding: 8px; color: #666;">SMTP Server:</td><td style="padding: 8px;">in-v3.mailjet.com</td></tr>
+                                    </table>
+                                    <p style="color: #666; font-size: 14px;">Das Email-System funktioniert wie in Access VBA.</p>
+                                </div>
+                            </body>
+                            </html>
+                        `,
+                        plain_body: 'CONSEC Test erfolgreich! Zeitstempel: ' + new Date().toLocaleString('de-DE')
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="status-box status-success">
+                            <span class="icon">✅</span>
+                            <div>
+                                <strong>Email erfolgreich gesendet!</strong><br>
+                                <small>${result.message}</small>
+                            </div>
+                        </div>
+                    `;
+                    log('✅ Test-Email erfolgreich gesendet!', 'success');
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status-box status-error">
+                            <span class="icon">❌</span>
+                            <div>
+                                <strong>Fehler beim Senden</strong><br>
+                                <small>${result.error}</small>
+                            </div>
+                        </div>
+                    `;
+                    log('❌ Fehler: ' + result.error, 'error');
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `
+                    <div class="status-box status-error">
+                        <span class="icon">❌</span>
+                        <div>
+                            <strong>Verbindungsfehler</strong><br>
+                            <small>${e.message}</small>
+                        </div>
+                    </div>
+                `;
+                log('❌ Verbindungsfehler: ' + e.message, 'error');
+            }
+        }
+        
+        // Auto-start
+        window.onload = function() {
+            log('CONSEC Email System gestartet', 'info');
+            log('Konfiguration: Mailjet SMTP (in-v3.mailjet.com:587)', 'info');
+            checkAllSystems();
+        };
+    </script>
+</body>
+</html>

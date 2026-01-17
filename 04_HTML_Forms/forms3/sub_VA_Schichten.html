@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schichten</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background: #9090c0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .subform-container {
+            background: #9090c0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 4px;
+        }
+
+        .subform-header {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 4px 8px;
+            border: 1px solid #606090;
+            font-weight: 600;
+            font-size: 10px;
+            color: #000080;
+            margin-bottom: 4px;
+        }
+
+        .schichten-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .schicht-item {
+            background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+            border: 1px solid #808080;
+            padding: 6px 8px;
+            cursor: pointer;
+        }
+
+        .schicht-item:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+        }
+
+        .schicht-item.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+            color: white;
+        }
+
+        .schicht-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .schicht-zeit {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .schicht-anzahl {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+        }
+
+        .schicht-item.active .schicht-anzahl {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .schicht-anzahl.complete {
+            background: #90c090;
+            color: #006000;
+        }
+
+        .schicht-anzahl.incomplete {
+            background: #e0a0a0;
+            color: #800000;
+        }
+
+        .schicht-item.active .schicht-anzahl.complete,
+        .schicht-item.active .schicht-anzahl.incomplete {
+            color: white;
+        }
+
+        .schicht-details {
+            font-size: 9px;
+            color: #666;
+        }
+
+        .schicht-item.active .schicht-details {
+            color: #ddd;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            background: white;
+            border: 1px solid #999;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .toolbar-btn {
+            flex: 1;
+            padding: 3px 6px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 1px solid #808080;
+            cursor: pointer;
+            font-size: 9px;
+            text-align: center;
+        }
+
+        .toolbar-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">Schichten</div>
+        <div class="schichten-list" id="schichtenList">
+            <div class="empty-state">Keine Schichten</div>
+        </div>
+        <div class="toolbar">
+            <button class="toolbar-btn" onclick="addSchicht()">+ Schicht</button>
+            <button class="toolbar-btn" onclick="editSchicht()">Bearbeiten</button>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        let currentVA_ID = null;
+        let currentDate = null;
+        let selectedSchicht = null;
+
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            if (data && data.type === 'LOAD_DATA') {
+                currentVA_ID = data.va_id || data.id;
+                currentDate = data.datum || data.date;
+                loadData();
+            }
+            if (data && data.type === 'DAY_SELECTED') {
+                currentDate = data.date;
+                loadData();
+            }
+        });
+
+        async function loadData() {
+            if (!currentVA_ID) return;
+
+            try {
+                let url = `http://localhost:5000/api/schichten/${currentVA_ID}`;
+                if (currentDate) url += `?datum=${currentDate}`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('API Fehler');
+
+                const data = await response.json();
+                renderSchichten(data);
+            } catch (error) {
+                console.log('[sub_VA_Schichten] Fehler:', error);
+            }
+        }
+
+        function renderSchichten(data) {
+            const container = document.getElementById('schichtenList');
+            const schichten = data.schichten || data || [];
+
+            if (schichten.length === 0) {
+                container.innerHTML = '<div class="empty-state">Keine Schichten</div>';
+                return;
+            }
+
+            container.innerHTML = schichten.map(s => {
+                const isComplete = (s.MA_Anzahl_Ist || 0) >= (s.MA_Anzahl || 0);
+                const statusClass = isComplete ? 'complete' : 'incomplete';
+
+                return `
+                    <div class="schicht-item" data-id="${s.VAStart_ID || s.ID}" onclick="selectSchicht(this)">
+                        <div class="schicht-header">
+                            <span class="schicht-zeit">${s.VA_Start || ''} - ${s.VA_Ende || ''}</span>
+                            <span class="schicht-anzahl ${statusClass}">
+                                ${s.MA_Anzahl_Ist || 0}/${s.MA_Anzahl || 0} MA
+                            </span>
+                        </div>
+                        <div class="schicht-details">
+                            ${s.Position || 'Standard'} | ${calcDuration(s.VA_Start, s.VA_Ende)} Std
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Select first schicht by default
+            const firstSchicht = container.querySelector('.schicht-item');
+            if (firstSchicht) selectSchicht(firstSchicht);
+        }
+
+        function calcDuration(start, end) {
+            if (!start || !end) return '0';
+            const [sh, sm] = start.split(':').map(Number);
+            const [eh, em] = end.split(':').map(Number);
+            let diff = (eh * 60 + em) - (sh * 60 + sm);
+            if (diff < 0) diff += 24 * 60; // Overnight
+            return (diff / 60).toFixed(1);
+        }
+
+        function selectSchicht(element) {
+            document.querySelectorAll('.schicht-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            selectedSchicht = element.dataset.id;
+
+            // Notify parent
+            window.parent.postMessage({
+                type: 'SCHICHT_SELECTED',
+                schicht_id: selectedSchicht,
+                va_id: currentVA_ID,
+                datum: currentDate
+            }, '*');
+        }
+
+        function addSchicht() {
+            window.parent.postMessage({
+                type: 'ADD_SCHICHT',
+                va_id: currentVA_ID,
+                datum: currentDate
+            }, '*');
+        }
+
+        function editSchicht() {
+            if (selectedSchicht) {
+                window.parent.postMessage({
+                    type: 'EDIT_SCHICHT',
+                    schicht_id: selectedSchicht,
+                    va_id: currentVA_ID
+                }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

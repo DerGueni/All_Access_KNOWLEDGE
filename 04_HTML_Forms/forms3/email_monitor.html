@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="30">
+    <title>CONSEC Email Monitor</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        h1 { 
+            font-size: 28px; 
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        .status-online { background: #00ff88; box-shadow: 0 0 20px #00ff88; }
+        .status-offline { background: #ff4444; box-shadow: 0 0 20px #ff4444; }
+        .status-checking { background: #ffaa00; box-shadow: 0 0 20px #ffaa00; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .stat-box {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-box h3 { font-size: 14px; color: #888; margin-bottom: 8px; }
+        .stat-box .value { font-size: 24px; font-weight: bold; }
+        .stat-box .value.online { color: #00ff88; }
+        .stat-box .value.offline { color: #ff4444; }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,255,136,0.4); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.3); }
+        .log {
+            background: #000;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .log-entry { padding: 3px 0; border-bottom: 1px solid #222; }
+        .log-time { color: #666; }
+        .log-ok { color: #00ff88; }
+        .log-error { color: #ff4444; }
+        .log-info { color: #00aaff; }
+        .instructions {
+            background: rgba(255,170,0,0.2);
+            border: 1px solid #ffaa00;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .instructions h3 { color: #ffaa00; margin-bottom: 15px; }
+        .instructions ol { margin-left: 20px; line-height: 2; }
+        .instructions code {
+            background: rgba(0,0,0,0.5);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+        }
+        .countdown {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+        #testEmailSection { display: none; }
+        #testEmailSection.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>
+                <span id="mainIndicator" class="status-indicator status-checking"></span>
+                CONSEC Email System Monitor
+            </h1>
+            <p id="mainStatus" style="color: #888; margin-top: 10px;">Prüfe Systemstatus...</p>
+            <p class="countdown">Automatische Aktualisierung alle 30 Sekunden</p>
+        </div>
+
+        <div class="grid">
+            <div class="stat-box">
+                <h3>API Server (Port 5000)</h3>
+                <div id="status5000" class="value offline">Prüfe...</div>
+            </div>
+            <div class="stat-box">
+                <h3>Email Endpoint</h3>
+                <div id="statusEmail" class="value offline">Prüfe...</div>
+            </div>
+            <div class="stat-box">
+                <h3>Email Server (Port 5001)</h3>
+                <div id="status5001" class="value offline">Prüfe...</div>
+            </div>
+            <div class="stat-box">
+                <h3>Letzte Prüfung</h3>
+                <div id="lastCheck" class="value" style="font-size: 16px;">--:--:--</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 15px;">📋 Protokoll</h2>
+            <div id="log" class="log"></div>
+        </div>
+
+        <div id="testEmailSection" class="card">
+            <h2 style="margin-bottom: 15px;">📧 Email-Test</h2>
+            <p style="margin-bottom: 15px; color: #888;">Email-System ist bereit! Senden Sie eine Test-Email:</p>
+            <button class="btn btn-primary" onclick="sendTestEmail()">📨 Test-Email senden</button>
+            <p id="testResult" style="margin-top: 15px;"></p>
+        </div>
+
+        <div class="instructions" id="instructions">
+            <h3>⚠️ Server-Neustart erforderlich</h3>
+            <p style="margin-bottom: 15px;">Der Email-Endpoint ist noch nicht aktiv. Bitte starten Sie den API-Server neu:</p>
+            <ol>
+                <li>Öffnen Sie den Windows Explorer</li>
+                <li>Navigieren Sie zu: <code>C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\08_Tools\python</code></li>
+                <li>Doppelklicken Sie auf: <code>NEUSTART_API_SERVER.bat</code></li>
+                <li>Warten Sie, bis der Server gestartet ist</li>
+            </ol>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="checkNow()">🔄 Jetzt prüfen</button>
+                <a href="file:///C:/Users/guenther.siegert/Documents/0006_All_Access_KNOWLEDGE/08_Tools/python/" class="btn btn-secondary">📂 Ordner öffnen</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let emailEndpointAvailable = false;
+        let availableEndpoint = null;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString('de-DE');
+            const className = 'log-' + type;
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="${className}">${message}</span>`;
+            logDiv.insertBefore(entry, logDiv.firstChild);
+            
+            // Max 50 Einträge
+            while (logDiv.children.length > 50) {
+                logDiv.removeChild(logDiv.lastChild);
+            }
+        }
+
+        async function checkStatus() {
+            const indicator = document.getElementById('mainIndicator');
+            const mainStatus = document.getElementById('mainStatus');
+            indicator.className = 'status-indicator status-checking';
+            
+            log('Prüfe Systemstatus...', 'info');
+            
+            // Port 5000 - API Server
+            let api5000 = false;
+            try {
+                const r = await fetch('http://localhost:5000/', { timeout: 3000 });
+                api5000 = r.ok;
+            } catch (e) {}
+            document.getElementById('status5000').textContent = api5000 ? 'ONLINE' : 'OFFLINE';
+            document.getElementById('status5000').className = 'value ' + (api5000 ? 'online' : 'offline');
+            
+            // Email Endpoint auf Port 5000
+            let email5000 = false;
+            if (api5000) {
+                try {
+                    const r = await fetch('http://localhost:5000/api/email/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ to: 'test@test.de', subject: 'Test', html_body: '<p>Test</p>' })
+                    });
+                    email5000 = r.status !== 404;
+                    if (email5000) availableEndpoint = 'http://localhost:5000/api/email/send';
+                } catch (e) {}
+            }
+            
+            // Port 5001 - Standalone Email Server
+            let api5001 = false;
+            try {
+                const r = await fetch('http://localhost:5001/', { timeout: 3000 });
+                api5001 = r.ok;
+                if (api5001 && !availableEndpoint) {
+                    availableEndpoint = 'http://localhost:5001/api/email/send';
+                }
+            } catch (e) {}
+            document.getElementById('status5001').textContent = api5001 ? 'ONLINE' : 'OFFLINE';
+            document.getElementById('status5001').className = 'value ' + (api5001 ? 'online' : 'offline');
+            
+            // Email Status
+            emailEndpointAvailable = email5000 || api5001;
+            document.getElementById('statusEmail').textContent = emailEndpointAvailable ? 'BEREIT' : 'NICHT VERFÜGBAR';
+            document.getElementById('statusEmail').className = 'value ' + (emailEndpointAvailable ? 'online' : 'offline');
+            
+            // Hauptstatus
+            if (emailEndpointAvailable) {
+                indicator.className = 'status-indicator status-online';
+                mainStatus.textContent = '✅ Email-System ist betriebsbereit!';
+                mainStatus.style.color = '#00ff88';
+                document.getElementById('instructions').style.display = 'none';
+                document.getElementById('testEmailSection').classList.add('show');
+                log('✅ Email-System ist bereit via ' + availableEndpoint, 'ok');
+            } else {
+                indicator.className = 'status-indicator status-offline';
+                mainStatus.textContent = '❌ Email-Endpoint nicht verfügbar - Server-Neustart erforderlich';
+                mainStatus.style.color = '#ff4444';
+                document.getElementById('instructions').style.display = 'block';
+                document.getElementById('testEmailSection').classList.remove('show');
+                log('❌ Email-Endpoint nicht verfügbar', 'error');
+            }
+            
+            // Zeitstempel
+            document.getElementById('lastCheck').textContent = new Date().toLocaleTimeString('de-DE');
+        }
+
+        async function sendTestEmail() {
+            if (!availableEndpoint) {
+                alert('Kein Email-Endpoint verfügbar!');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<span style="color: #ffaa00;">Sende Test-Email...</span>';
+            log('Sende Test-Email an siegert@consec-nuernberg.de...', 'info');
+            
+            try {
+                const response = await fetch(availableEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: 'siegert@consec-nuernberg.de',
+                        subject: 'CONSEC Email-System Test - ' + new Date().toLocaleString('de-DE'),
+                        html_body: `
+                            <!DOCTYPE html>
+                            <html>
+                            <head><meta charset="UTF-8"></head>
+                            <body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
+                                <div style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                    <div style="background: linear-gradient(135deg, #000080, #1a5276); padding: 30px; text-align: center;">
+                                        <h1 style="color: #fff; margin: 0;">✅ Test erfolgreich!</h1>
+                                    </div>
+                                    <div style="padding: 30px;">
+                                        <p style="font-size: 16px; color: #333;">Das CONSEC Email-System funktioniert einwandfrei.</p>
+                                        <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+                                            <tr style="background: #f8f9fa;">
+                                                <td style="padding: 12px; border: 1px solid #dee2e6;"><strong>Zeitstempel:</strong></td>
+                                                <td style="padding: 12px; border: 1px solid #dee2e6;">${new Date().toLocaleString('de-DE')}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 12px; border: 1px solid #dee2e6;"><strong>Endpoint:</strong></td>
+                                                <td style="padding: 12px; border: 1px solid #dee2e6;">${availableEndpoint}</td>
+                                            </tr>
+                                            <tr style="background: #f8f9fa;">
+                                                <td style="padding: 12px; border: 1px solid #dee2e6;"><strong>SMTP Server:</strong></td>
+                                                <td style="padding: 12px; border: 1px solid #dee2e6;">in-v3.mailjet.com:587</td>
+                                            </tr>
+                                        </table>
+                                        <p style="color: #666; font-size: 14px;">Diese Email wurde automatisch vom CONSEC Email-System gesendet.</p>
+                                    </div>
+                                </div>
+                            </body>
+                            </html>
+                        `,
+                        plain_body: 'CONSEC Email-System Test erfolgreich! Zeitstempel: ' + new Date().toLocaleString('de-DE')
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = '<span style="color: #00ff88;">✅ Test-Email erfolgreich gesendet!</span>';
+                    log('✅ Test-Email erfolgreich gesendet an siegert@consec-nuernberg.de', 'ok');
+                } else {
+                    resultDiv.innerHTML = '<span style="color: #ff4444;">❌ Fehler: ' + (result.error || 'Unbekannt') + '</span>';
+                    log('❌ Fehler beim Senden: ' + (result.error || 'Unbekannt'), 'error');
+                }
+            } catch (e) {
+                resultDiv.innerHTML = '<span style="color: #ff4444;">❌ Verbindungsfehler: ' + e.message + '</span>';
+                log('❌ Verbindungsfehler: ' + e.message, 'error');
+            }
+        }
+
+        function checkNow() {
+            checkStatus();
+        }
+
+        // Initial check
+        checkStatus();
+        
+        // Prüfe alle 10 Sekunden
+        setInterval(checkStatus, 10000);
+    </script>
+</body>
+</html>

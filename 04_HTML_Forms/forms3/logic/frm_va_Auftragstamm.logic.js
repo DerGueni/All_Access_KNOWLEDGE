@@ -627,7 +627,8 @@ function fillVADatumComboFromData(einsatztage) {
 
     einsatztage.forEach(item => {
         const opt = document.createElement('option');
-        opt.value = item.VADatum || item.VADatum_ID;
+        // FIX 16.01.2026: Numerische ID aus tbl_VA_AnzTage verwenden (nicht Datum-String!)
+        opt.value = item.ID || item.VADatum_ID || item.VADatum;
         opt.textContent = formatDate(item.VADatum);
         combo.appendChild(opt);
     });
@@ -635,7 +636,8 @@ function fillVADatumComboFromData(einsatztage) {
     // Erstes Datum auswählen
     combo.selectedIndex = 1;
     state.currentVADatum = einsatztage[0].VADatum;
-    state.currentVADatum_ID = einsatztage[0].VADatum_ID || einsatztage[0].VADatum;
+    // FIX 16.01.2026: Numerische ID speichern
+    state.currentVADatum_ID = einsatztage[0].ID || einsatztage[0].VADatum_ID;
 }
 
 async function loadVADatumCombo(va_id) {
@@ -649,7 +651,8 @@ async function loadVADatumCombo(va_id) {
         if (result.data && result.data.length > 0) {
             result.data.forEach(item => {
                 const opt = document.createElement('option');
-                opt.value = item.VADatum;
+                // FIX 16.01.2026: Numerische ID aus tbl_VA_AnzTage verwenden
+                opt.value = item.ID || item.VADatum_ID || item.VADatum;
                 opt.textContent = formatDate(item.VADatum);
                 combo.appendChild(opt);
             });
@@ -657,7 +660,8 @@ async function loadVADatumCombo(va_id) {
             // Erstes Datum auswaehlen
             combo.selectedIndex = 1;
             state.currentVADatum = result.data[0].VADatum;
-            state.currentVADatum_ID = result.data[0].VADatum_ID || result.data[0].VADatum;
+            // FIX 16.01.2026: Numerische ID speichern
+            state.currentVADatum_ID = result.data[0].ID || result.data[0].VADatum_ID;
         }
     } catch (error) {
         console.warn('[Auftragstamm] VADatum-Liste fehlgeschlagen:', error);

@@ -1,11 +1,141 @@
 # STAND DER ARBEIT - WebView2 HTML Formulare
 
-**Letztes Update:** 2026-01-16 14:30
-**Session:** REST-API Fallback für 4 Subforms - IMPLEMENTIERT ✅
+**Letztes Update:** 2026-01-17 09:30
+**Session:** ALLE KORREKTUREN ABGESCHLOSSEN ✅
 
 ---
 
 ## AKTUELLER STAND
+
+### ✅ NICHTS MEHR OFFEN - ALLE AUFGABEN ERLEDIGT ✅
+
+**Ignoriert (auf Anweisung):**
+- frm_va_Auftragstamm2
+- frm_Mahnung
+
+---
+
+### ✅ Alle Korrekturen durchgeführt (2026-01-17 09:30) - ERLEDIGT ✅
+
+| Aufgabe | Anzahl | Status |
+|---------|--------|--------|
+| Header-Fixes (→16px) | 5 Formulare | ✅ |
+| Button-Events (onclick) | 3 Buttons | ✅ |
+| Logic-Dateien (Inline→Module) | 9 Formulare | ✅ |
+| API-Fix (ODBC Crash) | 2 Endpoints | ✅ |
+
+**Korrigierte Formulare:**
+- frm_OB_Objekt, frm_KD_Verrechnungssaetze, frm_MA_Adressen
+- frm_va_Auftragstamm, frm_KD_Kundenstamm (Header)
+- frm_MA_Serien_eMail_dienstplan, frm_MA_Serien_eMail_Auftrag (Buttons)
+- frm_Systeminfo, frm_KD_Umsatzauswertung, frm_KD_Verrechnungssaetze (Logic)
+- frm_MA_Adressen, sub_MA_Dienstplan, sub_MA_Jahresuebersicht (Logic)
+- sub_MA_Rechnungen, sub_MA_Stundenuebersicht, sub_MA_Zeitkonto (Logic)
+
+**Vollständiger Report:** Siehe CLAUDE2.md
+
+---
+
+### ✅ Vollständige Access-Parität Analyse (2026-01-17 08:30) - ABGESCHLOSSEN ✅
+
+**Umfang:** 47 HTML-Formulare + Subformulare analysiert (6 parallele Subagents)
+
+**Finales Ergebnis nach Korrekturen:**
+| Kategorie | Anzahl |
+|-----------|--------|
+| ✅ Vollständig OK | 45 |
+| ⚠️ Ignoriert | 2 |
+
+**API-Fix:** `/api/lohn/stunden-export` (4-Tabellen-Query aufgeteilt)
+
+---
+
+### ✅ API ODBC-Crash Fix + Browser-Tests (2026-01-17 01:50) - IMPLEMENTIERT ✅
+
+**Problem:** `/api/zuordnungen` Endpoint crashte mit Segmentation Fault bei jedem Aufruf
+
+**Ursache:**
+- Komplexe SQL-Query mit 4 Tabellen und 3 LEFT JOINs
+- Microsoft Access ODBC Treiber ist nicht thread-safe
+- Komplexe JOINs verursachen Speicherfehler im Treiber
+
+**Lösung:**
+- Query von 4 Tabellen (3 JOINs) auf 2 Tabellen (1 JOIN) reduziert
+- Auftrag/Objekt-Daten werden bei Bedarf separat geladen
+
+**Geänderte Datei:** `08_Tools/python/api_server.py` (Zeilen 1507-1513)
+
+**Browser-Tests durchgeführt:**
+| Formular | Ergebnis | Details |
+|----------|----------|---------|
+| frm_MA_VA_Schnellauswahl | ✅ | 125 MA, Doppelklick-Zuordnung funktioniert |
+| frm_va_Auftragstamm | ✅ | 197 Aufträge, Auftrags-Liste korrekt |
+| frm_MA_Mitarbeiterstamm | ✅ | MA-Daten geladen, alle Tabs funktionieren |
+
+**API-Endpoints getestet:**
+| Endpoint | Status |
+|----------|--------|
+| `/api/zuordnungen` | ✅ Funktioniert (nach Fix) |
+| `/api/planungen` | ✅ Funktioniert |
+| `/api/auftraege` | ✅ Funktioniert |
+| `/api/health` | ✅ Funktioniert |
+
+**Dokumentation:** CLAUDE2.md aktualisiert
+
+---
+
+### ✅ Access-Parität Batch 1 (2026-01-16 17:30) - IMPLEMENTIERT ✅
+
+**Phase 1: CSS-Anpassung (global)**
+- `css/unified-header.css`: `--title-font-size: 15px`
+- `css/form-titles.css`: `font-size: 15px`, `color: #000000`
+
+**Phase 2: 5 Formulare abgeglichen (6 Agents parallel)**
+
+| Formular | VBA-Events | Änderungen | Status |
+|----------|------------|------------|--------|
+| frm_MA_VA_Schnellauswahl | 31 | Keine (bereits korrekt) | ✅ |
+| frm_DP_Dienstplan_MA | 23 | lbl_Tag DblClick, Buttons | ✅ |
+| frm_DP_Dienstplan_Objekt | 22 | Header, btnOutpExcelSend | ✅ |
+| frm_Einsatzuebersicht | 0 | Keine (Anzeige-Formular) | ✅ |
+| frm_MA_Abwesenheit | 13 | Header, Sidebar | ✅ |
+
+**Geänderte Dateien:**
+- `css/unified-header.css`
+- `css/form-titles.css`
+- `frm_DP_Dienstplan_MA.html`
+- `frm_DP_Dienstplan_Objekt.html`
+- `frm_MA_Abwesenheit.html`
+
+**Nächster Batch:** frm_MA_Zeitkonten, frm_Rechnung, frm_Angebot, frm_N_Bewerber, frm_Rueckmeldestatistik
+
+---
+
+---
+
+## AKTUELLER STAND
+
+### ✅ BWN-Buttons VBA Bridge Korrektur (2026-01-16 15:25) - IMPLEMENTIERT ✅
+
+**Problem:** btn_BWN_Druck und cmd_BWN_send verwendeten falschen Endpoint statt VBA Bridge
+
+**Ursache:**
+- `bindButton()` in logic.js überschrieb korrekten HTML onclick Handler
+- `window.bwnDrucken` und `window.bwnSenden` überschrieben korrekte HTML-Funktionen
+- Redirect-Funktionen `function bwnDrucken() { return druckeBWN(); }` leiteten falsch um
+
+**Lösung in `frm_va_Auftragstamm.logic.js`:**
+1. **Zeile 147-152:** `bindButton('btn_BWN_Druck', ...)` und `bindButton('cmd_BWN_send', ...)` auskommentiert
+2. **Zeile 2189-2192:** `window.bwnDrucken` und `window.bwnSenden` Überschreibungen auskommentiert
+3. **Zeile 2436-2439:** Redirect-Funktionen `bwnDrucken()` und `bwnSenden()` auskommentiert
+
+**Ergebnis:** HTML onclick Handler verwenden jetzt korrekt VBA Bridge (Port 5002)
+
+**Hinweis:** BWN-Buttons nur sichtbar bei Veranstalter_ID = 20760 (ESS)
+
+**GESCHÜTZT in CLAUDE.md:** Beide Korrekturen dokumentiert und geschützt
+
+---
 
 ### ✅ REST-API Fallback für Subforms (2026-01-16 14:30) - IMPLEMENTIERT ✅
 

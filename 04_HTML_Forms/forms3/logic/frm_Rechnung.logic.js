@@ -12,7 +12,8 @@ const state = {
     kunden: [],
     positionen: [],
     rechnungsnummer: null,
-    nextPositionNr: 1
+    nextPositionNr: 1,
+    selectedKunde: null  // Ausgewählter Kunde (Access-Parität: cboKunde)
 };
 
 // ========================================
@@ -33,8 +34,103 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add first empty position
     addPosition();
 
+    // Bind event handlers (Access-Parität)
+    bindEventHandlers();
+
     console.log('[Rechnung] Ready');
 });
+
+// ========================================
+// EVENT HANDLERS (Access-Parität)
+// ========================================
+function bindEventHandlers() {
+    // cboKunde_AfterUpdate → kunde change
+    const kundeSelect = document.getElementById('kunde');
+    if (kundeSelect) {
+        kundeSelect.addEventListener('change', onKundeChange);
+    }
+
+    // zahlungsziel change
+    const zahlungszielSelect = document.getElementById('zahlungsziel');
+    if (zahlungszielSelect) {
+        zahlungszielSelect.addEventListener('change', onZahlungszielChange);
+    }
+
+    // istRechnung Toggle (falls vorhanden)
+    const istRechnungToggle = document.getElementById('istRechnung');
+    if (istRechnungToggle) {
+        istRechnungToggle.addEventListener('change', onIstRechnungChange);
+    }
+
+    console.log('[Rechnung] Event handlers bound');
+}
+
+/**
+ * Entspricht istRechnung_AfterUpdate in VBA
+ * Toggle zwischen Rechnung und Angebot
+ */
+function onIstRechnungChange() {
+    const isRechnung = document.getElementById('istRechnung').checked;
+    const label = document.querySelector('label[for="istRechnung"]');
+
+    if (isRechnung) {
+        if (label) label.textContent = 'Rechnung';
+        console.log('[Rechnung] Modus: Rechnung');
+        // In Access: Me.recordSource = "qry_tbl_Rch_Kopf"
+    } else {
+        if (label) label.textContent = 'Angebot';
+        console.log('[Rechnung] Modus: Angebot');
+        // In Access: Me.recordSource = "qry_tbl_Rch_Kopf_Ang"
+    }
+}
+
+/**
+ * Entspricht cboKunde_AfterUpdate in VBA
+ * In Access: Filter auf Kunde setzen
+ * In HTML: Kundendetails laden und anzeigen
+ */
+async function onKundeChange() {
+    const kundeId = document.getElementById('kunde').value;
+
+    if (!kundeId) {
+        state.selectedKunde = null;
+        console.log('[Rechnung] Kunde abgewählt');
+        return;
+    }
+
+    const kunde = state.kunden.find(k => k.kun_Id == kundeId);
+    if (kunde) {
+        state.selectedKunde = kunde;
+        console.log(`[Rechnung] Kunde ausgewählt: ${kunde.kun_Firma} (ID: ${kundeId})`);
+
+        // Optional: Lade Kundendetails/Adresse für Rechnungskopf
+        try {
+            const response = await fetch(`http://localhost:5000/api/kunden/${kundeId}`);
+            if (response.ok) {
+                const kundenDetails = await response.json();
+                state.selectedKunde = kundenDetails;
+                console.log('[Rechnung] Kundendetails geladen:', kundenDetails);
+            }
+        } catch (err) {
+            console.warn('[Rechnung] Kundendetails konnten nicht geladen werden:', err.message);
+        }
+    }
+}
+
+/**
+ * Entspricht Zahlungsziel-Änderung
+ * Berechnet Fälligkeitsdatum
+ */
+function onZahlungszielChange() {
+    const tage = parseInt(document.getElementById('zahlungsziel').value) || 30;
+    const rechnungsdatum = document.getElementById('rechnungsdatum').value;
+
+    if (rechnungsdatum) {
+        const datum = new Date(rechnungsdatum);
+        datum.setDate(datum.getDate() + tage);
+        console.log(`[Rechnung] Fällig bis: ${datum.toLocaleDateString('de-DE')}`);
+    }
+}
 
 // ========================================
 // DATA LOADING
@@ -47,7 +143,9 @@ async function loadKunden() {
             throw new Error(`API-Fehler: ${response.statusText}`);
         }
 
-        const kunden = await response.json();
+        const result = await response.json();
+        // API gibt {data: [...]} zurück
+        const kunden = Array.isArray(result) ? result : (result.data || []);
         state.kunden = kunden;
 
         // Fill dropdown

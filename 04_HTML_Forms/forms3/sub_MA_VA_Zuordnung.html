@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MA-Zuordnung (sub_MA_VA_Zuordnung)</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+            font-family: Arial, sans-serif;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .datasheet-container {
+            flex: 1;
+            overflow: auto;
+        }
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            table-layout: fixed;
+        }
+        .datasheet th {
+            background: linear-gradient(180deg, #f8f8f8 0%, #e0e0e0 100%);
+            border: 1px solid #999;
+            padding: 3px 4px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        /* von/bis Überschriften zentriert (14.01.2026) */
+        .datasheet th.col-time {
+            text-align: center;
+        }
+        .datasheet td {
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+            height: 18px;
+            vertical-align: middle;
+        }
+        .datasheet tbody tr:hover { background: #e8f4fc; }
+        .datasheet tbody tr.selected { background: #cce5ff; }
+
+        /* Bedingte Formatierung wie in Access (14.01.2026) */
+        /* IstFraglich = True -> tuerkisblaue Hintergrundfarbe (Access: BackColor = 16777088 = RGB(192,255,255)) */
+        .datasheet tbody tr.ist-fraglich { background: #c0ffff; }
+        .datasheet tbody tr.ist-fraglich.selected { background: #a0e0e0; }
+        /* Einsatzleitung = True -> fett und leicht hervorgehoben */
+        .datasheet tbody tr.is-el { font-weight: bold; }
+        /* PKW > 0 -> PKW-Spalte gruen hervorheben */
+        .datasheet tbody tr.has-pkw td.col-pkw { color: #008000; font-weight: bold; }
+
+        /* Spaltenbreiten - 18px schmäler (14.01.2026) */
+        .col-lfd { width: 6px; text-align: right; }      /* 24-18=6px, rechtsbündig */
+        .col-ma { width: 92px; }                          /* 110-18=92px */
+        .col-time { width: 20px; text-align: center; }   /* 38-18=20px, zentriert */
+        .col-std { width: 14px; text-align: right; }     /* 32-18=14px, rechtsbündig */
+        .col-bemerk { width: 120px; }
+        .col-info { width: 16px; text-align: center; }   /* ? zentriert, schmäler (14.01.2026) */
+        .col-pkw { width: 24px; text-align: center; }    /* 42-18=24px, zentriert */
+        .col-el { width: 16px; text-align: center; }     /* EL zentriert, schmäler (14.01.2026) */
+        .col-re { width: 16px; text-align: center; }     /* RE zentriert, schmäler (14.01.2026) */
+
+        /* Leere Zeile (noch kein MA zugeordnet) */
+        .datasheet tbody tr.new-row {
+            background: #fffef0;
+        }
+        .datasheet tbody tr.new-row:hover {
+            background: #fff8d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container" id="sub_MA_VA_Zuordnung">
+        <div class="datasheet-container">
+            <table class="datasheet" id="tbl_MA_VA_Zuordnung">
+                <thead>
+                    <tr>
+                        <th class="col-lfd">Lfd</th>
+                        <th class="col-ma">Mitarbeiter</th>
+                        <th class="col-time">von</th>
+                        <th class="col-time">bis</th>
+                        <th class="col-std">Std</th>
+                        <th class="col-bemerk">Bemerkungen</th>
+                        <th class="col-info">?</th>
+                        <th class="col-pkw">PKW</th>
+                        <th class="col-el">EL</th>
+                        <th class="col-re">RE</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_MA_VA_Zuordnung">
+                    <!-- Daten werden via JS geladen -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Logic Module -->
+    <script src="js/webview2-bridge.js"></script>
+    <script type="module" src="logic/sub_MA_VA_Zuordnung.logic.js?v=20260114_1710"></script>
+</body>
+</html>

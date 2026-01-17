@@ -532,6 +532,211 @@ def vba_nummern_current(nummern_id):
         return jsonify({"success": False, "error": str(e)}), 500
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# AUFTRAGSTAMM BUTTON ENDPOINTS (15.01.2026)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@app.route('/api/vba/namensliste-ess', methods=['POST'])
+def vba_namensliste_ess():
+    """
+    Erstellt Namensliste ESS (Einsatzstundenliste).
+    Ruft VBA-Funktion Stundenliste_erstellen auf.
+
+    Request Body:
+    {
+        "VA_ID": 12345,
+        "MA_ID": 0,          // optional, 0 = alle MA
+        "kun_ID": 456        // Veranstalter/Kunden-ID
+    }
+
+    Response:
+    {
+        "success": true,
+        "message": "Namensliste ESS erstellt"
+    }
+    """
+    log("=== /api/vba/namensliste-ess aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('VA_ID')
+        ma_id = data.get('MA_ID', 0)
+        kun_id = data.get('kun_ID', 0)
+
+        if not va_id:
+            return jsonify({"success": False, "error": "VA_ID fehlt"}), 400
+
+        log(f"Erstelle Namensliste ESS: VA_ID={va_id}, MA_ID={ma_id}, kun_ID={kun_id}")
+
+        if not HAS_WIN32COM:
+            return jsonify({
+                "success": False,
+                "error": "win32com nicht verfügbar",
+                "simulated": True
+            })
+
+        # VBA-Funktion Stundenliste_erstellen aufrufen
+        result = run_vba_function("Stundenliste_erstellen", int(va_id), int(ma_id), int(kun_id))
+
+        if result.get("success"):
+            log("Namensliste ESS erfolgreich erstellt")
+            return jsonify({
+                "success": True,
+                "message": "Namensliste ESS erfolgreich erstellt"
+            })
+        else:
+            log(f"Fehler: {result.get('error')}")
+            return jsonify(result), 500
+
+    except Exception as e:
+        error_msg = traceback.format_exc()
+        log(f"Fehler in /api/vba/namensliste-ess: {error_msg}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/el-drucken', methods=['POST'])
+def vba_el_drucken():
+    """
+    Druckt Einsatzliste (EL) für Auftrag.
+    Ruft VBA-Funktion EinsatzlisteDruckenFromHTML auf.
+
+    Request Body:
+    {
+        "va_id": 12345,
+        "vadatum_id": 67890    // optional
+    }
+
+    Response:
+    {
+        "success": true,
+        "message": "Einsatzliste gedruckt"
+    }
+    """
+    log("=== /api/vba/el-drucken aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+        vadatum_id = data.get('vadatum_id') or data.get('VADatum_ID', 0)
+
+        if not va_id:
+            return jsonify({"success": False, "error": "va_id fehlt"}), 400
+
+        log(f"Drucke Einsatzliste: va_id={va_id}, vadatum_id={vadatum_id}")
+
+        if not HAS_WIN32COM:
+            return jsonify({
+                "success": False,
+                "error": "win32com nicht verfügbar",
+                "simulated": True
+            })
+
+        # VBA-Funktion EinsatzlisteDruckenFromHTML aufrufen
+        result = run_vba_function("EinsatzlisteDruckenFromHTML", int(va_id), int(vadatum_id))
+
+        if result.get("success"):
+            vba_return = str(result.get("result", ""))
+
+            # VBA-Funktionen geben ">OK" oder ">FEHLER: ..." zurück
+            if vba_return.startswith(">OK"):
+                log("Einsatzliste erfolgreich gedruckt")
+                return jsonify({
+                    "success": True,
+                    "message": "Einsatzliste erfolgreich erstellt"
+                })
+            elif vba_return.startswith(">FEHLER"):
+                error_text = vba_return.replace(">FEHLER:", "").strip()
+                log(f"VBA-Fehler: {error_text}")
+                return jsonify({
+                    "success": False,
+                    "error": error_text
+                }), 500
+            else:
+                log(f"Unerwarteter VBA-Rückgabewert: {vba_return}")
+                return jsonify({
+                    "success": True,
+                    "message": vba_return
+                })
+        else:
+            log(f"Fehler: {result.get('error')}")
+            return jsonify(result), 500
+
+    except Exception as e:
+        error_msg = traceback.format_exc()
+        log(f"Fehler in /api/vba/el-drucken: {error_msg}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/el-senden', methods=['POST'])
+def vba_el_senden():
+    """
+    Sendet Einsatzliste (EL) per E-Mail.
+    Ruft VBA-Funktion SendeBewachungsnachweiseFromHTML auf.
+
+    Request Body:
+    {
+        "va_id": 12345,
+        "vadatum_id": 67890    // optional
+    }
+
+    Response:
+    {
+        "success": true,
+        "message": "Einsatzliste gesendet"
+    }
+    """
+    log("=== /api/vba/el-senden aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+        vadatum_id = data.get('vadatum_id') or data.get('VADatum_ID', 0)
+
+        if not va_id:
+            return jsonify({"success": False, "error": "va_id fehlt"}), 400
+
+        log(f"Sende Einsatzliste: va_id={va_id}, vadatum_id={vadatum_id}")
+
+        if not HAS_WIN32COM:
+            return jsonify({
+                "success": False,
+                "error": "win32com nicht verfügbar",
+                "simulated": True
+            })
+
+        # VBA-Funktion SendeBewachungsnachweiseFromHTML aufrufen
+        result = run_vba_function("SendeBewachungsnachweiseFromHTML", int(va_id), int(vadatum_id))
+
+        if result.get("success"):
+            vba_return = str(result.get("result", ""))
+
+            # VBA-Funktionen geben ">OK" oder ">FEHLER: ..." zurück
+            if vba_return.startswith(">OK"):
+                log("Einsatzliste erfolgreich gesendet")
+                return jsonify({
+                    "success": True,
+                    "message": "Einsatzliste erfolgreich gesendet"
+                })
+            elif vba_return.startswith(">FEHLER"):
+                error_text = vba_return.replace(">FEHLER:", "").strip()
+                log(f"VBA-Fehler: {error_text}")
+                return jsonify({
+                    "success": False,
+                    "error": error_text
+                }), 500
+            else:
+                log(f"Unerwarteter VBA-Rückgabewert: {vba_return}")
+                return jsonify({
+                    "success": True,
+                    "message": vba_return
+                })
+        else:
+            log(f"Fehler: {result.get('error')}")
+            return jsonify(result), 500
+
+    except Exception as e:
+        error_msg = traceback.format_exc()
+        log(f"Fehler in /api/vba/el-senden: {error_msg}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # AUSWEIS ENDPOINTS
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -629,6 +834,409 @@ def vba_ausweis_nummer():
     except Exception as e:
         error_msg = traceback.format_exc()
         log(f"Fehler in /api/vba/ausweis/nummer: {error_msg}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# AUFTRAGSTAMM WEITERE BUTTON ENDPOINTS (15.01.2026)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@app.route('/api/vba/sortieren', methods=['POST'])
+def vba_sortieren():
+    """
+    Sortiert MA-Zuordnungen für einen Auftrag/Tag.
+    Entspricht btn_sortieren_Click -> sort_zuo_plan()
+
+    Request Body:
+    {
+        "va_id": 12345,
+        "vadatum_id": 67890,
+        "mode": 1  // 1=Zuordnung, 2=Planung
+    }
+    """
+    log("=== /api/vba/sortieren aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+        vadatum_id = data.get('vadatum_id') or data.get('VADatum_ID')
+        mode = data.get('mode', 1)
+
+        if not va_id or not vadatum_id:
+            return jsonify({"success": False, "error": "va_id und vadatum_id erforderlich"}), 400
+
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        result = run_vba_function("sort_zuo_plan", int(va_id), int(vadatum_id), int(mode))
+
+        if result.get("success"):
+            return jsonify({"success": True, "message": "Sortierung durchgeführt"})
+        else:
+            return jsonify(result), 500
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/sortieren: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/zuordnung-fill', methods=['POST'])
+def vba_zuordnung_fill():
+    """
+    Erstellt Zuordnungs-Slots für Schichten.
+    Entspricht btnVAPlanCrea_Click -> Zuord_Fill()
+
+    Request Body:
+    {
+        "va_id": 12345,
+        "vadatum_id": 67890
+    }
+    """
+    log("=== /api/vba/zuordnung-fill aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+        vadatum_id = data.get('vadatum_id') or data.get('VADatum_ID')
+
+        if not va_id or not vadatum_id:
+            return jsonify({"success": False, "error": "va_id und vadatum_id erforderlich"}), 400
+
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        # Schritt 1: Zuordnungs-Slots erstellen
+        result = run_vba_function("Zuord_Fill", int(vadatum_id), int(va_id))
+
+        if result.get("success"):
+            # Schritt 2: Tag-Schicht Update
+            run_vba_function("fTag_Schicht_Update_Tag", int(vadatum_id), int(va_id))
+            return jsonify({"success": True, "message": "Zuordnungen erstellt"})
+        else:
+            return jsonify(result), 500
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/zuordnung-fill: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/std-check', methods=['POST'])
+def vba_std_check():
+    """
+    Stunden-Check durchführen + Status auf 'Abrechnung' setzen + EL drucken.
+    Entspricht btn_std_check_Click
+
+    Request Body:
+    {
+        "va_id": 12345
+    }
+    """
+    log("=== /api/vba/std-check aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+
+        if not va_id:
+            return jsonify({"success": False, "error": "va_id erforderlich"}), 400
+
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        # Status auf 3 (Abrechnung) setzen
+        access_app = get_access_app()
+        if access_app:
+            try:
+                # SQL direkt ausführen
+                sql = f"UPDATE tbl_VA_Auftragstamm SET Veranst_Status_ID = 3, Aend_am = Now() WHERE ID = {va_id}"
+                access_app.DoCmd.RunSQL(sql)
+                log(f"Status für VA {va_id} auf 3 (Abrechnung) gesetzt")
+            except Exception as e:
+                log(f"Status-Update Fehler: {e}")
+
+        # EL drucken (wie btnDruckZusage_Click)
+        result = run_vba_function("EinsatzlisteDruckenFromHTML", int(va_id), 0)
+
+        return jsonify({
+            "success": True,
+            "message": "Status auf Abrechnung gesetzt und Einsatzliste erstellt",
+            "new_status": 3
+        })
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/std-check: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/folgetag-kopieren', methods=['POST'])
+def vba_folgetag_kopieren():
+    """
+    Kopiert Schichten und MA-Zuordnungen in den Folgetag.
+    Entspricht btnPlan_Kopie_Click
+
+    Request Body:
+    {
+        "va_id": 12345,
+        "vadatum_id": 67890
+    }
+    """
+    log("=== /api/vba/folgetag-kopieren aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+        vadatum_id = data.get('vadatum_id') or data.get('VADatum_ID') or data.get('current_datum_id')
+
+        if not va_id or not vadatum_id:
+            return jsonify({"success": False, "error": "va_id und vadatum_id erforderlich"}), 400
+
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        # VBA-Funktion für Folgetag-Kopie aufrufen
+        result = run_vba_function("KopiereInFolgetag", int(va_id), int(vadatum_id))
+
+        if result.get("success"):
+            vba_result = result.get("result", "")
+            # Erwartetes Format: "OK:next_datum_id:schichten:zuordnungen" oder ">OK"
+            if str(vba_result).startswith(">OK") or str(vba_result).startswith("OK"):
+                parts = str(vba_result).replace(">OK", "OK").split(":")
+                next_datum_id = parts[1] if len(parts) > 1 else None
+                schichten_count = int(parts[2]) if len(parts) > 2 else 0
+                zuordnungen_count = int(parts[3]) if len(parts) > 3 else 0
+
+                return jsonify({
+                    "success": True,
+                    "message": "Daten in Folgetag kopiert",
+                    "data": {
+                        "next_datum_id": next_datum_id,
+                        "schichten_count": schichten_count,
+                        "zuordnungen_count": zuordnungen_count
+                    }
+                })
+            else:
+                return jsonify({"success": True, "message": str(vba_result)})
+        else:
+            return jsonify(result), 500
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/folgetag-kopieren: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/rechnung/pdf', methods=['POST'])
+def vba_rechnung_pdf():
+    """
+    Erstellt Rechnungs-PDF.
+    Entspricht btnPDFKopf_Click
+
+    Request Body:
+    {
+        "va_id": 12345,
+        "rch_kopf_id": 111  // optional
+    }
+    """
+    log("=== /api/vba/rechnung/pdf aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+        rch_kopf_id = data.get('rch_kopf_id', 0)
+
+        if not va_id:
+            return jsonify({"success": False, "error": "va_id erforderlich"}), 400
+
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        # VBA-Funktion für Rechnungs-PDF aufrufen
+        result = run_vba_function("RechnungPDFFromHTML", int(va_id), int(rch_kopf_id))
+
+        if result.get("success"):
+            return jsonify({
+                "success": True,
+                "message": "Rechnungs-PDF erstellt",
+                "pdf_path": result.get("result", "")
+            })
+        else:
+            return jsonify(result), 500
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/rechnung/pdf: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/berechnungsliste/pdf', methods=['POST'])
+def vba_berechnungsliste_pdf():
+    """
+    Erstellt Berechnungsliste-PDF.
+    Entspricht btnPDFPos_Click
+
+    Request Body:
+    {
+        "va_id": 12345
+    }
+    """
+    log("=== /api/vba/berechnungsliste/pdf aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+
+        if not va_id:
+            return jsonify({"success": False, "error": "va_id erforderlich"}), 400
+
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        # Report als PDF exportieren
+        result = run_vba_function("BerechnungslistePDFFromHTML", int(va_id))
+
+        if result.get("success"):
+            return jsonify({
+                "success": True,
+                "message": "Berechnungsliste-PDF erstellt",
+                "pdf_path": result.get("result", "")
+            })
+        else:
+            return jsonify(result), 500
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/berechnungsliste/pdf: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/rechnung/lexware', methods=['POST'])
+def vba_rechnung_lexware():
+    """
+    Erstellt Rechnung in Lexware.
+    Entspricht btnRchLex_Click
+
+    Request Body:
+    {
+        "va_id": 12345,
+        "kun_id": 456
+    }
+    """
+    log("=== /api/vba/rechnung/lexware aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+        kun_id = data.get('kun_id') or data.get('kun_ID', 0)
+
+        if not va_id:
+            return jsonify({"success": False, "error": "va_id erforderlich"}), 400
+
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        # VBA-Funktion für Lexware-Rechnung aufrufen
+        result = run_vba_function("RechnungLexwareFromHTML", int(va_id), int(kun_id))
+
+        if result.get("success"):
+            return jsonify({
+                "success": True,
+                "message": "Rechnung in Lexware erstellt",
+                "lexware_nr": result.get("result", "")
+            })
+        else:
+            return jsonify(result), 500
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/rechnung/lexware: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/rechnung/daten-laden', methods=['POST'])
+def vba_rechnung_daten_laden():
+    """
+    Lädt Rechnungsdaten (Berechnungsliste füllen).
+    Entspricht btnLoad_Click -> fill_Berechnungsliste()
+
+    Request Body:
+    {
+        "va_id": 12345
+    }
+    """
+    log("=== /api/vba/rechnung/daten-laden aufgerufen ===")
+
+    try:
+        data = request.get_json()
+        va_id = data.get('va_id') or data.get('VA_ID')
+
+        if not va_id:
+            return jsonify({"success": False, "error": "va_id erforderlich"}), 400
+
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        # VBA-Funktion zum Füllen der Berechnungsliste aufrufen
+        result = run_vba_function("fill_Berechnungsliste", int(va_id))
+
+        if result.get("success"):
+            return jsonify({
+                "success": True,
+                "message": "Rechnungsdaten geladen"
+            })
+        else:
+            return jsonify(result), 500
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/rechnung/daten-laden: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/rueckmeldungen', methods=['POST'])
+def vba_rueckmeldungen():
+    """
+    Öffnet Rückmelde-Auswertung.
+    Entspricht btn_Rueckmeld_Click
+
+    Request Body:
+    {
+        "va_id": 12345  // optional
+    }
+    """
+    log("=== /api/vba/rueckmeldungen aufgerufen ===")
+
+    try:
+        data = request.get_json() or {}
+        va_id = data.get('va_id') or data.get('VA_ID', 0)
+
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        # Formular öffnen via DoCmd.OpenForm
+        access_app = get_access_app()
+        if access_app:
+            try:
+                access_app.DoCmd.OpenForm("zfrm_Rueckmeldungen", 0)  # acNormal = 0
+                return jsonify({"success": True, "message": "Rückmelde-Formular geöffnet"})
+            except Exception as e:
+                return jsonify({"success": False, "error": str(e)}), 500
+        else:
+            return jsonify({"success": False, "error": "Access nicht verbunden"}), 500
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/rueckmeldungen: {traceback.format_exc()}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/vba/abwesenheiten', methods=['POST'])
+def vba_abwesenheiten():
+    """
+    Öffnet Abwesenheitsübersicht.
+    Entspricht btn_VA_Abwesenheiten_Click
+    """
+    log("=== /api/vba/abwesenheiten aufgerufen ===")
+
+    try:
+        if not HAS_WIN32COM:
+            return jsonify({"success": False, "error": "win32com nicht verfügbar", "simulated": True})
+
+        access_app = get_access_app()
+        if access_app:
+            try:
+                access_app.DoCmd.OpenForm("frm_abwesenheitsuebersicht", 2)  # acFormDS = 2
+                return jsonify({"success": True, "message": "Abwesenheits-Formular geöffnet"})
+            except Exception as e:
+                return jsonify({"success": False, "error": str(e)}), 500
+        else:
+            return jsonify({"success": False, "error": "Access nicht verbunden"}), 500
+
+    except Exception as e:
+        log(f"Fehler in /api/vba/abwesenheiten: {traceback.format_exc()}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 # ═══════════════════════════════════════════════════════════════════════════════

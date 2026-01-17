@@ -2,12 +2,35 @@
  * frm_MA_Serien_eMail_dienstplan.logic.js
  * Logik für Serien-E-Mail-Versand von Dienstplänen
  * Versand von Dienstplan-E-Mails an mehrere Mitarbeiter
+ *
+ * VBA-Referenz: Form_frm_MA_Serien_eMail_dienstplan.bas
+ *
+ * VBA-Events implementiert:
+ * - btnSendEmail_Click -> versendeEmails()
+ * - cboeMail_Vorlage_AfterUpdate -> onVorlageChange()
+ * - btnVorschau -> showVorschau() [NEU]
+ * - btnAuftrag_Click -> openAuftrag() [NEU]
+ * - btnSchnellPlan_Click -> openSchnellPlan() [NEU]
+ * - btnZuAbsage_Click -> openZuAbsage() [NEU]
+ * - btnAttachSuch_Click -> attachmentSuchen() [NEU]
+ * - btnAttLoesch_Click -> attachmentLoeschen() [NEU]
+ * - btnPDFCrea_Click -> pdfErstellen() [NEU]
  */
 import { Bridge } from '../api/bridgeClient.js';
+
+// VBA Bridge Server Endpoint
+const VBA_BRIDGE_URL = 'http://localhost:5002/api/vba/execute';
 
 let elements = {};
 let selectedMitarbeiter = [];
 let emailVorlagen = [];
+
+// Formular-Kontext (wie in VBA: VA_ID, cboVADatum)
+let formContext = {
+    VA_ID: null,
+    VADatum_ID: null,
+    VAStart_ID: null
+};
 
 async function init() {
     console.log('[MA_Serien_eMail_dienstplan] Initialisierung...');
@@ -394,5 +417,283 @@ function showSuccess(msg) {
     if (typeof Toast !== 'undefined') Toast.success(msg);
     else alert(msg);
 }
+
+// ============================================
+// VBA-BRIDGE FUNKTIONEN
+// ============================================
+
+/**
+ * Ruft VBA-Funktion über Bridge Server auf
+ * @param {string} funcName - Name der VBA-Funktion
+ * @param {object} args - Argumente für die Funktion
+ * @returns {Promise<any>} - Ergebnis der VBA-Funktion
+ */
+async function callVBAFunction(funcName, args = {}) {
+    console.log(`[MA_Serien_eMail_dienstplan] VBA Call: ${funcName}`, args);
+
+    try {
+        const response = await fetch(VBA_BRIDGE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                function: funcName,
+                args: args
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'VBA-Funktion fehlgeschlagen');
+        }
+
+        console.log(`[MA_Serien_eMail_dienstplan] VBA Result:`, result);
+        return result.result;
+
+    } catch (error) {
+        console.error(`[MA_Serien_eMail_dienstplan] VBA Error:`, error);
+        throw error;
+    }
+}
+
+/**
+ * btnAuftrag_Click - Öffnet Auftragstamm mit aktuellem Auftrag
+ * VBA: DoCmd.OpenForm "frm_VA_Auftragstamm" + Call Form_frm_VA_Auftragstamm.VAOpen(iVA_ID, iVADatum_ID)
+ */
+async function openAuftrag() {
+    console.log('[MA_Serien_eMail_dienstplan] openAuftrag');
+
+    if (!formContext.VA_ID) {
+        // Ohne VA_ID einfach Auftragstamm öffnen (Navigation)
+        navigateToForm('frm_va_Auftragstamm.html');
+        return;
+    }
+
+    // Mit VA_ID: Im Shell-Kontext navigieren
+    const params = new URLSearchParams({
+        va_id: formContext.VA_ID,
+        vadatum_id: formContext.VADatum_ID || ''
+    });
+    navigateToForm(`frm_va_Auftragstamm.html?${params.toString()}`);
+}
+
+/**
+ * btnSchnellPlan_Click - Öffnet Schnellauswahl mit aktuellem Auftrag
+ * VBA: DoCmd.OpenForm "frm_MA_VA_Schnellauswahl" + Call Form_frm_MA_VA_Schnellauswahl.VAOpen(iVA_ID, iVADatum_ID)
+ */
+async function openSchnellPlan() {
+    console.log('[MA_Serien_eMail_dienstplan] openSchnellPlan');
+
+    if (!formContext.VA_ID) {
+        navigateToForm('frm_MA_VA_Schnellauswahl.html');
+        return;
+    }
+
+    const params = new URLSearchParams({
+        va_id: formContext.VA_ID,
+        vadatum_id: formContext.VADatum_ID || ''
+    });
+    navigateToForm(`frm_MA_VA_Schnellauswahl.html?${params.toString()}`);
+}
+
+/**
+ * btnZuAbsage_Click - Öffnet Zu-/Absage-Formular
+ * VBA: DoCmd.OpenForm "frmTop_MA_ZuAbsage"
+ */
+async function openZuAbsage() {
+    console.log('[MA_Serien_eMail_dienstplan] openZuAbsage');
+
+    try {
+        // Versuche über VBA Bridge zu öffnen
+        await callVBAFunction('HTML_OpenForm', {
+            formName: 'frmTop_MA_ZuAbsage'
+        });
+        showSuccess('Zu-/Absage-Formular geöffnet');
+    } catch (error) {
+        console.warn('[MA_Serien_eMail_dienstplan] VBA Bridge nicht verfügbar, öffne HTML-Version');
+        // Fallback: Navigiere zu HTML-Version falls vorhanden
+        navigateToForm('frmTop_MA_ZuAbsage.html');
+    }
+}
+
+/**
+ * btnAttachSuch_Click - Attachment-Datei suchen
+ * VBA: s = AlleSuch() + INSERT INTO tbltmp_Attachfile
+ */
+async function attachmentSuchen() {
+    console.log('[MA_Serien_eMail_dienstplan] attachmentSuchen');
+
+    try {
+        const result = await callVBAFunction('HTML_AttachmentSuchen', {
+            VA_ID: formContext.VA_ID,
+            VADatum_ID: formContext.VADatum_ID
+        });
+
+        if (result && result.filename) {
+            showSuccess(`Attachment hinzugefügt: ${result.filename}`);
+            // TODO: Attachment-Liste aktualisieren wenn UI vorhanden
+        }
+    } catch (error) {
+        showError('Attachment-Suche fehlgeschlagen: ' + error.message);
+    }
+}
+
+/**
+ * btnAttLoesch_Click - Alle Attachments löschen
+ * VBA: DELETE * FROM tbltmp_Attachfile
+ */
+async function attachmentLoeschen() {
+    console.log('[MA_Serien_eMail_dienstplan] attachmentLoeschen');
+
+    if (!confirm('Alle Attachments entfernen?')) {
+        return;
+    }
+
+    try {
+        await callVBAFunction('HTML_AttachmentLoeschen', {});
+        showSuccess('Attachments entfernt');
+        // TODO: Attachment-Liste aktualisieren wenn UI vorhanden
+    } catch (error) {
+        showError('Fehler beim Löschen: ' + error.message);
+    }
+}
+
+/**
+ * btnPDFCrea_Click - PDF-Zusage erstellen und als Attachment hinzufügen
+ * VBA: DoCmd.OutputTo acOutputReport, "rpt_Auftrag_Zusage", "PDF", PDF_Datei
+ */
+async function pdfErstellen() {
+    console.log('[MA_Serien_eMail_dienstplan] pdfErstellen');
+
+    if (!formContext.VA_ID || !formContext.VADatum_ID) {
+        showError('Bitte zuerst einen Auftrag und Datum auswählen');
+        return;
+    }
+
+    try {
+        const result = await callVBAFunction('HTML_PDF_Zusage_Erstellen', {
+            VA_ID: formContext.VA_ID,
+            VADatum_ID: formContext.VADatum_ID
+        });
+
+        if (result && result.filename) {
+            showSuccess(`PDF erstellt: ${result.filename}`);
+        } else {
+            showSuccess('PDF als Attachment hinzugefügt');
+        }
+    } catch (error) {
+        showError('PDF-Erstellung fehlgeschlagen: ' + error.message);
+    }
+}
+
+/**
+ * btnPosListeAtt_Click - Positionsliste als Attachment hinzufügen
+ * VBA: Lookup in tbl_Zusatzdateien nach Kurzbeschreibung = VA_ID_VADatum_ID
+ */
+async function positionslisteAnhaengen() {
+    console.log('[MA_Serien_eMail_dienstplan] positionslisteAnhaengen');
+
+    if (!formContext.VA_ID || !formContext.VADatum_ID) {
+        showError('Bitte zuerst einen Auftrag und Datum auswählen');
+        return;
+    }
+
+    try {
+        const result = await callVBAFunction('HTML_PosListeAtt', {
+            VA_ID: formContext.VA_ID,
+            VADatum_ID: formContext.VADatum_ID
+        });
+
+        if (result && result.found) {
+            showSuccess('Positionsliste angehängt');
+        } else {
+            showError('Keine Positionsliste für diesen Auftrag/Tag gefunden');
+        }
+    } catch (error) {
+        showError('Fehler: ' + error.message);
+    }
+}
+
+/**
+ * Navigiert zu einem anderen Formular (Shell-Integration)
+ */
+function navigateToForm(formUrl) {
+    // Prüfe ob in Shell eingebettet
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+            type: 'NAVIGATE',
+            form: formUrl
+        }, '*');
+    } else {
+        // Direkter Navigation
+        window.location.href = formUrl;
+    }
+}
+
+/**
+ * VAOpen - Öffnet Formular mit Auftragsdaten (wird von außen aufgerufen)
+ * VBA: Public Function VAOpen(iVA_ID As Long, iVADatum_ID As Long)
+ */
+async function VAOpen(va_id, vadatum_id) {
+    console.log(`[MA_Serien_eMail_dienstplan] VAOpen: VA_ID=${va_id}, VADatum_ID=${vadatum_id}`);
+
+    formContext.VA_ID = va_id;
+    formContext.VADatum_ID = vadatum_id;
+
+    // Daten für diesen Auftrag laden
+    try {
+        // Mitarbeiter für diesen Auftrag laden (geplant + zugesagt)
+        const mitarbeiter = await Bridge.execute('getMitarbeiterFuerAuftrag', {
+            va_id: va_id,
+            vadatum_id: vadatum_id
+        });
+
+        if (mitarbeiter && mitarbeiter.length > 0) {
+            renderMitarbeiterListe(mitarbeiter);
+        }
+    } catch (error) {
+        console.error('[MA_Serien_eMail_dienstplan] Fehler bei VAOpen:', error);
+    }
+}
+
+/**
+ * Autosend - Automatischer E-Mail-Versand (wird von Auftragstamm aufgerufen)
+ * VBA: Public Function Autosend(iTyp As Integer, iVA_ID As Long, iVADatum_ID As Long)
+ * Typ 1 = Einladung (geplante MA, alle Zeiten einzeln, mit Voting)
+ * Typ 2 = Versammlungsinfo (alle MA, alle Zeiten zusammen, PDF-Attach)
+ * Typ 3 = Positionsliste (zugesagte MA, alle Zeiten, Positionsliste-Attach)
+ */
+async function Autosend(typ, va_id, vadatum_id) {
+    console.log(`[MA_Serien_eMail_dienstplan] Autosend: Typ=${typ}, VA_ID=${va_id}, VADatum_ID=${vadatum_id}`);
+
+    try {
+        const result = await callVBAFunction('HTML_Autosend_Dienstplan', {
+            typ: typ,
+            VA_ID: va_id,
+            VADatum_ID: vadatum_id
+        });
+
+        showSuccess(`E-Mails für Typ ${typ} versendet`);
+        return result;
+    } catch (error) {
+        showError('Autosend fehlgeschlagen: ' + error.message);
+        throw error;
+    }
+}
+
+// Globale Funktionen für onclick-Handler verfügbar machen
+window.openAuftrag = openAuftrag;
+window.openSchnellPlan = openSchnellPlan;
+window.openZuAbsage = openZuAbsage;
+window.attachmentSuchen = attachmentSuchen;
+window.attachmentLoeschen = attachmentLoeschen;
+window.pdfErstellen = pdfErstellen;
+window.positionslisteAnhaengen = positionslisteAnhaengen;
+window.VAOpen = VAOpen;
+window.Autosend = Autosend;
 
 document.addEventListener('DOMContentLoaded', init);

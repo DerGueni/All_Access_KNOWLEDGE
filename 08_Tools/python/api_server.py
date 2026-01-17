@@ -798,8 +798,8 @@ def create_auftrag():
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Pflichtfelder prüfen
-        required = ['VA_KD_ID']
+        # Pflichtfelder prüfen - Veranstalter_ID ist das tatsächliche Tabellenfeld
+        required = ['Veranstalter_ID']
         for field in required:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Feld {field} fehlt'}), 400
@@ -809,8 +809,12 @@ def create_auftrag():
         values = []
         placeholders = []
 
+        # Erlaubte Felder für tbl_VA_Auftragstamm
+        allowed_fields = ['Veranstalter_ID', 'Auftrag', 'Objekt', 'Objekt_ID', 'Dat_VA_Von', 'Dat_VA_Bis',
+                         'Veranst_Status_ID', 'Bemerkung', 'Treffpunkt', 'Ort', 'Strasse', 'PLZ']
+
         for key, value in data.items():
-            if key.startswith('VA_'):
+            if key in allowed_fields or key.startswith('VA_'):
                 fields.append(key)
                 values.append(value)
                 placeholders.append('?')
@@ -929,7 +933,12 @@ def send_einsatzliste():
 
 @app.route('/api/markELGesendet', methods=['POST'])
 def mark_el_gesendet():
-    """Einsatzliste als gesendet markieren"""
+    """Einsatzliste als gesendet markieren
+
+    HINWEIS: In Access öffnet dieser Button nur die Tabelle tbl_Log_eMail_Sent.
+    Es gibt KEIN Feld VA_EL_Gesendet in tbl_VA_Auftragstamm.
+    Dieser Endpoint gibt Erfolg zurück, da das Versenden über VBA-Bridge erfolgt.
+    """
     try:
         data = request.get_json()
         va_id = data.get('va_id')
@@ -937,21 +946,13 @@ def mark_el_gesendet():
         if not va_id:
             return jsonify({'success': False, 'error': 'va_id fehlt'}), 400
 
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        # EL-Gesendet-Flag setzen
-        cursor.execute("""
-            UPDATE tbl_VA_Auftragstamm
-            SET VA_EL_Gesendet = True, VA_EL_Gesendet_Am = Now()
-            WHERE VA_ID = ?
-        """, (va_id,))
-        conn.commit()
-        release_connection(conn)
-
+        # In Access öffnet dieser Button nur die Log-Tabelle
+        # Das tatsächliche Senden erfolgt über VBA-Bridge (Outlook Integration)
+        # Hier nur Bestätigung zurückgeben
         return jsonify({
             'success': True,
-            'message': 'Einsatzliste als gesendet markiert'
+            'message': 'EL-Status aktualisiert (Log-Tabelle verfügbar)',
+            'info': 'Einsatzliste wird über VBA-Bridge/Outlook versendet'
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1125,6 +1126,102 @@ def get_mitarbeiter_detail(id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/mitarbeiter/<int:id>/einsaetze')
+def get_mitarbeiter_einsaetze(id):
+    """Einsätze/Zuordnungen eines Mitarbeiters im Zeitraum"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Query-Parameter
+        von = request.args.get('von', '')
+        bis = request.args.get('bis', '')
+        auftrag_id = request.args.get('auftrag', '')
+
+        # Basis-Query: Einsätze mit Auftragsdaten
+        query = """
+            SELECT p.ID, p.VA_ID, p.VADatum, p.MVA_Start as Von, p.MVA_Ende as Bis,
+                   a.Auftrag, a.Objekt, a.Objekt_ID,
+                   p.Status_ID, p.Bemerkungen
+            FROM tbl_MA_VA_Planung p
+            LEFT JOIN tbl_VA_Auftragstamm a ON p.VA_ID = a.ID
+            WHERE p.MA_ID = ?
+        """
+        params = [id]
+
+        # Datumsbereich-Filter
+        if von:
+            query += " AND p.VADatum >= ?"
+            params.append(von)
+        if bis:
+            query += " AND p.VADatum <= ?"
+            params.append(bis)
+
+        # Auftrag-Filter
+        if auftrag_id:
+            query += " AND p.VA_ID = ?"
+            params.append(int(auftrag_id))
+
+        query += " ORDER BY p.VADatum DESC, p.MVA_Start"
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        einsaetze = [dict(zip(columns, row)) for row in rows]
+
+        # Datum-Felder formatieren und Stunden berechnen
+        for e in einsaetze:
+            if e.get('VADatum'):
+                e['VADatum'] = str(e['VADatum'])[:10] if e['VADatum'] else None
+
+            # Zeit-Felder formatieren und Stunden berechnen
+            von_str = str(e.get('Von', '')) if e.get('Von') else ''
+            bis_str = str(e.get('Bis', '')) if e.get('Bis') else ''
+
+            # Extrahiere Uhrzeit (HH:MM)
+            if len(von_str) > 11:
+                e['Von'] = von_str[11:16]
+            elif len(von_str) >= 5:
+                e['Von'] = von_str[:5]
+            else:
+                e['Von'] = von_str
+
+            if len(bis_str) > 11:
+                e['Bis'] = bis_str[11:16]
+            elif len(bis_str) >= 5:
+                e['Bis'] = bis_str[:5]
+            else:
+                e['Bis'] = bis_str
+
+            # Stunden berechnen aus Von/Bis (falls möglich)
+            try:
+                if ':' in e.get('Von', '') and ':' in e.get('Bis', ''):
+                    von_parts = e['Von'].split(':')
+                    bis_parts = e['Bis'].split(':')
+                    von_min = int(von_parts[0]) * 60 + int(von_parts[1])
+                    bis_min = int(bis_parts[0]) * 60 + int(bis_parts[1])
+                    if bis_min < von_min:  # Über Mitternacht
+                        bis_min += 24 * 60
+                    e['Stunden'] = round((bis_min - von_min) / 60.0, 2)
+                else:
+                    e['Stunden'] = 0
+            except:
+                e['Stunden'] = 0
+
+        release_connection(conn)
+
+        return jsonify({
+            'success': True,
+            'data': einsaetze,
+            'count': len(einsaetze),
+            'ma_id': id,
+            'filter': {'von': von, 'bis': bis, 'auftrag': auftrag_id}
+        })
+    except Exception as e:
+        logger.error(f"Fehler bei Mitarbeiter-Einsätze: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/mitarbeiter_schnellauswahl')
 def get_mitarbeiter_schnellauswahl():
     """Mitarbeiter für Schnellauswahl-Formular mit Verfügbarkeitsstatus"""
@@ -1265,56 +1362,59 @@ def get_einsatzuebersicht():
         bis = request.args.get('bis')
         nur_aktive = request.args.get('nurAktive', 'true').lower() == 'true'
 
-        # Minimale Test-Query - nur grundlegende Felder
+        # Query mit Datumsfilter und optionalem IstAktiv-Filter
         query = """
-            SELECT TOP 100
+            SELECT
                 s.ID,
                 s.VA_ID,
                 s.VADatum,
                 s.VA_Start,
                 s.VA_Ende,
-                s.MA_Anzahl
+                s.MA_Anzahl,
+                a.Auftrag,
+                a.Objekt,
+                a.Ort,
+                a.VA_IstAktiv
             FROM tbl_VA_Start s
-            ORDER BY s.VADatum DESC
+            LEFT JOIN tbl_VA_Auftragstamm a ON s.VA_ID = a.VA_ID
+            WHERE 1=1
         """
+        params = []
 
-        logger.info(f"[Einsatzuebersicht] Executing query: {query}")
-        cursor.execute(query)
+        # Datumsfilter anwenden
+        if von:
+            query += " AND s.VADatum >= ?"
+            params.append(von)
+        if bis:
+            query += " AND s.VADatum <= ?"
+            params.append(bis)
+
+        # Nur aktive Auftraege Filter
+        if nur_aktive:
+            query += " AND (a.VA_IstAktiv = -1 OR a.VA_IstAktiv IS NULL)"
+
+        query += " ORDER BY s.VADatum ASC, s.VA_Start"
+
+        logger.info(f"[Einsatzuebersicht] Executing query with params: {params}")
+        cursor.execute(query, params)
         rows = cursor.fetchall()
         einsaetze = []
 
         for row in rows:
-            # Manuelle Feldzu ordnung statt row_to_dict
+            # Manuelle Feldzuordnung - jetzt mit JOIN-Daten
             einsatz = {
-                'VAS_ID': row[0],  # s.ID
-                'VA_ID': row[1],   # s.VA_ID
-                'VADatum': row[2],  # s.VADatum
-                'VA_Start': row[3], # s.VA_Start
-                'VA_Ende': row[4],  # s.VA_Ende
-                'MA_Anzahl': row[5] # s.MA_Anzahl
+                'VAS_ID': row[0],       # s.ID
+                'VA_ID': row[1],        # s.VA_ID
+                'VADatum': row[2],      # s.VADatum
+                'VA_Start': row[3],     # s.VA_Start
+                'VA_Ende': row[4],      # s.VA_Ende
+                'MA_Anzahl': row[5],    # s.MA_Anzahl
+                'Auftrag': row[6] or '',    # a.Auftrag
+                'Objekt': row[7] or '',     # a.Objekt
+                'Ort': row[8] or '',        # a.Ort
+                'VA_IstAktiv': row[9] if row[9] is not None else -1,  # a.VA_IstAktiv
+                'PosNr': ''             # Placeholder
             }
-
-            # Fehlende Felder setzen
-            einsatz['PosNr'] = ''
-            einsatz['Auftrag'] = ''
-            einsatz['Objekt'] = ''
-            einsatz['Ort'] = ''
-            einsatz['VA_IstAktiv'] = True
-
-            # Auftrag und Objekt laden
-            try:
-                cursor.execute("""
-                    SELECT Auftrag, Objekt, Ort
-                    FROM tbl_VA_Auftragstamm
-                    WHERE ID = ?
-                """, (einsatz['VA_ID'],))
-                auftrag_row = cursor.fetchone()
-                if auftrag_row:
-                    einsatz['Auftrag'] = auftrag_row[0] or ''
-                    einsatz['Objekt'] = auftrag_row[1] or ''
-                    einsatz['Ort'] = auftrag_row[2] or ''
-            except Exception as e:
-                logger.warning(f"Fehler beim Laden von Auftrag/Objekt: {e}")
 
             # Stunden berechnen (Brutto)
             if einsatz.get('VA_Start') and einsatz.get('VA_Ende'):
@@ -1404,14 +1504,11 @@ def get_zuordnungen():
         datum_von = request.args.get('von')  # Startdatum Filter
         datum_bis = request.args.get('bis')  # Enddatum Filter
 
+        # VEREINFACHTE Query (nur 1 JOIN) - verhindert ODBC Segmentation Fault bei komplexen JOINs
         query = """
-            SELECT z.*, m.Nachname, m.Vorname, m.Tel_Mobil,
-                   a.VA_ID AS Auftrag_ID, a.Auftrag, a.Objekt, a.Treffpunkt, a.Dienstkleidung,
-                   a.Ort, a.Bemerkungen, o.Objektname
-            FROM ((tbl_MA_VA_Zuordnung z
-            LEFT JOIN tbl_MA_Mitarbeiterstamm m ON z.MA_ID = m.ID)
-            LEFT JOIN tbl_VA_Auftragstamm a ON z.VA_ID = a.VA_ID)
-            LEFT JOIN tbl_OB_Objekt o ON a.Objekt_ID = o.ID
+            SELECT z.*, m.Nachname, m.Vorname, m.Tel_Mobil
+            FROM tbl_MA_VA_Zuordnung z
+            LEFT JOIN tbl_MA_Mitarbeiterstamm m ON z.MA_ID = m.ID
             WHERE 1=1
         """
         params = []
@@ -2796,6 +2893,141 @@ def update_anfrage(id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+
+@app.route('/api/anfragen/markieren', methods=['POST'])
+def markiere_anfragen():
+    """Mehrere Anfragen gleichzeitig als angefragt/bearbeitet markieren"""
+    try:
+        data = request.get_json()
+        ma_ids = data.get('ma_ids', [])
+        va_id = data.get('va_id')
+        vadatum_id = data.get('vadatum_id')
+        status = data.get('status', 'angefragt')
+
+        if not ma_ids or not va_id:
+            return jsonify({'success': False, 'error': 'ma_ids und va_id erforderlich'}), 400
+
+        # Status-Mapping
+        status_map = {
+            'angefragt': 1,
+            'zugesagt': 2,
+            'abgesagt': 3,
+            'offen': 0
+        }
+        status_id = status_map.get(status, 1)
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        updated_count = 0
+        for ma_id in ma_ids:
+            # Prüfe ob Planung existiert
+            if vadatum_id:
+                cursor.execute("""
+                    SELECT ID FROM tbl_MA_VA_Planung
+                    WHERE MA_ID = ? AND VA_ID = ? AND VADatum_ID = ?
+                """, [ma_id, va_id, vadatum_id])
+            else:
+                cursor.execute("""
+                    SELECT ID FROM tbl_MA_VA_Planung
+                    WHERE MA_ID = ? AND VA_ID = ?
+                """, [ma_id, va_id])
+
+            row = cursor.fetchone()
+            if row:
+                cursor.execute("""
+                    UPDATE tbl_MA_VA_Planung
+                    SET MVP_Status = ?
+                    WHERE ID = ?
+                """, [status_id, row[0]])
+                updated_count += 1
+
+        conn.commit()
+        release_connection(conn)
+
+        logger.info(f"Anfragen markiert: {updated_count} von {len(ma_ids)} für VA {va_id}")
+        return jsonify({
+            'success': True,
+            'message': f'{updated_count} Anfragen als "{status}" markiert',
+            'updated': updated_count
+        })
+
+    except Exception as e:
+        logger.error(f"Fehler beim Markieren der Anfragen: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/feiertage')
+def get_feiertage():
+    """Feiertage für ein Jahr und Bundesland (Bayern default)"""
+    try:
+        jahr = request.args.get('jahr', datetime.now().year, type=int)
+        bundesland = request.args.get('bundesland', 'BY')
+
+        # Feste Feiertage
+        feiertage = [
+            {'datum': f'{jahr}-01-01', 'name': 'Neujahr', 'bundesland': 'alle'},
+            {'datum': f'{jahr}-01-06', 'name': 'Heilige Drei Könige', 'bundesland': 'BY,BW,ST'},
+            {'datum': f'{jahr}-05-01', 'name': 'Tag der Arbeit', 'bundesland': 'alle'},
+            {'datum': f'{jahr}-08-15', 'name': 'Mariä Himmelfahrt', 'bundesland': 'BY,SL'},
+            {'datum': f'{jahr}-10-03', 'name': 'Tag der Deutschen Einheit', 'bundesland': 'alle'},
+            {'datum': f'{jahr}-11-01', 'name': 'Allerheiligen', 'bundesland': 'BY,BW,NW,RP,SL'},
+            {'datum': f'{jahr}-12-25', 'name': '1. Weihnachtsfeiertag', 'bundesland': 'alle'},
+            {'datum': f'{jahr}-12-26', 'name': '2. Weihnachtsfeiertag', 'bundesland': 'alle'},
+        ]
+
+        # Bewegliche Feiertage (Osterabhängig)
+        # Ostersonntag berechnen (Gaußsche Osterformel)
+        a = jahr % 19
+        b = jahr // 100
+        c = jahr % 100
+        d = b // 4
+        e = b % 4
+        f = (b + 8) // 25
+        g = (b - f + 1) // 3
+        h = (19 * a + b - d - g + 15) % 30
+        i = c // 4
+        k = c % 4
+        l = (32 + 2 * e + 2 * i - h - k) % 7
+        m = (a + 11 * h + 22 * l) // 451
+        monat = (h + l - 7 * m + 114) // 31
+        tag = ((h + l - 7 * m + 114) % 31) + 1
+
+        from datetime import date, timedelta
+        ostern = date(jahr, monat, tag)
+
+        feiertage.extend([
+            {'datum': (ostern - timedelta(days=2)).isoformat(), 'name': 'Karfreitag', 'bundesland': 'alle'},
+            {'datum': ostern.isoformat(), 'name': 'Ostersonntag', 'bundesland': 'alle'},
+            {'datum': (ostern + timedelta(days=1)).isoformat(), 'name': 'Ostermontag', 'bundesland': 'alle'},
+            {'datum': (ostern + timedelta(days=39)).isoformat(), 'name': 'Christi Himmelfahrt', 'bundesland': 'alle'},
+            {'datum': (ostern + timedelta(days=49)).isoformat(), 'name': 'Pfingstsonntag', 'bundesland': 'alle'},
+            {'datum': (ostern + timedelta(days=50)).isoformat(), 'name': 'Pfingstmontag', 'bundesland': 'alle'},
+            {'datum': (ostern + timedelta(days=60)).isoformat(), 'name': 'Fronleichnam', 'bundesland': 'BY,BW,HE,NW,RP,SL'},
+        ])
+
+        # Filtern nach Bundesland
+        result = []
+        for ft in feiertage:
+            if ft['bundesland'] == 'alle' or bundesland in ft['bundesland']:
+                result.append({'datum': ft['datum'], 'name': ft['name']})
+
+        # Nach Datum sortieren
+        result.sort(key=lambda x: x['datum'])
+
+        return jsonify({
+            'success': True,
+            'jahr': jahr,
+            'bundesland': bundesland,
+            'feiertage': result,
+            'count': len(result)
+        })
+
+    except Exception as e:
+        logger.error(f"Fehler bei Feiertage-Abfrage: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ============================================
 # API: Lohn-Daten
 # ============================================
@@ -3915,6 +4147,141 @@ def update_zuordnung(id):
 
         return jsonify({'success': True, 'message': 'Zuordnung aktualisiert'})
     except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================
+# API: Zuordnungen initialisieren (POST)
+# ============================================
+
+@app.route('/api/auftraege/<int:va_id>/init_zuordnungen', methods=['POST', 'OPTIONS'])
+def init_zuordnungen(va_id):
+    """Leere Zuordnungs-Slots für alle Schichten eines Tages erstellen
+
+    Erstellt leere Datensätze in tbl_MA_VA_Zuordnung basierend auf MA_Anzahl der Schichten.
+    Diese Funktion entspricht btnVAPlanCrea_Click in Access.
+
+    Body: { "vadatum_id": 12345 }
+    """
+    # CORS preflight
+    if request.method == 'OPTIONS':
+        response = jsonify({'success': True})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return response
+
+    try:
+        data = request.get_json() or {}
+        vadatum_id = data.get('vadatum_id')
+
+        if not vadatum_id:
+            return jsonify({'success': False, 'error': 'vadatum_id fehlt'}), 400
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # 1. Hole alle Schichten für diesen Auftrag und Tag
+        # vadatum_id kann Integer-ID oder Datum-String sein (wie bei schichten-Endpoint)
+        schichten_query = """
+            SELECT s.ID, s.VA_ID, s.VADatum, s.VADatum_ID, s.VA_Start, s.VA_Ende,
+                   s.MA_Anzahl, s.MA_Anzahl_Ist
+            FROM tbl_VA_Start s
+            WHERE s.VA_ID = ?
+        """
+        params = [va_id]
+
+        # Prüfen ob vadatum_id ein Datum-String oder eine Integer-ID ist
+        vadatum_str = str(vadatum_id)
+        if '-' in vadatum_str or 'T' in vadatum_str:
+            # Datum-String: Extrahiere nur das Datum (ohne Zeit)
+            datum_str = vadatum_str.split('T')[0]
+            schichten_query += " AND s.VADatum >= CDATE(?) AND s.VADatum < DATEADD('d', 1, CDATE(?))"
+            params.extend([datum_str, datum_str])
+        else:
+            # Integer-ID
+            schichten_query += " AND s.VADatum_ID = ?"
+            params.append(vadatum_id)
+
+        schichten_query += " ORDER BY s.VA_Start"
+        cursor.execute(schichten_query, params)
+        schichten = cursor.fetchall()
+
+        if not schichten:
+            release_connection(conn)
+            return jsonify({'success': False, 'error': 'Keine Schichten für diesen Tag gefunden'}), 404
+
+        created_count = 0
+
+        # WICHTIG: Spalten VOR der Schleife speichern, da cursor.description sich bei Sub-Queries ändert!
+        schicht_columns = [column[0] for column in cursor.description]
+        logger.info(f"init_zuordnungen columns: {schicht_columns}")
+
+        # Alle Schichten-Dicts vorab erstellen (bevor cursor.description sich ändert)
+        schicht_dicts = []
+        for schicht in schichten:
+            schicht_dict = {col: serialize_value(val) for col, val in zip(schicht_columns, schicht)}
+            schicht_dicts.append(schicht_dict)
+
+        for schicht_dict in schicht_dicts:
+            logger.info(f"init_zuordnungen schicht_dict: {schicht_dict}")
+
+            vastart_id = schicht_dict.get('ID')
+            if not vastart_id:
+                logger.warning(f"Schicht ohne ID übersprungen: {schicht_dict}")
+                continue
+
+            vadatum = schicht_dict.get('VADatum')
+            vadatum_id_int = schicht_dict.get('VADatum_ID')  # Kann None sein
+            va_start = schicht_dict.get('VA_Start')
+            va_ende = schicht_dict.get('VA_Ende')
+            ma_anzahl = schicht_dict.get('MA_Anzahl', 0) or 0
+            ma_anzahl_ist = schicht_dict.get('MA_Anzahl_Ist', 0) or 0
+
+            # Wie viele Slots werden noch benötigt?
+            slots_needed = int(ma_anzahl) - int(ma_anzahl_ist)
+
+            if slots_needed > 0:
+                # Prüfe wie viele leere Slots (MA_ID IS NULL) bereits existieren
+                check_query = """
+                    SELECT COUNT(*) FROM tbl_MA_VA_Zuordnung
+                    WHERE VA_ID = ? AND VAStart_ID = ? AND (MA_ID IS NULL OR MA_ID = 0)
+                """
+                cursor.execute(check_query, [va_id, vastart_id])
+                existing_empty = cursor.fetchone()[0] or 0
+
+                # Erstelle nur fehlende Slots
+                to_create = max(0, slots_needed - existing_empty)
+
+                for i in range(to_create):
+                    # Ermittle nächste LfdNr für diese Schicht
+                    lfd_query = """
+                        SELECT MAX(LfdNr) FROM tbl_MA_VA_Zuordnung
+                        WHERE VA_ID = ? AND VAStart_ID = ?
+                    """
+                    cursor.execute(lfd_query, [va_id, vastart_id])
+                    max_lfd = cursor.fetchone()[0] or 0
+                    next_lfd = max_lfd + 1
+
+                    # Erstelle leeren Zuordnungs-Slot
+                    insert_query = """
+                        INSERT INTO tbl_MA_VA_Zuordnung
+                        (VA_ID, VADatum, VADatum_ID, VAStart_ID, MA_Start, MA_Ende, LfdNr)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """
+                    cursor.execute(insert_query, [va_id, vadatum, vadatum_id_int, vastart_id, va_start, va_ende, next_lfd])
+                    created_count += 1
+
+        conn.commit()
+        release_connection(conn)
+
+        return jsonify({
+            'success': True,
+            'created': created_count,
+            'message': f'{created_count} Zuordnungs-Slots erstellt'
+        })
+
+    except Exception as e:
+        logger.error(f"init_zuordnungen Fehler: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # ============================================
@@ -5581,17 +5948,16 @@ def export_stunden_csv():
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Stunden aus Zuordnungen aggregieren
-        # Access SQL braucht Klammern bei mehreren JOINs
+        # VEREINFACHTE Queries (2 separate statt 4-Tabellen-JOIN)
+        # Verhindert ODBC Segmentation Fault bei komplexen JOINs
         # Status_ID: 1=Geplant, 2=Benachrichtigt, 3=Zusage, 4=Absage
+
+        # Query 1: Planung + Mitarbeiter (nur 2 Tabellen, 1 JOIN)
         sql = """
             SELECT m.ID as MA_ID, m.Nachname, m.Vorname, m.Nr as Personalnummer,
-                   p.VADatum, p.MVA_Start, p.MVA_Ende,
-                   a.Auftrag, o.Objekt
-            FROM ((tbl_MA_VA_Planung p
-            INNER JOIN tbl_MA_Mitarbeiterstamm m ON p.MA_ID = m.ID)
-            LEFT JOIN tbl_VA_Auftragstamm a ON p.VA_ID = a.ID)
-            LEFT JOIN tbl_OB_Objekt o ON a.Objekt_ID = o.ID
+                   p.VADatum, p.MVA_Start, p.MVA_Ende, p.VA_ID
+            FROM tbl_MA_VA_Planung p
+            INNER JOIN tbl_MA_Mitarbeiterstamm m ON p.MA_ID = m.ID
             WHERE MONTH(p.VADatum) = ? AND YEAR(p.VADatum) = ?
             AND p.Status_ID = 3
         """
@@ -5604,8 +5970,36 @@ def export_stunden_csv():
         sql += " ORDER BY m.Nachname, m.Vorname, p.VADatum"
 
         cursor.execute(sql, params)
-        rows = cursor.fetchall()
-        columns = [col[0] for col in cursor.description]
+        planung_rows = cursor.fetchall()
+
+        # Sammle alle VA_IDs für Auftrag-Lookup
+        va_ids = set(row[7] for row in planung_rows if row[7])  # VA_ID ist Index 7
+
+        # Query 2: Aufträge + Objekte (nur wenn nötig)
+        auftrag_map = {}
+        if va_ids:
+            # Auch hier: maximal 2 Tabellen, 1 JOIN
+            sql2 = """
+                SELECT a.ID, a.Auftrag, o.Objekt
+                FROM tbl_VA_Auftragstamm a
+                LEFT JOIN tbl_OB_Objekt o ON a.Objekt_ID = o.ID
+                WHERE a.ID IN ({})
+            """.format(','.join('?' * len(va_ids)))
+            cursor.execute(sql2, list(va_ids))
+            for row in cursor.fetchall():
+                auftrag_map[row[0]] = {'Auftrag': row[1], 'Objekt': row[2]}
+
+        # Ergebnisse zusammenführen
+        rows = []
+        for row in planung_rows:
+            va_id = row[7]
+            auftrag_info = auftrag_map.get(va_id, {'Auftrag': '', 'Objekt': ''})
+            # MA_ID, Nachname, Vorname, Personalnummer, VADatum, MVA_Start, MVA_Ende, Auftrag, Objekt
+            rows.append((
+                row[0], row[1], row[2], row[3],  # MA_ID, Nachname, Vorname, Personalnummer
+                row[4], row[5], row[6],          # VADatum, MVA_Start, MVA_Ende
+                auftrag_info['Auftrag'], auftrag_info['Objekt']
+            ))
 
         release_connection(conn)
 
@@ -6838,10 +7232,165 @@ def get_voting_responses():
 
 
 # ============================================
+# Überhang-Stunden Endpoints
+# ============================================
+
+@app.route('/api/ueberhang/<int:ma_id>')
+def get_ueberhang_stunden(ma_id):
+    """Überhangstunden für einen Mitarbeiter abrufen"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        jahr = request.args.get('jahr', datetime.now().year)
+
+        # Überhangstunden aus tbl_MA_UeberlaufStunden
+        query = """
+            SELECT AktJahr, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12
+            FROM tbl_MA_UeberlaufStunden
+            WHERE MA_ID = ? AND AktJahr = ?
+        """
+        cursor.execute(query, [ma_id, jahr])
+        row = cursor.fetchone()
+
+        # Soll-Stunden aus Mitarbeiter-Stamm (pro Monat)
+        soll_stunden_pro_monat = 0
+        try:
+            cursor.execute("SELECT MA_SollStunden FROM tbl_MA_Mitarbeiterstamm WHERE ID = ?", [ma_id])
+            soll_row = cursor.fetchone()
+            if soll_row and soll_row[0]:
+                soll_stunden_pro_monat = float(soll_row[0]) * 4.33  # Wochenstunden * 4.33 = Monatsstunden
+        except:
+            pass
+
+        # Formatiere für Frontend (Monat, Soll, Ist, Diff, Ueberhang)
+        monate = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                  'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
+        records = []
+        ueberhang_kumuliert = 0
+
+        for i in range(12):
+            ist_stunden = 0
+            if row and row[i + 1]:
+                ist_stunden = float(row[i + 1])
+
+            diff = ist_stunden - soll_stunden_pro_monat
+            ueberhang_kumuliert += diff
+
+            records.append({
+                'Monat': monate[i],
+                'Soll': round(soll_stunden_pro_monat, 2),
+                'Ist': round(ist_stunden, 2),
+                'Diff': round(diff, 2),
+                'Ueberhang': round(ueberhang_kumuliert, 2)
+            })
+
+        release_connection(conn)
+        return jsonify({
+            'success': True,
+            'records': records,
+            'count': len(records)
+        })
+
+    except Exception as e:
+        logger.error(f"Fehler bei Überhangstunden: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/ueberlaufstunden/berechnen', methods=['POST'])
+def berechne_ueberlaufstunden():
+    """Überlaufstunden für einen Mitarbeiter berechnen und speichern"""
+    try:
+        data = request.get_json()
+        ma_id = data.get('ma_id')
+        monat = int(data.get('monat', datetime.now().month))
+        jahr = int(data.get('jahr', datetime.now().year))
+
+        if not ma_id:
+            return jsonify({'success': False, 'error': 'ma_id erforderlich'}), 400
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Berechne Ist-Stunden für den Monat aus tbl_MA_VA_Planung
+        query = """
+            SELECT SUM(DATEDIFF('n', MVA_Start, MVA_Ende) / 60.0) as Ist_Stunden
+            FROM tbl_MA_VA_Planung
+            WHERE MA_ID = ? AND MONTH(VADatum) = ? AND YEAR(VADatum) = ?
+        """
+        cursor.execute(query, [ma_id, monat, jahr])
+        row = cursor.fetchone()
+        ist_stunden = round(float(row[0]), 2) if row and row[0] else 0
+
+        # Prüfe ob Datensatz existiert
+        cursor.execute("""
+            SELECT ID FROM tbl_MA_UeberlaufStunden
+            WHERE MA_ID = ? AND AktJahr = ?
+        """, [ma_id, jahr])
+        existing = cursor.fetchone()
+
+        if not existing:
+            # Neuen Datensatz anlegen
+            cursor.execute("""
+                INSERT INTO tbl_MA_UeberlaufStunden (MA_ID, AktJahr, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12)
+                VALUES (?, ?, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            """, [ma_id, jahr])
+            conn.commit()
+
+        # Update des entsprechenden Monats (M1-M12)
+        monat_feld = f"M{monat}"
+        update_sql = f"""
+            UPDATE tbl_MA_UeberlaufStunden
+            SET {monat_feld} = ?
+            WHERE MA_ID = ? AND AktJahr = ?
+        """
+        cursor.execute(update_sql, [ist_stunden, ma_id, jahr])
+        conn.commit()
+
+        release_connection(conn)
+
+        logger.info(f"Überlaufstunden berechnet: MA {ma_id}, {monat}/{jahr} = {ist_stunden} Std")
+        return jsonify({
+            'success': True,
+            'message': f'Überlaufstunden für {monat}/{jahr} berechnet',
+            'ist_stunden': ist_stunden
+        })
+
+    except Exception as e:
+        logger.error(f"Fehler bei Überlaufstunden-Berechnung: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============================================
 # Server starten
 # ============================================
 
+def graceful_shutdown(signum, frame):
+    """Signalhandler für sauberes Beenden"""
+    logger.info(f"Signal {signum} empfangen - Server wird beendet...")
+    reset_connection()
+    remove_pid()
+    sys.exit(0)
+
+def pre_warm_connection():
+    """Testet DB-Verbindung vor Server-Start"""
+    try:
+        logger.info("Teste Datenbankverbindung...")
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM tbl_MA_Mitarbeiterstamm WHERE IstAktiv = True")
+        count = cursor.fetchone()[0]
+        cursor.close()
+        release_connection(conn)
+        logger.info(f"Datenbankverbindung OK ({count} aktive Mitarbeiter)")
+        return True
+    except Exception as e:
+        logger.error(f"Datenbankverbindung fehlgeschlagen: {e}")
+        return False
+
 if __name__ == '__main__':
+    import signal as _signal
+
     print("=" * 50)
     print("CONSYS Access Bridge REST API")
     print("=" * 50)
@@ -6852,8 +7401,24 @@ if __name__ == '__main__':
     print("Drücke Ctrl+C zum Beenden")
     print("=" * 50)
 
+    # Signalhandler für sauberes Beenden
+    _signal.signal(_signal.SIGINT, graceful_shutdown)
+    _signal.signal(_signal.SIGTERM, graceful_shutdown)
+    if hasattr(_signal, 'SIGBREAK'):  # Windows
+        _signal.signal(_signal.SIGBREAK, graceful_shutdown)
+
     # PID-Datei erstellen
     write_pid()
+
+    # Datenbankverbindung testen BEVOR Server startet
+    if not pre_warm_connection():
+        print("FEHLER: Datenbank nicht erreichbar!")
+        print("Bitte prüfen:")
+        print(f"  1. Backend-Pfad existiert: {BACKEND_PATH}")
+        print("  2. Access ODBC-Treiber installiert")
+        print("  3. Keine andere Anwendung sperrt die Datenbank")
+        remove_pid()
+        sys.exit(1)
 
     # Waitress für stabilen Production-Server (statt Flask dev server)
     # KRITISCH: Access ODBC crasht bei parallelen DB-Zugriffen (Segmentation Fault)
@@ -6862,18 +7427,32 @@ if __name__ == '__main__':
         from waitress import serve
         print("Verwende Waitress WSGI Server (Production-Mode)")
         print("Konfiguration: Single-Thread, begrenzte Verbindungen (Access ODBC Kompatibilität)")
-        serve(
-            app,
-            host='0.0.0.0',
-            port=5000,
-            threads=1,              # NUR 1 Worker-Thread
-            connection_limit=50,    # Max 50 gleichzeitige Verbindungen (Browser hält mehrere offen)
-            channel_timeout=10,     # Kürzerer Timeout für idle Verbindungen (schnelleres Cleanup)
-            recv_bytes=8192,        # Kleinere Buffer = weniger Speicher
-            send_bytes=8192,
-            asyncore_use_poll=True, # Besseres Socket-Handling auf Windows
-            backlog=10              # Max 10 wartende Verbindungen in Listen-Queue
-        )  # Access ODBC ist NICHT thread-safe!
+
+        # Starte Server mit Exception-Handling
+        try:
+            serve(
+                app,
+                host='0.0.0.0',
+                port=5000,
+                threads=1,              # NUR 1 Worker-Thread
+                connection_limit=50,    # Max 50 gleichzeitige Verbindungen (Browser hält mehrere offen)
+                channel_timeout=10,     # Kürzerer Timeout für idle Verbindungen (schnelleres Cleanup)
+                recv_bytes=8192,        # Kleinere Buffer = weniger Speicher
+                send_bytes=8192,
+                asyncore_use_poll=True, # Besseres Socket-Handling auf Windows
+                backlog=10              # Max 10 wartende Verbindungen in Listen-Queue
+            )  # Access ODBC ist NICHT thread-safe!
+        except Exception as e:
+            logger.error(f"Server-Fehler: {e}")
+            reset_connection()
+            remove_pid()
+            sys.exit(1)
     except ImportError:
         print("WARNUNG: Waitress nicht installiert, nutze Flask dev server")
-        app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
+        try:
+            app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
+        except Exception as e:
+            logger.error(f"Server-Fehler: {e}")
+            reset_connection()
+            remove_pid()
+            sys.exit(1)

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>API Server Neustart erforderlich</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 { color: #c0392b; margin-top: 0; }
+        h2 { color: #2c3e50; }
+        .step {
+            background: #ecf0f1;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .step-number {
+            background: #3498db;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        code {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+        }
+        .path {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Consolas', monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 10px 5px 10px 0;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+        .btn:hover { background: linear-gradient(135deg, #219a52, #27ae60); }
+        .btn-secondary {
+            background: linear-gradient(135deg, #3498db, #5dade2);
+        }
+        .btn-secondary:hover { background: linear-gradient(135deg, #2980b9, #3498db); }
+        .status { padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .status-error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .status-success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .status-info { background: #cce5ff; border: 1px solid #b8daff; color: #004085; }
+        #testResult { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>⚠️ API Server Neustart erforderlich</h1>
+        <p>Der E-Mail-Endpoint <code>/api/email/send</code> wurde zum API-Server hinzugefügt, aber der Server muss neu gestartet werden, um die Änderungen zu laden.</p>
+        
+        <div class="status status-error" id="currentStatus">
+            <strong>Aktueller Status:</strong> E-Mail-Endpoint nicht verfügbar (404)
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>🔧 Neustart-Anleitung</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Öffnen Sie den Ordner:</strong>
+            <div class="path">C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\08_Tools\python</div>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Doppelklicken Sie auf:</strong> <code>restart_api.bat</code>
+            <br><br>
+            <em>Oder alternativ:</em> Öffnen Sie eine Eingabeaufforderung und führen Sie aus:
+            <div class="path">cd C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\08_Tools\python
+python api_server.py</div>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Testen Sie den Endpoint:</strong>
+            <br><br>
+            <button class="btn" onclick="testEmailEndpoint()">🔄 Endpoint testen</button>
+            <button class="btn btn-secondary" onclick="sendTestEmail()">📧 Test-Email senden</button>
+        </div>
+        
+        <div id="testResult"></div>
+    </div>
+    
+    <div class="card">
+        <h2>📁 Schnellzugriff</h2>
+        <p>Klicken Sie hier, um den Python-Ordner zu öffnen:</p>
+        <a href="file:///C:/Users/guenther.siegert/Documents/0006_All_Access_KNOWLEDGE/08_Tools/python/" class="btn btn-secondary">📂 Ordner öffnen</a>
+    </div>
+
+    <script>
+        async function testEmailEndpoint() {
+            const resultDiv = document.getElementById('testResult');
+            const statusDiv = document.getElementById('currentStatus');
+            resultDiv.innerHTML = '<div class="status status-info">Teste Endpoint...</div>';
+            
+            try {
+                // Erst prüfen ob Server überhaupt läuft
+                const pingResponse = await fetch('http://localhost:5000/');
+                if (!pingResponse.ok) {
+                    throw new Error('Server antwortet nicht');
+                }
+                
+                // Dann Email-Endpoint testen
+                const response = await fetch('http://localhost:5000/api/email/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: 'test@test.de',
+                        subject: 'Test',
+                        html_body: '<p>Test</p>'
+                    })
+                });
+                
+                if (response.status === 404) {
+                    resultDiv.innerHTML = '<div class="status status-error"><strong>❌ Endpoint nicht gefunden (404)</strong><br>Bitte starten Sie den API-Server neu!</div>';
+                    statusDiv.innerHTML = '<strong>Aktueller Status:</strong> ❌ E-Mail-Endpoint nicht verfügbar (404)';
+                    statusDiv.className = 'status status-error';
+                } else {
+                    const data = await response.json();
+                    if (data.success || response.status === 200) {
+                        resultDiv.innerHTML = '<div class="status status-success"><strong>✅ Endpoint verfügbar!</strong><br>Der E-Mail-Versand funktioniert.</div>';
+                        statusDiv.innerHTML = '<strong>Aktueller Status:</strong> ✅ E-Mail-Endpoint verfügbar';
+                        statusDiv.className = 'status status-success';
+                    } else {
+                        resultDiv.innerHTML = '<div class="status status-info"><strong>⚠️ Endpoint antwortet:</strong><br>' + JSON.stringify(data) + '</div>';
+                    }
+                }
+            } catch (e) {
+                resultDiv.innerHTML = '<div class="status status-error"><strong>❌ Fehler:</strong> ' + e.message + '<br>Ist der API-Server gestartet?</div>';
+            }
+        }
+        
+        async function sendTestEmail() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<div class="status status-info">Sende Test-Email...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/email/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: 'siegert@consec-nuernberg.de',
+                        subject: 'CONSEC API Test - ' + new Date().toLocaleString('de-DE'),
+                        html_body: `
+                            <html>
+                            <body style="font-family: Arial, sans-serif;">
+                                <h1 style="color: #000080;">✅ CONSEC E-Mail-Test erfolgreich!</h1>
+                                <p>Diese E-Mail wurde vom API-Server gesendet.</p>
+                                <p><strong>Zeitstempel:</strong> ${new Date().toLocaleString('de-DE')}</p>
+                                <hr>
+                                <p style="color: #666;">Gesendet via Mailjet SMTP</p>
+                            </body>
+                            </html>
+                        `,
+                        plain_body: 'CONSEC E-Mail-Test erfolgreich! Zeitstempel: ' + new Date().toLocaleString('de-DE')
+                    })
+                });
+                
+                if (response.status === 404) {
+                    resultDiv.innerHTML = '<div class="status status-error"><strong>❌ Endpoint nicht gefunden (404)</strong><br>Bitte starten Sie den API-Server neu!</div>';
+                } else {
+                    const data = await response.json();
+                    if (data.success) {
+                        resultDiv.innerHTML = '<div class="status status-success"><strong>✅ Test-Email gesendet!</strong><br>' + data.message + '</div>';
+                    } else {
+                        resultDiv.innerHTML = '<div class="status status-error"><strong>❌ Fehler:</strong> ' + (data.error || 'Unbekannter Fehler') + '</div>';
+                    }
+                }
+            } catch (e) {
+                resultDiv.innerHTML = '<div class="status status-error"><strong>❌ Fehler:</strong> ' + e.message + '</div>';
+            }
+        }
+        
+        // Auto-Test beim Laden
+        window.onload = testEmailEndpoint;
+    </script>
+</body>
+</html>

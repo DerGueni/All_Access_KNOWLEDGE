@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexware Stunden Import/Export</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        body {
+            background: #8080c0;
+        }
+
+        .dialog-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90vw;
+            max-width: 1400px;
+            height: 85vh;
+            background: #f0f0f0;
+            border: 3px solid #4316B2;
+            border-radius: 6px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: linear-gradient(180deg, #4316B2 0%, #3558c0 100%);
+            color: white;
+            border-bottom: 2px solid #2a3a80;
+        }
+
+        .dialog-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: #c75050;
+            border: 1px solid #a03030;
+            color: white;
+            padding: 2px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 3px;
+        }
+
+        .close-btn:hover {
+            background: #d06060;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: #e8e8e8;
+            border-bottom: 1px solid #ccc;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toolbar-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .toolbar select,
+        .toolbar input {
+            padding: 3px 6px;
+            border: 1px solid #999;
+            font-size: 11px;
+            background: white;
+            min-width: 150px;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 24px;
+            background: #999;
+            margin: 0 6px;
+        }
+
+        .btn {
+            padding: 4px 12px;
+            border: 1px solid #999;
+            background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(180deg, #f5f5f5 0%, #ddd 100%);
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #5cb85c 0%, #449d44 100%);
+            border-color: #449d44;
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(180deg, #d9534f 0%, #c9302c 100%);
+            border-color: #c9302c;
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(180deg, #5bc0de 0%, #46b8da 100%);
+            border-color: #46b8da;
+            color: white;
+        }
+
+        .tabs-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: white;
+            margin: 4px;
+        }
+
+        .tab-nav {
+            display: flex;
+            background: #d0d0d0;
+            border-bottom: 2px solid #999;
+        }
+
+        .tab-btn {
+            padding: 8px 20px;
+            border: none;
+            background: #e8e8e8;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border-right: 1px solid #999;
+            transition: all 0.15s ease;
+        }
+
+        .tab-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-bottom: 2px solid #4316B2;
+            color: #4316B2;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .tab-pane {
+            display: none;
+            height: 100%;
+            overflow: auto;
+            padding: 12px;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .data-table-container {
+            height: 100%;
+            overflow: auto;
+            border: 1px solid #ccc;
+            background: white;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .data-table th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+            border: 1px solid #999;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 4px 8px;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .data-table tbody tr:hover {
+            background: #e8f4ff;
+        }
+
+        .data-table tbody tr.selected {
+            background: #cce5ff !important;
+        }
+
+        .footer-status {
+            padding: 6px 12px;
+            background: #e8e8e8;
+            border-top: 1px solid #ccc;
+            font-size: 10px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 40px;
+            border: 2px solid #4316B2;
+            border-radius: 6px;
+            z-index: 1000;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 11px;
+        }
+
+        .error-row {
+            background: #ffe0e0 !important;
+        }
+
+        .success-row {
+            background: #e0ffe0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog-container">
+        <!-- Header -->
+        <div class="dialog-header">
+            <div class="dialog-title">Lexware Stunden Import/Export</div>
+            <button class="close-btn" onclick="closeDialog()">✕</button>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <label class="toolbar-label">Mitarbeiter:</label>
+                <select id="cboMA" class="form-control">
+                    <option value="">-- Alle --</option>
+                </select>
+            </div>
+
+            <div class="toolbar-group">
+                <label class="toolbar-label">Zeitraum:</label>
+                <select id="cboZeitraum" class="form-control">
+                    <option value="aktuell">Aktueller Monat</option>
+                    <option value="vormonat">Vormonat</option>
+                    <option value="quartal">Aktuelles Quartal</option>
+                    <option value="jahr">Aktuelles Jahr</option>
+                    <option value="custom">Benutzerdefiniert</option>
+                </select>
+            </div>
+
+            <div class="toolbar-group">
+                <label class="toolbar-label">Anstellungsart:</label>
+                <select id="cboAnstArt" class="form-control">
+                    <option value="">-- Alle --</option>
+                    <option value="3">Festangestellt (3)</option>
+                    <option value="5">Subunternehmer (5)</option>
+                </select>
+            </div>
+
+            <div class="toolbar-separator"></div>
+
+            <div class="toolbar-group">
+                <label class="toolbar-label">Von:</label>
+                <input type="date" id="AU_von" class="form-control">
+            </div>
+
+            <div class="toolbar-group">
+                <label class="toolbar-label">Bis:</label>
+                <input type="date" id="AU_bis" class="form-control">
+            </div>
+
+            <div class="toolbar-separator"></div>
+
+            <button class="btn btn-primary" id="btnImport" onclick="handleImport()">📥 Import</button>
+            <button class="btn btn-info" id="btnExport" onclick="handleExport()">📤 Export</button>
+            <button class="btn" id="btnZKMini" onclick="handleZKMini()">ZK Mini</button>
+            <button class="btn" id="btnZKFest" onclick="handleZKFest()">ZK Fest</button>
+            <button class="btn" id="btnZKeinzel" onclick="handleZKEinzel()">ZK Einzeln</button>
+            <button class="btn" id="btnExportDiff" onclick="handleExportDiff()">Export Diff</button>
+            <button class="btn" id="btnZKMiniAbrech" onclick="handleZKMiniAbrech()">ZK Mini Abrech</button>
+            <button class="btn" id="btnZKFestAbrech" onclick="handleZKFestAbrech()">ZK Fest Abrech</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="stunden">Importierte Stunden</button>
+                <button class="tab-btn" data-tab="abgleich">Abgleich</button>
+                <button class="tab-btn" data-tab="fehler">Importfehler</button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Tab: Importierte Stunden -->
+                <div class="tab-pane active" id="tab-stunden">
+                    <div class="data-table-container">
+                        <table class="data-table" id="tableStunden">
+                            <thead>
+                                <tr>
+                                    <th>MA-Nr</th>
+                                    <th>Nachname</th>
+                                    <th>Vorname</th>
+                                    <th>Datum</th>
+                                    <th>Stunden</th>
+                                    <th>Zuschlag</th>
+                                    <th>Auftrag</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyStunden">
+                                <tr>
+                                    <td colspan="8" class="empty-state">Keine Daten vorhanden. Bitte Import durchführen.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab: Abgleich -->
+                <div class="tab-pane" id="tab-abgleich">
+                    <div class="data-table-container">
+                        <table class="data-table" id="tableAbgleich">
+                            <thead>
+                                <tr>
+                                    <th>MA-Nr</th>
+                                    <th>Nachname</th>
+                                    <th>Vorname</th>
+                                    <th>Datum</th>
+                                    <th>Lexware Std</th>
+                                    <th>Consys Std</th>
+                                    <th>Differenz</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyAbgleich">
+                                <tr>
+                                    <td colspan="8" class="empty-state">Keine Abgleichdaten vorhanden.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab: Importfehler -->
+                <div class="tab-pane" id="tab-fehler">
+                    <div class="data-table-container">
+                        <table class="data-table" id="tableFehler">
+                            <thead>
+                                <tr>
+                                    <th>Zeile</th>
+                                    <th>MA-Nr</th>
+                                    <th>Datum</th>
+                                    <th>Fehlertyp</th>
+                                    <th>Fehlermeldung</th>
+                                    <th>Rohdaten</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyFehler">
+                                <tr>
+                                    <td colspan="6" class="empty-state">Keine Importfehler.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-status">
+            <span id="statusLeft">Bereit</span>
+            <span id="statusRight">Datensätze: 0</span>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading" id="loadingOverlay">
+            <div>Lade Daten...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/sidebar.js"></script>
+    <script type="module" src="./logic/zfrm_MA_Stunden_Lexware.logic.js"></script>
+
+    <script>
+        // Tab-Switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetTab = this.dataset.tab;
+
+                // Update buttons
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Update panes
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                document.getElementById('tab-' + targetTab).classList.add('active');
+            });
+        });
+
+        // Close Dialog
+        function closeDialog() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ action: 'close' });
+            } else {
+                window.close();
+            }
+        }
+
+        // Placeholder functions (implemented in logic.js)
+        function handleImport() {
+            console.log('Import triggered');
+        }
+
+        function handleExport() {
+            console.log('Export triggered');
+        }
+
+        function handleZKMini() {
+            console.log('ZK Mini triggered');
+        }
+
+        function handleZKFest() {
+            console.log('ZK Fest triggered');
+        }
+
+        function handleZKEinzel() {
+            console.log('ZK Einzeln triggered');
+        }
+
+        function handleExportDiff() {
+            console.log('Export Diff triggered');
+        }
+
+        function handleZKMiniAbrech() {
+            console.log('ZK Mini Abrech triggered');
+        }
+
+        function handleZKFestAbrech() {
+            console.log('ZK Fest Abrech triggered');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <title>Bridge Test</title>
+</head>
+<body>
+    <h1>Bridge Test</h1>
+    <pre id="log"></pre>
+
+    <script src="./js/webview2-bridge.js"></script>
+    <script>
+        const log = document.getElementById('log');
+
+        function addLog(msg) {
+            log.textContent += msg + '\n';
+            console.log(msg);
+        }
+
+        // Event-Handler registrieren
+        Bridge.on('onDataReceived', function(data) {
+            addLog('EVENT onDataReceived: ' + JSON.stringify(data).substring(0, 200));
+        });
+
+        Bridge.on('onError', function(data) {
+            addLog('EVENT onError: ' + JSON.stringify(data));
+        });
+
+        addLog('Bridge geladen: ' + (typeof Bridge));
+        addLog('Bridge.on: ' + (typeof Bridge.on));
+        addLog('Bridge.loadData: ' + (typeof Bridge.loadData));
+
+        // Test: Status laden
+        addLog('Lade Status...');
+        Bridge.loadData('status').then(function(result) {
+            addLog('Promise resolved: ' + JSON.stringify(result).substring(0, 200));
+        }).catch(function(err) {
+            addLog('Promise rejected: ' + err.message);
+        });
+
+        // Test: Aufträge laden
+        setTimeout(function() {
+            addLog('Lade Aufträge...');
+            Bridge.loadData('auftraege_liste', null, { limit: 3 });
+        }, 1000);
+    </script>
+</body>
+</html>

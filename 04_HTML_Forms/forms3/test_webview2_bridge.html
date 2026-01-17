@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WebView2 Bridge Test</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.ok { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warn { background: #fff3cd; color: #856404; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+        }
+        button:hover { background: #0056b3; }
+        #log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .log-entry { margin: 2px 0; }
+        .log-error { color: #ff6b6b; }
+        .log-success { color: #69db7c; }
+        .log-info { color: #74c0fc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebView2 Bridge Test</h1>
+
+        <div id="webview2-status" class="status">Prüfe WebView2...</div>
+        <div id="bridge-status" class="status">Prüfe Bridge...</div>
+
+        <h2>Tests</h2>
+        <button onclick="testPing()">Ping C# Bridge</button>
+        <button onclick="testLoadAufträge()">Lade Aufträge</button>
+        <button onclick="testLoadMitarbeiter()">Lade Mitarbeiter</button>
+        <button onclick="testLoadKunden()">Lade Kunden</button>
+        <button onclick="clearLog()">Log leeren</button>
+
+        <div id="log"></div>
+    </div>
+
+    <script src="js/webview2-bridge.js"></script>
+    <script>
+        const logEl = document.getElementById('log');
+
+        function log(msg, type) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry' + (type ? ' log-' + type : '');
+            entry.textContent = new Date().toLocaleTimeString() + ' - ' + msg;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+            logEl.innerHTML = '';
+        }
+
+        // Status-Anzeige aktualisieren
+        function updateStatus() {
+            const wv2Status = document.getElementById('webview2-status');
+            const bridgeStatus = document.getElementById('bridge-status');
+
+            // WebView2 Check
+            if (window.chrome && window.chrome.webview) {
+                wv2Status.className = 'status ok';
+                wv2Status.textContent = '✓ WebView2 erkannt - Direkte Kommunikation mit C# möglich';
+                log('WebView2 erkannt', 'success');
+            } else {
+                wv2Status.className = 'status warn';
+                wv2Status.textContent = '⚠ WebView2 nicht erkannt - Browser-Modus (API-Server erforderlich)';
+                log('WebView2 NICHT erkannt - Browser-Modus', 'error');
+            }
+
+            // Bridge Check
+            if (typeof Bridge !== 'undefined') {
+                bridgeStatus.className = 'status ok';
+                bridgeStatus.textContent = '✓ Bridge geladen (v3.0)';
+                log('Bridge geladen', 'success');
+            } else {
+                bridgeStatus.className = 'status error';
+                bridgeStatus.textContent = '✗ Bridge NICHT geladen!';
+                log('Bridge NICHT geladen!', 'error');
+            }
+        }
+
+        // Test: Ping
+        async function testPing() {
+            log('Sende Ping...', 'info');
+            try {
+                const result = await Bridge.ping();
+                log('Ping erfolgreich: ' + JSON.stringify(result), 'success');
+            } catch (e) {
+                log('Ping fehlgeschlagen: ' + JSON.stringify(e), 'error');
+            }
+        }
+
+        // Test: Aufträge laden
+        function testLoadAufträge() {
+            log('Lade Aufträge...', 'info');
+
+            Bridge.on('onDataReceived', function(data) {
+                log('Daten empfangen: ' + JSON.stringify(data).substring(0, 200) + '...', 'success');
+            });
+
+            Bridge.loadData('auftraege_liste', null, { limit: 10 });
+        }
+
+        // Test: Mitarbeiter laden
+        function testLoadMitarbeiter() {
+            log('Lade Mitarbeiter...', 'info');
+            Bridge.loadData('mitarbeiter_liste', null, { aktiv: true, limit: 10 });
+        }
+
+        // Test: Kunden laden
+        function testLoadKunden() {
+            log('Lade Kunden...', 'info');
+            Bridge.loadData('kunden', null, { aktiv: true });
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Seite geladen', 'info');
+            updateStatus();
+        });
+
+        // Globaler Error-Handler
+        Bridge.on('onError', function(error) {
+            log('FEHLER: ' + JSON.stringify(error), 'error');
+        });
+    </script>
+</body>
+</html>

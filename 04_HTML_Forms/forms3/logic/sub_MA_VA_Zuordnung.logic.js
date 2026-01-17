@@ -27,7 +27,9 @@
 const state = {
     VA_ID: null,
     VADatum_ID: null,
-    records: [],
+    schichten: [],    // Alle Schichten für das Datum
+    zuordnungen: [],  // MA-Zuordnungen
+    records: [],      // Kombinierte Anzeige-Daten (Schichten + Zuordnungen)
     selectedIndex: -1,
     isEmbedded: false,
     maLookup: [] // Mitarbeiter-Auswahlliste
@@ -41,6 +43,7 @@ let cboMASelect = null;
  * Initialisierung
  */
 function init() {
+    console.log('[sub_MA_VA_Zuordnung] init() gestartet');
     tbody = document.getElementById('tbody_MA_VA_Zuordnung');
     cboMASelect = document.getElementById('new_cboMA_Ausw');
 
@@ -56,7 +59,23 @@ function init() {
     // Wenn embedded, auf Parent-Messages hören
     if (state.isEmbedded) {
         window.addEventListener('message', handleParentMessage);
+
+        // Ready-Signal MEHRFACH senden (Robustheit gegen Timing-Probleme)
+        // 1. Sofort senden
+        console.log('[sub_MA_VA_Zuordnung] Sende subform_ready (sofort)');
         window.parent.postMessage({ type: 'subform_ready', name: 'sub_MA_VA_Zuordnung' }, '*');
+
+        // 2. Nach 100ms erneut senden (falls Parent noch nicht bereit war)
+        setTimeout(() => {
+            console.log('[sub_MA_VA_Zuordnung] Sende subform_ready (100ms delay)');
+            window.parent.postMessage({ type: 'subform_ready', name: 'sub_MA_VA_Zuordnung' }, '*');
+        }, 100);
+
+        // 3. Nach 500ms erneut senden (für langsame Verbindungen)
+        setTimeout(() => {
+            console.log('[sub_MA_VA_Zuordnung] Sende subform_ready (500ms delay)');
+            window.parent.postMessage({ type: 'subform_ready', name: 'sub_MA_VA_Zuordnung' }, '*');
+        }, 500);
     }
 
     // WebView2 Event Listener
@@ -72,10 +91,15 @@ function init() {
  */
 function handleParentMessage(event) {
     const data = event.data;
-    if (!data || !data.type) return;
+    console.log('[sub_MA_VA_Zuordnung] Message empfangen:', JSON.stringify(data));
+    if (!data || !data.type) {
+        console.log('[sub_MA_VA_Zuordnung] Message ignoriert - kein type');
+        return;
+    }
 
     switch (data.type) {
         case 'set_link_params':
+            console.log('[sub_MA_VA_Zuordnung] set_link_params VA_ID:', data.VA_ID, 'VADatum_ID:', data.VADatum_ID);
             if (data.VA_ID !== undefined) state.VA_ID = data.VA_ID;
             if (data.VADatum_ID !== undefined) state.VADatum_ID = data.VADatum_ID;
             loadData();
@@ -133,18 +157,49 @@ function setSubformLocked(locked) {
 
 /**
  * Veranstalter-spezifische Anpassungen (VBA: Form_Current)
- * Bei Veranstalter_ID = 20760: PKW und Einsatzleitung ausblenden
+ * Bei Veranstalter_ID = 20760: PKW und EL ausblenden, RE einblenden
+ * Bei anderen Veranstaltern: PKW und EL einblenden, RE ausblenden
  */
 function handleVeranstalterChange(veranstalterId) {
-    const isPKWHidden = veranstalterId === 20760;
-    setColumnHidden('col-pkw', isPKWHidden);
-    setColumnHidden('col-el', isPKWHidden);
+    const isBWNKunde = veranstalterId === 20760;
+    // Bei BWN-Kunde (20760): PKW und EL verstecken, RE zeigen
+    setColumnHidden('col-pkw', isBWNKunde);
+    setColumnHidden('col-el', isBWNKunde);
+    // RE-Spalte nur bei BWN-Kunde zeigen (14.01.2026)
+    setColumnHidden('col-re', !isBWNKunde);
 }
 
 /**
- * MA-Lookup laden via WebView2-Bridge
+ * MA-Lookup laden via WebView2-Bridge oder REST-API (Browser-Fallback)
  */
-function loadMALookup() {
+async function loadMALookup() {
+    // IMMER REST-API verwenden - WebView2-Bridge hat Timeout-Probleme bei iframes
+    const isBrowserMode = true; // Erzwinge REST-API Modus
+    if (isBrowserMode) {
+        try {
+            const url = 'http://localhost:5000/api/mitarbeiter?aktiv=true';
+            console.log('[sub_MA_VA_Zuordnung] Lade MA-Lookup:', url);
+            const response = await fetch(url);
+            const result = await response.json();
+            const records = result.data || result || [];
+            state.maLookup = records.map(ma => ({
+                ID: ma.ID || ma.MA_ID,
+                Name: `${ma.Nachname || ''}, ${ma.Vorname || ''}`,
+                Tel_Mobil: ma.Tel_Mobil || ''
+            }));
+            console.log('[sub_MA_VA_Zuordnung] MA-Lookup geladen:', state.maLookup.length, 'Mitarbeiter');
+            populateMASelect();
+            // Falls Daten schon da sind, neu rendern für MA-Namen
+            if (state.records.length > 0) {
+                render();
+            }
+        } catch (e) {
+            console.error('[sub_MA_VA_Zuordnung] Fehler beim Laden MA-Lookup:', e);
+        }
+        return;
+    }
+
+    // WebView2-Modus: Über Bridge
     Bridge.sendEvent('loadSubformData', {
         type: 'ma_lookup',
         aktiv: true
@@ -175,7 +230,8 @@ function handleDataReceived(data) {
             IstFraglich: rec.MVP_IstFraglich || rec.IstFraglich,
             PKW_Anzahl: rec.MVP_PKW_Anzahl || rec.PKW_Anzahl,
             PreisArt_ID: rec.MVP_PreisArt_ID || rec.PreisArt_ID,
-            MA_Brutto_Std: rec.MVP_MA_Brutto_Std || rec.MA_Brutto_Std
+            MA_Brutto_Std: rec.MVP_MA_Brutto_Std || rec.MA_Brutto_Std,
+            Rch_Erstellt: rec.MVP_Rch_Erstellt || rec.Rch_Erstellt
         }));
         render();
     }
@@ -197,14 +253,63 @@ function populateMASelect() {
 }
 
 /**
- * Daten laden via WebView2-Bridge
+ * Daten laden via WebView2-Bridge oder REST-API (Browser-Fallback)
+ *
+ * WICHTIG: Lädt ALLE SCHICHTEN für das Datum, dann MA-Zuordnungen
+ * Zeigt jede Schicht an - auch wenn keine MA zugeordnet sind
  */
-function loadData() {
+async function loadData() {
+    console.log('[sub_MA_VA_Zuordnung] loadData() aufgerufen - VA_ID:', state.VA_ID, 'VADatum_ID:', state.VADatum_ID);
+
     if (!state.VA_ID) {
+        console.warn('[sub_MA_VA_Zuordnung] loadData() ABBRUCH: keine VA_ID');
         renderEmpty();
         return;
     }
 
+    console.log('[sub_MA_VA_Zuordnung] loadData startet API-Calls...');
+
+    // IMMER REST-API verwenden - WebView2-Bridge ist zu langsam/unzuverlässig für iframes
+    // Die WebView2-Bridge hat Timeout-Probleme bei eingebetteten iframes
+    const isBrowserMode = true; // Erzwinge REST-API Modus
+    console.log('[sub_MA_VA_Zuordnung] Verwende REST-API Modus (erzwungen)');
+    if (isBrowserMode) {
+        try {
+            // 1. ALLE SCHICHTEN für das Datum laden
+            let schichtenUrl = `http://localhost:5000/api/auftraege/${state.VA_ID}/schichten`;
+            if (state.VADatum_ID) {
+                schichtenUrl += `?vadatum_id=${state.VADatum_ID}`;
+            }
+            console.log('[sub_MA_VA_Zuordnung] Fetch Schichten:', schichtenUrl);
+            const schichtenResponse = await fetch(schichtenUrl);
+            const schichtenResult = await schichtenResponse.json();
+            state.schichten = schichtenResult.data || [];
+            console.log('[sub_MA_VA_Zuordnung] Schichten geladen:', state.schichten.length);
+
+            // 2. MA-Zuordnungen laden
+            let zuordnungenUrl = `http://localhost:5000/api/auftraege/${state.VA_ID}/zuordnungen`;
+            if (state.VADatum_ID) {
+                zuordnungenUrl += `?vadatum_id=${state.VADatum_ID}`;
+            }
+            console.log('[sub_MA_VA_Zuordnung] Fetch Zuordnungen:', zuordnungenUrl);
+            const zuordnungenResponse = await fetch(zuordnungenUrl);
+            const zuordnungenResult = await zuordnungenResponse.json();
+            state.zuordnungen = zuordnungenResult.data || [];
+            console.log('[sub_MA_VA_Zuordnung] Zuordnungen geladen:', state.zuordnungen.length);
+
+            // 3. Records kombinieren: Jede Schicht + ihre MA-Zuordnungen
+            state.records = buildDisplayRecords();
+
+            console.log('[sub_MA_VA_Zuordnung] Display-Records:', state.records.length);
+            render();
+        } catch (e) {
+            console.error('[sub_MA_VA_Zuordnung] Fehler beim Laden:', e);
+            renderEmpty();
+        }
+        return;
+    }
+
+    // WebView2-Modus: Über Bridge
     Bridge.sendEvent('loadSubformData', {
         type: 'ma_va_zuordnung',
         va_id: state.VA_ID,
@@ -213,67 +318,142 @@ function loadData() {
 }
 
 /**
- * Daten rendern
+ * Kombiniert Schichten und Zuordnungen zu Anzeige-Records
+ *
+ * Für jede Schicht (tbl_VA_Start):
+ * - Zeige MA_Anzahl Zeilen (so viele wie geplant)
+ * - Fülle mit zugeordneten MA, Rest bleibt leer
+ *
+ * Sortierung: Nach Schicht-Startzeit (VA_Start)
+ */
+function buildDisplayRecords() {
+    const records = [];
+    let lfdNr = 1;
+
+    // Schichten nach Startzeit sortieren
+    const sortedSchichten = [...state.schichten].sort((a, b) => {
+        const timeA = a.VA_Start || '';
+        const timeB = b.VA_Start || '';
+        return timeA.localeCompare(timeB);
+    });
+
+    for (const schicht of sortedSchichten) {
+        const schichtId = schicht.ID;
+        const maAnzahl = schicht.MA_Anzahl || 1;  // Geplante Anzahl MA
+
+        // MA-Zuordnungen für diese Schicht finden (VAStart_ID = Schicht-ID)
+        const schichtZuordnungen = state.zuordnungen.filter(z =>
+            z.VAStart_ID === schichtId || z.VAStart_ID == schichtId
+        );
+
+        // Erzeuge MA_Anzahl Zeilen für diese Schicht
+        for (let i = 0; i < maAnzahl; i++) {
+            const zuo = schichtZuordnungen[i];  // Zuordnung falls vorhanden
+
+            if (zuo) {
+                // MA zugeordnet
+                records.push({
+                    ID: zuo.ID || zuo.MVP_ID,
+                    VA_ID: zuo.VA_ID || state.VA_ID,
+                    PosNr: lfdNr++,
+                    MA_Start: zuo.MA_Start || zuo.MVA_Start || schicht.VA_Start,
+                    MA_Ende: zuo.MA_Ende || zuo.MVA_Ende || schicht.VA_Ende,
+                    MA_ID: zuo.MA_ID || 0,
+                    MA_Name: zuo.Nachname ? `${zuo.Nachname}, ${zuo.Vorname || ''}`.trim() : '',
+                    PKW: zuo.PKW || 0,
+                    VADatum_ID: zuo.VADatum_ID || state.VADatum_ID,
+                    VAStart_ID: schichtId,
+                    Bemerkungen: zuo.Bemerkungen || zuo.Bemerkung || '',
+                    Einsatzleitung: zuo.Einsatzleitung || false,
+                    IstFraglich: zuo.IstFraglich || false,
+                    PKW_Anzahl: zuo.PKW_Anzahl,
+                    PreisArt_ID: zuo.PreisArt_ID,
+                    MA_Brutto_Std: zuo.MA_Brutto_Std || zuo.Std,
+                    Rch_Erstellt: zuo.Rch_Erstellt || false,
+                    _isNewRow: false,
+                    _schichtInfo: schicht
+                });
+            } else {
+                // Leere Zeile (noch kein MA zugeordnet)
+                records.push({
+                    ID: null,
+                    VA_ID: state.VA_ID,
+                    PosNr: lfdNr++,
+                    MA_Start: schicht.VA_Start,
+                    MA_Ende: schicht.VA_Ende,
+                    MA_ID: null,
+                    MA_Name: '',
+                    PKW: 0,
+                    VADatum_ID: state.VADatum_ID,
+                    VAStart_ID: schichtId,
+                    Bemerkungen: '',
+                    Einsatzleitung: false,
+                    IstFraglich: false,
+                    PKW_Anzahl: null,
+                    PreisArt_ID: null,
+                    MA_Brutto_Std: null,
+                    Rch_Erstellt: false,
+                    _isNewRow: true,
+                    _schichtInfo: schicht
+                });
+            }
+        }
+    }
+
+    return records;
+}
+
+/**
+ * Daten rendern - Normale Tabellenzeilen ohne Input-Felder
  */
 function render() {
     if (!tbody) return;
 
     if (state.records.length === 0) {
-        renderEmpty();
+        renderNoSchichten();
         return;
     }
 
     tbody.innerHTML = state.records.map((rec, idx) => {
         const rowClass = getRowClass(rec, idx);
-        const maName = getMAName(rec.MA_ID);
+        const isNewRow = rec._isNewRow === true;
+        const maName = rec.MA_Name || getMAName(rec.MA_ID) || '';
+        const stunden = formatDecimal(rec.MA_Brutto_Std || calculateHours(rec.MA_Start, rec.MA_Ende));
 
+        // Normale Tabellenzeilen - keine Input-Felder
         return `
-            <tr data-index="${idx}" data-id="${rec.ID}" class="${rowClass}">
-                <td class="col-hidden">${rec.ID || ''}</td>
-                <td class="col-hidden">${rec.VA_ID || ''}</td>
+            <tr data-index="${idx}" data-id="${rec.ID || ''}" data-vastart-id="${rec.VAStart_ID || ''}"
+                class="${rowClass} ${isNewRow ? 'new-row' : ''}">
                 <td class="col-lfd">${rec.PosNr || ''}</td>
-                <td class="col-time">
-                    <input type="text" value="${formatTime(rec.MA_Start)}"
-                           data-field="MA_Start" data-id="${rec.ID}">
-                </td>
-                <td class="col-time">
-                    <input type="text" value="${formatTime(rec.MA_Ende)}"
-                           data-field="MA_Ende" data-id="${rec.ID}">
-                </td>
-                <td class="col-ma">
-                    <select data-field="MA_ID" data-id="${rec.ID}">
-                        ${renderMAOptions(rec.MA_ID)}
-                    </select>
-                </td>
-                <td class="col-pkw">
-                    <input type="checkbox" ${rec.PKW ? 'checked' : ''}
-                           data-field="PKW" data-id="${rec.ID}">
-                </td>
-                <td class="col-hidden">${rec.VADatum_ID || ''}</td>
-                <td class="col-schicht">
-                    ${formatSchicht(rec.VAStart_ID)}
-                </td>
-                <td class="col-bemerk">
-                    <input type="text" value="${rec.Bemerkungen || ''}"
-                           data-field="Bemerkungen" data-id="${rec.ID}">
-                </td>
-                <td class="col-el">
-                    <input type="checkbox" ${rec.Einsatzleitung ? 'checked' : ''}
-                           data-field="Einsatzleitung" data-id="${rec.ID}">
-                </td>
-                <td class="col-info">
-                    <input type="checkbox" ${rec.IstFraglich ? 'checked' : ''}
-                           data-field="IstFraglich" data-id="${rec.ID}" title="Informieren">
-                </td>
-                <td class="col-preis">${rec.PreisArt_ID || ''}</td>
-                <td class="col-pkwanz cell-number">${rec.PKW_Anzahl || ''}</td>
-                <td class="col-std cell-number">${formatDecimal(rec.MA_Brutto_Std)}</td>
+                <td class="col-ma">${maName}</td>
+                <td class="col-time">${formatTime(rec.MA_Start)}</td>
+                <td class="col-time">${formatTime(rec.MA_Ende)}</td>
+                <td class="col-std">${stunden}</td>
+                <td class="col-bemerk">${rec.Bemerkungen || ''}</td>
+                <td class="col-info"><input type="checkbox" ${rec.IstFraglich ? 'checked' : ''} disabled title="Fraglich"></td>
+                <td class="col-pkw">${formatCurrency(rec.PKW)}</td>
+                <td class="col-el"><input type="checkbox" ${rec.Einsatzleitung ? 'checked' : ''} disabled title="Einsatzleitung"></td>
+                <td class="col-re"><input type="checkbox" ${rec.Rch_Erstellt ? 'checked' : ''} disabled title="Rechnung erstellt"></td>
             </tr>
         `;
     }).join('');
 
-    // Event Listener für Zeilen
+    // Event Listener für Zeilen-Klick
     attachRowListeners();
+}
+
+/**
+ * Anzeige wenn keine Schichten vorhanden
+ */
+function renderNoSchichten() {
+    if (!tbody) return;
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="15" style="text-align:center; color:#666; padding:20px;">
+                Keine Schichten für dieses Datum angelegt
+            </td>
+        </tr>
+    `;
 }
 
 /**
@@ -450,11 +630,15 @@ function selectRow(index) {
 
 /**
  * Feldänderung verarbeiten
+ *
+ * Behandelt sowohl existierende Records als auch neue Zeilen
  */
-function handleFieldChange(event) {
+async function handleFieldChange(event) {
     const el = event.target;
     const field = el.dataset.field;
     const id = el.dataset.id;
+    const vastartId = el.dataset.vastartId;
+    const isNew = el.dataset.isNew === 'true' || !id;
     let value = el.value;
 
     // Zeit-Felder konvertieren
@@ -462,16 +646,100 @@ function handleFieldChange(event) {
         value = parseTime(value);
     }
 
-    Bridge.sendEvent('updateRecord', {
-        table: 'tbl_MA_VA_Planung',
-        id: id,
-        field: field,
-        value: value
-    });
+    // Bei MA-Auswahl auf leerer Zeile: Neuen Record erstellen
+    if (isNew && field === 'MA_ID' && value) {
+        await createNewZuordnung(vastartId, parseInt(value), el);
+        return;
+    }
 
-    // Lokalen Record aktualisieren
-    const rec = state.records.find(r => r.ID == id);
-    if (rec) rec[field] = value;
+    // Existierender Record: Update via API
+    if (id) {
+        try {
+            // Browser-Modus: REST-API
+            const isBrowserMode = !(window.chrome && window.chrome.webview);
+            if (isBrowserMode) {
+                const response = await fetch(`http://localhost:5000/api/zuordnungen/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [field]: value })
+                });
+                if (!response.ok) {
+                    console.error('[sub_MA_VA_Zuordnung] Update fehlgeschlagen');
+                }
+            } else {
+                Bridge.sendEvent('updateRecord', {
+                    table: 'tbl_MA_VA_Planung',
+                    id: id,
+                    field: field,
+                    value: value
+                });
+            }
+        } catch (e) {
+            console.error('[sub_MA_VA_Zuordnung] Update-Fehler:', e);
+        }
+
+        // Lokalen Record aktualisieren
+        const rec = state.records.find(r => r.ID == id);
+        if (rec) rec[field] = value;
+    }
+
+    notifyParentChanged();
+}
+
+/**
+ * Neue MA-Zuordnung erstellen (wenn MA auf leerer Schicht-Zeile ausgewählt wird)
+ */
+async function createNewZuordnung(vastartId, maId, selectElement) {
+    if (!vastartId || !maId) return;
+
+    const row = selectElement.closest('tr');
+    const idx = parseInt(row.dataset.index);
+    const rec = state.records[idx];
+
+    if (!rec) return;
+
+    const newData = {
+        VA_ID: state.VA_ID,
+        VADatum_ID: state.VADatum_ID,
+        VAStart_ID: parseInt(vastartId),
+        MA_ID: maId,
+        MVA_Start: rec.MA_Start,
+        MVA_Ende: rec.MA_Ende,
+        Bemerkungen: rec.Bemerkungen || '',
+        PKW: rec.PKW || 0,
+        Einsatzleitung: rec.Einsatzleitung || false,
+        IstFraglich: rec.IstFraglich || false
+    };
+
+    console.log('[sub_MA_VA_Zuordnung] Erstelle neue Zuordnung:', newData);
+
+    try {
+        const isBrowserMode = !(window.chrome && window.chrome.webview);
+        if (isBrowserMode) {
+            const response = await fetch('http://localhost:5000/api/zuordnungen', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('[sub_MA_VA_Zuordnung] Zuordnung erstellt:', result);
+                // Daten neu laden um ID zu bekommen
+                loadData();
+            } else {
+                console.error('[sub_MA_VA_Zuordnung] Erstellen fehlgeschlagen');
+            }
+        } else {
+            Bridge.sendEvent('insertRecord', {
+                table: 'tbl_MA_VA_Planung',
+                data: newData
+            });
+            loadData();
+        }
+    } catch (e) {
+        console.error('[sub_MA_VA_Zuordnung] Fehler beim Erstellen:', e);
+    }
 
     notifyParentChanged();
 }
@@ -584,7 +852,17 @@ function recalc() {
  */
 function formatTime(value) {
     if (!value) return '';
-    if (typeof value === 'string' && value.includes(':')) return value;
+
+    // ISO-String mit T erkennen (z.B. "1899-12-30T15:00:00")
+    if (typeof value === 'string' && value.includes('T')) {
+        const date = new Date(value);
+        if (!isNaN(date)) {
+            return date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        }
+    }
+
+    // Bereits formatierte Zeit (z.B. "15:00")
+    if (typeof value === 'string' && /^\d{1,2}:\d{2}$/.test(value)) return value;
 
     // Dezimalwert (Access-typisch, z.B. 0.5 = 12:00)
     if (typeof value === 'number' && value < 1) {
@@ -629,6 +907,47 @@ function formatSchicht(vaStartId) {
 function formatDecimal(value) {
     if (!value && value !== 0) return '';
     return parseFloat(value).toFixed(2);
+}
+
+/**
+ * Währung formatieren (Euro)
+ */
+function formatCurrency(value) {
+    if (!value && value !== 0) return '';
+    const num = parseFloat(value);
+    if (isNaN(num) || num === 0) return '';
+    return num.toFixed(2).replace('.', ',') + ' €';
+}
+
+/**
+ * Stunden aus Start/Ende berechnen
+ */
+function calculateHours(startVal, endVal) {
+    if (!startVal || !endVal) return null;
+
+    const parseTimeValue = (val) => {
+        if (typeof val === 'string' && val.includes('T')) {
+            const date = new Date(val);
+            return date.getHours() + date.getMinutes() / 60;
+        }
+        if (typeof val === 'number' && val < 1) {
+            return val * 24;
+        }
+        if (typeof val === 'string' && /^\d{1,2}:\d{2}$/.test(val)) {
+            const [h, m] = val.split(':').map(Number);
+            return h + m / 60;
+        }
+        return null;
+    };
+
+    const start = parseTimeValue(startVal);
+    const end = parseTimeValue(endVal);
+
+    if (start === null || end === null) return null;
+
+    let hours = end - start;
+    if (hours < 0) hours += 24; // Über Mitternacht
+    return hours;
 }
 
 // API für Parent-Formular

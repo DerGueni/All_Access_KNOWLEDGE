@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter Stundenuebersicht</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background: #f0f0f0;
+            padding: 8px;
+        }
+
+        .subform-container {
+            background: white;
+            border: 1px solid #999;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .subform-header {
+            background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+            padding: 6px 10px;
+            border-bottom: 1px solid #999;
+            font-weight: 600;
+            font-size: 12px;
+            color: #000080;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ccc;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .filter-group label {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 2px 6px;
+            border: 1px solid #808080;
+            font-size: 10px;
+        }
+
+        .subform-content {
+            flex: 1;
+            overflow: auto;
+            padding: 8px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 1px solid #808080;
+            padding: 4px 8px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            border: 1px solid #ccc;
+            padding: 3px 8px;
+            font-size: 10px;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .data-table tbody tr:hover {
+            background: #e0e8f0;
+        }
+
+        .data-table tfoot {
+            font-weight: 600;
+            background: #e8e8e8;
+        }
+
+        .text-right { text-align: right; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .status-bar {
+            padding: 4px 10px;
+            background: #e8e8e8;
+            border-top: 1px solid #ccc;
+            font-size: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">Stundenuebersicht</div>
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Von:</label>
+                <input type="date" id="filterVon">
+            </div>
+            <div class="filter-group">
+                <label>Bis:</label>
+                <input type="date" id="filterBis">
+            </div>
+            <button class="toolbar-btn" onclick="loadData()" style="padding: 3px 10px; background: linear-gradient(to bottom, #e8e8e8, #c0c0c0); border: 1px solid #808080; cursor: pointer; font-size: 10px;">Filtern</button>
+        </div>
+        <div class="subform-content">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Auftrag</th>
+                        <th>Objekt</th>
+                        <th class="text-right">Stunden</th>
+                        <th class="text-right">Zuschlag</th>
+                        <th class="text-right">Gesamt</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="6" class="empty-state">Keine Stunden-Eintraege vorhanden</td>
+                    </tr>
+                </tbody>
+                <tfoot id="tableFoot" style="display: none;">
+                    <tr>
+                        <td colspan="3">Summe</td>
+                        <td class="text-right" id="sumStunden">0:00</td>
+                        <td class="text-right" id="sumZuschlag">0:00</td>
+                        <td class="text-right" id="sumGesamt">0:00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="status-bar" id="statusBar">Bereit</div>
+    </div>
+
+    <script src="logic/sub_MA_Stundenuebersicht.logic.js"></script>
+</body>
+</html>
