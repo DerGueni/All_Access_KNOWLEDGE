@@ -2,6 +2,13 @@
  * frm_VA_Planungsuebersicht.logic.js
  * Logik für Planungsübersicht
  * REST-API Anbindung an localhost:5000
+ *
+ * Features:
+ * - DblClick auf Zeile: Öffnet Auftragstamm
+ * - DblClick auf MA-Zelle: Öffnet Schnellauswahl
+ * - DblClick auf Tag-Header: Setzt Startdatum
+ * - Entf-Taste: Löscht MA-Zuordnung
+ * - Navigation: ±3 Tage (wie Access)
  */
 
 import { Bridge } from '../api/bridgeClient.js';
@@ -10,6 +17,7 @@ import { Bridge } from '../api/bridgeClient.js';
 const state = {
     records: [],
     selectedRecord: null,
+    selectedZuoId: null,  // Für Entf-Taste Löschung
     filters: {
         von: null,
         bis: null,
@@ -104,9 +112,10 @@ function setupEventListeners() {
         loadData();
     });
 
+    // Navigation ±3 Tage (wie Access)
     elements.btnVorwoche.addEventListener('click', () => {
         const neuesDatum = new Date(state.filters.von);
-        neuesDatum.setDate(neuesDatum.getDate() - 7);
+        neuesDatum.setDate(neuesDatum.getDate() - 3);  // Access macht -3, nicht -7
         elements.datStartdatum.value = formatDate(neuesDatum);
         state.filters.von = neuesDatum;
         const bis = new Date(neuesDatum);
@@ -117,7 +126,7 @@ function setupEventListeners() {
 
     elements.btnNachwoche.addEventListener('click', () => {
         const neuesDatum = new Date(state.filters.von);
-        neuesDatum.setDate(neuesDatum.getDate() + 7);
+        neuesDatum.setDate(neuesDatum.getDate() + 3);  // Access macht +3, nicht +7
         elements.datStartdatum.value = formatDate(neuesDatum);
         state.filters.von = neuesDatum;
         const bis = new Date(neuesDatum);
@@ -150,6 +159,12 @@ function setupEventListeners() {
 
     // Export
     elements.btnUebersichtDrucken.addEventListener('click', exportData);
+
+    // Tag-Header DblClick: Setzt Startdatum auf diesen Tag
+    setupTagHeaderDblClick();
+
+    // Entf-Taste für Zuordnungs-Löschung
+    setupDeleteKeyHandler();
 }
 
 /**
@@ -201,17 +216,22 @@ async function loadData() {
 
         // Planungsdaten laden (Aufträge mit Schichten)
         // Access-SQL: Mehrfache JOINs benötigen Klammerung
+        // Erweitert um IDs für DblClick-Funktionen
         const result = await Bridge.query(`
             SELECT
                 a.ID AS VA_ID,
                 a.Objekt,
                 a.Ort AS VA_Ort,
                 a.Kun_Firma,
+                d.ID AS VADatum_ID,
                 d.VADatum,
+                s.ID AS VAStart_ID,
                 s.VA_Start,
                 s.VA_Ende,
                 s.MA_Anzahl,
                 s.MA_Anzahl_Ist,
+                p.ID AS Zuo_ID,
+                m.ID AS MA_ID,
                 m.Nachname AS MA_Nachname,
                 m.Vorname AS MA_Vorname
             FROM (((tbl_VA_Auftragstamm AS a
@@ -271,6 +291,7 @@ function updateDayHeaders() {
 
 /**
  * Daten nach Auftrag gruppieren
+ * Erweitert um IDs für DblClick-Funktionen
  */
 function groupByAuftrag(data) {
     const grouped = new Map();
@@ -310,7 +331,12 @@ function groupByAuftrag(data) {
                     ? `${row.MA_Nachname}, ${row.MA_Vorname.charAt(0)}.`
                     : '',
                 soll: row.MA_Anzahl || 0,
-                ist: row.MA_Anzahl_Ist || 0
+                ist: row.MA_Anzahl_Ist || 0,
+                // IDs für DblClick-Funktionen
+                vadatum_id: row.VADatum_ID || '',
+                vastart_id: row.VAStart_ID || '',
+                zuo_id: row.Zuo_ID || '',
+                ma_id: row.MA_ID || ''
             });
         }
     });
@@ -386,46 +412,58 @@ function renderTable() {
     }
 
     elements.tbody.innerHTML = filtered.map((auftrag, idx) => {
-        // Erste Zeile: Auftraginfo
-        let html = `<tr data-index="${idx}">`;
-        html += `<td rowspan="2" style="vertical-align:top;padding:5px;">`;
+        // Erste Zeile: Auftraginfo mit data-va-id für DblClick
+        let html = `<tr class="dp-row auftrag-row" data-index="${idx}" data-va-id="${auftrag.VA_ID}">`;
+        html += `<td class="col-auftrag" rowspan="2" style="vertical-align:top;padding:5px;">`;
         html += `<strong>${auftrag.VA_ID}</strong><br>`;
         html += `${auftrag.Objekt}<br>`;
         html += `<small>${auftrag.Ort}</small>`;
         html += `</td>`;
 
-        // Für jeden Tag: Name-Spalte
-        tageArray.forEach(datum => {
+        // Für jeden Tag: MA-Zelle mit DblClick für Schnellauswahl
+        tageArray.forEach((datum, dayIdx) => {
             const schichten = auftrag.tage[datum] || [];
-            html += `<td style="padding:2px;font-size:9px;border-right:1px solid #ccc;">`;
+            const vadatumId = schichten[0]?.vadatum_id || '';
+            const zuoId = schichten[0]?.zuo_id || '';
+
+            html += `<td class="ma-zelle ma-name"
+                        data-vadatum-id="${vadatumId}"
+                        data-zuo-id="${zuoId}"
+                        data-day="${dayIdx}"
+                        style="padding:2px;font-size:9px;border-right:1px solid #ccc;">`;
             schichten.forEach(s => {
                 if (s.ma_name) {
-                    html += `${s.ma_name}<br>`;
+                    html += `<span class="ma-eintrag" data-zuo-id="${s.zuo_id || ''}">${s.ma_name}</span><br>`;
                 }
             });
+            if (schichten.length === 0 || !schichten.some(s => s.ma_name)) {
+                html += `<span class="ma-leer" style="color:#999;">&nbsp;</span>`;
+            }
             html += `</td>`;
-        });
 
-        html += `</tr>`;
-
-        // Zweite Zeile: Zeiten
-        html += `<tr>`;
-        tageArray.forEach(datum => {
-            const schichten = auftrag.tage[datum] || [];
-            html += `<td colspan="2" style="padding:2px;font-size:9px;text-align:center;border-right:2px solid #999;">`;
+            // von/bis Spalten
+            html += `<td class="zeit" style="padding:2px;font-size:9px;text-align:center;">`;
             schichten.forEach(s => {
-                if (s.von && s.bis) {
-                    html += `${s.von}-${s.bis}<br>`;
-                }
+                if (s.von) html += `${s.von}<br>`;
+            });
+            html += `</td>`;
+            html += `<td class="zeit" style="padding:2px;font-size:9px;text-align:center;border-right:2px solid #999;">`;
+            schichten.forEach(s => {
+                if (s.bis) html += `${s.bis}<br>`;
             });
             html += `</td>`;
         });
+
         html += `</tr>`;
 
         return html;
     }).join('');
 
     elements.lblAnzAuftraege.textContent = `${filtered.length} Aufträge`;
+
+    // DblClick-Handler nach dem Rendern einrichten
+    setupAuftragDblClick();
+    setupMaZuordnungDblClick();
 }
 
 
@@ -475,11 +513,158 @@ function setStatus(text) {
     elements.lblStatus.textContent = text;
 }
 
+// ============================================================
+// DBLCLICK-FUNKTIONEN (Access-Parität)
+// ============================================================
+
+/**
+ * DblClick auf Auftrags-Zeile: Öffnet Auftragstamm
+ */
+function setupAuftragDblClick() {
+    document.querySelectorAll('#tbody_Planung tr[data-va-id]').forEach(row => {
+        row.addEventListener('dblclick', (e) => {
+            // Ignorieren wenn auf MA-Zelle geklickt
+            if (e.target.classList.contains('ma-zelle')) return;
+
+            const vaId = row.dataset.vaId;
+            if (vaId) {
+                console.log('[Planungsübersicht] Öffne Auftragstamm für VA_ID:', vaId);
+                const url = 'frm_va_Auftragstamm.html?va_id=' + vaId;
+                if (window.parent && window.parent.loadFormInShell) {
+                    window.parent.loadFormInShell(url);
+                } else {
+                    window.location.href = url;
+                }
+            }
+        });
+        row.style.cursor = 'pointer';
+    });
+}
+
+/**
+ * DblClick auf MA-Zelle: Öffnet Schnellauswahl für diese Schicht
+ */
+function setupMaZuordnungDblClick() {
+    document.querySelectorAll('.ma-zelle').forEach(cell => {
+        cell.addEventListener('dblclick', (e) => {
+            e.stopPropagation(); // Verhindert Auftrag-DblClick
+
+            const vadatumId = cell.dataset.vadatumId;
+            const vaId = cell.closest('tr')?.dataset.vaId;
+
+            if (vadatumId && vaId) {
+                console.log('[Planungsübersicht] Öffne Schnellauswahl für VA_ID:', vaId, 'VADatum_ID:', vadatumId);
+                const url = `frm_MA_VA_Schnellauswahl.html?va_id=${vaId}&vadatum_id=${vadatumId}`;
+                if (window.parent && window.parent.loadFormInShell) {
+                    window.parent.loadFormInShell(url);
+                } else {
+                    window.location.href = url;
+                }
+            }
+        });
+
+        // Click für Selektion (für Entf-Taste)
+        cell.addEventListener('click', (e) => {
+            // Vorherige Selektion entfernen
+            document.querySelectorAll('.ma-zelle.selected').forEach(c => c.classList.remove('selected'));
+
+            // Neue Selektion
+            cell.classList.add('selected');
+            state.selectedZuoId = cell.dataset.zuoId || null;
+            console.log('[Planungsübersicht] MA-Zelle selektiert, ZuoID:', state.selectedZuoId);
+        });
+    });
+}
+
+/**
+ * Tag-Header DblClick: Setzt Startdatum auf diesen Tag
+ */
+function setupTagHeaderDblClick() {
+    document.querySelectorAll('.tag-header').forEach((header) => {
+        header.addEventListener('dblclick', () => {
+            const offset = parseInt(header.dataset.dayOffset) || 0;
+            const start = new Date(state.filters.von);
+            start.setDate(start.getDate() + offset);
+
+            console.log('[Planungsübersicht] Setze Startdatum auf:', formatDate(start));
+            elements.datStartdatum.value = formatDate(start);
+            state.filters.von = start;
+
+            const bis = new Date(start);
+            bis.setDate(bis.getDate() + 6);
+            state.filters.bis = bis;
+
+            loadData();
+        });
+    });
+}
+
+/**
+ * Entf-Taste: Löscht selektierte MA-Zuordnung
+ */
+function setupDeleteKeyHandler() {
+    document.addEventListener('keydown', async (e) => {
+        if (e.key === 'Delete' && state.selectedZuoId) {
+            if (confirm('Zuordnung wirklich löschen?')) {
+                try {
+                    console.log('[Planungsübersicht] Lösche Zuordnung:', state.selectedZuoId);
+                    const response = await fetch(`http://localhost:5000/api/zuordnungen/${state.selectedZuoId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        setStatus('Zuordnung gelöscht');
+                        state.selectedZuoId = null;
+                        await loadData();
+                    } else {
+                        const error = await response.json();
+                        setStatus('Fehler: ' + (error.message || 'Löschen fehlgeschlagen'));
+                    }
+                } catch (err) {
+                    console.error('[Planungsübersicht] Löschen fehlgeschlagen:', err);
+                    setStatus('Fehler: ' + err.message);
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Navigation ±3 Tage (globale Funktionen für onclick im HTML)
+ */
+window.navigateVor = function() {
+    const start = new Date(elements.datStartdatum.value);
+    start.setDate(start.getDate() + 3); // Access macht +3, nicht +7
+    elements.datStartdatum.value = formatDate(start);
+    state.filters.von = start;
+    const bis = new Date(start);
+    bis.setDate(bis.getDate() + 6);
+    state.filters.bis = bis;
+    loadData();
+};
+
+window.navigateZurueck = function() {
+    const start = new Date(elements.datStartdatum.value);
+    start.setDate(start.getDate() - 3); // Access macht -3, nicht -7
+    elements.datStartdatum.value = formatDate(start);
+    state.filters.von = start;
+    const bis = new Date(start);
+    bis.setDate(bis.getDate() + 6);
+    state.filters.bis = bis;
+    loadData();
+};
+
+// ============================================================
+// INITIALISIERUNG
+// ============================================================
+
 // Init bei DOM ready
 document.addEventListener('DOMContentLoaded', init);
 
 // Globaler Zugriff
 window.Planungsuebersicht = {
     loadData,
-    exportData
+    exportData,
+    navigateVor: window.navigateVor,
+    navigateZurueck: window.navigateZurueck
 };

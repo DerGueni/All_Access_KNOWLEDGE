@@ -365,11 +365,44 @@ function setupListClickHandler() {
     if (!tbody) return;
 
     tbody.querySelectorAll('tr').forEach(row => {
+        // Single Click - Datensatz auswählen
         row.addEventListener('click', () => {
             const idx = parseInt(row.dataset.index);
             if (!isNaN(idx)) gotoRecord(idx);
         });
+
+        // Double Click - Access: lst_MA_DblClick - Detailansicht öffnen
+        row.addEventListener('dblclick', () => {
+            const maId = row.dataset.id;
+            if (maId) {
+                lst_MA_DblClick(maId);
+            }
+        });
     });
+}
+
+/**
+ * Access: lst_MA_DblClick - Öffnet MA-Detailansicht
+ * VBA Original: Öffnet Detaildialog oder springt zum Tab
+ * @param {string|number} maId - Die Mitarbeiter-ID
+ */
+function lst_MA_DblClick(maId) {
+    console.log('[lst_MA_DblClick] MA-ID:', maId);
+
+    // Option 1: Detailformular in neuem Fenster öffnen
+    // window.open(`frm_MA_Mitarbeiterstamm_Detail.html?ma_id=${maId}`, 'MA_Detail', 'width=800,height=600');
+
+    // Option 2: Zum Adress-Tab wechseln (wie in Access regMA)
+    const adresseTab = document.querySelector('[data-tab="adresse"]') ||
+                       document.querySelector('.tab-button[data-tab="stammdaten"]');
+    if (adresseTab) {
+        adresseTab.click();
+    }
+
+    // Option 3: Zeitkonto öffnen (häufige Aktion)
+    if (confirm('Zeitkonto für diesen Mitarbeiter öffnen?')) {
+        openZeitkonto();
+    }
 }
 
 /**
@@ -534,14 +567,40 @@ function formatDateISO(value) {
 }
 
 /**
- * Foto laden
+ * Foto laden - Verwendet API-Proxy zum UNC-Server
+ * Browser koennen nicht direkt auf file:// zugreifen,
+ * daher Proxy ueber /api/fotos/mitarbeiter/<filename>
  */
 function loadFoto(filename) {
+    // Versuche zuerst das HTML-Element direkt (maPhoto)
+    const photoEl = document.getElementById('maPhoto');
+
+    if (photoEl) {
+        if (filename) {
+            // API-Proxy-Pfad fuer Mitarbeiterfotos (umgeht Browser file:// Blockade)
+            const src = `/api/fotos/mitarbeiter/${encodeURIComponent(filename)}`;
+
+            photoEl.onerror = () => {
+                photoEl.removeAttribute('src');
+                photoEl.alt = 'Foto nicht gefunden';
+                console.warn('[MA-Logic] Mitarbeiterfoto nicht gefunden:', filename);
+            };
+            photoEl.alt = 'Mitarbeiterfoto';
+            photoEl.src = src;
+            console.log('[MA-Logic] Foto geladen:', filename, '-> API:', src);
+        } else {
+            photoEl.removeAttribute('src');
+            photoEl.alt = 'Kein Foto';
+        }
+        return;
+    }
+
+    // Fallback: fotoContainer (falls vorhanden)
     if (!elements.fotoContainer) return;
 
     if (filename) {
-        // Hier könnte der tatsächliche Foto-Pfad stehen
-        elements.fotoContainer.innerHTML = `<img src="../images/mitarbeiter/${filename}" alt="Foto" onerror="this.parentElement.innerHTML='<div class=\\'foto-placeholder\\'>Kein Foto</div>'">`;
+        const src = `/api/fotos/mitarbeiter/${encodeURIComponent(filename)}`;
+        elements.fotoContainer.innerHTML = `<img src="${src}" alt="Foto" onerror="this.parentElement.innerHTML='<div class=\\'foto-placeholder\\'>Kein Foto</div>'">`;
     } else {
         elements.fotoContainer.innerHTML = '<div class="foto-placeholder">Foto</div>';
     }
@@ -764,6 +823,244 @@ function setStatus(text) {
     if (elements.lblStatus) {
         elements.lblStatus.textContent = text;
     }
+}
+
+// ============================================
+// BERECHNUNGSFUNKTIONEN (Access-Parität)
+// ============================================
+
+/**
+ * Access: calc_netto_std - Berechnet Netto-Arbeitsstunden
+ * VBA Original: SELECT MA_Netto_Std FROM qry_MA_VA_Plan_All_AufUeber2_Zuo
+ * @param {number} maId - Mitarbeiter-ID
+ * @param {string|Date} von - Startdatum
+ * @param {string|Date} bis - Enddatum
+ * @returns {Promise<number>} Summe der Netto-Stunden
+ */
+async function calc_netto_std(maId, von, bis) {
+    console.log('[calc_netto_std] MA:', maId, 'von:', von, 'bis:', bis);
+
+    try {
+        const vonDate = typeof von === 'string' ? von : formatDateISO(von);
+        const bisDate = typeof bis === 'string' ? bis : formatDateISO(bis);
+
+        const result = await Bridge.execute('getZuordnungen', {
+            ma_id: maId,
+            von: vonDate,
+            bis: bisDate
+        });
+
+        const records = result.data || result || [];
+        let summe = 0;
+
+        records.forEach(rec => {
+            // MA_Netto_Std = Arbeitszeit ohne Pausen
+            const nettoStd = parseFloat(rec.MA_Netto_Std || rec.Netto_Std || rec.NettoStunden || 0);
+            summe += nettoStd;
+        });
+
+        console.log('[calc_netto_std] Ergebnis:', summe, 'Stunden');
+        return summe;
+
+    } catch (error) {
+        console.error('[calc_netto_std] Fehler:', error);
+        return 0;
+    }
+}
+
+/**
+ * Access: calc_brutto_std - Berechnet Brutto-Anwesenheitsstunden
+ * VBA Original: SELECT MA_brutto_Std FROM qry_MA_VA_Plan_All_AufUeber2_Zuo
+ * @param {number} maId - Mitarbeiter-ID
+ * @param {string|Date} von - Startdatum
+ * @param {string|Date} bis - Enddatum
+ * @param {string} [auftrag] - Optional: Auftragsnummer zum Filtern
+ * @returns {Promise<number>} Summe der Brutto-Stunden
+ */
+async function calc_brutto_std(maId, von, bis, auftrag) {
+    console.log('[calc_brutto_std] MA:', maId, 'von:', von, 'bis:', bis, 'Auftrag:', auftrag);
+
+    try {
+        const vonDate = typeof von === 'string' ? von : formatDateISO(von);
+        const bisDate = typeof bis === 'string' ? bis : formatDateISO(bis);
+
+        const params = {
+            ma_id: maId,
+            von: vonDate,
+            bis: bisDate
+        };
+
+        if (auftrag) {
+            params.auftrag = auftrag;
+        }
+
+        const result = await Bridge.execute('getZuordnungen', params);
+        const records = result.data || result || [];
+        let summe = 0;
+
+        records.forEach(rec => {
+            // MA_Brutto_Std = Gesamte Anwesenheitszeit inkl. Pausen
+            const bruttoStd = parseFloat(rec.MA_Brutto_Std || rec.Brutto_Std || rec.BruttoStunden || rec.Stunden || 0);
+            summe += bruttoStd;
+        });
+
+        console.log('[calc_brutto_std] Ergebnis:', summe, 'Stunden');
+        return summe;
+
+    } catch (error) {
+        console.error('[calc_brutto_std] Fehler:', error);
+        return 0;
+    }
+}
+
+/**
+ * Access: regMA - Register-Steuerung für Mitarbeiterstamm
+ * VBA Original: Steuert Sichtbarkeit und Datenladung je nach Tab
+ * @param {number} tabIndex - Index des aktiven Tabs
+ * @param {boolean} [isChange] - Ob es ein Tab-Wechsel ist
+ */
+async function regMA(tabIndex, isChange = false) {
+    console.log('[regMA] Tab-Index:', tabIndex, 'isChange:', isChange);
+
+    // Tab-Namen aus Access übernommen
+    const tabNames = [
+        'pgAdresse',        // 0
+        'pgBem',            // 1
+        'pgMonat',          // 2
+        'pgJahr',           // 3
+        'pgAuftrUeb',       // 4
+        'pgStundenuebersicht', // 5
+        'pgnVerfueg',       // 6
+        'pgPlan',           // 7
+        'pgStdVormonat',    // 8
+        'pgMaps',           // 9
+        'pgSubRech'         // 10
+    ];
+
+    const tabName = tabNames[tabIndex] || 'pgAdresse';
+    const maId = state.currentRecord?.ID || state.currentRecord?.MA_ID;
+
+    // Zeitraum-Felder standardmäßig ausblenden
+    const cboZeitraum = document.getElementById('cboZeitraum');
+    const auVon = document.getElementById('AU_von');
+    const auBis = document.getElementById('AU_bis');
+
+    if (cboZeitraum) cboZeitraum.style.display = 'none';
+    if (auVon) auVon.style.display = 'none';
+    if (auBis) auBis.style.display = 'none';
+
+    switch (tabName) {
+        case 'pgAdresse':
+            // Stammdaten - keine zusätzliche Aktion
+            break;
+
+        case 'pgBem':
+            // Bemerkungen laden falls vorhanden
+            break;
+
+        case 'pgMonat':
+            // Monatsübersicht - Monat/Jahr setzen
+            const cboMonat = document.getElementById('cboMonat');
+            const cboJahr = document.getElementById('cboJahr');
+            if (cboMonat) cboMonat.value = new Date().getMonth() + 1;
+            if (cboJahr) cboJahr.value = new Date().getFullYear();
+            break;
+
+        case 'pgJahr':
+            // Jahresübersicht
+            const cboJahrJa = document.getElementById('cboJahrJa');
+            if (cboJahrJa) cboJahrJa.value = new Date().getFullYear();
+            break;
+
+        case 'pgAuftrUeb':
+            // Auftragsübersicht - Zeitraum einblenden
+            if (cboZeitraum) cboZeitraum.style.display = '';
+            if (auVon) auVon.style.display = '';
+            if (auBis) auBis.style.display = '';
+            if (isChange && maId) {
+                // Letzter Monat als Default
+                const heute = new Date();
+                const letzterMonatStart = new Date(heute.getFullYear(), heute.getMonth() - 1, 1);
+                const letzterMonatEnde = new Date(heute.getFullYear(), heute.getMonth(), 0);
+                if (auVon) auVon.value = formatDateISO(letzterMonatStart);
+                if (auBis) auBis.value = formatDateISO(letzterMonatEnde);
+            }
+            break;
+
+        case 'pgStundenuebersicht':
+            if (cboZeitraum) cboZeitraum.style.display = '';
+            if (auVon) auVon.style.display = '';
+            if (auBis) auBis.style.display = '';
+            break;
+
+        case 'pgnVerfueg':
+            // Nicht-Verfügbarkeiten
+            if (cboZeitraum) cboZeitraum.style.display = '';
+            if (auVon) auVon.style.display = '';
+            if (auBis) auBis.style.display = '';
+            break;
+
+        case 'pgPlan':
+            // Planungsansicht - nächste 10 Tage
+            if (cboZeitraum) cboZeitraum.style.display = '';
+            if (auVon) auVon.style.display = '';
+            if (auBis) auBis.style.display = '';
+            if (isChange) {
+                const heute = new Date();
+                const in10Tagen = new Date(heute.getTime() + 10 * 24 * 60 * 60 * 1000);
+                if (auVon) auVon.value = formatDateISO(heute);
+                if (auBis) auBis.value = formatDateISO(in10Tagen);
+            }
+            break;
+
+        case 'pgMaps':
+            // Google Maps mit Adresse laden
+            loadMapsForCurrentMA();
+            break;
+
+        case 'pgSubRech':
+            // Subrechnungen laden
+            if (maId) {
+                txRechSub_AfterUpdate('');
+            }
+            break;
+    }
+}
+
+/**
+ * Lädt Google Maps für den aktuellen Mitarbeiter
+ */
+function loadMapsForCurrentMA() {
+    const rec = state.currentRecord;
+    if (!rec) return;
+
+    const mapContainer = document.getElementById('mapContainer') ||
+                         document.getElementById('ufrm_Maps');
+    if (!mapContainer) return;
+
+    const strasse = rec.Strasse || '';
+    const nr = rec.Nr || '';
+    const plz = rec.PLZ || '';
+    const ort = rec.Ort || '';
+
+    if (!ort) {
+        mapContainer.innerHTML = '<div style="padding:20px;color:#666;">Keine Adresse vorhanden</div>';
+        return;
+    }
+
+    const adresse = encodeURIComponent(`${strasse} ${nr}, ${plz} ${ort}`);
+    const mapUrl = `https://www.google.de/maps/embed/v1/place?key=YOUR_API_KEY&q=${adresse}`;
+
+    // Fallback ohne API-Key: Link zu Google Maps
+    mapContainer.innerHTML = `
+        <div style="padding:10px;">
+            <a href="https://www.google.de/maps/place/${adresse}" target="_blank"
+               style="display:inline-block;padding:10px 20px;background:#4285f4;color:white;text-decoration:none;border-radius:4px;">
+                In Google Maps öffnen
+            </a>
+            <p style="margin-top:10px;color:#666;">${strasse} ${nr}, ${plz} ${ort}</p>
+        </div>
+    `;
 }
 
 // ============================================
@@ -1187,7 +1484,14 @@ window.MitarbeiterStamm = {
     MANameEingabe_AfterUpdate,
     cboFilterAuftrag_AfterUpdate,
     cboIDSuche_AfterUpdate,
-    txRechSub_AfterUpdate
+    txRechSub_AfterUpdate,
+    // NEU: Berechnungsfunktionen
+    calc_netto_std,
+    calc_brutto_std,
+    // NEU: Register-Steuerung
+    regMA,
+    // NEU: DblClick Handler
+    lst_MA_DblClick
 };
 
 // ============ FUNCTION ALIASES (fuer onclick-Handler Kompatibilitaet) ============
@@ -1535,5 +1839,415 @@ window.quickInfoShowNotizen = function() {
 };
 
 console.log('[frm_MA_Mitarbeiterstamm] Alle onclick-Handler registriert');
+
+// === btnMehrfachtermine - Abwesenheitsplanung öffnen (VBA Z.688) ===
+window.btnMehrfachtermine_Click = function() {
+    console.log('[btnMehrfachtermine] Abwesenheitsplanung öffnen');
+    const maId = state.currentRecord?.ID;
+    if (!maId) {
+        if (typeof Toast !== 'undefined') Toast.warning('Bitte zuerst MA auswählen');
+        return;
+    }
+    // Öffne Abwesenheitsplanung mit vorausgewähltem MA
+    const url = 'frmTop_MA_Abwesenheitsplanung.html?ma_id=' + maId;
+    if (window.parent && window.parent.loadFormInShell) {
+        window.parent.loadFormInShell(url);
+    } else {
+        window.open(url, '_blank');
+    }
+};
+
+// === TermineAbHeute - Filter für Nicht-Verfügbarkeiten (VBA Z.1112) ===
+window.TermineAbHeute_AfterUpdate = async function() {
+    console.log('[TermineAbHeute] Filter aktualisieren');
+    const maId = state.currentRecord?.ID || state.currentRecord?.PersNr;
+    const termineAbHeute = document.getElementById('TermineAbHeute')?.checked;
+    const auVon = document.getElementById('AU_von')?.value;
+    const auBis = document.getElementById('AU_bis')?.value;
+
+    if (!maId) return;
+
+    try {
+        let url = `/api/mitarbeiter/${maId}/nverfueg`;
+        if (termineAbHeute) {
+            url += '?ab_heute=1';
+        } else if (auVon && auBis) {
+            url += `?von=${auVon}&bis=${auBis}`;
+        }
+
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            renderNVerfuegListe(data.data || data);
+        }
+    } catch (err) {
+        console.error('[TermineAbHeute] Fehler:', err);
+    }
+};
+
+function renderNVerfuegListe(data) {
+    const tbody = document.querySelector('#sub_MA_tbl_MA_NVerfuegZeiten tbody, #gridNVerfueg tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    (data || []).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${row.Zeittyp || ''}</td><td>${formatDate(row.vonDat)}</td><td>${formatDate(row.bisDat)}</td><td>${row.Bemerkung || ''}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+function formatDate(d) {
+    if (!d) return '';
+    const date = new Date(d);
+    return date.toLocaleDateString('de-DE');
+}
+
+// Event-Binding für TermineAbHeute Checkbox
+document.addEventListener('DOMContentLoaded', function() {
+    const chk = document.getElementById('TermineAbHeute');
+    if (chk) {
+        chk.addEventListener('change', TermineAbHeute_AfterUpdate);
+    }
+});
+
+// === btnAU_Lesen - Einsatzübersicht laden (VBA Z.573-605) ===
+window.btnAU_Lesen_Click = async function() {
+    console.log('[btnAU_Lesen] Einsatzübersicht laden');
+    const maId = state.currentRecord?.ID;
+    const auVon = document.getElementById('AU_von')?.value;
+    const auBis = document.getElementById('AU_bis')?.value;
+    const filterAuftrag = document.getElementById('cboFilterAuftrag')?.value;
+
+    if (!maId) {
+        console.warn('[btnAU_Lesen] Kein MA ausgewählt');
+        return;
+    }
+
+    try {
+        // API-Aufruf für Zuordnungen
+        let url = `/api/mitarbeiter/${maId}/zuordnungen?von=${auVon}&bis=${auBis}`;
+        if (filterAuftrag) url += `&auftrag=${encodeURIComponent(filterAuftrag)}`;
+
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            renderLstZuo(data.data || data);
+
+            // Stundenberechnung
+            const istNSB = state.currentRecord?.IstNSB;
+            if (istNSB) {
+                const brutto = await calc_brutto_std(maId, auVon, auBis, filterAuftrag);
+                updateSummeLabel('Gesamt brutto: ' + brutto.toFixed(2) + ' h');
+            } else {
+                const netto = await calc_netto_std(maId, auVon, auBis);
+                updateSummeLabel('Gesamt netto: ' + netto.toFixed(2) + ' h');
+            }
+        }
+    } catch (err) {
+        console.error('[btnAU_Lesen] Fehler:', err);
+    }
+};
+
+function renderLstZuo(data) {
+    const tbody = document.querySelector('#lst_Zuo tbody, #gridZuordnungen tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    (data || []).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = row.ID || row.id;
+        tr.innerHTML = `<td>${row.VADatum || ''}</td><td>${row.Auftrag || ''}</td><td>${row.Beginn || ''}</td><td>${row.Ende || ''}</td><td>${row.MA_Brutto_Std || ''}</td><td>${row.MA_Netto_Std || ''}</td>`;
+        tr.onclick = () => lst_Zuo_Click(row);
+        tbody.appendChild(tr);
+    });
+}
+
+function updateSummeLabel(text) {
+    const lbl = document.getElementById('lbSummeStunden') || document.querySelector('.summe-stunden');
+    if (lbl) lbl.textContent = text;
+}
+
+// === lst_Zuo_Click - Zuordnung ausgewählt ===
+function lst_Zuo_Click(row) {
+    console.log('[lst_Zuo_Click] Zuordnung:', row);
+    state.selectedZuordnung = row;
+    // Details anzeigen oder Subform aktualisieren
+    if (typeof window.updateZuordnungDetails === 'function') {
+        window.updateZuordnungDetails(row);
+    }
+}
+window.lst_Zuo_Click = lst_Zuo_Click;
+
+// === cboAuswahl - Spaltenauswahl für MA-Liste (VBA Z.923) ===
+window.cboAuswahl_AfterUpdate = function() {
+    console.log('[cboAuswahl] Spaltenauswahl geändert');
+    const cbo = document.getElementById('cboAuswahl');
+    const auswahl = cbo?.value;
+
+    // Spalten-Mapping wie in VBA
+    const spaltenMap = {
+        '1': { field: 'Tel_Mobil', label: 'Telefon' },
+        '2': { field: 'Hat_keine_34a', label: '34a' },
+        '3': { field: 'Email', label: 'E-Mail' },
+        '4': { field: 'Anstellungsart', label: 'Anstellungsart' },
+        '5': { field: 'IstAktiv', label: 'Aktiv' },
+        '6': { field: 'Geb_Dat', label: 'Geb.Datum' },
+        '7': { field: 'Arbst_pro_Arbeitstag', label: 'Std/Tag' },
+        '8': { field: 'Arbeitstage_pro_woche', label: 'Tage/Wo' },
+        '9': { field: 'Resturl_vorjahr', label: 'Resturlaub' },
+        '10': { field: 'Urlaubsanspruch_pro_jahr', label: 'Urlaub/Jahr' },
+        '14': { field: 'Epin_DFB', label: 'E-PIN DFB' },
+        '15': { field: 'HatSachkunde', label: 'Sachkunde' }
+    };
+
+    state.listExtraColumn = spaltenMap[auswahl] || null;
+
+    // Liste neu rendern mit zusätzlicher Spalte
+    if (typeof renderList === 'function') {
+        renderList();
+    }
+};
+
+// === cboMASuche - Suche nach MA-Name (VBA Z.708) ===
+window.cboMASuche_AfterUpdate = function() {
+    console.log('[cboMASuche] Suche nach Name');
+    const cbo = document.getElementById('cboMASuche');
+    const suchName = cbo?.value;
+
+    if (!suchName) return;
+
+    // In der Liste nach Name suchen und markieren
+    const rows = document.querySelectorAll('#Lst_MA tbody tr, #tbodyListe tr');
+    for (const row of rows) {
+        const nachname = row.cells[1]?.textContent || row.dataset.nachname;
+        if (nachname && nachname.toLowerCase().includes(suchName.toLowerCase())) {
+            row.click(); // Datensatz auswählen
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            break;
+        }
+    }
+};
+
+// Event-Bindings für cboAuswahl und cboMASuche
+document.addEventListener('DOMContentLoaded', function() {
+    const cboAuswahl = document.getElementById('cboAuswahl');
+    if (cboAuswahl) {
+        cboAuswahl.addEventListener('change', cboAuswahl_AfterUpdate);
+    }
+
+    const cboMASuche = document.getElementById('cboMASuche');
+    if (cboMASuche) {
+        cboMASuche.addEventListener('change', cboMASuche_AfterUpdate);
+    }
+});
+
+// === Form_Open - Initiale Einstellungen (VBA Z.871) ===
+window.Form_Open = async function() {
+    console.log('[Form_Open] Initiale Einstellungen');
+
+    // lst_Zuo leeren
+    const lstZuo = document.querySelector('#lst_Zuo tbody');
+    if (lstZuo) lstZuo.innerHTML = '';
+
+    // Datum-Label setzen
+    const lblDatum = document.getElementById('lbl_Datum');
+    if (lblDatum) lblDatum.textContent = new Date().toLocaleDateString('de-DE');
+
+    // Aktuellen Monat/Jahr setzen
+    const heute = new Date();
+    const cboMonat = document.getElementById('cboMonat');
+    const cboJahr = document.getElementById('cboJahr');
+    if (cboMonat) cboMonat.value = heute.getMonth() + 1;
+    if (cboJahr) cboJahr.value = heute.getFullYear();
+
+    // Mon_Ausw aufrufen falls vorhanden
+    if (typeof window.Mon_Ausw === 'function') {
+        window.Mon_Ausw();
+    }
+
+    // TermineAbHeute und NurAktiveMA initialisieren
+    if (typeof window.TermineAbHeute_AfterUpdate === 'function') {
+        await window.TermineAbHeute_AfterUpdate();
+    }
+    if (typeof window.NurAktiveMA_AfterUpdate === 'function') {
+        await window.NurAktiveMA_AfterUpdate();
+    }
+
+    // Ersten MA auswählen
+    const ersteZeile = document.querySelector('#Lst_MA tbody tr, #tbodyListe tr');
+    if (ersteZeile) ersteZeile.click();
+};
+
+// === lstPl_Zuo_DblClick - Planungsliste Doppelklick ===
+window.lstPl_Zuo_DblClick = function(row) {
+    console.log('[lstPl_Zuo_DblClick] Auftrag öffnen:', row);
+    const vaId = row?.VA_ID || row?.va_id;
+    const vadatumId = row?.VADatum_ID || row?.vadatum_id;
+
+    if (!vaId) {
+        console.warn('[lstPl_Zuo_DblClick] Keine VA_ID');
+        return;
+    }
+
+    // Auftragstamm öffnen
+    let url = 'frm_va_Auftragstamm.html?va_id=' + vaId;
+    if (vadatumId) url += '&vadatum_id=' + vadatumId;
+
+    if (window.parent && window.parent.loadFormInShell) {
+        window.parent.loadFormInShell(url);
+    } else {
+        window.location.href = url;
+    }
+};
+
+// === lst_Zuo_DblClick erweitert - Öffnet Auftrag (VBA Z.1197) ===
+window.lst_Zuo_DblClick = function(row) {
+    console.log('[lst_Zuo_DblClick] Auftrag öffnen:', row);
+    const vaId = row?.VA_ID || row?.va_id;
+    const vadatumId = row?.VADatum_ID || row?.vadatum_id;
+
+    if (!vaId) {
+        console.warn('[lst_Zuo_DblClick] Keine VA_ID');
+        return;
+    }
+
+    // Auftragstamm öffnen mit Sprung zum Datum
+    let url = 'frm_va_Auftragstamm.html?va_id=' + vaId;
+    if (vadatumId) url += '&vadatum_id=' + vadatumId;
+
+    if (window.parent && window.parent.loadFormInShell) {
+        window.parent.loadFormInShell(url);
+    } else {
+        window.location.href = url;
+    }
+};
+
+// DblClick-Handler für lstPl_Zuo registrieren
+document.addEventListener('DOMContentLoaded', function() {
+    const lstPl = document.getElementById('lstPl_Zuo');
+    if (lstPl) {
+        lstPl.addEventListener('dblclick', function(e) {
+            const row = e.target.closest('tr');
+            if (row && row.dataset) {
+                window.lstPl_Zuo_DblClick({
+                    VA_ID: row.dataset.vaId,
+                    VADatum_ID: row.dataset.vadatumId
+                });
+            }
+        });
+    }
+});
+
+// === Anstellungsart_AfterUpdate - Setzt abhängige Felder (VBA Z.27) ===
+window.Anstellungsart_AfterUpdate = function() {
+    console.log('[Anstellungsart] AfterUpdate');
+    const anstellungsartId = parseInt(document.getElementById('Anstellungsart')?.value || document.getElementById('Anstellungsart_ID')?.value);
+
+    // Zielfelder
+    const istNSB = document.getElementById('IstNSB');
+    const istSub = document.getElementById('IstSubunternehmer');
+    const stdMax = document.getElementById('StundenZahlMax');
+    const stundenlohn = document.getElementById('Stundenlohn_brutto');
+
+    switch (anstellungsartId) {
+        case 11: // Subunternehmer
+            if (istNSB) istNSB.checked = true;
+            if (istSub) istSub.checked = true;
+            if (stdMax) stdMax.value = 0;
+            if (stundenlohn) stundenlohn.value = '';
+            break;
+        case 5: // Minijobber
+            if (istNSB) istNSB.checked = false;
+            if (istSub) istSub.checked = false;
+            if (stdMax) stdMax.value = 38.5;
+            if (stundenlohn) stundenlohn.value = 2;
+            break;
+        case 3: // Festangestellt
+            if (istNSB) istNSB.checked = false;
+            if (istSub) istSub.checked = false;
+            if (stdMax) stdMax.value = 0;
+            if (stundenlohn) stundenlohn.value = 1;
+            break;
+        default:
+            if (istNSB) istNSB.checked = false;
+            if (istSub) istSub.checked = false;
+            if (stdMax) stdMax.value = 0;
+            if (stundenlohn) stundenlohn.value = '';
+    }
+
+    // State aktualisieren
+    if (state.currentRecord) {
+        state.currentRecord.IstNSB = istNSB?.checked;
+        state.currentRecord.IstSubunternehmer = istSub?.checked;
+    }
+};
+
+// === btnLesen - Monatsdaten laden (VBA Z.608) ===
+window.btnLesen_Click = async function() {
+    console.log('[btnLesen] Monatsdaten laden');
+    const maId = state.currentRecord?.ID;
+    const monat = document.getElementById('cboMonat')?.value;
+    const jahr = document.getElementById('cboJahr')?.value;
+
+    if (!maId) {
+        console.warn('[btnLesen] Kein MA ausgewählt');
+        return;
+    }
+
+    try {
+        // Lade Zeitkonto-Daten für den Monat
+        const url = `/api/mitarbeiter/${maId}/zeitkonto?monat=${monat}&jahr=${jahr}`;
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+
+            // Subforms aktualisieren
+            updateMonatSubformsFromBtnLesen(data);
+
+            // Labels aktualisieren
+            const einsProMon = document.getElementById('EinsProMon');
+            const tagProMon = document.getElementById('TagProMon');
+            if (einsProMon && data.anzahlEinsaetze !== undefined) {
+                einsProMon.textContent = data.anzahlEinsaetze;
+            }
+            if (tagProMon && data.anzahlTage !== undefined) {
+                tagProMon.textContent = data.anzahlTage;
+            }
+        }
+    } catch (err) {
+        console.error('[btnLesen] Fehler:', err);
+    }
+};
+
+function updateMonatSubformsFromBtnLesen(data) {
+    // Subform 1: Tageswerte
+    const sub1 = document.querySelector('#sub_tbl_MA_Zeitkonto_Aktmon1 tbody');
+    if (sub1 && data.tageswerte) {
+        sub1.innerHTML = '';
+        data.tageswerte.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${row.Tag || ''}</td><td>${row.Auftrag || ''}</td><td>${row.Brutto || ''}</td><td>${row.Netto || ''}</td>`;
+            sub1.appendChild(tr);
+        });
+    }
+
+    // Subform 2: Zusatzwerte
+    const sub2 = document.querySelector('#sub_tbl_MA_Zeitkonto_Aktmon2 tbody');
+    if (sub2 && data.zusatzwerte) {
+        sub2.innerHTML = '';
+        data.zusatzwerte.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${row.Datum || ''}</td><td>${row.Typ || ''}</td><td>${row.Betrag || ''}</td>`;
+            sub2.appendChild(tr);
+        });
+    }
+}
+
+// Event-Binding für Anstellungsart
+document.addEventListener('DOMContentLoaded', function() {
+    const anst = document.getElementById('Anstellungsart') || document.getElementById('Anstellungsart_ID');
+    if (anst) {
+        anst.addEventListener('change', Anstellungsart_AfterUpdate);
+    }
+});
 
 })(); // Ende IIFE

@@ -88,6 +88,9 @@ async function init() {
     // Event Listener
     setupEventListeners();
 
+    // Such-Comboboxen initialisieren
+    setupSuchComboboxen();
+
     // Daten laden
     await loadList();
 
@@ -274,11 +277,50 @@ function renderList() {
 
     // Click-Handler
     elements.tbodyListe.querySelectorAll('tr').forEach(row => {
+        // Single Click - Datensatz auswählen
         row.addEventListener('click', () => {
             const idx = parseInt(row.dataset.index);
             if (!isNaN(idx)) gotoRecord(idx);
         });
+
+        // Double Click - Access: lst_KD_DblClick - Kundendetails öffnen
+        row.addEventListener('dblclick', () => {
+            const kdId = row.dataset.id;
+            if (kdId) {
+                lst_KD_DblClick(kdId);
+            }
+        });
     });
+}
+
+/**
+ * Access: lst_KD_DblClick - Öffnet Kundendetails bei Doppelklick
+ * VBA Original: Öffnet Detail-Dialog oder wechselt Tab
+ * @param {string|number} kdId - Die Kunden-ID
+ */
+function lst_KD_DblClick(kdId) {
+    console.log('[lst_KD_DblClick] KD-ID:', kdId);
+
+    // Optionen für Doppelklick-Aktion:
+    const actions = [
+        'Aufträge anzeigen',
+        'Verrechnungssätze öffnen',
+        'Abbrechen'
+    ];
+
+    // Einfache Aktion: Zum Aufträge-Tab wechseln
+    const auftraegeTab = document.querySelector('[data-tab="auftraege"]');
+    if (auftraegeTab) {
+        auftraegeTab.click();
+        filterAuftraege(); // Aufträge für diesen Kunden laden
+        return;
+    }
+
+    // Fallback: Auswahldialog
+    const choice = confirm('Aufträge für diesen Kunden anzeigen?');
+    if (choice) {
+        filterAuftraege();
+    }
 }
 
 /**
@@ -755,6 +797,263 @@ async function dateiHinzufuegen() {
 }
 
 // ============================================
+// SUCH-COMBOBOXEN (Access-Parität)
+// ============================================
+
+/**
+ * Access: cboSuchOrt_AfterUpdate - Suche nach Ort
+ * VBA Original: Filtert Kundenliste nach Ort
+ * @param {string} ort - Der gesuchte Ort
+ */
+async function cboSuchOrt_AfterUpdate(ort) {
+    console.log('[cboSuchOrt_AfterUpdate] Suche nach Ort:', ort);
+
+    if (!ort || ort.trim() === '') {
+        await loadList();
+        return;
+    }
+
+    setStatus('Suche nach Ort...');
+
+    try {
+        const result = await Bridge.kunden.list({ ort: ort, aktiv: state.nurAktive ? 1 : 0 });
+        state.records = result.data || result || [];
+        renderList();
+
+        if (state.records.length > 0) {
+            gotoRecord(0);
+            setStatus(`${state.records.length} Kunden in ${ort} gefunden`);
+        } else {
+            clearForm();
+            setStatus(`Keine Kunden in ${ort} gefunden`);
+        }
+    } catch (error) {
+        console.error('[cboSuchOrt] Fehler:', error);
+        // Lokale Filterung als Fallback
+        const term = ort.toLowerCase();
+        const filtered = state.records.filter(r =>
+            (r.KD_Ort || r.kun_Ort || '').toLowerCase().includes(term)
+        );
+        state.records = filtered;
+        renderList();
+        if (filtered.length > 0) gotoRecord(0);
+        setStatus(`${filtered.length} Kunden gefunden (lokal)`);
+    }
+}
+
+/**
+ * Access: cboSuchPLZ_AfterUpdate - Suche nach PLZ
+ * VBA Original: Filtert Kundenliste nach PLZ
+ * @param {string} plz - Die gesuchte PLZ
+ */
+async function cboSuchPLZ_AfterUpdate(plz) {
+    console.log('[cboSuchPLZ_AfterUpdate] Suche nach PLZ:', plz);
+
+    if (!plz || plz.trim() === '') {
+        await loadList();
+        return;
+    }
+
+    setStatus('Suche nach PLZ...');
+
+    try {
+        const result = await Bridge.kunden.list({ plz: plz, aktiv: state.nurAktive ? 1 : 0 });
+        state.records = result.data || result || [];
+        renderList();
+
+        if (state.records.length > 0) {
+            gotoRecord(0);
+            setStatus(`${state.records.length} Kunden mit PLZ ${plz} gefunden`);
+        } else {
+            clearForm();
+            setStatus(`Keine Kunden mit PLZ ${plz} gefunden`);
+        }
+    } catch (error) {
+        console.error('[cboSuchPLZ] Fehler:', error);
+        // Lokale Filterung als Fallback
+        const filtered = state.records.filter(r =>
+            (r.KD_PLZ || r.kun_PLZ || '').startsWith(plz)
+        );
+        state.records = filtered;
+        renderList();
+        if (filtered.length > 0) gotoRecord(0);
+        setStatus(`${filtered.length} Kunden gefunden (lokal)`);
+    }
+}
+
+/**
+ * Initialisiert die Such-Comboboxen
+ */
+function setupSuchComboboxen() {
+    // Ort-Suche
+    const cboSuchOrt = document.getElementById('cboSuchOrt');
+    if (cboSuchOrt) {
+        cboSuchOrt.addEventListener('change', () => {
+            cboSuchOrt_AfterUpdate(cboSuchOrt.value);
+        });
+        cboSuchOrt.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                cboSuchOrt_AfterUpdate(cboSuchOrt.value);
+            }
+        });
+    }
+
+    // PLZ-Suche
+    const cboSuchPLZ = document.getElementById('cboSuchPLZ');
+    if (cboSuchPLZ) {
+        cboSuchPLZ.addEventListener('change', () => {
+            cboSuchPLZ_AfterUpdate(cboSuchPLZ.value);
+        });
+        cboSuchPLZ.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                cboSuchPLZ_AfterUpdate(cboSuchPLZ.value);
+            }
+        });
+    }
+
+    console.log('[Kundenstamm] Such-Comboboxen initialisiert');
+}
+
+// ============================================
+// KOPF_BERECH FUNKTION (Access-Parität)
+// ============================================
+
+/**
+ * Access: Kopf_Berech - Berechnet Kopf-Statistiken für Kunden
+ * VBA Original: Berechnet Aufträge, Personal, Stunden, Umsatz für 3 Zeiträume
+ * @returns {Promise<Object>} Statistik-Objekt mit allen Werten
+ */
+async function Kopf_Berech() {
+    const kdId = state.currentRecord?.KD_ID || state.currentRecord?.kun_Id;
+    if (!kdId) {
+        console.warn('[Kopf_Berech] Keine Kunden-ID');
+        return null;
+    }
+
+    console.log('[Kopf_Berech] Berechne Statistik für Kunde:', kdId);
+
+    const heute = new Date();
+    const vor90Tagen = new Date(heute.getTime() - 90 * 24 * 60 * 60 * 1000);
+    const vor30Tagen = new Date(heute.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    // Zeiträume wie in Access VBA
+    const zeitraeume = [
+        { name: 'Gesamt', von: null, bis: null },
+        { name: 'Letzte 90 Tage', von: vor90Tagen, bis: heute },
+        { name: 'Letzte 30 Tage', von: vor30Tagen, bis: heute }
+    ];
+
+    const stats = {
+        zeitraeume: []
+    };
+
+    try {
+        for (let i = 0; i < zeitraeume.length; i++) {
+            const zr = zeitraeume[i];
+            const params = { kunde_id: kdId };
+
+            if (zr.von) params.von = formatDateISO(zr.von);
+            if (zr.bis) params.bis = formatDateISO(zr.bis);
+
+            // Aufträge zählen
+            const auftraege = await Bridge.auftraege.list(params);
+            const auftraegeData = auftraege.data || auftraege || [];
+
+            // Stunden und Personal aus Zuordnungen
+            const zuordnungen = await Bridge.execute('getZuordnungen', params);
+            const zuordnungenData = zuordnungen.data || zuordnungen || [];
+
+            // Berechne Summen
+            let persGes = 0;
+            let stdGes = 0;
+            let umsGes = 0;
+            let std5 = 0, std6 = 0, std7 = 0; // Freitag, Samstag, Sonntag
+            let pers5 = 0, pers6 = 0, pers7 = 0;
+
+            zuordnungenData.forEach(z => {
+                persGes++;
+                const stunden = parseFloat(z.MA_Brutto_Std || z.Stunden || 0);
+                stdGes += stunden;
+
+                // Wochentag ermitteln (5=Fr, 6=Sa, 7=So)
+                const datum = new Date(z.VADatum || z.Datum);
+                const wochentag = datum.getDay(); // 0=So, 1=Mo, ..., 6=Sa
+
+                if (wochentag === 5) { std5 += stunden; pers5++; } // Freitag
+                if (wochentag === 6) { std6 += stunden; pers6++; } // Samstag
+                if (wochentag === 0) { std7 += stunden; pers7++; } // Sonntag
+            });
+
+            // Umsatz berechnen (falls Netto-Betrag vorhanden)
+            auftraegeData.forEach(a => {
+                umsGes += parseFloat(a.NettoBetrag || a.Umsatz || 0);
+            });
+
+            stats.zeitraeume.push({
+                name: zr.name,
+                index: i + 1,
+                AufAnz: auftraegeData.length,
+                PersGes: persGes,
+                StdGes: stdGes.toFixed(2),
+                UmsGes: umsGes.toFixed(2),
+                Std5: std5.toFixed(2),
+                Std6: std6.toFixed(2),
+                Std7: std7.toFixed(2),
+                Pers5: pers5,
+                Pers6: pers6,
+                Pers7: pers7
+            });
+        }
+
+        // Werte in Formular eintragen falls Felder existieren
+        stats.zeitraeume.forEach((s, i) => {
+            const idx = i + 1;
+            setFieldIfExists(`AufAnz${idx}`, s.AufAnz);
+            setFieldIfExists(`PersGes${idx}`, s.PersGes);
+            setFieldIfExists(`StdGes${idx}`, s.StdGes);
+            setFieldIfExists(`UmsGes${idx}`, s.UmsGes);
+            setFieldIfExists(`Std5${idx}`, s.Std5);
+            setFieldIfExists(`Std6${idx}`, s.Std6);
+            setFieldIfExists(`Std7${idx}`, s.Std7);
+            setFieldIfExists(`Pers5${idx}`, s.Pers5);
+            setFieldIfExists(`Pers6${idx}`, s.Pers6);
+            setFieldIfExists(`Pers7${idx}`, s.Pers7);
+        });
+
+        console.log('[Kopf_Berech] Statistik berechnet:', stats);
+        return stats;
+
+    } catch (error) {
+        console.error('[Kopf_Berech] Fehler:', error);
+        return null;
+    }
+}
+
+/**
+ * Hilfsfunktion: Setzt Feldwert falls Element existiert
+ */
+function setFieldIfExists(fieldId, value) {
+    const el = document.getElementById(fieldId);
+    if (el) {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.value = value ?? '';
+        } else {
+            el.textContent = value ?? '';
+        }
+    }
+}
+
+/**
+ * Formatiert Datum als ISO-String (YYYY-MM-DD)
+ */
+function formatDateISO(date) {
+    if (!date) return '';
+    const d = date instanceof Date ? date : new Date(date);
+    if (isNaN(d)) return '';
+    return d.toISOString().split('T')[0];
+}
+
+// ============================================
 // ACCESS VBA-SYNC EVENTS (AfterUpdate)
 // ============================================
 
@@ -868,6 +1167,517 @@ function cboKundenSuche_AfterUpdate(kundeId) {
     }
 }
 
+// ============================================
+// TAB-LOADER FUNKTIONEN (REST-API)
+// ============================================
+
+/**
+ * Bemerkungen-Tab: Lädt kun_Anschreiben, kun_BriefKopf, kun_memo
+ * Diese Felder werden bereits beim Laden des Kundendatensatzes geladen
+ */
+function loadTabContent_Bemerkungen() {
+    // Bemerkungen werden mit dem Hauptdatensatz geladen (data-field Binding)
+    console.log('[Tab:Bemerkungen] Felder sind bereits via data-field gebunden');
+}
+
+/**
+ * Rechnungen-Tab: Lädt Rechnungen des Kunden
+ */
+async function loadTabContent_Rechnungen() {
+    const kdId = state.currentRecord?.KD_ID || state.currentRecord?.kun_Id;
+    if (!kdId) return;
+
+    const tbody = document.getElementById('rechnungenBody');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px;">Lade Rechnungen...</td></tr>';
+    }
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/kunden/${kdId}/rechnungen`);
+        if (response.ok) {
+            const result = await response.json();
+            const data = result.data || result || [];
+            renderRechnungen(data);
+        } else {
+            console.warn('[Tab:Rechnungen] API nicht verfügbar, Status:', response.status);
+            if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:10px;">Keine Rechnungen verfügbar</td></tr>';
+        }
+    } catch (err) {
+        console.error('[Tab:Rechnungen] Fehler:', err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999; padding:10px;">API nicht erreichbar</td></tr>';
+    }
+}
+
+function renderRechnungen(data) {
+    const tbody = document.getElementById('rechnungenBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:20px;">Keine Rechnungen vorhanden</td></tr>';
+        return;
+    }
+
+    data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${row.Rch_Nr || row.ID || ''}</td>
+            <td>${formatDateDE(row.Rch_Datum || row.Datum)}</td>
+            <td>${row.Rch_Bezeichnung || row.Bezeichnung || ''}</td>
+            <td style="text-align:right;">${formatCurrency(row.Rch_Betrag || row.Betrag)}</td>
+            <td>${row.Rch_Status || row.Status || ''}</td>
+            <td>${formatDateDE(row.Rch_Bezahlt || row.BezahltAm)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+/**
+ * Aufträge-Tab: Lädt Aufträge des Kunden
+ */
+async function loadTabContent_Auftraege() {
+    const kdId = state.currentRecord?.KD_ID || state.currentRecord?.kun_Id;
+    if (!kdId) return;
+
+    const von = document.getElementById('datAuftraegeVon')?.value || document.getElementById('datAufträgeVon')?.value;
+    const bis = document.getElementById('datAuftraegeBis')?.value || document.getElementById('datAufträgeBis')?.value;
+
+    const tbody = document.getElementById('auftraegeBody') || document.getElementById('tbody_Auftraege');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px;">Lade Aufträge...</td></tr>';
+    }
+
+    try {
+        let url = `http://localhost:5000/api/kunden/${kdId}/auftraege`;
+        const params = [];
+        if (von) params.push(`von=${von}`);
+        if (bis) params.push(`bis=${bis}`);
+        if (params.length > 0) url += '?' + params.join('&');
+
+        const response = await fetch(url);
+        if (response.ok) {
+            const result = await response.json();
+            const data = result.data || result || [];
+            renderAuftraegeTab(data);
+        } else {
+            // Fallback: Versuche allgemeines Auftraege-Endpoint mit Filter
+            const fallbackResponse = await fetch(`http://localhost:5000/api/auftraege?kunde_id=${kdId}`);
+            if (fallbackResponse.ok) {
+                const result = await fallbackResponse.json();
+                const data = result.data || result || [];
+                renderAuftraegeTab(data);
+            } else {
+                if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:10px;">Keine Aufträge verfügbar</td></tr>';
+            }
+        }
+    } catch (err) {
+        console.error('[Tab:Auftraege] Fehler:', err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999; padding:10px;">API nicht erreichbar</td></tr>';
+    }
+}
+
+function renderAuftraegeTab(data) {
+    const tbody = document.getElementById('auftraegeBody') || document.getElementById('tbody_Auftraege');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:20px;">Keine Aufträge vorhanden</td></tr>';
+        return;
+    }
+
+    data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = row.VA_ID || row.ID;
+        tr.innerHTML = `
+            <td>${row.VA_Nr || row.Auftrag || row.ID || ''}</td>
+            <td>${row.VA_Bezeichnung || row.Bezeichnung || ''}</td>
+            <td>${formatDateDE(row.VA_Datum || row.Dat_VA_Von || row.Datum)}</td>
+            <td>${row.VA_Objekt || row.Objekt || ''}</td>
+            <td>${row.VA_Status || row.Status || ''}</td>
+            <td style="text-align:right;">${formatCurrency(row.VA_Betrag || row.Betrag)}</td>
+        `;
+        tr.addEventListener('click', () => {
+            document.querySelectorAll('#auftraegeBody tr, #tbody_Auftraege tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+        });
+        tbody.appendChild(tr);
+    });
+}
+
+/**
+ * Objekte-Tab: Lädt Objekte des Kunden
+ */
+async function loadTabContent_Objekte() {
+    const kdId = state.currentRecord?.KD_ID || state.currentRecord?.kun_Id;
+    if (!kdId) return;
+
+    const tbody = document.getElementById('objekteBody');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:10px;">Lade Objekte...</td></tr>';
+    }
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/kunden/${kdId}/objekte`);
+        if (response.ok) {
+            const result = await response.json();
+            const data = result.data || result || [];
+            renderObjekteTab(data);
+        } else {
+            // Fallback: Versuche allgemeines Objekte-Endpoint mit Filter
+            const fallbackResponse = await fetch(`http://localhost:5000/api/objekte?kunde_id=${kdId}`);
+            if (fallbackResponse.ok) {
+                const result = await fallbackResponse.json();
+                const data = result.data || result || [];
+                renderObjekteTab(data);
+            } else {
+                if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#666; padding:10px;">Keine Objekte verfügbar</td></tr>';
+            }
+        }
+    } catch (err) {
+        console.error('[Tab:Objekte] Fehler:', err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999; padding:10px;">API nicht erreichbar</td></tr>';
+    }
+}
+
+function renderObjekteTab(data) {
+    const tbody = document.getElementById('objekteBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#666; padding:20px;">Keine Objekte vorhanden</td></tr>';
+        return;
+    }
+
+    data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = row.ob_id || row.ID;
+        tr.innerHTML = `
+            <td>${row.ob_id || row.ID || ''}</td>
+            <td>${row.ob_Objektname || row.Objektname || ''}</td>
+            <td>${row.ob_Ort || row.Ort || ''}</td>
+            <td>${row.ob_IstAktiv ? 'Ja' : 'Nein'}</td>
+            <td>${row.anzahl_auftraege || row.AnzahlAuftraege || ''}</td>
+        `;
+        tr.addEventListener('click', () => {
+            document.querySelectorAll('#objekteBody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+        });
+        tbody.appendChild(tr);
+    });
+}
+
+/**
+ * Ansprechpartner-Tab: Lädt Ansprechpartner des Kunden
+ */
+async function loadTabContent_Ansprechpartner() {
+    const kdId = state.currentRecord?.KD_ID || state.currentRecord?.kun_Id;
+    if (!kdId) return;
+
+    const tbody = document.getElementById('ansprechpartnerTbody') || document.getElementById('ansprechpartnerBody');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px;">Lade Ansprechpartner...</td></tr>';
+    }
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/kunden/${kdId}/ansprechpartner`);
+        if (response.ok) {
+            const result = await response.json();
+            const data = result.data || result || [];
+            renderAnsprechpartnerTab(data);
+        } else {
+            if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:10px;">Keine Ansprechpartner verfügbar</td></tr>';
+        }
+    } catch (err) {
+        console.error('[Tab:Ansprechpartner] Fehler:', err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999; padding:10px;">API nicht erreichbar</td></tr>';
+    }
+}
+
+function renderAnsprechpartnerTab(data) {
+    const tbody = document.getElementById('ansprechpartnerTbody') || document.getElementById('ansprechpartnerBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:20px;">Keine Ansprechpartner vorhanden</td></tr>';
+        return;
+    }
+
+    data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = row.adr_ID || row.ID;
+        tr.innerHTML = `
+            <td>${row.adr_Nachname || row.Nachname || ''}</td>
+            <td>${row.adr_Vorname || row.Vorname || ''}</td>
+            <td>${row.adr_Name1 || row.Position || ''}</td>
+            <td>${row.adr_Tel || row.Telefon || ''}</td>
+            <td>${row.adr_Handy || row.Mobil || ''}</td>
+            <td>${row.adr_eMail || row.Email || ''}</td>
+        `;
+        tr.addEventListener('click', () => {
+            document.querySelectorAll('#ansprechpartnerTbody tr, #ansprechpartnerBody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+        });
+        tbody.appendChild(tr);
+    });
+}
+
+/**
+ * Preise-Tab: Lädt Kundenpreise
+ */
+async function loadTabContent_Preise() {
+    const kdId = state.currentRecord?.KD_ID || state.currentRecord?.kun_Id;
+    if (!kdId) return;
+
+    const tbody = document.getElementById('kundenpreiseBody');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:10px;">Lade Preise...</td></tr>';
+    }
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/kunden/${kdId}/preise`);
+        if (response.ok) {
+            const result = await response.json();
+            const data = result.data || result || [];
+            renderPreiseTab(data);
+        } else {
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#666; padding:10px;">Keine Preise verfügbar</td></tr>';
+        }
+    } catch (err) {
+        console.error('[Tab:Preise] Fehler:', err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#999; padding:10px;">API nicht erreichbar</td></tr>';
+    }
+}
+
+function renderPreiseTab(data) {
+    const tbody = document.getElementById('kundenpreiseBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#666; padding:20px;">Keine Kundenpreise vorhanden. Klicken Sie auf "Standardpreise anlegen".</td></tr>';
+        return;
+    }
+
+    data.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = row.ID;
+        tr.innerHTML = `
+            <td style="text-align:center;">${index + 1}</td>
+            <td>${row.Bezeichnung || ''}</td>
+            <td style="text-align:right;">${formatCurrency(row.StdPreis)}</td>
+            <td style="text-align:right;">${formatCurrency(row.TagPreis)}</td>
+            <td style="text-align:right;">${row.Nachtzuschlag ? row.Nachtzuschlag + ' %' : '-'}</td>
+            <td>${row.Bemerkung || ''}</td>
+            <td>${formatDateDE(row.GeaendertAm)}</td>
+        `;
+        tr.addEventListener('click', () => {
+            document.querySelectorAll('#kundenpreiseBody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+        });
+        tbody.appendChild(tr);
+    });
+}
+
+/**
+ * Angebote-Tab: Lädt Angebote des Kunden
+ */
+async function loadTabContent_Angebote() {
+    const kdId = state.currentRecord?.KD_ID || state.currentRecord?.kun_Id;
+    if (!kdId) return;
+
+    const tbody = document.getElementById('angeboteBody');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px;">Lade Angebote...</td></tr>';
+    }
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/kunden/${kdId}/angebote`);
+        if (response.ok) {
+            const result = await response.json();
+            const data = result.data || result || [];
+            renderAngeboteTab(data);
+        } else {
+            if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:10px;">Keine Angebote verfügbar</td></tr>';
+        }
+    } catch (err) {
+        console.error('[Tab:Angebote] Fehler:', err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999; padding:10px;">API nicht erreichbar</td></tr>';
+    }
+}
+
+function renderAngeboteTab(data) {
+    const tbody = document.getElementById('angeboteBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#666; padding:20px;">Keine Angebote vorhanden</td></tr>';
+        // Summen aktualisieren
+        const anzahlEl = document.getElementById('angeboteAnzahl');
+        const gesamtwertEl = document.getElementById('angeboteGesamtwert');
+        if (anzahlEl) anzahlEl.textContent = '0';
+        if (gesamtwertEl) gesamtwertEl.textContent = '0,00 EUR';
+        return;
+    }
+
+    let gesamtwert = 0;
+
+    data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = row.ID || row.ang_ID;
+        const betrag = parseFloat(row.Betrag || row.ang_Betrag || 0);
+        gesamtwert += betrag;
+
+        tr.innerHTML = `
+            <td>${formatDateDE(row.Datum || row.ang_Datum)}</td>
+            <td>${row.Nummer || row.ang_Nummer || ''}</td>
+            <td>${row.Bezeichnung || row.ang_Bezeichnung || ''}</td>
+            <td style="text-align:right;">${formatCurrency(betrag)}</td>
+            <td>${getAngebotStatusText(row.Status || row.ang_Status)}</td>
+            <td>${formatDateDE(row.GueltigBis || row.ang_GueltigBis)}</td>
+        `;
+        tr.addEventListener('click', () => {
+            document.querySelectorAll('#angeboteBody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+        });
+        tbody.appendChild(tr);
+    });
+
+    // Summen aktualisieren
+    const anzahlEl = document.getElementById('angeboteAnzahl');
+    const gesamtwertEl = document.getElementById('angeboteGesamtwert');
+    if (anzahlEl) anzahlEl.textContent = data.length;
+    if (gesamtwertEl) gesamtwertEl.textContent = formatCurrency(gesamtwert);
+}
+
+function getAngebotStatusText(status) {
+    const statusMap = { 0: 'Offen', 1: 'Angenommen', 2: 'Abgelehnt', 3: 'Abgelaufen' };
+    return statusMap[status] || status || 'Offen';
+}
+
+/**
+ * Statistik-Tab: Lädt detaillierte Statistik (pg_Rch_Kopf)
+ */
+async function loadTabContent_Statistik() {
+    const kdId = state.currentRecord?.KD_ID || state.currentRecord?.kun_Id;
+    if (!kdId) return;
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/kunden/${kdId}/statistik`);
+        if (response.ok) {
+            const result = await response.json();
+            const data = result.data || result;
+            renderStatistikTab(data);
+        } else {
+            console.warn('[Tab:Statistik] API nicht verfügbar');
+            // Zeige zumindest die Jahres-Header
+            updateStatistikJahre();
+        }
+    } catch (err) {
+        console.error('[Tab:Statistik] Fehler:', err);
+    }
+}
+
+function updateStatistikJahre() {
+    const aktJahr = new Date().getFullYear();
+    const el1 = document.getElementById('statJahr1Header');
+    const el2 = document.getElementById('statJahr2Header');
+    const el3 = document.getElementById('statJahr3Header');
+    if (el1) el1.textContent = aktJahr;
+    if (el2) el2.textContent = aktJahr - 1;
+    if (el3) el3.textContent = aktJahr - 2;
+}
+
+function renderStatistikTab(data) {
+    if (!data) return;
+
+    updateStatistikJahre();
+
+    // Jahres-Statistiken
+    for (let i = 1; i <= 3; i++) {
+        const jahr = data[`jahr${i}`] || {};
+        setElementText(`UmsNGes${i}`, formatCurrency(jahr.UmsatzNetto));
+        setElementText(`UmsGes${i}`, formatCurrency(jahr.UmsatzBrutto));
+        setElementText(`StdGes${i}`, jahr.Stunden || '0');
+        setElementText(`AufAnz${i}`, jahr.Auftraege || '0');
+        setElementText(`PersGes${i}`, jahr.Personal || '0');
+    }
+
+    // KW-Statistiken (letzte Wochen)
+    if (data.wochen) {
+        data.wochen.forEach((woche, idx) => {
+            const kwNr = 51 + idx;
+            setElementText(`Std${kwNr}`, woche.Stunden || '0');
+            setElementText(`Pers${kwNr}`, woche.Personal || '0');
+        });
+    }
+}
+
+function setElementText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? '';
+}
+
+/**
+ * Erweiterte switchTab-Funktion für die Logic-Datei
+ * Diese wird als globale Funktion registriert und kann die HTML-inline switchTab überschreiben
+ */
+function switchTabExtended(tabName) {
+    console.log('[switchTab] Wechsel zu Tab:', tabName);
+
+    // Tab-Buttons aktivieren/deaktivieren
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+
+    // Tab-Seiten ein-/ausblenden
+    document.querySelectorAll('.tab-page').forEach(page => {
+        page.classList.toggle('active', page.id === 'tab-' + tabName);
+    });
+
+    // Tab-spezifische Daten laden, wenn Kunde ausgewählt
+    if (state.currentRecord) {
+        switch (tabName) {
+            case 'stammdaten':
+                // Stammdaten sind bereits geladen
+                break;
+            case 'objekte':
+                loadTabContent_Objekte();
+                break;
+            case 'konditionen':
+                // Konditionen sind Teil des Hauptdatensatzes
+                break;
+            case 'zusatzdateien':
+                // loadZusatzdateien() - falls im HTML definiert
+                if (typeof window.loadZusatzdateien === 'function') {
+                    window.loadZusatzdateien();
+                }
+                break;
+            case 'bemerkungen':
+                loadTabContent_Bemerkungen();
+                break;
+            case 'preise':
+                loadTabContent_Preise();
+                break;
+            case 'auftraguebersicht':
+                loadTabContent_Auftraege();
+                break;
+            case 'ansprechpartner':
+                loadTabContent_Ansprechpartner();
+                break;
+            case 'angebote':
+                loadTabContent_Angebote();
+                break;
+            case 'statistik':
+                loadTabContent_Statistik();
+                break;
+        }
+    }
+}
+
 // Init bei DOM ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
@@ -891,8 +1701,36 @@ window.KundenStamm = {
     datAuftraegeVon_AfterUpdate,
     datAuftraegeBis_AfterUpdate,
     KD_Zahlungsbedingung_AfterUpdate,
-    cboKundenSuche_AfterUpdate
+    cboKundenSuche_AfterUpdate,
+    // NEU: Such-Comboboxen
+    cboSuchOrt_AfterUpdate,
+    cboSuchPLZ_AfterUpdate,
+    // NEU: Kopf-Berechnung
+    Kopf_Berech,
+    // NEU: DblClick Handler
+    lst_KD_DblClick,
+    // NEU: Tab-Loader Funktionen
+    loadTabContent_Bemerkungen,
+    loadTabContent_Rechnungen,
+    loadTabContent_Auftraege,
+    loadTabContent_Objekte,
+    loadTabContent_Ansprechpartner,
+    loadTabContent_Preise,
+    loadTabContent_Angebote,
+    loadTabContent_Statistik,
+    switchTabExtended
 };
+
+// Tab-Loader als globale Funktionen registrieren
+window.loadTabContent_Bemerkungen = loadTabContent_Bemerkungen;
+window.loadTabContent_Rechnungen = loadTabContent_Rechnungen;
+window.loadTabContent_Auftraege = loadTabContent_Auftraege;
+window.loadTabContent_Objekte = loadTabContent_Objekte;
+window.loadTabContent_Ansprechpartner = loadTabContent_Ansprechpartner;
+window.loadTabContent_Preise = loadTabContent_Preise;
+window.loadTabContent_Angebote = loadTabContent_Angebote;
+window.loadTabContent_Statistik = loadTabContent_Statistik;
+window.switchTabExtended = switchTabExtended;
 
 // ============ FUNCTION ALIASES (fuer onclick-Handler Kompatibilitaet) ============
 

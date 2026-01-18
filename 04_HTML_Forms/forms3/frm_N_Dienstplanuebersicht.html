@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplanuebersicht</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 12px;
+            background-color: #8080c0;
+            overflow: hidden;
+        }
+
+        /* Shell-Modus: Sidebar ausblenden */
+        body.shell-mode .left-menu,
+        body.shell-mode .app-sidebar {
+            display: none !important;
+        }
+
+        body.shell-mode .content-wrapper,
+        body.shell-mode .app-main {
+            width: 100% !important;
+            margin-left: 0 !important;
+        }
+
+        body.shell-mode .app-wrapper {
+            display: block !important;
+        }
+
+        /* Hauptcontainer */
+        .form-container {
+            width: 100%;
+            height: 100%;
+            background-color: #8080c0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Detail Section */
+        .form-detail {
+            position: relative;
+            height: calc(100% - 50px);
+            min-height: 400px;
+            background-color: #8080c0;
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* ============================================ */
+        /* UNIFIED HEADER OVERRIDES                    */
+        /* ============================================ */
+
+        .unified-input {
+            height: 24px;
+            font-size: 11px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 2px 6px;
+        }
+
+        .unified-select {
+            height: 24px;
+            font-size: 11px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 2px 4px;
+        }
+
+        /* ============================================ */
+        /* FILTER-BEREICH                              */
+        /* ============================================ */
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 8px 10px;
+            background-color: #ece9d8;
+            border-bottom: 1px solid #808080;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            height: 24px;
+            font-size: 11px;
+            border: 1px solid #808080;
+            padding: 2px 4px;
+        }
+
+        .filter-group input[type="date"] {
+            width: 130px;
+        }
+
+        .filter-group select {
+            min-width: 120px;
+        }
+
+        /* Navigation Buttons */
+        .nav-btn {
+            padding: 4px 12px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .nav-btn:hover {
+            background-color: #a8c4e8;
+        }
+
+        .nav-btn.today {
+            background-color: #ffcc00;
+        }
+
+        .week-display {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 10px;
+            background-color: #fff;
+            border: 1px solid #808080;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        /* ============================================ */
+        /* KALENDER GRID                               */
+        /* ============================================ */
+
+        .calendar-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ffffff;
+            overflow: auto;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 180px repeat(7, 1fr);
+            gap: 1px;
+            background-color: #ccc;
+            min-height: 100%;
+        }
+
+        .calendar-header {
+            background-color: #00CED1;
+            color: #000;
+            font-weight: bold;
+            font-size: 11px;
+            padding: 8px 6px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .calendar-header.ma-col {
+            background-color: #5c0000;
+            color: #fff;
+        }
+
+        .calendar-header.weekend {
+            background-color: #8B0000;
+            color: #fff;
+        }
+
+        .calendar-header.feiertag {
+            background-color: #c04040;
+            color: white;
+        }
+
+        .calendar-header.today {
+            background-color: #ffcc00;
+            color: #000;
+        }
+
+        .calendar-row {
+            display: contents;
+        }
+
+        .calendar-cell-name {
+            background-color: #f5f5f5;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            min-height: 32px;
+        }
+
+        .calendar-cell {
+            background-color: #ffffff;
+            padding: 2px;
+            font-size: 9px;
+            border-bottom: 1px solid #eee;
+            min-height: 32px;
+            position: relative;
+            vertical-align: top;
+        }
+
+        .calendar-cell.weekend {
+            background-color: #e0f7fa;
+        }
+
+        .calendar-cell.feiertag {
+            background-color: #ffe6e6;
+        }
+
+        .calendar-cell.today {
+            background-color: #ffffd0;
+        }
+
+        /* Einsatz-Eintrag im Kalender */
+        .einsatz-entry {
+            background-color: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 2px;
+            padding: 2px 4px;
+            margin: 1px 0;
+            font-size: 9px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .einsatz-entry:hover {
+            background-color: #c3e6cb;
+        }
+
+        .einsatz-entry .zeit {
+            font-weight: bold;
+            color: #155724;
+        }
+
+        .einsatz-entry .objekt {
+            color: #333;
+        }
+
+        .einsatz-entry.status-planung {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .einsatz-entry.status-bestaetigt {
+            background-color: #d4edda;
+            border-color: #28a745;
+        }
+
+        .einsatz-entry.status-problem {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        /* MA Zeile alternierend */
+        .calendar-row:nth-child(even) .calendar-cell-name {
+            background-color: #eaeaea;
+        }
+
+        .calendar-row:hover .calendar-cell-name,
+        .calendar-row:hover .calendar-cell {
+            background-color: #e8f4fc;
+        }
+
+        /* ============================================ */
+        /* DETAIL PANEL (Sidebar rechts)               */
+        /* ============================================ */
+
+        .detail-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 350px;
+            height: 100%;
+            background-color: #fff;
+            border-left: 2px solid #5c0000;
+            box-shadow: -3px 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .detail-panel.show {
+            display: flex;
+        }
+
+        .detail-header {
+            background-color: #5c0000;
+            color: #fff;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        .detail-close:hover {
+            color: #ffcc00;
+        }
+
+        .detail-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .detail-row {
+            margin-bottom: 12px;
+        }
+
+        .detail-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .detail-ma-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .detail-ma-list li {
+            padding: 6px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 11px;
+        }
+
+        .detail-ma-list li:last-child {
+            border-bottom: none;
+        }
+
+        .detail-actions {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+        }
+
+        .detail-actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        /* ============================================ */
+        /* LOADING & NOTIFICATIONS                     */
+        /* ============================================ */
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ddd;
+            border-top-color: #5c0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status-Leiste */
+        .status-bar {
+            background-color: #ece9d8;
+            border-top: 1px solid #808080;
+            padding: 4px 10px;
+            font-size: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-bar .status-text {
+            color: #333;
+        }
+
+        .status-bar .status-count {
+            font-weight: bold;
+            color: #5c0000;
+        }
+
+        /* Ansicht-Tabs */
+        .view-tabs {
+            display: flex;
+            gap: 2px;
+            margin-left: auto;
+        }
+
+        .view-tab {
+            padding: 4px 12px;
+            background-color: #d0d0d0;
+            border: 1px solid #808080;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .view-tab.active {
+            background-color: #ece9d8;
+            font-weight: bold;
+        }
+
+        .view-tab:hover:not(.active) {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Hauptcontainer -->
+    <div class="form-container">
+
+        <!-- UNIFIED HEADER -->
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 15px; color: #000000;">Dienstplanuebersicht</span>
+
+                <div class="buttons-grid">
+                    <button type="button" class="btn unified-btn" id="btnAktualisieren" title="Daten neu laden">Aktualisieren</button>
+                    <button type="button" class="btn unified-btn btn-blue" id="btnDPSenden" title="Dienstplaene per E-Mail senden">DP senden</button>
+                    <button type="button" class="btn unified-btn" id="btnExcel" title="Nach Excel exportieren">Excel</button>
+                    <button type="button" class="btn unified-btn" id="btnDrucken" title="Uebersicht drucken">Drucken</button>
+                </div>
+
+                <div class="header-spacer"></div>
+
+                <div class="view-tabs">
+                    <div class="view-tab active" data-view="woche">Woche</div>
+                    <div class="view-tab" data-view="monat">Monat</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTER-ZEILE -->
+        <div class="filter-row">
+            <div class="filter-group">
+                <button type="button" class="nav-btn" id="btnVorwoche" title="Vorherige Woche">&lt;&lt;</button>
+                <div class="week-display" id="lblWoche">KW 3: 13.01.2026 - 19.01.2026</div>
+                <button type="button" class="nav-btn" id="btnNachwoche" title="Naechste Woche">&gt;&gt;</button>
+                <button type="button" class="nav-btn today" id="btnHeute" title="Zur aktuellen Woche">Heute</button>
+            </div>
+
+            <div class="filter-group">
+                <label for="datePicker">Datum:</label>
+                <input type="date" id="datePicker" class="unified-input">
+            </div>
+
+            <div class="filter-group">
+                <label for="cboAnsicht">Ansicht:</label>
+                <select id="cboAnsicht" class="unified-select">
+                    <option value="alle">Alle Einsaetze</option>
+                    <option value="ma">Nach Mitarbeiter</option>
+                    <option value="objekt">Nach Objekt</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="cboObjekt">Objekt:</label>
+                <select id="cboObjekt" class="unified-select">
+                    <option value="">Alle Objekte</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="cboMA">Mitarbeiter:</label>
+                <select id="cboMA" class="unified-select">
+                    <option value="">Alle Mitarbeiter</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="cboStatus">Status:</label>
+                <select id="cboStatus" class="unified-select">
+                    <option value="">Alle</option>
+                    <option value="Planung">Planung</option>
+                    <option value="Bestaetigt">Bestaetigt</option>
+                    <option value="Abgesagt">Abgesagt</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <input type="checkbox" id="chkNurFreieSchichten" style="margin-right: 4px;">
+                <label for="chkNurFreieSchichten" style="cursor: pointer;" title="Nur Schichten anzeigen, die noch Mitarbeiter benoetigen">Nur freie Schichten</label>
+            </div>
+        </div>
+
+        <!-- DETAIL BEREICH (Kalender) -->
+        <div class="form-detail">
+            <div class="calendar-container" id="calendarContainer">
+                <!-- Kalender-Header -->
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Header wird dynamisch gefuellt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- STATUS-LEISTE -->
+        <div class="status-bar">
+            <span class="status-text" id="lblStatus">Bereit</span>
+            <span class="status-count" id="lblAnzEinsaetze">Einsaetze: 0</span>
+        </div>
+
+    </div>
+
+    <!-- DETAIL PANEL (rechts) -->
+    <div class="detail-panel" id="detailPanel">
+        <div class="detail-header">
+            <span>Einsatz-Details</span>
+            <button type="button" class="detail-close" id="btnCloseDetail">&times;</button>
+        </div>
+        <div class="detail-body">
+            <div class="detail-row">
+                <div class="detail-label">Objekt</div>
+                <div class="detail-value" id="detailObjekt">-</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Datum</div>
+                <div class="detail-value" id="detailDatum">-</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Zeit</div>
+                <div class="detail-value" id="detailZeit">-</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Status</div>
+                <div class="detail-value" id="detailStatus">-</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">MA Soll / Ist</div>
+                <div class="detail-value">
+                    <span id="detailSoll">0</span> / <span id="detailIst">0</span>
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Zugeordnete Mitarbeiter</div>
+                <ul class="detail-ma-list" id="detailMAListe">
+                    <li>Keine Mitarbeiter zugeordnet</li>
+                </ul>
+            </div>
+        </div>
+        <div class="detail-actions">
+            <button type="button" class="btn unified-btn" id="btnEditEinsatz">Auftrag oeffnen</button>
+            <button type="button" class="btn unified-btn btn-blue" id="btnPlanung">MA Planung</button>
+        </div>
+    </div>
+
+    <!-- Logic-Datei laden -->
+    <script src="logic/frm_N_Dienstplanuebersicht.logic.js"></script>
+</body>
+</html>

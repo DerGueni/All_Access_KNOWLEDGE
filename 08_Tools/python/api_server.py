@@ -3457,6 +3457,93 @@ def reject_bewerber(id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/bewerber', methods=['POST'])
+def create_bewerber():
+    """Neuen Bewerber erstellen"""
+    try:
+        data = request.get_json()
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                INSERT INTO tbl_MA_Bewerber
+                (BW_Nachname, BW_Vorname, BW_Email, BW_Telefon, BW_Geburtsdatum, BW_Eingang, BW_Status, BW_Bemerkungen)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                data.get('Nachname', ''),
+                data.get('Vorname', ''),
+                data.get('Email', ''),
+                data.get('Telefon', ''),
+                data.get('Geburtsdatum'),
+                data.get('Eingangsdatum'),
+                data.get('Status', 'Neu'),
+                data.get('Bemerkungen', '')
+            ))
+            conn.commit()
+
+            # Neue ID holen
+            cursor.execute("SELECT @@IDENTITY")
+            new_id = cursor.fetchone()[0]
+        except Exception as db_err:
+            release_connection(conn)
+            return jsonify({'success': False, 'error': str(db_err)}), 500
+
+        release_connection(conn)
+
+        return jsonify({
+            'success': True,
+            'message': 'Bewerber erstellt',
+            'id': new_id
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/bewerber/<int:id>', methods=['PUT'])
+def update_bewerber(id):
+    """Bewerber aktualisieren"""
+    try:
+        data = request.get_json()
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                UPDATE tbl_MA_Bewerber SET
+                    BW_Nachname = ?,
+                    BW_Vorname = ?,
+                    BW_Email = ?,
+                    BW_Telefon = ?,
+                    BW_Geburtsdatum = ?,
+                    BW_Eingang = ?,
+                    BW_Status = ?,
+                    BW_Bemerkungen = ?
+                WHERE ID = ?
+            """, (
+                data.get('Nachname', ''),
+                data.get('Vorname', ''),
+                data.get('Email', ''),
+                data.get('Telefon', ''),
+                data.get('Geburtsdatum'),
+                data.get('Eingangsdatum'),
+                data.get('Status', 'Neu'),
+                data.get('Bemerkungen', ''),
+                id
+            ))
+            conn.commit()
+        except Exception as db_err:
+            release_connection(conn)
+            return jsonify({'success': False, 'error': str(db_err)}), 500
+
+        release_connection(conn)
+
+        return jsonify({
+            'success': True,
+            'message': 'Bewerber aktualisiert'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # ============================================
 # API: Zeitkonten Importfehler
 # ============================================
@@ -5853,6 +5940,119 @@ def get_kunden_statistik(kd_id):
     except Exception as e:
         logger.error(f"Fehler bei Kundenstatistik: {e}")
         return jsonify({'success': False, 'error': str(e), 'data': {}})
+
+
+@app.route('/api/kunden/<int:kd_id>/auftraege')
+def get_kunden_auftraege(kd_id):
+    """Auftraege eines Kunden laden"""
+    try:
+        von = request.args.get('von')
+        bis = request.args.get('bis')
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        sql = """
+            SELECT a.ID, a.Auftrag, a.Veranstalter_ID, a.Objekt_ID, a.Objekt,
+                   a.Dat_VA_Von, a.Dat_VA_Bis, a.Veranst_Status_ID,
+                   o.ob_Objektname as ObjektName
+            FROM tbl_VA_Auftragstamm a
+            LEFT JOIN tbl_OB_Objekt o ON a.Objekt_ID = o.ob_id
+            WHERE a.Veranstalter_ID = ?
+        """
+        params = [kd_id]
+
+        if von:
+            sql += " AND a.Dat_VA_Von >= ?"
+            params.append(von)
+        if bis:
+            sql += " AND a.Dat_VA_Von <= ?"
+            params.append(bis)
+
+        sql += " ORDER BY a.Dat_VA_Von DESC"
+
+        cursor.execute(sql, params)
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        data = [dict(zip(columns, row)) for row in rows]
+
+        release_connection(conn)
+        return jsonify({'success': True, 'data': data, 'count': len(data)})
+    except Exception as e:
+        logger.error(f"Fehler bei Kundenauftraegen: {e}")
+        return jsonify({'success': False, 'error': str(e), 'data': []})
+
+
+@app.route('/api/kunden/<int:kd_id>/objekte')
+def get_kunden_objekte(kd_id):
+    """Objekte eines Kunden laden (via Auftraege verknuepft)"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Objekte, die in Auftraegen des Kunden vorkommen
+        cursor.execute("""
+            SELECT DISTINCT o.ob_id, o.ob_Objektname, o.ob_Ort, o.ob_IstAktiv,
+                   COUNT(a.ID) as anzahl_auftraege
+            FROM tbl_OB_Objekt o
+            INNER JOIN tbl_VA_Auftragstamm a ON o.ob_id = a.Objekt_ID
+            WHERE a.Veranstalter_ID = ?
+            GROUP BY o.ob_id, o.ob_Objektname, o.ob_Ort, o.ob_IstAktiv
+            ORDER BY o.ob_Objektname
+        """, [kd_id])
+
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        data = [dict(zip(columns, row)) for row in rows]
+
+        release_connection(conn)
+        return jsonify({'success': True, 'data': data, 'count': len(data)})
+    except Exception as e:
+        logger.error(f"Fehler bei Kundenobjekten: {e}")
+        return jsonify({'success': False, 'error': str(e), 'data': []})
+
+
+@app.route('/api/kunden/<int:kd_id>/rechnungen')
+def get_kunden_rechnungen(kd_id):
+    """Rechnungen eines Kunden laden"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Versuche aus tbl_Rch_Kopf zu laden
+        try:
+            cursor.execute("""
+                SELECT r.ID, r.Rch_Nr, r.Rch_Datum, r.Rch_Bezeichnung,
+                       r.Rch_Betrag, r.Rch_Status, r.Rch_Bezahlt,
+                       r.Betrag_Brutto, r.Betrag_Netto
+                FROM tbl_Rch_Kopf r
+                WHERE r.Kd_ID = ?
+                ORDER BY r.Rch_Datum DESC
+            """, [kd_id])
+        except:
+            # Fallback: Alternative Tabellenstruktur
+            try:
+                cursor.execute("""
+                    SELECT ID, Rechnungsnummer as Rch_Nr, Datum as Rch_Datum,
+                           Bezeichnung as Rch_Bezeichnung, Betrag as Rch_Betrag,
+                           Status as Rch_Status, BezahltAm as Rch_Bezahlt
+                    FROM tbl_Rechnungen
+                    WHERE KD_ID = ?
+                    ORDER BY Datum DESC
+                """, [kd_id])
+            except:
+                # Keine Rechnungstabelle gefunden
+                return jsonify({'success': True, 'data': [], 'count': 0})
+
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        data = [dict(zip(columns, row)) for row in rows]
+
+        release_connection(conn)
+        return jsonify({'success': True, 'data': data, 'count': len(data)})
+    except Exception as e:
+        logger.error(f"Fehler bei Kundenrechnungen: {e}")
+        return jsonify({'success': False, 'error': str(e), 'data': []})
 
 
 @app.route('/api/auftraege/<int:va_id>/positionen')

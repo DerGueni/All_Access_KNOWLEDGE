@@ -3,1071 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planungsübersicht</title>
-        <link rel="stylesheet" href="css/fonts_override.css">
+    <title>Planungsübersicht - CONSYS</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/form-titles.css">
+    <link rel="stylesheet" href="css/unified-header.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 11px;
-        }
-
-        body {
-            background-color: #8080c0;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-        }
-
-        /* ============================================ */
-        /* LEFT SIDEBAR MENU                           */
-        /* ============================================ */
-
-        .left-menu {
-            width: 185px;
-            background-color: #6060a0;
-            padding: 5px;
+        /* Planungsübersicht spezifische Styles */
+        .dp-container.no-menu {
             display: flex;
             flex-direction: column;
-            gap: 3px;
             height: 100vh;
-            overflow-y: auto;
+            background: #f5f5f5;
         }
-
-        .menu-header {
-            background-color: #000080;
-            color: white;
-            padding: 6px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 11px;
-            margin-bottom: 5px;
-        }
-
-        .menu-btn {
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            padding: 8px 10px;
-            font-size: 11px;
-            width: 100%;
-            text-align: center;
-            cursor: pointer;
-            color: #000;
-            font-weight: 500;
-            position: relative;
-            border: none;
-            margin: 1px 0;
-        }
-
-        .menu-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: calc(100% - 4px);
-            height: 2px;
-            background: #ffffff;
-        }
-
-        .menu-btn::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: calc(100% - 4px);
-            height: 2px;
-            background: #404070;
-        }
-
-        .menu-btn:hover {
-            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
-        }
-
-        .menu-btn.active {
-            background: linear-gradient(to bottom, #4040a0, #6060c0);
-            color: white;
-        }
-
-        /* ============================================ */
-        /* MAIN CONTENT                                */
-        /* ============================================ */
-
-        .main-content {
+        .dp-main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 10px;
             overflow: hidden;
         }
-
-        .header-bar {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 8px 15px;
-            font-size: 22px; /* Formulartitel +8px (war 14px) gemaess Anforderung */
-            font-weight: bold;
-            margin-bottom: 10px;
+        .dp-header {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-bar .header-right {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        #lbl_Version {
-            font-size: 9px;
-            opacity: 0.7;
-        }
-
-        #lbl_Datum {
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        /* ============================================ */
-        /* FILTER BAR                                  */
-        /* ============================================ */
-
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-            background: #d0d0e0;
-            padding: 8px;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 10px 20px;
+            background: #4316B2;
+            color: white;
             flex-wrap: wrap;
+            gap: 10px;
         }
-
-        .filter-bar label {
+        .dp-header .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .dp-header .dp-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+        .dp-header .header-center {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dp-header .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .dp-date-input {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .dp-btn {
+            padding: 6px 12px;
+            background: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .dp-btn:hover {
+            background: #e0e0e0;
+        }
+        .dp-btn-nav {
+            padding: 6px 10px;
+            background: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
             font-weight: bold;
         }
-
-        .filter-bar input, .filter-bar select {
-            padding: 3px 5px;
-            border: 1px solid #808080;
+        .dp-btn-nav:hover {
+            background: #e0e0e0;
         }
-
-        .filter-bar button {
-            padding: 4px 12px;
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            cursor: pointer;
-        }
-
-        .filter-bar button:hover {
-            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
-        }
-
-        .filter-bar button.primary {
-            background: #95B3D7;
-        }
-
-        /* Startdatum Bereich */
-        #Rechteck108 {
-            background-color: rgba(0,0,0,0.05);
-            border: 1px solid #5c0000;
-            border-radius: 3px;
-            padding: 5px 10px;
+        .filter-options {
             display: flex;
-            gap: 5px;
+            gap: 15px;
             align-items: center;
         }
-
-        /* Checkbox Filter */
         .filter-checkbox {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 5px;
+            font-size: 12px;
+            color: white;
+        }
+        .dp-input-small {
+            width: 50px;
+            padding: 3px 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .version-info {
+            display: flex;
+            gap: 10px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
         }
 
-        /* ============================================ */
-        /* PLANNING GRID                               */
-        /* ============================================ */
-
-        .planning-grid {
+        /* Tabelle */
+        .dp-table-container {
             flex: 1;
-            background: white;
-            border: 2px solid;
-            border-color: #808080 #ffffff #ffffff #808080;
             overflow: auto;
+            padding: 10px;
         }
-
-        .planning-table {
+        .dp-table {
             width: 100%;
             border-collapse: collapse;
+            background: white;
+            font-size: 11px;
         }
-
-        .planning-table th {
-            background: #000080;
+        .dp-table th, .dp-table td {
+            border: 1px solid #ccc;
+            padding: 4px 6px;
+        }
+        .dp-header-row th {
+            background: #4316B2;
             color: white;
-            padding: 6px;
-            text-align: left;
-            position: sticky;
-            top: 0;
-            font-weight: bold;
+            text-align: center;
+            font-weight: 600;
+        }
+        .dp-subheader-row th {
+            background: #6633CC;
+            color: white;
+            text-align: center;
             font-size: 10px;
         }
-
-        .planning-table th.day-header {
+        .th-content {
+            padding: 5px;
+        }
+        .th-content.cyan {
             background: #00CED1;
             color: #000;
-            text-align: center;
+        }
+        .col-auftrag {
+            min-width: 180px;
+            max-width: 220px;
+            vertical-align: top;
+            background: #f9f9f9;
+        }
+        .col-day {
+            min-width: 180px;
+        }
+        .sub-col {
+            min-width: 60px;
+        }
+        .auftrag-sub {
+            min-width: 180px;
+        }
+
+        /* Zeilen */
+        .dp-row {
             cursor: pointer;
         }
-
-        .planning-table th.day-header.weekend {
-            background: #8B0000;
-            color: #fff;
+        .dp-row:hover {
+            background: #e8f4ff;
         }
-
-        .planning-table th.day-header.feiertag {
-            color: #ff0000 !important;
+        .dp-row.selected {
+            background: #cce5ff;
         }
-
-        .planning-table td {
-            padding: 5px;
-            border-bottom: 1px solid #d0d0d0;
+        .auftrag-row td:first-child {
+            font-weight: 600;
+        }
+        .ma-name {
             font-size: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
         }
-
-        .planning-table tr:hover {
-            background: #e0e0ff;
-        }
-
-        .planning-table tr:nth-child(even) {
-            background: #f8f8f8;
-        }
-
-        .planning-table tr:nth-child(even):hover {
-            background: #e0e0ff;
-        }
-
-        /* Status-Farben */
-        .status-offen { color: #c00000; font-weight: bold; }
-        .status-geplant { color: #008000; }
-        .status-abgesagt { color: #808080; text-decoration: line-through; }
-        .status-besetzt { color: #006400; font-weight: bold; }
-        .status-planung { color: #ff8c00; }
-
-        /* Zellen für Tage */
-        .day-cell {
+        .zeit {
+            font-size: 10px;
             text-align: center;
-            font-size: 9px;
-            border-left: 1px solid #ddd;
+        }
+        .highlight-cyan {
+            background: #00CED1 !important;
+        }
+        .highlight-yellow {
+            background: #FFD700 !important;
         }
 
-        .day-cell .ma-name {
-            font-size: 8px;
-            color: #333;
+        /* MA-Zelle für DblClick */
+        .ma-zelle {
+            cursor: pointer;
+        }
+        .ma-zelle:hover {
+            background: #fffacd;
+        }
+        .ma-zelle.selected {
+            background: #ffeb3b;
+            outline: 2px solid #f57c00;
         }
 
-        .day-cell .zeit {
-            font-size: 8px;
-            color: #666;
+        /* Tag-Header für DblClick */
+        .tag-header {
+            cursor: pointer;
+        }
+        .tag-header:hover {
+            background: #5a3dd8 !important;
         }
 
-        .day-cell.weekend {
-            background-color: #ffe0e0;
-        }
-
-        /* ============================================ */
-        /* FOOTER BAR                                  */
-        /* ============================================ */
-
-        .footer-bar {
-            background: #d0d0e0;
-            padding: 5px 10px;
-            margin-top: 10px;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
+        /* Footer */
+        .dp-footer {
             display: flex;
             justify-content: space-between;
-        }
-
-        /* ============================================ */
-        /* LOADING                                     */
-        /* ============================================ */
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .loading-overlay.active { display: flex; }
-
-        .loading-spinner {
-            background: white;
-            padding: 20px 40px;
-            border: 2px solid #000080;
-        }
-
-        /* ============================================ */
-        /* TOAST                                       */
-        /* ============================================ */
-
-        #toastContainer {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            background-color: #333;
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            min-width: 250px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .toast.success { background-color: #28a745; }
-        .toast.error { background-color: #dc3545; }
-        .toast.warning { background-color: #ffc107; color: #000; }
-        .toast.info { background-color: #17a2b8; }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            padding: 8px 20px;
+            background: #eee;
+            border-top: 1px solid #ccc;
+            font-size: 12px;
         }
     </style>
-    <script src="js/webview2-bridge.js"></script>
-<link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body data-active-menu="planungsübersicht">
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
+<body data-active-menu="planungsuebersicht">
+    <div class="dp-container no-menu">
+        <!-- Hauptbereich (ohne Menu - wird aus Access geöffnet) -->
+        <main class="dp-main">
+            <!-- Header -->
+            <header class="dp-header">
+                <div class="header-left">
+                    <div class="dp-logo"></div>
+                    <h1 class="dp-title">Planungsübersicht</h1>
+                </div>
+                <div class="header-center">
+                    <input type="date" id="datStartdatum" class="dp-date-input" value="">
+                    <button class="dp-btn" id="btnStartdatumAendern">Startdatum Ändern</button>
+                    <button class="dp-btn-nav" id="btnVorwoche" title="3 Tage zurück">&#9664;</button>
+                    <button class="dp-btn-nav" id="btnNachwoche" title="3 Tage vor">&#9654;</button>
+                    <button class="dp-btn" id="btnAbHeute">Ab Heute</button>
+                </div>
+                <div class="header-right">
+                    <div class="filter-options">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="chkNurFreieSchichten">
+                            Nur freie Schichten anzeigen
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="chkWenigerAls">
+                            Nur Aufträge mit weniger als
+                            <input type="number" id="txtPositionen" class="dp-input-small" value="25" min="1" max="100">
+                            Positionen anzeigen
+                        </label>
+                    </div>
+                    <button class="dp-btn" id="btnUebersichtDrucken">Übersicht drucken</button>
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V2.1</span>
+                        <span id="lblDatum"></span>
+                    </div>
+                </div>
+            </header>
 
-    <!-- LEFT SIDEBAR MENU -->
-    <div class="left-menu">
-        <div class="menu-header">HAUPTMENUE</div>
-        <button class="menu-btn" onclick="navigateToForm('frm_N_Dienstplanübersicht')">Dienstplanübersicht</button>
-        <button class="menu-btn active">Planungsübersicht</button>
-        <button class="menu-btn" onclick="navigateToForm('frm_va_Auftragstamm')">Auftragsverwaltung</button>
-        <button class="menu-btn" onclick="navigateToForm('frm_MA_Mitarbeiterstamm')">Mitarbeiterverwaltung</button>
-        <button class="menu-btn" onclick="navigateToForm('frm_MA_VA_Schnellauswahl')">Offene Anfragen</button>
+            <!-- Planungs Tabelle -->
+            <div class="dp-table-container">
+                <table class="dp-table" id="tblPlanung">
+                    <thead>
+                        <tr class="dp-header-row">
+                            <th class="col-auftrag" rowspan="2">
+                                <div class="th-content cyan">Auftrag / Veranstaltung</div>
+                            </th>
+                            <th class="col-day tag-header" colspan="3" id="thTag1" data-day-offset="0">
+                                <div class="th-content">Tag 1</div>
+                            </th>
+                            <th class="col-day tag-header" colspan="3" id="thTag2" data-day-offset="1">
+                                <div class="th-content">Tag 2</div>
+                            </th>
+                            <th class="col-day tag-header" colspan="3" id="thTag3" data-day-offset="2">
+                                <div class="th-content">Tag 3</div>
+                            </th>
+                            <th class="col-day tag-header" colspan="3" id="thTag4" data-day-offset="3">
+                                <div class="th-content">Tag 4</div>
+                            </th>
+                            <th class="col-day tag-header" colspan="3" id="thTag5" data-day-offset="4">
+                                <div class="th-content">Tag 5</div>
+                            </th>
+                            <th class="col-day tag-header" colspan="3" id="thTag6" data-day-offset="5">
+                                <div class="th-content">Tag 6</div>
+                            </th>
+                            <th class="col-day tag-header" colspan="3" id="thTag7" data-day-offset="6">
+                                <div class="th-content">Tag 7</div>
+                            </th>
+                        </tr>
+                        <tr class="dp-subheader-row">
+                            <th class="sub-col auftrag-sub">Auftrag Objekt Ort</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody_Planung">
+                        <tr>
+                            <td colspan="22" style="text-align:center;padding:40px;color:#666;">
+                                Lade Planungsdaten...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <footer class="dp-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblAnzAuftraege">0 Aufträge</span>
+                </div>
+            </footer>
+        </main>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <!-- Header -->
-        <div class="header-bar">
-            <span>Planungsübersicht - Alle Aufträge</span>
-            <div class="header-right">
-                <span id="lbl_Version">Version</span>
-                <span id="lbl_Datum"></span>
-                <button id="Befehl37" onclick="Befehl37_Click()" style="background:#fff; border:1px solid #ccc; padding:2px 8px; cursor:pointer;" data-testid="plan-btn-schliessen">X</button>
-            </div>
-        </div>
+    <script type="module" src="logic/frm_VA_Planungsuebersicht.logic.js"></script>
 
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-            <!-- Startdatum Bereich -->
-            <div id="Rechteck108">
-                <label>Startdatum:</label>
-                <input type="date" id="dtStartdatum" ondblclick="dtStartdatum_DblClick()" data-testid="plan-date-startdatum">
-                <button id="btnStartdatum" onclick="btnStartdatum_Click()" data-testid="plan-btn-aktualisieren">Aktualisieren</button>
-                <button id="btnVor" onclick="btnVor_Click()" data-testid="plan-btn-vor">+3</button>
-                <button id="btnrück" onclick="btnrück_Click()" data-testid="plan-btn-zurueck">-3</button>
-                <button id="btn_Heute" onclick="btn_Heute_Click()" class="primary" data-testid="plan-btn-heute">Heute</button>
-            </div>
-
-            <!-- Filter Optionen -->
-            <div class="filter-checkbox">
-                <input type="checkbox" id="NurIstNichtZugeordnet" onchange="NurIstNichtZugeordnet_AfterUpdate()" data-testid="plan-checkbox-nurzugeordnet">
-                <label for="NurIstNichtZugeordnet">Nur nicht zugeordnet</label>
-            </div>
-
-            <div class="filter-checkbox">
-                <input type="checkbox" id="IstAuftrAusblend" onchange="IstAuftrAusblend_AfterUpdate()" data-testid="plan-checkbox-ausblenden">
-                <label for="IstAuftrAusblend">Aufträge ausblenden ab:</label>
-                <input type="number" id="PosAusblendAb" value="25" style="width:50px;" onchange="PosAusblendAb_AfterUpdate()" data-testid="plan-input-ausblendab">
-            </div>
-
-            <!-- Export Buttons -->
-            <button id="btnOutpExcel" onclick="btnOutpExcel_Click()" data-testid="plan-btn-excel">Übersicht drucken</button>
-            <button id="btnOutpExcelSend" onclick="btnOutpExcelSend_Click()" data-testid="plan-btn-excel-senden">Übersicht senden</button>
-        </div>
-
-        <!-- Planning Grid -->
-        <div class="planning-grid">
-            <table class="planning-table">
-                <thead>
-                    <tr>
-                        <th id="lbl_Auftrag" style="width:175px;">Auftrag / Objekt</th>
-                        <th id="lbl_Tag_1" class="day-header" ondblclick="lbl_Tag_DblClick(1)">Mo 01.01.</th>
-                        <th id="lbl_Tag_2" class="day-header" ondblclick="lbl_Tag_DblClick(2)">Di 02.01.</th>
-                        <th id="lbl_Tag_3" class="day-header" ondblclick="lbl_Tag_DblClick(3)">Mi 03.01.</th>
-                        <th id="lbl_Tag_4" class="day-header" ondblclick="lbl_Tag_DblClick(4)">Do 04.01.</th>
-                        <th id="lbl_Tag_5" class="day-header" ondblclick="lbl_Tag_DblClick(5)">Fr 05.01.</th>
-                        <th id="lbl_Tag_6" class="day-header weekend" ondblclick="lbl_Tag_DblClick(6)">Sa 06.01.</th>
-                        <th id="lbl_Tag_7" class="day-header weekend" ondblclick="lbl_Tag_DblClick(7)">So 07.01.</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody_Planung" data-testid="plan-table-planungen">
-                    <tr><td colspan="8" style="text-align:center; padding:20px;">Lade Daten...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer-bar">
-            <span id="lblStatus">Bereit</span>
-            <span id="lblRecordInfo">0 Eintraege</span>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner">Lade Daten...</div>
-    </div>
-
-    <script>
-    /**
-     * frm_VA_Planungsübersicht - VBA Events als JavaScript
-     * Synchronisiert mit Access VBA Events aus frm_DP_Dienstplan_Objekt
-     */
-
-    // ============================================
-    // STATE MANAGEMENT
-    // ============================================
-    const state = {
-        dtStartdatum: new Date(),
-        nurIstNichtZugeordnet: false,
-        istAuftrAusblend: false,
-        posAusblendAb: 25,
-        auftraege: [],
-        planungen: []
-    };
-
-    // ============================================
-    // FORM EVENTS (VBA: Form_Open, Form_Load)
-    // ============================================
-
-    /**
-     * Form_Open Event - Initialisierung beim Öffnen
-     * VBA: DoCmd.Maximize, Get_Priv_Property, btnStartdatum_Click
-     */
-    function Form_Open() {
-        console.log('[Form_Open] Formular wird geöffnet...');
-
-        // Gespeichertes Startdatum laden
-        const savedDate = localStorage.getItem('prp_Dienstpl_StartDatum');
-        if (savedDate) {
-            state.dtStartdatum = new Date(savedDate);
-        } else {
-            state.dtStartdatum = new Date();
-        }
-
-        document.getElementById('dtStartdatum').valueAsDate = state.dtStartdatum;
-
-        // Initial laden
-        btnStartdatum_Click();
-    }
-
-    /**
-     * Form_Load Event - Version anzeigen
-     * VBA: DoCmd.Maximize, lbl_Version.caption
-     */
-    function Form_Load() {
-        console.log('[Form_Load] Formular geladen');
-
-        // Version anzeigen
-        document.getElementById('lbl_Version').textContent = 'HTML 1.0 | WebView2';
-
-        // Aktuelles Datum anzeigen
-        const heute = new Date();
-        document.getElementById('lbl_Datum').textContent = heute.toLocaleDateString('de-DE', {
-            weekday: 'short', day: '2-digit', month: '2-digit', year: '2-digit'
-        });
-    }
-
-    /**
-     * Form_Close Event - Aufraemen
-     * VBA: DoCmd.ShowToolbar "Ribbon", acToolbarYes, GL_DP_Objekt_Fld = ""
-     */
-    function Form_Close() {
-        console.log('[Form_Close] Formular wird geschlossen');
-    }
-
-    // ============================================
-    // BUTTON CLICK EVENTS
-    // ============================================
-
-    /**
-     * Befehl37_Click - Formular schließen
-     */
-    function Befehl37_Click() {
-        console.log('[Befehl37_Click] Schliessen');
-        if (typeof closeToShell === 'function') {
-            closeToShell();
-        } else {
-            window.close();
-        }
-    }
-
-    /**
-     * btn_Heute_Click - Zum heutigen Datum springen
-     * VBA: Me!dtStartdatum = Date, btnStartdatum_Click
-     */
-    function btn_Heute_Click() {
-        console.log('[btn_Heute_Click] Heute');
-        state.dtStartdatum = new Date();
-        document.getElementById('dtStartdatum').valueAsDate = state.dtStartdatum;
-        btnStartdatum_Click();
-    }
-
-    /**
-     * btnVor_Click - 3 Tage vor
-     * VBA: Me!dtStartdatum = dt + 3, btnStartdatum_Click
-     */
-    function btnVor_Click() {
-        console.log('[btnVor_Click] +3 Tage');
-        state.dtStartdatum.setDate(state.dtStartdatum.getDate() + 3);
-        document.getElementById('dtStartdatum').valueAsDate = state.dtStartdatum;
-        btnStartdatum_Click();
-    }
-
-    /**
-     * btnrück_Click - 3 Tage zurück
-     * VBA: Me!dtStartdatum = dt - 3, btnStartdatum_Click
-     */
-    function btnrück_Click() {
-        console.log('[btnrück_Click] -3 Tage');
-        state.dtStartdatum.setDate(state.dtStartdatum.getDate() - 3);
-        document.getElementById('dtStartdatum').valueAsDate = state.dtStartdatum;
-        btnStartdatum_Click();
-    }
-
-    /**
-     * btnStartdatum_Click - Hauptfunktion: Daten laden und anzeigen
-     * VBA: fCreate_DP_tmptable, fset_Tage, sub_DP_Grund.Form.Requery
-     */
-    function btnStartdatum_Click() {
-        console.log('[btnStartdatum_Click] Daten aktualisieren');
-
-        // Startdatum aus Input holen
-        const dateInput = document.getElementById('dtStartdatum');
-        if (dateInput.value) {
-            state.dtStartdatum = new Date(dateInput.value);
-        }
-
-        // Tages-Header setzen (VBA: fset_Tage)
-        fset_Tage();
-
-        // Daten laden
-        loadPlanungData();
-
-        // Startdatum speichern (VBA: Set_Priv_Property)
-        localStorage.setItem('prp_Dienstpl_StartDatum', state.dtStartdatum.toISOString());
-    }
-
-    /**
-     * fset_Tage - Tages-Header aktualisieren
-     * VBA: For i = 0 To 6: Me("lbl_Tag_" & (i + 1)).Value = Me!dtStartdatum + i
-     */
-    function fset_Tage() {
-        const wochentage = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-
-        for (let i = 0; i < 7; i++) {
-            const datum = new Date(state.dtStartdatum);
-            datum.setDate(datum.getDate() + i);
-
-            const wt = wochentage[datum.getDay()];
-            const tag = datum.getDate().toString().padStart(2, '0');
-            const monat = (datum.getMonth() + 1).toString().padStart(2, '0');
-            const isWeekend = datum.getDay() === 0 || datum.getDay() === 6;
-
-            const lbl = document.getElementById('lbl_Tag_' + (i + 1));
-            if (lbl) {
-                lbl.textContent = wt + ' ' + tag + '.' + monat + '.';
-                lbl.dataset.datum = datum.toISOString().split('T')[0];
-
-                // Wochenende markieren
-                if (isWeekend) {
-                    lbl.classList.add('weekend');
-                } else {
-                    lbl.classList.remove('weekend');
-                }
-
-                // Feiertag prüfen
-                const feiertag = checkFeiertag(datum);
-                if (feiertag) {
-                    lbl.classList.add('feiertag');
-                    lbl.title = feiertag;
-                } else {
-                    lbl.classList.remove('feiertag');
-                    lbl.title = '';
-                }
-            }
-        }
-    }
-
-    /**
-     * btnOutpExcel_Click - Übersicht als Excel erstellen
-     * VBA: FCreate_Dienstplan_Excel(1)
-     */
-    function btnOutpExcel_Click() {
-        console.log('[btnOutpExcel_Click] Excel Export');
-        showToast('Excel-Export wird erstellt...', 'info');
-
-        if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
-            Bridge.sendEvent('exportExcel', {
-                type: 'planung',
-                von: formatDateSQL(state.dtStartdatum),
-                bis: formatDateSQL(getEnddatum())
-            });
-        } else {
-            exportToCSV();
-        }
-    }
-
-    /**
-     * btnOutpExcelSend_Click - Übersicht per Excel senden
-     * VBA: FCreate_Dienstplan_Excel_Send(1)
-     */
-    function btnOutpExcelSend_Click() {
-        console.log('[btnOutpExcelSend_Click] Excel senden');
-        showToast('Excel wird erstellt und versendet...', 'info');
-
-        if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
-            Bridge.sendEvent('exportExcelSend', {
-                type: 'planung',
-                von: formatDateSQL(state.dtStartdatum),
-                bis: formatDateSQL(getEnddatum())
-            });
-        }
-    }
-
-    // ============================================
-    // DBLCLICK EVENTS
-    // ============================================
-
-    /**
-     * dtStartdatum_DblClick - Kalender öffnen
-     * VBA: DoCmd.OpenForm "_frmHlp_Kalender_3Mon"
-     */
-    function dtStartdatum_DblClick() {
-        console.log('[dtStartdatum_DblClick] Kalender öffnen');
-        document.getElementById('dtStartdatum').showPicker && document.getElementById('dtStartdatum').showPicker();
-    }
-
-    /**
-     * lbl_Tag_DblClick - Auf diesen Tag springen
-     * VBA: Me!dtStartdatum = Me!lbl_Tag_X, btnStartdatum_Click
-     */
-    function lbl_Tag_DblClick(tagNr) {
-        console.log('[lbl_Tag_DblClick] Tag ' + tagNr);
-        const lbl = document.getElementById('lbl_Tag_' + tagNr);
-        if (lbl && lbl.dataset.datum) {
-            state.dtStartdatum = new Date(lbl.dataset.datum);
-            document.getElementById('dtStartdatum').valueAsDate = state.dtStartdatum;
-            btnStartdatum_Click();
-        }
-    }
-
-    // ============================================
-    // AFTERUPDATE EVENTS
-    // ============================================
-
-    /**
-     * NurIstNichtZugeordnet_AfterUpdate - Filter geaendert
-     * VBA: Implizit in btnStartdatum_Click
-     */
-    function NurIstNichtZugeordnet_AfterUpdate() {
-        console.log('[NurIstNichtZugeordnet_AfterUpdate] Filter geaendert');
-        state.nurIstNichtZugeordnet = document.getElementById('NurIstNichtZugeordnet').checked;
-        renderTable();
-    }
-
-    /**
-     * IstAuftrAusblend_AfterUpdate - Filter geaendert
-     * VBA: iPosausblend = Me!PosAusblendAb in btnStartdatum_Click
-     */
-    function IstAuftrAusblend_AfterUpdate() {
-        console.log('[IstAuftrAusblend_AfterUpdate] Filter geaendert');
-        state.istAuftrAusblend = document.getElementById('IstAuftrAusblend').checked;
-        renderTable();
-    }
-
-    /**
-     * PosAusblendAb_AfterUpdate - Ausblend-Position geaendert
-     */
-    function PosAusblendAb_AfterUpdate() {
-        console.log('[PosAusblendAb_AfterUpdate] Position geaendert');
-        state.posAusblendAb = parseInt(document.getElementById('PosAusblendAb').value) || 25;
-        if (state.istAuftrAusblend) {
-            renderTable();
-        }
-    }
-
-    // ============================================
-    // RIBBON/DABA BUTTONS
-    // ============================================
-
-    function btnRibbonAus_Click() {
-        console.log('[btnRibbonAus_Click] Ribbon aus');
-    }
-
-    function btnRibbonEin_Click() {
-        console.log('[btnRibbonEin_Click] Ribbon ein');
-    }
-
-    function btnDaBaAus_Click() {
-        console.log('[btnDaBaAus_Click] DaBa aus');
-    }
-
-    function btnDaBaEin_Click() {
-        console.log('[btnDaBaEin_Click] DaBa ein');
-    }
-
-    // ============================================
-    // DATA LOADING (WebView2 Bridge)
-    // ============================================
-
-    async function loadPlanungData() {
-        setStatus('Lade Planungsdaten...');
-        showLoading(true);
-
-        const von = formatDateSQL(state.dtStartdatum);
-        const bis = formatDateSQL(getEnddatum());
-        const isWebView2 = !!(window.chrome && window.chrome.webview);
-
-        if (isWebView2 && typeof Bridge !== 'undefined' && Bridge.sendEvent) {
-            Bridge.sendEvent('loadPlanungen', {
-                von: von,
-                bis: bis,
-                nurNichtZugeordnet: state.nurIstNichtZugeordnet
-            });
-        } else {
-            // REST-API Fallback fuer Browser-Modus
-            try {
-                // Schichten mit Zuordnungen laden
-                let url = 'http://localhost:5000/api/schichten?von=' + von + '&bis=' + bis;
-                if (state.nurIstNichtZugeordnet) url += '&nur_offen=1';
-
-                const response = await fetch(url);
-                const schichten = await response.json();
-
-                state.auftraege = groupByAuftrag(schichten || []);
-                renderTable();
-                showLoading(false);
-                setStatus(state.auftraege.length + ' Auftraege geladen');
-            } catch (error) {
-                console.error('[loadPlanungData] Fehler:', error);
-                showToast('Fehler beim Laden: ' + error.message, 'error');
-                showLoading(false);
-                setStatus('Fehler');
-            }
-        }
-    }
-
-    // WebView2 Bridge Event Handler
-    if (typeof Bridge !== 'undefined' && Bridge.on) {
-        Bridge.on('onDataReceived', function(data) {
-            console.log('[Bridge] Daten empfangen:', data);
-
-            if (data.planungen || data.schichten) {
-                state.auftraege = groupByAuftrag(data.planungen || data.schichten || []);
-                renderTable();
-                showLoading(false);
-                setStatus(state.auftraege.length + ' Aufträge geladen');
-            }
-
-            if (data.error) {
-                showToast('Fehler: ' + data.error, 'error');
-                showLoading(false);
-            }
-        });
-    }
-
-    /**
-     * Daten nach Auftrag gruppieren
-     */
-    function groupByAuftrag(data) {
-        const grouped = new Map();
-
-        data.forEach(row => {
-            const key = row.VA_ID;
-
-            if (!grouped.has(key)) {
-                grouped.set(key, {
-                    VA_ID: row.VA_ID,
-                    Objekt: row.Objekt || '',
-                    Ort: row.VA_Ort || row.Ort || '',
-                    Kunde: row.Kun_Firma || row.Kunde || '',
-                    tage: {}
-                });
-            }
-
-            const auftrag = grouped.get(key);
-            const datum = row.VADatum;
-
-            if (datum) {
-                const datumKey = typeof datum === 'string' ? datum.split('T')[0] : formatDateSQL(new Date(datum));
-
-                if (!auftrag.tage[datumKey]) {
-                    auftrag.tage[datumKey] = [];
-                }
-
-                auftrag.tage[datumKey].push({
-                    von: formatTime(row.VA_Start),
-                    bis: formatTime(row.VA_Ende),
-                    ma_name: row.MA_Nachname && row.MA_Vorname
-                        ? row.MA_Nachname + ', ' + row.MA_Vorname.charAt(0) + '.'
-                        : '',
-                    soll: row.MA_Anzahl || 0,
-                    ist: row.MA_Anzahl_Ist || 0
-                });
-            }
-        });
-
-        return Array.from(grouped.values());
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('tbody_Planung');
-        let filtered = state.auftraege;
-
-        // Filter: Nur nicht zugeordnete
-        if (state.nurIstNichtZugeordnet) {
-            filtered = filtered.filter(auftrag => {
-                let hatFreieSchichten = false;
-                Object.values(auftrag.tage).forEach(schichten => {
-                    schichten.forEach(s => {
-                        if (!s.ma_name || s.ist < s.soll) {
-                            hatFreieSchichten = true;
-                        }
-                    });
-                });
-                return hatFreieSchichten;
-            });
-        }
-
-        // Filter: Aufträge ausblenden ab Position
-        if (state.istAuftrAusblend && state.posAusblendAb > 0) {
-            filtered = filtered.slice(0, state.posAusblendAb);
-        }
-
-        if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#666;">Keine Aufträge gefunden</td></tr>';
-            document.getElementById('lblRecordInfo').textContent = '0 Eintraege';
-            return;
-        }
-
-        // 7 Tage Array erstellen
-        const tageArray = [];
-        for (let i = 0; i < 7; i++) {
-            const datum = new Date(state.dtStartdatum);
-            datum.setDate(datum.getDate() + i);
-            tageArray.push(formatDateSQL(datum));
-        }
-
-        tbody.innerHTML = filtered.map((auftrag, idx) => {
-            let html = '<tr data-index="' + idx + '" data-va-id="' + auftrag.VA_ID + '">';
-
-            // Auftrag-Spalte
-            html += '<td style="vertical-align:top; padding:5px;">';
-            html += '<strong>' + auftrag.VA_ID + '</strong><br>';
-            html += auftrag.Objekt + '<br>';
-            html += '<small style="color:#666;">' + auftrag.Ort + '</small>';
-            html += '</td>';
-
-            // Fuer jeden Tag eine Spalte
-            tageArray.forEach((datum, dayIdx) => {
-                const schichten = auftrag.tage[datum] || [];
-                const isWeekend = dayIdx >= 5;
-
-                html += '<td class="day-cell ' + (isWeekend ? 'weekend' : '') + '">';
-                schichten.forEach(s => {
-                    const statusClass = s.ist >= s.soll ? 'status-besetzt' :
-                                       s.ist > 0 ? 'status-planung' : 'status-offen';
-
-                    if (s.ma_name) {
-                        html += '<div class="ma-name">' + s.ma_name + '</div>';
-                    }
-                    if (s.von && s.bis) {
-                        html += '<div class="zeit ' + statusClass + '">' + s.von + '-' + s.bis + '</div>';
-                    }
-                    html += '<div style="font-size:8px; color:#888;">' + s.ist + '/' + s.soll + '</div>';
-                });
-                html += '</td>';
-            });
-
-            html += '</tr>';
-            return html;
-        }).join('');
-
-        document.getElementById('lblRecordInfo').textContent = filtered.length + ' Eintraege';
-    }
-
-    function generateDemoData() {
-        // Demo-Daten für Offline-Test
-        return [
-            {
-                VA_ID: 1001,
-                Objekt: 'Messe Nuernberg',
-                Ort: 'Nuernberg',
-                Kunde: 'NuernbergMesse GmbH',
-                tage: {}
-            },
-            {
-                VA_ID: 1002,
-                Objekt: 'Konzerthalle',
-                Ort: 'Fuerth',
-                Kunde: 'Stadtwerke Fuerth',
-                tage: {}
-            }
-        ];
-    }
-
-    // ============================================
-    // EXPORT FUNCTION
-    // ============================================
-
-    function exportToCSV() {
-        if (state.auftraege.length === 0) {
-            showToast('Keine Daten zum Exportieren', 'warning');
-            return;
-        }
-
-        // CSV erstellen
-        const headers = ['VA-ID', 'Objekt', 'Ort', 'Kunde'];
-        const rows = state.auftraege.map(a => [
-            a.VA_ID,
-            a.Objekt,
-            a.Ort,
-            a.Kunde
-        ]);
-
-        const csv = [headers, ...rows]
-            .map(row => row.map(cell => '"' + (cell || '') + '"').join(';'))
-            .join('\n');
-
-        // Download
-        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Planungsübersicht_' + formatDateSQL(new Date()) + '.csv';
-        a.click();
-        URL.revokeObjectURL(url);
-
-        showToast('Export abgeschlossen', 'success');
-    }
-
-    // ============================================
-    // HELPER FUNCTIONS
-    // ============================================
-
-    function formatDateSQL(date) {
-        if (!date) return null;
-        return date.toISOString().split('T')[0];
-    }
-
-    function formatTime(dt) {
-        if (!dt) return '';
-        if (typeof dt === 'string' && dt.includes(':')) {
-            return dt.substring(0, 5);
-        }
-        const d = new Date(dt);
-        return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function getEnddatum() {
-        const end = new Date(state.dtStartdatum);
-        end.setDate(end.getDate() + 6);
-        return end;
-    }
-
-    function checkFeiertag(datum) {
-        const tag = datum.getDate();
-        const monat = datum.getMonth() + 1;
-
-        if (monat === 1 && tag === 1) return 'Neujahr';
-        if (monat === 5 && tag === 1) return 'Tag der Arbeit';
-        if (monat === 10 && tag === 3) return 'Tag der Deutschen Einheit';
-        if (monat === 12 && tag === 25) return '1. Weihnachtstag';
-        if (monat === 12 && tag === 26) return '2. Weihnachtstag';
-
-        return null;
-    }
-
-    function setStatus(text) {
-        document.getElementById('lblStatus').textContent = text;
-    }
-
-    function showLoading(show) {
-        const overlay = document.getElementById('loadingOverlay');
-        if (show) {
-            overlay.classList.add('active');
-        } else {
-            overlay.classList.remove('active');
-        }
-    }
-
-    function showToast(message, type) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = 'toast ' + (type || 'info');
-        toast.textContent = message;
-        container.appendChild(toast);
-
-        setTimeout(() => toast.remove(), 4000);
-    }
-
-    function navigateToForm(formName, id) {
-        // Verwende shell-detector.js Funktion wenn verfuegbar
-        if (typeof window._shellNavigateToForm === 'function') {
-            window._shellNavigateToForm(formName, id);
-        } else if (window.parent !== window) {
-            window.parent.postMessage({ type: 'NAVIGATE', formName: formName, id: id }, '*');
-        } else {
-            let url = formName + '.html';
-            if (id) url += '?id=' + id;
-            window.location.href = url;
-        }
-    }
-
-    // ============================================
-    // INITIALIZATION
-    // ============================================
-
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('[DOMContentLoaded] Initialisiere Planungsübersicht');
-        Form_Load();
-        Form_Open();
-    });
-    </script>
-
-    <!-- Shell Detector - muss vor </body> stehen -->
-    <script src="js/shell-detector.js"></script>
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="js/webview2-bridge.js"></script>
 </body>
 </html>
-
