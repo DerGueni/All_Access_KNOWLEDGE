@@ -1,432 +1,342 @@
 /**
  * frm_abwesenheitsuebersicht.logic.js
- * Logik für Abwesenheitsübersicht (Kalender-Ansicht)
- * Zeigt Abwesenheiten aller Mitarbeiter in einer Wochenansicht
- */
-
 import { Bridge } from '../api/bridgeClient.js';
 
-// State
-const state = {
-    currentDate: new Date(), // Aktuelles Datum für Wochenansicht
-    selectedMonth: new Date().getMonth() + 1,
-    selectedYear: new Date().getFullYear(),
-    filterType: '', // Urlaub, Krank, Privat
-    mitarbeiterList: [],
-    abwesenheiten: [],
-    weekStart: null,
-    weekEnd: null
+const ANSTELLUNGSART_FILTERS = {
+    '': 'Beide',
+    '3': 'Minijobber',
+    '5': 'Festangestellte'
 };
 
-// DOM-Elemente
+const state = {
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+    anstellungsart: '',
+    mitarbeiter: [],
+    rawRecords: [],
+    dayEntries: [],
+    filteredEntries: [],
+    selectedMaId: null,
+    selectedDayId: null
+};
+
 let elements = {};
 
-/**
- * Initialisierung
- */
+document.addEventListener('DOMContentLoaded', init);
+
 async function init() {
-    console.log('[Abwesenheitsübersicht] Initialisierung...');
-
-    // DOM-Referenzen sammeln
-    elements = {
-        // Header Navigation
-        btnVorwoche: document.getElementById('btnVorwoche'),
-        btnNachwoche: document.getElementById('btnNachwoche'),
-        btnHeute: document.getElementById('btnHeute'),
-        lblWoche: document.getElementById('lblWoche'),
-
-        // Toolbar Filter
-        cboMonat: document.getElementById('cboMonat'),
-        cboJahr: document.getElementById('cboJahr'),
-        cboFilter: document.getElementById('cboFilter'),
-        btnAktualisieren: document.getElementById('btnAktualisieren'),
-        btnExport: document.getElementById('btnExport'),
-        btnDrucken: document.getElementById('btnDrucken'),
-
-        // Kalender
-        calendarGrid: document.getElementById('calendarGrid'),
-
-        // Footer
-        lblStatus: document.getElementById('lblStatus'),
-        lblAnzahl: document.getElementById('lblAnzahl')
-    };
-
-    // Event Listener einrichten
+    cacheElements();
+    setupMonthSelect();
     setupEventListeners();
 
-    // Aktuelles Datum auf Monatsbeginn setzen
-    setCurrentMonth(state.selectedMonth, state.selectedYear);
-
-    // Mitarbeiter laden
     await loadMitarbeiter();
-
-    // Abwesenheiten laden
     await loadAbwesenheiten();
 
-    // Kalender rendern
-    renderCalendar();
-
+    renderMitarbeiterList();
+    applyFilters();
     setStatus('Bereit');
 }
 
-/**
- * Event Listener einrichten
- */
+function cacheElements() {
+    elements = {
+        cboMonat: document.getElementById('cboMonat'),
+        txtJahr: document.getElementById('txtJahr'),
+        cboAnstellungsart: document.getElementById('cboAnstellungsart'),
+        btnAktualisieren: document.getElementById('btnAktualisieren'),
+        maList: document.getElementById('maList'),
+        tbodyTage: document.getElementById('tbodyTage'),
+        detailDatum: document.getElementById('detailDatum'),
+        detailMitarbeiter: document.getElementById('detailMitarbeiter'),
+        detailArt: document.getElementById('detailArt'),
+        detailZeitraum: document.getElementById('detailZeitraum'),
+        detailBemerkung: document.getElementById('detailBemerkung'),
+        lblStatus: document.getElementById('lblStatus'),
+        lblRecordInfo: document.getElementById('lblRecordInfo')
+    };
+}
+
+function setupMonthSelect() {
+    const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    elements.cboMonat.innerHTML = months.map((m, idx) => `<option value="${idx + 1}">${m}</option>`).join('');
+    elements.cboMonat.value = state.month;
+    elements.txtJahr.value = state.year;
+}
+
 function setupEventListeners() {
-    // Wochen-Navigation
-    elements.btnVorwoche.addEventListener('click', () => {
-        state.currentDate.setDate(state.currentDate.getDate() - 7);
-        loadAbwesenheiten();
-        renderCalendar();
-    });
-
-    elements.btnNachwoche.addEventListener('click', () => {
-        state.currentDate.setDate(state.currentDate.getDate() + 7);
-        loadAbwesenheiten();
-        renderCalendar();
-    });
-
-    elements.btnHeute.addEventListener('click', () => {
-        state.currentDate = new Date();
-        const month = state.currentDate.getMonth() + 1;
-        const year = state.currentDate.getFullYear();
-        elements.cboMonat.value = month;
-        elements.cboJahr.value = year;
-        setCurrentMonth(month, year);
-        loadAbwesenheiten();
-        renderCalendar();
-    });
-
-    // Monats/Jahres-Wechsel
     elements.cboMonat.addEventListener('change', () => {
-        const month = parseInt(elements.cboMonat.value);
-        const year = parseInt(elements.cboJahr.value);
-        setCurrentMonth(month, year);
+        state.month = parseInt(elements.cboMonat.value, 10);
         loadAbwesenheiten();
-        renderCalendar();
     });
 
-    elements.cboJahr.addEventListener('change', () => {
-        const month = parseInt(elements.cboMonat.value);
-        const year = parseInt(elements.cboJahr.value);
-        setCurrentMonth(month, year);
+    elements.txtJahr.addEventListener('change', () => {
+        state.year = parseInt(elements.txtJahr.value, 10) || state.year;
         loadAbwesenheiten();
-        renderCalendar();
     });
 
-    // Filter
-    elements.cboFilter.addEventListener('change', () => {
-        state.filterType = elements.cboFilter.value;
-        renderCalendar();
+    elements.cboAnstellungsart.addEventListener('change', () => {
+        state.anstellungsart = elements.cboAnstellungsart.value;
+        applyFilters();
     });
 
-    // Aktionen
     elements.btnAktualisieren.addEventListener('click', () => {
         loadAbwesenheiten();
-        renderCalendar();
     });
 
-    elements.btnExport.addEventListener('click', exportToCSV);
-    elements.btnDrucken.addEventListener('click', printCalendar);
+    elements.maList.addEventListener('click', event => {
+        const item = event.target.closest('.ma-item');
+        if (!item) return;
+        const maId = parseInt(item.dataset.id, 10);
+        state.selectedMaId = state.selectedMaId === maId ? null : maId;
+        renderMitarbeiterList();
+        applyFilters();
+    });
+
+    elements.tbodyTage.addEventListener('click', event => {
+        const row = event.target.closest('tr[data-day-id]');
+        if (!row) return;
+        selectDay(row.dataset.dayId);
+    });
 }
 
-/**
- * Aktuellen Monat setzen
- */
-function setCurrentMonth(month, year) {
-    state.selectedMonth = month;
-    state.selectedYear = year;
-    state.currentDate = new Date(year, month - 1, 1);
-}
-
-/**
- * Mitarbeiter laden
- */
 async function loadMitarbeiter() {
     try {
         setStatus('Lade Mitarbeiter...');
+        const result = await Bridge.query(`
+            SELECT ID, Nachname, Vorname, Anstellungsart_ID
+            FROM tbl_MA_Mitarbeiterstamm
+            WHERE IstAktiv = -1
+            ORDER BY Nachname, Vorname
+        `);
 
-        const result = await Bridge.mitarbeiter.list({ aktiv: true });
-
-        state.mitarbeiterList = (result.data || []).map(ma => ({
-            ID: ma.MA_ID || ma.ID,
-            Nachname: ma.MA_Nachname || ma.Nachname || '',
-            Vorname: ma.MA_Vorname || ma.Vorname || '',
-            Name: `${ma.MA_Nachname || ma.Nachname || ''}, ${ma.MA_Vorname || ma.Vorname || ''}`
-        })).sort((a, b) => a.Nachname.localeCompare(b.Nachname));
-
-        elements.lblAnzahl.textContent = `${state.mitarbeiterList.length} Mitarbeiter`;
-
+        state.mitarbeiter = (result.data || []).map(rec => ({
+            ID: rec.ID,
+            Nachname: rec.Nachname || '',
+            Vorname: rec.Vorname || '',
+            Name: `${rec.Nachname || ''}, ${rec.Vorname || ''}`,
+            Anstellungsart_ID: rec.Anstellungsart_ID
+        }));
     } catch (error) {
         console.error('[Abwesenheitsübersicht] Fehler beim Laden der Mitarbeiter:', error);
         setStatus('Fehler beim Laden der Mitarbeiter');
     }
 }
 
-/**
- * Abwesenheiten für den aktuellen Monat laden
- */
 async function loadAbwesenheiten() {
     try {
-        setStatus('Lade Abwesenheiten...');
+        setStatus('Lade Tagesdaten...');
 
-        // Monatsbereich berechnen
-        const monthStart = new Date(state.selectedYear, state.selectedMonth - 1, 1);
-        const monthEnd = new Date(state.selectedYear, state.selectedMonth, 0);
+        const monthStart = new Date(state.year, state.month - 1, 1);
+        const monthEnd = new Date(state.year, state.month, 0);
+        const von = formatForAccess(monthStart);
+        const bis = formatForAccess(monthEnd);
 
-        const vonDatum = formatDateForAPI(monthStart);
-        const bisDatum = formatDateForAPI(monthEnd);
-
-        // Abwesenheiten laden via Bridge
         const result = await Bridge.query(`
-            SELECT nv.*, ma.Nachname, ma.Vorname
-            FROM tbl_MA_NVerfuegZeiten nv
-            LEFT JOIN tbl_MA_Mitarbeiterstamm ma ON nv.MA_ID = ma.ID
+            SELECT nv.ID,
+                   nv.MA_ID,
+                   nv.vonDat,
+                   nv.bisDat,
+                   nv.Grund,
+                   nv.Bemerkung,
+                   ma.Nachname,
+                   ma.Vorname,
+                   ma.Anstellungsart_ID
+            FROM tbl_MA_NVerfuegZeiten AS nv
+            INNER JOIN tbl_MA_Mitarbeiterstamm AS ma ON ma.ID = nv.MA_ID
             WHERE ma.IstAktiv = -1
-              AND (
-                (nv.vonDat <= #${bisDatum}# AND nv.bisDat >= #${vonDatum}#)
-              )
+              AND nv.vonDat <= #${bis}#
+              AND nv.bisDat >= #${von}#
             ORDER BY ma.Nachname, ma.Vorname, nv.vonDat
         `);
 
-        state.abwesenheiten = (result.data || []).map(rec => ({
-            ID: rec.ID,
-            MA_ID: rec.MA_ID,
-            VonDat: parseDate(rec.vonDat),
-            BisDat: parseDate(rec.bisDat),
-            Grund: rec.Grund || 'Sonstiges',
-            Ganztaegig: rec.Ganztaegig !== false,
-            VonZeit: rec.vonZeit,
-            BisZeit: rec.bisZeit,
-            Bemerkung: rec.Bemerkung || ''
-        }));
+        state.rawRecords = result.data || [];
+        buildDayEntries();
+        applyFilters();
 
-        setStatus(`${state.abwesenheiten.length} Abwesenheiten geladen`);
-
+        setStatus(`${state.dayEntries.length} Tage generiert`);
     } catch (error) {
         console.error('[Abwesenheitsübersicht] Fehler beim Laden der Abwesenheiten:', error);
         setStatus('Fehler beim Laden der Abwesenheiten');
     }
 }
 
-/**
- * Kalender rendern
- */
-function renderCalendar() {
-    // Wochenbeginn berechnen (Montag)
-    const week = getWeekDays(state.currentDate);
-    state.weekStart = week[0];
-    state.weekEnd = week[6];
+function buildDayEntries() {
+    const entries = [];
 
-    // Wochenlabel aktualisieren
-    const weekNum = getWeekNumber(state.currentDate);
-    elements.lblWoche.textContent = `KW ${weekNum} (${formatDisplayDate(week[0])} - ${formatDisplayDate(week[6])})`;
+    state.rawRecords.forEach(rec => {
+        const start = parseDate(rec.vonDat);
+        const end = parseDate(rec.bisDat);
+        if (!start || !end) return;
 
-    // Kalender-Grid leeren (Header behalten)
-    const headerRows = 8; // 1 Header-Zeile mit Mitarbeiter + 7 Tage
-    const gridItems = Array.from(elements.calendarGrid.children);
+        const category = normalizeGrund(rec.Grund);
+        const maName = `${rec.Nachname || ''}, ${rec.Vorname || ''}`.trim().replace(/^,\s*/, '');
 
-    // Alle Zeilen außer Header entfernen
-    while (elements.calendarGrid.children.length > headerRows) {
-        elements.calendarGrid.removeChild(elements.calendarGrid.lastChild);
-    }
+        for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
+            if (day.getMonth() + 1 !== state.month || day.getFullYear() !== state.year) continue;
 
-    // Datum-Header aktualisieren
-    const dateHeaders = elements.calendarGrid.querySelectorAll('.calendar-header');
-    week.forEach((date, idx) => {
-        if (idx < 7 && dateHeaders[idx + 1]) { // +1 weil erste Header-Spalte "Mitarbeiter" ist
-            const day = date.getDate();
-            const weekday = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'][idx];
-            dateHeaders[idx + 1].innerHTML = `${weekday}<br>${day}.${state.selectedMonth}.`;
+            const datum = new Date(day);
+            const iso = toISODate(datum);
+            entries.push({
+                id: `${rec.ID}-${iso}`,
+                datum,
+                datumDisplay: formatDisplayDate(datum),
+                datumISO: iso,
+                maId: rec.MA_ID,
+                maName,
+                anstellungsartId: rec.Anstellungsart_ID,
+                grundKey: category.key,
+                grundLabel: category.label,
+                bemerkung: rec.Bemerkung || '',
+                vonDat: start,
+                bisDat: end,
+                rawGrund: rec.Grund || '',
+                nvId: rec.ID
+            });
         }
     });
 
-    // Mitarbeiter-Zeilen rendern
-    let visibleCount = 0;
-    state.mitarbeiterList.forEach(ma => {
-        // Filter anwenden
-        const maAbwesenheiten = state.abwesenheiten.filter(a => a.MA_ID === ma.ID);
-
-        if (state.filterType) {
-            const hasFilteredAbsence = maAbwesenheiten.some(a => a.Grund === state.filterType);
-            if (!hasFilteredAbsence) return;
+    entries.sort((a, b) => {
+        if (a.datum.getTime() !== b.datum.getTime()) {
+            return a.datum - b.datum;
         }
-
-        visibleCount++;
-
-        // Mitarbeiter-Zelle
-        const maCell = document.createElement('div');
-        maCell.className = 'calendar-ma';
-        maCell.textContent = ma.Name;
-        elements.calendarGrid.appendChild(maCell);
-
-        // Tag-Zellen für diese Woche
-        week.forEach(date => {
-            const cell = document.createElement('div');
-            cell.className = 'calendar-cell';
-
-            // Wochenende markieren
-            const dayOfWeek = date.getDay();
-            if (dayOfWeek === 0 || dayOfWeek === 6) {
-                cell.classList.add('weekend');
-            }
-
-            // Abwesenheiten für diesen Tag prüfen
-            const absence = getAbsenceForDate(ma.ID, date);
-            if (absence) {
-                cell.classList.add('absent');
-
-                const grundClass = absence.Grund ? absence.Grund.toLowerCase() : 'sonstiges';
-                cell.classList.add(grundClass);
-
-                // Tooltip
-                const tooltip = `${absence.Grund}${!absence.Ganztaegig ? ` (${absence.VonZeit || ''}-${absence.BisZeit || ''})` : ''}${absence.Bemerkung ? '\n' + absence.Bemerkung : ''}`;
-                cell.title = tooltip;
-
-                // Kurz-Anzeige
-                if (!absence.Ganztaegig) {
-                    const span = document.createElement('span');
-                    span.style.fontSize = '9px';
-                    span.textContent = `${absence.VonZeit || ''}-${absence.BisZeit || ''}`;
-                    cell.appendChild(span);
-                }
-            }
-
-            elements.calendarGrid.appendChild(cell);
-        });
+        return a.maName.localeCompare(b.maName);
     });
 
-    elements.lblAnzahl.textContent = `${visibleCount} Mitarbeiter (${state.abwesenheiten.length} Abwesenheiten)`;
+    state.dayEntries = entries;
 }
 
-/**
- * Abwesenheit für bestimmten MA und Datum finden
- */
-function getAbsenceForDate(maId, date) {
-    const dateOnly = new Date(date);
-    dateOnly.setHours(0, 0, 0, 0);
+function applyFilters() {
+    let list = [...state.dayEntries];
 
-    return state.abwesenheiten.find(a => {
-        if (a.MA_ID !== maId) return false;
-
-        const von = new Date(a.VonDat);
-        von.setHours(0, 0, 0, 0);
-        const bis = new Date(a.BisDat);
-        bis.setHours(0, 0, 0, 0);
-
-        return dateOnly >= von && dateOnly <= bis;
-    });
-}
-
-/**
- * Wochentage für ein Datum ermitteln (Mo-So)
- */
-function getWeekDays(date) {
-    const current = new Date(date);
-    const day = current.getDay();
-    const diff = day === 0 ? -6 : 1 - day; // Montag als Wochenstart
-
-    const monday = new Date(current);
-    monday.setDate(current.getDate() + diff);
-    monday.setHours(0, 0, 0, 0);
-
-    const days = [];
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        days.push(d);
+    if (state.anstellungsart) {
+        list = list.filter(entry => String(entry.anstellungsartId) === state.anstellungsart);
     }
 
-    return days;
+    if (state.selectedMaId) {
+        list = list.filter(entry => entry.maId === state.selectedMaId);
+    }
+
+    state.filteredEntries = list;
+    renderDaysTable();
+    updateRecordInfo();
 }
 
-/**
- * Kalenderwoche berechnen
- */
-function getWeekNumber(date) {
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+function renderMitarbeiterList() {
+    if (!state.mitarbeiter.length) {
+        elements.maList.innerHTML = '<div class="ma-item">Keine Mitarbeiter gefunden</div>';
+        return;
+    }
+
+    elements.maList.innerHTML = state.mitarbeiter.map(ma => {
+        const selected = ma.ID === state.selectedMaId ? 'selected' : '';
+        return `<div class="ma-item ${selected}" data-id="${ma.ID}">${ma.Name}</div>`;
+    }).join('');
 }
 
-/**
- * Datum formatieren für Anzeige (DD.MM.YYYY)
- */
+function renderDaysTable() {
+    if (!state.filteredEntries.length) {
+        elements.tbodyTage.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;">Keine Tage im gewählten Zeitraum</td></tr>';
+        clearDetails();
+        return;
+    }
+
+    const rows = state.filteredEntries.map(entry => {
+        const selectedClass = entry.id === state.selectedDayId ? 'selected' : '';
+        return `
+            <tr class="day-row ${selectedClass}" data-day-id="${entry.id}">
+                <td>${entry.datumDisplay}</td>
+                <td>${entry.maName}</td>
+                <td><span class="category-pill category-${entry.grundKey}">${entry.grundLabel}</span></td>
+                <td>${entry.bemerkung || ''}</td>
+            </tr>
+        `;
+    }).join('');
+
+    elements.tbodyTage.innerHTML = rows;
+
+    if (state.filteredEntries.length && !state.selectedDayId) {
+        selectDay(state.filteredEntries[0].id);
+    } else if (state.selectedDayId) {
+        const stillExists = state.filteredEntries.some(entry => entry.id === state.selectedDayId);
+        if (!stillExists && state.filteredEntries.length) {
+            selectDay(state.filteredEntries[0].id);
+        } else if (!stillExists) {
+            clearDetails();
+        }
+    }
+}
+
+function selectDay(dayId) {
+    state.selectedDayId = dayId;
+    const entry = state.filteredEntries.find(item => item.id === dayId);
+    updateDetails(entry || null);
+    renderDaysTable();
+}
+
+function updateDetails(entry) {
+    if (!entry) {
+        clearDetails();
+        return;
+    }
+
+    elements.detailDatum.value = entry.datumDisplay;
+    elements.detailMitarbeiter.value = entry.maName;
+    elements.detailArt.value = entry.grundLabel;
+    elements.detailZeitraum.value = `${formatDisplayDate(entry.vonDat)} - ${formatDisplayDate(entry.bisDat)}`;
+    elements.detailBemerkung.value = entry.bemerkung;
+}
+
+function clearDetails() {
+    state.selectedDayId = null;
+    elements.detailDatum.value = '';
+    elements.detailMitarbeiter.value = '';
+    elements.detailArt.value = '';
+    elements.detailZeitraum.value = '';
+    elements.detailBemerkung.value = '';
+}
+
+function updateRecordInfo() {
+    if (!elements.lblRecordInfo) return;
+    const filterText = ANSTELLUNGSART_FILTERS[state.anstellungsart] || 'Beide';
+    elements.lblRecordInfo.textContent = `${state.filteredEntries.length} Tage (${filterText})`;
+}
+
+function normalizeGrund(grund) {
+    const value = (grund || '').toLowerCase();
+    if (value.includes('krank')) return { label: 'Krank', key: 'krank' };
+    if (value.includes('urlaub')) return { label: 'Urlaub', key: 'urlaub' };
+    return { label: 'Privat Verplant', key: 'privat' };
+}
+
+function parseDate(value) {
+    if (!value) return null;
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? null : date;
+}
+
 function formatDisplayDate(date) {
-    const d = date.getDate().toString().padStart(2, '0');
-    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    if (!date) return '';
+    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, '0');
     const y = date.getFullYear();
     return `${d}.${m}.${y}`;
 }
 
-/**
- * Datum formatieren für Access-API (#MM/DD/YYYY#)
- */
-function formatDateForAPI(date) {
-    const m = (date.getMonth() + 1).toString().padStart(2, '0');
-    const d = date.getDate().toString().padStart(2, '0');
+function formatForAccess(date) {
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
     const y = date.getFullYear();
     return `${m}/${d}/${y}`;
 }
 
-/**
- * Datum-String parsen
- */
-function parseDate(dateStr) {
-    if (!dateStr) return null;
-
-    // ISO-Format oder deutsches Format
-    const date = new Date(dateStr);
-    return isNaN(date.getTime()) ? null : date;
+function toISODate(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
-/**
- * Export zu CSV
- */
-function exportToCSV() {
-    try {
-        let csv = 'Mitarbeiter;Von;Bis;Grund;Ganztägig;Bemerkung\n';
-
-        state.abwesenheiten.forEach(a => {
-            const ma = state.mitarbeiterList.find(m => m.ID === a.MA_ID);
-            const maName = ma ? ma.Name : 'Unbekannt';
-            const von = formatDisplayDate(a.VonDat);
-            const bis = formatDisplayDate(a.BisDat);
-            const ganztag = a.Ganztaegig ? 'Ja' : 'Nein';
-
-            csv += `"${maName}";"${von}";"${bis}";"${a.Grund}";"${ganztag}";"${a.Bemerkung}"\n`;
-        });
-
-        // Download auslösen
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `Abwesenheiten_${state.selectedMonth}_${state.selectedYear}.csv`;
-        link.click();
-
-        setStatus('Export erfolgreich');
-
-    } catch (error) {
-        console.error('[Abwesenheitsübersicht] Fehler beim Export:', error);
-        if (typeof Toast !== 'undefined') Toast.error('Fehler beim Export: ' + error.message);
-        else alert('Fehler beim Export: ' + error.message);
+function setStatus(text) {
+    if (elements.lblStatus) {
+        elements.lblStatus.textContent = text;
     }
 }
-
-/**
- * Drucken
- */
-function printCalendar() {
-    window.print();
-}
-
-/**
- * Status setzen
- */
-function setStatus(text) {
-    elements.lblStatus.textContent = text;
 }
 
 // Init bei DOM ready

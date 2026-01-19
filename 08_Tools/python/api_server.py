@@ -172,6 +172,78 @@ def health_check():
         }), 500
 
 
+@app.route('/api/start-vba-bridge', methods=['POST'])
+def start_vba_bridge():
+    """Startet die VBA Bridge falls sie nicht läuft"""
+    import socket
+    import subprocess
+
+    # Prüfe ob VBA Bridge bereits läuft (Port 5002)
+    def is_port_in_use(port):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex(('localhost', port)) == 0
+
+    if is_port_in_use(5002):
+        return jsonify({
+            'success': True,
+            'status': 'already_running',
+            'message': 'VBA Bridge läuft bereits auf Port 5002'
+        })
+
+    # VBA Bridge starten
+    try:
+        vba_bridge_script = Path(__file__).parent.parent.parent / '04_HTML_Forms' / 'forms3' / '_scripts' / 'vba_bridge_server.py'
+        vba_bridge_bat = Path(__file__).parent.parent.parent / '04_HTML_Forms' / 'forms3' / '_scripts' / 'START_VBA_BRIDGE.bat'
+
+        if vba_bridge_bat.exists():
+            # Batch-Datei starten (unsichtbar)
+            subprocess.Popen(
+                ['cmd', '/c', 'start', '/min', '', str(vba_bridge_bat)],
+                shell=False,
+                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0
+            )
+            logger.info(f"VBA Bridge gestartet via Batch: {vba_bridge_bat}")
+        elif vba_bridge_script.exists():
+            # Python-Script direkt starten
+            subprocess.Popen(
+                ['python', str(vba_bridge_script)],
+                shell=False,
+                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0
+            )
+            logger.info(f"VBA Bridge gestartet via Python: {vba_bridge_script}")
+        else:
+            return jsonify({
+                'success': False,
+                'status': 'not_found',
+                'message': 'VBA Bridge Script nicht gefunden'
+            }), 404
+
+        # Kurz warten und prüfen
+        import time
+        time.sleep(2)
+
+        if is_port_in_use(5002):
+            return jsonify({
+                'success': True,
+                'status': 'started',
+                'message': 'VBA Bridge erfolgreich gestartet'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'status': 'start_failed',
+                'message': 'VBA Bridge konnte nicht gestartet werden (Port 5002 nicht erreichbar)'
+            }), 500
+
+    except Exception as e:
+        logger.error(f"Fehler beim Starten der VBA Bridge: {e}")
+        return jsonify({
+            'success': False,
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+
 # PID-File Management
 PID_FILE = Path(__file__).parent / 'api_server.pid'
 
@@ -527,6 +599,17 @@ def serve_forms(filename):
     """Liefert HTML-Formulare aus dem Forms3-Ordner (Formulare liegen direkt darin)"""
     return send_from_directory(str(FORMS_PATH), filename)
 
+# Redirect für alte URLs (Kompatibilität mit VBA-Modulen)
+@app.route('/shell.html')
+def redirect_shell():
+    """Redirect /shell.html -> /forms/shell.html für VBA-Kompatibilität"""
+    from flask import redirect, request
+    query = request.query_string.decode('utf-8')
+    target = '/forms/shell.html'
+    if query:
+        target += '?' + query
+    return redirect(target, code=302)
+
 # Route für CSS/JS Assets (aus forms3/css und forms3/js)
 @app.route('/css/<path:filename>')
 def serve_css(filename):
@@ -642,8 +725,8 @@ def get_auftraege():
         # Parameter für Filterung
         kunde_id = request.args.get('kunde_id')
         datum_ab = request.args.get('ab')  # Datum ab Filter (alt)
-        datum_von = request.args.get('von')  # Startdatum Filter
-        datum_bis = request.args.get('bis')  # Enddatum Filter
+        datum_von = request.args.get('von') or request.args.get('datum_von')  # Startdatum Filter (beide Varianten)
+        datum_bis = request.args.get('bis') or request.args.get('datum_bis')  # Enddatum Filter (beide Varianten)
         limit = request.args.get('limit', 100, type=int)
         offset = request.args.get('offset', 0, type=int)
 
@@ -994,6 +1077,32 @@ def get_sync_errors():
         })
 
 # ============================================
+# API: Anstellungsarten (tbl_hlp_MA_Anstellungsart)
+# ============================================
+
+@app.route('/api/anstellungsarten')
+def get_anstellungsarten():
+    """Alle Anstellungsarten aus Hilfstabelle"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT ID, Anstellungsart, Sortierung
+            FROM tbl_hlp_MA_Anstellungsart
+            ORDER BY Sortierung, Anstellungsart
+        """)
+
+        rows = cursor.fetchall()
+        data = [{'ID': r[0], 'Anstellungsart': r[1], 'Sortierung': r[2]} for r in rows]
+
+        conn.close()
+        return jsonify({'success': True, 'data': data, 'count': len(data)})
+    except Exception as e:
+        logger.error(f"[GET /api/anstellungsarten] Fehler: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # API: Mitarbeiter (tbl_MA_Mitarbeiterstamm)
 # ============================================
 
@@ -1219,6 +1328,215 @@ def get_mitarbeiter_einsaetze(id):
         })
     except Exception as e:
         logger.error(f"Fehler bei Mitarbeiter-Einsätze: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============================================================================
+# MITARBEITER SUB-ENDPOINTS (#11, #12, #13)
+# ============================================================================
+
+@app.route('/api/mitarbeiter/<int:ma_id>/zuordnungen')
+def get_mitarbeiter_zuordnungen(ma_id):
+    """Alle VA-Zuordnungen eines Mitarbeiters aus tbl_MA_VA_Planung"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Optionale Filter
+        von = request.args.get('von', '')
+        bis = request.args.get('bis', '')
+        va_id = request.args.get('va_id', '')
+
+        query = """
+            SELECT p.ID, p.VA_ID, p.VADatum, p.VAStart_ID, p.MA_ID,
+                   p.MVA_Start, p.MVA_Ende, p.Status_ID, p.Bemerkungen
+            FROM tbl_MA_VA_Planung p
+            WHERE p.MA_ID = ?
+        """
+        params = [ma_id]
+
+        if von:
+            query += " AND p.VADatum >= ?"
+            params.append(von)
+        if bis:
+            query += " AND p.VADatum <= ?"
+            params.append(bis)
+        if va_id:
+            query += " AND p.VA_ID = ?"
+            params.append(int(va_id))
+
+        query += " ORDER BY p.VADatum DESC, p.MVA_Start"
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        zuordnungen = [dict(zip(columns, row)) for row in rows]
+
+        # Datum/Zeit formatieren
+        for z in zuordnungen:
+            if z.get('VADatum'):
+                z['VADatum'] = str(z['VADatum'])[:10]
+            if z.get('MVA_Start'):
+                z['MVA_Start'] = str(z['MVA_Start'])[11:16] if len(str(z['MVA_Start'])) > 11 else str(z['MVA_Start'])[:5]
+            if z.get('MVA_Ende'):
+                z['MVA_Ende'] = str(z['MVA_Ende'])[11:16] if len(str(z['MVA_Ende'])) > 11 else str(z['MVA_Ende'])[:5]
+            if z.get('Erst_am'):
+                z['Erst_am'] = str(z['Erst_am'])[:10]
+            if z.get('Aend_am'):
+                z['Aend_am'] = str(z['Aend_am'])[:10]
+
+        release_connection(conn)
+
+        return jsonify({
+            'success': True,
+            'data': zuordnungen,
+            'count': len(zuordnungen),
+            'ma_id': ma_id
+        })
+    except Exception as e:
+        logger.error(f"Fehler bei Mitarbeiter-Zuordnungen: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/mitarbeiter/<int:ma_id>/nverfueg')
+def get_mitarbeiter_nverfueg(ma_id):
+    """Nichtverfuegbarkeiten eines Mitarbeiters aus tbl_MA_NVerfuegZeiten"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Optionale Filter
+        von = request.args.get('von', '')
+        bis = request.args.get('bis', '')
+        zeittyp = request.args.get('zeittyp', '')
+
+        query = """
+            SELECT ID, MA_ID, Zeittyp_ID, vonDat, bisDat,
+                   vonTag, bisTag, vonZeit, bisZeit,
+                   Bemerkung, KopfID,
+                   Erst_von, Erst_am, Aend_von, Aend_am
+            FROM tbl_MA_NVerfuegZeiten
+            WHERE MA_ID = ?
+        """
+        params = [ma_id]
+
+        if von:
+            query += " AND bisDat >= ?"
+            params.append(von)
+        if bis:
+            query += " AND vonDat <= ?"
+            params.append(bis)
+        if zeittyp:
+            query += " AND Zeittyp_ID = ?"
+            params.append(zeittyp)
+
+        query += " ORDER BY vonDat DESC"
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        nverfueg = [dict(zip(columns, row)) for row in rows]
+
+        # Datum/Zeit formatieren
+        for n in nverfueg:
+            for field in ['vonDat', 'bisDat', 'vonTag', 'bisTag', 'Erst_am', 'Aend_am']:
+                if n.get(field):
+                    n[field] = str(n[field])[:10]
+            for field in ['vonZeit', 'bisZeit']:
+                if n.get(field):
+                    zeit_str = str(n[field])
+                    n[field] = zeit_str[11:16] if len(zeit_str) > 11 else zeit_str[:5]
+
+        release_connection(conn)
+
+        return jsonify({
+            'success': True,
+            'data': nverfueg,
+            'count': len(nverfueg),
+            'ma_id': ma_id
+        })
+    except Exception as e:
+        logger.error(f"Fehler bei Mitarbeiter-NVerfueg: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/mitarbeiter/<int:ma_id>/zeitkonto')
+def get_mitarbeiter_zeitkonto(ma_id):
+    """Zeitkonto-Daten eines Mitarbeiters (Wrapper fuer /api/zeitkonten/ma/)"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        jahr = request.args.get('jahr', datetime.now().year)
+
+        # Ist-Stunden aus Planungen
+        query_ist = """
+            SELECT SUM(DATEDIFF('n', MVA_Start, MVA_Ende) / 60.0) as Ist_Stunden
+            FROM tbl_MA_VA_Planung
+            WHERE MA_ID = ? AND YEAR(VADatum) = ?
+        """
+        cursor.execute(query_ist, [ma_id, jahr])
+        row = cursor.fetchone()
+        ist_stunden = row[0] if row and row[0] else 0
+
+        # Soll-Stunden aus Mitarbeiter-Stamm (berechnet aus Arbst_pro_Arbeitstag * Arbeitstage_pro_Woche)
+        soll_stunden = 0
+        try:
+            cursor.execute("SELECT Arbst_pro_Arbeitstag, Arbeitstage_pro_Woche FROM tbl_MA_Mitarbeiterstamm WHERE ID = ?", [ma_id])
+            row = cursor.fetchone()
+            if row and row[0] and row[1]:
+                wochenstunden = float(row[0]) * float(row[1])
+                soll_stunden = wochenstunden * 52  # Wochenstunden * 52 Wochen
+        except:
+            pass
+
+        # Ueberlaufstunden aus tbl_MA_UeberlaufStunden
+        ueberlauf = {}
+        try:
+            cursor.execute("""
+                SELECT AktJahr, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12
+                FROM tbl_MA_UeberlaufStunden
+                WHERE MA_ID = ? AND AktJahr = ?
+            """, [ma_id, jahr])
+            row = cursor.fetchone()
+            if row:
+                ueberlauf = {
+                    'jahr': row[0],
+                    'monate': [row[i] if row[i] else 0 for i in range(1, 13)]
+                }
+        except:
+            pass
+
+        # Monatliche Uebersicht (Access-kompatibel ohne COUNT DISTINCT)
+        query_monate = """
+            SELECT MONTH(VADatum) as Monat,
+                   COUNT(VADatum) as Eintraege,
+                   SUM(DATEDIFF('n', MVA_Start, MVA_Ende) / 60.0) as Stunden
+            FROM tbl_MA_VA_Planung
+            WHERE MA_ID = ? AND YEAR(VADatum) = ?
+            GROUP BY MONTH(VADatum)
+            ORDER BY MONTH(VADatum)
+        """
+        cursor.execute(query_monate, [ma_id, jahr])
+        rows = cursor.fetchall()
+        monate = [{'monat': r[0], 'eintraege': r[1], 'stunden': round(r[2], 2) if r[2] else 0} for r in rows]
+
+        release_connection(conn)
+
+        return jsonify({
+            'success': True,
+            'data': {
+                'ma_id': ma_id,
+                'jahr': int(jahr),
+                'soll_stunden': round(soll_stunden, 2),
+                'ist_stunden': round(ist_stunden, 2),
+                'differenz': round(ist_stunden - soll_stunden, 2),
+                'ueberlauf': ueberlauf,
+                'monate': monate
+            }
+        })
+    except Exception as e:
+        logger.error(f"Fehler bei Mitarbeiter-Zeitkonto: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -2270,7 +2588,18 @@ def get_kunde(id):
         conn = get_connection()
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM tbl_KD_Kundenstamm WHERE kun_Id = ?", (id,))
+        # Explizite Feldliste statt SELECT * um Parameter-Fehler zu vermeiden
+        cursor.execute("""
+            SELECT kun_Id, kunnr_lex, kun_AdressArt, kun_Firma, kun_Bezeichnung, kun_Matchcode,
+                   kun_Strasse, kun_PLZ, kun_Ort, kun_LKZ, kun_BriefKopf, kun_ans_manuell,
+                   kun_Anschreiben, kun_land_vorwahl, kun_telefon, kun_telefax, kun_mobil,
+                   kun_email, kun_URL, kun_kreditinstitut, kun_blz, kun_kontonummer, kun_iban,
+                   kun_bic, kun_ustidnr, kun_memo, kun_geloescht, kun_Probleme, Erst_von,
+                   Erst_am, Aend_von, Aend_am, kun_IDF_PersonID, kun_Zahlbed,
+                   kun_IstSammelRechnung, kun_IstAktiv
+            FROM tbl_KD_Kundenstamm
+            WHERE kun_Id = ?
+        """, (id,))
         row = cursor.fetchone()
 
         if not row:
@@ -2444,7 +2773,7 @@ def update_mitarbeiter(id):
             'Tel_Mobil', 'Tel_Festnetz', 'Email', 'Geschlecht', 'Staatsang',
             'Geb_Dat', 'Geb_Ort', 'Geb_Name', 'IstAktiv', 'IstSubunternehmer', 'Lex_Aktiv',
             'Eintrittsdatum', 'Austrittsdatum', 'Anstellungsart_ID', 'Kleidergroesse',
-            'Fahrerlaubnis', 'Eigener_PKW', 'DienstausweisNr', 'Ausweis_Endedatum',
+            'Fahrerlaubnis', 'Eigener_PKW', 'Hat_Fahrerausweis', 'DienstausweisNr', 'Ausweis_Endedatum',
             'AUsweis_Funktion', 'Datum_Pruefung', 'Bewacher_ID', 'Amt_Pruefung',
             'Epin_DFB', 'Modul1_DFB', 'Kontoinhaber', 'Bankname', 'IBAN', 'BIC',
             'SteuerNr', 'Steuerklasse', 'KV_Kasse', 'Sozialvers_Nr',
@@ -5207,103 +5536,240 @@ def get_rechnungen_ma(ma_id):
 
 @app.route('/api/kundenpreise')
 def get_kundenpreise():
-    """Liste aller Kundenpreise"""
+    """Liste aller Kundenpreise - korrigiert fuer tbl_KD_Standardpreise (Key-Value Struktur)"""
     try:
         conn = get_connection()
         cursor = conn.cursor()
 
+        # Hole zuerst alle Preisarten aus tbl_KD_Artikelbeschreibung
+        cursor.execute("SELECT ID, Beschreibung FROM tbl_KD_Artikelbeschreibung ORDER BY ID")
+        preisarten_rows = cursor.fetchall()
+        preisarten = {row[0]: row[1] for row in preisarten_rows}
+
+        # Hole alle Kunden mit ihren Preisen aus tbl_KD_Standardpreise
         query = """
-            SELECT k.kun_Id as id, k.kun_Firma as firma, k.kun_IstAktiv as aktiv,
-                   COALESCE(p.KP_Sicherheit, 0) as sicherheit,
-                   COALESCE(p.KP_Leitung, 0) as leitung,
-                   COALESCE(p.KP_Nachtzuschlag, 25) as nacht,
-                   COALESCE(p.KP_Sonntagszuschlag, 50) as sonntag,
-                   COALESCE(p.KP_Feiertagszuschlag, 100) as feiertag,
-                   COALESCE(p.KP_Fahrtkosten, 0) as fahrt,
-                   COALESCE(p.KP_Sonstiges, 0) as sonstiges
+            SELECT k.kun_Id, k.kun_Firma, k.kun_IstAktiv,
+                   sp.Preisart_ID, sp.StdPreis, sp.ID as Preis_ID
             FROM tbl_KD_Kundenstamm k
-            LEFT JOIN tbl_KD_Kundenpreise p ON k.kun_Id = p.KD_ID
-            ORDER BY k.kun_Firma
+            LEFT JOIN tbl_KD_Standardpreise sp ON k.kun_Id = sp.kun_ID
+            ORDER BY k.kun_Firma, sp.Preisart_ID
         """
         cursor.execute(query)
         rows = cursor.fetchall()
 
-        kundenpreise = []
+        # Gruppiere nach Kunde
+        kunden_dict = {}
         for row in rows:
-            kundenpreise.append({
-                'id': row[0],
-                'firma': row[1],
-                'aktiv': bool(row[2]) if row[2] is not None else True,
-                'sicherheit': float(row[3]) if row[3] else 0,
-                'leitung': float(row[4]) if row[4] else 0,
-                'nacht': int(row[5]) if row[5] else 25,
-                'sonntag': int(row[6]) if row[6] else 50,
-                'feiertag': int(row[7]) if row[7] else 100,
-                'fahrt': float(row[8]) if row[8] else 0,
-                'sonstiges': float(row[9]) if row[9] else 0
-            })
+            kun_id = row[0]
+            if kun_id not in kunden_dict:
+                kunden_dict[kun_id] = {
+                    'kunId': kun_id,
+                    'firma': row[1],
+                    'aktiv': bool(row[2]) if row[2] is not None else True,
+                    'preise': {}
+                }
+            # Preis hinzufuegen wenn vorhanden
+            if row[3] is not None:  # Preisart_ID
+                preisart_name = preisarten.get(row[3], f'Preisart_{row[3]}')
+                kunden_dict[kun_id]['preise'][preisart_name] = {
+                    'preisId': row[5],
+                    'preisartId': row[3],
+                    'preis': float(row[4]) if row[4] else 0
+                }
+
+        # Fuer die Tabelle: Preise flach machen
+        kundenpreise = []
+        for kun_id, kunde in kunden_dict.items():
+            preis_flat = {
+                'kunId': kunde['kunId'],
+                'firma': kunde['firma'],
+                'aktiv': kunde['aktiv'],
+                # Standard-Preisarten (abhaengig von tbl_KD_Artikelbeschreibung)
+                'Sicherheitspersonal': kunde['preise'].get('Sicherheitspersonal', {}).get('preis', 0),
+                'Leitungspersonal': kunde['preise'].get('Leitungspersonal', {}).get('preis', 0),
+                'Nachtzuschlag': kunde['preise'].get('Nachtzuschlag', {}).get('preis', 0),
+                'Sonntagszuschlag': kunde['preise'].get('Sonntagszuschlag', {}).get('preis', 0),
+                'Feiertagszuschlag': kunde['preise'].get('Feiertagszuschlag', {}).get('preis', 0),
+                'Fahrtkosten': kunde['preise'].get('Fahrtkosten', {}).get('preis', 0),
+                'Sonstiges': kunde['preise'].get('Sonstiges', {}).get('preis', 0)
+            }
+            kundenpreise.append(preis_flat)
 
         release_connection(conn)
-        return jsonify(kundenpreise)
+        return jsonify({'success': True, 'data': kundenpreise})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/kundenpreise/<int:kd_id>')
+def get_kundenpreis_detail(kd_id):
+    """Detail-Preise fuer einen Kunden"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Kunde holen
+        cursor.execute("SELECT kun_Id, kun_Firma FROM tbl_KD_Kundenstamm WHERE kun_Id = ?", [kd_id])
+        kunde_row = cursor.fetchone()
+        if not kunde_row:
+            return jsonify({'success': False, 'error': 'Kunde nicht gefunden'}), 404
+
+        # Preisarten holen
+        cursor.execute("SELECT ID, Beschreibung FROM tbl_KD_Artikelbeschreibung ORDER BY ID")
+        preisarten = {row[0]: row[1] for row in cursor.fetchall()}
+
+        # Preise des Kunden holen
+        cursor.execute("""
+            SELECT ID, Preisart_ID, StdPreis, Bemerkung, GeaendertAm
+            FROM tbl_KD_Standardpreise
+            WHERE kun_ID = ?
+        """, [kd_id])
+        preis_rows = cursor.fetchall()
+
+        preise = {}
+        for row in preis_rows:
+            preisart_name = preisarten.get(row[1], f'Preisart_{row[1]}')
+            preise[preisart_name] = {
+                'preisId': row[0],
+                'preisartId': row[1],
+                'preis': float(row[2]) if row[2] else 0,
+                'bemerkung': row[3],
+                'geaendertAm': str(row[4]) if row[4] else None
+            }
+
+        release_connection(conn)
+        return jsonify({
+            'success': True,
+            'data': {
+                'kunId': kunde_row[0],
+                'firma': kunde_row[1],
+                'preise': preise,
+                'preisarten': preisarten
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/api/kundenpreise/<int:kd_id>', methods=['PUT'])
 def update_kundenpreis(kd_id):
-    """Kundenpreis aktualisieren"""
+    """Kundenpreise aktualisieren - korrigiert fuer tbl_KD_Standardpreise"""
     try:
         data = request.get_json()
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Pruefen ob bereits existiert
-        cursor.execute("SELECT COUNT(*) FROM tbl_KD_Kundenpreise WHERE KD_ID = ?", [kd_id])
-        exists = cursor.fetchone()[0] > 0
-
-        if exists:
-            query = """
-                UPDATE tbl_KD_Kundenpreise SET
-                    KP_Sicherheit = ?,
-                    KP_Leitung = ?,
-                    KP_Nachtzuschlag = ?,
-                    KP_Sonntagszuschlag = ?,
-                    KP_Feiertagszuschlag = ?,
-                    KP_Fahrtkosten = ?,
-                    KP_Sonstiges = ?
-                WHERE KD_ID = ?
-            """
-            cursor.execute(query, [
-                data.get('sicherheit', 0),
-                data.get('leitung', 0),
-                data.get('nacht', 25),
-                data.get('sonntag', 50),
-                data.get('feiertag', 100),
-                data.get('fahrt', 0),
-                data.get('sonstiges', 0),
-                kd_id
-            ])
+        # data erwartet: { preisartId: preis, ... } oder { preise: { preisartId: { preis: x }, ... } }
+        if 'preise' in data:
+            preise_dict = data['preise']
         else:
-            query = """
-                INSERT INTO tbl_KD_Kundenpreise (KD_ID, KP_Sicherheit, KP_Leitung,
-                    KP_Nachtzuschlag, KP_Sonntagszuschlag, KP_Feiertagszuschlag,
-                    KP_Fahrtkosten, KP_Sonstiges)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """
-            cursor.execute(query, [
-                kd_id,
-                data.get('sicherheit', 0),
-                data.get('leitung', 0),
-                data.get('nacht', 25),
-                data.get('sonntag', 50),
-                data.get('feiertag', 100),
-                data.get('fahrt', 0),
-                data.get('sonstiges', 0)
-            ])
+            preise_dict = data
+
+        updated = 0
+        inserted = 0
+
+        for preisart_id, preis_data in preise_dict.items():
+            if isinstance(preis_data, dict):
+                preis = preis_data.get('preis', 0)
+            else:
+                preis = preis_data
+
+            try:
+                preisart_id_int = int(preisart_id)
+            except:
+                continue
+
+            # Pruefen ob Preis existiert
+            cursor.execute("""
+                SELECT ID FROM tbl_KD_Standardpreise
+                WHERE kun_ID = ? AND Preisart_ID = ?
+            """, [kd_id, preisart_id_int])
+            existing = cursor.fetchone()
+
+            if existing:
+                cursor.execute("""
+                    UPDATE tbl_KD_Standardpreise
+                    SET StdPreis = ?, GeaendertAm = Now()
+                    WHERE kun_ID = ? AND Preisart_ID = ?
+                """, [preis, kd_id, preisart_id_int])
+                updated += 1
+            else:
+                cursor.execute("""
+                    INSERT INTO tbl_KD_Standardpreise (kun_ID, Preisart_ID, StdPreis, GeaendertAm)
+                    VALUES (?, ?, ?, Now())
+                """, [kd_id, preisart_id_int, preis])
+                inserted += 1
+
+        conn.commit()
+        release_connection(conn)
+        return jsonify({'success': True, 'updated': updated, 'inserted': inserted})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/kundenpreise/preis/<int:preis_id>', methods=['PUT'])
+def update_einzelpreis(preis_id):
+    """Einzelnen Preis aktualisieren"""
+    try:
+        data = request.get_json()
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE tbl_KD_Standardpreise
+            SET StdPreis = ?, GeaendertAm = Now()
+            WHERE ID = ?
+        """, [data.get('StdPreis', 0), preis_id])
 
         conn.commit()
         release_connection(conn)
         return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/kundenpreise/preis/<int:preis_id>', methods=['DELETE'])
+def delete_einzelpreis(preis_id):
+    """Einzelnen Preis loeschen"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM tbl_KD_Standardpreise WHERE ID = ?", [preis_id])
+
+        conn.commit()
+        release_connection(conn)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/preisarten')
+def get_preisarten():
+    """Liste aller Preisarten aus tbl_KD_Artikelbeschreibung"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT ID, Beschreibung, MwSt_Satz, Mengenheit, IstPersonal
+            FROM tbl_KD_Artikelbeschreibung
+            ORDER BY ID
+        """)
+        rows = cursor.fetchall()
+
+        preisarten = []
+        for row in rows:
+            preisarten.append({
+                'id': row[0],
+                'beschreibung': row[1],
+                'mwstSatz': row[2],
+                'mengenheit': row[3],
+                'istPersonal': bool(row[4]) if row[4] is not None else False
+            })
+
+        release_connection(conn)
+        return jsonify({'success': True, 'data': preisarten})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -5403,35 +5869,6 @@ def create_ansprechpartner(kd_id):
         release_connection(conn)
         return jsonify({'success': True})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-# ============================================
-# Preisarten API
-# ============================================
-
-@app.route('/api/preisarten')
-def get_preisarten():
-    """Alle Preisarten/Artikelbeschreibungen laden (aus tbl_KD_Artikelbeschreibung)"""
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT ID, Beschreibung as Bezeichnung, Mengenheit as Einheit,
-                   MwSt_Satz, cbo_Beschreibung, IstPersonal
-            FROM tbl_KD_Artikelbeschreibung
-            WHERE ID > 0
-            ORDER BY Beschreibung
-        """)
-
-        rows = cursor.fetchall()
-        columns = [col[0] for col in cursor.description]
-        data = [dict(zip(columns, row)) for row in rows]
-
-        release_connection(conn)
-        return jsonify({'success': True, 'data': data, 'count': len(data)})
-    except Exception as e:
-        logger.error(f"Fehler bei Preisarten-Abfrage: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

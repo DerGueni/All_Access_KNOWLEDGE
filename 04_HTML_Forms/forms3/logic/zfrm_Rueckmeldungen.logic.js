@@ -1,328 +1,502 @@
 /**
  * zfrm_Rueckmeldungen.logic.js
- * Logik für Rückmeldungen/Nachrichten-Übersicht
- * REST-API Anbindung an localhost:5000
+ *
+ * JavaScript-Logik für das Formular "Auswertung der Rückmeldungen"
+ *
+ * Entspricht dem Access-Formular zfrm_Rueckmeldungen mit:
+ * - Form_Load: Ruft Rückmeldeauswertung auf (lädt Daten)
+ * - Form_Close: Löscht temporäre Tabelle ztbl_Rueckmeldezeiten
+ * - Subform zsub_Rueckmeldungen: Endlosformular mit Statistikdaten pro Mitarbeiter
+ *
+ * Query zqry_Rueckmeldungen:
+ * SELECT MA_ID, Count(Anfragezeitpunkt) AS AnzahlvonAnfragezeitpunkt,
+ *        Count(Rueckmeldezeitpunkt) AS AnzahlvonRueckmeldezeitpunkt,
+ *        Avg(Reaktionszeit) AS MittelwertvonReaktionszeit,
+ *        Round(IIf([AnzahlvonAnfragezeitpunkt]<>0,[AnzahlvonRueckmeldezeitpunkt]/[AnzahlvonAnfragezeitpunkt]*100,0),0) AS Antwortrate,
+ *        Sum(IIf([Status_ID]=3,1,0)) AS Zusagen,
+ *        Sum(IIf([Status_ID]=4,1,0)) AS Absagen
+ * FROM ztbl_Rueckmeldezeiten GROUP BY MA_ID
  */
 
-import { Bridge } from '../api/bridgeClient.js';
+'use strict';
 
-const state = {
-    rueckmeldungen: [],
-    selectedRueckmeldung: null,
-    filter: ''
-};
+// ============================================================================
+// KONSTANTEN & KONFIGURATION
+// ============================================================================
 
-let elements = {};
+const API_BASE = 'http://localhost:5000/api';
+const VBA_BRIDGE = 'http://localhost:5002';
 
-async function init() {
-    console.log('[Rueckmeldungen] Initialisierung...');
+// Globaler State
+let rueckmeldungenData = [];
+let currentSortField = 'Name';
+let currentSortOrder = 'ASC';
+let selectedRowId = null;
 
-    elements = {
-        // Filter
-        cboFilter: document.getElementById('cboFilter'),
-        txtSuche: document.getElementById('txtSuche'),
-        btnAlleGelesen: document.getElementById('btnAlleGelesen'),
-        btnAktualisieren: document.getElementById('btnAktualisieren'),
+// ============================================================================
+// FORM EVENTS (Access VBA → JavaScript Mapping)
+// ============================================================================
 
-        // Stats
-        statGesamt: document.getElementById('statGesamt'),
-        statUngelesen: document.getElementById('statUngelesen'),
-        statBestaetigt: document.getElementById('statBestätigt'),
-        statAbsagen: document.getElementById('statAbsagen'),
+/**
+ * Form_Load - Entspricht Access Form_Load Event
+ * In Access: Call Rückmeldeauswertung
+ */
+async function Form_Load() {
+    console.log('[zfrm_Rueckmeldungen] Form_Load');
 
-        // Liste
-        rueckmeldungListe: document.querySelector('.content-main'),
-
-        // Detail
-        nachrichtContainer: document.querySelector('.nachricht-container'),
-
-        // Footer
-        lblStatus: document.getElementById('lblStatus'),
-        lblAnzahl: document.getElementById('lblAnzahl')
-    };
-
-    setupEventListeners();
-    await loadRueckmeldungen();
-    setStatus('Bereit');
-}
-
-function setupEventListeners() {
-    if (elements.cboFilter) {
-        elements.cboFilter.addEventListener('change', () => {
-            state.filter = elements.cboFilter.value;
-            loadRueckmeldungen();
-        });
-    }
-
-    if (elements.txtSuche) {
-        elements.txtSuche.addEventListener('input', debounce(loadRueckmeldungen, 300));
-    }
-
-    if (elements.btnAlleGelesen) {
-        elements.btnAlleGelesen.addEventListener('click', markAllRead);
-    }
-
-    if (elements.btnAktualisieren) {
-        elements.btnAktualisieren.addEventListener('click', () => loadRueckmeldungen());
-    }
-}
-
-async function loadRueckmeldungen() {
-    setStatus('Lade Rückmeldungen...');
+    // VBA Bridge: Rückmeldeauswertung aufrufen (füllt ztbl_Rueckmeldezeiten)
     try {
-        const params = {
-            filter: state.filter || null,
-            search: elements.txtSuche?.value.trim() || null
-        };
+        await callVBABridge('Rückmeldeauswertung');
+    } catch (e) {
+        console.warn('[Form_Load] VBA Bridge nicht erreichbar, verwende REST API:', e.message);
+    }
 
-        const result = await Bridge.rueckmeldungen.list(params);
-        state.rueckmeldungen = result.data || [];
+    // Daten laden
+    await loadRueckmeldungen();
+}
 
-        renderRueckmeldungen();
-        updateStats();
-        updateAnzahl();
-        setStatus(`${state.rueckmeldungen.length} Rückmeldungen`);
+/**
+ * Form_Close - Entspricht Access Form_Close Event
+ * In Access: CurrentDb.Execute "DELETE * FROM ztbl_Rueckmeldezeiten"
+ */
+async function Form_Close() {
+    console.log('[zfrm_Rueckmeldungen] Form_Close');
+
+    // Optional: VBA Bridge aufrufen um temporäre Tabelle zu leeren
+    try {
+        await fetch(`${VBA_BRIDGE}/execute`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'execute_sql',
+                sql: 'DELETE * FROM ztbl_Rueckmeldezeiten'
+            })
+        });
+    } catch (e) {
+        console.warn('[Form_Close] Cleanup nicht möglich:', e.message);
+    }
+}
+
+// ============================================================================
+// DATEN LADEN & ANZEIGEN
+// ============================================================================
+
+/**
+ * Lädt Rückmeldungen-Statistik vom API Server
+ */
+async function loadRueckmeldungen() {
+    const tableBody = document.getElementById('tableBody');
+    tableBody.innerHTML = '<tr><td colspan="8" class="loading">Lade Daten...</td></tr>';
+
+    try {
+        // Filter-Werte auslesen
+        const anstellungsart = document.getElementById('filterAnstellungsart').value;
+        const sortField = document.getElementById('sortField').value;
+        const sortOrder = document.getElementById('sortOrder').value;
+
+        currentSortField = sortField;
+        currentSortOrder = sortOrder;
+
+        // API Request mit Parametern
+        let url = `${API_BASE}/rueckmeldungen/statistik`;
+        const params = new URLSearchParams();
+
+        if (anstellungsart) {
+            params.append('anstellungsart', anstellungsart);
+        }
+        params.append('sort', sortField);
+        params.append('order', sortOrder);
+
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+
+        console.log('[loadRueckmeldungen] Fetching:', url);
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        rueckmeldungenData = result.data || result || [];
+
+        // Tabelle rendern
+        renderTable(rueckmeldungenData);
+
+        // Zusammenfassung berechnen
+        updateSummary(rueckmeldungenData);
+
+        // Status aktualisieren
+        document.getElementById('recordCount').textContent = `${rueckmeldungenData.length} Datensätze`;
+        document.getElementById('lastUpdate').textContent = `Letzte Aktualisierung: ${new Date().toLocaleTimeString('de-DE')}`;
 
     } catch (error) {
-        console.error('[Rueckmeldungen] Fehler beim Laden:', error);
-        setStatus('Fehler: ' + error.message);
+        console.error('[loadRueckmeldungen] Fehler:', error);
+        tableBody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">Fehler beim Laden: ${error.message}</td></tr>`;
+
+        // Fallback: Testdaten laden falls API nicht erreichbar
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            console.log('[loadRueckmeldungen] Versuche Fallback mit Testdaten...');
+            loadTestData();
+        }
     }
 }
 
-function renderRueckmeldungen() {
-    const container = elements.rueckmeldungListe;
-    if (!container) return;
+/**
+ * Rendert die Tabelle mit den Rückmeldungsdaten
+ */
+function renderTable(data) {
+    const tableBody = document.getElementById('tableBody');
 
-    if (state.rueckmeldungen.length === 0) {
-        container.innerHTML = `
-            <div style="text-align:center;padding:40px;color:#666;">
-                Keine Rückmeldungen vorhanden
-            </div>
-        `;
-        clearDetail();
+    if (!data || data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#606060;">Keine Daten vorhanden</td></tr>';
         return;
     }
 
-    container.innerHTML = state.rueckmeldungen.map(r => {
-        const ungelesen = !r.Gelesen ? 'ungelesen' : '';
-        const selected = state.selectedRueckmeldung?.ID === r.ID ? 'selected' : '';
-        const typClass = getTypClass(r.Typ);
+    tableBody.innerHTML = data.map((row, index) => {
+        const ma_id = row.MA_ID || row.ma_id || '';
+        const name = row.Name || row.name || row.Mitarbeiter || `MA ${ma_id}`;
+        const anstellungsart = row.Anstellungsart_ID || row.anstellungsart_id || row.Anstellungsart || '-';
+        const anzAnfragen = row.AnzahlvonAnfragezeitpunkt || row.anzahl_anfragen || 0;
+        const anzRueckmeldungen = row.AnzahlvonRueckmeldezeitpunkt || row.anzahl_rueckmeldungen || 0;
+        const reaktionszeit = row.MittelwertvonReaktionszeit || row.reaktionszeit || 0;
+        const antwortrate = row.Antwortrate || row.antwortrate || 0;
+        const zusagen = row.Zusagen || row.zusagen || 0;
+        const absagen = row.Absagen || row.absagen || 0;
 
-        return `
-            <div class="rückmeldung-card ${ungelesen} ${selected}" data-id="${r.ID}">
-                <div class="rückmeldung-indicator ${r.Gelesen ? 'gelesen' : ''}"></div>
-                <div class="rückmeldung-content">
-                    <div class="rückmeldung-header">
-                        <span class="rückmeldung-absender">${r.Absender || 'Unbekannt'}</span>
-                        <span class="rückmeldung-zeit">${formatZeit(r.Datum)}</span>
-                    </div>
-                    <div class="rückmeldung-betreff">
-                        ${r.Betreff || 'Kein Betreff'}
-                        <span class="rückmeldung-typ ${typClass}">${r.Typ || 'Info'}</span>
-                    </div>
-                    <div class="rückmeldung-preview">${truncate(r.Nachricht, 60)}</div>
-                </div>
-            </div>
-        `;
+        const isSelected = selectedRowId === ma_id;
+
+        return `<tr data-ma-id="${ma_id}" class="${isSelected ? 'selected' : ''}"
+                    onclick="selectRow(${ma_id})"
+                    ondblclick="openMitarbeiter(${ma_id})">
+            <td>${escapeHtml(name)}</td>
+            <td class="num">${anstellungsart}</td>
+            <td class="num">${anzAnfragen}</td>
+            <td class="num">${anzRueckmeldungen}</td>
+            <td class="num">${formatReaktionszeit(reaktionszeit)}</td>
+            <td class="num">${antwortrate}%</td>
+            <td class="num" style="color: #208020; font-weight: bold;">${zusagen}</td>
+            <td class="num" style="color: #c04040; font-weight: bold;">${absagen}</td>
+        </tr>`;
     }).join('');
 
-    // Click-Handler
-    container.querySelectorAll('.rückmeldung-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const id = parseInt(card.dataset.id);
-            selectRueckmeldung(id);
-        });
+    // Sortier-Icons aktualisieren
+    updateSortIcons();
+}
+
+/**
+ * Aktualisiert die Zusammenfassungs-Karten
+ */
+function updateSummary(data) {
+    if (!data || data.length === 0) {
+        document.getElementById('sumAnfragen').textContent = '0';
+        document.getElementById('sumRueckmeldungen').textContent = '0';
+        document.getElementById('sumZusagen').textContent = '0';
+        document.getElementById('sumAbsagen').textContent = '0';
+        document.getElementById('avgAntwortrate').textContent = '0%';
+        return;
+    }
+
+    let sumAnfragen = 0;
+    let sumRueckmeldungen = 0;
+    let sumZusagen = 0;
+    let sumAbsagen = 0;
+    let sumAntwortrate = 0;
+
+    data.forEach(row => {
+        sumAnfragen += parseInt(row.AnzahlvonAnfragezeitpunkt || row.anzahl_anfragen || 0);
+        sumRueckmeldungen += parseInt(row.AnzahlvonRueckmeldezeitpunkt || row.anzahl_rueckmeldungen || 0);
+        sumZusagen += parseInt(row.Zusagen || row.zusagen || 0);
+        sumAbsagen += parseInt(row.Absagen || row.absagen || 0);
+        sumAntwortrate += parseFloat(row.Antwortrate || row.antwortrate || 0);
     });
 
-    // Erste automatisch auswählen
-    if (!state.selectedRueckmeldung && state.rueckmeldungen.length > 0) {
-        selectRueckmeldung(state.rueckmeldungen[0].ID);
+    const avgAntwortrate = data.length > 0 ? Math.round(sumAntwortrate / data.length) : 0;
+
+    document.getElementById('sumAnfragen').textContent = sumAnfragen.toLocaleString('de-DE');
+    document.getElementById('sumRueckmeldungen').textContent = sumRueckmeldungen.toLocaleString('de-DE');
+    document.getElementById('sumZusagen').textContent = sumZusagen.toLocaleString('de-DE');
+    document.getElementById('sumAbsagen').textContent = sumAbsagen.toLocaleString('de-DE');
+    document.getElementById('avgAntwortrate').textContent = avgAntwortrate + '%';
+}
+
+// ============================================================================
+// SORTIERUNG
+// ============================================================================
+
+/**
+ * Sortiert die Tabelle nach dem angegebenen Feld
+ */
+function sortBy(field) {
+    // Toggle Sortierrichtung wenn gleiches Feld
+    if (currentSortField === field) {
+        currentSortOrder = currentSortOrder === 'ASC' ? 'DESC' : 'ASC';
+    } else {
+        currentSortField = field;
+        currentSortOrder = 'ASC';
+    }
+
+    // Dropdown-Werte aktualisieren
+    document.getElementById('sortField').value = field;
+    document.getElementById('sortOrder').value = currentSortOrder;
+
+    // Daten neu laden
+    loadRueckmeldungen();
+}
+
+/**
+ * Aktualisiert die Sortier-Icons in den Spaltenköpfen
+ */
+function updateSortIcons() {
+    // Alle Icons entfernen
+    document.querySelectorAll('.data-table th').forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+    });
+
+    // Aktuelles Icon setzen
+    const activeHeader = document.querySelector(`.data-table th[data-field="${currentSortField}"]`);
+    if (activeHeader) {
+        activeHeader.classList.add(currentSortOrder === 'ASC' ? 'sort-asc' : 'sort-desc');
     }
 }
 
-async function selectRueckmeldung(id) {
-    try {
-        const result = await Bridge.rueckmeldungen.get(id);
-        state.selectedRueckmeldung = result.data || result;
+// ============================================================================
+// ZEILEN-INTERAKTION
+// ============================================================================
 
-        // Als gelesen markieren
-        if (!state.selectedRueckmeldung.Gelesen) {
-            await Bridge.rueckmeldungen.markRead(id);
-            state.selectedRueckmeldung.Gelesen = true;
+/**
+ * Wählt eine Zeile aus (einzelklick)
+ */
+function selectRow(ma_id) {
+    selectedRowId = ma_id;
 
-            // UI aktualisieren
-            const card = elements.rueckmeldungListe.querySelector(`[data-id="${id}"]`);
-            if (card) {
-                card.classList.remove('ungelesen');
-                card.querySelector('.rückmeldung-indicator')?.classList.add('gelesen');
-            }
-            updateStats();
+    // Alle Zeilen deselektieren
+    document.querySelectorAll('.data-table tbody tr').forEach(tr => {
+        tr.classList.remove('selected');
+    });
+
+    // Aktuelle Zeile selektieren
+    const row = document.querySelector(`.data-table tbody tr[data-ma-id="${ma_id}"]`);
+    if (row) {
+        row.classList.add('selected');
+    }
+}
+
+/**
+ * Öffnet den Mitarbeiterstamm (Doppelklick)
+ */
+function openMitarbeiter(ma_id) {
+    console.log('[openMitarbeiter] MA_ID:', ma_id);
+
+    // Versuche WebView2 Bridge
+    if (typeof Bridge !== 'undefined' && Bridge.openForm) {
+        Bridge.openForm('frm_MA_Mitarbeiterstamm', { MA_ID: ma_id });
+    } else {
+        // Fallback: Shell-Navigation
+        const shellFrame = window.parent;
+        if (shellFrame && shellFrame !== window) {
+            shellFrame.postMessage({
+                type: 'NAVIGATE',
+                form: 'frm_MA_Mitarbeiterstamm.html',
+                params: { ma_id: ma_id }
+            }, '*');
+        } else {
+            // Direktes Öffnen
+            window.location.href = `frm_MA_Mitarbeiterstamm.html?ma_id=${ma_id}`;
+        }
+    }
+}
+
+// ============================================================================
+// BUTTON-HANDLER
+// ============================================================================
+
+/**
+ * Exportiert die Daten nach Excel
+ */
+function exportToExcel() {
+    console.log('[exportToExcel] Export gestartet');
+
+    if (!rueckmeldungenData || rueckmeldungenData.length === 0) {
+        alert('Keine Daten zum Exportieren vorhanden.');
+        return;
+    }
+
+    // CSV erstellen
+    const headers = ['Mitarbeiter', 'Anstellungsart', 'Anz. Anfragen', 'Anz. Rückmeldungen', 'Reaktionszeit (h)', 'Antwortrate %', 'Zusagen', 'Absagen'];
+    const rows = rueckmeldungenData.map(row => [
+        row.Name || row.name || '',
+        row.Anstellungsart_ID || row.anstellungsart_id || '',
+        row.AnzahlvonAnfragezeitpunkt || row.anzahl_anfragen || 0,
+        row.AnzahlvonRueckmeldezeitpunkt || row.anzahl_rueckmeldungen || 0,
+        formatReaktionszeit(row.MittelwertvonReaktionszeit || row.reaktionszeit || 0),
+        row.Antwortrate || row.antwortrate || 0,
+        row.Zusagen || row.zusagen || 0,
+        row.Absagen || row.absagen || 0
+    ]);
+
+    const csv = [
+        headers.join(';'),
+        ...rows.map(r => r.join(';'))
+    ].join('\n');
+
+    // Download
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Rueckmeldungen_${formatDate(new Date())}.csv`;
+    link.click();
+
+    console.log('[exportToExcel] Export abgeschlossen');
+}
+
+/**
+ * Schließt das Formular
+ */
+function closeForm() {
+    console.log('[closeForm] Formular wird geschlossen');
+
+    // Form_Close Event aufrufen
+    Form_Close();
+
+    // Versuche verschiedene Schließ-Methoden
+    if (typeof Bridge !== 'undefined' && Bridge.close) {
+        Bridge.close();
+    } else if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'CLOSE_FORM' }, '*');
+    } else {
+        window.history.back();
+    }
+}
+
+// ============================================================================
+// HILFSFUNKTIONEN
+// ============================================================================
+
+/**
+ * Ruft eine VBA-Funktion über den VBA Bridge Server auf
+ */
+async function callVBABridge(functionName, params = {}) {
+    const response = await fetch(`${VBA_BRIDGE}/execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'run_vba',
+            function: functionName,
+            params: params
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`VBA Bridge Error: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+/**
+ * Formatiert Reaktionszeit in lesbares Format
+ */
+function formatReaktionszeit(hours) {
+    if (hours === null || hours === undefined || isNaN(hours)) return '-';
+    const h = parseFloat(hours);
+    if (h < 1) {
+        return Math.round(h * 60) + ' min';
+    }
+    return h.toFixed(1);
+}
+
+/**
+ * Formatiert Datum für Dateinamen
+ */
+function formatDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+/**
+ * Escaped HTML-Sonderzeichen
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * Lädt Testdaten falls API nicht erreichbar
+ */
+function loadTestData() {
+    console.log('[loadTestData] Lade Testdaten...');
+
+    const testData = [
+        { MA_ID: 1, Name: 'Müller, Hans', Anstellungsart_ID: 3, AnzahlvonAnfragezeitpunkt: 45, AnzahlvonRueckmeldezeitpunkt: 42, MittelwertvonReaktionszeit: 2.5, Antwortrate: 93, Zusagen: 38, Absagen: 4 },
+        { MA_ID: 2, Name: 'Schmidt, Anna', Anstellungsart_ID: 3, AnzahlvonAnfragezeitpunkt: 32, AnzahlvonRueckmeldezeitpunkt: 30, MittelwertvonReaktionszeit: 1.8, Antwortrate: 94, Zusagen: 28, Absagen: 2 },
+        { MA_ID: 3, Name: 'Weber, Peter', Anstellungsart_ID: 5, AnzahlvonAnfragezeitpunkt: 28, AnzahlvonRueckmeldezeitpunkt: 20, MittelwertvonReaktionszeit: 4.2, Antwortrate: 71, Zusagen: 18, Absagen: 2 },
+        { MA_ID: 4, Name: 'Fischer, Maria', Anstellungsart_ID: 3, AnzahlvonAnfragezeitpunkt: 50, AnzahlvonRueckmeldezeitpunkt: 48, MittelwertvonReaktionszeit: 1.2, Antwortrate: 96, Zusagen: 45, Absagen: 3 },
+        { MA_ID: 5, Name: 'Bauer, Thomas', Anstellungsart_ID: 5, AnzahlvonAnfragezeitpunkt: 15, AnzahlvonRueckmeldezeitpunkt: 10, MittelwertvonReaktionszeit: 8.5, Antwortrate: 67, Zusagen: 8, Absagen: 2 },
+    ];
+
+    // Filter anwenden
+    const anstellungsart = document.getElementById('filterAnstellungsart').value;
+    let filteredData = testData;
+
+    if (anstellungsart) {
+        const filterValues = anstellungsart.split(',').map(v => parseInt(v.trim()));
+        filteredData = testData.filter(row => filterValues.includes(row.Anstellungsart_ID));
+    }
+
+    // Sortieren
+    const sortField = document.getElementById('sortField').value;
+    const sortOrder = document.getElementById('sortOrder').value;
+
+    filteredData.sort((a, b) => {
+        let valA = a[sortField] || a.Name;
+        let valB = b[sortField] || b.Name;
+
+        if (typeof valA === 'string') {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
         }
 
-        displayDetail(state.selectedRueckmeldung);
+        if (sortOrder === 'ASC') {
+            return valA < valB ? -1 : valA > valB ? 1 : 0;
+        } else {
+            return valA > valB ? -1 : valA < valB ? 1 : 0;
+        }
+    });
 
-        // Selection aktualisieren
-        elements.rueckmeldungListe.querySelectorAll('.rückmeldung-card').forEach(card => {
-            card.classList.toggle('selected', parseInt(card.dataset.id) === id);
-        });
+    rueckmeldungenData = filteredData;
+    renderTable(filteredData);
+    updateSummary(filteredData);
 
-    } catch (error) {
-        console.error('[Rueckmeldungen] Fehler beim Laden Detail:', error);
-        setStatus('Fehler: ' + error.message);
-    }
+    document.getElementById('recordCount').textContent = `${filteredData.length} Datensätze (Testdaten)`;
+    document.getElementById('lastUpdate').textContent = `Letzte Aktualisierung: ${new Date().toLocaleTimeString('de-DE')} (Offline)`;
 }
 
-function displayDetail(r) {
-    if (!elements.nachrichtContainer || !r) return;
+// ============================================================================
+// INITIALISIERUNG (DOMContentLoaded = Form_Load)
+// ============================================================================
 
-    const typClass = getTypClass(r.Typ);
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('[zfrm_Rueckmeldungen] DOMContentLoaded - Initialisierung');
 
-    elements.nachrichtContainer.innerHTML = `
-        <div class="nachricht-header">
-            <div class="nachricht-betreff">${r.Betreff || 'Kein Betreff'}</div>
-            <div class="nachricht-meta">
-                <span><strong>Von:</strong> ${r.Absender || 'Unbekannt'}</span>
-                <span><strong>Datum:</strong> ${formatDatum(r.Datum)}</span>
-                <span><strong>Typ:</strong> <span class="rückmeldung-typ ${typClass}">${r.Typ || 'Info'}</span></span>
-            </div>
-        </div>
-        <div class="nachricht-body">
-            ${formatNachricht(r.Nachricht)}
-        </div>
-        <div class="nachricht-actions">
-            <button class="btn btn-primary" onclick="Rueckmeldungen.antworten(${r.ID})">Antworten</button>
-            <button class="btn" onclick="Rueckmeldungen.weiterleiten(${r.ID})">Weiterleiten</button>
-            <button class="btn" onclick="Rueckmeldungen.archivieren(${r.ID})">Archivieren</button>
-            <button class="btn btn-danger" onclick="Rueckmeldungen.loeschen(${r.ID})">Löschen</button>
-        </div>
-    `;
-}
+    // Form_Load aufrufen
+    Form_Load();
 
-function clearDetail() {
-    state.selectedRueckmeldung = null;
-    if (elements.nachrichtContainer) {
-        elements.nachrichtContainer.innerHTML = `
-            <div style="text-align:center;padding:40px;color:#666;">
-                Keine Nachricht ausgewählt
-            </div>
-        `;
-    }
-}
+    // Cleanup bei Page Unload (Form_Close)
+    window.addEventListener('beforeunload', Form_Close);
+});
 
-async function markAllRead() {
-    if (!confirm('Alle Nachrichten als gelesen markieren?')) return;
-
-    try {
-        setStatus('Markiere alle als gelesen...');
-        await Bridge.rueckmeldungen.markAllRead();
-        await loadRueckmeldungen();
-        setStatus('Alle als gelesen markiert');
-    } catch (error) {
-        console.error('[Rueckmeldungen] Fehler:', error);
-        setStatus('Fehler: ' + error.message);
-    }
-}
-
-function updateStats() {
-    const gesamt = state.rueckmeldungen.length;
-    const ungelesen = state.rueckmeldungen.filter(r => !r.Gelesen).length;
-    const bestaetigt = state.rueckmeldungen.filter(r => r.Typ === 'Zusage' || r.Typ === 'Bestätigung').length;
-    const absagen = state.rueckmeldungen.filter(r => r.Typ === 'Absage').length;
-
-    if (elements.statGesamt) elements.statGesamt.textContent = gesamt;
-    if (elements.statUngelesen) elements.statUngelesen.textContent = ungelesen;
-    if (elements.statBestaetigt) elements.statBestaetigt.textContent = bestaetigt;
-    if (elements.statAbsagen) elements.statAbsagen.textContent = absagen;
-}
-
-function updateAnzahl() {
-    if (elements.lblAnzahl) {
-        elements.lblAnzahl.textContent = `${state.rueckmeldungen.length} Rückmeldungen`;
-    }
-}
-
-// Aktionen
-function antworten(id) {
-    const r = state.rueckmeldungen.find(x => x.ID === id);
-    if (r?.AbsenderEmail) {
-        window.open(`mailto:${r.AbsenderEmail}?subject=Re: ${r.Betreff || ''}`);
-    } else {
-        alert('Keine E-Mail-Adresse vorhanden');
-    }
-}
-
-function weiterleiten(id) {
-    alert('Weiterleiten: ID ' + id);
-}
-
-function archivieren(id) {
-    alert('Archivieren: ID ' + id);
-}
-
-async function loeschen(id) {
-    if (!confirm('Nachricht wirklich löschen?')) return;
-    alert('Löschen: ID ' + id);
-}
-
-function setStatus(text) {
-    if (elements.lblStatus) elements.lblStatus.textContent = text;
-}
-
-function getTypClass(typ) {
-    switch (typ?.toLowerCase()) {
-        case 'zusage':
-        case 'bestätigung': return 'typ-bestätigung';
-        case 'absage': return 'typ-absage';
-        case 'anfrage': return 'typ-anfrage';
-        case 'problem': return 'typ-problem';
-        default: return 'typ-info';
-    }
-}
-
-function formatZeit(value) {
-    if (!value) return '';
-    const d = new Date(value);
-    const now = new Date();
-    const diff = (now - d) / 1000;
-
-    if (diff < 3600) return `vor ${Math.floor(diff / 60)} Min`;
-    if (diff < 86400) return `vor ${Math.floor(diff / 3600)} Std`;
-    if (diff < 172800) return 'gestern';
-    return d.toLocaleDateString('de-DE');
-}
-
-function formatDatum(value) {
-    if (!value) return '-';
-    const d = new Date(value);
-    return d.toLocaleDateString('de-DE') + ' ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-}
-
-function formatNachricht(text) {
-    if (!text) return '<p>Keine Nachricht</p>';
-    return text.split('\n').map(line => `<p>${line || '&nbsp;'}</p>`).join('');
-}
-
-function truncate(text, length) {
-    if (!text) return '';
-    return text.length > length ? text.substring(0, length) + '...' : text;
-}
-
-function debounce(fn, delay) {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => fn(...args), delay);
-    };
-}
-
-document.addEventListener('DOMContentLoaded', init);
-
-window.Rueckmeldungen = {
-    loadRueckmeldungen,
-    selectRueckmeldung,
-    markAllRead,
-    antworten,
-    weiterleiten,
-    archivieren,
-    loeschen
-};
+// Globale Funktionen für onclick-Handler verfügbar machen
+window.loadRueckmeldungen = loadRueckmeldungen;
+window.sortBy = sortBy;
+window.selectRow = selectRow;
+window.openMitarbeiter = openMitarbeiter;
+window.exportToExcel = exportToExcel;
+window.closeForm = closeForm;

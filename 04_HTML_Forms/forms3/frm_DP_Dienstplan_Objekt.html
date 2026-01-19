@@ -183,6 +183,7 @@
         .form-detail {
             display: flex;
             flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
             background-color: #b8b8d8;
             overflow: auto;
             border: 1px solid #606090;
@@ -224,6 +225,7 @@
 
         .main-content {
             flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
             display: flex;
             flex-direction: column;
             padding: 5px;
@@ -235,6 +237,10 @@
             display: flex;
             height: 28px;
             margin-bottom: 1px;
+            position: sticky; /* STICKY HEADER */
+            top: 0;
+            z-index: 11;
+            background-color: #8080c0; /* Hintergrund für sticky */
         }
 
         .col-auftrag-header {
@@ -251,6 +257,7 @@
 
         .day-column-header {
             flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
             display: flex;
             flex-direction: column;
             min-width: 180px;
@@ -307,6 +314,7 @@
         /* Kalender Body */
         .calendar-body {
             flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
             overflow-y: auto;
             background: #8080C0;
         }
@@ -347,6 +355,7 @@
 
         .day-column {
             flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
             min-width: 180px;
             border-right: 2px solid #9090c0;
             padding: 3px;

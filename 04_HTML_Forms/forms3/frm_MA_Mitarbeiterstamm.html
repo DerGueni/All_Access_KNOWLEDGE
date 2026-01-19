@@ -108,8 +108,9 @@
             display: flex;
             flex: 1;
             overflow: hidden;
-        
-            min-width: 0;}
+            min-width: 0;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+        }
 
         /* Left Menu */
         .left-menu {
@@ -222,6 +223,7 @@
             flex-direction: column;
             gap: 2px;
             overflow: hidden;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         /* Header Row - Überschrieben durch unified-header.css */
@@ -301,6 +303,7 @@
             flex: 1;
             gap: 3px;
             overflow: hidden;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         /* Left Work Panel */
@@ -310,6 +313,7 @@
             flex-direction: column;
             gap: 2px;
             overflow: hidden;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         /* Tab Container */
@@ -320,6 +324,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         .tab-header {
@@ -353,6 +358,7 @@
             flex: 1;
             overflow: auto;
             background: #b8b8d8;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         .tab-page {
@@ -469,6 +475,49 @@
             cursor: pointer;
         }
 
+        /* Map Container - unter dem Foto */
+        .map-container {
+            width: 200px;
+            height: 150px;
+            margin-top: 8px;
+            border: 1px solid #808080;
+            background: #f0f0f0;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none; /* Klick geht auf Container */
+        }
+        .map-container:hover {
+            border-color: #0066cc;
+        }
+        .map-container:hover::after {
+            content: 'Klicken zum Oeffnen in Google Maps';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,102,204,0.9);
+            color: white;
+            font-size: 9px;
+            padding: 3px;
+            text-align: center;
+        }
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 10px;
+            text-align: center;
+        }
+
         /* Right Panel: Employee List */
         .right-panel {
             width: 425px;
@@ -478,6 +527,7 @@
             flex-direction: column;
             flex-shrink: 0;
             overflow: hidden;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         .right-header {
@@ -525,12 +575,20 @@
         .list-wrapper {
             flex: 1;
             overflow: auto;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         .data-grid {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate; /* KRITISCH: collapse bricht sticky header! */
+            border-spacing: 0; /* Visuell wie collapse aber kompatibel mit sticky */
             font-size: 11px;
+        }
+
+        .data-grid thead {
+            position: sticky;
+            top: 0;
+            z-index: 11;
         }
 
         .data-grid th {
@@ -541,6 +599,7 @@
             font-weight: bold;
             position: sticky;
             top: 0;
+            z-index: 10;
             white-space: nowrap;
         }
 
@@ -778,12 +837,20 @@
             overflow-y: auto;
             border: 1px solid #a0a0c0;
             background: white;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         .quickinfo-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate; /* KRITISCH: collapse bricht sticky header! */
+            border-spacing: 0; /* Visuell wie collapse aber kompatibel mit sticky */
             font-size: 10px;
+        }
+
+        .quickinfo-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 11;
         }
 
         .quickinfo-table th {
@@ -794,6 +861,7 @@
             font-weight: bold;
             position: sticky;
             top: 0;
+            z-index: 10;
         }
 
         .quickinfo-table td {
@@ -880,7 +948,7 @@
             </div>
             <div class="title-bar-buttons">
                 <button class="title-btn tiny-btn" onclick="Bridge.sendEvent('minimize')" data-testid="ma-btn-minimieren">_</button>
-                <button class="title-btn" data-testid="ma-btn-maximieren">&#9633;</button>
+                <button class="title-btn" onclick="toggleFullscreen()" data-testid="ma-btn-maximieren">&#9633;</button>
                 <button class="title-btn close" onclick="closeForm()" data-testid="ma-btn-schliessen">&#10005;</button>
             </div>
         </div>
@@ -1102,8 +1170,11 @@
                                                 <select class="form-select input-md" id="Anstellungsart_ID" data-field="Anstellungsart_ID" data-testid="ma-select-anstellungsart">
                                                     <option value=""></option>
                                                     <option value="3">Festangestellt</option>
+                                                    <option value="5">Minijobber</option>
                                                     <option value="4">Freiberufler</option>
-                                                    <option value="5">Subunternehmer</option>
+                                                    <option value="11">Subunternehmer</option>
+                                                    <option value="6">Vorübergehend inaktiv</option>
+                                                    <option value="9">Inaktiv</option>
                                                 </select>
                                             </div>
                                             <div class="checkbox-row">
@@ -1203,7 +1274,8 @@
                                             </div>
                                             <div class="form-row">
                                                 <span class="form-label">Koordinaten:</span>
-                                                <input type="text" class="form-input wide" id="Koordinaten" data-field="Koordinaten">
+                                                <input type="text" class="form-input wide" id="Koordinaten" data-field="Koordinaten" style="width: 150px;">
+                                                <button class="btn btn-small" id="cmdGeocode" onclick="cmdGeocode_Click()" title="Koordinaten ermitteln" style="margin-left: 4px;">Geocode</button>
                                             </div>
                                             <div class="form-row">
                                                 <span class="form-label">Steuer-ID:</span>
@@ -1287,6 +1359,14 @@
                                         <input type="file" id="fotoUploadInput" accept="image/*" style="display:none;" onchange="handleFotoUpload(this)">
                                         <input type="file" id="fotoUploadInput2" accept="image/*" style="display:none;" onchange="handleFotoUpload2(this)">
                                         <button class="photo-btn" onclick="document.getElementById('fotoUploadInput').click()" title="Lichtbild hochladen (Access: btnDateisuch)">Foto hochladen</button>
+
+                                        <!-- Kartenansicht - Google Maps Embed -->
+                                        <div class="map-container" id="maMapContainer" onclick="openMapsFullscreen()" title="Klicken um Google Maps zu oeffnen">
+                                            <div class="map-placeholder" id="maMapPlaceholder">
+                                                <span>Adresse eingeben<br>fuer Kartenansicht</span>
+                                            </div>
+                                            <iframe id="maMapFrame" src="" style="display:none;"></iframe>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1324,6 +1404,7 @@
                                             <select id="cboJahrEinsatz" data-testid="ma-select-jahr-einsatz" style="width: 100px;">
                                                 <option value="">Alle</option>
                                             </select>
+                                            <button class="btn" id="Bericht_drucken" onclick="Bericht_drucken_Click()" title="Einsatzübersicht drucken">Drucken</button>
                                             <span style="margin-left: auto;">Letzte 50 Einsätze</span>
                                         </div>
                                         <div style="height: 350px; overflow-y: auto; border: 1px solid #808080;">
@@ -1365,6 +1446,9 @@
                                             <select id="cboJahrDienstplan" data-testid="ma-select-jahr-dienstplan" style="width: 100px;">
                                                 <option value="">Alle</option>
                                             </select>
+                                            <span style="border-left: 1px solid #ccc; padding-left: 8px;"></span>
+                                            <button class="btn" id="btn_Diensplan_prnt" onclick="btn_Diensplan_prnt_Click()" title="Dienstplan drucken">Drucken</button>
+                                            <button class="btn btn-blue" id="btn_Dienstplan_send" onclick="btn_Dienstplan_send_Click()" title="Dienstplan per Email senden">Senden</button>
                                         </div>
                                         <iframe src="sub_MA_Dienstplan.html" style="width: 100%; height: 350px; border: none;"></iframe>
                                     </div>
@@ -1376,6 +1460,7 @@
                                         <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap;">
                                             <button class="btn btn-green" onclick="neueNichtVerfügbar()">+ Neu</button>
                                             <button class="btn btn-red" onclick="loescheNichtVerfügbar()">Löschen</button>
+                                            <button class="btn" id="btnMehrfachtermine" onclick="btnMehrfachtermine_Click()" title="Abwesenheitsplanung öffnen">Mehrfachtermine</button>
                                             <label>Monat:</label>
                                             <select id="cboMonatNV" data-testid="ma-select-monat-nv" style="width: 120px;">
                                                 <option value="">Alle</option>
@@ -1412,6 +1497,7 @@
                                         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                                             <button class="btn btn-green" onclick="neueDienstkleidung()">+ Ausgabe</button>
                                             <button class="btn" onclick="rückgabeDienstkleidung()">Rückgabe</button>
+                                            <button class="btn" id="btnReport_Dienstkleidung" onclick="btnReport_Dienstkleidung_Click()" title="Dienstkleidung drucken">Drucken</button>
                                         </div>
                                         <div style="height: 350px; overflow-y: auto; border: 1px solid #808080;">
                                             <table class="data-grid" id="dkTable" data-testid="ma-table-dienstkleidung">
@@ -1444,6 +1530,8 @@
                                             <label>Jahr:</label>
                                             <select id="cboJahrZeitkonto" style="width: 100px; height: 22px; font-size: 11px;"></select>
                                             <button class="btn btn-blue" id="btnLesen" onclick="btnLesen_Click()">Lesen</button>
+                                            <button class="btn" id="btnCalc" onclick="btnCalc_Click()" title="Stundenberechnung öffnen">Stundenberechnung</button>
+                                            <button class="btn" id="btnZuAb" onclick="btnZuAb_Click()" title="Zu/Abschläge bearbeiten">Zu/Abschläge</button>
                                             <span id="lblDatumZeitkonto" style="margin-left: auto; font-weight: bold;"></span>
                                         </div>
                                         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
@@ -1565,6 +1653,7 @@
                                             <button class="btn btn-red" onclick="loescheDokument()">Löschen</button>
                                             <button class="btn" onclick="öffneDokument()">Öffnen</button>
                                             <button class="btn" onclick="loadDokumente()">Aktualisieren</button>
+                                            <button class="btn btn-blue" id="btn_Dokumente" onclick="btn_Dokumente_Click()" title="Dokumentenverwaltung in Access öffnen">In Access öffnen</button>
                                         </div>
                                         <div style="height: 350px; overflow-y: auto; border: 1px solid #808080;">
                                             <table class="data-grid" id="dokumenteTable">
@@ -2160,8 +2249,17 @@
                 }
             });
 
-            // Photo
-            updatePhoto(ma.Lichtbild || ma.MA_Lichtbild);
+            // Photo - tblBilddatei ist das Feld in Access
+            updatePhoto(ma.tblBilddatei || ma.Lichtbild || ma.MA_Lichtbild);
+
+            // Kartenansicht aktualisieren
+            loadMap(
+                ma.Strasse || '',
+                ma.Nr || '',
+                ma.PLZ || '',
+                ma.Ort || ma.MA_Ort || '',
+                ma.Land || 'DE'
+            );
 
             // Audit-Felder
             if (ma.Erst_am) {
@@ -2474,6 +2572,125 @@
                 const addr = `${state.currentRecord.Strasse} ${state.currentRecord.Nr}, ${state.currentRecord.PLZ} ${state.currentRecord.Ort}`;
                 window.open(`https://www.google.com/maps?q=${encodeURIComponent(addr)}`, '_blank');
             }
+        }
+
+        // ============================================
+        // KARTENANSICHT FUNKTIONEN
+        // ============================================
+
+        // Aktuelle Adresse fuer Karte speichern
+        let currentMapAddress = '';
+
+        /**
+         * Karte mit Adresse laden (Google Maps Embed)
+         * @param {string} strasse - Strassenname
+         * @param {string} nr - Hausnummer
+         * @param {string} plz - Postleitzahl
+         * @param {string} ort - Stadt/Ort
+         * @param {string} land - Land (optional, default: Deutschland)
+         */
+        function loadMap(strasse, nr, plz, ort, land) {
+            const mapContainer = document.getElementById('maMapContainer');
+            const mapFrame = document.getElementById('maMapFrame');
+            const mapPlaceholder = document.getElementById('maMapPlaceholder');
+
+            if (!mapContainer || !mapFrame || !mapPlaceholder) {
+                console.warn('[Map] Map-Container nicht gefunden');
+                return;
+            }
+
+            // Pruefe ob Adresse vorhanden
+            if (!ort && !plz) {
+                // Keine Adresse - Placeholder zeigen
+                mapPlaceholder.style.display = 'flex';
+                mapFrame.style.display = 'none';
+                mapFrame.src = '';
+                currentMapAddress = '';
+                return;
+            }
+
+            // Adresse zusammenbauen
+            const addressParts = [];
+            if (strasse) {
+                let streetAddr = strasse;
+                if (nr) streetAddr += ' ' + nr;
+                addressParts.push(streetAddr);
+            }
+            if (plz || ort) {
+                addressParts.push([plz, ort].filter(Boolean).join(' '));
+            }
+            if (land && land !== 'DE' && land !== 'Deutschland') {
+                addressParts.push(land);
+            } else {
+                addressParts.push('Deutschland');
+            }
+
+            const address = addressParts.join(', ');
+            currentMapAddress = address;
+
+            // Google Maps Embed URL (ohne API-Key)
+            const encodedAddress = encodeURIComponent(address);
+            const mapUrl = `https://maps.google.com/maps?q=${encodedAddress}&output=embed&z=15`;
+
+            console.log('[Map] Lade Karte fuer:', address);
+
+            // Karte laden
+            mapPlaceholder.style.display = 'none';
+            mapFrame.style.display = 'block';
+            mapFrame.src = mapUrl;
+        }
+
+        /**
+         * Oeffnet Google Maps im neuen Tab mit der aktuellen Adresse
+         */
+        function openMapsFullscreen() {
+            if (!currentMapAddress) {
+                // Versuche Adresse aus aktuellen Feldern zu holen
+                const strasse = document.querySelector('[data-field="Strasse"]')?.value || '';
+                const nr = document.querySelector('[data-field="Nr"]')?.value || '';
+                const plz = document.querySelector('[data-field="PLZ"]')?.value || '';
+                const ort = document.querySelector('[data-field="Ort"]')?.value || '';
+
+                if (!ort && !plz) {
+                    showToast('Keine Adresse vorhanden', 'warning');
+                    return;
+                }
+
+                const addressParts = [];
+                if (strasse) {
+                    let streetAddr = strasse;
+                    if (nr) streetAddr += ' ' + nr;
+                    addressParts.push(streetAddr);
+                }
+                if (plz || ort) {
+                    addressParts.push([plz, ort].filter(Boolean).join(' '));
+                }
+                addressParts.push('Deutschland');
+                currentMapAddress = addressParts.join(', ');
+            }
+
+            // Google Maps in neuem Tab oeffnen
+            const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(currentMapAddress)}`;
+            window.open(url, '_blank');
+        }
+
+        /**
+         * Aktualisiert die Kartenansicht mit Daten aus dem aktuellen Datensatz
+         */
+        function updateMapFromRecord() {
+            if (!state.currentRecord) {
+                loadMap('', '', '', '', '');
+                return;
+            }
+
+            const rec = state.currentRecord;
+            loadMap(
+                rec.Strasse || '',
+                rec.Nr || '',
+                rec.PLZ || '',
+                rec.Ort || rec.MA_Ort || '',
+                rec.Land || 'DE'
+            );
         }
 
         function einsaetzeUebertragen(typ) {

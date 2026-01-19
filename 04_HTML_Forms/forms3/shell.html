@@ -366,19 +366,16 @@
                 <div class="category-block">
                     <div class="category-header">PERSONAL</div>
                     <button class="menu-btn" data-form="frm_MA_Zeitkonten" title="Zeitkonten der Mitarbeiter einsehen">Zeitkonten</button>
-                    <button class="menu-btn" data-form="frm_N_Stundenauswertung" title="Stundenauswertung und Statistik">Stundenauswertung</button>
                     <button class="menu-btn" data-form="frm_MA_Abwesenheit" title="Urlaub, Krankheit, Abwesenheiten">Abwesenheiten</button>
-                    <!-- Lohn entfernt (14.01.2026) -->
-                    <button class="menu-btn" data-action="telefonliste" title="Telefonliste drucken">Telefonliste</button>
+                    <!-- Stundenauswertung, Telefonliste entfernt (18.01.2026) -->
                     <button class="menu-btn" data-action="letzterEinsatz" title="Letzten Einsatz eines MA anzeigen">Letzter Einsatz</button>
                     <button class="menu-btn" data-form="zfrm_ZK_Lohnarten_Zuschlag" title="Lohnarten verwalten">Lohnarten</button>
                 </div>
 
                 <!-- EXTRAS -->
+                <!-- Schnellauswahl, Einsatzübersicht entfernt (18.01.2026) -->
                 <div class="category-block">
                     <div class="category-header">EXTRAS</div>
-                    <button class="menu-btn" data-form="frm_MA_VA_Schnellauswahl" title="Schnelle Mitarbeiter-Zuweisung">Schnellauswahl</button>
-                    <button class="menu-btn" data-form="frm_Einsatzuebersicht" title="Alle Einsätze auf einen Blick">Einsatzübersicht</button>
                     <button class="menu-btn" data-form="frmTop_neue_Vorlagen" title="Vorlagen verwalten">Vorlagen</button>
                 </div>
 
@@ -396,8 +393,14 @@
                 <div class="category-block">
                     <div class="category-header">SYSTEM</div>
                     <button class="menu-btn" data-form="frm_Lex_Aktiv" title="Lexware Aktiv-Status">Lex Aktiv</button>
-                    <button class="menu-btn" data-action="loewensaalSync" title="Löwensaal Daten synchronisieren">Löwensaal Sync</button>
-                    <!-- Löwensaal HP entfernt (14.01.2026) -->
+                </div>
+
+                <!-- AUFTRÄGE ANLEGEN -->
+                <div class="category-block">
+                    <div class="category-header">AUFTRÄGE ANLEGEN</div>
+                    <button class="menu-btn" data-action="syncAuftraege" title="Aufträge vom Löwensaal synchronisieren">Aufträge sync</button>
+                    <button class="menu-btn" data-action="standwachenAnlegen" title="Standwachen aus E-Mail anlegen">Standwachen anlegen</button>
+                    <button class="menu-btn" data-action="hirschAnlegen" title="Hirsch Auftrag anlegen">Hirsch Auftrag anlegen</button>
                 </div>
             </div>
         </div>
@@ -435,11 +438,9 @@
             'frm_KD_Kundenstamm': 'Kunden',
             'frm_OB_Objekt': 'Objekte',
             'frm_MA_Zeitkonten': 'Zeitkonten',
-            'frm_N_Stundenauswertung': 'Stunden',
             'frm_MA_Abwesenheit': 'Abwesenheiten',
             'frm_N_Lohnabrechnungen': 'Lohn',
-            'frm_MA_VA_Schnellauswahl': 'Schnellauswahl',
-            'frm_Einsatzuebersicht': 'Einsätze',
+            // Entfernt 18.01.2026: frm_N_Stundenauswertung, frm_MA_VA_Schnellauswahl, frm_Einsatzuebersicht
             'frm_Menuefuehrung1': 'Menü',
             'zfrm_ZK_Lohnarten_Zuschlag': 'Lohnarten',
             'frmTop_neue_Vorlagen': 'Vorlagen',
@@ -861,8 +862,19 @@
                         break;
 
                     case 'loewensaalSync':
-                        // Löwensaal Daten synchronisieren - Original Access Funktion
+                    case 'syncAuftraege':
+                        // Aufträge synchronisieren (Löwensaal)
                         vbaFunc = 'HTML_btn_LoewensaalSync_Click';
+                        break;
+
+                    case 'standwachenAnlegen':
+                        // Standwachen aus E-Mail anlegen (Stawas)
+                        vbaFunc = 'Email_Zu_Auftrag';
+                        break;
+
+                    case 'hirschAnlegen':
+                        // Hirsch Auftrag anlegen
+                        vbaFunc = 'HirschImport_Starten';
                         break;
 
                     case 'loewensaalSyncHP':

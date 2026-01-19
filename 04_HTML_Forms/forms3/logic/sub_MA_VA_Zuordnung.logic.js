@@ -447,9 +447,11 @@ function render() {
  */
 function renderNoSchichten() {
     if (!tbody) return;
+    // NUR tbody leeren, thead bleibt intakt! (17.01.2026)
+    // colspan=10 entspricht den 10 Spalten: Lfd, MA, von, bis, Std, Bemerk, ?, PKW, EL, RE
     tbody.innerHTML = `
         <tr>
-            <td colspan="15" style="text-align:center; color:#666; padding:20px;">
+            <td colspan="10" style="text-align:center; color:#666; padding:20px;">
                 Keine Schichten für dieses Datum angelegt
             </td>
         </tr>
@@ -585,9 +587,11 @@ function notifyParentRecalc() {
  */
 function renderEmpty() {
     if (!tbody) return;
+    // NUR tbody leeren, thead bleibt intakt! (17.01.2026)
+    // colspan=10 entspricht den 10 Spalten: Lfd, MA, von, bis, Std, Bemerk, ?, PKW, EL, RE
     tbody.innerHTML = `
         <tr>
-            <td colspan="15" style="text-align:center; color:#666; padding:20px;">
+            <td colspan="10" style="text-align:center; color:#666; padding:20px;">
                 Keine MA-Zuordnungen vorhanden
             </td>
         </tr>
@@ -599,9 +603,11 @@ function renderEmpty() {
  */
 function renderError(message) {
     if (!tbody) return;
+    // NUR tbody leeren, thead bleibt intakt! (17.01.2026)
+    // colspan=10 entspricht den 10 Spalten: Lfd, MA, von, bis, Std, Bemerk, ?, PKW, EL, RE
     tbody.innerHTML = `
         <tr>
-            <td colspan="15" style="text-align:center; color:#dc3545; padding:20px;">
+            <td colspan="10" style="text-align:center; color:#dc3545; padding:20px;">
                 Fehler: ${message}
             </td>
         </tr>

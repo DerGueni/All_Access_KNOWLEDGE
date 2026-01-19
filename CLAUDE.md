@@ -40,6 +40,13 @@ Call ExportUltimate   ' Erstellt alle 4 Index-Dateien neu
 
 **Trigger-Wörter:** "wie in Access", "teste Buttons", "funktioniert wie", "Filter wie Access"
 
+### ⚠️ NIE RATEN ODER EIGENMÄCHTIG ENTSCHEIDEN!
+Wenn Informationen fehlen oder etwas unklar ist:
+1. **ZUERST** in Access VBA-Modulen nachsehen (`exports/vba/...`)
+2. **DANN** in Access-Frontend prüfen (über Bridge oder manuell)
+3. **NOTFALLS** den Benutzer fragen
+4. **NIEMALS** raten, annehmen oder eigenmächtig entscheiden!
+
 ### PFLICHT-WORKFLOW:
 1. **LESEN:** `exports/vba/forms/Form_frm_[NAME].bas` + `exports/forms/frm_[NAME]/controls.json`
 2. **ANALYSIEREN:** Events finden (`_Click`, `_AfterUpdate`, `_DblClick`)
@@ -261,6 +268,22 @@ CSS: font-size: 11px, table-layout: fixed
 
 ## Trusted Workspace
 `C:\Users\guenther.siegert\Documents` = voll vertraut, keine Nachfragen
+
+---
+
+## 🏆 ERLEDIGT-REGEL (KRITISCH!)
+
+**Eine Aufgabe gilt ERST als erledigt, wenn:**
+1. Der **Senior Master Agent** die Aufgabe geprüft hat
+2. Der **Senior Master Agent** die Aufgabe getestet hat
+3. Der Test **erfolgreich** war
+
+**Erst dann darf ausgegeben werden:** `"Erledigt !"`
+
+**VERBOTEN:**
+- "Erledigt" sagen ohne Test
+- "Sollte funktionieren" als Abschluss
+- Aufgabe als fertig markieren ohne Prüfung
 
 ---
 

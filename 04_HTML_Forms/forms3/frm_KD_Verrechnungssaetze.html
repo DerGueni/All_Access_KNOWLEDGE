@@ -270,9 +270,15 @@
 
         <!-- Filter -->
         <div class="filter-row">
+            <label>Kunde:</label>
+            <select id="kundenFilter" onchange="filterByKunde()">
+                <option value="">-- Alle Kunden --</option>
+            </select>
             <label>Suche:</label>
             <input type="text" id="searchInput" placeholder="Firma suchen..." oninput="filterTable()">
             <span id="recordCount">0 Kunden</span>
+            <button class="btn unified-btn btn-green" onclick="editSelected()" title="Preise bearbeiten">Bearbeiten</button>
+            <button class="btn unified-btn" onclick="deleteSelected()" title="Preise loeschen" style="background: linear-gradient(to bottom, #c06060, #803030); color: white;">Loeschen</button>
         </div>
 
         <!-- Content -->

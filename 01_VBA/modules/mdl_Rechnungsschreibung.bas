@@ -43,7 +43,7 @@ Zahlbed_Zahlbar_BetragNetto = fctround(betrag - (betrag * sd))
 End Function
 
 ''Public Function Get_NeueNr(Optional iArt As Long = 1) As String
-'''CONSEC 5 stellig mit führender Null
+'''CONSEC 5 stellig mit fï¿½hrender Null
 ''Select Case iArt
 ''    Case 1 ' Rechnung
 ''    Case 2 ' Angebot
@@ -98,7 +98,7 @@ End If
 
 End Function
 
-Function Update_Rch_Nr(iID As Long) As Long
+Public Function Update_Rch_Nr(iID As Long) As Long
 Dim i As Long
 Dim strSQL As String
 

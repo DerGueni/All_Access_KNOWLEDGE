@@ -3,330 +3,737 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planungsübersicht - CONSYS</title>
+    <title>Planungsübersicht</title>
     <link rel="stylesheet" href="css/app-layout.css">
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/form-titles.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
     <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
-        /* Planungsübersicht spezifische Styles */
-        .dp-container.no-menu {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background: #f5f5f5;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .dp-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 12px;
+            background-color: #8080c0;
             overflow: hidden;
         }
-        .dp-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background: #4316B2;
-            color: white;
-            flex-wrap: wrap;
-            gap: 10px;
+
+        /* Shell-Modus: Sidebar ausblenden */
+        body.shell-mode .left-menu,
+        body.shell-mode .app-sidebar {
+            display: none !important;
         }
-        .dp-header .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+
+        body.shell-mode .app-main {
+            width: 100% !important;
+            margin-left: 0 !important;
         }
-        .dp-header .dp-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: white;
+
+        body.shell-mode .app-container {
+            display: block !important;
+        }
+
+        /* ============================================ */
+        /* SIDEBAR - Referenz-Design (wie frm_va_Auftragstamm) */
+        /* ============================================ */
+        .app-container {
+            display: flex !important;
+            height: 100vh !important;
+            width: 100% !important;
+        }
+
+        .app-sidebar,
+        .left-menu {
+            width: 185px !important;
+            background-color: #6060a0 !important;
+            padding: 5px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex-shrink: 0 !important;
+            height: 100vh !important;
+        }
+
+        .sidebar-header,
+        .menu-header {
+            background-color: #000080 !important;
+            color: white !important;
+            padding: 6px !important;
+            text-align: center !important;
+            font-weight: bold !important;
+            font-size: 12px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .sidebar-menu,
+        .menu-buttons {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 !important;
+            justify-content: space-between !important;
+        }
+
+        .sidebar-btn,
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0) !important;
+            padding: 8px 10px !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            font-size: 12px !important;
+            color: #000 !important;
+            font-weight: 500 !important;
+            position: relative !important;
+            border: none !important;
+            margin: 1px 0 !important;
+            overflow: visible !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            width: 100% !important;
+        }
+
+        /* Obere helle Kante - 4px nach rechts versetzt */
+        .sidebar-btn::before,
+        .menu-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: calc(100% - 4px) !important;
+            height: 2px !important;
+            background: #ffffff !important;
+            z-index: 1 !important;
+        }
+
+        /* Untere dunkle Kante - 4px nach links versetzt */
+        .sidebar-btn::after,
+        .menu-btn::after {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            right: 0 !important;
+            width: calc(100% - 4px) !important;
+            height: 2px !important;
+            background: #404070 !important;
+            z-index: 1 !important;
+        }
+
+        .sidebar-btn:hover,
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0) !important;
+        }
+
+        .sidebar-btn:active,
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0) !important;
+        }
+
+        .sidebar-btn:active::before,
+        .menu-btn:active::before {
+            background: #404070 !important;
+            left: 4px !important;
+            width: calc(100% - 4px) !important;
+        }
+
+        .sidebar-btn:active::after,
+        .menu-btn:active::after {
+            background: #ffffff !important;
+            right: 4px !important;
+            width: calc(100% - 4px) !important;
+        }
+
+        .sidebar-btn.active,
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0) !important;
+        }
+
+        .sidebar-btn.active::before,
+        .menu-btn.active::before {
+            background: #505080 !important;
+            left: 4px !important;
+            width: calc(100% - 4px) !important;
+        }
+
+        .sidebar-btn.active::after,
+        .menu-btn.active::after {
+            background: #c0c0d8 !important;
+            right: 4px !important;
+            width: calc(100% - 4px) !important;
+        }
+
+        .app-main {
+            flex: 1 !important;
+            overflow: hidden !important;
+        }
+
+        /* Hauptcontainer - Referenz-Farben */
+        .form-container {
+            width: 100%;
+            height: 100%;
+            background-color: #8080c0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Detail Section - Unterhalb des unified-header */
+        .form-detail {
+            display: flex;
+            flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+            background-color: #b8b8d8;
+            overflow: auto;
+            border: 1px solid #606090;
+            margin: 2px;
+        }
+
+        /* Inline Checkbox im Header */
+        .header-checkbox-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            margin: 0 8px;
+        }
+
+        .header-checkbox-inline input[type="checkbox"] {
             margin: 0;
         }
-        .dp-header .header-center {
+
+        .header-checkbox-inline label {
+            white-space: nowrap;
+        }
+
+        /* Header Select */
+        .header-select {
+            border: 1px solid #ccc;
+            border-radius: 2px;
+        }
+
+        /* Header Date Input */
+        .header-date-input {
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+        }
+
+        /* ============================================ */
+        /* MAIN CONTENT                                */
+        /* ============================================ */
+
+        .main-content {
+            flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+            display: flex;
+            flex-direction: column;
+            padding: 5px;
+            overflow: hidden;
+        }
+
+        /* Kalender Header - Referenz-Design (blau) */
+        .calendar-header-row {
+            display: flex;
+            height: 28px;
+            margin-bottom: 1px;
+            position: sticky; /* STICKY HEADER */
+            top: 0;
+            z-index: 11;
+            background-color: #8080c0; /* Hintergrund für sticky */
+        }
+
+        .col-auftrag-header {
+            width: 250px;
+            background-color: #000080;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            padding-left: 10px;
+            flex-shrink: 0;
         }
-        .dp-header .header-right {
+
+        .day-column-header {
+            flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
             display: flex;
-            align-items: center;
-            gap: 15px;
+            flex-direction: column;
+            min-width: 180px;
         }
-        .dp-date-input {
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 13px;
+
+        .day-title {
+            background-color: #000080;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 4px 8px;
+            text-align: center;
+            border-left: 1px solid #000060;
         }
-        .dp-btn {
-            padding: 6px 12px;
-            background: #fff;
-            color: #333;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
+
+        .day-title.weekend {
+            background-color: #4040a0;
+            color: white;
         }
-        .dp-btn:hover {
-            background: #e0e0e0;
-        }
-        .dp-btn-nav {
-            padding: 6px 10px;
-            background: #fff;
-            color: #333;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
+
+        .day-title.feiertag {
+            background-color: #c04040;
+            color: white;
             font-weight: bold;
         }
-        .dp-btn-nav:hover {
-            background: #e0e0e0;
-        }
-        .filter-options {
+
+        .day-sub-headers {
             display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        .filter-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
-            color: white;
-        }
-        .dp-input-small {
-            width: 50px;
-            padding: 3px 5px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 12px;
-        }
-        .version-info {
-            display: flex;
-            gap: 10px;
-            font-size: 11px;
-            color: rgba(255,255,255,0.8);
+            background-color: #9090c0;
+            font-size: 9px;
+            font-weight: bold;
+            border-left: 1px solid #606090;
         }
 
-        /* Tabelle */
-        .dp-table-container {
+        .day-sub-headers span {
+            padding: 2px 4px;
+            text-align: center;
+        }
+
+        .sub-name {
+            flex: 2;
+            border-right: 1px solid #7070a0;
+        }
+
+        .sub-von {
+            width: 35px;
+            border-right: 1px solid #7070a0;
+        }
+
+        .sub-bis {
+            width: 35px;
+        }
+
+        /* Kalender Body */
+        .calendar-body {
             flex: 1;
-            overflow: auto;
-            padding: 10px;
-        }
-        .dp-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            font-size: 11px;
-        }
-        .dp-table th, .dp-table td {
-            border: 1px solid #ccc;
-            padding: 4px 6px;
-        }
-        .dp-header-row th {
-            background: #4316B2;
-            color: white;
-            text-align: center;
-            font-weight: 600;
-        }
-        .dp-subheader-row th {
-            background: #6633CC;
-            color: white;
-            text-align: center;
-            font-size: 10px;
-        }
-        .th-content {
-            padding: 5px;
-        }
-        .th-content.cyan {
-            background: #00CED1;
-            color: #000;
-        }
-        .col-auftrag {
-            min-width: 180px;
-            max-width: 220px;
-            vertical-align: top;
-            background: #f9f9f9;
-        }
-        .col-day {
-            min-width: 180px;
-        }
-        .sub-col {
-            min-width: 60px;
-        }
-        .auftrag-sub {
-            min-width: 180px;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+            overflow-y: auto;
+            background: #8080C0;
         }
 
-        /* Zeilen */
-        .dp-row {
-            cursor: pointer;
+        .calendar-row {
+            display: flex;
+            border-bottom: 3px solid #606090;
+            min-height: 60px;
         }
-        .dp-row:hover {
-            background: #e8f4ff;
+
+        .calendar-row:nth-child(even) {
+            background-color: #9090C8;
         }
-        .dp-row.selected {
-            background: #cce5ff;
+
+        .col-auftrag {
+            width: 250px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #C0C0D8;
+            border-right: 2px solid #9090c0;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
-        .auftrag-row td:first-child {
-            font-weight: 600;
+
+        .auftrag-name {
+            font-weight: bold;
+            color: #333;
         }
+
+        .auftrag-details {
+            font-weight: normal;
+            font-size: 9px;
+            color: #666;
+        }
+
+        .day-column {
+            flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+            min-width: 180px;
+            border-right: 2px solid #9090c0;
+            padding: 3px;
+            font-size: 11px;
+            background-color: #FFFFFF;
+        }
+
+        .day-column.weekend {
+            background-color: #FFFFFF;
+        }
+
+        .day-column.feiertag {
+            background-color: #ffe6e6;
+        }
+
+        /* MA-Eintrag in Tageszelle */
+        .ma-entry {
+            display: flex;
+            padding: 2px 4px;
+            border-bottom: 1px solid #ccc;
+            font-size: 11px;
+        }
+
+        .ma-entry:hover {
+            background-color: #e8f4fc;
+        }
+
+        /* Unbesetzte Position (gelb) */
+        .ma-entry.unbesetzt {
+            background-color: #ffffcc;
+        }
+
+        /* Fragliche Zusage (türkis) */
+        .ma-entry.fraglich {
+            background-color: #ccffff;
+        }
+
         .ma-name {
-            font-size: 10px;
-            white-space: nowrap;
+            flex: 2;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 80px;
+            white-space: nowrap;
+            font-size: 11px;
         }
-        .zeit {
-            font-size: 10px;
+
+        .ma-von {
+            width: 40px;
+            text-align: center;
+            color: #009900;
+            font-weight: bold;
+        }
+
+        .ma-bis {
+            width: 40px;
             text-align: center;
         }
-        .highlight-cyan {
-            background: #00CED1 !important;
-        }
-        .highlight-yellow {
-            background: #FFD700 !important;
+
+        .ma-entry.storno .ma-name {
+            color: #cc0000;
+            font-weight: bold;
         }
 
-        /* MA-Zelle für DblClick */
-        .ma-zelle {
-            cursor: pointer;
-        }
-        .ma-zelle:hover {
-            background: #fffacd;
-        }
-        .ma-zelle.selected {
-            background: #ffeb3b;
-            outline: 2px solid #f57c00;
-        }
-
-        /* Tag-Header für DblClick */
-        .tag-header {
-            cursor: pointer;
-        }
-        .tag-header:hover {
-            background: #5a3dd8 !important;
-        }
-
-        /* Footer */
-        .dp-footer {
+        /* Loading */
+        .loading {
             display: flex;
-            justify-content: space-between;
-            padding: 8px 20px;
-            background: #eee;
-            border-top: 1px solid #ccc;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #888;
             font-size: 12px;
         }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top-color: #8B0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Vollbild-Button oben rechts */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #606060 #606060 #ffffff;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .fullscreen-btn:active {
+            border-color: #606060 #ffffff #ffffff #606060;
+        }
+
     </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+<link rel="stylesheet" href="css/visbug_overrides.css">
 </head>
-<body data-active-menu="planungsuebersicht">
-    <div class="dp-container no-menu">
-        <!-- Hauptbereich (ohne Menu - wird aus Access geöffnet) -->
-        <main class="dp-main">
-            <!-- Header -->
-            <header class="dp-header">
-                <div class="header-left">
-                    <div class="dp-logo"></div>
-                    <h1 class="dp-title">Planungsübersicht</h1>
-                </div>
-                <div class="header-center">
-                    <input type="date" id="datStartdatum" class="dp-date-input" value="">
-                    <button class="dp-btn" id="btnStartdatumAendern">Startdatum Ändern</button>
-                    <button class="dp-btn-nav" id="btnVorwoche" title="3 Tage zurück">&#9664;</button>
-                    <button class="dp-btn-nav" id="btnNachwoche" title="3 Tage vor">&#9654;</button>
-                    <button class="dp-btn" id="btnAbHeute">Ab Heute</button>
-                </div>
-                <div class="header-right">
-                    <div class="filter-options">
-                        <label class="filter-checkbox">
-                            <input type="checkbox" id="chkNurFreieSchichten">
-                            Nur freie Schichten anzeigen
-                        </label>
-                        <label class="filter-checkbox">
-                            <input type="checkbox" id="chkWenigerAls">
-                            Nur Aufträge mit weniger als
-                            <input type="number" id="txtPositionen" class="dp-input-small" value="25" min="1" max="100">
-                            Positionen anzeigen
-                        </label>
-                    </div>
-                    <button class="dp-btn" id="btnUebersichtDrucken">Übersicht drucken</button>
-                    <div class="version-info">
-                        <span id="lblVersion">FE | V2.1</span>
-                        <span id="lblDatum"></span>
-                    </div>
-                </div>
-            </header>
+<body data-form="frm_VA_Planungsuebersicht">
+    <script>
+        // Shell-Modus erkennen (URL-Parameter oder SHELL_PARAMS)
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isShell = urlParams.get('shell') === '1' || (window.SHELL_PARAMS && window.SHELL_PARAMS.shell === '1');
+            if (isShell) {
+                document.body.classList.add('shell-mode');
+            }
+        })();
+    </script>
+    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">&#9974;</button>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">HAUPTMENU</div>
+            <nav class="sidebar-menu">
+                <button class="menu-btn" data-form="frm_DP_Dienstplan_MA">Dienstplanübersicht</button>
+                <button class="menu-btn active" data-form="frm_VA_Planungsuebersicht">Planungsübersicht</button>
+                <button class="menu-btn" data-form="frm_va_Auftragstamm">Auftragsverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_VA_Schnellauswahl">Offene Mail Anfragen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Excel Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_Abwesenheiten">Abwesenheitsplanung</button>
+                <button class="menu-btn">Dienstausweis erstellen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Stundenabgleich</button>
+                <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kundenverwaltung</button>
+                <button class="menu-btn">Verrechnungssätze</button>
+                <button class="menu-btn">Sub Rechnungen</button>
+                <button class="menu-btn" data-form="frmOff_Outlook_aufrufen">E-Mail</button>
+                <button class="menu-btn" data-form="frm_Menuefuehrung1">Menu 2</button>
+                <button class="menu-btn" onclick="openHtmlAnsicht()">HTML Ansicht</button>
+                <button class="menu-btn">System Info</button>
+            </nav>
+        </aside>
 
-            <!-- Planungs Tabelle -->
-            <div class="dp-table-container">
-                <table class="dp-table" id="tblPlanung">
-                    <thead>
-                        <tr class="dp-header-row">
-                            <th class="col-auftrag" rowspan="2">
-                                <div class="th-content cyan">Auftrag / Veranstaltung</div>
-                            </th>
-                            <th class="col-day tag-header" colspan="3" id="thTag1" data-day-offset="0">
-                                <div class="th-content">Tag 1</div>
-                            </th>
-                            <th class="col-day tag-header" colspan="3" id="thTag2" data-day-offset="1">
-                                <div class="th-content">Tag 2</div>
-                            </th>
-                            <th class="col-day tag-header" colspan="3" id="thTag3" data-day-offset="2">
-                                <div class="th-content">Tag 3</div>
-                            </th>
-                            <th class="col-day tag-header" colspan="3" id="thTag4" data-day-offset="3">
-                                <div class="th-content">Tag 4</div>
-                            </th>
-                            <th class="col-day tag-header" colspan="3" id="thTag5" data-day-offset="4">
-                                <div class="th-content">Tag 5</div>
-                            </th>
-                            <th class="col-day tag-header" colspan="3" id="thTag6" data-day-offset="5">
-                                <div class="th-content">Tag 6</div>
-                            </th>
-                            <th class="col-day tag-header" colspan="3" id="thTag7" data-day-offset="6">
-                                <div class="th-content">Tag 7</div>
-                            </th>
-                        </tr>
-                        <tr class="dp-subheader-row">
-                            <th class="sub-col auftrag-sub">Auftrag Objekt Ort</th>
-                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
-                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
-                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
-                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
-                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
-                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
-                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody_Planung">
-                        <tr>
-                            <td colspan="22" style="text-align:center;padding:40px;color:#666;">
-                                Lade Planungsdaten...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- Main Content -->
+        <main class="app-main">
+    <div class="form-container">
+        <!-- HEADER SECTION - Unified Header -->
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold;">Planungsübersicht</span>
+                <div class="buttons-grid">
+                    <label style="font-size:11px; margin-right:5px;">KW:</label>
+                    <select id="cboKW" class="header-select" style="width:60px; height:22px; font-size:11px; margin-right:10px;"></select>
+                    <input type="date" class="header-date-input" id="dtStartdatum" style="width:90px; height:22px; font-size:10px;">
+                    <button class="btn unified-btn" id="btnVor" title="Vorwärts">&gt;</button>
+                    <button class="btn unified-btn" id="btnrueck" title="Zurück">&lt;</button>
+                    <button class="btn unified-btn" id="btnStartdatum">Startdatum Ändern</button>
+                    <button class="btn unified-btn" id="btn_Heute">Ab Heute</button>
+                    <span class="header-checkbox-inline">
+                        <input type="checkbox" id="NurIstNichtZugeordnet">
+                        <label for="NurIstNichtZugeordnet">Nur freie Schichten</label>
+                    </span>
+                    <span class="header-checkbox-inline">
+                        <input type="checkbox" id="IstAuftrAusblend">
+                        <label for="IstAuftrAusblend">Max Pos:</label>
+                        <input type="text" id="PosAusblendAb" value="25" style="width:30px; height:18px; font-size:10px; text-align:center;">
+                    </span>
+                    <button class="btn unified-btn" id="btnreq" title="Aktualisieren">&#x21bb;</button>
+                    <button class="btn unified-btn" id="btnOutpExcel">Übersicht drucken</button>
+                    <button class="btn unified-btn" id="btnOutpExcelSend" style="display:none;">Übersicht senden</button>
+                    <button class="btn unified-btn btn-close" id="Befehl37" title="Schließen">&times;</button>
+                </div>
             </div>
+            <div class="gpt-box">CONSYS<span>Web</span></div>
+        </div>
 
-            <!-- Footer -->
-            <footer class="dp-footer">
-                <div class="footer-left">
-                    <span id="lblStatus">Bereit</span>
+        <!-- DETAIL SECTION -->
+        <div class="form-detail">
+            <div class="main-content">
+                <!-- Kalender Header -->
+                <div class="calendar-header-row">
+                    <div class="col-auftrag-header">Auftrag / Veranstaltung</div>
+                    <div class="day-column-header" id="day_1">
+                        <div class="day-title">Mo. 28.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_2">
+                        <div class="day-title">Di. 29.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_3">
+                        <div class="day-title">Mi. 30.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_4">
+                        <div class="day-title">Do. 31.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_5">
+                        <div class="day-title">Fr. 01.08.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_6">
+                        <div class="day-title weekend">Sa. 02.08.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_7">
+                        <div class="day-title weekend">So. 03.08.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="footer-right">
-                    <span id="lblAnzAuftraege">0 Aufträge</span>
+
+                <!-- Kalender Body -->
+                <div class="calendar-body" id="calendarBody">
+                    <div class="loading">Lade Planungsübersicht...</div>
                 </div>
-            </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebView2 Bridge -->
+    <script src="js/webview2-bridge.js"></script>
+
+    <!-- Formular-Logik - Verwendet dieselbe Logik wie Dienstplan_Objekt -->
+    <script type="module" src="logic/frm_DP_Dienstplan_Objekt.logic.js"></script>
+
+    <!-- WebView2 Integration -->
+    <script src="logic/frm_DP_Dienstplan_Objekt.webview2.js"></script>
+
+    <!-- Hilfsfunktionen -->
+    <script>
+        // Vollbild-Toggle (UI-spezifisch, bleibt inline)
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            if (btn) btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+
+        // Timestamp aktualisieren
+        function updateTimestamp() {
+            const el = document.getElementById('timestamp');
+            if (el) el.textContent = new Date().toLocaleString('de-DE');
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+
+        // HTML-Ansicht oeffnen (fuer Sidebar-Button)
+        function openHtmlAnsicht() {
+            // Navigation via Shell oder direkt
+            if (typeof window.navigateToForm === 'function') {
+                window.navigateToForm('frm_va_Auftragstamm');
+            } else {
+                window.location.href = 'frm_va_Auftragstamm.html';
+            }
+        }
+
+        // DblClick auf Datums-Input: Datepicker öffnen
+        document.getElementById('dtStartdatum')?.addEventListener('dblclick', function() {
+            this.showPicker?.();
+        });
+
+        // DblClick auf Tag-Headers: Datum setzen und Daten neu laden
+        for (let i = 1; i <= 7; i++) {
+            const dayElement = document.getElementById(`day_${i}`);
+            if (dayElement) {
+                dayElement.addEventListener('dblclick', function() {
+                    // Datum aus day-title extrahieren
+                    const dayTitle = this.querySelector('.day-title');
+                    if (dayTitle && dayTitle.textContent) {
+                        const text = dayTitle.textContent.trim();
+                        // Format: "Mo. 28.07.25" -> Datum extrahieren
+                        const dateMatch = text.match(/(\d{1,2})\.(\d{1,2})\.(\d{2})/);
+                        if (dateMatch) {
+                            const day = dateMatch[1].padStart(2, '0');
+                            const month = dateMatch[2].padStart(2, '0');
+                            const year = `20${dateMatch[3]}`;
+                            const dateStr = `${year}-${month}-${day}`;
+
+                            // Datum setzen
+                            const dtInput = document.getElementById('dtStartdatum');
+                            if (dtInput) {
+                                dtInput.value = dateStr;
+                                // Trigger change event für Daten-Reload
+                                dtInput.dispatchEvent(new Event('change', { bubbles: true }));
+                                // Auch loadData aufrufen falls verfügbar
+                                if (typeof window.loadData === 'function') {
+                                    window.loadData?.();
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">Ready</div>
+                <div class="status-right">
+                    <span id="timestamp"></span>
+                </div>
+            </div>
         </main>
     </div>
 
-    <script type="module" src="logic/frm_VA_Planungsuebersicht.logic.js"></script>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; padding:20px; border-radius:8px; text-align:center;">
+            <div style="font-size:14px; margin-bottom:10px;">Laden...</div>
+            <div style="width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid #3498db; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto;"></div>
+        </div>
+    </div>
 
-    <!-- WebView2 Bridge für Access-Integration -->
-    <script src="js/webview2-bridge.js"></script>
+    <!-- Toast Container -->
+    <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:10000;"></div>
+
+    <!-- Sidebar Navigation -->
+    <script type="module" src="js/sidebar.js"></script>
+
+    <!-- Global Handlers -->
+    <script src="js/global-handlers.js"></script>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </body>
 </html>

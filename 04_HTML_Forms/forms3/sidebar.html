@@ -128,23 +128,30 @@
             <div class="menu-header">HAUPTMENÜ</div>
         </div>
         <div class="menu-buttons">
-            <button class="menu-btn" data-form="frm_N_Dienstplanübersicht">Dienstplanübersicht</button>
+            <button class="menu-btn" data-form="frm_N_Dienstplanuebersicht">Dienstplanübersicht</button>
             <button class="menu-btn" data-form="frm_DP_Dienstplan_Objekt">Planungsübersicht</button>
             <button class="menu-btn" data-form="frm_va_Auftragstamm">Auftragsverwaltung</button>
             <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiterverwaltung</button>
             <button class="menu-btn" data-form="frm_MA_Offene_Anfragen">Offene Mail Anfragen</button>
-            <button class="menu-btn" data-form="frm_MA_Zeitkonten">Excel Zeitkonten</button>
             <button class="menu-btn" data-form="frm_MA_Zeitkonten">Zeitkonten</button>
             <button class="menu-btn" data-form="frmTop_MA_Abwesenheitsplanung">Abwesenheitsplanung</button>
             <button class="menu-btn" data-form="frm_Ausweis_Create">Dienstausweis erstellen</button>
             <button class="menu-btn" data-form="frm_N_Stundenauswertung">Stundenabgleich</button>
             <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kundenverwaltung</button>
             <button class="menu-btn" data-form="frm_OB_Objekt">Objektverwaltung</button>
-            <button class="menu-btn" data-form="frm_Verrechnungssaetze">Verrechnungssätze</button>
+            <button class="menu-btn" data-form="frm_KD_Verrechnungssaetze">Verrechnungssätze</button>
             <button class="menu-btn" data-form="frm_SubRechnungen">Sub Rechnungen</button>
             <button class="menu-btn" data-form="frmOff_Outlook_aufrufen">E-Mail</button>
             <button class="menu-btn" data-form="frm_Menuefuehrung1">Menü 2</button>
-            <button class="menu-btn" data-form="frm_SystemInfo">System Info</button>
+            <button class="menu-btn" data-form="frm_Systeminfo">System Info</button>
+        </div>
+        <div>
+            <div class="menu-header" style="margin-top: 10px;">AUFTRÄGE ANLEGEN</div>
+        </div>
+        <div class="menu-buttons" style="flex: 0;">
+            <button class="menu-btn" data-action="sync_auftraege">Aufträge sync</button>
+            <button class="menu-btn" data-action="standwachen_anlegen">Standwachen anlegen</button>
+            <button class="menu-btn" data-action="hirsch_anlegen">Hirsch Auftrag anlegen</button>
         </div>
     </div>
 
@@ -153,21 +160,99 @@
         document.querySelectorAll('.menu-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const formName = this.dataset.form;
-                if (!formName) return;
-                
-                // Aktiven Button markieren
-                document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Navigation via PostMessage an Parent (Shell)
-                if (window.parent !== window) {
-                    window.parent.postMessage({
-                        type: 'SIDEBAR_NAVIGATE',
-                        form: formName
-                    }, '*');
+                const actionName = this.dataset.action;
+
+                // Aktiven Button markieren (nur für Formular-Buttons)
+                if (formName) {
+                    document.querySelectorAll('.menu-btn[data-form]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Navigation via PostMessage an Parent (Shell)
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'SIDEBAR_NAVIGATE',
+                            form: formName
+                        }, '*');
+                    }
+                }
+
+                // Action-Buttons (Aufträge anlegen)
+                if (actionName) {
+                    handleAction(actionName);
                 }
             });
         });
+
+        // Action Handler für "Aufträge anlegen" Buttons
+        async function handleAction(action) {
+            const VBA_BRIDGE = 'http://localhost:5002/api/vba';
+
+            const actions = {
+                'sync_auftraege': {
+                    vbaFunction: 'HTML_btn_LoewensaalSync_Click',
+                    message: 'Aufträge werden synchronisiert...'
+                },
+                'standwachen_anlegen': {
+                    vbaFunction: 'Email_Zu_Auftrag',
+                    message: 'Standwachen werden angelegt...'
+                },
+                'hirsch_anlegen': {
+                    vbaFunction: 'HirschImport_Starten',
+                    message: 'Hirsch Auftrag wird angelegt...'
+                }
+            };
+
+            const config = actions[action];
+            if (!config) return;
+
+            console.log(`[Sidebar] Action: ${action} → ${config.vbaFunction}`);
+
+            // Feedback an Parent senden
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'SIDEBAR_ACTION',
+                    action: action,
+                    vbaFunction: config.vbaFunction,
+                    message: config.message
+                }, '*');
+            }
+
+            // VBA-Bridge aufrufen
+            try {
+                const response = await fetch(VBA_BRIDGE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        function: config.vbaFunction,
+                        params: {}
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log(`[Sidebar] VBA Result:`, result);
+
+                    if (window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'SIDEBAR_ACTION_COMPLETE',
+                            action: action,
+                            success: result.success,
+                            result: result
+                        }, '*');
+                    }
+                }
+            } catch (e) {
+                console.warn(`[Sidebar] VBA-Bridge nicht erreichbar:`, e);
+                // Fallback: Versuche über REST API
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'SIDEBAR_ACTION_ERROR',
+                        action: action,
+                        error: 'VBA-Bridge nicht erreichbar'
+                    }, '*');
+                }
+            }
+        }
 
         // Aktives Formular von Shell empfangen
         window.addEventListener('message', function(event) {

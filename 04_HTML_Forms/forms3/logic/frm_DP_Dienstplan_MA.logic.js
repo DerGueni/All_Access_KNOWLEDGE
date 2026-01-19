@@ -9,7 +9,7 @@ const state = {
     startDate: new Date(),
     mitarbeiter: [],
     dienstplaene: {},
-    filter: 1 // 1=Alle aktiven, 0=Alle, 2=Festangestellte, 3=Minijobber, 4=Sub
+    filter: 2 // 2=Festangestellte (Standard), 0=Alle, 1=Alle aktiven, 3=Minijobber, 4=Sub
 };
 
 // DOM-Elemente
@@ -378,15 +378,15 @@ async function loadDienstplan() {
             } else if (state.filter === 2) {
                 // Festangestellte (Anstellungsart_ID = 3)
                 params.push('aktiv=true');
-                params.push('anstellung=3');
+                params.push('anstellungsart_id=3');
             } else if (state.filter === 3) {
                 // Minijobber (Anstellungsart_ID = 5)
                 params.push('aktiv=true');
-                params.push('anstellung=5');
+                params.push('anstellungsart_id=5');
             } else if (state.filter === 4) {
                 // Sub (Anstellungsart_ID = 11)
                 params.push('aktiv=true');
-                params.push('anstellung=11');
+                params.push('anstellungsart_id=11');
             }
 
             maUrl += '?' + params.join('&');
@@ -459,8 +459,15 @@ function renderWochenansicht() {
         if (isWeekend) headerClass += ' weekend';
         if (isFeiertag) headerClass += ' feiertag';
 
-        html += `<div class="${headerClass}">
-            ${WOCHENTAGE[date.getDay()]} ${date.getDate()}.${date.getMonth() + 1}
+        // Farben: Sa/So = schwaches Gelb, Mo-Fr = hell lila (wie Sidebar)
+        const bgColor = isWeekend ? '#fff9c4' : '#c0c0e0';
+        // Format: "Mo. 19.01."
+        const dayStr = WOCHENTAGE[date.getDay()];
+        const dateNum = String(date.getDate()).padStart(2, '0');
+        const monthNum = String(date.getMonth() + 1).padStart(2, '0');
+
+        html += `<div class="${headerClass}" style="background-color: ${bgColor};">
+            ${dayStr}. ${dateNum}.${monthNum}.
         </div>`;
     }
 

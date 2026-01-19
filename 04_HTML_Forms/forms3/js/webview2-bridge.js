@@ -421,6 +421,32 @@ const Bridge = {
                     this._fireEvent('onDataReceived', { type: 'status', records: Array.isArray(result) ? result : (result.data || []) });
                     return result;
 
+                case 'mitarbeiter':
+                    // Mitarbeiter-Liste mit Filtern
+                    const mitarbeiterQueryParams = new URLSearchParams();
+                    if (params.aktiv) mitarbeiterQueryParams.append('aktiv', 'true');
+                    // API verwendet anstellungsart_id (nicht anstellungsart)
+                    if (params.anstellungsart) mitarbeiterQueryParams.append('anstellungsart_id', params.anstellungsart);
+                    if (params.anstellungsart_in && Array.isArray(params.anstellungsart_in)) {
+                        // Mehrere Anstellungsarten: "3,4" für Festangestellt + Minijobber
+                        mitarbeiterQueryParams.append('anstellungsart_in', params.anstellungsart_in.join(','));
+                    }
+                    if (params.ist_subunternehmer) mitarbeiterQueryParams.append('ist_subunternehmer', 'true');
+                    if (params.search) mitarbeiterQueryParams.append('search', params.search);
+                    if (params.limit) mitarbeiterQueryParams.append('limit', params.limit);
+
+                    const mitarbeiterUrl = `/mitarbeiter${mitarbeiterQueryParams.toString() ? '?' + mitarbeiterQueryParams.toString() : ''}`;
+
+                    // Falls einzelner Mitarbeiter geladen werden soll (mit ID)
+                    if (id) {
+                        result = await apiFetch(`/mitarbeiter/${id}`);
+                        this._fireEvent('onDataReceived', { type: 'mitarbeiter', record: result.data || result });
+                    } else {
+                        result = await apiFetch(mitarbeiterUrl);
+                        this._fireEvent('onDataReceived', { type: 'mitarbeiter', records: Array.isArray(result) ? result : (result.data || []) });
+                    }
+                    return result;
+
                 case 'kunden':
                     const kundenParams = params.aktiv ? '?aktiv=true' : '';
                     result = await apiFetch(`/kunden${kundenParams}`);
@@ -872,6 +898,8 @@ const Bridge = {
                 return await this.list('status', params);
             case 'getDienstkleidungListe':
                 return await this.list('dienstkleidung', params);
+            case 'getAnstellungsarten':
+                return await this.list('anstellungsarten', params);
 
             case 'getVADatumListe':
                 return await this.list('einsatztage', { va_id: params.VA_ID });

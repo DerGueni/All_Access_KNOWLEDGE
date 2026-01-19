@@ -84,6 +84,12 @@
         .datasheet tbody tr.new-row:hover {
             background: #fff8d0;
         }
+
+        /* KRITISCH: thead MUSS immer sichtbar sein, auch bei leerem tbody (16.01.2026) */
+        .datasheet thead {
+            display: table-header-group !important;
+            visibility: visible !important;
+        }
     </style>
 </head>
 <body>

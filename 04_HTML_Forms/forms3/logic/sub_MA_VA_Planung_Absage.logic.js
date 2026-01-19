@@ -135,6 +135,7 @@ function render() {
     if (state.records.length === 0) { renderEmpty(); return; }
     tbody.innerHTML = state.records.map((rec, idx) => {
         const selectedClass = idx === state.selectedIndex ? ' selected' : '';
+        const disabledAttr = state.isLocked ? 'disabled' : '';
         return `
         <tr data-index="${idx}" data-id="${rec.ID}" class="${selectedClass}">
             <td class="col-hidden">${rec.ID || ''}</td>
@@ -142,12 +143,21 @@ function render() {
             <td class="col-ma">${rec.MA_Name || rec.MA_ID || ''}</td>
             <td class="col-time">${formatTime(rec.VA_Start)}</td>
             <td class="col-time">${formatTime(rec.VA_Ende)}</td>
-            <td class="col-bemerk">${rec.Bemerkungen || ''}</td>
+            <td class="col-bemerk">
+                <input type="text" class="bemerk-input"
+                       data-id="${rec.ID}"
+                       data-index="${idx}"
+                       value="${escapeHtml(rec.Bemerkungen || '')}"
+                       ${disabledAttr}
+                       title="Bemerkung bearbeiten"/>
+            </td>
         </tr>
     `}).join('');
 
     // Event Listener für Zeilen binden
     attachRowListeners();
+    // Event Listener für Bemerkungen-Inputs binden
+    attachBemerkInputListeners();
 }
 
 /**
@@ -198,6 +208,132 @@ function selectRow(index) {
 function renderEmpty() {
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#666;padding:10px;">Keine Absagen</td></tr>';
+}
+
+/**
+ * Escape HTML Sonderzeichen für sichere Darstellung
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * Event Listener für Bemerkungen-Inputs (AfterUpdate wie VBA)
+ * VBA: Form_BeforeUpdate setzt Aend_am und Aend_von
+ */
+function attachBemerkInputListeners() {
+    tbody.querySelectorAll('.bemerk-input').forEach(input => {
+        // Speichere ursprünglichen Wert
+        input.dataset.originalValue = input.value;
+
+        // AfterUpdate (blur = Fokus verliert)
+        input.addEventListener('blur', async (e) => {
+            await handleBemerkungAfterUpdate(e.target);
+        });
+
+        // Enter-Taste = Speichern
+        input.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.target.blur(); // Löst blur-Event aus
+            } else if (e.key === 'Escape') {
+                // Abbrechen: Wert zurücksetzen
+                e.target.value = e.target.dataset.originalValue || '';
+                e.target.blur();
+            }
+        });
+    });
+}
+
+/**
+ * Bemerkung AfterUpdate Handler (wie VBA Form_BeforeUpdate)
+ * Speichert Bemerkung via REST API
+ */
+async function handleBemerkungAfterUpdate(input) {
+    const newValue = input.value.trim();
+    const originalValue = input.dataset.originalValue || '';
+
+    // Keine Änderung = nichts tun
+    if (newValue === originalValue) return;
+
+    const recordId = input.dataset.id;
+    const recordIndex = parseInt(input.dataset.index);
+
+    if (!recordId) {
+        console.warn('[sub_MA_VA_Planung_Absage] Keine Record-ID für Bemerkung');
+        return;
+    }
+
+    console.log(`[sub_MA_VA_Planung_Absage] Bemerkung AfterUpdate: ID=${recordId}, "${originalValue}" → "${newValue}"`);
+
+    // REST API: PUT /api/zuordnungen/<id>
+    // (verwendet existierenden Endpoint aus api_server.py Zeilen 1990-2063)
+    try {
+        const response = await fetch(`http://localhost:5000/api/zuordnungen/${recordId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                Bemerkungen: newValue,
+                Aend_von: 'HTML'  // Wie VBA: atCNames(1)
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API Fehler: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('[sub_MA_VA_Planung_Absage] Bemerkung gespeichert:', result);
+
+        // Erfolg: Lokalen State aktualisieren
+        if (state.records[recordIndex]) {
+            state.records[recordIndex].Bemerkungen = newValue;
+        }
+        input.dataset.originalValue = newValue;
+
+        // Visuelles Feedback
+        showSaveStatus(input, 'success', '✓');
+
+        // Parent informieren (für mögliche Aktualisierung)
+        if (state.isEmbedded) {
+            window.parent.postMessage({
+                type: 'bemerkung_updated',
+                name: 'sub_MA_VA_Planung_Absage',
+                record_id: recordId,
+                bemerkung: newValue
+            }, '*');
+        }
+
+    } catch (err) {
+        console.error('[sub_MA_VA_Planung_Absage] Fehler beim Speichern:', err);
+
+        // Fehler: Wert zurücksetzen
+        input.value = originalValue;
+        showSaveStatus(input, 'error', '✗');
+    }
+}
+
+/**
+ * Zeigt kurzen Speicher-Status neben dem Input an
+ */
+function showSaveStatus(input, type, text) {
+    // Entferne vorherigen Status
+    const existingStatus = input.parentNode.querySelector('.save-status');
+    if (existingStatus) existingStatus.remove();
+
+    // Neuen Status erstellen
+    const status = document.createElement('span');
+    status.className = `save-status ${type}`;
+    status.textContent = text;
+    input.parentNode.appendChild(status);
+
+    // Nach 2 Sekunden ausblenden
+    setTimeout(() => {
+        status.remove();
+    }, 2000);
 }
 
 function formatTime(value) {

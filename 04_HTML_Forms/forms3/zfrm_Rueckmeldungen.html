@@ -3,41 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rueckmeldungen - CONSYS</title>
-        <link rel="stylesheet" href="css/fonts_override.css">
+    <title>Auswertung der Rückmeldungen - CONSYS</title>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; font-size: 11px; }
-        body { background-color: #8080c0; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .placeholder {
-            background: #d0d0e0;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 40px;
-            text-align: center;
-            max-width: 500px;
+        body { background-color: #f2f0e6; font-family: 'Segoe UI', sans-serif; font-size: 11px; margin: 0; }
+        .window-frame { height: 100vh; display: flex; flex-direction: column; }
+
+        /* Header Section - wie in Access */
+        .form-header {
+            background: #f2f0e6;
+            padding: 10px 15px;
+            border-bottom: 1px solid #c0c0c0;
         }
-        .placeholder h1 { color: #000080; margin-bottom: 20px; font-size: 16px; }
-        .placeholder p { margin-bottom: 15px; color: #333; }
-        .btn {
-            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 8px 20px;
-            cursor: pointer;
+        .form-header h1 {
+            font-size: 20px;
+            font-weight: normal;
+            color: #7f7f7f;
+            margin: 0 0 10px 0;
+            font-family: Arial, sans-serif;
+        }
+        .legend-box {
+            background: #f2f0e6;
+            padding: 5px 10px;
+            font-size: 11px;
+            color: #7f7f7f;
+            line-height: 1.6;
+        }
+        .legend-box p { margin: 2px 0; }
+
+        /* Content / Subform Area */
+        .content {
+            flex: 1;
+            overflow: auto;
+            background: white;
+        }
+
+        /* Data Table (zsub_Rueckmeldungen - Endlosformular) */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            font-family: Arial, sans-serif;
+        }
+        .data-table th {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+            border: 1px solid #a0a0a0;
+            padding: 6px 10px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .data-table td {
+            border: 1px solid #c0c0c0;
+            padding: 5px 10px;
+        }
+        .data-table tbody tr:nth-child(even) { background: #f2f2f2; }
+        .data-table tbody tr:hover { background: #e0e0ff; }
+        .data-table tbody tr.selected { background: #b0b0ff; }
+
+        /* Numerische Spalten rechtsbündig */
+        .num { text-align: right; }
+
+        /* Filter-Toolbar */
+        .filter-toolbar {
+            background: #e8e8e8;
+            padding: 8px 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            border-bottom: 1px solid #c0c0c0;
+        }
+        .filter-toolbar label { font-weight: bold; }
+        .filter-toolbar select {
+            font-size: 11px;
+            padding: 3px 8px;
+            border: 1px solid #808080;
+        }
+
+        /* Footer (Status) */
+        .form-footer {
+            background: #e8e8e8;
+            padding: 5px 15px;
+            border-top: 1px solid #c0c0c0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-size: 11px;
         }
-        .btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+
+        /* Sortier-Icons */
+        .sortable { cursor: pointer; user-select: none; }
+        .sortable:hover { background: #d0d0e0; }
+        .sort-asc::after { content: ' ▲'; font-size: 9px; }
+        .sort-desc::after { content: ' ▼'; font-size: 9px; }
+
+        /* Loading Indicator */
+        .loading { text-align: center; padding: 40px; color: #606060; }
+
+        /* Zusammenfassungs-Karten */
+        .summary-row {
+            display: flex;
+            gap: 15px;
+            padding: 10px 15px;
+            background: #f8f8f8;
+            border-bottom: 1px solid #c0c0c0;
+        }
+        .summary-card {
+            background: white;
+            border: 1px solid #c0c0c0;
+            padding: 8px 15px;
+            min-width: 120px;
+            text-align: center;
+        }
+        .summary-card .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000080;
+        }
+        .summary-card .label {
+            font-size: 10px;
+            color: #606060;
+        }
+        .summary-card.green .value { color: #208020; }
+        .summary-card.red .value { color: #c04040; }
     </style>
+    <link rel="stylesheet" href="css/visbug_overrides.css">
     <script src="js/webview2-bridge.js"></script>
 </head>
-<body>
-    <div class="placeholder">
-        <h1>Rueckmeldungen</h1>
-        <p>Dieses Formular zeigt die Rueckmelde-Statistik der Mitarbeiter an.</p>
-        <p><em>HTML-Version in Entwicklung</em></p>
-        <br>
-        <button class="btn" onclick="history.back()">Zurueck</button>
-        <button class="btn" onclick="Bridge.close()">Schliessen</button>
+<body data-form="zfrm_Rueckmeldungen">
+    <div class="window-frame">
+        <!-- Unified Header -->
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 15px; font-weight: bold; color: #000000;">Auswertung der Rückmeldungen</span>
+                <div class="buttons-grid">
+                    <button class="btn unified-btn" id="btnAktualisieren" onclick="loadRueckmeldungen()">Aktualisieren</button>
+                    <button class="btn unified-btn" id="btnExportExcel" onclick="exportToExcel()">Excel Export</button>
+                    <button class="btn unified-btn" id="btnDrucken" onclick="window.print()">Drucken</button>
+                    <button class="btn unified-btn" id="btnSchliessen" onclick="closeForm()">Schließen</button>
+                </div>
+            </div>
+            <div class="gpt-box">CONSYS<span>Web</span></div>
+        </div>
+
+        <!-- Form Header mit Legende (wie in Access) -->
+        <div class="form-header">
+            <div class="legend-box">
+                <p><strong>Anzahl Anfragen</strong> = Alle automatisch gesendeten Abfragen</p>
+                <p><strong>Anzahl Rückmeldungen</strong> = Alle automatisch erfassten Rückmeldungen des Mitarbeiters</p>
+                <p><strong>Antwortzeit in Stunden</strong> = Durchschnittliche Anzahl Stunden zwischen Anfrage und Antwort</p>
+                <p><strong>Antwortrate in %</strong> = Prozentsatz der beantworteten Anfragen</p>
+                <p><strong>Zusagen</strong> = Anzahl ALLER Zusagen (Automatisch + manuell eingetragene)</p>
+                <p><strong>Absagen</strong> = Anzahl ALLER Absagen (Automatisch + manuell eingetragene)</p>
+            </div>
+        </div>
+
+        <!-- Filter-Toolbar -->
+        <div class="filter-toolbar">
+            <label>Anstellungsart:</label>
+            <select id="filterAnstellungsart" onchange="loadRueckmeldungen()">
+                <option value="">Alle</option>
+                <option value="3" selected>Festangestellte (3)</option>
+                <option value="5">Minijobber (5)</option>
+                <option value="3,5">Festangest. + Minijob</option>
+            </select>
+            <label style="margin-left: 20px;">Sortierung:</label>
+            <select id="sortField" onchange="loadRueckmeldungen()">
+                <option value="Name">Name</option>
+                <option value="Antwortrate">Antwortrate</option>
+                <option value="Zusagen">Zusagen</option>
+                <option value="AnzahlvonRueckmeldezeitpunkt">Anz. Rückmeldungen</option>
+            </select>
+            <select id="sortOrder" onchange="loadRueckmeldungen()">
+                <option value="ASC">Aufsteigend</option>
+                <option value="DESC">Absteigend</option>
+            </select>
+        </div>
+
+        <!-- Zusammenfassung -->
+        <div class="summary-row">
+            <div class="summary-card">
+                <div class="value" id="sumAnfragen">-</div>
+                <div class="label">Gesamt Anfragen</div>
+            </div>
+            <div class="summary-card">
+                <div class="value" id="sumRueckmeldungen">-</div>
+                <div class="label">Gesamt Rückmeldungen</div>
+            </div>
+            <div class="summary-card green">
+                <div class="value" id="sumZusagen">-</div>
+                <div class="label">Gesamt Zusagen</div>
+            </div>
+            <div class="summary-card red">
+                <div class="value" id="sumAbsagen">-</div>
+                <div class="label">Gesamt Absagen</div>
+            </div>
+            <div class="summary-card">
+                <div class="value" id="avgAntwortrate">-</div>
+                <div class="label">Ø Antwortrate %</div>
+            </div>
+        </div>
+
+        <!-- Content: Subform zsub_Rueckmeldungen als Tabelle -->
+        <div class="content">
+            <table class="data-table" id="rueckmeldungenTable">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-field="Name" onclick="sortBy('Name')">Mitarbeiter</th>
+                        <th class="sortable num" data-field="Anstellungsart" onclick="sortBy('Anstellungsart')">Anst.Art</th>
+                        <th class="sortable num" data-field="AnzahlvonAnfragezeitpunkt" onclick="sortBy('AnzahlvonAnfragezeitpunkt')">Anz. Anfragen</th>
+                        <th class="sortable num" data-field="AnzahlvonRueckmeldezeitpunkt" onclick="sortBy('AnzahlvonRueckmeldezeitpunkt')">Anz. Rückmeldungen</th>
+                        <th class="sortable num" data-field="MittelwertvonReaktionszeit" onclick="sortBy('MittelwertvonReaktionszeit')">Ø Reaktionszeit (h)</th>
+                        <th class="sortable num" data-field="Antwortrate" onclick="sortBy('Antwortrate')">Antwortrate %</th>
+                        <th class="sortable num" data-field="Zusagen" onclick="sortBy('Zusagen')">Zusagen</th>
+                        <th class="sortable num" data-field="Absagen" onclick="sortBy('Absagen')">Absagen</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="8" class="loading">Lade Daten...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+            <span id="recordCount">0 Datensätze</span>
+            <span id="lastUpdate">-</span>
+        </div>
     </div>
+
+    <script src="logic/zfrm_Rueckmeldungen.logic.js"></script>
 </body>
 </html>

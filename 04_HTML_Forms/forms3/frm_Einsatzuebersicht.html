@@ -119,6 +119,7 @@
 
         .main-content {
             flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
             display: flex;
             flex-direction: column;
             padding: 10px;
@@ -230,6 +231,7 @@
 
         .einsatz-grid {
             flex: 1;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
             background: white;
             border: 2px solid;
             border-color: #808080 #ffffff #ffffff #808080;
@@ -238,8 +240,15 @@
 
         .einsatz-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate; /* Sticky Header Fix */
+            border-spacing: 0;
             min-width: 900px;
+        }
+
+        .einsatz-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 11;
         }
 
         .einsatz-table th {
@@ -249,6 +258,7 @@
             text-align: left;
             position: sticky;
             top: 0;
+            z-index: 10; /* Sticky Header Fix */
             font-weight: bold;
             font-size: 10px;
             cursor: pointer;

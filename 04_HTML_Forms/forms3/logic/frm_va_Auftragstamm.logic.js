@@ -370,6 +370,115 @@ function handleSubformMessage(event) {
         case 'request_link_params':
             sendLinkParamsToSubform(data.name);
             break;
+
+        case 'row_dblclick':
+            // Doppelklick auf MA-Zeile öffnet Mitarbeiterstamm (18.01.2026)
+            if (data.ma_id) {
+                console.log('[Auftragstamm] Öffne Mitarbeiterstamm für MA_ID:', data.ma_id);
+                // Shell-Navigation wenn verfügbar
+                if (window.parent?.ConsysShell?.showForm) {
+                    localStorage.setItem('consec_ma_id', String(data.ma_id));
+                    window.parent.ConsysShell.showForm('frm_MA_Mitarbeiterstamm', { ma_id: data.ma_id });
+                } else if (window.ConsysShell?.showForm) {
+                    localStorage.setItem('consec_ma_id', String(data.ma_id));
+                    window.ConsysShell.showForm('frm_MA_Mitarbeiterstamm', { ma_id: data.ma_id });
+                } else {
+                    // Fallback: In neuem Fenster öffnen
+                    window.open(`frm_MA_Mitarbeiterstamm.html?ma_id=${data.ma_id}`, 'Mitarbeiterstamm', 'width=1200,height=800');
+                }
+            }
+            break;
+
+        // ============ SUBFORM postMessage HANDLER (19.01.2026) ============
+
+        case 'SCHICHT_SELECTED':
+            // Von sub_VA_Schichten - Schicht gewählt (Großbuchstaben-Variante)
+            console.log('[Auftragstamm] SCHICHT_SELECTED:', data);
+            state.currentVAStart_ID = data.schicht_id;
+            state.currentVADatum_ID = data.vadatum_id;
+            updateMASubforms();
+            break;
+
+        case 'DAY_SELECTED':
+            // Von sub_VA_Einsatztage - Tag ausgewählt
+            console.log('[Auftragstamm] DAY_SELECTED:', data);
+            state.currentVADatum_ID = data.datum_id;
+            state.currentVADatum = data.date;
+            // Schichten für diesen Tag laden
+            if (state.currentVA_ID) {
+                loadSchichtenForDay(state.currentVA_ID, data.datum_id);
+            }
+            break;
+
+        case 'DAY_DBLCLICK':
+            // Von sub_VA_Einsatztage - Doppelklick auf Tag
+            console.log('[Auftragstamm] DAY_DBLCLICK:', data);
+            // Tag-Details öffnen oder bearbeiten
+            if (typeof openDayDetails === 'function') {
+                openDayDetails(data.va_id, data.datum_id, data.date);
+            }
+            break;
+
+        case 'FILTER_CHANGED':
+            // Von sub_VA_Einsatztage - Filter geändert
+            console.log('[Auftragstamm] FILTER_CHANGED:', data.filter, 'Count:', data.count);
+            break;
+
+        case 'SCHICHT_CHANGED':
+            // Von sub_VA_Schichten - Schicht wurde geändert
+            console.log('[Auftragstamm] SCHICHT_CHANGED:', data);
+            // Subforms aktualisieren
+            if (state.currentVA_ID) {
+                loadSchichtenForDay(state.currentVA_ID, data.vadatum_id);
+            }
+            break;
+
+        case 'ZUORDNUNG_RECALC_REQUEST':
+            // Von sub_VA_Schichten - Zuordnungen neu laden
+            console.log('[Auftragstamm] ZUORDNUNG_RECALC_REQUEST:', data);
+            updateMASubforms();
+            break;
+
+        case 'ADD_DAY':
+            // Von sub_VA_Einsatztage - Neuen Tag hinzufügen
+            console.log('[Auftragstamm] ADD_DAY für VA:', data.va_id);
+            if (typeof addNewDay === 'function') {
+                addNewDay(data.va_id);
+            }
+            break;
+
+        case 'REMOVE_DAY':
+        case 'REMOVE_DAYS':
+            // Von sub_VA_Einsatztage - Tag(e) löschen
+            console.log('[Auftragstamm] REMOVE_DAY(S):', data);
+            if (typeof removeDays === 'function') {
+                removeDays(data.va_id, data.dates || [data.date]);
+            }
+            break;
+
+        case 'COPY_DAY':
+            // Von sub_VA_Einsatztage - Tag kopieren
+            console.log('[Auftragstamm] COPY_DAY:', data);
+            if (typeof copyDay === 'function') {
+                copyDay(data.va_id, data.date, data.datum_id);
+            }
+            break;
+
+        case 'ADD_SCHICHT':
+            // Von sub_VA_Schichten - Neue Schicht hinzufügen
+            console.log('[Auftragstamm] ADD_SCHICHT für VA:', data.va_id);
+            if (typeof addNewSchicht === 'function') {
+                addNewSchicht(data.va_id, data.vadatum_id);
+            }
+            break;
+
+        case 'EDIT_SCHICHT':
+            // Von sub_VA_Schichten - Schicht bearbeiten
+            console.log('[Auftragstamm] EDIT_SCHICHT:', data.schicht_id);
+            if (typeof editSchicht === 'function') {
+                editSchicht(data.schicht_id);
+            }
+            break;
     }
 }
 
@@ -427,6 +536,28 @@ function updateMASubforms() {
         console.log('[Auftragstamm] updateMASubforms -> loadSubformData mit VA_ID:', vaId, 'VADatum_ID:', vadatumId);
         window.loadSubformData(vaId, vadatumId);
     }
+}
+
+/**
+ * Lädt Schichten für einen bestimmten Tag (postMessage Handler)
+ */
+function loadSchichtenForDay(vaId, vadatumId) {
+    console.log('[Auftragstamm] loadSchichtenForDay:', vaId, vadatumId);
+    state.currentVADatum_ID = vadatumId;
+
+    // Update cboVADatum dropdown wenn vorhanden
+    const cboVADatum = document.getElementById('cboVADatum');
+    if (cboVADatum) {
+        cboVADatum.value = vadatumId;
+    }
+
+    // Subform-Daten laden
+    if (typeof window.loadSubformData === 'function') {
+        window.loadSubformData(vaId, vadatumId);
+    }
+
+    // MA-Subforms aktualisieren
+    updateMASubforms();
 }
 
 function handleSubformSelection(data) {
@@ -519,10 +650,43 @@ async function loadFirstVisibleAuftrag() {
 
 /**
  * Markiert Auftrag in der Liste - Wrapper für geschützte Logik
- * NICHT ÄNDERN!
+ * FIX 17.01.2026: Erweitert um VADatum_ID für Mehrtages-Aufträge
+ * Bei Mehrtages-Aufträgen wird nur der exakte Tag markiert (VA_ID + VADatum_ID)
  */
 function highlightAuftragInList(auftragId) {
-    highlightAuftragInListProtected(auftragId);
+    const tbody = document.querySelector('#auftraegeTable tbody');
+    if (!tbody) {
+        // Fallback zur geschützten Funktion
+        highlightAuftragInListProtected(auftragId);
+        return;
+    }
+
+    const idStr = String(auftragId);
+    const vadatumIdStr = state.currentVADatum_ID ? String(state.currentVADatum_ID) : null;
+
+    // FIX 17.01.2026: Bei Mehrtages-Aufträgen NUR die exakte Zeile markieren
+    tbody.querySelectorAll('tr').forEach(row => {
+        const rowVaId = row.dataset.id;
+        const rowVadatumId = row.dataset.vadatumId || row.dataset.displayDate;
+
+        let isMatch = false;
+
+        if (vadatumIdStr && rowVadatumId) {
+            // Mehrtages-Auftrag: Beide IDs müssen übereinstimmen
+            isMatch = (rowVaId === idStr) && (rowVadatumId === vadatumIdStr);
+        } else {
+            // Eintages-Auftrag: Nur VA_ID prüfen
+            isMatch = (rowVaId === idStr);
+        }
+
+        if (isMatch) {
+            row.classList.add('selected');
+            // Scroll zur markierten Zeile
+            row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+            row.classList.remove('selected');
+        }
+    });
 }
 
 async function loadCombos() {
@@ -1577,6 +1741,94 @@ function getStatusText(statusId) {
     }
 }
 
+// ============ STATUS-GEFILTERTE AUFTRAGSLISTE (17.01.2026) ============
+/**
+ * Rendert die Auftragsliste gefiltert nach Status
+ * Status-IDs: 1=In Planung, 2=Versendet, 3=Beendet
+ */
+function renderAuftragslisteFiltered(filterStatusId) {
+    const tbody = document.querySelector('#auftraegeTable tbody');
+    if (!tbody) {
+        console.warn('[Auftragsliste] Tabelle #auftraegeTable tbody nicht gefunden');
+        return;
+    }
+
+    console.log('[Auftragsliste] STATUS-GEFILTERT - Filtere nach Status:', filterStatusId);
+
+    // Mehrtages-Ansicht: Jeder Tag wird als separate Zeile angezeigt
+    const allDays = [];
+
+    // Filtere state.records nach Status
+    const filteredRecords = state.records.filter(rec => {
+        const recStatus = parseInt(rec.Veranst_Status_ID) || 1;
+        return recStatus === filterStatusId;
+    });
+
+    console.log('[Auftragsliste] Gefiltert:', filteredRecords.length, 'von', state.records.length, 'Aufträgen');
+
+    filteredRecords.forEach(rec => {
+        const dateVon = rec.VA_DatumVon || rec.Dat_VA_Von;
+        const dateBis = rec.VA_DatumBis || rec.Dat_VA_Bis || dateVon;
+
+        // Generiere alle Tage zwischen Von und Bis
+        const days = generateDaysBetween(dateVon, dateBis);
+
+        days.forEach(day => {
+            allDays.push({
+                date: day,
+                dateString: day.toISOString().split('T')[0], // YYYY-MM-DD
+                auftrag: rec.VA_Bezeichnung || rec.Auftrag || '',
+                ort: rec.VA_Ort || rec.Ort || '',
+                objekt: rec.VA_Objekt || rec.Objekt || '',
+                soll: rec.MA_Anzahl || 0,
+                ist: rec.MA_Anzahl_Ist || 0,
+                status: rec.Veranst_Status_ID || 0,
+                vaId: rec.VA_ID || rec.ID
+            });
+        });
+    });
+
+    // Sortiere alle Tage nach Datum
+    allDays.sort((a, b) => a.date - b.date);
+
+    tbody.innerHTML = allDays.map((day, idx) => {
+        const datum = formatDate(day.dateString);
+
+        // Markierung wenn aktueller Auftrag UND aktuelles Datum
+        const isSelected = (day.vaId === state.currentVA_ID) &&
+                          (day.dateString === state.currentVADatum ||
+                           day.dateString === state.currentVADatum_ID);
+        const selectedClass = isSelected ? 'selected' : '';
+
+        return `
+            <tr data-index="${idx}" data-id="${day.vaId}" data-display-date="${day.dateString}" class="${selectedClass}">
+                <td>${datum}</td>
+                <td>${day.auftrag}</td>
+                <td>${day.objekt || day.ort}</td>
+                <td style="text-align: center;">${day.soll}</td>
+                <td style="text-align: center;">${day.ist}</td>
+                <td style="text-align: center;">${getStatusText(day.status)}</td>
+            </tr>
+        `;
+    }).join('');
+
+    setupAuftragslisteClickHandlerWithDate();
+
+    // Lade ersten gefilterten Auftrag wenn vorhanden
+    if (allDays.length > 0) {
+        const firstRow = tbody.querySelector('tr');
+        if (firstRow) {
+            firstRow.classList.add('selected');
+            const firstId = firstRow.dataset.id;
+            if (firstId && typeof loadAuftrag === 'function') {
+                loadAuftrag(parseInt(firstId));
+            }
+        }
+    }
+
+    console.log('[Auftragsliste] Status-gefiltert gerendert:', allDays.length, 'Tage');
+}
+
 // Erweiterter Click-Handler fuer tagesweise Auswahl
 function setupAuftragslisteClickHandlerWithDate() {
     const tbody = document.querySelector('#auftraegeTable tbody');
@@ -1735,10 +1987,40 @@ function applyStatusRules(statusValue) {
     sendToSubform('sub_MA_VA_Zuordnung', { type: 'set_locked', locked: lockInputs });
 }
 
-function applyObjektRules(value) {
+async function applyObjektRules(value) {
     const hasObjekt = !!(value && Number(value) > 0);
     setVisible('btn_Posliste_oeffnen', hasObjekt);
     setVisible('btnmailpos', hasObjekt);
+
+    // #23: Wenn Objekt ausgewählt, Ansprechpartner + Treffpunkt laden
+    if (hasObjekt) {
+        try {
+            const result = await Bridge.execute('getObjekt', { id: Number(value) });
+            if (result && result.data) {
+                const obj = result.data;
+                // Ansprechpartner übernehmen (falls im Auftrag noch leer)
+                const ansprField = document.getElementById('Ansprechpartner');
+                if (ansprField && !ansprField.value && obj.Ansprechpartner) {
+                    ansprField.value = obj.Ansprechpartner;
+                    console.log('[applyObjektRules] Ansprechpartner übernommen:', obj.Ansprechpartner);
+                }
+                // Treffpunkt übernehmen (falls leer)
+                const treffField = document.getElementById('Treffpunkt');
+                if (treffField && !treffField.value && obj.Treffpunkt) {
+                    treffField.value = obj.Treffpunkt;
+                    console.log('[applyObjektRules] Treffpunkt übernommen:', obj.Treffpunkt);
+                }
+                // Dienstkleidung übernehmen (falls leer)
+                const dklField = document.getElementById('Dienstkleidung');
+                if (dklField && !dklField.value && obj.Dienstkleidung) {
+                    dklField.value = obj.Dienstkleidung;
+                    console.log('[applyObjektRules] Dienstkleidung übernommen:', obj.Dienstkleidung);
+                }
+            }
+        } catch (e) {
+            console.warn('[applyObjektRules] Objekt-Daten laden fehlgeschlagen:', e);
+        }
+    }
 }
 
 function setVisible(id, visible) {
@@ -2214,10 +2496,33 @@ window.openEventWeblink = function() { console.log('[Auftragstamm] openEventWebl
 window.loadEventWetter = function() { console.log('[Auftragstamm] loadEventWetter'); };
 window.saveEventNotes = function() { console.log('[Auftragstamm] saveEventNotes'); };
 
-// Filter-Funktionen
-window.filterByStatus = function(status) {
-    console.log('[Auftragstamm] filterByStatus:', status);
-    if (typeof applyAuftraegeFilter === 'function') applyAuftraegeFilter({ status: status });
+// Filter-Funktionen - Status-Filter für Header-Block (16.01.2026)
+window.filterByStatus = function(statusId) {
+    console.log('[Auftragstamm] filterByStatus aufgerufen mit:', statusId);
+
+    // Status-Filter in state speichern
+    state.auftraegeFilter = state.auftraegeFilter || {};
+    state.auftraegeFilter.status = statusId;
+
+    // Visuelles Feedback: aktiven Filter markieren
+    const statusBlock = document.getElementById('statusHeaderBlock');
+    if (statusBlock) {
+        statusBlock.querySelectorAll('div[onclick]').forEach(el => {
+            el.style.fontWeight = 'normal';
+            el.style.backgroundColor = '';
+        });
+        // Aktuellen Filter hervorheben
+        const activeFilter = statusBlock.querySelector(`div[onclick="filterByStatus(${statusId})"]`);
+        if (activeFilter) {
+            activeFilter.style.fontWeight = 'bold';
+            activeFilter.style.backgroundColor = '#9090b8';
+        }
+    }
+
+    // Auftragsliste mit Status-Filter rendern
+    renderAuftragslisteFiltered(statusId);
+
+    console.log('[Auftragstamm] Status-Filter gesetzt auf:', statusId);
 };
 
 // Tage-Navigation
@@ -2493,20 +2798,10 @@ function showELGesendet() {
     }
 }
 
-// Status-Filter
+// Status-Filter - Alias auf window.filterByStatus (17.01.2026 korrigiert)
+// Die echte Implementierung ist in window.filterByStatus definiert
 function filterByStatus(statusId) {
-    console.log('[filterByStatus] Filtere nach Status:', statusId);
-    // Setze Filter und aktualisiere Liste
-    const filterVon = document.getElementById('filterVon');
-    const filterBis = document.getElementById('filterBis');
-    if (filterVon && filterBis) {
-        filterVon.value = formatDate(new Date());
-        filterBis.value = formatDate(new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)); // +1 Jahr
-    }
-    // Filter auf Status setzen (wird in applyAuftraegeFilter verwendet)
-    state.auftraegeFilter = state.auftraegeFilter || {};
-    state.auftraegeFilter.status = statusId;
-    return applyAuftraegeFilter();
+    return window.filterByStatus(statusId);
 }
 
 // Sortierung

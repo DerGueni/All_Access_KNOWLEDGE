@@ -52,6 +52,52 @@
         .col-std { width: 50px; text-align: center; }
         .col-bemerk { min-width: 120px; }
         .col-status { width: 100px; }
+
+        /* Status-Dropdown Styling (wie Access ComboBox) */
+        .status-select {
+            width: 100%;
+            padding: 2px 4px;
+            font-size: 10px;
+            border: 1px solid #ccc;
+            background: white;
+            cursor: pointer;
+        }
+        .status-select:focus {
+            border-color: #0078d7;
+            outline: none;
+        }
+        .status-select option { padding: 2px 4px; }
+
+        /* Status-Farben für Zeilen */
+        tr.status-geplant { background-color: #fff3cd; }
+        tr.status-benachrichtigt { background-color: #cce5ff; }
+        tr.status-zusage { background-color: #d4edda; }
+        tr.status-absage { background-color: #f8d7da; }
+        tr.status-geplant:hover { background-color: #ffe8a1; }
+        tr.status-benachrichtigt:hover { background-color: #b8daff; }
+        tr.status-zusage:hover { background-color: #c3e6cb; }
+        tr.status-absage:hover { background-color: #f5c6cb; }
+
+        /* Checkbox-artige Checkmark für Status */
+        .status-indicator {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #666;
+            border-radius: 2px;
+            margin-right: 4px;
+            vertical-align: middle;
+            text-align: center;
+            line-height: 12px;
+            font-size: 10px;
+        }
+        .status-indicator.checked {
+            background-color: #0078d7;
+            color: white;
+        }
+        .status-indicator.checked::after {
+            content: "✓";
+        }
     </style>
 </head>
 <body>

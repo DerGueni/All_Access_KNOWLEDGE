@@ -491,6 +491,11 @@ function renderMitarbeiterListe() {
         return;
     }
 
+    // Schicht-Zeiten aus der ausgewählten Schicht holen
+    const selectedSchichtData = state.schichten[state.selectedSchicht];
+    const schichtStart = selectedSchichtData ? formatTime(selectedSchichtData.VA_Start) : '';
+    const schichtEnde = selectedSchichtData ? formatTime(selectedSchichtData.VA_Ende) : '';
+
     elements.maList.innerHTML = gefiltert.map(ma => {
         const id = ma.ID;
         const isSelected = state.selectedMAs.has(id);
@@ -499,8 +504,8 @@ function renderMitarbeiterListe() {
             <div class="listbox-row ${isSelected ? 'selected' : ''}" data-id="${id}">
                 <span style="flex: 2;">${ma.Nachname || ''}, ${ma.Vorname || ''}</span>
                 <span style="flex: 1;">${ma.Stunden || ''}</span>
-                <span style="flex: 1;">${ma.Beginn || ''}</span>
-                <span style="flex: 1;">${ma.Ende || ''}</span>
+                <span style="flex: 1;">${schichtStart}</span>
+                <span style="flex: 1;">${schichtEnde}</span>
                 <span style="flex: 1;"></span>
             </div>
         `;
@@ -918,6 +923,11 @@ function renderMitarbeiterListeMitEntfernung() {
         return;
     }
 
+    // Schicht-Zeiten aus der ausgewählten Schicht holen
+    const selectedSchichtData = state.schichten[state.selectedSchicht];
+    const schichtStart = selectedSchichtData ? formatTime(selectedSchichtData.VA_Start) : '';
+    const schichtEnde = selectedSchichtData ? formatTime(selectedSchichtData.VA_Ende) : '';
+
     // Render mit Entfernungs-Spalte und Farbcodierung
     elements.maList.innerHTML = gefiltert.map(ma => {
         const id = ma.ID;
@@ -938,8 +948,8 @@ function renderMitarbeiterListeMitEntfernung() {
             <div class="listbox-row ${isSelected ? 'selected' : ''}" data-id="${id}">
                 <span style="flex: 2;">${ma.Nachname || ''}, ${ma.Vorname || ''}</span>
                 <span style="flex: 1;" class="${entfClass}">${entfText}</span>
-                <span style="flex: 1;">${ma.Beginn || ''}</span>
-                <span style="flex: 1;">${ma.Ende || ''}</span>
+                <span style="flex: 1;">${schichtStart}</span>
+                <span style="flex: 1;">${schichtEnde}</span>
                 <span style="flex: 1;">${ma.Grund || ''}</span>
             </div>
         `;

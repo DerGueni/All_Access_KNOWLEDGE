@@ -9,9 +9,12 @@
  * - DblClick auf Tag-Header: Setzt Startdatum
  * - Entf-Taste: Löscht MA-Zuordnung
  * - Navigation: ±3 Tage (wie Access)
+ *
+ * GEÄNDERT 2026-01-18: Bridge.query() ersetzt durch fetch() Aufrufe
  */
 
-import { Bridge } from '../api/bridgeClient.js';
+// API-Basis-URL
+const API_BASE = 'http://localhost:5000/api';
 
 // State
 const state = {
@@ -176,33 +179,20 @@ function formatDate(date) {
 
 /**
  * Objekte für Filter laden
+ * HINWEIS: Diese Funktion wird aktuell nicht verwendet, da kein Objekt-Dropdown im HTML existiert
  */
 async function loadObjekte() {
-    try {
-        const result = await Bridge.query(`
-            SELECT DISTINCT VA_ID, Objekt
-            FROM tbl_VA_Auftragstamm
-            WHERE Objekt IS NOT NULL
-            ORDER BY Objekt
-        `);
-
-        const objekte = result.data || [];
-
-        elements.cboObjekt.innerHTML = '<option value="">Alle Objekte</option>';
-        objekte.forEach(obj => {
-            const option = document.createElement('option');
-            option.value = obj.Objekt;
-            option.textContent = obj.Objekt;
-            elements.cboObjekt.appendChild(option);
-        });
-
-    } catch (error) {
-        console.error('[Planungsübersicht] Fehler beim Laden der Objekte:', error);
-    }
+    // Funktion entfernt - kein cboObjekt-Element im HTML
+    console.log('[Planungsübersicht] loadObjekte() übersprungen - kein Dropdown vorhanden');
 }
 
 /**
- * Daten laden
+ * Daten laden via REST-API
+ * GEÄNDERT 2026-01-18: Bridge.query() ersetzt durch fetch()
+ *
+ * Strategie:
+ * 1. Aufträge im Zeitraum laden (/api/auftraege?von=&bis=)
+ * 2. Für jeden Auftrag: Schichten und Zuordnungen laden
  */
 async function loadData() {
     setStatus('Lade Planungsdaten...');
@@ -214,43 +204,125 @@ async function loadData() {
         // Tages-Header setzen
         updateDayHeaders();
 
-        // Planungsdaten laden (Aufträge mit Schichten)
-        // Access-SQL: Mehrfache JOINs benötigen Klammerung
-        // Erweitert um IDs für DblClick-Funktionen
-        const result = await Bridge.query(`
-            SELECT
-                a.ID AS VA_ID,
-                a.Objekt,
-                a.Ort AS VA_Ort,
-                a.Kun_Firma,
-                d.ID AS VADatum_ID,
-                d.VADatum,
-                s.ID AS VAStart_ID,
-                s.VA_Start,
-                s.VA_Ende,
-                s.MA_Anzahl,
-                s.MA_Anzahl_Ist,
-                p.ID AS Zuo_ID,
-                m.ID AS MA_ID,
-                m.Nachname AS MA_Nachname,
-                m.Vorname AS MA_Vorname
-            FROM (((tbl_VA_Auftragstamm AS a
-                INNER JOIN tbl_VA_AnzTage AS d ON a.ID = d.VA_ID)
-                LEFT JOIN tbl_VA_Start AS s ON s.VADatum_ID = d.ID)
-                LEFT JOIN tbl_MA_VA_Planung AS p ON s.ID = p.VAStart_ID)
-                LEFT JOIN tbl_MA_Mitarbeiterstamm AS m ON p.MA_ID = m.ID
-            WHERE d.VADatum >= CDate('${von}') AND d.VADatum <= CDate('${bis}')
-            ORDER BY a.ID, d.VADatum, s.VA_Start
-        `);
+        // 1. Aufträge im Zeitraum laden
+        const auftraegeResponse = await fetch(`${API_BASE}/auftraege?von=${von}&bis=${bis}&limit=200`);
+        if (!auftraegeResponse.ok) {
+            throw new Error(`Aufträge-API: HTTP ${auftraegeResponse.status}`);
+        }
+        const auftraegeResult = await auftraegeResponse.json();
+        const auftraegeListe = auftraegeResult.data || auftraegeResult || [];
 
-        // Daten gruppieren nach Auftrag
-        const auftraege = groupByAuftrag(result.data || []);
-        state.records = auftraege;
+        console.log(`[Planungsübersicht] ${auftraegeListe.length} Aufträge gefunden`);
 
+        // 2. Für jeden Auftrag: Schichten und Zuordnungen laden (parallel)
+        const detailPromises = auftraegeListe.map(async (auftrag) => {
+            const vaId = auftrag.ID;
+
+            // Schichten laden
+            const schichtenResponse = await fetch(`${API_BASE}/auftraege/${vaId}/schichten`);
+            let schichten = [];
+            if (schichtenResponse.ok) {
+                const schichtenResult = await schichtenResponse.json();
+                schichten = schichtenResult.data || schichtenResult || [];
+            }
+
+            // Zuordnungen laden
+            const zuordnungenResponse = await fetch(`${API_BASE}/auftraege/${vaId}/zuordnungen`);
+            let zuordnungen = [];
+            if (zuordnungenResponse.ok) {
+                const zuordnungenResult = await zuordnungenResponse.json();
+                zuordnungen = zuordnungenResult.data || zuordnungenResult || [];
+            }
+
+            return {
+                VA_ID: vaId,
+                Objekt: auftrag.Objekt || '',
+                Ort: auftrag.Ort || '',
+                Kunde: auftrag.Kun_Firma || auftrag.Kunde || '',
+                schichten: schichten,
+                zuordnungen: zuordnungen
+            };
+        });
+
+        const auftraegeDetails = await Promise.all(detailPromises);
+
+        // Daten in Tages-Format gruppieren
+        const auftraege = auftraegeDetails.map(auftrag => {
+            const tage = {};
+
+            // Schichten nach Datum gruppieren
+            auftrag.schichten.forEach(schicht => {
+                const datum = schicht.VADatum ? schicht.VADatum.split('T')[0] : null;
+                if (!datum) return;
+
+                // Nur Schichten im gewünschten Zeitraum
+                if (datum < von || datum > bis) return;
+
+                if (!tage[datum]) {
+                    tage[datum] = [];
+                }
+
+                // Zuordnungen für diese Schicht finden
+                const zuordnungenFuerSchicht = auftrag.zuordnungen.filter(z =>
+                    z.VAStart_ID === schicht.ID || z.VADatum === datum
+                );
+
+                const formatTime = (dt) => {
+                    if (!dt) return '';
+                    const d = new Date(dt);
+                    return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                };
+
+                // Wenn Zuordnungen vorhanden, für jede einen Eintrag
+                if (zuordnungenFuerSchicht.length > 0) {
+                    zuordnungenFuerSchicht.forEach(z => {
+                        tage[datum].push({
+                            von: formatTime(schicht.VA_Start),
+                            bis: formatTime(schicht.VA_Ende),
+                            ma_name: z.Nachname && z.Vorname
+                                ? `${z.Nachname}, ${z.Vorname.charAt(0)}.`
+                                : (z.Nachname || ''),
+                            soll: schicht.MA_Anzahl || 0,
+                            ist: schicht.MA_Anzahl_Ist || 0,
+                            vadatum_id: schicht.VADatum_ID || '',
+                            vastart_id: schicht.ID || '',
+                            zuo_id: z.ID || '',
+                            ma_id: z.MA_ID || ''
+                        });
+                    });
+                } else {
+                    // Keine Zuordnung - leerer Slot
+                    tage[datum].push({
+                        von: formatTime(schicht.VA_Start),
+                        bis: formatTime(schicht.VA_Ende),
+                        ma_name: '',
+                        soll: schicht.MA_Anzahl || 0,
+                        ist: schicht.MA_Anzahl_Ist || 0,
+                        vadatum_id: schicht.VADatum_ID || '',
+                        vastart_id: schicht.ID || '',
+                        zuo_id: '',
+                        ma_id: ''
+                    });
+                }
+            });
+
+            return {
+                VA_ID: auftrag.VA_ID,
+                Objekt: auftrag.Objekt,
+                Ort: auftrag.Ort,
+                Kunde: auftrag.Kunde,
+                tage: tage
+            };
+        });
+
+        // Nur Aufträge mit Schichten im Zeitraum anzeigen
+        const gefiltert = auftraege.filter(a => Object.keys(a.tage).length > 0);
+
+        state.records = gefiltert;
         renderTable();
 
-        setStatus(`${auftraege.length} Aufträge geladen`);
-        elements.lblAnzAuftraege.textContent = `${auftraege.length} Aufträge`;
+        setStatus(`${gefiltert.length} Aufträge geladen`);
+        elements.lblAnzAuftraege.textContent = `${gefiltert.length} Aufträge`;
 
     } catch (error) {
         console.error('[Planungsübersicht] Fehler beim Laden:', error);

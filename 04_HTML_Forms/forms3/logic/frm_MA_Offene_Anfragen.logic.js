@@ -57,15 +57,15 @@
     }
 
     /**
-     * Lädt offene Anfragen über Bridge
+     * Lädt offene Anfragen über Bridge oder REST-API Fallback
      */
-    function loadAnfragen() {
+    async function loadAnfragen() {
         console.log('[Offene Anfragen] Lade Daten von API...');
 
         showLoading(true);
         footerStatus.textContent = 'Lade Daten...';
 
-        // Bridge Event senden
+        // Bridge Event senden (WebView2)
         if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
             Bridge.sendEvent('loadAnfragen', {
                 filter: {
@@ -74,16 +74,34 @@
                 }
             });
         } else {
-            console.error('[Offene Anfragen] Bridge nicht verfügbar');
-            showError('Bridge nicht verfügbar - bitte Seite neu laden');
-            showLoading(false);
+            // REST-API Fallback (Browser-Modus)
+            console.log('[Offene Anfragen] Bridge nicht verfügbar, nutze REST-API Fallback');
+            try {
+                const response = await fetch('http://localhost:5000/api/anfragen?offen=true');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('[Offene Anfragen] REST-API Daten empfangen:', data);
+
+                // Daten verarbeiten (gleiche Logik wie handleBridgeData)
+                allAnfragen = processAnfragenData(data);
+                applyFilter();
+                updateLastUpdateTime();
+                footerStatus.textContent = 'Bereit';
+                showLoading(false);
+            } catch (err) {
+                console.error('[Offene Anfragen] REST-API Fehler:', err);
+                showError('Keine Verbindung zum API-Server (Port 5000)');
+                showLoading(false);
+            }
         }
     }
 
     /**
      * Verarbeitet die API-Daten und filtert offene Anfragen
      * Entspricht der Access-Abfrage: qry_MA_Offene_Anfragen
-     * WHERE Dat_VA_Von > Date() AND Anfragezeitpunkt > #1/1/2022# AND Rueckmeldezeitpunkt IS NULL
+     * WHERE VADatum > Date() AND Anfragezeitpunkt > #1/1/2022# AND Rueckmeldezeitpunkt IS NULL
      */
     function processAnfragenData(data) {
         const today = new Date();
@@ -91,10 +109,17 @@
 
         const cutoffDate = new Date('2022-01-01');
 
-        return (data.anfragen || data || [])
+        // API gibt {data: Array, success: true} oder {anfragen: Array} zurück
+        const rawData = data.data || data.anfragen || (Array.isArray(data) ? data : []);
+
+        console.log('[Offene Anfragen] Verarbeite', rawData.length, 'Datensätze...');
+
+        return rawData
             .filter(item => {
-                // Nur zukünftige Einsätze
-                const datVon = item.Dat_VA_Von ? parseDate(item.Dat_VA_Von) : null;
+                // Nur zukünftige Einsätze (VADatum > heute)
+                // API liefert: VADatum (Access-Feld)
+                const vaDatum = item.VADatum || item.Dat_VA_Von;
+                const datVon = vaDatum ? parseDate(vaDatum) : null;
                 if (!datVon || datVon <= today) return false;
 
                 // Nur mit Anfragezeitpunkt nach 1.1.2022
@@ -107,11 +132,11 @@
                 return true;
             })
             .map(item => ({
-                id: item.id || `${item.VA_ID}_${item.MA_ID}_${item.VAStart_ID}`,
+                id: item.id || item.ID || `${item.VA_ID}_${item.MA_ID}_${item.VAStart_ID}`,
                 name: item.Name || `${item.Nachname || ''} ${item.Vorname || ''}`.trim(),
-                datum: parseDate(item.Dat_VA_Von),
+                datum: parseDate(item.VADatum || item.Dat_VA_Von),
                 auftrag: item.Auftrag || '',
-                ort: item.Ort || '',
+                ort: item.Ort || item.Objekt || '',
                 von: item.von || item.MVA_Start || '',
                 bis: item.bis || item.MVA_Ende || '',
                 anfragezeitpunkt: parseDate(item.Anfragezeitpunkt),
@@ -217,24 +242,85 @@
 
     /**
      * Behandelt Klick auf Tabellenzeile
+     * Unterstützt Multi-Selektion wie Access Datasheet:
+     * - Einfacher Klick: Einzelselektion
+     * - Ctrl+Klick: Zur Selektion hinzufügen/entfernen
+     * - Shift+Klick: Bereich selektieren
      */
+    let lastSelectedIndex = null; // Für Shift-Klick Bereichsselektion
+
     function handleRowClick(e) {
         const tr = e.target.closest('tr');
         if (!tr || !tr.dataset.index) return;
 
-        // Vorherige Selektion entfernen
+        const index = parseInt(tr.dataset.index, 10);
+
+        // Shift+Klick: Bereichsselektion (wie Access SelHeight)
+        if (e.shiftKey && lastSelectedIndex !== null) {
+            const start = Math.min(lastSelectedIndex, index);
+            const end = Math.max(lastSelectedIndex, index);
+
+            // Alle Zeilen im Bereich selektieren
+            for (let i = start; i <= end; i++) {
+                selectedRows.add(i);
+            }
+            updateRowSelection();
+            updateSelectionCount();
+            return;
+        }
+
+        // Ctrl+Klick: Toggle einzelne Zeile
+        if (e.ctrlKey || e.metaKey) {
+            if (selectedRows.has(index)) {
+                selectedRows.delete(index);
+                tr.classList.remove('selected');
+            } else {
+                selectedRows.add(index);
+                tr.classList.add('selected');
+            }
+            lastSelectedIndex = index;
+            updateSelectionCount();
+            return;
+        }
+
+        // Einfacher Klick: Einzelselektion (bisheriges Verhalten)
+        // Vorherige Selektion komplett entfernen
+        selectedRows.clear();
         if (selectedRow) {
             selectedRow.classList.remove('selected');
         }
+        document.querySelectorAll('.anfragen-table tbody tr.selected').forEach(row => {
+            row.classList.remove('selected');
+        });
 
         // Neue Selektion setzen
         tr.classList.add('selected');
         selectedRow = tr;
+        selectedRows.add(index);
+        lastSelectedIndex = index;
 
         // Details anzeigen
-        const index = parseInt(tr.dataset.index, 10);
         const anfrage = filteredAnfragen[index];
         showAnfrageDetails(anfrage);
+        updateSelectionCount();
+    }
+
+    /**
+     * Aktualisiert die Anzeige der Selektionsanzahl (entspricht txSelHeightSub in Access)
+     */
+    function updateSelectionCount() {
+        const count = selectedRows.size;
+        if (count > 1) {
+            footerStatus.textContent = `${count} Datensätze ausgewählt`;
+        } else if (count === 1) {
+            const idx = Array.from(selectedRows)[0];
+            const anfrage = filteredAnfragen[idx];
+            if (anfrage) {
+                footerStatus.textContent = `Ausgewählt: ${anfrage.name} - ${anfrage.auftrag}`;
+            }
+        } else {
+            footerStatus.textContent = 'Bereit';
+        }
     }
 
     /**
@@ -319,21 +405,28 @@ IDs: VA=${anfrage.va_id}, MA=${anfrage.ma_id}, VAStart=${anfrage.vastart_id}
                     });
                     results.push(`${anfrage.name}: OK`);
                 } else {
-                    // Fallback: API-Aufruf
-                    const response = await fetch('/api/anfragen/senden', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            ma_id: anfrage.ma_id,
-                            va_id: anfrage.va_id,
-                            vadatum_id: anfrage.vadatum_id,
-                            vastart_id: anfrage.vastart_id
-                        })
-                    });
-                    if (response.ok) {
-                        results.push(`${anfrage.name}: OK`);
-                    } else {
-                        results.push(`${anfrage.name}: Fehler`);
+                    // Fallback: API-Aufruf an VBA Bridge Server (Port 5002)
+                    // Die VBA-Funktion "Anfragen" sendet die E-Mail und setzt Anfragezeitpunkt
+                    try {
+                        const response = await fetch('http://localhost:5002/api/vba/anfragen', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ma_id: anfrage.ma_id,
+                                va_id: anfrage.va_id,
+                                vadatum_id: anfrage.vadatum_id,
+                                vastart_id: anfrage.vastart_id
+                            })
+                        });
+                        if (response.ok) {
+                            const result = await response.json();
+                            results.push(`${anfrage.name}: ${result.message || 'OK'}`);
+                        } else {
+                            results.push(`${anfrage.name}: Fehler (API)`);
+                        }
+                    } catch (apiErr) {
+                        console.error('[Offene Anfragen] API-Fallback fehlgeschlagen:', apiErr);
+                        results.push(`${anfrage.name}: Keine Verbindung zu VBA Bridge`);
                     }
                 }
             } catch (err) {
@@ -517,13 +610,26 @@ IDs: VA=${anfrage.va_id}, MA=${anfrage.ma_id}, VAStart=${anfrage.vastart_id}
     }
 
     /**
-     * Formatiert Zeit zu deutschem Format
+     * Formatiert Zeit zu deutschem Format (HH:MM)
      */
     function formatTime(timeStr) {
         if (!timeStr) return '';
 
         // Wenn bereits HH:MM Format
-        if (typeof timeStr === 'string' && timeStr.match(/^\d{2}:\d{2}/)) {
+        if (typeof timeStr === 'string' && timeStr.match(/^\d{2}:\d{2}$/)) {
+            return timeStr;
+        }
+
+        // Wenn ISO DateTime Format (2026-12-19T17:30:00)
+        if (typeof timeStr === 'string' && timeStr.includes('T')) {
+            const timePart = timeStr.split('T')[1];
+            if (timePart) {
+                return timePart.substring(0, 5); // HH:MM
+            }
+        }
+
+        // Wenn HH:MM:SS Format
+        if (typeof timeStr === 'string' && timeStr.match(/^\d{2}:\d{2}:\d{2}/)) {
             return timeStr.substring(0, 5);
         }
 

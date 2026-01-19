@@ -1,10 +1,9 @@
 ﻿<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="css/unified-header.css">
-    <link rel="stylesheet" href="css/form-titles.css">
-    <script>
+<html lang="de" data-yd-content-ready="true" style="position: relative;"><head style="position: relative;">
+    <meta charset="UTF-8" style="position: relative;">
+    <link rel="stylesheet" href="css/unified-header.css" style="position: relative;">
+    <link rel="stylesheet" href="css/form-titles.css" style="position: relative;">
+    <script style="position: relative;">
     // Auto-Load in Shell (Sidebar-Integration)
     (function() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -24,10 +23,10 @@
             window.location.replace(shellUrl);
         }
     })();
-    </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mitarbeiter Auswahl - Offene Mail Anfragen</title>
-    <style>
+    </script><script src="chrome-extension://oglffgiaiekgeicdgkdlnlkhliajdlja/injectScript.js" style="position: relative;"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" style="position: relative;">
+    <title style="position: relative;">Mitarbeiter Auswahl - Offene Mail Anfragen</title>
+    <style style="position: relative;">
         * {
             margin: 0;
             padding: 0;
@@ -54,6 +53,7 @@
             display: flex;
             flex: 1;
             overflow: hidden;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         /* Left Menu (Sidebar) */
@@ -160,6 +160,7 @@
             flex-direction: column;
             gap: 2px;
             overflow: hidden;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         /* Auftrag-Auswahl Row (unterhalb unified-header) */
@@ -184,6 +185,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         /* Buttons */
@@ -261,6 +263,7 @@
             gap: 8px;
             flex: 1;
             overflow: hidden;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         .list-panel {
@@ -278,6 +281,7 @@
             flex: 1;
             min-width: 430px; /* 280+150=430px breiter (14.01.2026) */
             max-width: 570px; /* 420+150=570px breiter (14.01.2026) */
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         .list-panel.medium {
@@ -322,6 +326,7 @@
             overflow: auto;
             border: 1px solid #808080;
             background: white;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         /* Listbox Styles */
@@ -493,6 +498,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         .anfrage-progress-container {
@@ -534,7 +540,8 @@
 
         .anfrage-log-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate; /* GEÄNDERT für sticky header */
+            border-spacing: 0; /* KRITISCH: Ersetzt collapse */
             font-size: 11px;
             background: white;
         }
@@ -545,6 +552,9 @@
             padding: 4px 8px;
             text-align: left;
             border: 1px solid #404040;
+            position: sticky; /* KRITISCH: Sticky header */
+            top: 0;
+            z-index: 10;
         }
 
         .anfrage-log-table td {
@@ -602,205 +612,314 @@
         }
 
     </style>
-    <link rel="stylesheet" href="consys-common.css">
-    <link rel="stylesheet" href="css/fonts_override.css">
-    <script src="js/performance-init.js"></script>
-<link rel="stylesheet" href="css/visbug_overrides.css">
-</head>
-<body data-form="frm_MA_VA_Schnellauswahl">
+    <link rel="stylesheet" href="consys-common.css" style="position: relative;">
+    <link rel="stylesheet" href="css/fonts_override.css" style="position: relative;">
+    <script src="js/performance-init.js" style="position: relative;"></script>
+<link rel="stylesheet" href="css/visbug_overrides.css" style="position: relative;">
+<style style="position: relative;">
+            /* Shell-Modus: Sidebar versteckt */
+            body.shell-mode .left-menu {
+                display: none !important;
+            }
+            body.shell-mode .main-container {
+                margin-left: 0 !important;
+            }
+            body.shell-mode .content-area {
+                width: 100% !important;
+            }
+        </style><style id="perf-init-styles" style="position: relative;">
+        @keyframes skeleton-shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        .skeleton-loading {
+            pointer-events: none;
+        }
+
+        .skeleton-row {
+            display: flex;
+            gap: 8px;
+            padding: 6px 4px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .skeleton-cell {
+            height: 14px;
+            background: linear-gradient(90deg, #e8e8e8 25%, #f0f0f0 50%, #e8e8e8 75%);
+            background-size: 400px 100%;
+            animation: skeleton-shimmer 1.2s ease-in-out infinite;
+            border-radius: 3px;
+        }
+
+        .skeleton-cell.w-20 { width: 20%; }
+        .skeleton-cell.w-30 { width: 30%; }
+        .skeleton-cell.w-40 { width: 40%; }
+        .skeleton-cell.w-50 { width: 50%; }
+        .skeleton-cell.w-60 { width: 60%; }
+
+        .form-loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.7);
+            z-index: 100;
+        }
+
+        .form-loading::after {
+            content: 'Laden...';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 101;
+            font-size: 12px;
+            color: #666;
+        }
+
+        [data-lazy-src]:not(.lazy-loaded) {
+            background: #f5f5f5;
+            min-height: 50px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.2s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style><style style="position: relative;">@keyframes loading {
+    0% {
+        transform: rotate(0);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar-thumb {
+    background: #dfdfdf;
+    border-radius: 4px;
+}
+
+.ag-textarea .MuiInputBase-input::-webkit-scrollbar-thumb:hover {
+    background: #d4d4d4;
+}
+</style><style style="position: relative;">.translated-content .ytCoreImageHost {
+    visibility: visible;
+}
+</style><style style="position: relative;">body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow:hidden}body.swal2-height-auto{height:auto !important}body.swal2-no-backdrop .swal2-container{background-color:rgba(0,0,0,0) !important;pointer-events:none}body.swal2-no-backdrop .swal2-container .swal2-popup{pointer-events:all}body.swal2-no-backdrop .swal2-container .swal2-modal{box-shadow:0 0 10px rgba(0,0,0,.4)}body.swal2-toast-shown .swal2-container{box-sizing:border-box;width:360px;max-width:100%;background-color:rgba(0,0,0,0);pointer-events:none}body.swal2-toast-shown .swal2-container.swal2-top{inset:0 auto auto 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-top-end,body.swal2-toast-shown .swal2-container.swal2-top-right{inset:0 0 auto auto}body.swal2-toast-shown .swal2-container.swal2-top-start,body.swal2-toast-shown .swal2-container.swal2-top-left{inset:0 auto auto 0}body.swal2-toast-shown .swal2-container.swal2-center-start,body.swal2-toast-shown .swal2-container.swal2-center-left{inset:50% auto auto 0;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-center{inset:50% auto auto 50%;transform:translate(-50%, -50%)}body.swal2-toast-shown .swal2-container.swal2-center-end,body.swal2-toast-shown .swal2-container.swal2-center-right{inset:50% 0 auto auto;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-start,body.swal2-toast-shown .swal2-container.swal2-bottom-left{inset:auto auto 0 0}body.swal2-toast-shown .swal2-container.swal2-bottom{inset:auto auto 0 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-end,body.swal2-toast-shown .swal2-container.swal2-bottom-right{inset:auto 0 0 auto}@media print{body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow-y:scroll !important}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown)>[aria-hidden=true]{display:none}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown) .swal2-container{position:static !important}}div:where(.swal2-container){display:grid;position:fixed;z-index:1060;inset:0;box-sizing:border-box;grid-template-areas:"top-start     top            top-end" "center-start  center         center-end" "bottom-start  bottom-center  bottom-end";grid-template-rows:minmax(min-content, auto) minmax(min-content, auto) minmax(min-content, auto);height:100%;padding:.625em;overflow-x:hidden;transition:background-color .1s;-webkit-overflow-scrolling:touch}div:where(.swal2-container).swal2-backdrop-show,div:where(.swal2-container).swal2-noanimation{background:rgba(0,0,0,.4)}div:where(.swal2-container).swal2-backdrop-hide{background:rgba(0,0,0,0) !important}div:where(.swal2-container).swal2-top-start,div:where(.swal2-container).swal2-center-start,div:where(.swal2-container).swal2-bottom-start{grid-template-columns:minmax(0, 1fr) auto auto}div:where(.swal2-container).swal2-top,div:where(.swal2-container).swal2-center,div:where(.swal2-container).swal2-bottom{grid-template-columns:auto minmax(0, 1fr) auto}div:where(.swal2-container).swal2-top-end,div:where(.swal2-container).swal2-center-end,div:where(.swal2-container).swal2-bottom-end{grid-template-columns:auto auto minmax(0, 1fr)}div:where(.swal2-container).swal2-top-start>.swal2-popup{align-self:start}div:where(.swal2-container).swal2-top>.swal2-popup{grid-column:2;place-self:start center}div:where(.swal2-container).swal2-top-end>.swal2-popup,div:where(.swal2-container).swal2-top-right>.swal2-popup{grid-column:3;place-self:start end}div:where(.swal2-container).swal2-center-start>.swal2-popup,div:where(.swal2-container).swal2-center-left>.swal2-popup{grid-row:2;align-self:center}div:where(.swal2-container).swal2-center>.swal2-popup{grid-column:2;grid-row:2;place-self:center center}div:where(.swal2-container).swal2-center-end>.swal2-popup,div:where(.swal2-container).swal2-center-right>.swal2-popup{grid-column:3;grid-row:2;place-self:center end}div:where(.swal2-container).swal2-bottom-start>.swal2-popup,div:where(.swal2-container).swal2-bottom-left>.swal2-popup{grid-column:1;grid-row:3;align-self:end}div:where(.swal2-container).swal2-bottom>.swal2-popup{grid-column:2;grid-row:3;place-self:end center}div:where(.swal2-container).swal2-bottom-end>.swal2-popup,div:where(.swal2-container).swal2-bottom-right>.swal2-popup{grid-column:3;grid-row:3;place-self:end end}div:where(.swal2-container).swal2-grow-row>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-column:1/4;width:100%}div:where(.swal2-container).swal2-grow-column>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-row:1/4;align-self:stretch}div:where(.swal2-container).swal2-no-transition{transition:none !important}div:where(.swal2-container) div:where(.swal2-popup){display:none;position:relative;box-sizing:border-box;grid-template-columns:minmax(0, 100%);width:32em;max-width:100%;padding:0 0 1.25em;border:none;border-radius:5px;background:#fff;color:hsl(0,0%,33%);font-family:inherit;font-size:1rem}div:where(.swal2-container) div:where(.swal2-popup):focus{outline:none}div:where(.swal2-container) div:where(.swal2-popup).swal2-loading{overflow-y:hidden}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable{cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable div:where(.swal2-icon){cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging{cursor:grabbing}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging div:where(.swal2-icon){cursor:grabbing}div:where(.swal2-container) h2:where(.swal2-title){position:relative;max-width:100%;margin:0;padding:.8em 1em 0;color:inherit;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;word-wrap:break-word;cursor:initial}div:where(.swal2-container) div:where(.swal2-actions){display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:center;width:auto;margin:1.25em auto 0;padding:0}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled[disabled]{opacity:.4}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled:hover{background-image:linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled:active{background-image:linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2))}div:where(.swal2-container) div:where(.swal2-loader){display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 rgba(0,0,0,0) #2778c4 rgba(0,0,0,0)}div:where(.swal2-container) button:where(.swal2-styled){margin:.3125em;padding:.625em 1.1em;transition:box-shadow .1s;box-shadow:0 0 0 3px rgba(0,0,0,0);font-weight:500}div:where(.swal2-container) button:where(.swal2-styled):not([disabled]){cursor:pointer}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm){border:0;border-radius:.25em;background:initial;background-color:#7066e0;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm):focus-visible{box-shadow:0 0 0 3px rgba(112,102,224,.5)}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny){border:0;border-radius:.25em;background:initial;background-color:#dc3741;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny):focus-visible{box-shadow:0 0 0 3px rgba(220,55,65,.5)}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel){border:0;border-radius:.25em;background:initial;background-color:#6e7881;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):focus-visible{box-shadow:0 0 0 3px rgba(110,120,129,.5)}div:where(.swal2-container) button:where(.swal2-styled).swal2-default-outline:focus-visible{box-shadow:0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) button:where(.swal2-styled):focus-visible{outline:none}div:where(.swal2-container) button:where(.swal2-styled)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-footer){margin:1em 0 0;padding:1em 1em 0;border-top:1px solid #eee;color:inherit;font-size:1em;text-align:center;cursor:initial}div:where(.swal2-container) .swal2-timer-progress-bar-container{position:absolute;right:0;bottom:0;left:0;grid-column:auto !important;overflow:hidden;border-bottom-right-radius:5px;border-bottom-left-radius:5px}div:where(.swal2-container) div:where(.swal2-timer-progress-bar){width:100%;height:.25em;background:rgba(0,0,0,.2)}div:where(.swal2-container) img:where(.swal2-image){max-width:100%;margin:2em auto 1em;cursor:initial}div:where(.swal2-container) button:where(.swal2-close){z-index:2;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin-top:0;margin-right:0;margin-bottom:-1.2em;padding:0;overflow:hidden;transition:color .1s,box-shadow .1s;border:none;border-radius:5px;background:rgba(0,0,0,0);color:#ccc;font-family:monospace;font-size:2.5em;cursor:pointer;justify-self:end}div:where(.swal2-container) button:where(.swal2-close):hover{transform:none;background:rgba(0,0,0,0);color:#f27474}div:where(.swal2-container) button:where(.swal2-close):focus-visible{outline:none;box-shadow:inset 0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) button:where(.swal2-close)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-html-container){z-index:1;justify-content:center;margin:0;padding:1em 1.6em .3em;overflow:auto;color:inherit;font-size:1.125em;font-weight:normal;line-height:normal;text-align:center;word-wrap:break-word;word-break:break-word;cursor:initial}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea),div:where(.swal2-container) select:where(.swal2-select),div:where(.swal2-container) div:where(.swal2-radio),div:where(.swal2-container) label:where(.swal2-checkbox){margin:1em 2em 3px}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea){box-sizing:border-box;width:auto;transition:border-color .1s,box-shadow .1s;border:1px solid hsl(0,0%,85%);border-radius:.1875em;background:rgba(0,0,0,0);box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(0,0,0,0);color:inherit;font-size:1.125em}div:where(.swal2-container) input:where(.swal2-input).swal2-inputerror,div:where(.swal2-container) input:where(.swal2-file).swal2-inputerror,div:where(.swal2-container) textarea:where(.swal2-textarea).swal2-inputerror{border-color:#f27474 !important;box-shadow:0 0 2px #f27474 !important}div:where(.swal2-container) input:where(.swal2-input):focus,div:where(.swal2-container) input:where(.swal2-file):focus,div:where(.swal2-container) textarea:where(.swal2-textarea):focus{border:1px solid #b4dbed;outline:none;box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) input:where(.swal2-input)::placeholder,div:where(.swal2-container) input:where(.swal2-file)::placeholder,div:where(.swal2-container) textarea:where(.swal2-textarea)::placeholder{color:#ccc}div:where(.swal2-container) .swal2-range{margin:1em 2em 3px;background:#fff}div:where(.swal2-container) .swal2-range input{width:80%}div:where(.swal2-container) .swal2-range output{width:20%;color:inherit;font-weight:600;text-align:center}div:where(.swal2-container) .swal2-range input,div:where(.swal2-container) .swal2-range output{height:2.625em;padding:0;font-size:1.125em;line-height:2.625em}div:where(.swal2-container) .swal2-input{height:2.625em;padding:0 .75em}div:where(.swal2-container) .swal2-file{width:75%;margin-right:auto;margin-left:auto;background:rgba(0,0,0,0);font-size:1.125em}div:where(.swal2-container) .swal2-textarea{height:6.75em;padding:.75em}div:where(.swal2-container) .swal2-select{min-width:50%;max-width:100%;padding:.375em .625em;background:rgba(0,0,0,0);color:inherit;font-size:1.125em}div:where(.swal2-container) .swal2-radio,div:where(.swal2-container) .swal2-checkbox{align-items:center;justify-content:center;background:#fff;color:inherit}div:where(.swal2-container) .swal2-radio label,div:where(.swal2-container) .swal2-checkbox label{margin:0 .6em;font-size:1.125em}div:where(.swal2-container) .swal2-radio input,div:where(.swal2-container) .swal2-checkbox input{flex-shrink:0;margin:0 .4em}div:where(.swal2-container) label:where(.swal2-input-label){display:flex;justify-content:center;margin:1em auto 0}div:where(.swal2-container) div:where(.swal2-validation-message){align-items:center;justify-content:center;margin:1em 0 0;padding:.625em;overflow:hidden;background:hsl(0,0%,94%);color:#666;font-size:1em;font-weight:300}div:where(.swal2-container) div:where(.swal2-validation-message)::before{content:"!";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}div:where(.swal2-container) .swal2-progress-steps{flex-wrap:wrap;align-items:center;max-width:100%;margin:1.25em auto;padding:0;background:rgba(0,0,0,0);font-weight:600}div:where(.swal2-container) .swal2-progress-steps li{display:inline-block;position:relative}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step{z-index:20;flex-shrink:0;width:2em;height:2em;border-radius:2em;background:#2778c4;color:#fff;line-height:2em;text-align:center}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step{background:#2778c4}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step{background:#add8e6;color:#fff}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line{background:#add8e6}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step-line{z-index:10;flex-shrink:0;width:2.5em;height:.4em;margin:0 -1px;background:#2778c4}div:where(.swal2-icon){position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:2.5em auto .6em;border:.25em solid rgba(0,0,0,0);border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;user-select:none}div:where(.swal2-icon) .swal2-icon-content{display:flex;align-items:center;font-size:3.75em}div:where(.swal2-icon).swal2-error{border-color:#f27474;color:#f27474}div:where(.swal2-icon).swal2-error .swal2-x-mark{position:relative;flex-grow:1}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line]{display:block;position:absolute;top:2.3125em;width:2.9375em;height:.3125em;border-radius:.125em;background-color:#f27474}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=left]{left:1.0625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=right]{right:1em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-error.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-error.swal2-icon-show .swal2-x-mark{animation:swal2-animate-error-x-mark .5s}div:where(.swal2-icon).swal2-warning{border-color:rgb(249.95234375,205.965625,167.74765625);color:#f8bb86}div:where(.swal2-icon).swal2-warning.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-warning.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .5s}div:where(.swal2-icon).swal2-info{border-color:rgb(156.7033492823,224.2822966507,246.2966507177);color:#3fc3ee}div:where(.swal2-icon).swal2-info.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-info.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .8s}div:where(.swal2-icon).swal2-question{border-color:rgb(200.8064516129,217.9677419355,225.1935483871);color:#87adbd}div:where(.swal2-icon).swal2-question.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-question.swal2-icon-show .swal2-icon-content{animation:swal2-animate-question-mark .8s}div:where(.swal2-icon).swal2-success{border-color:#a5dc86;color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line]{position:absolute;width:3.75em;height:7.5em;border-radius:50%}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.4375em;left:-2.0635em;transform:rotate(-45deg);transform-origin:3.75em 3.75em;border-radius:7.5em 0 0 7.5em}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.6875em;left:1.875em;transform:rotate(-45deg);transform-origin:0 3.75em;border-radius:0 7.5em 7.5em 0}div:where(.swal2-icon).swal2-success .swal2-success-ring{position:absolute;z-index:2;top:-0.25em;left:-0.25em;box-sizing:content-box;width:100%;height:100%;border:.25em solid rgba(165,220,134,.3);border-radius:50%}div:where(.swal2-icon).swal2-success .swal2-success-fix{position:absolute;z-index:1;top:.5em;left:1.625em;width:.4375em;height:5.625em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line]{display:block;position:absolute;z-index:2;height:.3125em;border-radius:.125em;background-color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=tip]{top:2.875em;left:.8125em;width:1.5625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=long]{top:2.375em;right:.5em;width:2.9375em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-animate-success-line-tip .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-animate-success-line-long .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-circular-line-right{animation:swal2-rotate-success-circular-line 4.25s ease-in}[class^=swal2]{-webkit-tap-highlight-color:rgba(0,0,0,0)}.swal2-show{animation:swal2-show .3s}.swal2-hide{animation:swal2-hide .15s forwards}.swal2-noanimation{transition:none}.swal2-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}.swal2-rtl .swal2-close{margin-right:initial;margin-left:0}.swal2-rtl .swal2-timer-progress-bar{right:0;left:auto}.swal2-toast{box-sizing:border-box;grid-column:1/4 !important;grid-row:1/4 !important;grid-template-columns:min-content auto min-content;padding:1em;overflow-y:hidden;background:#fff;box-shadow:0 0 1px rgba(0,0,0,.075),0 1px 2px rgba(0,0,0,.075),1px 2px 4px rgba(0,0,0,.075),1px 3px 8px rgba(0,0,0,.075),2px 4px 16px rgba(0,0,0,.075);pointer-events:all}.swal2-toast>*{grid-column:2}.swal2-toast h2:where(.swal2-title){margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-toast .swal2-loading{justify-content:center}.swal2-toast input:where(.swal2-input){height:2em;margin:.5em;font-size:1em}.swal2-toast .swal2-validation-message{font-size:1em}.swal2-toast div:where(.swal2-footer){margin:.5em 0 0;padding:.5em 0 0;font-size:.8em}.swal2-toast button:where(.swal2-close){grid-column:3/3;grid-row:1/99;align-self:center;width:.8em;height:.8em;margin:0;font-size:2em}.swal2-toast div:where(.swal2-html-container){margin:.5em 1em;padding:0;overflow:initial;font-size:1em;text-align:initial}.swal2-toast div:where(.swal2-html-container):empty{padding:0}.swal2-toast .swal2-loader{grid-column:1;grid-row:1/99;align-self:center;width:2em;height:2em;margin:.25em}.swal2-toast .swal2-icon{grid-column:1;grid-row:1/99;align-self:center;width:2em;min-width:2em;height:2em;margin:0 .5em 0 0}.swal2-toast .swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:1.8em;font-weight:bold}.swal2-toast .swal2-icon.swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line]{top:.875em;width:1.375em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:.3125em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:.3125em}.swal2-toast div:where(.swal2-actions){justify-content:flex-start;height:auto;margin:0;margin-top:.5em;padding:0 .5em}.swal2-toast button:where(.swal2-styled){margin:.25em .5em;padding:.4em .6em;font-size:1em}.swal2-toast .swal2-success{border-color:#a5dc86}.swal2-toast .swal2-success [class^=swal2-success-circular-line]{position:absolute;width:1.6em;height:3em;border-radius:50%}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.8em;left:-0.5em;transform:rotate(-45deg);transform-origin:2em 2em;border-radius:4em 0 0 4em}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.25em;left:.9375em;transform-origin:0 1.5em;border-radius:0 4em 4em 0}.swal2-toast .swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-success .swal2-success-fix{top:0;left:.4375em;width:.4375em;height:2.6875em}.swal2-toast .swal2-success [class^=swal2-success-line]{height:.3125em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=tip]{top:1.125em;left:.1875em;width:.75em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=long]{top:.9375em;right:.1875em;width:1.375em}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-toast-animate-success-line-tip .75s}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-toast-animate-success-line-long .75s}.swal2-toast.swal2-show{animation:swal2-toast-show .5s}.swal2-toast.swal2-hide{animation:swal2-toast-hide .1s forwards}@keyframes swal2-show{0%{transform:scale(0.7)}45%{transform:scale(1.05)}80%{transform:scale(0.95)}100%{transform:scale(1)}}@keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(0.5);opacity:0}}@keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-0.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(0.4);opacity:0}50%{margin-top:1.625em;transform:scale(0.4);opacity:0}80%{margin-top:-0.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0deg);opacity:1}}@keyframes swal2-rotate-loading{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes swal2-animate-question-mark{0%{transform:rotateY(-360deg)}100%{transform:rotateY(0)}}@keyframes swal2-animate-i-mark{0%{transform:rotateZ(45deg);opacity:0}25%{transform:rotateZ(-25deg);opacity:.4}50%{transform:rotateZ(15deg);opacity:.8}75%{transform:rotateZ(-5deg);opacity:1}100%{transform:rotateX(0);opacity:1}}@keyframes swal2-toast-show{0%{transform:translateY(-0.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(0.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0deg)}}@keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-0.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}</style></head>
+<body data-form="frm_MA_VA_Schnellauswahl" class="shell-mode" inmaintabuse="1" style="position: relative;">
     <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">â›¶</button>
-    <div class="window-frame">
+    <div class="window-frame" style="position: relative;">
         <!-- Unified Header -->
-        <div class="header-row-wrapper">
-            <div class="header-row combined-buttons">
-                <div class="logo-box">C</div>
-                <span class="title-text" style="font-size: 16px; font-weight: bold;">Mitarbeiterauswahl - Offene Mail Anfragen</span>
-                <div class="buttons-grid">
-                    <button class="btn unified-btn" id="btnAuftrag">Zurück zum Auftrag</button>
-                    <span id="lbl_Datum" style="font-size: 12px; color: white;"></span>
+        <div class="header-row-wrapper" style="position: relative;">
+            <div class="header-row combined-buttons" style="position: relative;">
+                <div class="logo-box" style="position: relative;">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold; position: relative;">Mitarbeiterauswahl - Offene Mail Anfragen</span>
+                <div class="buttons-grid" style="position: relative;">
+                    <button class="btn unified-btn" id="btnAuftrag" style="position: relative;">Zurück zum Auftrag</button>
+                    <span id="lbl_Datum" style="font-size: 12px; color: white; position: relative;">So. 18.01.2026</span>
                 </div>
             </div>
-            <div class="gpt-box">CONSYS<span>Web</span></div>
+            <div class="gpt-box" style="position: relative;">CONSYS<span style="position: relative;">Web</span></div>
         </div>
 
         <!-- Main Container -->
-        <div class="main-container">
+        <div class="main-container" style="margin-left: 0px; position: relative;">
             <!-- Left Sidebar -->
 
             <!-- Content Area -->
-            <div class="content-area">
+            <div class="content-area" style="position: relative;">
                 <!-- Auftrag-Auswahl Row -->
-                <div class="auftrag-selection-row">
-                    <span class="auftrag-label">Auftrag:</span>
-                    <select id="VA_ID" class="form-select" style="min-width: 280px; font-size: 12px;">
-                        <option value="">-- Auftrag wählen --</option>
+                <div class="auftrag-selection-row" style="position: relative;">
+                    <span class="auftrag-label" style="position: relative;">Auftrag:</span>
+                    <select id="VA_ID" class="form-select" style="min-width: 280px; font-size: 12px; position: relative;"><option value="" style="position: relative;">-- Auftrag wählen --</option><option value="8796" style="position: relative;"> - </option><option value="9260" style="position: relative;"> - </option><option value="7619" style="position: relative;"> - </option><option value="7661" style="position: relative;"> - </option><option value="7688" style="position: relative;"> - </option><option value="7712" style="position: relative;"> - </option><option value="7740" style="position: relative;"> - </option><option value="8953" style="position: relative;"> - </option><option value="8948" style="position: relative;"> - </option><option value="7836" style="position: relative;"> - </option><option value="8910" style="position: relative;"> - </option><option value="7986" style="position: relative;"> - </option><option value="8979" style="position: relative;"> - </option><option value="8027" style="position: relative;"> - </option><option value="8186" style="position: relative;"> - </option><option value="8376" style="position: relative;"> - </option><option value="8382" style="position: relative;"> - </option><option value="8387" style="position: relative;"> - </option><option value="8440" style="position: relative;"> - </option><option value="8581" style="position: relative;"> - </option><option value="8619" style="position: relative;"> - </option><option value="8623" style="position: relative;"> - </option><option value="8154" style="position: relative;"> - </option><option value="8722" style="position: relative;"> - </option><option value="8618" style="position: relative;">01.11. SSV Ulm Anfahrtspauschale - Donaustadion</option><option value="8121" style="position: relative;">01099 - Stadthalle</option><option value="8924" style="position: relative;">1. FC Nürnberg -  1.FC Köln - Max-Morlock-Stadion</option><option value="8093" style="position: relative;">1. FC Nürnberg -  Eintracht Braunschweig - Max-Morlock-Stadion</option><option value="8248" style="position: relative;">1. FC Nürnberg -  FC St. Pauli - Max-Morlock-Stadion</option><option value="8094" style="position: relative;">1. FC Nürnberg -  FC St. Pauli - Max-Morlock-Stadion</option><option value="8089" style="position: relative;">1. FC Nürnberg -  Hansa Rostock - Max-Morlock-Stadion</option><option value="8245" style="position: relative;">1. FC Nürnberg -  Holstein Kiel - Max-Morlock-Stadion</option><option value="8247" style="position: relative;">1. FC Nürnberg -  Karlsruher SC - Max-Morlock-Stadion</option><option value="8899" style="position: relative;">1. FC Nürnberg -  SC Paderborn - Max-Morlock-Stadion</option><option value="8246" style="position: relative;">1. FC Nürnberg -  SC Paderborn - Max-Morlock-Stadion</option><option value="8923" style="position: relative;">1. FC Nürnberg -  SV 07 Elversberg - Max-Morlock-Stadion</option><option value="8249" style="position: relative;">1. FC Nürnberg -  SV Elversberg - Max-Morlock-Stadion</option><option value="8092" style="position: relative;">1. FC Nürnberg - 1.FC Kaiserslautern - Max-Morlock-Stadion</option><option value="9159" style="position: relative;">1. Fc Nürnberg - Hannover 96 - Max-Morlock-Stadion</option><option value="8898" style="position: relative;">1. FC Nürnberg - HSV - Max Morlock Stadion</option><option value="9000" style="position: relative;">1. FC Nürnberg - SC Paderborn - Max-Morlock-Stadion</option><option value="8989" style="position: relative;">1. FC Nürnberg - SV Darmstadt - Max-Morlock-Stadion</option><option value="9163" style="position: relative;">1. Fc Nürnberg - Sv Elversberg - Max-Morlock-Stadion</option><option value="8091" style="position: relative;">1. FC Nürnberg - VFL Osnabrück - Max-Morlock-Stadion</option><option value="9157" style="position: relative;">1. Fc Nürnberg Frauen - 1. Fc Union Berlin - Max-Morlock-Stadion</option><option value="9151" style="position: relative;">1. Fc Nürnberg Frauen - Eintracht Frankfurt - Max-Morlock-Stadion</option><option value="9154" style="position: relative;">1. Fc Nürnberg Frauen - Vfl Wolfsburg - Max-Morlock-Stadion</option><option value="8801" style="position: relative;">1. FCN - Greuther Fürth - Max Morlock Stadion</option><option value="8550" style="position: relative;">1.FCN - 1.FC Kaiserslautern - Max Morlock Stadion</option><option value="8468" style="position: relative;">1.FCN - 1.FC Magdeburg - Max Morlock Stadion</option><option value="8976" style="position: relative;">1.FCN - Borussia Mgladbach - Max Morlock Stadion</option><option value="8678" style="position: relative;">1.FCN - Eintracht Braunschweig - Max Morlock Stadion</option><option value="8411" style="position: relative;">1.FCN - FC Schalke 04 - Max Morlock Stadion</option><option value="8551" style="position: relative;">1.FCN - Fortuna Düsseldorf - Max Morlock Stadion</option><option value="8736" style="position: relative;">1.FCN - Hannover 96 - Max Morlock Stadion</option><option value="8469" style="position: relative;">1.FCN - Hertha BSC - Max Morlock Stadion</option><option value="8549" style="position: relative;">1.FCN - Jahn Regensburg - Max Morlock Stadion</option><option value="8410" style="position: relative;">1.FCN - Juventus Turin - Max Morlock Stadion</option><option value="8679" style="position: relative;">1.FCN - Karsruher SC - Max Morlock Stadion</option><option value="8548" style="position: relative;">1.FCN - Preußen Münster - Max Morlock Stadion</option><option value="8735" style="position: relative;">1.FCN - SSV Ulm - Max Morlock Stadion</option><option value="8734" style="position: relative;">1.FCN - SV Darmstadt 98 - Max Morlock Stadion</option><option value="8293" style="position: relative;">1.FCN Damen - Leipzig - Max-Morlock-Stadion</option><option value="8463" style="position: relative;">1.FCN II - FC Bayern München II - Max Morlock Stadion</option><option value="8847" style="position: relative;">1000 Jahr Feier Schwarzenbruck - Festplatz, Dürrenhembacher Str.</option><option value="9153" style="position: relative;">1099 - KIA Metropol Arena</option><option value="9215" style="position: relative;">1986zig - Löwensaal</option><option value="8195" style="position: relative;">25 Jahre SDP - Strandbad</option><option value="8015" style="position: relative;">25 Jahre SDP - Zusatzshow - Strandbad</option><option value="7388" style="position: relative;">50 Jahr Feier - DJK Fiegenstall 1974 e.V.</option><option value="7817" style="position: relative;">50-Jahr-Feier - Neumarkter Straße 27</option><option value="8119" style="position: relative;">75 Jahr Feier SV Berngau - Sportplatz</option><option value="8947" style="position: relative;">75 jähriges Vereinsjubiläum - Zuckermandelweg 100</option><option value="8383" style="position: relative;">75 jähriges Vereinsjubiläum - Zum Sportpark 1</option><option value="8994" style="position: relative;">75 jähriges Vereinsjubiläum - BSC Woffenbach - Kleine Jurahalle</option><option value="9210" style="position: relative;">Abba Night - Serenadenhof</option><option value="8763" style="position: relative;">ABBA Night - Serenadenhof</option><option value="8334" style="position: relative;">ABBA Night - Serenadenhof</option><option value="8988" style="position: relative;">Abel Selacoe &amp; Stuttgarter Symphoniker - Serenadenhof</option><option value="7754" style="position: relative;">Abi Ball Gymnasium Beilngries - Bühlerhalle, Ingolstädter Str 7</option><option value="8014" style="position: relative;">AC DC - Zeppelinfeld</option><option value="8798" style="position: relative;">Across Büsra Kayikci - Neues Museum</option><option value="8704" style="position: relative;">Adventssingen - Max-Morlock-Stadion</option><option value="8153" style="position: relative;">Afterwork Party - Skybar</option><option value="9084" style="position: relative;">Alex Stoldt - Löwensaal</option><option value="8005" style="position: relative;">Alice Cooper - Stadionpark</option><option value="8918" style="position: relative;">Altenpflege Standpartys - Messezentrum</option><option value="8893" style="position: relative;">Altenpflege Standwachen - Messezentrum</option><option value="8872" style="position: relative;">Altstadtfest - Don Caribico, Hauptstraße 12</option><option value="8215" style="position: relative;">Altstadtfest - Innenstadt</option><option value="8987" style="position: relative;">Altstadtflohmarkt - Rathausplatz</option><option value="8268" style="position: relative;">Altstadtflohmarkt - Rathausplatz</option><option value="8797" style="position: relative;">Andre Rieu - Arena</option><option value="9097" style="position: relative;">Annenmaykantereit - PSD Bank Arena Nürnberg</option><option value="8561" style="position: relative;">Annenmaykantereit - Lido Sounds OA St Gallen</option><option value="8560" style="position: relative;">Annenmaykantereit - Hurricane Southside</option><option value="8938" style="position: relative;">Annenmaykantereit - Clair…. Probehalle</option><option value="8937" style="position: relative;">Annenmaykantereit - Carlswerk Victoria</option><option value="9191" style="position: relative;">Anthrax - Löwensaal</option><option value="8811" style="position: relative;">Apres Ski Party - Sportplatz, An der Heide 3</option></select>
+                    <span class="auftrag-label" style="position: relative;">Datum:</span>
+                    <select id="cboVADatum" class="form-select datum-display" style="width: 140px; font-size: 12px; position: relative;">
+                        <option value="" style="position: relative;">-- Datum --</option>
                     </select>
-                    <span class="auftrag-label">Datum:</span>
-                    <select id="cboVADatum" class="form-select datum-display" style="width: 140px; font-size: 12px;">
-                        <option value="">-- Datum --</option>
-                    </select>
-                    <span id="lbAuftrag" style="margin-left: auto; font-weight: bold; display: none;">-- Bitte Auftrag wählen --</span>
+                    <span id="lbAuftrag" style="margin-left: auto; font-weight: bold; display: none; position: relative;">200 Aufträge geladen</span>
                     <!-- cboAuftrStatus: Visible=Falsch in Access -->
-                    <span class="form-label" style="margin-left: auto; display: none;">Auftragsstatus</span>
-                    <select id="cboAuftrStatus" class="form-select" style="width: 50px; display: none;">
-                        <option value="">-</option>
+                    <span class="form-label" style="margin-left: auto; display: none; position: relative;">Auftragsstatus</span>
+                    <select id="cboAuftrStatus" class="form-select" style="width: 50px; display: none; position: relative;">
+                        <option value="" style="position: relative;">-</option>
                     </select>
-                    <button class="btn" id="btnPosListe" style="display: none;">Positionsliste</button>
-                    <button class="btn" id="btnZuAbsage" style="display: none;">Manuelles Bearbeiten</button>
+                    <button class="btn" id="btnPosListe" style="display: none; position: relative;">Positionsliste</button>
+                    <button class="btn" id="btnZuAbsage" style="display: none; position: relative;">Manuelles Bearbeiten</button>
                 </div>
 
                 <!-- Form Section -->
-                <div class="form-section">
+                <div class="form-section" style="position: relative;">
                     <!-- Filter Zeile mit Checkboxen und Buttons (14.01.2026 neu angeordnet) -->
-                    <div class="filter-row">
-                        <span class="form-label">Mitarbeiter</span>
-                        <span class="form-label">Gesamt:</span>
-                        <input type="text" id="iGes_MA" class="form-input readonly" readonly value="0" style="width: 50px;">
+                    <div class="filter-row" style="position: relative;">
+                        <span class="form-label" style="position: relative;">Mitarbeiter</span>
+                        <span class="form-label" style="position: relative;">Gesamt:</span>
+                        <input type="text" id="iGes_MA" class="form-input readonly" readonly="" value="0" style="width: 50px; position: relative;">
 
                         <!-- Checkbox-Blöcke links -->
-                        <div style="display: flex; gap: 20px; margin-left: 20px;">
-                            <div class="checkbox-block">
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="cbVerplantVerfuegbar">
-                                    <label for="cbVerplantVerfuegbar">geplant = verfügbar</label>
+                        <div style="display: flex; gap: 20px; margin-left: 20px; position: relative;">
+                            <div class="checkbox-block" style="position: relative;">
+                                <div class="checkbox-group" style="position: relative;">
+                                    <input type="checkbox" id="cbVerplantVerfuegbar" style="position: relative; top: -0.5px;">
+                                    <label for="cbVerplantVerfuegbar" style="position: relative; top: 0px;">geplant = verfügbar</label>
                                 </div>
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="IstVerfuegbar">
-                                    <label for="IstVerfuegbar">Nur freie anzeigen</label>
+                                <div class="checkbox-group" style="position: relative;">
+                                    <input type="checkbox" id="IstVerfuegbar" style="position: relative; top: 9.5px;">
+                                    <label for="IstVerfuegbar" style="position: relative; top: 10px;">Nur freie anzeigen</label>
                                 </div>
                             </div>
                             <!-- Aktiv/34a mit Anstellung/Kategorie zusammen -->
-                            <div class="checkbox-block">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="IstAktiv" checked>
-                                        <label for="IstAktiv">Nur aktive anzeigen</label>
+                            <div class="checkbox-block" style="position: relative;">
+                                <div style="display: flex; align-items: center; gap: 10px; position: relative;">
+                                    <div class="checkbox-group" style="position: relative;">
+                                        <input type="checkbox" id="IstAktiv" checked="" style="position: relative; display: none;">
+                                        <label for="IstAktiv" style="position: relative; display: none;">Nur aktive anzeigen</label>
                                     </div>
-                                    <span class="form-label">Anstellung:</span>
-                                    <select id="cboAnstArt" class="form-select" style="width: 100px;">
-                                        <option value="13" selected>Alle aktiven</option>
-                                        <option value="3">Festangestellt</option>
-                                        <option value="5">Aushilfe</option>
-                                        <option value="9">Studenten</option>
-                                        <option value="11">Praktikanten</option>
+                                    <span class="form-label" style="position: relative; left: 80px; top: -3.5px;">Anstellung:</span>
+                                    <select id="cboAnstArt" class="form-select" style="width: 100px; position: relative; left: 80px; top: 0px;">
+                                        <option value="13" style="position: relative;">Alle aktiven</option>
+                                        <option value="3" style="position: relative;">Festangestellt</option>
+                                        <option value="5" selected="" style="position: relative;">Minijobber</option>
+                                        <option value="9" style="position: relative;">Studenten</option>
+                                        <option value="11" style="position: relative;">Praktikanten</option>
                                     </select>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="cbNur34a">
-                                        <label for="cbNur34a">Nur 34a</label>
+                                <div style="display: flex; align-items: center; gap: 10px; position: relative;">
+                                    <div class="checkbox-group" style="position: relative;">
+                                        <input type="checkbox" id="cbNur34a" style="position: relative; top: -1px;">
+                                        <label for="cbNur34a" style="position: relative; top: -0.5px;">Nur 34a</label>
                                     </div>
-                                    <span class="form-label" style="margin-left: 40px;">Kategorie:</span>
-                                    <select id="cboQuali" class="form-select" style="width: 100px;">
-                                        <option value="">Alle</option>
+                                    <span class="form-label" style="margin-left: 40px; position: relative; left: -15px; top: -0.5px;">Kategorie:</span>
+                                    <select id="cboQuali" class="form-select" style="width: 100px; position: relative; left: -15px; top: 3px;">
+                                        <option value="" style="position: relative;">Alle</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Grüne Buttons über Block "Mitarbeiter geplant" -->
-                        <div style="display: flex; flex-direction: column; gap: 4px; margin-left: auto;">
-                            <button class="btn btn-green" id="btnMailSelected">Nur Selektierte anfragen</button>
-                            <button class="btn btn-green" id="btnMail">Alle Mitarbeiter anfragen</button>
+                        <div style="display: flex; flex-direction: column; gap: 4px; margin-left: auto; position: relative;">
+                            <button class="btn btn-green" id="btnMailSelected" style="position: relative; left: -490px;">Nur Selektierte anfragen</button>
+                            <button class="btn btn-green" id="btnMail" style="position: relative; left: -490px;">Alle Mitarbeiter anfragen</button>
                         </div>
                     </div>
 
                     <!-- Lists Container -->
-                    <div class="lists-container">
+                    <div class="lists-container" style="position: relative;">
                         <!-- Zeiten Liste -->
-                        <div class="list-panel narrow">
-                            <span class="form-label">Dienstbeginn auswählen:</span>
-                            <div class="grid-wrapper">
+                        <div class="list-panel narrow" style="position: relative;">
+                            <span class="form-label" style="position: relative;">Dienstbeginn auswählen:</span>
+                            <div class="grid-wrapper" style="position: relative;">
                                 <div class="listbox-header">
-                                    <span style="width: 25px;">Ist</span>
-                                    <span style="width: 25px;">Soll</span>
-                                    <span style="width: 50px;">Beginn</span>
-                                    <span style="width: 50px;">Ende</span>
+                                    <span style="width: 25px; position: relative;">Ist</span>
+                                    <span style="width: 25px; position: relative;">Soll</span>
+                                    <span style="width: 50px; position: relative;">Beginn</span>
+                                    <span style="width: 50px; position: relative;">Ende</span>
                                 </div>
-                                <div id="lstZeiten_Body"></div>
+                                <div id="lstZeiten_Body" style="position: relative;"></div>
                             </div>
-                            <span class="form-label">Endzeit:</span>
-                            <input type="time" id="DienstEnde" class="form-input" style="width: 70px;">
-                            <span class="form-label">Parallele Einsätze:</span>
-                            <div class="grid-wrapper" style="height: 150px;">
-                                <div id="Lst_Parallel_Einsatz"></div>
+                            <span class="form-label" style="position: relative;">Endzeit:</span>
+                            <input type="time" id="DienstEnde" class="form-input" style="width: 70px; position: relative;">
+                            <span class="form-label" style="position: relative;">Parallele Einsätze:</span>
+                            <div class="grid-wrapper" style="height: 150px; position: relative;">
+                                <div id="Lst_Parallel_Einsatz" style="position: relative;"></div>
                             </div>
                         </div>
 
                         <!-- MA Liste -->
-                        <div class="list-panel wide">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="form-label">Mitarbeiterauswahl durch Doppelklick</span>
+                        <div class="list-panel wide" style="position: relative;">
+                            <div style="display: flex; align-items: center; gap: 8px; position: relative;">
+                                <span class="form-label" style="position: relative;">Mitarbeiterauswahl durch Doppelklick</span>
                                 <!-- strSchnellSuche + btnSchnellGo: Visible=Falsch in Access -->
-                                <input type="text" id="strSchnellSuche" class="form-input" placeholder="Suche..." style="width: 80px; display: none;">
-                                <button class="btn tiny-btn" id="btnSchnellGo" style="background-color: #8B0000; color: white; display: none;">GO</button>
+                                <input type="text" id="strSchnellSuche" class="form-input" placeholder="Suche..." style="width: 80px; display: none; position: relative;">
+                                <button class="btn tiny-btn" id="btnSchnellGo" style="background-color: rgb(139, 0, 0); color: white; display: none; position: relative;">GO</button>
                             </div>
-                            <div class="grid-wrapper">
+                            <div class="grid-wrapper" style="position: relative;">
                                 <div class="listbox-header">
-                                    <span style="width: 120px;">Name</span>
-                                    <span style="width: 35px;">Std</span>
-                                    <span style="width: 50px;">Beginn</span>
-                                    <span style="width: 50px;">Ende</span>
-                                    <span style="flex: 1;">Grund</span>
-                                    <span id="colEntfernung" style="width: 50px; display: none;">Entf.</span>
+                                    <span style="width: 120px; position: relative;">Name</span>
+                                    <span style="width: 35px; position: relative;">Std</span>
+                                    <span style="width: 50px; position: relative;">Beginn</span>
+                                    <span style="width: 50px; position: relative;">Ende</span>
+                                    <span style="flex: 1 1 0%; position: relative;">Grund</span>
+                                    <span id="colEntfernung" style="width: 50px; display: none; position: relative;">Entf.</span>
                                 </div>
-                                <div id="List_MA_Body"></div>
+                                <div id="List_MA_Body" style="position: relative;"></div>
                             </div>
-                            <div style="display: flex; gap: 5px; justify-content: center;">
-                                <button class="btn" id="cmdListMA_Standard">Standard</button>
-                                <button class="btn" id="cmdListMA_Entfernung">Entfernung</button>
+                            <div style="display: flex; gap: 5px; justify-content: center; position: relative;">
+                                <button class="btn" id="cmdListMA_Standard" style="position: relative;">Standard</button>
+                                <button class="btn" id="cmdListMA_Entfernung" style="position: relative;">Entfernung</button>
                             </div>
                         </div>
 
                         <!-- Buttons MA &rarr; Plan -->
-                        <div class="button-column">
-                            <button class="btn tiny-btn" id="btnAddSelected" title="Ausgewählte MA zur Planung hinzufügen">&rarr;</button>
-                            <button class="btn tiny-btn" id="btnDelSelected" title="Ausgewählte MA aus Planung entfernen">&larr;</button>
+                        <div class="button-column" style="position: relative;">
+                            <button class="btn tiny-btn" id="btnAddSelected" title="Ausgewählte MA zur Planung hinzufügen" style="position: relative;">→</button>
+                            <button class="btn tiny-btn" id="btnDelSelected" title="Ausgewählte MA aus Planung entfernen" style="position: relative;">←</button>
                             <!-- btnDelAll: Visible=Falsch in Access -->
-                            <button class="btn tiny-btn" id="btnDelAll" title="Alle aus Planung entfernen" style="display: none;">&times;</button>
+                            <button class="btn tiny-btn" id="btnDelAll" title="Alle aus Planung entfernen" style="display: none; position: relative;">×</button>
                         </div>
 
                         <!-- Plan Liste -->
-                        <div class="list-panel medium">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="form-label">Mitarbeiter geplant:</span>
+                        <div class="list-panel medium" style="position: relative;">
+                            <div style="display: flex; align-items: center; gap: 8px; position: relative;">
+                                <span class="form-label" style="position: relative;">Mitarbeiter geplant:</span>
                                 <!-- btnSortPLan: Visible=Falsch in Access -->
-                                <button class="btn" id="btnSortPLan" style="margin-left: auto; display: none;">Sortieren</button>
+                                <button class="btn" id="btnSortPLan" style="margin-left: auto; display: none; position: relative;">Sortieren</button>
                             </div>
-                            <div class="grid-wrapper">
+                            <div class="grid-wrapper" style="position: relative; width: 265px;">
                                 <div class="listbox-header">
-                                    <span style="width: 25px;">Lfd</span>
-                                    <span style="flex: 1;">Nachname</span>
-                                    <span style="flex: 1;">Vorname</span>
-                                    <span style="width: 45px;">Beginn</span>
+                                    <span style="width: 25px; position: relative;">Lfd</span>
+                                    <span style="flex: 1 1 0%; position: relative;">Nachname</span>
+                                    <span style="flex: 1 1 0%; position: relative;">Vorname</span>
+                                    <span style="width: 45px; position: relative;">Beginn</span>
                                 </div>
-                                <div id="lstMA_Plan_Body"></div>
+                                <div id="lstMA_Plan_Body" style="position: relative;"></div>
                             </div>
                         </div>
 
                         <!-- Buttons Plan &rarr; Zusage: Alle Visible=Falsch in Access -->
-                        <div class="button-column" style="display: none;">
-                            <button class="btn tiny-btn" id="btnAddZusage" title="Zur Zusage verschieben">&rarr;</button>
-                            <button class="btn tiny-btn" id="btnMoveZusage" title="Zurück zur Planung">&larr;</button>
-                            <button class="btn tiny-btn" id="btnDelZusage" title="Aus Zusage entfernen">&times;</button>
+                        <div class="button-column" style="display: none; position: relative;">
+                            <button class="btn tiny-btn" id="btnAddZusage" title="Zur Zusage verschieben" style="position: relative;">→</button>
+                            <button class="btn tiny-btn" id="btnMoveZusage" title="Zurück zur Planung" style="position: relative;">←</button>
+                            <button class="btn tiny-btn" id="btnDelZusage" title="Aus Zusage entfernen" style="position: relative;">×</button>
                         </div>
 
                         <!-- Zusage Liste -->
-                        <div class="list-panel medium">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="form-label">Mitarbeiter zugesagt:</span>
+                        <div class="list-panel medium" style="position: relative; left: 35px;">
+                            <div style="display: flex; align-items: center; gap: 8px; position: relative;">
+                                <span class="form-label" style="position: relative; left: 35px;">Mitarbeiter zugesagt:</span>
                                 <!-- btnSortZugeord: Visible=Falsch in Access -->
-                                <button class="btn" id="btnSortZugeord" style="margin-left: auto; display: none;">Sortieren</button>
+                                <button class="btn" id="btnSortZugeord" style="margin-left: auto; display: none; position: relative;">Sortieren</button>
                             </div>
-                            <div class="grid-wrapper">
+                            <div class="grid-wrapper" style="position: relative; left: 35px; width: 265px;">
                                 <!-- Überschriften hinzugefügt (14.01.2026) -->
                                 <div class="listbox-header">
-                                    <span style="width: 25px;">Lfd</span>
-                                    <span style="flex: 1;">Nachname</span>
-                                    <span style="flex: 1;">Vorname</span>
-                                    <span style="width: 45px;">Beginn</span>
+                                    <span style="width: 25px; position: relative;">Lfd</span>
+                                    <span style="flex: 1 1 0%; position: relative;">Nachname</span>
+                                    <span style="flex: 1 1 0%; position: relative;">Vorname</span>
+                                    <span style="width: 45px; position: relative;">Beginn</span>
                                 </div>
-                                <div id="lstMA_Zusage"></div>
+                                <div id="lstMA_Zusage" style="position: relative;"></div>
                             </div>
                         </div>
                     </div>
@@ -810,12 +929,12 @@
     </div>
 
     <!-- WebView2 Bridge für Access-Integration -->
-    <script src="js/webview2-bridge.js"></script>
+    <script src="js/webview2-bridge.js" style="position: relative;"></script>
 
     <!-- Formular-Logik (Modul) -->
-    <script type="module" src="logic/frm_MA_VA_Schnellauswahl.logic.js"></script>
+    <script type="module" src="logic/frm_MA_VA_Schnellauswahl.logic.js" style="position: relative;"></script>
 
-    <script>
+    <script style="position: relative;">
         // ============================================
         // VBA EVENT SYNCHRONISATION
         // Access VBA Events -> JavaScript Implementierung
@@ -1185,23 +1304,27 @@
         }
 
         // Schichten via REST API laden
-        // Die Schichten sind im Haupt-Auftrag-Response unter "startzeiten"
+        // Dedizierter Endpoint: /api/auftraege/<id>/schichten
         async function loadSchichten(vaId, vadatumId) {
             try {
-                const response = await fetch(`http://localhost:5000/api/auftraege/${vaId}`);
-                if (!response.ok) throw new Error('Auftrag nicht gefunden');
+                // Korrekter Endpoint für Schichten
+                let url = `http://localhost:5000/api/auftraege/${vaId}/schichten`;
+                if (vadatumId) {
+                    url += `?vadatum_id=${vadatumId}`;
+                }
+                console.log('[loadSchichten] URL:', url);
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Schichten nicht gefunden');
 
                 const result = await response.json();
-                if (result.success && result.data && result.data.startzeiten) {
-                    // Filter nach vadatumId falls angegeben
-                    let schichten = result.data.startzeiten;
-                    if (vadatumId) {
-                        schichten = schichten.filter(s =>
-                            s.VADatum_ID == vadatumId ||
-                            String(s.VADatum_ID) === String(vadatumId)
-                        );
-                    }
-                    return schichten;
+                if (result.success && result.data) {
+                    console.log('[loadSchichten] Schichten geladen:', result.data.length);
+                    // Mapping: API gibt ID, populateSchichtenListe erwartet VAStart_ID
+                    return result.data.map(s => ({
+                        ...s,
+                        VAStart_ID: s.ID || s.VAStart_ID
+                    }));
                 }
                 return [];
             } catch (err) {
@@ -1211,38 +1334,104 @@
         }
 
         // Mitarbeiter-Liste via REST API laden
+        // Berücksichtigt Verfügbarkeit: nicht eingeplant, nicht krank, nicht Urlaub, nicht privat verplant
         async function loadMitarbeiterListe() {
             try {
                 // Filter-Werte sammeln
                 const istAktiv = document.getElementById('IstAktiv')?.checked !== false;
-                const anstArt = document.getElementById('cboAnstArt')?.value || '';
+                const anstArt = document.getElementById('cboAnstArt')?.value || '5'; // Default: Minijobber
+                const nurFreie = document.getElementById('IstVerfuegbar')?.checked;
 
+                // Basis-URL mit korrektem Parameter-Namen
                 let url = `http://localhost:5000/api/mitarbeiter?aktiv=${istAktiv}`;
-                if (anstArt) url += `&anstellungsart=${anstArt}`;
+
+                // Anstellungsart-Filter (außer "13" = alle)
+                if (anstArt && anstArt !== '13') {
+                    url += `&anstellungsart_id=${anstArt}`;
+                }
+
+                console.log('[loadMitarbeiterListe] URL:', url);
 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Mitarbeiter nicht gefunden');
 
                 const result = await response.json();
                 if (result.success && result.data) {
-                    populateMitarbeiterListe(result.data);
+                    let mitarbeiter = result.data;
+
+                    // Verfügbarkeitsprüfung wenn aktiviert
+                    if (nurFreie && formState.VADatum_ID) {
+                        mitarbeiter = await filterVerfuegbare(mitarbeiter, formState.VA_ID, formState.VADatum_ID);
+                    }
+
+                    populateMitarbeiterListe(mitarbeiter);
 
                     // Gesamt-Anzeige aktualisieren
                     const iGesMA = document.getElementById('iGes_MA');
-                    if (iGesMA) iGesMA.value = result.data.length;
+                    if (iGesMA) iGesMA.value = mitarbeiter.length;
                 }
             } catch (err) {
                 console.error('[loadMitarbeiterListe] Fehler:', err);
             }
         }
 
+        // Filtert Mitarbeiter nach Verfügbarkeit
+        // Ausgeschlossen werden: bereits eingeplant, krank, Urlaub, privat verplant
+        async function filterVerfuegbare(mitarbeiter, vaId, vadatumId) {
+            try {
+                // Aktuelles Datum aus VADatum_ID ermitteln
+                const cboVADatum = document.getElementById('cboVADatum');
+                const selectedOption = cboVADatum?.options[cboVADatum.selectedIndex];
+                const datumText = selectedOption?.textContent || '';
+
+                // Hole bereits eingeplante MA für diesen Auftrag/Tag
+                const planungResponse = await fetch(`http://localhost:5000/api/planungen?va_id=${vaId}&vadatum_id=${vadatumId}`);
+                let geplanteMAIds = new Set();
+                if (planungResponse.ok) {
+                    const planungResult = await planungResponse.json();
+                    if (planungResult.success && planungResult.data) {
+                        planungResult.data.forEach(p => geplanteMAIds.add(String(p.MA_ID)));
+                    }
+                }
+
+                // Hole Nichtverfügbarkeiten (krank, urlaub, privat)
+                // Konvertiere Datum für API-Aufruf
+                const dateParts = datumText.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+                let nvMAIds = new Set();
+                if (dateParts) {
+                    const isoDate = `${dateParts[3]}-${dateParts[2]}-${dateParts[1]}`;
+                    const nvResponse = await fetch(`http://localhost:5000/api/verfuegbarkeit?datum=${isoDate}`);
+                    if (nvResponse.ok) {
+                        const nvResult = await nvResponse.json();
+                        if (nvResult.success && nvResult.data) {
+                            nvResult.data.forEach(nv => nvMAIds.add(String(nv.MA_ID)));
+                        }
+                    }
+                }
+
+                console.log('[filterVerfuegbare] Geplante:', geplanteMAIds.size, 'Nicht-verfuegbar:', nvMAIds.size);
+
+                // Filtern: nur MA die weder geplant noch nichtverfügbar sind
+                return mitarbeiter.filter(ma => {
+                    const maId = String(ma.ID || ma.MA_ID);
+                    const istGeplant = geplanteMAIds.has(maId);
+                    const istNichtVerfuegbar = nvMAIds.has(maId);
+                    return !istGeplant && !istNichtVerfuegbar;
+                });
+            } catch (err) {
+                console.error('[filterVerfuegbare] Fehler:', err);
+                return mitarbeiter; // Bei Fehler alle zurückgeben
+            }
+        }
+
         // Geplante und zugesagte MA laden
         async function loadPlanungUndZusage(vaId, vadatumId) {
             try {
-                // Geplante MA
-                const planungResponse = await fetch(`http://localhost:5000/api/planungen?va_id=${vaId}&vadatum_id=${vadatumId}`);
+                // Geplante MA - API verwendet datum_id nicht vadatum_id
+                const planungResponse = await fetch(`http://localhost:5000/api/planungen?va_id=${vaId}&datum_id=${vadatumId}`);
                 if (planungResponse.ok) {
                     const planungResult = await planungResponse.json();
+                    console.log('[loadPlanungUndZusage] Geplante MA:', planungResult.data?.length);
                     if (planungResult.success && planungResult.data) {
                         populatePlanungListe(planungResult.data);
                         // Geplante MA aus linker Liste ausblenden
@@ -1250,12 +1439,15 @@
                     }
                 }
 
-                // Zugesagte MA
-                const zusageResponse = await fetch(`http://localhost:5000/api/zuordnungen?va_id=${vaId}&vadatum_id=${vadatumId}`);
+                // Zugesagte MA (Status=2 oder 3)
+                const zusageResponse = await fetch(`http://localhost:5000/api/zuordnungen?va_id=${vaId}&datum_id=${vadatumId}`);
                 if (zusageResponse.ok) {
                     const zusageResult = await zusageResponse.json();
+                    console.log('[loadPlanungUndZusage] Zugesagte MA:', zusageResult.data?.length);
                     if (zusageResult.success && zusageResult.data) {
-                        populateZusageListe(zusageResult.data);
+                        // Nur zugesagte MA (Status >= 2) in Zusage-Liste
+                        const zugesagte = zusageResult.data.filter(z => (z.Status || z.Status_ID) >= 2);
+                        populateZusageListe(zugesagte);
                     }
                 }
             } catch (err) {
@@ -1309,6 +1501,7 @@
                 const row = document.createElement('div');
                 row.className = 'listbox-row';
                 row.dataset.id = schicht.VAStart_ID;
+                row.dataset.beginn = schicht.VA_Start || '';
                 row.dataset.ende = schicht.VA_Ende || '';
 
                 row.innerHTML = `
@@ -1334,6 +1527,11 @@
 
             listMA.innerHTML = '';
 
+            // Schicht-Zeiten als Fallback wenn MA keine eigenen Zeiten hat
+            const selectedSchichtRow = document.querySelector('#lstZeiten_Body .listbox-row.selected');
+            const schichtBeginn = selectedSchichtRow?.dataset.beginn || '';
+            const schichtEnde = selectedSchichtRow?.dataset.ende || '';
+
             mitarbeiter.forEach(ma => {
                 const row = document.createElement('div');
                 row.className = 'listbox-row';
@@ -1347,11 +1545,15 @@
                 // Name kürzen falls zu lang
                 const shortName = name.length > 18 ? name.substring(0, 17) + '…' : name;
 
+                // Zeiten: MA-spezifisch oder Schicht-Zeiten als Fallback
+                const beginn = ma.Beginn || schichtBeginn;
+                const ende = ma.Ende || schichtEnde;
+
                 row.innerHTML = `
                     <span style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${name}">${shortName}</span>
                     <span style="width: 35px;">${ma.StdMonat || ''}</span>
-                    <span style="width: 50px;">${formatTimeValue(ma.Beginn)}</span>
-                    <span style="width: 50px;">${formatTimeValue(ma.Ende)}</span>
+                    <span style="width: 50px;">${formatTimeValue(beginn)}</span>
+                    <span style="width: 50px;">${formatTimeValue(ende)}</span>
                     <span style="flex: 1;">${ma.Grund || ''}</span>
                 `;
 
@@ -1412,18 +1614,24 @@
 
             planungen.forEach((plan, index) => {
                 const row = document.createElement('div');
-                const statusId = plan.Status_ID || plan.status_id || 1;
+                // API gibt Status nicht Status_ID zurück
+                const statusId = plan.Status || plan.Status_ID || plan.status_id || 1;
                 const statusClass = statusClassMap[statusId] || 'geplant';
                 row.className = `listbox-row ${statusClass}`;
-                row.dataset.id = plan.MVA_ID || plan.id;
+                row.dataset.id = plan.ID || plan.MVA_ID || plan.id;
                 row.dataset.maid = plan.MA_ID;
                 row.dataset.statusId = statusId;
 
+                // API gibt MA_Nachname/MA_Vorname zurück, nicht Nachname/Vorname
+                const nachname = plan.MA_Nachname || plan.Nachname || '';
+                const vorname = plan.MA_Vorname || plan.Vorname || '';
+                const startZeit = plan.MA_Start || plan.MVA_Start;
+
                 row.innerHTML = `
                     <span style="width: 25px;">${index + 1}</span>
-                    <span style="flex: 1;">${plan.Nachname || ''}</span>
-                    <span style="flex: 1;">${plan.Vorname || ''}</span>
-                    <span style="width: 45px;">${formatTimeValue(plan.MVA_Start)}</span>
+                    <span style="flex: 1;">${nachname}</span>
+                    <span style="flex: 1;">${vorname}</span>
+                    <span style="width: 45px;">${formatTimeValue(startZeit)}</span>
                 `;
 
                 row.addEventListener('click', function(e) {
@@ -1445,17 +1653,24 @@
 
             lstZusage.innerHTML = '';
 
-            zusagen.forEach(zuo => {
+            zusagen.forEach((zuo, index) => {
                 if (!zuo.MA_ID || zuo.MA_ID === 0) return; // Leere Zuordnungen überspringen
 
                 const row = document.createElement('div');
                 row.className = 'listbox-row zugesagt';
-                row.dataset.id = zuo.MVA_ID || zuo.id;
+                row.dataset.id = zuo.ID || zuo.MVA_ID || zuo.id;
                 row.dataset.maid = zuo.MA_ID;
 
+                // API gibt MA_Nachname/MA_Vorname zurück, nicht Nachname/Vorname
+                const nachname = zuo.MA_Nachname || zuo.Nachname || '';
+                const vorname = zuo.MA_Vorname || zuo.Vorname || '';
+                const startZeit = zuo.MA_Start || zuo.MVA_Start;
+
                 row.innerHTML = `
-                    <span style="flex: 1;">${zuo.Nachname || ''}, ${zuo.Vorname || ''}</span>
-                    <span style="width: 45px;">${formatTimeValue(zuo.MVA_Start)}</span>
+                    <span style="width: 25px;">${index + 1}</span>
+                    <span style="flex: 1;">${nachname}</span>
+                    <span style="flex: 1;">${vorname}</span>
+                    <span style="width: 45px;">${formatTimeValue(startZeit)}</span>
                 `;
 
                 row.addEventListener('click', function(e) {
@@ -1651,8 +1866,8 @@
             }
         }
 
-        // btnDelSelected_Click - Aus Planung entfernen
-        function btnDelSelected_Click() {
+        // btnDelSelected_Click - Aus Planung entfernen (REST-API)
+        async function btnDelSelected_Click() {
             console.log('[VBA] btnDelSelected_Click');
 
             const lstPlan = document.getElementById('lstMA_Plan_Body');
@@ -1663,16 +1878,20 @@
                 return;
             }
 
+            // Alle ausgewählten IDs sammeln und per REST-API löschen (skipRefresh=true)
+            const deletePromises = [];
             selected.forEach(row => {
                 const planId = row.dataset.id;
-                if (planId && window.Bridge) {
-                    Bridge.sendEvent('delete', {
-                        type: 'planung',
-                        id: planId
-                    });
+                if (planId) {
+                    deletePromises.push(removeMAfromPlanung(parseInt(planId), true));
                 }
             });
 
+            // Warten bis alle Löschungen abgeschlossen sind
+            await Promise.all(deletePromises);
+            console.log('[btnDelSelected] Alle ausgewählten Planungen gelöscht');
+
+            // Listen einmal am Ende aktualisieren
             refreshPlanungListe();
             zf_MA_Selektion();
         }
@@ -1831,11 +2050,24 @@
          * @param {boolean} selectedOnly - true = nur selektierte MA, false = alle geplanten MA
          */
         async function sendeAnfragenViaVBABridge(selectedOnly) {
-            // Validierung
+            // Validierung - ALLE 3 IDs sind erforderlich!
             if (!formState.VA_ID || !formState.VADatum_ID) {
                 alert('Bitte Auftrag und Datum wählen');
                 return;
             }
+
+            // VAStart_ID ist PFLICHT für VBA-Funktion!
+            if (!formState.VAStart_ID) {
+                console.error('[VBA Bridge] FEHLER: VAStart_ID ist nicht gesetzt!');
+                alert('Bitte zuerst eine Schicht (Zeitraum) auswählen!');
+                return;
+            }
+
+            console.log('[VBA Bridge] Parameter:', {
+                VA_ID: formState.VA_ID,
+                VADatum_ID: formState.VADatum_ID,
+                VAStart_ID: formState.VAStart_ID
+            });
 
             // MA-IDs aus Planungsliste sammeln
             const lstPlan = document.getElementById('lstMA_Plan_Body');
@@ -2679,19 +2911,25 @@
         }
 
         // Hilfsfunktion: MA aus Planung entfernen
-        async function removeMAfromPlanung(planId) {
+        // skipRefresh=true wenn mehrere Löschungen erfolgen und Refresh am Ende gemacht wird
+        async function removeMAfromPlanung(planId, skipRefresh = false) {
             try {
                 const response = await fetch(`http://localhost:5000/api/planungen/${planId}`, {
                     method: 'DELETE'
                 });
                 if (response.ok) {
-                    refreshPlanungListe();
-                    zf_MA_Selektion();
+                    if (!skipRefresh) {
+                        refreshPlanungListe();
+                        zf_MA_Selektion();
+                    }
+                    return true;
                 } else {
                     console.error('[removeMAfromPlanung] Fehler:', response.status);
+                    return false;
                 }
             } catch (err) {
                 console.error('[removeMAfromPlanung] Fehler:', err);
+                return false;
             }
         }
 
@@ -2718,7 +2956,8 @@
             if (!formState.VA_ID || !formState.VADatum_ID) return;
 
             try {
-                const response = await fetch(`http://localhost:5000/api/planungen?va_id=${formState.VA_ID}&vadatum_id=${formState.VADatum_ID}`);
+                // API verwendet datum_id nicht vadatum_id
+                const response = await fetch(`http://localhost:5000/api/planungen?va_id=${formState.VA_ID}&datum_id=${formState.VADatum_ID}`);
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success && result.data) {
@@ -2760,7 +2999,8 @@
             if (!formState.VA_ID || !formState.VADatum_ID) return;
 
             try {
-                const response = await fetch(`http://localhost:5000/api/zuordnungen?va_id=${formState.VA_ID}&vadatum_id=${formState.VADatum_ID}`);
+                // API verwendet datum_id nicht vadatum_id
+                const response = await fetch(`http://localhost:5000/api/zuordnungen?va_id=${formState.VA_ID}&datum_id=${formState.VADatum_ID}`);
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success && result.data) {
@@ -2955,53 +3195,54 @@
     </script>
 
     <!-- Shell-Detector (muss vor </body>) -->
-    <script src="js/shell-detector.js"></script>
+    <script src="js/shell-detector.js" style="position: relative;"></script>
     <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
-    <script src="js/server-watchdog.js"></script>
+    <script src="js/server-watchdog.js" style="position: relative;"></script>
 
     <!-- ============================================
          ANFRAGE-LOG MODAL (Phase 2)
          ============================================ -->
     <div id="anfrageModalOverlay" class="anfrage-modal-overlay">
-        <div class="anfrage-modal">
-            <div class="anfrage-modal-header">
-                <span id="anfrageModalTitle">Mitarbeiter werden angefragt...</span>
-                <button class="anfrage-modal-close" id="anfrageModalCloseX" disabled>&times;</button>
+        <div class="anfrage-modal" style="position: relative;">
+            <div class="anfrage-modal-header" style="position: relative;">
+                <span id="anfrageModalTitle" style="position: relative;">Mitarbeiter werden angefragt...</span>
+                <button class="anfrage-modal-close" id="anfrageModalCloseX" disabled="" style="position: relative;">×</button>
             </div>
-            <div class="anfrage-modal-body">
-                <div class="anfrage-progress-container">
-                    <div class="anfrage-progress-label">
-                        <span>Fortschritt:</span>
-                        <span id="anfrageProgressCount">0 / 0</span>
+            <div class="anfrage-modal-body" style="position: relative;">
+                <div class="anfrage-progress-container" style="position: relative;">
+                    <div class="anfrage-progress-label" style="position: relative;">
+                        <span style="position: relative;">Fortschritt:</span>
+                        <span id="anfrageProgressCount" style="position: relative;">0 / 0</span>
                     </div>
                     <div class="anfrage-progress-bar">
-                        <div class="anfrage-progress-fill" id="anfrageProgressFill"></div>
+                        <div class="anfrage-progress-fill" id="anfrageProgressFill" style="position: relative;"></div>
                         <span class="anfrage-progress-text" id="anfrageProgressPercent">0%</span>
                     </div>
                 </div>
-                <div style="flex: 1; overflow: auto; max-height: 300px;">
-                    <table class="anfrage-log-table">
-                        <thead>
-                            <tr>
+                <div style="flex: 1 1 0%; overflow: auto; max-height: 300px; position: relative;">
+                    <table class="anfrage-log-table" style="position: relative;">
+                        <thead style="position: relative;">
+                            <tr style="position: relative;">
                                 <th style="width: 40px;">Nr</th>
                                 <th>Mitarbeiter</th>
                                 <th style="width: 100px;">Status</th>
                                 <th style="width: 150px;">Ergebnis</th>
                             </tr>
                         </thead>
-                        <tbody id="anfrageLogBody">
+                        <tbody id="anfrageLogBody" style="position: relative;">
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="anfrage-modal-footer">
-                <span class="anfrage-summary" id="anfrageSummary"></span>
-                <button class="anfrage-modal-btn" id="anfrageModalCloseBtn" disabled>Schließen</button>
+            <div class="anfrage-modal-footer" style="position: relative;">
+                <span class="anfrage-summary" id="anfrageSummary" style="position: relative;"></span>
+                <button class="anfrage-modal-btn" id="anfrageModalCloseBtn" disabled="" style="position: relative;">Schließen</button>
             </div>
         </div>
     </div>
-</body>
-</html>
 
 
 
+
+
+<script src="chrome-extension://lhannfkhjdhmibllojbbdjdbpegidojj/js/content/sm.js" data-pname="recorder-screenshot-v3" data-asset-path="chrome-extension://lhannfkhjdhmibllojbbdjdbpegidojj/" style="position: relative;"></script><div class="host-lopnbnfpjmgpbppclhclehhgafnifija" style="position: relative; z-index: 2147483647;"></div></body></html>

@@ -162,7 +162,8 @@
 
             overflow: hidden;
 
-        
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+
             min-width: 0;}
 
 
@@ -388,6 +389,8 @@
             gap: 2px;
 
             overflow: hidden;
+
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
 
         }
 
@@ -669,6 +672,8 @@
 
             overflow: hidden;
 
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+
         }
 
 
@@ -684,6 +689,8 @@
             flex-direction: column;
 
             overflow: hidden;
+
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
 
         }
 
@@ -801,6 +808,8 @@
 
             overflow: hidden;
 
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+
         }
 
 
@@ -873,6 +882,8 @@
 
             background-color: #c0c0e0;
 
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+
         }
 
 
@@ -910,6 +921,8 @@
             flex-direction: column;
 
             overflow: hidden;
+
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
 
         }
 
@@ -965,6 +978,8 @@
 
             overflow: auto;
 
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
+
         }
 
 
@@ -975,9 +990,23 @@
 
             width: 100%;
 
-            border-collapse: collapse;
+            border-collapse: separate; /* KRITISCH: separate statt collapse für sticky */
+
+            border-spacing: 0;
 
             font-size: 10px;
+
+        }
+
+
+
+        .data-grid thead {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 11;
 
         }
 
@@ -999,7 +1028,9 @@
 
             top: 0;
 
-            z-index: 1;
+            z-index: 10;
+
+            background-color: #b0b0c0; /* Fallback für sticky */
 
         }
 
@@ -1049,9 +1080,23 @@
 
             width: 100%;
 
-            border-collapse: collapse;
+            border-collapse: separate; /* KRITISCH: separate statt collapse für sticky */
+
+            border-spacing: 0;
 
             font-size: 10px;
+
+        }
+
+
+
+        .positionen-grid thead {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 11;
 
         }
 
@@ -1068,6 +1113,14 @@
             text-align: left;
 
             font-weight: bold;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 10;
+
+            background-color: #b0b0c0; /* Fallback für sticky */
 
         }
 

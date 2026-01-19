@@ -110,6 +110,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         /* Header-Styles werden von unified-header.css bereitgestellt */
@@ -183,12 +184,16 @@
             gap: 0.5rem;
             padding: 8px;
             background-color: #b8b8d8;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         .content-main {
             flex: 1;
+            display: flex;
+            flex-direction: column;
             overflow: auto;
             min-width: 0;
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
         /* Summary Bar - VBA: fSumme_Stunden_ges, fSumme_Stunden_abger */
@@ -217,7 +222,14 @@
         .datasheet {
             width: 100%;
             background-color: white;
-            border-collapse: collapse;
+            border-collapse: separate; /* GEÄNDERT für sticky header */
+            border-spacing: 0; /* Keine Lücken zwischen Zellen */
+        }
+
+        .datasheet thead {
+            position: sticky;
+            top: 0;
+            z-index: 11; /* Höher als th für korrekte Überlagerung */
         }
 
         .datasheet th {
@@ -230,6 +242,7 @@
             border: 1px solid #606090;
             position: sticky;
             top: 0;
+            z-index: 10; /* Sticky header z-index */
         }
 
         .datasheet td {
@@ -327,9 +340,15 @@
             background-color: #b8b8d8;
             border: 1px solid #7070a0;
             padding: 8px;
+            overflow: auto; /* Scrollbar für Tabelleninhalt */
+            min-height: 0; /* KRITISCH: Flex-Kette für sticky header */
         }
 
-        .tab-content.active { display: block; }
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
 
         /* Status Bar */
         .app-footer {

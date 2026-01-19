@@ -43,6 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('txtMASearch').addEventListener('input', filterMA);
     document.getElementById('lstMitarbeiter').addEventListener('change', updateSelectedCount);
 
+    // Filter-Dropdowns AfterUpdate (wie Access)
+    document.getElementById('selObjekt').addEventListener('change', onFilterChange);
+    document.getElementById('selKunde').addEventListener('change', onFilterChange);
+    document.getElementById('selPosition').addEventListener('change', onFilterChange);
+    document.getElementById('chkNurBestaetigte').addEventListener('change', onFilterChange);
+
     // Load data
     loadMitarbeiter();
     loadObjekte();
@@ -220,6 +226,18 @@ function selectNoneMA() {
     state.selectedMAIds.clear();
     renderMAList();
     updateSelectedCount();
+}
+
+/**
+ * Filter-Change Handler (wie Access AfterUpdate)
+ * Regeneriert Vorschau wenn Filter geändert werden und bereits Daten vorhanden
+ */
+function onFilterChange() {
+    console.log('[EinzelDP] Filter geändert');
+    // Wenn bereits eine Vorschau existiert, automatisch neu generieren
+    if (Object.keys(state.dienstplaene).length > 0) {
+        renderPreview();
+    }
 }
 
 /**

@@ -101,10 +101,39 @@ async function init() {
     // Event Listener
     setupEventListeners();
 
+    // Anstellungsarten laden (dynamisch aus DB)
+    await loadAnstellungsarten();
+
     // Daten laden
     await loadList();
 
     setStatus('Bereit');
+}
+
+/**
+ * Lädt Anstellungsarten aus API und befüllt Dropdown
+ */
+async function loadAnstellungsarten() {
+    const select = document.getElementById('Anstellungsart_ID');
+    if (!select) return;
+
+    try {
+        const result = await Bridge.execute('getAnstellungsarten');
+        if (result && result.data && result.data.length > 0) {
+            // Erste leere Option behalten
+            select.innerHTML = '<option value=""></option>';
+            result.data.forEach(a => {
+                const option = document.createElement('option');
+                option.value = a.ID;
+                option.textContent = a.Anstellungsart;
+                select.appendChild(option);
+            });
+            console.log('[MA-Logic] Anstellungsarten geladen:', result.data.length);
+        }
+    } catch (e) {
+        console.warn('[MA-Logic] Anstellungsarten laden fehlgeschlagen, verwende statische:', e);
+        // Fallback: Statische Optionen bleiben
+    }
 }
 
 /**
@@ -500,7 +529,7 @@ function displayRecord(rec) {
     setFieldValue('Austrittsdatum', formatDateISO(rec.Austrittsdatum));
     setFieldValue('Anstellungsart', rec.Anstellungsart_ID);
     setFieldValue('Kleidergroesse', rec.Kleidergroesse);
-    setCheckbox('Fahrerlaubnis', rec.Fahrerlaubnis);
+    setCheckbox('Hat_Fahrerausweis', rec.Hat_Fahrerausweis);
     setCheckbox('Eigener_PKW', rec.Eigener_PKW);
     setFieldValue('DienstausweisNr', rec.DienstausweisNr);
     setFieldValue('Ausweis_Endedatum', formatDateISO(rec.Ausweis_Endedatum));
@@ -697,6 +726,7 @@ async function saveRecord() {
         Email: getField('Email')?.value?.trim() || '',
         IstAktiv: getField('IstAktiv')?.checked ? 1 : 0,
         IstSubunternehmer: getField('IstSubunternehmer')?.checked ? 1 : 0,
+        Hat_Fahrerausweis: getField('Hat_Fahrerausweis')?.checked ? 1 : 0,
         Kontoinhaber: getField('Kontoinhaber')?.value?.trim() || '',
         IBAN: getField('IBAN')?.value?.trim() || '',
         SteuerNr: getField('SteuerNr')?.value?.trim() || '',

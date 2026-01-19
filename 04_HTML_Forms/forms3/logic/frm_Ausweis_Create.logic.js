@@ -12,6 +12,60 @@ const state = {
     validUntil: null
 };
 
+// Badge/Card service configuration
+const BADGE_SERVICE_DEFAULT = 'http://192.168.128.24:5005';
+const BADGE_TEMPLATE_KEYS = {
+    Einsatzleitung: 'Einsatzleitung',
+    Bereichsleiter: 'Bereichsleiter',
+    Security: 'Security',
+    Service: 'Service',
+    Platzanweiser: 'Platzanweiser',
+    Staff: 'Staff'
+};
+
+const CARD_TEMPLATE_KEYS = {
+    Sicherheit: 'Sicherheit',
+    Service: 'Servicekarte',
+    Rueckseite: 'Rueckseite',
+    Sonder: 'Sonder'
+};
+
+function getBadgeServiceBase() {
+    const stored = (localStorage.getItem('badgeServiceUrl') || '').trim();
+    const base = stored || BADGE_SERVICE_DEFAULT;
+    return base.replace(/\/+$/, '');
+}
+
+async function callBadgeService(path, options = {}) {
+    const url = `${getBadgeServiceBase()}${path}`;
+    const defaultOptions = {
+        headers: { 'Content-Type': 'application/json' }
+    };
+    const response = await fetch(url, {
+        ...defaultOptions,
+        ...options,
+        headers: { ...defaultOptions.headers, ...(options.headers || {}) }
+    });
+    const text = await response.text();
+    let data;
+    try {
+        data = text ? JSON.parse(text) : {};
+    } catch (err) {
+        data = { raw: text };
+    }
+
+    if (!response.ok) {
+        const message = data?.error || response.statusText || 'Badge-Service Fehler';
+        throw new Error(`${message} (HTTP ${response.status})`);
+    }
+
+    return data;
+}
+
+function getSelectedPrinter() {
+    return document.getElementById('cbo_Kartendrucker').value;
+}
+
 // ========================================
 // INITIALIZATION
 // ========================================
@@ -50,8 +104,16 @@ function updateDateDisplays() {
     const dateStr = now.toLocaleDateString('de-DE');
     const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
-    document.getElementById('headerDate').textContent = `${dateStr} ${timeStr}`;
-    document.getElementById('footerDate').textContent = dateStr;
+    // headerDate ist optional - existiert nicht immer im HTML
+    const headerDateEl = document.getElementById('headerDate');
+    if (headerDateEl) {
+        headerDateEl.textContent = `${dateStr} ${timeStr}`;
+    }
+
+    const footerDateEl = document.getElementById('footerDate');
+    if (footerDateEl) {
+        footerDateEl.textContent = dateStr;
+    }
 }
 
 /**
@@ -108,6 +170,9 @@ function attachEventListeners() {
     // DOPPELKLICK-HANDLER (wie Access lstMA_Alle_DblClick / lstMA_Ausweis_DblClick)
     document.getElementById('lstMA_Alle').addEventListener('dblclick', lstMA_Alle_DblClick);
     document.getElementById('lstMA_Ausweis').addEventListener('dblclick', lstMA_Ausweis_DblClick);
+
+    // KEYDOWN-HANDLER (wie Access lstMA_Alle_KeyDown - Enter = Service drucken)
+    document.getElementById('lstMA_Alle').addEventListener('keydown', lstMA_Alle_KeyDown);
 }
 
 // ========================================
@@ -137,6 +202,7 @@ async function loadAllEmployees() {
 
         renderAllEmployees();
         updateCounters();
+        refreshSelectedEmployeesFromAll();
 
         console.log(`[Ausweis Create] ${state.allEmployees.length} Mitarbeiter geladen`);
 
@@ -184,6 +250,13 @@ function renderSelectedEmployees() {
 
     document.getElementById('countSelected').textContent = state.selectedEmployees.length;
     updateStatusMessage();
+}
+
+function refreshSelectedEmployeesFromAll() {
+    if (state.selectedEmployees.length === 0) return;
+    const lookup = new Map(state.allEmployees.map(emp => [emp.ID, emp]));
+    state.selectedEmployees = state.selectedEmployees.map(emp => lookup.get(emp.ID) || emp);
+    renderSelectedEmployees();
 }
 
 function formatEmployeeLine(emp) {
@@ -278,6 +351,14 @@ function deselectAll() {
     document.getElementById('lstMA_Ausweis').selectedIndex = -1;
 }
 
+function getSingleSelectedEmployee() {
+    if (state.selectedEmployees.length !== 1) {
+        showToast('Ausweiskarten bitte einzeln drucken!', 'warning');
+        return null;
+    }
+    return state.selectedEmployees[0];
+}
+
 // ========================================
 // ACCESS-PARITÄT: DOPPELKLICK-HANDLER
 // ========================================
@@ -327,6 +408,39 @@ function openDatePicker() {
     const input = document.getElementById('GueltBis');
     // Browser-eigener Date-Picker wird bei click geöffnet
     input.showPicker && input.showPicker();
+}
+
+/**
+ * lstMA_Alle_KeyDown - Tastendruck auf Mitarbeiter in "Alle" Liste
+ * VBA: Bei Enter/Leertaste: Löscht Auswahl, fügt aktuellen hinzu, druckt SERVICE-Karte
+ * (Unterschied zu DblClick: Service statt Sicherheit!)
+ */
+function lstMA_Alle_KeyDown(event) {
+    // Nur bei Enter oder Leertaste reagieren
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+
+    event.preventDefault();
+
+    const listbox = document.getElementById('lstMA_Alle');
+    const selected = Array.from(listbox.selectedOptions);
+
+    if (selected.length === 0) return;
+
+    // Wie Access: btnDelAll_Click + btnAddSelected_Click + btn_ausweisservice_Click
+    state.selectedEmployees = [];
+
+    selected.forEach(option => {
+        const emp = JSON.parse(option.dataset.employee);
+        state.selectedEmployees.push(emp);
+    });
+
+    renderSelectedEmployees();
+
+    // Automatisch SERVICE drucken (nicht Sicherheit wie bei DblClick!)
+    printBadge('Service');
+
+    // Fokus zurück zur Liste
+    listbox.focus();
 }
 
 // ========================================
@@ -436,48 +550,31 @@ async function saveKartendrucker() {
  * printSonderausweis - Sonderausweis mit 2 Zeilen Text (wie Access InputBox)
  */
 async function printSonderausweis() {
-    if (state.selectedEmployees.length !== 1) {
+    const employee = getSingleSelectedEmployee();
+    if (!employee) {
         showToast('Sonderausweise bitte einzeln drucken!', 'warning');
         return;
     }
 
-    const printer = document.getElementById('cbo_Kartendrucker').value;
-    if (!printer || !printer.toLowerCase().includes('badgy')) {
-        showToast('Für Kartendruck nur Kartendrucker (Badgy) zulässig!', 'warning');
+    const printer = getSelectedPrinter();
+    if (!printer) {
+        showToast('Bitte Kartendrucker auswählen', 'warning');
         return;
     }
 
-    // Zeile 1 und 2 abfragen (wie Access InputBox)
     const zeile1 = prompt('Text Zeile1:', '');
-    if (zeile1 === null) return; // Abbruch
+    if (zeile1 === null) return;
 
     const zeile2 = prompt('Text Zeile2:', '');
-    if (zeile2 === null) return; // Abbruch
+    if (zeile2 === null) return;
 
-    const sonderText = `${zeile1}/${zeile2}`;
-
-    try {
-        const emp = state.selectedEmployees[0];
-
-        const response = await fetch('http://localhost:5002/api/vba/execute', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                function: 'Karte_Drucken_Sonder',
-                args: [emp.ID, sonderText, printer]
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Karten-Druck fehlgeschlagen: ${response.statusText}`);
-        }
-
-        showToast(`Sonderausweis gedruckt: ${sonderText}`, 'success');
-
-    } catch (err) {
-        console.error('Sonderausweis drucken fehlgeschlagen:', err);
-        showToast(`Fehler: ${err.message}`, 'error');
+    const sonderText = `${zeile1}/${zeile2}`.trim();
+    if (!zeile1.trim() && !zeile2.trim()) {
+        showToast('Bitte Text für den Sonderausweis eingeben', 'warning');
+        return;
     }
+
+    await printCard('Sonder', { customText: sonderText, printer });
 }
 
 /**
@@ -485,23 +582,6 @@ async function printSonderausweis() {
  * VBA: If TCount("MA_ID", "tbltmp_AusweisMA_ID") <> 1 Then MsgBox "Ausweiskarten bitte einzeln drucken!"
  */
 async function printCardSingle(cardType) {
-    if (state.selectedEmployees.length !== 1) {
-        showToast('Ausweiskarten bitte einzeln drucken!', 'warning');
-        return;
-    }
-
-    const printer = document.getElementById('cbo_Kartendrucker').value;
-    if (!printer) {
-        showToast('Bitte Kartendrucker auswählen', 'warning');
-        return;
-    }
-
-    // Prüfung auf Kartendrucker (wie Access: InStr(lbl_Kartendrucker.caption, "Badgy"))
-    if (cardType !== 'Rueckseite' && !printer.toLowerCase().includes('badgy')) {
-        showToast('Für Kartendruck nur Kartendrucker (Badgy) zulässig!', 'warning');
-        return;
-    }
-
     await printCard(cardType);
 }
 
@@ -521,147 +601,86 @@ async function printBadge(badgeType) {
         return;
     }
 
-    console.log(`Print Badge: ${badgeType}`, {
-        employees: state.selectedEmployees.map(e => `${e.Nachname}, ${e.Vorname}`),
-        validUntil: validUntil,
-        count: state.selectedEmployees.length
-    });
+    const templateKey = BADGE_TEMPLATE_KEYS[badgeType];
+    if (!templateKey) {
+        showToast(`Unbekanntes Ausweis-Template: ${badgeType}`, 'error');
+        return;
+    }
 
-    showToast(`Erstelle ${state.selectedEmployees.length} Ausweise (${badgeType})...`, 'info');
+    const employeeIds = state.selectedEmployees.map(emp => emp.ID);
+    const printer = getSelectedPrinter();
+
+    console.log(`Badge job via service: ${badgeType}`, { employeeIds, validUntil, printer });
+
+    showToast(`Lege ${employeeIds.length} Ausweise in die Warteschlange…`, 'info');
     showLoading(true);
 
     try {
-        let successCount = 0;
-        let errorCount = 0;
+        const job = await callBadgeService('/api/badges/jobs', {
+            method: 'POST',
+            body: JSON.stringify({
+                template: templateKey,
+                employeeIds,
+                validUntil,
+                printer,
+                assignNumbers: true,
+                updateEmployeeValidity: true
+            })
+        });
 
-        // Process each employee
-        for (const emp of state.selectedEmployees) {
-            try {
-                // Step 1: Assign badge number if needed (only if not already assigned)
-                if (!emp.ausweisNr || emp.ausweisNr === '-') {
-                    const nummerResponse = await fetch('http://localhost:5002/api/vba/ausweis/nummer', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ MA_ID: emp.ID })
-                    });
-
-                    if (!nummerResponse.ok) {
-                        throw new Error(`Nummer-Vergabe fehlgeschlagen: ${nummerResponse.statusText}`);
-                    }
-
-                    const nummerData = await nummerResponse.json();
-                    console.log(`[${emp.Nachname}] Ausweis-Nummer vergeben:`, nummerData.ausweis_nr);
-                    emp.ausweisNr = nummerData.ausweis_nr; // Update local state
-                }
-
-                // Step 2: Print badge via VBA-Bridge
-                const druckResponse = await fetch('http://localhost:5002/api/vba/ausweis/drucken', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        MA_ID: emp.ID,
-                        badgeType: badgeType,
-                        validUntil: validUntil
-                    })
-                });
-
-                if (!druckResponse.ok) {
-                    throw new Error(`Druck fehlgeschlagen: ${druckResponse.statusText}`);
-                }
-
-                const druckData = await druckResponse.json();
-                console.log(`[${emp.Nachname}] Ausweis gedruckt:`, druckData);
-                successCount++;
-
-            } catch (err) {
-                console.error(`Fehler bei ${emp.Nachname}:`, err);
-                errorCount++;
-            }
-        }
-
-        // Show result
-        if (errorCount === 0) {
-            showToast(`${successCount} Ausweise erfolgreich gedruckt (${badgeType})`, 'success');
-        } else {
-            showToast(`${successCount} erfolgreich, ${errorCount} fehlgeschlagen`, 'warning');
-        }
-
-        // Refresh employee list to show updated badge numbers
+        showToast(`Ausweisjob angelegt (Job ${job.jobId || 'n/a'})`, 'success');
         await loadAllEmployees();
 
     } catch (err) {
         console.error('Print Badge Error:', err);
         showToast(`Fehler beim Drucken: ${err.message}`, 'error');
-
-        // Fallback: Show preview if VBA-Bridge not available
         showPrintPreview(badgeType, state.selectedEmployees, validUntil);
     } finally {
         showLoading(false);
     }
 }
 
-async function printCard(cardType) {
-    if (state.selectedEmployees.length === 0) {
-        showToast('Bitte zuerst Mitarbeiter auswählen', 'warning');
-        return;
-    }
+async function printCard(cardType, options = {}) {
+    const employee = getSingleSelectedEmployee();
+    if (!employee) return;
 
-    const printer = document.getElementById('cbo_Kartendrucker').value;
-
-    if (!printer) {
+    const requestPrinter = (options.printer || getSelectedPrinter() || '').trim();
+    if (!requestPrinter) {
         showToast('Bitte Kartendrucker auswählen', 'warning');
         return;
     }
 
-    const validUntil = state.validUntil || document.getElementById('GueltBis').value;
+    if (cardType !== 'Rueckseite' && !requestPrinter.toLowerCase().includes('badgy')) {
+        showToast('Für Kartendruck nur Kartendrucker (Badgy) zulässig!', 'warning');
+        return;
+    }
 
-    console.log(`Print Card: ${cardType}`, {
-        employees: state.selectedEmployees.map(e => `${e.Nachname}, ${e.Vorname}`),
-        printer: printer,
-        validUntil: validUntil,
-        count: state.selectedEmployees.length
-    });
+    const templateKey = CARD_TEMPLATE_KEYS[cardType];
+    if (!templateKey) {
+        showToast(`Unbekannter Kartentyp: ${cardType}`, 'error');
+        return;
+    }
 
-    showToast(`Drucke ${state.selectedEmployees.length} Karten (${cardType}) auf ${printer}...`, 'info');
+    const payload = {
+        cardType: templateKey,
+        employeeId: employee.ID,
+        printer: requestPrinter
+    };
+
+    if (options.customText) {
+        payload.customText = options.customText;
+    }
+
+    showToast(`Kartenjob "${cardType}" wird vorbereitet…`, 'info');
     showLoading(true);
 
     try {
-        let successCount = 0;
-        let errorCount = 0;
+        const job = await callBadgeService('/api/cards/jobs', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
 
-        // Process each employee
-        for (const emp of state.selectedEmployees) {
-            try {
-                // Print card via VBA-Bridge (using Karte_Drucken VBA function)
-                const response = await fetch('http://localhost:5002/api/vba/execute', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        function: 'Karte_Drucken',
-                        args: [emp.ID, cardType, printer]
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Karten-Druck fehlgeschlagen: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                console.log(`[${emp.Nachname}] Karte gedruckt:`, data);
-                successCount++;
-
-            } catch (err) {
-                console.error(`Fehler bei ${emp.Nachname}:`, err);
-                errorCount++;
-            }
-        }
-
-        // Show result
-        if (errorCount === 0) {
-            showToast(`${successCount} Karten erfolgreich gedruckt (${cardType})`, 'success');
-        } else {
-            showToast(`${successCount} erfolgreich, ${errorCount} fehlgeschlagen`, 'warning');
-        }
+        showToast(`Kartenjob angelegt (Job ${job.jobId || 'n/a'})`, 'success');
 
     } catch (err) {
         console.error('Print Card Error:', err);

@@ -2,7 +2,7 @@ Attribute VB_Name = "mdlAutoexec"
 Option Compare Database
 Option Explicit
 
-Function fAutoexec()
+Public Function fAutoexec()
 
 Dim sysPfad As String
 Dim DocPfad As String
@@ -26,8 +26,9 @@ Dim BE_Email_PfadDB As String
 
 Dim i As Long
 
-'########### Backend verknüpfen
-
+'########### Server fuer HTML-Formulare starten
+StartAPIServer      ' Port 5000 - Datenzugriff
+StartVBABridge      ' Port 5002 - VBA-Funktionen
 
 Call checkconnectAcc
 
@@ -107,7 +108,7 @@ DoEvents
 'Aufgelaufene eMails zuordnen
 'All_eMail_Update
 
-'Hauptmenü öffnen
+'Hauptmenï¿½ ï¿½ffnen
 DoCmd.OpenForm "frm_va_auftragstamm"
 'DoCmd.OpenForm "frm_DP_Dienstplan_Objekt"
 

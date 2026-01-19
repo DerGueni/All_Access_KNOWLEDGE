@@ -46,6 +46,395 @@ Jede Änderung wird wie folgt dokumentiert:
 
 <!-- ÄNDERUNGEN AB HIER EINFÜGEN -->
 
+### 2026-01-18 - frm_KD_Verrechnungssaetze - API Tabellen-Korrektur (#3 + #16)
+**Element:** api_server.py, frm_KD_Verrechnungssaetze.logic.js
+**Typ:** python, js (API-Endpoint + JS-Logik korrigiert)
+**Änderung:** Falsche Tabelle tbl_KD_Kundenpreise (existiert NICHT) durch korrekte Tabelle tbl_KD_Standardpreise ersetzt
+
+**Vorher:**
+- API verwendete nicht existierende Tabelle `tbl_KD_Kundenpreise`
+- Falsche Feldnamen: KP_Sicherheit, KP_Leitung, KP_Nachtzuschlag, etc. (existieren nicht)
+- API gab direktes Array zurueck ohne success-Wrapper
+
+**Nachher:**
+- API verwendet korrekte Tabelle `tbl_KD_Standardpreise` mit Key-Value Struktur
+- Korrekte Feldnamen: ID, kun_ID, Bemerkung, Preisart_ID, StdPreis, GeaendertAm, Aenderer
+- Preisarten kommen aus `tbl_KD_Artikelbeschreibung` (ID, Beschreibung)
+- API gibt `{ success: true, data: [...] }` zurueck
+- Neue Endpoints: `/api/kundenpreise/<kd_id>` (GET Detail), `/api/kundenpreise/preis/<preis_id>` (PUT/DELETE), `/api/preisarten` (GET)
+- Logic.js angepasst fuer neue API-Struktur mit Fallback
+
+**Anweisung:** "#3 + #16 frm_KD_Verrechnungssaetze korrigieren - API verwendet tbl_KD_Kundenpreise die nicht existiert"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-18 - frm_va_Auftragstamm.html - Upload-Funktion Tab Zusatzdateien korrigiert
+**Element:** neuenAttachHinzufuegen(), loadAttachments(), openAttachment(), deleteAttachment()
+**Typ:** js (API-Endpoints korrigiert)
+**Änderung:** API-URLs korrigiert, Feldmapping an tbl_Zusatzdateien angepasst
+
+**Vorher:**
+- Upload: `${API_BASE_LOCAL}/auftraege/${state.currentAuftragId}/attachments` (existiert nicht)
+- Laden: `/auftraege/${state.currentAuftragId}/zusatzdateien` (existiert nicht)
+- Download: `/auftraege/${state.currentAuftragId}/attachments/${attachId}/download` (existiert nicht)
+- Delete: `/zusatzdateien/${attachId}` (existiert nicht)
+- Feldmapping: att.Typ, att.Dateilaenge, att.Dateidatum (falsch)
+
+**Nachher:**
+- Upload: `${API_BASE_LOCAL}/attachments/upload` (korrekt)
+- Laden: `/attachments?va_id=${state.currentAuftragId}` (korrekt)
+- Download: `/attachments/${attachId}/download` (korrekt)
+- Delete: `/attachments/${attachId}` (korrekt)
+- Feldmapping: att.Texttyp, att.DLaenge, att.DFiledate (korrekt zu DB-Schema)
+
+**Anweisung:** "#7 Upload-Funktion Tab Zusatzdateien - Problem: Upload-Funktion fehlt"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-18 15:XX - frm_va_Auftragstamm.html - TAG_SELECTED Event Implementation
+**Element:** onTagSelected(), vaDatumChanged(), loadAuftragByRow(), message-listener
+**Typ:** js
+**Änderung:** TAG_SELECTED Event für Kommunikation bei Tag-Auswahl hinzugefügt
+**Vorher:**
+- vaDatumChanged() setzte nur state.currentVADatumId und rief loadSubformData() auf
+- loadAuftragByRow() rief nur loadAuftrag() auf
+- Kein explizites TAG_SELECTED Event
+**Nachher:**
+- Neue Funktion onTagSelected(datum, vadatum_id) hinzugefügt
+- vaDatumChanged() ruft onTagSelected() auf
+- loadAuftragByRow() ruft onTagSelected() bei Zeilen-Klick auf
+- onTagSelected() sendet postMessage mit type='TAG_SELECTED' an Parent
+- onTagSelected() feuert CustomEvent 'tagSelected' für lokale Listener
+- Message-Listener behandelt eingehende TAG_SELECTED Events
+**Anweisung:** "sub_VA_Tag Kommunikation mit Parent implementieren - Ausgewählter Tag wird nicht an Parent gemeldet"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-18 - frm_va_Auftragstamm.html - VAStart_ID Validierung für Anfragen-Panel
+**Element:** sendeMinijobberAnfragen() JavaScript-Funktion
+**Typ:** js
+**Änderung:** VAStart_ID Validierung hinzugefügt - VBA Bridge sendet jetzt keine Anfragen mehr ohne Schicht-Auswahl
+
+**Vorher:**
+```javascript
+async function sendeMinijobberAnfragen() {
+    // Validierung
+    if (state.selectedMinijobberPanel.length === 0) { ... }
+    if (!state.currentAuftragId) { ... }
+    if (!state.currentVADatumId) { ... }
+    // MA-IDs sammeln
+    // ...
+    body: JSON.stringify({
+        VA_ID: state.currentAuftragId,
+        VADatum_ID: state.currentVADatumId,
+        VAStart_ID: state.currentVAStartId || null,  // FEHLER: null erlaubt!
+        MA_IDs: maIds
+    }),
+```
+
+**Nachher:**
+```javascript
+async function sendeMinijobberAnfragen() {
+    // Validierung - ALLE 4 IDs sind PFLICHT!
+    if (state.selectedMinijobberPanel.length === 0) { ... }
+    if (!state.currentAuftragId) { ... }
+    if (!state.currentVADatumId) { ... }
+    // VAStart_ID ist PFLICHT für VBA-Funktion!
+    if (!state.currentVAStartId) {
+        console.error('[VBA Bridge] FEHLER: VAStart_ID ist nicht gesetzt!');
+        showToast('Bitte zuerst eine Schicht (Zeitraum) auswählen!', 'error');
+        alert('Bitte zuerst eine Schicht (Zeitraum) auswählen!\n\nDie Schicht wird benötigt, um die korrekten Einsatzzeiten in der Anfrage-E-Mail anzuzeigen.');
+        return;
+    }
+    console.log('[VBA Bridge] Parameter:', { VA_ID, VADatum_ID, VAStart_ID });
+    // MA-IDs sammeln
+    // ...
+    body: JSON.stringify({
+        VA_ID: state.currentAuftragId,
+        VADatum_ID: state.currentVADatumId,
+        VAStart_ID: state.currentVAStartId,  // KORRIGIERT: Kein null mehr!
+        MA_IDs: maIds
+    }),
+```
+
+**Anweisung:** "Anfragen-Panel auf VBA Bridge umstellen - vastart_id ist PFLICHT (nicht 0!)"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-18 - frm_va_Auftragstamm.html - Bedingte Formatierung Auftragsliste
+**Element:** CSS-Klassen + renderAuftraegeListe() JavaScript
+**Typ:** css + js
+**Änderung:** Bedingte Formatierung für Soll>Ist und Status-Farben implementiert
+
+**Vorher (CSS):**
+```css
+#auftraegeBody tr.status-planung { background-color: #FFFFC0 !important; }
+#auftraegeBody tr.status-versendet { background-color: #C0E0FF !important; }
+#auftraegeBody tr.status-beendet { background-color: #C0FFC0 !important; }
+#auftraegeBody tr.soll-nicht-erreicht { background-color: #FFCCCC !important; }
+```
+
+**Nachher (CSS):**
+```css
+#auftraegeBody tr.status-planung { background-color: #fff3cd !important; }
+#auftraegeBody tr.status-angefragt { background-color: #cce5ff !important; }
+#auftraegeBody tr.status-beendet { background-color: #d4edda !important; }
+#auftraegeBody tr.soll-nicht-erfuellt { background-color: #ffcccc !important; }
+#auftraegeBody tr.soll-nicht-erfuellt:hover { background-color: #ffaaaa !important; }
+```
+
+**Vorher (JS):**
+```javascript
+if (statusId === 1) tr.classList.add('status-planung');
+else if (statusId === 2) tr.classList.add('status-versendet');
+else if (statusId === 3) tr.classList.add('status-beendet');
+```
+
+**Nachher (JS):**
+```javascript
+const statusClasses = { 1: 'status-planung', 2: 'status-angefragt', 5: 'status-beendet' };
+if (statusClasses[statusId]) tr.classList.add(statusClasses[statusId]);
+```
+
+**Anweisung:** "Bedingte Formatierung für Soll>Ist und Status-Farben"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-18 - frm_va_Auftragstamm.html - Probleme #5, #8, #9, #10, #11 behoben
+**Element:** Mehrere Elemente (Filter, Suche, objektChanged, auftragKopieren)
+**Typ:** HTML + JavaScript
+**Änderung:** 5 Probleme behoben:
+
+1. **#5 Upload-Funktion:** Bereits vorhanden in `neuenAttachHinzufuegen()` - kein Fix nötig
+2. **#8 Objekt→Ansprechpartner:** `objektChanged()` erweitert - lädt jetzt Ansprechpartner aus Objekt
+3. **#9 Datumsbereich-Filter:** Von/Bis Felder + IstStatus-Dropdown hinzugefügt
+4. **#10 Textsuche:** Suchfeld + `sucheAuftraege()` implementiert - durchsucht Auftrag, Veranstalter, Objekt
+5. **#11 confirm vor Kopieren:** `auftragKopieren()` zeigt jetzt Bestätigungsdialog
+
+**Vorher (Filter-Bereich):**
+```html
+<span>Aufträge ab:</span>
+<input type="date" id="Auftraege_ab">
+<button>Go</button>...
+```
+
+**Nachher (Filter-Bereich):**
+```html
+<span>Von:</span>
+<input type="date" id="Auftraege_ab" style="width: 110px;">
+<span>Bis:</span>
+<input type="date" id="Auftraege_bis" style="width: 110px;">
+<select id="IstStatus">
+    <option value="0">Alle</option>
+    <option value="1" selected>Offen</option>
+    <option value="2">Abgeschlossen</option>
+</select>
+<button>Go</button>...
+<!-- Textsuche -->
+<div class="search-nav">
+    <span>Suche:</span>
+    <input type="text" id="txtSucheAuftrag" onkeyup="sucheAuftraege()">
+    <button onclick="sucheZuruecksetzen()">X</button>
+</div>
+```
+
+**Anweisung:** "AUFGABE: Behebe Probleme #5, #8, #9, #10, #11 in frm_va_Auftragstamm"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-18 20:45 - frm_va_Auftragstamm.html - VBA Bridge für Anfragen-Panel
+**Element:** sendeMinijobberAnfragen() Funktion (JavaScript)
+**Typ:** JavaScript
+**Änderung:** Problem #32-37 - REST-API durch VBA Bridge ersetzt für E-Mail-Anfragen
+
+**Vorher:**
+```javascript
+async function sendeMinijobberAnfragen() {
+    // ...
+    const response = await fetch(`${API_BASE_LOCAL}/anfragen`, {
+        method: 'POST',
+        body: JSON.stringify({ va_id, ma_ids, typ: 'email' })
+    });
+    // Demo-Modus Fallback bei Fehler
+}
+```
+
+**Nachher:**
+```javascript
+async function sendeMinijobberAnfragen() {
+    // Validierung inkl. VADatum_ID
+    if (!state.currentVADatumId) { showToast('Bitte erst einen Einsatztag auswählen'); return; }
+
+    // VBA Bridge Health-Check (PFLICHT, kein Fallback)
+    const healthCheck = await fetch('http://localhost:5002/api/health');
+    if (!healthCheck.ok) { alert('VBA Bridge nicht erreichbar!'); return; }
+
+    // VBA Bridge aufrufen
+    const response = await fetch('http://localhost:5002/api/vba/anfragen', {
+        method: 'POST',
+        body: JSON.stringify({
+            VA_ID: state.currentAuftragId,
+            VADatum_ID: state.currentVADatumId,
+            VAStart_ID: state.currentVAStartId,
+            MA_IDs: maIds  // Array!
+        }),
+        signal: AbortSignal.timeout(120000)
+    });
+    // Detailliertes Feedback (sent/failed count)
+    // Einsatzliste + Antworten-Tab aktualisieren
+}
+```
+
+**Anweisung:** "Implementiere VBA Bridge Integration für Anfragen-Panel im Auftragstamm - Probleme #32-37"
+**Status:** ✅ Abgeschlossen
+
+**Hinweis zu Problem #13 (sub_VA_Tag postMessage):** Bereits implementiert - vaDatumChanged() ruft loadSubformData() auf, welche sendToEinsatzliste() mit postMessage aufruft.
+
+---
+
+### 2026-01-18 18:30 - frm_VA_Planungsuebersicht.logic.js - Bridge.query() ersetzt
+**Element:** frm_VA_Planungsuebersicht.logic.js (JavaScript Logic-Datei)
+**Typ:** JavaScript
+**Änderung:** Problem #19 - Bridge.query() existiert nicht, ersetzt durch fetch() Aufrufe
+
+**Vorher:**
+```javascript
+import { Bridge } from '../api/bridgeClient.js';
+// ...
+const result = await Bridge.query(`SELECT ... FROM tbl_VA_Auftragstamm ...`);
+```
+
+**Nachher:**
+```javascript
+const API_BASE = 'http://localhost:5000/api';
+// ...
+// 1. Aufträge im Zeitraum laden
+const auftraegeResponse = await fetch(`${API_BASE}/auftraege?von=${von}&bis=${bis}&limit=200`);
+// 2. Schichten und Zuordnungen parallel laden
+const schichtenResponse = await fetch(`${API_BASE}/auftraege/${vaId}/schichten`);
+const zuordnungenResponse = await fetch(`${API_BASE}/auftraege/${vaId}/zuordnungen`);
+```
+
+**Anweisung:** "Behebe Probleme in frm_VA_Planungsuebersicht.html - Problem #19: Bridge.query() existiert nicht"
+**Status:** ✅ Abgeschlossen
+
+**Hinweis zu Problem #21 (jQuery Datepicker):** HTML verwendet bereits natives `<input type="date">` - kein jQuery vorhanden
+**Hinweis zu Problem #22 (MA-Filter):** Dieses Formular zeigt Aufträge, nicht Mitarbeiter - kein MA-Filter vorhanden
+
+---
+
+### 2026-01-18 - frm_va_Auftragstamm.html - Auftragsliste Farblogik
+**Element:** #auftraegeBody tr (Auftragsliste Zeilen)
+**Typ:** CSS + JavaScript
+**Änderung:** Zwei neue Farblogiken implementiert
+
+**Problem #1 - Soll>Ist Rot-Markierung:**
+- Wenn MA_Anzahl_Ist < MA_Anzahl_Soll wird die Zeile rot markiert
+- CSS-Klasse: `.soll-nicht-erreicht` mit `background-color: #FFCCCC`
+
+**Problem #2 - Status-Farben:**
+- Status 1 (In Planung): Gelb `#FFFFC0` - Klasse `.status-planung`
+- Status 2 (Versendet): Blau `#C0E0FF` - Klasse `.status-versendet`
+- Status 3 (Beendet): Grün `#C0FFC0` - Klasse `.status-beendet`
+
+**CSS hinzugefügt (Zeile 1216-1244):**
+```css
+#auftraegeBody tr.status-planung { background-color: #FFFFC0 !important; }
+#auftraegeBody tr.status-versendet { background-color: #C0E0FF !important; }
+#auftraegeBody tr.status-beendet { background-color: #C0FFC0 !important; }
+#auftraegeBody tr.soll-nicht-erreicht { background-color: #FFCCCC !important; }
+#auftraegeBody tr.selected { background-color: #000080 !important; color: white !important; }
+```
+
+**JavaScript geändert in renderAuftraegeListe() (Zeile 3450-3465):**
+```javascript
+// Soll>Ist Rot-Markierung
+const maSoll = parseInt(a.MA_Anzahl_Soll || a.MA_Soll) || 0;
+const maIst = parseInt(a.MA_Anzahl_Ist || a.MA_Ist) || 0;
+if (maSoll > 0 && maIst < maSoll) {
+    tr.classList.add('soll-nicht-erreicht');
+}
+// Status-Farben
+const statusId = parseInt(a.Veranst_Status_ID) || 1;
+if (statusId === 1) tr.classList.add('status-planung');
+else if (statusId === 2) tr.classList.add('status-versendet');
+else if (statusId === 3) tr.classList.add('status-beendet');
+```
+
+**Priorität:** Soll>Ist (rot) > Status-Farben > normal, Selected überschreibt alles
+**Anweisung:** "Behebe Probleme #1 und #2 in frm_va_Auftragstamm.html"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-18 14:45 - VBA Bridge Auto-Start mit Watchdog
+**Element:** mod_N_WebView2_forms3.bas + mod_VBA_Bridge.bas
+**Typ:** VBA Module
+**Änderung:** VBA Bridge startet jetzt via Watchdog (automatischer Neustart bei Crash)
+
+**Neue Dateien erstellt:**
+- `08_Tools\python\vba_bridge_watchdog.py` - Überwacht VBA Bridge, Health-Checks alle 15s, Auto-Restart
+- `08_Tools\python\start_vba_bridge_watchdog.vbs` - VBS Starter für versteckten Watchdog-Start
+
+**mod_N_WebView2_forms3.bas - Vorher:**
+```vba
+cmd = "cmd /c cd /d """ & workDir & """ && start /min python vba_bridge_server.py"
+```
+
+**mod_N_WebView2_forms3.bas - Nachher:**
+```vba
+' Bevorzugt: Watchdog verwenden (ueberwacht und restartet bei Crash)
+If Dir(VBA_BRIDGE_WATCHDOG_PATH) <> "" Then
+    watchdogCmd = "cmd /c cd /d """ & watchdogDir & """ && start /b pythonw vba_bridge_watchdog.py"
+    Shell watchdogCmd, vbHide
+```
+
+**mod_VBA_Bridge.bas - Pfad geändert:**
+```vba
+' GEAENDERT: Watchdog statt direkter Start
+Private Const VBA_BRIDGE_PATH As String = "...\start_vba_bridge_watchdog.vbs"
+```
+
+**Anweisung:** "Die VBA Bridge muss automatisch gestartet werden und bei Crash neu starten"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-18 14:25 - api_server.py (Beginn-Zeiten Schnellauswahl)
+**Element:** get_zuordnungen() in api_server.py
+**Typ:** Python API
+**Änderung:** Schicht-Zeiten (tbl_VA_Start.VA_Start) als Fallback für leere MVA_Start
+
+**Vorher:**
+```sql
+SELECT p.MVA_Start AS MA_Start, p.MVA_Ende AS MA_Ende...
+FROM tbl_MA_VA_Planung AS p
+LEFT JOIN tbl_MA_Mitarbeiterstamm AS m ON p.MA_ID = m.ID
+```
+
+**Nachher:**
+```sql
+SELECT
+    IIF(p.MVA_Start IS NULL, s.VA_Start, p.MVA_Start) AS MA_Start,
+    IIF(p.MVA_Ende IS NULL, s.VA_Ende, p.MVA_Ende) AS MA_Ende,
+    s.VA_Start AS Schicht_Start,
+    s.VA_Ende AS Schicht_Ende...
+FROM (tbl_MA_VA_Planung AS p
+LEFT JOIN tbl_MA_Mitarbeiterstamm AS m ON p.MA_ID = m.ID)
+LEFT JOIN tbl_VA_Start AS s ON p.VAStart_ID = s.ID
+```
+
+**Anweisung:** "Die Beginn Zeiten müssen in der Auswahlliste angezeigt werden"
+**Status:** ✅ Abgeschlossen
+
+---
+
 ### 2026-01-18 - frm_KD_Kundenstamm (Tab-Funktionalität)
 **Element:** frm_KD_Kundenstamm.logic.js + api_server.py
 **Typ:** JS + Python API
@@ -1901,3 +2290,192 @@ SELECT TOP {limit}
 
 ---
 
+### 2026-01-18 - frm_va_Auftragstamm.html + logic.js - Doppelklick MA öffnet Mitarbeiterstamm
+**Element:** Message-Handler für `row_dblclick`
+**Typ:** js
+**Änderung:** Neuer Message-Handler für Doppelklick auf MA-Zeilen in sub_MA_VA_Zuordnung
+
+**Vorher:**
+```javascript
+// Nur diese Cases behandelt:
+case 'subform_ready': ...
+case 'subform_changed': ...
+case 'subform_recalc_request': ...
+// row_dblclick wurde NICHT behandelt!
+```
+
+**Nachher:**
+```javascript
+case 'row_dblclick':
+    // Doppelklick auf MA-Zeile öffnet Mitarbeiterstamm (18.01.2026)
+    if (data.ma_id) {
+        console.log('[Parent] Öffne Mitarbeiterstamm für MA_ID:', data.ma_id);
+        // Shell-Navigation wenn verfügbar
+        if (window.parent?.ConsysShell?.showForm) {
+            localStorage.setItem('consec_ma_id', String(data.ma_id));
+            window.parent.ConsysShell.showForm('frm_MA_Mitarbeiterstamm', { ma_id: data.ma_id });
+        } else if (window.ConsysShell?.showForm) {
+            localStorage.setItem('consec_ma_id', String(data.ma_id));
+            window.ConsysShell.showForm('frm_MA_Mitarbeiterstamm', { ma_id: data.ma_id });
+        } else {
+            // Fallback: In neuem Fenster öffnen
+            window.open(`frm_MA_Mitarbeiterstamm.html?ma_id=${data.ma_id}`, 'Mitarbeiterstamm', 'width=1200,height=800');
+        }
+    }
+    break;
+```
+
+**Anweisung:** "Doppelklick auf MA öffnet Mitarbeiterstamm (sub_MA_VA_Zuordnung)"
+**Status:** ✅ Abgeschlossen
+
+**Betroffene Dateien:**
+- `04_HTML_Forms/forms3/frm_va_Auftragstamm.html` (Zeile 3053-3069)
+- `04_HTML_Forms/forms3/logic/frm_va_Auftragstamm.logic.js` (Zeile 374-390)
+
+---
+
+
+
+### 2026-01-18 - frm_va_Auftragstamm.html - Mitarbeiterauswahl Parameter-Fix
+**Element:** renderSchichten(), onTagSelected(), initZuordnungen()
+**Typ:** js
+**Änderung:** Regression-Fix: Mitarbeiterauswahl übergibt jetzt automatisch alle Parameter
+
+**Problem:** 
+Bei Klick auf "Mitarbeiterauswahl" wurde die Schnellauswahl ohne VAStart_ID geöffnet, weil:
+1. Keine Schicht automatisch ausgewählt wurde
+2. Inkonsistente State-Variablennamen: `currentVADatum_ID` vs `currentVADatumId`
+
+**Fix 1 - renderSchichten() (Zeile 3568-3573):**
+```javascript
+// WICHTIG: Erste Schicht automatisch auswählen für Mitarbeiterauswahl
+// Ohne VAStart_ID funktioniert die VBA-Anfrage nicht!
+if (state.schichten.length > 0) {
+    selectSchicht(0);
+    console.log('[renderSchichten] Erste Schicht automatisch ausgewählt, VAStart_ID:', state.currentVAStartId);
+}
+```
+
+**Fix 2 - State-Variablen vereinheitlicht:**
+- Zeile 4103: `state.currentVADatum_ID` → `state.currentVADatumId`
+- Zeile 4727: `state.currentVADatum_ID` → `state.currentVADatumId`
+
+**Anweisung:** "Beim Klick auf Mitarbeiterauswahl im Auftragsstamm muss immer der Auftrag mit den jew Daten und gefilterten Mitarbeitern in der Schnellauswahl sofort angezeigt werden"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-19 - frm_va_Auftragstamm.logic.js - postMessage Handler erweitert
+**Element:** handleSubformMessage(), loadSchichtenForDay()
+**Typ:** js
+**Änderung:** Fehlende postMessage-Handler für Subform-Kommunikation hinzugefügt
+
+**Problem:**
+Subformulare (sub_VA_Einsatztage, sub_VA_Schichten) sendeten postMessages, die vom Parent nicht verarbeitet wurden:
+- `DAY_SELECTED` (Subform sendet) vs `TAG_SELECTED` (Parent erwartet)
+- `SCHICHT_SELECTED` (Großbuchstaben) vs `schicht_selected` (Kleinbuchstaben im Handler)
+- Fehlende Handler für: `DAY_DBLCLICK`, `FILTER_CHANGED`, `SCHICHT_CHANGED`, `ZUORDNUNG_RECALC_REQUEST`, `ADD_DAY`, `REMOVE_DAY`, `COPY_DAY`, `ADD_SCHICHT`, `EDIT_SCHICHT`
+
+**Nachher:**
+Neue Handler in `handleSubformMessage()` (Zeile ~374-470):
+- `SCHICHT_SELECTED` - Schicht ausgewählt
+- `DAY_SELECTED` - Tag ausgewählt → `loadSchichtenForDay()`
+- `DAY_DBLCLICK` - Doppelklick auf Tag
+- `FILTER_CHANGED` - Filter geändert
+- `SCHICHT_CHANGED` - Schicht geändert
+- `ZUORDNUNG_RECALC_REQUEST` - Neuberechnung angefordert
+- `ADD_DAY`, `REMOVE_DAY`, `COPY_DAY` - Tag-Operationen
+- `ADD_SCHICHT`, `EDIT_SCHICHT` - Schicht-Operationen
+
+Neue Funktion `loadSchichtenForDay()` (Zeile ~540):
+- Aktualisiert `state.currentVADatum_ID`
+- Ruft `window.loadSubformData()` und `updateMASubforms()` auf
+
+**Anweisung:** "sub_VA_Tag postMessage prüfen/fixen" (Excel Issue #10)
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-19 - frm_VA_Planungsuebersicht.html - Layout von Dienstplan_Objekt übernommen
+**Element:** Gesamtes Formular
+**Typ:** html
+**Änderung:** Formular komplett umstrukturiert, verwendet jetzt selbe Logik wie frm_DP_Dienstplan_Objekt
+
+**Vorher:**
+- Eigenes Layout mit Bridge.query() Aufrufen (veraltet)
+- Eigene Logic-Datei: frm_VA_Planungsuebersicht.logic.js
+
+**Nachher:**
+- Layout kopiert von frm_DP_Dienstplan_Objekt.html
+- Verwendet `data-form="frm_VA_Planungsuebersicht"` für Identifikation
+- Nutzt shared Logic-Datei: frm_DP_Dienstplan_Objekt.logic.js
+- REST-API fetch() statt Bridge.query()
+
+**Anweisung:** "frm_VA_Planungsuebersicht.html bitte die gleichen Einstellungen wie bei frm_DP_Dienstplan_Objekt.html" (Excel Issue #2)
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-19 - Batch-Fix: Issues #26, #24, #38, #39
+**Geänderte Dateien:**
+
+**#26 Hat_Fahrerausweis:**
+- `frm_MA_Mitarbeiterstamm.logic.js`: `Hat_Fahrerausweis` zu saveRecord()-Daten hinzugefügt
+- `api_server.py`: `Hat_Fahrerausweis` zur allowed-Liste hinzugefügt
+
+**#24 Datumsbereich-Filter:**
+- `api_server.py`: Akzeptiert jetzt sowohl `von`/`bis` als auch `datum_von`/`datum_bis` Parameter
+
+**#38 Anstellungsart Dropdown:**
+- `api_server.py`: Neuer Endpoint `/api/anstellungsarten` (lädt aus tbl_hlp_MA_Anstellungsart)
+- `frm_MA_Mitarbeiterstamm.logic.js`: Neue Funktion `loadAnstellungsarten()` lädt Dropdown dynamisch
+- `webview2-bridge.js`: Neuer Case `getAnstellungsarten`
+
+**#39 Beginn/Ende-Zeiten Schnellauswahl:**
+- `frm_MA_VA_Schnellauswahl.html`:
+  - `populateSchichtenListe()`: `dataset.beginn` hinzugefügt
+  - `populateMitarbeiterListe()`: Verwendet Schicht-Zeiten als Fallback für MA-Zeiten
+
+**Status:** ✅ Alle abgeschlossen
+
+---
+
+### 2026-01-19 - #23 Objekt-Auswahl -> Ansprechpartner aktualisieren
+**Datei:** `frm_va_Auftragstamm.logic.js`
+**Element:** `applyObjektRules()` Funktion
+**Typ:** js
+**Änderung:** Funktion async gemacht und Objekt-Daten laden
+
+**Vorher:**
+```javascript
+function applyObjektRules(value) {
+    const hasObjekt = !!(value && Number(value) > 0);
+    setVisible('btn_Posliste_oeffnen', hasObjekt);
+    setVisible('btnmailpos', hasObjekt);
+}
+```
+
+**Nachher:**
+```javascript
+async function applyObjektRules(value) {
+    const hasObjekt = !!(value && Number(value) > 0);
+    setVisible('btn_Posliste_oeffnen', hasObjekt);
+    setVisible('btnmailpos', hasObjekt);
+
+    // Wenn Objekt ausgewählt, Ansprechpartner + Treffpunkt laden
+    if (hasObjekt) {
+        try {
+            const result = await Bridge.execute('getObjekt', { id: Number(value) });
+            if (result && result.data) {
+                // Ansprechpartner/Treffpunkt/Dienstkleidung übernehmen (falls leer)
+                ...
+            }
+        } catch (e) { ... }
+    }
+}
+```
+
+**Anweisung:** Excel Issue #23 - Objekt-Auswahl soll Ansprechpartner automatisch aktualisieren
+**Status:** ✅ Abgeschlossen
+
+---

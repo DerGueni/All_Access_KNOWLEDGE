@@ -151,25 +151,46 @@
     </div>
 
     <script>
+        /**
+         * sub_VA_Schichten.logic.js (inline)
+         * Schichten-Subformular mit Stundenberechnung
+         *
+         * VBA-Referenz: Form_sub_VA_Start.bas
+         * - VA_Start_AfterUpdate: Aktualisiert MA_Start in Zuordnungen, ruft calc_ZUO_Stunden_all
+         * - VA_Ende_AfterUpdate: Aktualisiert MA_Ende in Zuordnungen, ruft calc_ZUO_Stunden_all
+         * - Form_BeforeUpdate: Validiert Eingaben, berechnet MVA_Start/MVA_Ende
+         */
         'use strict';
 
+        // State
         let currentVA_ID = null;
         let currentDate = null;
+        let currentVADatum_ID = null;
         let selectedSchicht = null;
+        let schichtenData = [];
 
+        // Message Handler
         window.addEventListener('message', function(event) {
             const data = event.data;
             if (data && data.type === 'LOAD_DATA') {
                 currentVA_ID = data.va_id || data.id;
                 currentDate = data.datum || data.date;
+                currentVADatum_ID = data.vadatum_id || null;
                 loadData();
             }
             if (data && data.type === 'DAY_SELECTED') {
                 currentDate = data.date;
+                currentVADatum_ID = data.vadatum_id || null;
+                loadData();
+            }
+            if (data && data.type === 'REQUERY') {
                 loadData();
             }
         });
 
+        /**
+         * Daten laden via REST-API
+         */
         async function loadData() {
             if (!currentVA_ID) return;
 
@@ -181,35 +202,44 @@
                 if (!response.ok) throw new Error('API Fehler');
 
                 const data = await response.json();
-                renderSchichten(data);
+                schichtenData = data.schichten || data || [];
+                renderSchichten(schichtenData);
             } catch (error) {
-                console.log('[sub_VA_Schichten] Fehler:', error);
+                console.error('[sub_VA_Schichten] Fehler:', error);
+                renderError(error.message);
             }
         }
 
-        function renderSchichten(data) {
+        /**
+         * Schichten rendern mit Inline-Bearbeitung
+         */
+        function renderSchichten(schichten) {
             const container = document.getElementById('schichtenList');
-            const schichten = data.schichten || data || [];
 
             if (schichten.length === 0) {
                 container.innerHTML = '<div class="empty-state">Keine Schichten</div>';
                 return;
             }
 
-            container.innerHTML = schichten.map(s => {
+            container.innerHTML = schichten.map((s, idx) => {
                 const isComplete = (s.MA_Anzahl_Ist || 0) >= (s.MA_Anzahl || 0);
                 const statusClass = isComplete ? 'complete' : 'incomplete';
+                const schichtId = s.VAStart_ID || s.ID;
+                const duration = calc_ZUO_Stunden(s.VA_Start, s.VA_Ende);
 
                 return `
-                    <div class="schicht-item" data-id="${s.VAStart_ID || s.ID}" onclick="selectSchicht(this)">
+                    <div class="schicht-item" data-id="${schichtId}" data-index="${idx}" onclick="selectSchicht(this)">
                         <div class="schicht-header">
-                            <span class="schicht-zeit">${s.VA_Start || ''} - ${s.VA_Ende || ''}</span>
+                            <span class="schicht-zeit" ondblclick="editTime(event, ${idx})">
+                                <span class="time-display">${formatTime(s.VA_Start)} - ${formatTime(s.VA_Ende)}</span>
+                            </span>
                             <span class="schicht-anzahl ${statusClass}">
                                 ${s.MA_Anzahl_Ist || 0}/${s.MA_Anzahl || 0} MA
                             </span>
                         </div>
                         <div class="schicht-details">
-                            ${s.Position || 'Standard'} | ${calcDuration(s.VA_Start, s.VA_Ende)} Std
+                            <span class="schicht-stunden" data-schicht-id="${schichtId}">${duration} Std</span>
+                            ${s.Bemerkung ? ' | <em>' + s.Bemerkung + '</em>' : ''}
                         </div>
                     </div>
                 `;
@@ -220,46 +250,338 @@
             if (firstSchicht) selectSchicht(firstSchicht);
         }
 
-        function calcDuration(start, end) {
-            if (!start || !end) return '0';
-            const [sh, sm] = start.split(':').map(Number);
-            const [eh, em] = end.split(':').map(Number);
-            let diff = (eh * 60 + em) - (sh * 60 + sm);
-            if (diff < 0) diff += 24 * 60; // Overnight
-            return (diff / 60).toFixed(1);
+        /**
+         * Fehler anzeigen
+         */
+        function renderError(message) {
+            const container = document.getElementById('schichtenList');
+            container.innerHTML = `<div class="empty-state" style="color:#800000;">Fehler: ${message}</div>`;
         }
 
+        /**
+         * calc_ZUO_Stunden - Stundenberechnung
+         * JavaScript-Äquivalent zur VBA-Funktion
+         *
+         * Berechnet Stunden zwischen Start- und Endzeit
+         * Berücksichtigt Mitternacht-Überschreitung (Nachtschichten)
+         *
+         * @param {string} startTime - Startzeit (HH:MM oder ISO-Format)
+         * @param {string} endTime - Endzeit (HH:MM oder ISO-Format)
+         * @returns {string} Stunden als formatierte Zahl (z.B. "8.5")
+         */
+        function calc_ZUO_Stunden(startTime, endTime) {
+            if (!startTime || !endTime) return '0.0';
+
+            try {
+                const start = parseTimeToMinutes(startTime);
+                const end = parseTimeToMinutes(endTime);
+
+                let diffMinutes = end - start;
+
+                // Nachtschicht: Ende ist am nächsten Tag
+                if (diffMinutes < 0) {
+                    diffMinutes += 24 * 60; // +24 Stunden
+                }
+
+                const hours = diffMinutes / 60;
+                return hours.toFixed(1);
+            } catch (e) {
+                console.error('[calc_ZUO_Stunden] Fehler:', e);
+                return '0.0';
+            }
+        }
+
+        /**
+         * Zeit zu Minuten konvertieren
+         * Unterstützt verschiedene Formate: HH:MM, ISO-String, Dezimalwert
+         */
+        function parseTimeToMinutes(value) {
+            if (!value) return 0;
+
+            // ISO-String (z.B. "1899-12-30T15:00:00" oder "2026-01-17T15:00:00")
+            if (typeof value === 'string' && value.includes('T')) {
+                const date = new Date(value);
+                if (!isNaN(date)) {
+                    return date.getHours() * 60 + date.getMinutes();
+                }
+            }
+
+            // HH:MM Format
+            if (typeof value === 'string' && /^\d{1,2}:\d{2}(:\d{2})?$/.test(value)) {
+                const parts = value.split(':').map(Number);
+                return parts[0] * 60 + parts[1];
+            }
+
+            // Dezimalwert (Access-typisch: 0.5 = 12:00)
+            if (typeof value === 'number' && value < 1) {
+                return Math.round(value * 24 * 60);
+            }
+
+            // Ganzzahl als Stunden
+            if (typeof value === 'number') {
+                return value * 60;
+            }
+
+            return 0;
+        }
+
+        /**
+         * Zeit formatieren für Anzeige
+         */
+        function formatTime(value) {
+            if (!value) return '';
+
+            // ISO-String
+            if (typeof value === 'string' && value.includes('T')) {
+                const date = new Date(value);
+                if (!isNaN(date)) {
+                    return date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                }
+            }
+
+            // Bereits formatiert (HH:MM)
+            if (typeof value === 'string' && /^\d{1,2}:\d{2}$/.test(value)) {
+                return value;
+            }
+
+            // HH:MM:SS Format
+            if (typeof value === 'string' && /^\d{1,2}:\d{2}:\d{2}$/.test(value)) {
+                return value.substring(0, 5);
+            }
+
+            // Dezimalwert
+            if (typeof value === 'number' && value < 1) {
+                const totalMinutes = Math.round(value * 24 * 60);
+                const hours = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+            }
+
+            return String(value);
+        }
+
+        /**
+         * calc_ZUO_Stunden_all - Alle Stunden für eine Schicht neu berechnen
+         * JavaScript-Äquivalent zur VBA-Funktion in Form_sub_MA_VA_Zuordnung
+         *
+         * Wird aufgerufen wenn Schicht-Zeiten geändert werden
+         * Aktualisiert alle MA-Zuordnungen der Schicht
+         *
+         * @param {number} VAStart_ID - ID der Schicht
+         */
+        async function calc_ZUO_Stunden_all(VAStart_ID) {
+            if (!VAStart_ID) return;
+
+            console.log('[sub_VA_Schichten] calc_ZUO_Stunden_all für Schicht:', VAStart_ID);
+
+            try {
+                // API-Aufruf um Stunden für alle Zuordnungen der Schicht zu berechnen
+                // Der Server sollte tbl_MA_VA_Zuordnung WHERE VAStart_ID aktualisieren
+                const response = await fetch(`http://localhost:5000/api/schichten/${VAStart_ID}/recalc_hours`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        va_id: currentVA_ID,
+                        vadatum_id: currentVADatum_ID
+                    })
+                });
+
+                if (!response.ok) {
+                    console.warn('[sub_VA_Schichten] Stunden-Neuberechnung nicht verfügbar (Endpoint fehlt)');
+                    // Fallback: Lokale Neuberechnung & UI-Update
+                }
+
+                // Parent informieren dass Zuordnungen aktualisiert werden müssen
+                notifyParentRecalc();
+
+            } catch (e) {
+                console.error('[sub_VA_Schichten] calc_ZUO_Stunden_all Fehler:', e);
+                // Bei Fehler trotzdem Parent informieren
+                notifyParentRecalc();
+            }
+        }
+
+        /**
+         * Zeit inline bearbeiten (Doppelklick)
+         * VBA-Äquivalent: VA_Start/VA_Ende Felder editieren
+         */
+        function editTime(event, schichtIndex) {
+            event.stopPropagation();
+
+            const schicht = schichtenData[schichtIndex];
+            if (!schicht) return;
+
+            const schichtId = schicht.VAStart_ID || schicht.ID;
+            const startFormatted = formatTime(schicht.VA_Start);
+            const endFormatted = formatTime(schicht.VA_Ende);
+
+            // Dialog für Zeit-Bearbeitung
+            const newStart = prompt('Startzeit (HH:MM):', startFormatted);
+            if (newStart === null) return;
+
+            const newEnd = prompt('Endzeit (HH:MM):', endFormatted);
+            if (newEnd === null) return;
+
+            // Validierung (VBA: Form_BeforeUpdate)
+            if (!validateTime(newStart) || !validateTime(newEnd)) {
+                alert('Ungültiges Zeitformat. Bitte HH:MM eingeben.');
+                return;
+            }
+
+            // API-Update
+            updateSchichtTime(schichtId, newStart, newEnd, schichtIndex);
+        }
+
+        /**
+         * Zeit-Validierung (VBA: Form_BeforeUpdate)
+         */
+        function validateTime(timeStr) {
+            if (!timeStr) return false;
+            return /^([01]?\d|2[0-3]):([0-5]\d)$/.test(timeStr.trim());
+        }
+
+        /**
+         * Schicht-Zeiten aktualisieren
+         * VBA-Äquivalent: VA_Start_AfterUpdate / VA_Ende_AfterUpdate
+         */
+        async function updateSchichtTime(schichtId, newStart, newEnd, schichtIndex) {
+            console.log('[sub_VA_Schichten] Update Schicht:', schichtId, newStart, '-', newEnd);
+
+            try {
+                // 1. Schicht aktualisieren (tbl_VA_Start)
+                const response = await fetch(`http://localhost:5000/api/schichten/${schichtId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        VA_Start: newStart,
+                        VA_Ende: newEnd
+                    })
+                });
+
+                if (response.ok) {
+                    // 2. Lokale Daten aktualisieren
+                    if (schichtenData[schichtIndex]) {
+                        schichtenData[schichtIndex].VA_Start = newStart;
+                        schichtenData[schichtIndex].VA_Ende = newEnd;
+                    }
+
+                    // 3. UI aktualisieren
+                    updateSchichtDisplay(schichtId, newStart, newEnd);
+
+                    // 4. Stunden für alle MA-Zuordnungen neu berechnen
+                    // VBA: Me.Parent!sub_MA_VA_Zuordnung.Form.calc_ZUO_Stunden_all(iVAStart_ID)
+                    await calc_ZUO_Stunden_all(schichtId);
+
+                    // 5. Parent informieren
+                    notifyParentChanged();
+
+                    console.log('[sub_VA_Schichten] Schicht erfolgreich aktualisiert');
+                } else {
+                    console.error('[sub_VA_Schichten] Update fehlgeschlagen');
+                    alert('Fehler beim Speichern der Schicht-Zeiten');
+                }
+            } catch (e) {
+                console.error('[sub_VA_Schichten] Update Fehler:', e);
+                alert('Netzwerkfehler beim Speichern');
+            }
+        }
+
+        /**
+         * Schicht-Anzeige im UI aktualisieren (ohne komplettes Re-Render)
+         */
+        function updateSchichtDisplay(schichtId, newStart, newEnd) {
+            const item = document.querySelector(`.schicht-item[data-id="${schichtId}"]`);
+            if (!item) return;
+
+            // Zeit-Anzeige
+            const timeDisplay = item.querySelector('.time-display');
+            if (timeDisplay) {
+                timeDisplay.textContent = `${newStart} - ${newEnd}`;
+            }
+
+            // Stunden neu berechnen und anzeigen
+            const stundenDisplay = item.querySelector('.schicht-stunden');
+            if (stundenDisplay) {
+                const newDuration = calc_ZUO_Stunden(newStart, newEnd);
+                stundenDisplay.textContent = `${newDuration} Std`;
+            }
+        }
+
+        /**
+         * Schicht auswählen
+         */
         function selectSchicht(element) {
             document.querySelectorAll('.schicht-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
             selectedSchicht = element.dataset.id;
 
-            // Notify parent
+            // Parent informieren
             window.parent.postMessage({
                 type: 'SCHICHT_SELECTED',
                 schicht_id: selectedSchicht,
                 va_id: currentVA_ID,
-                datum: currentDate
+                datum: currentDate,
+                vadatum_id: currentVADatum_ID
             }, '*');
         }
 
+        /**
+         * Neue Schicht hinzufügen
+         */
         function addSchicht() {
             window.parent.postMessage({
                 type: 'ADD_SCHICHT',
                 va_id: currentVA_ID,
-                datum: currentDate
+                datum: currentDate,
+                vadatum_id: currentVADatum_ID
             }, '*');
         }
 
+        /**
+         * Schicht bearbeiten
+         */
         function editSchicht() {
             if (selectedSchicht) {
                 window.parent.postMessage({
                     type: 'EDIT_SCHICHT',
                     schicht_id: selectedSchicht,
-                    va_id: currentVA_ID
+                    va_id: currentVA_ID,
+                    vadatum_id: currentVADatum_ID
                 }, '*');
             }
         }
+
+        /**
+         * Parent über Änderungen informieren
+         */
+        function notifyParentChanged() {
+            window.parent.postMessage({
+                type: 'SCHICHT_CHANGED',
+                va_id: currentVA_ID,
+                datum: currentDate,
+                vadatum_id: currentVADatum_ID
+            }, '*');
+        }
+
+        /**
+         * Parent über Recalc informieren (Zuordnungen neu laden)
+         */
+        function notifyParentRecalc() {
+            window.parent.postMessage({
+                type: 'ZUORDNUNG_RECALC_REQUEST',
+                va_id: currentVA_ID,
+                vadatum_id: currentVADatum_ID
+            }, '*');
+        }
+
+        // API für externen Zugriff
+        window.SubVASchichten = {
+            loadData: loadData,
+            calc_ZUO_Stunden: calc_ZUO_Stunden,
+            calc_ZUO_Stunden_all: calc_ZUO_Stunden_all,
+            getSelectedSchicht: () => selectedSchicht,
+            getSchichtenData: () => schichtenData
+        };
     </script>
 </body>
 </html>

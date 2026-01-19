@@ -118,17 +118,72 @@
         .toolbar-btn:hover {
             background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
         }
+
+        /* Filter-Toolbar Erweiterung */
+        .filter-toolbar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 4px;
+            align-items: center;
+        }
+        .filter-select {
+            flex: 1;
+            padding: 2px 4px;
+            font-size: 9px;
+            border: 1px solid #808080;
+            background: linear-gradient(to bottom, #f8f8f8, #e8e8e8);
+        }
+        .filter-label {
+            font-size: 9px;
+            color: #333;
+            white-space: nowrap;
+        }
+        /* Status-Badges */
+        .day-status.complete {
+            color: #008000;
+            font-weight: 600;
+        }
+        .day-status.incomplete {
+            color: #c00000;
+            font-weight: 600;
+        }
+        .day-status.partial {
+            color: #d07000;
+        }
+        /* Mehrfach-Selektion */
+        .day-item.multi-selected {
+            background: linear-gradient(to bottom, #b0b0d8, #9090b8);
+            color: white;
+        }
+        /* Wochenend-Markierung */
+        .day-item.weekend .day-weekday {
+            color: #c00000;
+        }
+        .day-item.active.weekend .day-weekday {
+            color: #ffcccc;
+        }
     </style>
 </head>
 <body>
     <div class="subform-container">
         <div class="subform-header">Einsatztage</div>
+        <!-- Filter-Toolbar (neu) -->
+        <div class="filter-toolbar">
+            <span class="filter-label">Filter:</span>
+            <select id="filterStatus" class="filter-select" onchange="applyFilter()">
+                <option value="alle">Alle</option>
+                <option value="offen">Offen</option>
+                <option value="voll">Voll besetzt</option>
+                <option value="teilweise">Teilweise</option>
+            </select>
+        </div>
         <div class="days-list" id="daysList">
             <div class="empty-state">Keine Einsatztage</div>
         </div>
         <div class="toolbar">
-            <button class="toolbar-btn" onclick="addDay()">+ Tag</button>
-            <button class="toolbar-btn" onclick="removeDay()">- Tag</button>
+            <button class="toolbar-btn" onclick="addDay()" title="Neuen Tag hinzufügen">+ Tag</button>
+            <button class="toolbar-btn" onclick="removeDay()" title="Ausgewählten Tag entfernen">- Tag</button>
+            <button class="toolbar-btn" onclick="copyDay()" title="Tag kopieren">Kopie</button>
         </div>
     </div>
 
@@ -136,85 +191,278 @@
         'use strict';
 
         const WOCHENTAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-        let currentVA_ID = null;
-        let selectedDate = null;
+
+        // State-Objekt für erweiterte Funktionalität
+        const state = {
+            va_id: null,
+            selectedDate: null,
+            selectedDatumId: null,
+            allDays: [],           // Alle geladenen Tage (ungefiltert)
+            filteredDays: [],      // Gefilterte Tage
+            filter: 'alle',        // Aktueller Filter
+            multiSelect: []        // Mehrfachselektion
+        };
 
         window.addEventListener('message', function(event) {
             const data = event.data;
-            if (data && data.type === 'LOAD_DATA') {
-                currentVA_ID = data.va_id || data.id;
-                loadData();
+            if (!data || !data.type) return;
+
+            switch (data.type) {
+                case 'LOAD_DATA':
+                    state.va_id = data.va_id || data.id;
+                    loadData();
+                    break;
+                case 'requery':
+                    loadData();
+                    break;
+                case 'set_filter':
+                    if (data.filter) {
+                        document.getElementById('filterStatus').value = data.filter;
+                        applyFilter();
+                    }
+                    break;
             }
         });
 
         async function loadData() {
-            if (!currentVA_ID) return;
+            if (!state.va_id) return;
 
             try {
-                const response = await fetch(`http://localhost:5000/api/einsatztage/${currentVA_ID}`);
+                // Verwende den korrekten API-Endpoint
+                const response = await fetch(`http://localhost:5000/api/einsatztage?va_id=${state.va_id}`);
                 if (!response.ok) throw new Error('API Fehler');
 
-                const data = await response.json();
-                renderDays(data);
+                const result = await response.json();
+                const data = result.data || result.tage || result || [];
+
+                // Daten normalisieren und im State speichern
+                state.allDays = Array.isArray(data) ? data : [];
+                console.log('[sub_VA_Einsatztage] Geladen:', state.allDays.length, 'Tage');
+
+                // Filter anwenden
+                applyFilter();
+
             } catch (error) {
-                console.log('[sub_VA_Einsatztage] Fehler:', error);
+                console.error('[sub_VA_Einsatztage] Fehler:', error);
+                state.allDays = [];
+                renderDays([]);
             }
         }
 
-        function renderDays(data) {
-            const container = document.getElementById('daysList');
-            const days = data.tage || data || [];
+        /**
+         * Filter anwenden (AfterUpdate-Event für Filter-Dropdown)
+         */
+        function applyFilter() {
+            const filterValue = document.getElementById('filterStatus').value;
+            state.filter = filterValue;
 
-            if (days.length === 0) {
-                container.innerHTML = '<div class="empty-state">Keine Einsatztage</div>';
+            console.log('[sub_VA_Einsatztage] Filter:', filterValue);
+
+            if (filterValue === 'alle') {
+                state.filteredDays = state.allDays;
+            } else {
+                state.filteredDays = state.allDays.filter(day => {
+                    const soll = day.MA_Anzahl || day.TVA_Soll || 0;
+                    const ist = day.MA_Anzahl_Ist || day.TVA_Ist || 0;
+
+                    switch (filterValue) {
+                        case 'offen':
+                            // Noch nicht vollständig besetzt
+                            return ist < soll;
+                        case 'voll':
+                            // Vollständig besetzt
+                            return ist >= soll && soll > 0;
+                        case 'teilweise':
+                            // Mindestens 1 aber nicht vollständig
+                            return ist > 0 && ist < soll;
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            renderDays(state.filteredDays);
+
+            // Parent über Filteränderung informieren
+            window.parent.postMessage({
+                type: 'FILTER_CHANGED',
+                filter: filterValue,
+                count: state.filteredDays.length,
+                total: state.allDays.length,
+                va_id: state.va_id
+            }, '*');
+        }
+
+        function renderDays(days) {
+            const container = document.getElementById('daysList');
+
+            if (!days || days.length === 0) {
+                container.innerHTML = '<div class="empty-state">Keine Einsatztage' +
+                    (state.filter !== 'alle' ? ' (Filter aktiv)' : '') + '</div>';
                 return;
             }
 
-            container.innerHTML = days.map(day => {
-                const d = new Date(day.VADatum || day.Datum);
+            container.innerHTML = days.map((day, index) => {
+                const dateValue = day.VADatum || day.Datum;
+                const datumId = day.ID || day.VADatum_ID;
+                const d = new Date(dateValue);
                 const weekday = WOCHENTAGE[d.getDay()];
                 const dateStr = d.toLocaleDateString('de-DE');
-                const isComplete = day.MA_Anzahl_Ist >= day.MA_Anzahl;
+                const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+
+                const soll = day.MA_Anzahl || day.TVA_Soll || 0;
+                const ist = day.MA_Anzahl_Ist || day.TVA_Ist || 0;
+
+                // Status-Klasse berechnen
+                let statusClass = '';
+                if (ist >= soll && soll > 0) {
+                    statusClass = 'complete';
+                } else if (ist > 0) {
+                    statusClass = 'partial';
+                } else if (soll > 0) {
+                    statusClass = 'incomplete';
+                }
+
+                const weekendClass = isWeekend ? ' weekend' : '';
 
                 return `
-                    <div class="day-item" data-date="${day.VADatum || day.Datum}" onclick="selectDay(this)">
+                    <div class="day-item${weekendClass}"
+                         data-date="${dateValue}"
+                         data-datum-id="${datumId}"
+                         data-index="${index}"
+                         onclick="selectDay(this)"
+                         ondblclick="openDayDetail(this)">
                         <div>
                             <span class="day-date">${dateStr}</span>
                             <span class="day-weekday">${weekday}</span>
                         </div>
-                        <span class="day-status ${isComplete ? '' : 'incomplete'}">
-                            ${day.MA_Anzahl_Ist || 0}/${day.MA_Anzahl || 0}
+                        <span class="day-status ${statusClass}">
+                            ${ist}/${soll}
                         </span>
                     </div>
                 `;
             }).join('');
 
-            // Select first day by default
-            const firstDay = container.querySelector('.day-item');
-            if (firstDay) selectDay(firstDay);
+            // Ersten Tag auswählen wenn keiner aktiv
+            if (!state.selectedDate && days.length > 0) {
+                const firstDay = container.querySelector('.day-item');
+                if (firstDay) selectDay(firstDay);
+            } else if (state.selectedDate) {
+                // Vorherige Auswahl wiederherstellen
+                const prevSelected = container.querySelector(`[data-date="${state.selectedDate}"]`);
+                if (prevSelected) {
+                    prevSelected.classList.add('active');
+                } else if (days.length > 0) {
+                    // Falls nicht mehr sichtbar: Ersten auswählen
+                    selectDay(container.querySelector('.day-item'));
+                }
+            }
         }
 
-        function selectDay(element) {
-            document.querySelectorAll('.day-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-            selectedDate = element.dataset.date;
+        function selectDay(element, isMultiSelect = false) {
+            // Bei Shift+Klick: Mehrfachselektion
+            if (event && event.shiftKey) {
+                element.classList.toggle('multi-selected');
+                const date = element.dataset.date;
+                if (element.classList.contains('multi-selected')) {
+                    if (!state.multiSelect.includes(date)) state.multiSelect.push(date);
+                } else {
+                    state.multiSelect = state.multiSelect.filter(d => d !== date);
+                }
+                return;
+            }
 
-            // Notify parent
+            // Normale Einzelselektion
+            document.querySelectorAll('.day-item').forEach(el => {
+                el.classList.remove('active');
+                el.classList.remove('multi-selected');
+            });
+            element.classList.add('active');
+
+            state.selectedDate = element.dataset.date;
+            state.selectedDatumId = element.dataset.datumId;
+            state.multiSelect = [];
+
+            // Parent benachrichtigen
             window.parent.postMessage({
                 type: 'DAY_SELECTED',
-                date: selectedDate,
-                va_id: currentVA_ID
+                date: state.selectedDate,
+                datum_id: state.selectedDatumId,
+                va_id: state.va_id
+            }, '*');
+        }
+
+        /**
+         * Doppelklick: Tag-Details öffnen (wie VBA DblClick)
+         */
+        function openDayDetail(element) {
+            const date = element.dataset.date;
+            const datumId = element.dataset.datumId;
+
+            window.parent.postMessage({
+                type: 'DAY_DBLCLICK',
+                date: date,
+                datum_id: datumId,
+                va_id: state.va_id
             }, '*');
         }
 
         function addDay() {
-            window.parent.postMessage({ type: 'ADD_DAY', va_id: currentVA_ID }, '*');
+            window.parent.postMessage({
+                type: 'ADD_DAY',
+                va_id: state.va_id
+            }, '*');
         }
 
         function removeDay() {
-            if (selectedDate) {
-                window.parent.postMessage({ type: 'REMOVE_DAY', va_id: currentVA_ID, date: selectedDate }, '*');
+            if (state.multiSelect.length > 0) {
+                // Mehrfachselektion löschen
+                window.parent.postMessage({
+                    type: 'REMOVE_DAYS',
+                    va_id: state.va_id,
+                    dates: state.multiSelect
+                }, '*');
+            } else if (state.selectedDate) {
+                // Einzelnen Tag löschen
+                window.parent.postMessage({
+                    type: 'REMOVE_DAY',
+                    va_id: state.va_id,
+                    date: state.selectedDate,
+                    datum_id: state.selectedDatumId
+                }, '*');
             }
+        }
+
+        /**
+         * Tag kopieren (neu) - entspricht VBA-Funktion "Tag kopieren"
+         */
+        function copyDay() {
+            if (!state.selectedDate) {
+                console.warn('[sub_VA_Einsatztage] Kein Tag ausgewählt');
+                return;
+            }
+
+            window.parent.postMessage({
+                type: 'COPY_DAY',
+                va_id: state.va_id,
+                date: state.selectedDate,
+                datum_id: state.selectedDatumId
+            }, '*');
+        }
+
+        // Expose für Parent-Zugriff
+        window.SubVAEinsatztage = {
+            loadData,
+            applyFilter,
+            selectDay,
+            getState: () => state
+        };
+
+        // Initial laden wenn va_id aus URL kommt
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('va_id')) {
+            state.va_id = parseInt(urlParams.get('va_id'));
+            loadData();
         }
     </script>
 </body>

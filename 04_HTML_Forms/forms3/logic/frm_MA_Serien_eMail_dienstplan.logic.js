@@ -685,7 +685,34 @@ async function Autosend(typ, va_id, vadatum_id) {
     }
 }
 
+/**
+ * btnSendEmail_Click - E-Mails senden (HTML onclick Handler)
+ * VBA: btnSendEmail_Click - Validierung + E-Mail-Versand
+ */
+async function btnSendEmail_Click() {
+    console.log('[MA_Serien_eMail_dienstplan] btnSendEmail_Click');
+
+    // Validierung (wie VBA)
+    const betreff = elements.betreff?.value || '';
+    const nachricht = elements.nachrichtText?.value || '';
+
+    if (!betreff.trim() || !nachricht.trim()) {
+        showError('Betreffzeile und E-Mail-Text müssen ausgefüllt sein');
+        return;
+    }
+
+    // Versenden delegieren an bestehende Funktion
+    await versendeEmails();
+}
+
+/**
+ * showVorschau - Vorschau anzeigen (HTML onclick Handler)
+ */
+// Bereits implementiert als showVorschau()
+
 // Globale Funktionen für onclick-Handler verfügbar machen
+window.btnSendEmail_Click = btnSendEmail_Click;
+window.showVorschau = showVorschau;
 window.openAuftrag = openAuftrag;
 window.openSchnellPlan = openSchnellPlan;
 window.openZuAbsage = openZuAbsage;
