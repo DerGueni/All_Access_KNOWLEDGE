@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstausweis erstellen</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <style>
+        /* Badge Creation Specific Styles */
+        .badge-container {
+            display: flex;
+            flex: 1;
+            gap: 12px;
+            padding: 12px;
+            overflow: hidden;
+        }
+
+        .list-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            overflow: hidden;
+        }
+
+        .list-header {
+            padding: 8px 10px;
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border-bottom: 1px solid #ccc;
+            font-weight: 600;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .list-box {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #999;
+            background: white;
+            font-size: 11px;
+            overflow-y: auto;
+        }
+
+        .list-box option {
+            padding: 3px 6px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .transfer-buttons {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 6px;
+        }
+
+        .transfer-buttons .btn {
+            min-width: 80px;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .right-panel {
+            width: 320px;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .settings-panel {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            padding: 12px;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .settings-row label {
+            min-width: 110px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .settings-row input,
+        .settings-row select {
+            flex: 1;
+            padding: 4px 8px;
+            border: 1px solid #999;
+            font-size: 11px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .button-grid .btn {
+            padding: 8px 10px;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #4316B2;
+        }
+
+        /* Grüne Ausweis-Buttons (Management/Security) */
+        #btn_ausweiseinsatzleitung,
+        #btn_ausweisBereichsleiter,
+        #btn_ausweissec {
+            background: linear-gradient(180deg, #DAF3DB 0%, #C8E7C9 100%);
+            border-color: #B8E6B9;
+            color: #2d5016;
+        }
+
+        #btn_ausweiseinsatzleitung:hover,
+        #btn_ausweisBereichsleiter:hover,
+        #btn_ausweissec:hover {
+            background: linear-gradient(180deg, #C8E7C9 0%, #B8E6B9 100%);
+        }
+
+        /* Gelbe Ausweis-Buttons (Service/Staff) */
+        #btn_ausweisservice,
+        #btn_ausweisplatzanweiser,
+        #btn_ausweisstaff {
+            background: linear-gradient(180deg, #F0F1D1 0%, #E3E4B8 100%);
+            border-color: #DFE0B8;
+            color: #5c5400;
+        }
+
+        #btn_ausweisservice:hover,
+        #btn_ausweisplatzanweiser:hover,
+        #btn_ausweisstaff:hover {
+            background: linear-gradient(180deg, #E3E4B8 0%, #D6D7A0 100%);
+        }
+
+        .btn-card {
+            background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+            border-color: #2980b9;
+            color: white;
+        }
+
+        .btn-card:hover {
+            background: linear-gradient(180deg, #2980b9 0%, #1f6aa5 100%);
+        }
+
+        .count-info {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Versteckte Transfer-Buttons (wie im Access-Original) */
+        #btnAddAll,
+        #btnDelAll,
+        #btnDeselect {
+            display: none;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+            overflow: visible;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:active::before {
+            background: #404070;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn:active::after {
+            background: #ffffff;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.active::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Menu -->
+
+        <!-- Main Area -->
+        <div class="app-main">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Dienstausweis erstellen</h1>
+                </div>
+                <div class="header-center">
+                    <button class="btn btn-primary" onclick="location.reload()">Aktualisieren</button>
+                </div>
+                <div class="header-right">
+                    <div class="version-info">CONSYS Web | GPT TEST</div>
+                    <div class="version-info" id="headerDate"></div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="app-content">
+                <div class="badge-container">
+                    <!-- Left: All Employees -->
+                    <div class="list-panel">
+                        <div class="list-header">
+                            <span>Alle Mitarbeiter</span>
+                            <span class="count-info" id="countAll">0</span>
+                        </div>
+                        <div class="list-content">
+                            <select class="list-box" id="lstMA_Alle" multiple size="20"></select>
+                        </div>
+                    </div>
+
+                    <!-- Transfer Buttons -->
+                    <div class="transfer-buttons">
+                        <button class="btn tiny-btn" id="btnAddSelected" title="Ausgewählte hinzufügen">&gt;</button>
+                        <button class="btn" id="btnAddAll" title="Alle hinzufügen">&gt;&gt;</button>
+                        <button class="btn tiny-btn" id="btnDelSelected" title="Ausgewählte entfernen">&lt;</button>
+                        <button class="btn" id="btnDelAll" title="Alle entfernen">&lt;&lt;</button>
+                        <button class="btn tiny-btn" id="btnDeselect" title="Auswahl aufheben">âœ•</button>
+                    </div>
+
+                    <!-- Right: Selected Employees -->
+                    <div class="list-panel">
+                        <div class="list-header">
+                            <span>Für Ausweiserstellung</span>
+                            <span class="count-info" id="countSelected">0</span>
+                        </div>
+                        <div class="list-content">
+                            <select class="list-box" id="lstMA_Ausweis" multiple size="20"></select>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Settings & Buttons -->
+                    <div class="right-panel">
+                        <!-- Settings -->
+                        <div class="settings-panel">
+                            <div class="section-title">Einstellungen</div>
+                            <div class="settings-row">
+                                <label>Gültig bis:</label>
+                                <input type="date" id="GueltBis" class="form-control">
+                            </div>
+                            <div class="settings-row">
+                                <label>Kartendrucker:</label>
+                                <select id="cbo_Kartendrucker" class="form-control">
+                                    <option value="">--- Drucker wählen ---</option>
+                                    <option value="CardPrinter1">Kartendrucker 1</option>
+                                    <option value="CardPrinter2">Kartendrucker 2</option>
+                                    <option value="DefaultPrinter">Standard-Drucker</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Badge Print Buttons -->
+                        <div class="button-grid">
+                            <div class="section-title" style="grid-column: 1 / -1;">Ausweis drucken</div>
+                            <button class="btn btn-badge" id="btn_ausweiseinsatzleitung">Einsatzleitung</button>
+                            <button class="btn btn-badge" id="btn_ausweisBereichsleiter">Bereichsleiter</button>
+                            <button class="btn btn-badge" id="btn_ausweissec">Security</button>
+                            <button class="btn btn-badge" id="btn_ausweisservice">Service</button>
+                            <button class="btn btn-badge" id="btn_ausweisplatzanweiser">Platzanweiser</button>
+                            <button class="btn btn-badge" id="btn_ausweisstaff">Staff</button>
+                        </div>
+
+                        <!-- Card Print Buttons -->
+                        <div class="button-grid">
+                            <div class="section-title" style="grid-column: 1 / -1;">Karte drucken</div>
+                            <button class="btn btn-card" id="btn_Karte_Sicherheit">Sicherheit</button>
+                            <button class="btn btn-card" id="btn_Karte_Service">Service</button>
+                            <button class="btn btn-card" id="btn_Karte_Rück">Rückseite</button>
+                            <button class="btn btn-card" id="btn_Sonder">Sonder</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <div class="footer-left">
+                    <span>Bereit</span>
+                </div>
+                <div class="footer-center">
+                    <span id="statusMessage">Ausgewählte MA: 0</span>
+                </div>
+                <div class="footer-right">
+                    <span id="footerDate"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/webview2-bridge.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="logic/frm_Ausweis_Create.logic.js"></script>
+</body>
+</html>
+
+

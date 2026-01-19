@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Master V05 - Dashboard + Quick Actions - CONSYS</title>
+    <style>
+        /* ==========================================================
+           CSS RESET & BASE
+           ========================================================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 14px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            line-height: 1.4;
+        }
+
+        :root {
+            --primary: #4a90d9;
+            --primary-dark: #3a7bc8;
+            --accent: #e63946;
+            --accent-light: #f4a261;
+            --success: #2a9d8f;
+            --warning: #f0ad4e;
+            --bg-card: rgba(27, 38, 59, 0.95);
+            --bg-input: rgba(45, 58, 74, 0.9);
+            --text-primary: #e0e1dd;
+            --text-secondary: #778da9;
+            --border-color: #415a77;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --radius: 12px;
+            --transition: 0.25s ease;
+        }
+
+        /* ==========================================================
+           HEADER
+           ========================================================== */
+        .header {
+            background: linear-gradient(90deg, #0d1b2a 0%, #1b263b 100%);
+            padding: 16px 24px;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .header-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title .badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .btn-close-header {
+            background: linear-gradient(145deg, #c1121f, #780000);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+
+        .btn-close-header:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(230, 57, 70, 0.5);
+        }
+
+        /* ==========================================================
+           SEARCH BOX
+           ========================================================== */
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: all var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .search-clear.visible {
+            opacity: 1;
+        }
+
+        .search-clear:hover {
+            color: var(--accent);
+        }
+
+        /* ==========================================================
+           MAIN CONTAINER
+           ========================================================== */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ==========================================================
+           SECTION HEADER
+           ========================================================== */
+        .section-header {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+            padding-left: 4px;
+        }
+
+        /* ==========================================================
+           QUICK ACTIONS - TOP 10 TILES
+           ========================================================== */
+        .quick-actions {
+            margin-bottom: 32px;
+        }
+
+        .tiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .tile {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px 16px;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+            min-height: 110px;
+        }
+
+        .tile:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .tile:active {
+            transform: translateY(-2px);
+        }
+
+        .tile.highlight {
+            border-color: var(--accent);
+            background: linear-gradient(145deg, rgba(230, 57, 70, 0.15), var(--bg-card));
+        }
+
+        .tile.highlight:hover {
+            border-color: var(--accent-light);
+            box-shadow: 0 8px 25px rgba(230, 57, 70, 0.3);
+        }
+
+        .tile-icon {
+            font-size: 2rem;
+            opacity: 0.9;
+        }
+
+        .tile-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .tile.hidden {
+            display: none;
+        }
+
+        /* ==========================================================
+           ACCORDION CATEGORIES
+           ========================================================== */
+        .accordion-section {
+            margin-bottom: 12px;
+        }
+
+        .accordion-header {
+            background: linear-gradient(90deg, var(--bg-card), rgba(65, 90, 119, 0.3));
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 14px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition);
+        }
+
+        .accordion-header:hover {
+            background: linear-gradient(90deg, rgba(65, 90, 119, 0.5), rgba(65, 90, 119, 0.2));
+            border-color: var(--text-secondary);
+        }
+
+        .accordion-header.active {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-color: transparent;
+        }
+
+        .accordion-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .accordion-title .cat-icon {
+            font-size: 1.2rem;
+        }
+
+        .accordion-count {
+            background: var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+
+        .accordion-arrow {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            transition: transform var(--transition);
+        }
+
+        .accordion-header.active .accordion-arrow {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            background: rgba(13, 27, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 var(--radius) var(--radius);
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+        }
+
+        .accordion-content.open {
+            padding: 12px;
+            max-height: 500px;
+        }
+
+        .accordion-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .accordion-section.hidden {
+            display: none;
+        }
+
+        /* ==========================================================
+           ACCORDION MENU BUTTONS
+           ========================================================== */
+        .menu-btn {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-align: left;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-btn:hover {
+            background: rgba(65, 90, 119, 0.5);
+            border-color: var(--text-secondary);
+            transform: translateX(4px);
+        }
+
+        .menu-btn:active {
+            transform: translateX(2px);
+        }
+
+        .menu-btn .btn-icon {
+            font-size: 1.1rem;
+            min-width: 24px;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        .menu-btn.hidden {
+            display: none;
+        }
+
+        /* ==========================================================
+           NO RESULTS MESSAGE
+           ========================================================== */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .no-results.visible {
+            display: block;
+        }
+
+        .no-results-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .no-results-text {
+            font-size: 1.1rem;
+        }
+
+        /* ==========================================================
+           TOAST NOTIFICATION
+           ========================================================== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 14px 28px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            z-index: 10001;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.success {
+            border-color: var(--success);
+            background: linear-gradient(145deg, rgba(42, 157, 143, 0.2), var(--bg-card));
+        }
+
+        .toast.error {
+            border-color: var(--accent);
+            background: linear-gradient(145deg, rgba(230, 57, 70, 0.2), var(--bg-card));
+        }
+
+        .toast.info {
+            border-color: var(--primary);
+            background: linear-gradient(145deg, rgba(74, 144, 217, 0.2), var(--bg-card));
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ==========================================================
+           RESPONSIVE DESIGN
+           ========================================================== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 16px;
+            }
+
+            .header-title {
+                font-size: 1.1rem;
+            }
+
+            .main-container {
+                padding: 16px;
+            }
+
+            .tiles-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .tile {
+                padding: 16px 12px;
+                min-height: 100px;
+            }
+
+            .tile-icon {
+                font-size: 1.6rem;
+            }
+
+            .tile-label {
+                font-size: 0.8rem;
+            }
+
+            .accordion-header {
+                padding: 12px 16px;
+            }
+
+            .menu-btn {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .tiles-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        /* ==========================================================
+           ANIMATIONS
+           ========================================================== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tile {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .tile:nth-child(1) { animation-delay: 0.05s; }
+        .tile:nth-child(2) { animation-delay: 0.1s; }
+        .tile:nth-child(3) { animation-delay: 0.15s; }
+        .tile:nth-child(4) { animation-delay: 0.2s; }
+        .tile:nth-child(5) { animation-delay: 0.25s; }
+        .tile:nth-child(6) { animation-delay: 0.3s; }
+        .tile:nth-child(7) { animation-delay: 0.35s; }
+        .tile:nth-child(8) { animation-delay: 0.4s; }
+        .tile:nth-child(9) { animation-delay: 0.45s; }
+        .tile:nth-child(10) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <!-- HEADER mit Suche -->
+    <header class="header">
+        <div class="header-top">
+            <div class="header-title">
+                CONSYS Menu
+                <span class="badge">V05</span>
+            </div>
+            <button class="btn-close-header" data-testid="menu-v05-close" onclick="closeForm()" title="Menu schliessen">X</button>
+        </div>
+        <div class="search-container">
+            <span class="search-icon">&#128269;</span>
+            <input type="text"
+                   class="search-input"
+                   id="searchInput"
+                   placeholder="Suchen... (z.B. Dienstplan, Mitarbeiter, Stunden)"
+                   autocomplete="off"
+                   data-testid="menu-v05-search">
+            <button class="search-clear" id="searchClear" onclick="clearSearch()">&#10006;</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-container">
+
+        <!-- QUICK ACTIONS - Top 10 Tiles -->
+        <section class="quick-actions" id="quickActions">
+            <div class="section-header">Quick Actions</div>
+            <div class="tiles-grid" id="tilesGrid">
+                <!-- 1. Dienstplan -->
+                <div class="tile highlight"
+                     data-testid="menu-v05-dienstplan"
+                     data-search="dienstplan uebersicht planung schichten"
+                     onclick="navigateTo('frm_N_Dienstplanuebersicht')">
+                    <span class="tile-icon">&#128197;</span>
+                    <span class="tile-label">Dienstplan</span>
+                </div>
+                <!-- 2. Planung -->
+                <div class="tile highlight"
+                     data-testid="menu-v05-planung"
+                     data-search="planung planungsuebersicht disposition"
+                     onclick="navigateTo('frm_VA_Planungsuebersicht')">
+                    <span class="tile-icon">&#128202;</span>
+                    <span class="tile-label">Planung</span>
+                </div>
+                <!-- 3. Auftraege -->
+                <div class="tile"
+                     data-testid="menu-v05-auftraege"
+                     data-search="auftraege auftragstamm auftragsverwaltung veranstaltungen"
+                     onclick="navigateTo('frm_va_Auftragstamm')">
+                    <span class="tile-icon">&#128203;</span>
+                    <span class="tile-label">Auftraege</span>
+                </div>
+                <!-- 4. Mitarbeiter -->
+                <div class="tile"
+                     data-testid="menu-v05-mitarbeiter"
+                     data-search="mitarbeiter mitarbeiterstamm personal ma"
+                     onclick="navigateTo('frm_MA_Mitarbeiterstamm')">
+                    <span class="tile-icon">&#128100;</span>
+                    <span class="tile-label">Mitarbeiter</span>
+                </div>
+                <!-- 5. Kunden -->
+                <div class="tile"
+                     data-testid="menu-v05-kunden"
+                     data-search="kunden kundenstamm auftraggeber"
+                     onclick="navigateTo('frm_KD_Kundenstamm')">
+                    <span class="tile-icon">&#128101;</span>
+                    <span class="tile-label">Kunden</span>
+                </div>
+                <!-- 6. Objekte -->
+                <div class="tile"
+                     data-testid="menu-v05-objekte"
+                     data-search="objekte objektverwaltung standorte location"
+                     onclick="navigateTo('frm_OB_Objekt')">
+                    <span class="tile-icon">&#127970;</span>
+                    <span class="tile-label">Objekte</span>
+                </div>
+                <!-- 7. Zeitkonten -->
+                <div class="tile"
+                     data-testid="menu-v05-zeitkonten"
+                     data-search="zeitkonten arbeitszeit stunden konto"
+                     onclick="navigateTo('frm_MA_Zeitkonten')">
+                    <span class="tile-icon">&#9201;</span>
+                    <span class="tile-label">Zeitkonten</span>
+                </div>
+                <!-- 8. Schnellauswahl -->
+                <div class="tile"
+                     data-testid="menu-v05-schnellauswahl"
+                     data-search="schnellauswahl mail anfragen zuordnung"
+                     onclick="navigateTo('frm_MA_VA_Schnellauswahl')">
+                    <span class="tile-icon">&#9889;</span>
+                    <span class="tile-label">Schnellauswahl</span>
+                </div>
+                <!-- 9. Stunden -->
+                <div class="tile"
+                     data-testid="menu-v05-stunden"
+                     data-search="stunden stundenauswertung arbeitszeit auswertung"
+                     onclick="navigateTo('frm_N_Stundenauswertung')">
+                    <span class="tile-icon">&#128337;</span>
+                    <span class="tile-label">Stunden</span>
+                </div>
+                <!-- 10. Email -->
+                <div class="tile"
+                     data-testid="menu-v05-email"
+                     data-search="email mail nachricht senden"
+                     onclick="navigateTo('frm_N_Email_versenden')">
+                    <span class="tile-icon">&#9993;</span>
+                    <span class="tile-label">Email</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- AKKORDEON KATEGORIEN -->
+        <section class="accordion-categories" id="accordionCategories">
+
+            <!-- Personal -->
+            <div class="accordion-section" data-category="personal" data-search="personal abwesenheit lohn ausweis">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="cat-icon">&#128101;</span>
+                        Personal
+                        <span class="accordion-count">3</span>
+                    </div>
+                    <span class="accordion-arrow">&#9660;</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-buttons">
+                        <button class="menu-btn"
+                                data-testid="menu-v05-abwesenheiten"
+                                data-search="abwesenheiten urlaub krank fehlzeiten"
+                                onclick="navigateTo('frm_Abwesenheiten')">
+                            <span class="btn-icon">&#128197;</span>
+                            Abwesenheiten
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-lohnabrechnungen"
+                                data-search="lohnabrechnungen gehalt lohn abrechnung"
+                                onclick="navigateTo('frm_N_Lohnabrechnungen')">
+                            <span class="btn-icon">&#128176;</span>
+                            Lohnabrechnungen
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-dienstausweis"
+                                data-search="dienstausweis ausweis karte drucken"
+                                onclick="navigateTo('frm_Ausweis_Create')">
+                            <span class="btn-icon">&#127380;</span>
+                            Dienstausweis
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automatisierung -->
+            <div class="accordion-section" data-category="automatisierung" data-search="automatisierung sync import zuordnung">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="cat-icon">&#129302;</span>
+                        Automatisierung
+                        <span class="accordion-count">7</span>
+                    </div>
+                    <span class="accordion-arrow">&#9660;</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-buttons">
+                        <button class="menu-btn"
+                                data-testid="menu-v05-auto-minijobber"
+                                data-search="auto zuordnung minijobber sport"
+                                onclick="btnAutoZuordnungSport_Click()">
+                            <span class="btn-icon">&#129302;</span>
+                            Auto-Zuordnung Minijobber
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-festangestellte"
+                                data-search="festangestellte zuordnen automatisch"
+                                onclick="btn_FA_eintragen_Click()">
+                            <span class="btn-icon">&#128101;</span>
+                            Festangestellte zuordnen
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-loewensaal-excel"
+                                data-search="loewensaal sync excel import"
+                                onclick="btn_LoewensaalSync_Click()">
+                            <span class="btn-icon">&#128259;</span>
+                            Loewensaal Sync (Excel)
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-loewensaal-hp"
+                                data-search="loewensaal homepage web sync"
+                                onclick="btn_Loewensaal_Sync_HP_Click()">
+                            <span class="btn-icon">&#127760;</span>
+                            Loewensaal Sync (Homepage)
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-bos-import"
+                                data-search="bos mail import email"
+                                onclick="btn_BOS_Click()">
+                            <span class="btn-icon">&#128229;</span>
+                            BOS Mail-Import
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-hirsch-import"
+                                data-search="hirsch import daten"
+                                onclick="btn_Hirsch_Click()">
+                            <span class="btn-icon">&#128229;</span>
+                            Hirsch Import
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-stawa-email"
+                                data-search="stawa email auftrag zuordnen"
+                                onclick="btn_Stawa_Click()">
+                            <span class="btn-icon">&#128231;</span>
+                            E-Mail zu Auftrag
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports -->
+            <div class="accordion-section" data-category="reports" data-search="reports berichte auswertung drucken">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="cat-icon">&#128202;</span>
+                        Reports
+                        <span class="accordion-count">6</span>
+                    </div>
+                    <span class="accordion-arrow">&#9660;</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-buttons">
+                        <button class="menu-btn"
+                                data-testid="menu-v05-telefonliste"
+                                data-search="telefonliste telefon liste drucken"
+                                onclick="openReport('rpt_telefonliste')">
+                            <span class="btn-icon">&#128222;</span>
+                            Telefonliste
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-monatsstunden"
+                                data-search="monatsstunden stunden monat bericht"
+                                onclick="openReport('rpt_monatsstunden')">
+                            <span class="btn-icon">&#128200;</span>
+                            Monatsstunden
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-jahresuebersicht"
+                                data-search="jahresuebersicht jahr uebersicht mitarbeiter"
+                                onclick="openReport('rpt_jahresuebersicht_mitarbeiter')">
+                            <span class="btn-icon">&#128197;</span>
+                            Jahresuebersicht MA
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-rueckmeldungen"
+                                data-search="rueckmeldungen feedback status"
+                                onclick="navigateTo('frm_Rueckmeldungen')">
+                            <span class="btn-icon">&#128172;</span>
+                            Rueckmeldungen
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-stunden-kreuztab"
+                                data-search="stunden kreuztabelle pivot auswertung"
+                                onclick="btnStundenMA_Click()">
+                            <span class="btn-icon">&#128202;</span>
+                            Stunden MA Kreuztabelle
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-letzter-einsatz"
+                                data-search="letzter einsatz mitarbeiter inaktiv"
+                                onclick="btnLetzterEinsatz_Click()">
+                            <span class="btn-icon">&#128269;</span>
+                            Letzter Einsatz MA
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools -->
+            <div class="accordion-section" data-category="tools" data-search="tools werkzeuge export rechnung">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="cat-icon">&#128295;</span>
+                        Tools
+                        <span class="accordion-count">5</span>
+                    </div>
+                    <span class="accordion-arrow">&#9660;</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-buttons">
+                        <button class="menu-btn"
+                                data-testid="menu-v05-verrechnungssaetze"
+                                data-search="verrechnungssaetze preise tarife"
+                                onclick="navigateTo('frm_KD_Verrechnungssaetze')">
+                            <span class="btn-icon">&#128176;</span>
+                            Verrechnungssaetze
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-sub-rechnungen"
+                                data-search="sub rechnungen subunternehmer export"
+                                onclick="btn_stunden_sub_Click()">
+                            <span class="btn-icon">&#128196;</span>
+                            Stunden Sub Export
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-ma-stamm-excel"
+                                data-search="mitarbeiterstamm excel export liste"
+                                onclick="exportMAStamm()">
+                            <span class="btn-icon">&#128196;</span>
+                            Mitarbeiterstamm Excel
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-lohnarten"
+                                data-search="lohnarten zuschlaege kategorien"
+                                onclick="navigateTo('zfrm_ZK_Lohnarten_Zuschlag')">
+                            <span class="btn-icon">&#128178;</span>
+                            Lohnarten / Zuschlaege
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-email-vorlagen"
+                                data-search="email vorlagen templates mail"
+                                onclick="navigateTo('frm_ma_serien_email_vorlage')">
+                            <span class="btn-icon">&#128196;</span>
+                            E-Mail Vorlagen
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System -->
+            <div class="accordion-section" data-category="system" data-search="system einstellungen info datenbank">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span class="cat-icon">&#9881;</span>
+                        System
+                        <span class="accordion-count">4</span>
+                    </div>
+                    <span class="accordion-arrow">&#9660;</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-buttons">
+                        <button class="menu-btn"
+                                data-testid="menu-v05-systeminfo"
+                                data-search="system info version status"
+                                onclick="navigateTo('frm_Systeminfo')">
+                            <span class="btn-icon">&#9881;</span>
+                            System Info
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-db-wechseln"
+                                data-search="datenbank wechseln backend umschalten"
+                                onclick="navigateTo('frm_DBWechseln')">
+                            <span class="btn-icon">&#128451;</span>
+                            Datenbank wechseln
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-auswahl-master"
+                                data-search="auswahl master konfiguration"
+                                onclick="navigateTo('frm_N_AuswahlMaster')">
+                            <span class="btn-icon">&#128736;</span>
+                            Auswahl-Master
+                        </button>
+                        <button class="menu-btn"
+                                data-testid="menu-v05-weitere-masken"
+                                data-search="weitere masken formulare mehr"
+                                onclick="btn_weitere_Masken_Click()">
+                            <span class="btn-icon">&#128193;</span>
+                            Weitere Masken
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- No Results Message -->
+        <div class="no-results" id="noResults">
+            <div class="no-results-icon">&#128269;</div>
+            <div class="no-results-text">Keine Treffer gefunden</div>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- WebView2 Bridge -->
+    <script src="../js/webview2-bridge.js"></script>
+    <!-- Global Handlers -->
+    <script src="../js/global-handlers.js"></script>
+
+    <script>
+        // ============================================
+        // SEARCH FILTER
+        // ============================================
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const tilesGrid = document.getElementById('tilesGrid');
+        const accordionCategories = document.getElementById('accordionCategories');
+        const noResults = document.getElementById('noResults');
+
+        let searchTimeout = null;
+
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value.trim().toLowerCase();
+
+            // Clear button visibility
+            searchClear.classList.toggle('visible', query.length > 0);
+
+            // Debounce search
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => filterAll(query), 150);
+        });
+
+        function clearSearch() {
+            searchInput.value = '';
+            searchClear.classList.remove('visible');
+            filterAll('');
+            searchInput.focus();
+        }
+
+        function filterAll(query) {
+            let visibleCount = 0;
+
+            // Filter Tiles
+            const tiles = tilesGrid.querySelectorAll('.tile');
+            tiles.forEach(tile => {
+                const searchText = tile.getAttribute('data-search') || '';
+                const label = tile.querySelector('.tile-label').textContent.toLowerCase();
+                const match = query === '' || searchText.includes(query) || label.includes(query);
+                tile.classList.toggle('hidden', !match);
+                if (match) visibleCount++;
+            });
+
+            // Filter Accordion Sections
+            const sections = accordionCategories.querySelectorAll('.accordion-section');
+            sections.forEach(section => {
+                const sectionSearch = section.getAttribute('data-search') || '';
+                const buttons = section.querySelectorAll('.menu-btn');
+                let sectionHasMatch = false;
+
+                buttons.forEach(btn => {
+                    const btnSearch = btn.getAttribute('data-search') || '';
+                    const btnLabel = btn.textContent.toLowerCase();
+                    const match = query === '' || btnSearch.includes(query) || btnLabel.includes(query);
+                    btn.classList.toggle('hidden', !match);
+                    if (match) {
+                        sectionHasMatch = true;
+                        visibleCount++;
+                    }
+                });
+
+                // Show section if it has matches or section title matches
+                const titleMatch = sectionSearch.includes(query);
+                section.classList.toggle('hidden', !sectionHasMatch && !titleMatch && query !== '');
+
+                // Auto-expand sections with matches when searching
+                if (query !== '' && sectionHasMatch) {
+                    const header = section.querySelector('.accordion-header');
+                    const content = section.querySelector('.accordion-content');
+                    header.classList.add('active');
+                    content.classList.add('open');
+                }
+            });
+
+            // Show/hide no results message
+            noResults.classList.toggle('visible', visibleCount === 0 && query !== '');
+        }
+
+        // ============================================
+        // ACCORDION TOGGLE
+        // ============================================
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            const isOpen = content.classList.contains('open');
+
+            // Close all other accordions (optional - remove for multi-open)
+            // document.querySelectorAll('.accordion-content.open').forEach(c => {
+            //     c.classList.remove('open');
+            //     c.previousElementSibling.classList.remove('active');
+            // });
+
+            // Toggle current
+            header.classList.toggle('active', !isOpen);
+            content.classList.toggle('open', !isOpen);
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function navigateTo(formName) {
+            try {
+                // An Shell/Parent mitteilen
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'NAVIGATE',
+                        formName: formName
+                    }, '*');
+                    console.log('[MenuV05] NAVIGATE gesendet:', formName);
+                }
+
+                // WebView2 Bridge falls verfuegbar
+                if (window.Bridge) {
+                    Bridge.navigate(formName);
+                }
+
+                showToast('Oeffne ' + formName + '...', 'success');
+
+                // Popup schliessen nach kurzer Verzoegerung
+                setTimeout(closeMenu, 300);
+            } catch (error) {
+                console.error('Navigation-Fehler:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================
+        // CLOSE MENU
+        // ============================================
+        function closeMenu() {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'CLOSE_MENU' }, '*');
+                console.log('[MenuV05] CLOSE_MENU gesendet');
+            }
+        }
+
+        function closeForm() {
+            closeMenu();
+        }
+
+        // ============================================
+        // REPORT & EXPORT FUNCTIONS
+        // ============================================
+        function openReport(reportName, view) {
+            view = view || 'acViewPreview';
+            try {
+                if (window.Bridge) {
+                    Bridge.sendEvent('openReport', { report: reportName, view: view });
+                    showToast('Report wird geoeffnet...', 'success');
+                } else {
+                    showToast('Report ' + reportName + ' - nur in Access verfuegbar', 'info');
+                }
+            } catch (error) {
+                console.error('Report-Fehler:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            }
+        }
+
+        function exportMAStamm() {
+            var datum = new Date().toISOString().split('T')[0];
+            var dateiname = 'Mitarbeiterstamm_' + datum + '.xlsx';
+
+            try {
+                if (window.Bridge) {
+                    Bridge.sendEvent('export', { type: 'MAStamm', dateiname: dateiname });
+                    showToast('Export wird erstellt...', 'success');
+                } else {
+                    showToast('Export nur in Access verfuegbar', 'info');
+                }
+            } catch (error) {
+                console.error('Export-Fehler:', error);
+                showToast('Export-Funktion nur in Access verfuegbar', 'error');
+            }
+        }
+
+        // ============================================
+        // VBA BUTTON EVENTS
+        // ============================================
+        function btnStundenMA_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openQuery', { query: 'zqry_MA_VA_Stunden_Plan_Ist_aktJahr_Kreuztabelle' });
+                showToast('Kreuztabelle wird geoeffnet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_stunden_sub_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('exportToExcel', {
+                    query: 'zqry_MA_VA_ZUO_PLAN_SUB',
+                    filename: 'Stunden_Sub_' + new Date().toISOString().split('T')[0] + '.xlsx'
+                });
+                showToast('Export wird erstellt...', 'success');
+            } else {
+                showToast('Export nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_LoewensaalSync_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'RunLoewensaalSync_WithWebScan' });
+                showToast('Synchronisation gestartet...', 'success');
+            } else {
+                showToast('Sync nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_Loewensaal_Sync_HP_Click() {
+            if (!confirm('Loewensaal-Events von der Homepage synchronisieren?\n\nDies kann einige Sekunden dauern.')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'mod_N_Loewensaal_HP.SyncLoewensaalEventsFromHomepage' });
+                showToast('Homepage-Synchronisation gestartet...', 'success');
+            } else {
+                showToast('Sync nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btnAutoZuordnungSport_Click() {
+            if (!confirm('Minijobber fuer Auftragsanfragen vorbereiten?')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Auto_MA_Zuordnung_Sport_Venues' });
+                showToast('Auto-Zuordnung gestartet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_FA_eintragen_Click() {
+            if (!confirm('Festangestellte Mitarbeiter automatisch zuordnen?')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Auto_Festangestellte_Zuordnen' });
+                showToast('Auto-Zuordnung Festangestellte...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_Stawa_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Email_Zu_Auftrag' });
+                showToast('E-Mail zu Auftrag...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_Hirsch_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'HirschImport_Starten' });
+                showToast('Hirsch Import gestartet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_BOS_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'MailToAuftrag_FromMailText' });
+                showToast('BOS Mail-Import...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_weitere_Masken_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openForm', { form: '__frmHlpMenu_Weitere_Masken' });
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+        }
+
+        function btnLetzterEinsatz_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openQuery', { query: 'qry_MA_letzter _Einsatz_Gueni' });
+                showToast('Abfrage wird geoeffnet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        // ============================================
+        // TOAST NOTIFICATION
+        // ============================================
+        function showToast(message, type) {
+            type = type || 'info';
+            var toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', function(e) {
+            // Escape: Close menu
+            if (e.key === 'Escape') {
+                if (searchInput.value) {
+                    clearSearch();
+                } else {
+                    closeForm();
+                }
+            }
+            // Focus search on Ctrl+F or /
+            if ((e.ctrlKey && e.key === 'f') || (e.key === '/' && document.activeElement !== searchInput)) {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[MenuV05] Dashboard + Quick Actions Menu initialisiert');
+            console.log('[MenuV05] 10 Quick Actions, 5 Kategorien mit 25+ Buttons');
+            console.log('[MenuV05] Tastaturkuerzel: ESC schliessen, Ctrl+F oder / suchen');
+
+            // Focus search input
+            searchInput.focus();
+
+            // Bridge Event Handler
+            if (window.Bridge) {
+                Bridge.on('onDataReceived', function(data) {
+                    console.log('[MenuV05] Daten empfangen:', data);
+                });
+            }
+        });
+    </script>
+
+    <!-- Shell-Detector -->
+    <script src="../js/shell-detector.js"></script>
+</body>
+</html>

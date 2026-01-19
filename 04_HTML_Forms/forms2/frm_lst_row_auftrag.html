@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsliste (frm_lst_row_auftrag)</title>
+    <style>
+        /* CSS Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 11px; }
+        body { background-color: #8080c0; }
+
+        /* Window Frame */
+        .window-frame {
+            background-color: #8080c0;
+            padding: 4px;
+            margin: 4px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            height: 18px;
+            border: 1px solid #000080;
+        }
+
+        /* Main Container */
+        .main-container {
+            background-color: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 4px;
+        }
+
+        /* Datasheet Container */
+        .datasheet-container {
+            background: white;
+            border: 1px solid #808080;
+            overflow: auto;
+        }
+
+        /* Table Styles */
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .datasheet thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .datasheet th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 3px 6px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10px;
+            color: #000;
+            border-color: #ffffff #808080 #808080 #ffffff;
+        }
+
+        .datasheet td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 6px;
+            font-size: 10px;
+            background: white;
+        }
+
+        .datasheet tr:hover {
+            background: #e0e0ff;
+        }
+
+        .datasheet tr.selected {
+            background: #000080;
+            color: white;
+        }
+
+        /* Column widths */
+        .col-id { width: 60px; }
+        .col-datum { width: 90px; }
+        .col-auftrag { width: 200px; }
+        .col-objekt { width: 180px; }
+        .col-ort { width: 150px; }
+        .col-soll { width: 50px; text-align: center; }
+        .col-ist { width: 50px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <div class="title-bar">Auftragsliste</div>
+        <div class="main-container">
+            <div class="datasheet-container" id="frm_lst_row_auftrag">
+                <table class="datasheet" id="tbl_Aufträge">
+                    <thead>
+                        <tr>
+                            <th class="col-id">ID</th>
+                            <th class="col-datum">Datum</th>
+                            <th class="col-auftrag">Auftrag</th>
+                            <th class="col-objekt">Objekt</th>
+                            <th class="col-ort">Ort</th>
+                            <th class="col-soll">Soll</th>
+                            <th class="col-ist">Ist</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody_Aufträge">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="logic/frm_lst_row_auftrag.logic.js"></script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MA-Auftrag Zuordnung - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        body {
+            background: #e8e8e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dialog-container {
+            background: white;
+            border: 1px solid #999;
+            border-radius: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            width: 750px;
+            max-width: 95vw;
+        }
+
+        .dialog-header {
+            padding: 12px 16px;
+            background: #4316B2;
+            color: white;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dialog-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .dialog-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .dialog-toolbar {
+            padding: 10px 16px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .toolbar-label {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .dialog-content {
+            display: flex;
+            height: 400px;
+        }
+
+        /* Schicht Info Links */
+        .schicht-info {
+            width: 250px;
+            border-right: 1px solid #ddd;
+            padding: 12px;
+            background: #fafafa;
+            overflow-y: auto;
+        }
+
+        .info-title {
+            font-weight: 600;
+            font-size: 12px;
+            color: #333333;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+        .info-label { color: #666; width: 80px; }
+        .info-value { font-weight: 500; }
+
+        .status-box {
+            margin-top: 12px;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+        .status-row:last-child { margin-bottom: 0; }
+        .status-ok { color: #333333; }
+        .status-warn { color: #666666; }
+        .status-err { color: #333333; }
+
+        /* MA-Liste Rechts */
+        .ma-liste-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ma-liste-header {
+            padding: 8px 12px;
+            background: #e8e8e8;
+            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .ma-liste {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .ma-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .ma-item:hover { background: #f5f5f5; }
+        .ma-item.selected { background: #e8e8e8; }
+        .ma-item.unavailable { background: #f9f9f9; color: #999; }
+        .ma-item.assigned { background: #f0f0f0; }
+
+        .ma-checkbox { margin-right: 10px; }
+        .ma-name { flex: 1; font-size: 11px; font-weight: 500; }
+        .ma-quali { font-size: 9px; color: #666; margin-left: 8px; }
+        .ma-status {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 8px;
+        }
+        .ma-status.verfügbar { background: #e8e8e8; color: #333333; }
+        .ma-status.anfrage { background: #e8e8e8; color: #333333; }
+        .ma-status.belegt { background: #e8e8e8; color: #333333; }
+        .ma-status.zugeordnet { background: #e8e8e8; color: #333333; }
+
+        .dialog-footer {
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            border-radius: 0 0 6px 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-zuordnen {
+            background: #4316B2;
+            border-color: #3558c0;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog-container">
+        <div class="dialog-header">
+            <span class="dialog-title">Mitarbeiter-Auftrag Zuordnung</span>
+            <button class="dialog-close" onclick="window.close()">x</button>
+        </div>
+
+        <div class="dialog-toolbar">
+            <div class="toolbar-item">
+                <span class="toolbar-label">Filter:</span>
+                <select class="form-control form-control-sm" id="cboFilter">
+                    <option value="alle">Alle MA</option>
+                    <option value="verfügbar" selected>Nur Verfügbare</option>
+                    <option value="quali">Mit Qualifikation</option>
+                </select>
+            </div>
+            <div class="toolbar-item">
+                <input type="text" class="form-control form-control-sm" id="txtSuche" placeholder="MA suchen..." style="width:150px;">
+            </div>
+            <div class="toolbar-item">
+                <label><input type="checkbox" id="chkNurAktive" checked> Nur aktive MA</label>
+            </div>
+        </div>
+
+        <div class="dialog-content">
+            <!-- Schicht-Info Links -->
+            <div class="schicht-info">
+                <div class="info-title">Schicht-Informationen</div>
+                <div class="info-row"><span class="info-label">Auftrag:</span><span class="info-value" id="lblAuftrag">VA-2024-001</span></div>
+                <div class="info-row"><span class="info-label">Objekt:</span><span class="info-value" id="lblObjekt">Messe FFM H1</span></div>
+                <div class="info-row"><span class="info-label">Kunde:</span><span class="info-value" id="lblKunde">Messe Frankfurt</span></div>
+                <div class="info-row"><span class="info-label">Datum:</span><span class="info-value" id="lblDatum">18.12.2024</span></div>
+                <div class="info-row"><span class="info-label">Zeit:</span><span class="info-value" id="lblZeit">08:00 - 16:00</span></div>
+                <div class="info-row"><span class="info-label">Position:</span><span class="info-value" id="lblPosition">Einlass</span></div>
+
+                <div class="status-box">
+                    <div class="status-row">
+                        <span>MA Soll:</span>
+                        <span id="lblSoll">4</span>
+                    </div>
+                    <div class="status-row">
+                        <span>MA Ist:</span>
+                        <span id="lblIst" class="status-warn">2</span>
+                    </div>
+                    <div class="status-row">
+                        <span>Offen:</span>
+                        <span id="lblOffen" class="status-err">2</span>
+                    </div>
+                    <div class="status-row">
+                        <span>Ausgewählt:</span>
+                        <span id="lblSelected">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MA-Liste Rechts -->
+            <div class="ma-liste-container">
+                <div class="ma-liste-header">Verfügbare Mitarbeiter (15)</div>
+                <div class="ma-liste" id="maListe">
+                    <div class="ma-item assigned">
+                        <input type="checkbox" class="ma-checkbox" checked disabled>
+                        <span class="ma-name">Müller, Klaus</span>
+                        <span class="ma-quali">34a, EL</span>
+                        <span class="ma-status zugeordnet">Zugeordnet</span>
+                    </div>
+                    <div class="ma-item assigned">
+                        <input type="checkbox" class="ma-checkbox" checked disabled>
+                        <span class="ma-name">Schmidt, Peter</span>
+                        <span class="ma-quali">34a</span>
+                        <span class="ma-status zugeordnet">Zugeordnet</span>
+                    </div>
+                    <div class="ma-item">
+                        <input type="checkbox" class="ma-checkbox">
+                        <span class="ma-name">Mustermann, Max</span>
+                        <span class="ma-quali">34a, Fahrer</span>
+                        <span class="ma-status verfügbar">Verfügbar</span>
+                    </div>
+                    <div class="ma-item">
+                        <input type="checkbox" class="ma-checkbox">
+                        <span class="ma-name">Weber, Thomas</span>
+                        <span class="ma-quali">34a</span>
+                        <span class="ma-status verfügbar">Verfügbar</span>
+                    </div>
+                    <div class="ma-item">
+                        <input type="checkbox" class="ma-checkbox">
+                        <span class="ma-name">Fischer, Anna</span>
+                        <span class="ma-quali">34a</span>
+                        <span class="ma-status anfrage">Anfrage</span>
+                    </div>
+                    <div class="ma-item unavailable">
+                        <input type="checkbox" class="ma-checkbox" disabled>
+                        <span class="ma-name">Becker, Stefan</span>
+                        <span class="ma-quali">34a</span>
+                        <span class="ma-status belegt">Belegt</span>
+                    </div>
+                    <div class="ma-item unavailable">
+                        <input type="checkbox" class="ma-checkbox" disabled>
+                        <span class="ma-name">Hoffmann, Lisa</span>
+                        <span class="ma-quali">-</span>
+                        <span class="ma-status belegt">Urlaub</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dialog-footer">
+            <div class="footer-actions">
+                <button class="btn btn-sm" id="btnAlleWählen">Alle wählen</button>
+                <button class="btn btn-sm" id="btnAlleAbwählen">Abwählen</button>
+            </div>
+            <div class="footer-actions">
+                <button class="btn" onclick="window.close()">Abbrechen</button>
+                <button class="btn btn-zuordnen" id="btnZuordnen">Zuordnen</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Bridge } from '../js/webview2-bridge.js';
+
+        let schichtInfo = {}, mitarbeiter = [], zugeordnet = [];
+        const params = new URLSearchParams(window.location.search);
+        const vaId = params.get('va_id');
+        const vaStartId = params.get('vastart_id');
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            document.getElementById('btnAlleWählen').addEventListener('click', alleWaehlen);
+            document.getElementById('btnAlleAbwählen').addEventListener('click', alleAbwaehlen);
+            document.getElementById('btnZuordnen').addEventListener('click', zuordnen);
+            document.getElementById('cboFilter').addEventListener('change', filterMA);
+            document.getElementById('txtSuche').addEventListener('input', filterMA);
+
+            if (vaStartId) await loadDaten();
+        }
+
+        async function loadDaten() {
+            try {
+                // Schicht-Info laden
+                const schichtResult = await Bridge.execute('executeSQL', {
+                    sql: `SELECT s.*, a.Auftrag, a.Objekt, k.kun_Firma FROM tbl_VA_Start s
+                          LEFT JOIN tbl_VA_Auftragstamm a ON s.VA_ID = a.VA_ID
+                          LEFT JOIN tbl_KD_Kundenstamm k ON a.Veranstalter_ID = k.kun_Id
+                          WHERE s.ID = ${vaStartId}`,
+                    fetch: true
+                });
+                schichtInfo = (schichtResult.rows && schichtResult.rows[0]) || {};
+                document.getElementById('lblAuftrag').textContent = schichtInfo.Auftrag || '';
+                document.getElementById('lblObjekt').textContent = schichtInfo.Objekt || '';
+                document.getElementById('lblKunde').textContent = schichtInfo.kun_Firma || '';
+                document.getElementById('lblDatum').textContent = schichtInfo.VADatum ? new Date(schichtInfo.VADatum).toLocaleDateString('de-DE') : '';
+                document.getElementById('lblZeit').textContent = `${schichtInfo.VA_Start || ''} - ${schichtInfo.VA_Ende || ''}`;
+                document.getElementById('lblSoll').textContent = schichtInfo.MA_Anzahl || 0;
+
+                // Zugeordnete laden
+                const zuoResult = await Bridge.execute('executeSQL', {
+                    sql: `SELECT p.MA_ID FROM tbl_MA_VA_Planung p WHERE p.VAStart_ID = ${vaStartId}`,
+                    fetch: true
+                });
+                zugeordnet = (zuoResult.rows || []).map(z => z.MA_ID);
+                document.getElementById('lblIst').textContent = zugeordnet.length;
+                document.getElementById('lblOffen').textContent = (schichtInfo.MA_Anzahl || 0) - zugeordnet.length;
+
+                // MA laden
+                const maResult = await Bridge.mitarbeiter.list({ aktiv: true });
+                mitarbeiter = maResult.data || maResult || [];
+                renderMA();
+            } catch (e) { console.error('Fehler:', e); }
+        }
+
+        function renderMA() {
+            const filter = document.getElementById('cboFilter').value;
+            const suche = document.getElementById('txtSuche').value.toLowerCase();
+            let filtered = mitarbeiter;
+
+            if (suche) filtered = filtered.filter(m => `${m.Nachname} ${m.Vorname}`.toLowerCase().includes(suche));
+
+            const maListe = document.getElementById('maListe');
+            maListe.innerHTML = filtered.map(m => {
+                const istZugeordnet = zugeordnet.includes(m.ID);
+                const cls = istZugeordnet ? 'assigned' : '';
+                return `<div class="ma-item ${cls}" data-id="${m.ID}">
+                    <input type="checkbox" class="ma-checkbox" ${istZugeordnet ? 'checked disabled' : ''}>
+                    <span class="ma-name">${m.Nachname}, ${m.Vorname}</span>
+                    <span class="ma-status ${istZugeordnet ? 'zugeordnet' : 'verfügbar'}">${istZugeordnet ? 'Zugeordnet' : 'Verfügbar'}</span>
+                </div>`;
+            }).join('');
+
+            maListe.querySelectorAll('.ma-item:not(.assigned)').forEach(item => {
+                item.addEventListener('click', () => {
+                    const cb = item.querySelector('.ma-checkbox');
+                    cb.checked = !cb.checked;
+                    item.classList.toggle('selected', cb.checked);
+                    updateSelectedCount();
+                });
+            });
+
+            document.querySelector('.ma-liste-header').textContent = `Verfügbare Mitarbeiter (${filtered.length})`;
+        }
+
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('.ma-item:not(.assigned) .ma-checkbox:checked').length;
+            document.getElementById('lblSelected').textContent = count;
+        }
+
+        function alleWaehlen() {
+            document.querySelectorAll('.ma-item:not(.assigned)').forEach(item => {
+                item.querySelector('.ma-checkbox').checked = true;
+                item.classList.add('selected');
+            });
+            updateSelectedCount();
+        }
+
+        function alleAbwaehlen() {
+            document.querySelectorAll('.ma-item:not(.assigned)').forEach(item => {
+                item.querySelector('.ma-checkbox').checked = false;
+                item.classList.remove('selected');
+            });
+            updateSelectedCount();
+        }
+
+        function filterMA() { renderMA(); }
+
+        async function zuordnen() {
+            const selected = [...document.querySelectorAll('.ma-item:not(.assigned) .ma-checkbox:checked')]
+                .map(cb => parseInt(cb.closest('.ma-item').dataset.id));
+            if (selected.length === 0) { alert('Keine MA ausgewählt'); return; }
+            try {
+                for (const maId of selected) {
+                    await Bridge.save('zuordnung', {
+                        VA_ID: vaId || schichtInfo.VA_ID,
+                        VAStart_ID: vaStartId,
+                        MA_ID: maId,
+                        VADatum: schichtInfo.VADatum
+                    });
+                }
+                window.parent.postMessage({ type: 'ZUORDNUNG_COMPLETE', count: selected.length }, '*');
+                window.close();
+            } catch (e) { console.error('Fehler:', e); alert('Fehler: ' + e.message); }
+        }
+    </script>
+</body>
+</html>

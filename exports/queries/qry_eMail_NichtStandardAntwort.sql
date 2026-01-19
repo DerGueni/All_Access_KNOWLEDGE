@@ -1,0 +1,6 @@
+-- Query: qry_eMail_NichtStandardAntwort
+-- Type: 0
+SELECT tbl_eMail_Import.Zu_Absage, tbl_eMail_Import.Body, tbl_MA_Mitarbeiterstamm.Nachname, tbl_MA_Mitarbeiterstamm.Vorname, tbl_VA_Start.VADatum, tbl_VA_Start.VA_Start, tbl_VA_Start.VA_Ende, tbl_VA_Auftragstamm.Auftrag, tbl_VA_Auftragstamm.Objekt, tbl_VA_Auftragstamm.Ort, tbl_eMail_Import.VA_ID, tbl_eMail_Import.VADatum_ID, tbl_eMail_Import.VAStart_ID, tbl_eMail_Import.MA_ID, tbl_eMail_Import.ID, tbl_eMail_Import.IstErledigt, tbl_eMail_Import.Zu_Absage
+FROM ((tbl_VA_Start INNER JOIN tbl_eMail_Import ON tbl_VA_Start.ID = tbl_eMail_Import.VAStart_ID) INNER JOIN tbl_MA_Mitarbeiterstamm ON tbl_eMail_Import.MA_ID = tbl_MA_Mitarbeiterstamm.ID) INNER JOIN tbl_VA_Auftragstamm ON tbl_eMail_Import.VA_ID = tbl_VA_Auftragstamm.ID
+WHERE (((tbl_eMail_Import.MA_ID)>0) AND ((tbl_eMail_Import.IstErledigt)<>-1));
+

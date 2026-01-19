@@ -1,0 +1,353 @@
+/**
+ * frm_N_Dienstplanuebersicht.css
+ * Spezifische Styles für Dienstplanübersicht
+ */
+
+/* Container OHNE Menü */
+.dp-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.dp-container.no-menu {
+    /* Kein linkes Menü */
+}
+
+/* Hauptbereich */
+.dp-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+/* Header - exakt 2,5 cm = 94px */
+.dp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 100%);
+    border-bottom: 1px solid #999;
+    height: 94px;
+    min-height: 94px;
+    max-height: 94px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dp-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.header-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.date-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.date-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dp-date-input {
+    padding: 4px 8px;
+    border: 1px solid #999;
+    border-radius: 2px;
+    font-size: 11px;
+    width: 110px;
+    text-align: center;
+}
+
+.dp-btn,
+.dp-btn-nav,
+.dp-btn-small {
+    padding: 5px 12px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.dp-btn:hover,
+.dp-btn-nav:hover,
+.dp-btn-small:hover {
+    background: linear-gradient(180deg, #f5f5f5 0%, #ddd 100%);
+    border-color: #666;
+}
+
+.dp-btn-nav {
+    padding: 4px 10px;
+    min-width: 32px;
+}
+
+.dp-btn-small {
+    padding: 4px 8px;
+    font-size: 10px;
+}
+
+.dp-select {
+    padding: 4px 8px;
+    border: 1px solid #999;
+    border-radius: 2px;
+    font-size: 11px;
+    background: white;
+}
+
+.senden-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.version-info {
+    font-size: 10px;
+    color: #666;
+}
+
+/* Tabelle Container */
+.dp-table-container {
+    flex: 1;
+    overflow: auto;
+    padding: 8px;
+}
+
+.dp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    background: white;
+}
+
+/* Header-Zeilen */
+.dp-header-row th {
+    background: #4A90A4; /* Hellblau/Türkis wie Access */
+    color: white;
+    padding: 8px 4px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #3a7a8a;
+}
+
+.dp-subheader-row th {
+    background: #d0e8f0;
+    color: #333;
+    padding: 6px 4px;
+    text-align: center;
+    font-size: 10px;
+    border: 1px solid #aaa;
+}
+
+.th-content {
+    font-size: 11px;
+}
+
+.th-content.cyan {
+    background: #4A90A4;
+    color: white;
+    padding: 4px;
+}
+
+/* Spalten */
+.col-ma {
+    min-width: 180px;
+    background: #f5f5f5;
+    font-weight: 600;
+    padding: 6px 8px !important;
+    border-right: 2px solid #4A90A4;
+}
+
+.col-day {
+    text-align: center;
+}
+
+.col-sum {
+    min-width: 70px;
+    text-align: center;
+    background: #f9f9f9;
+    font-weight: 600;
+}
+
+.sub-col {
+    font-size: 10px;
+    padding: 4px !important;
+}
+
+.sub-auftrag {
+    min-width: 80px;
+}
+
+.sub-zeit {
+    min-width: 45px;
+    text-align: center;
+}
+
+/* Datenzeilen */
+.dp-row td {
+    padding: 4px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.dp-row:nth-child(even) {
+    background: #fafafa;
+}
+
+.dp-row:hover {
+    background: #e8f4ff;
+}
+
+.einsatz {
+    font-size: 10px;
+    color: #333;
+}
+
+.zeit {
+    font-size: 10px;
+    color: #666;
+    font-weight: 600;
+}
+
+.abwesend {
+    background: #fff3cd !important;
+    color: #856404;
+}
+
+/* Footer - exakt 0,5 cm = 19px */
+.dp-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 12px;
+    background: #e8e8e8;
+    border-top: 1px solid #ccc;
+    height: 19px;
+    min-height: 19px;
+    max-height: 19px;
+    font-size: 10px;
+    color: #666;
+}
+
+.footer-left,
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Datepicker Popup */
+.date-picker-popup {
+    position: fixed;
+    background: white;
+    border: 1px solid #999;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 8px;
+    min-width: 240px;
+}
+
+.picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 4px;
+    margin-bottom: 8px;
+}
+
+.picker-title {
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.picker-nav {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.picker-nav:hover {
+    background: #f0f0f0;
+}
+
+.picker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 4px;
+}
+
+.picker-weekdays span {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: #666;
+    padding: 4px;
+}
+
+.picker-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.picker-day {
+    text-align: center;
+    padding: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.picker-day:hover {
+    background: #e8e8e8;
+}
+
+.picker-day.today {
+    background: #e8f4ff;
+    font-weight: 600;
+}
+
+.picker-day.selected {
+    background: #4A90A4;
+    color: white;
+    font-weight: 600;
+}
+
+.picker-day.empty {
+    cursor: default;
+}

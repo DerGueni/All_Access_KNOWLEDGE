@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS - Shell v2</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Shell Layout */
+        .shell-layout {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Zentrale Navigation (nav#menu) */
+        #menu {
+            width: 220px;
+            min-width: 220px;
+            background: #1a1a2e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            transition: width 0.2s ease;
+        }
+
+        #menu.collapsed {
+            width: 60px;
+            min-width: 60px;
+        }
+
+        .menu-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .menu-logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        #menu.collapsed .menu-logo {
+            display: none;
+        }
+
+        .menu-toggle {
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Menu Sections */
+        .menu-section {
+            padding: 8px 0;
+        }
+
+        .menu-section-title {
+            padding: 8px 16px;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 1px;
+        }
+
+        #menu.collapsed .menu-section-title {
+            display: none;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            gap: 12px;
+        }
+
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .menu-item.active {
+            background: #4316B2;
+            color: #fff;
+        }
+
+        .menu-item-icon {
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .menu-item-text {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        #menu.collapsed .menu-item-text {
+            display: none;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin: 8px 16px;
+        }
+
+        /* User Section */
+        .menu-user {
+            margin-top: auto;
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: #4316B2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .user-role {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        #menu.collapsed .user-info {
+            display: none;
+        }
+
+        /* Main Content Area */
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #4316B2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            transition: opacity 0.3s;
+        }
+
+        #loadingOverlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-logo {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        /* View Container */
+        #viewContainer {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .view-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .view-frame.active {
+            opacity: 1;
+            z-index: 10;
+        }
+
+        /* Error State */
+        .error-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="loading-logo">CONSYS</div>
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingStatus">Initialisiere...</div>
+    </div>
+
+    <div class="shell-layout">
+        <!-- Zentrales Menu (API-gesteuert) -->
+        <nav id="menu">
+            <div class="menu-header">
+                <span class="menu-logo">CONSYS</span>
+                <button class="menu-toggle" onclick="ShellApp.toggleMenu()" title="Menu ein-/ausklappen">&#9776;</button>
+            </div>
+            <div id="menuContent">
+                <!-- Wird durch API gefuellt -->
+            </div>
+            <div class="menu-user" id="userSection">
+                <div class="user-avatar" id="userAvatar">--</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Laden...</div>
+                    <div class="user-role" id="userRole">-</div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hauptcontent -->
+        <main id="content">
+            <div id="viewContainer">
+                <!-- Views werden hier dynamisch geladen -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+    /**
+     * CONSYS Shell v2
+     * API-gesteuertes Menu mit Hash-Routing
+     */
+    const ShellApp = {
+        config: {
+            apiBase: 'http://localhost:5000/api',
+            viewBasePath: 'views/',
+            defaultRoute: 'dashboard'
+        },
+
+        state: {
+            user: null,
+            menu: [],
+            activeRoute: null,
+            loadedViews: new Map()
+        },
+
+        /**
+         * Shell initialisieren
+         */
+        async init() {
+            try {
+                this.updateLoadingStatus('Lade Benutzerdaten...');
+                await this.loadUser();
+
+                this.updateLoadingStatus('Lade Menustruktur...');
+                await this.loadMenu();
+
+                this.updateLoadingStatus('Initialisiere Routing...');
+                this.initRouting();
+
+                // Initial Route laden
+                const hash = window.location.hash.slice(1) || this.config.defaultRoute;
+                await this.navigateTo(hash);
+
+                // Loading ausblenden
+                this.hideLoading();
+
+            } catch (error) {
+                console.error('Shell Init Fehler:', error);
+                this.updateLoadingStatus('Fehler: ' + error.message);
+            }
+        },
+
+        /**
+         * Benutzer von API laden
+         */
+        async loadUser() {
+            try {
+                const response = await fetch(this.config.apiBase + '/me');
+                if (response.ok) {
+                    this.state.user = await response.json();
+                } else {
+                    // Fallback wenn API nicht verfuegbar
+                    this.state.user = {
+                        id: 1,
+                        name: 'Benutzer',
+                        initials: 'BE',
+                        role: 'Standard'
+                    };
+                }
+            } catch (e) {
+                // API nicht erreichbar - Fallback
+                this.state.user = {
+                    id: 1,
+                    name: 'Offline-Modus',
+                    initials: 'OF',
+                    role: 'Lokal'
+                };
+            }
+            this.renderUser();
+        },
+
+        /**
+         * Menu von API laden
+         */
+        async loadMenu() {
+            try {
+                const response = await fetch(this.config.apiBase + '/menu');
+                if (response.ok) {
+                    this.state.menu = await response.json();
+                } else {
+                    this.state.menu = this.getDefaultMenu();
+                }
+            } catch (e) {
+                // API nicht erreichbar - Standard-Menu
+                this.state.menu = this.getDefaultMenu();
+            }
+            this.renderMenu();
+        },
+
+        /**
+         * Standard-Menu (Fallback wenn API nicht verfuegbar)
+         */
+        getDefaultMenu() {
+            return [
+                {
+                    section: 'Stammdaten',
+                    items: [
+                        { id: 'mitarbeiter', label: 'Mitarbeiter', icon: '&#128100;', view: 'frm_MA_Mitarbeiterstamm.html' },
+                        { id: 'kunden', label: 'Kunden', icon: '&#127970;', view: 'frm_KD_Kundenstamm.html' },
+                        { id: 'auftraege', label: 'Auftraege', icon: '&#128203;', view: 'frm_va_Auftragstamm.html' },
+                        { id: 'objekte', label: 'Objekte', icon: '&#127919;', view: 'frm_OB_Objekt.html' }
+                    ]
+                },
+                {
+                    section: 'Planung',
+                    items: [
+                        { id: 'dienstplan', label: 'Dienstplan', icon: '&#128197;', view: 'frm_N_Dienstplanuebersicht.html' },
+                        { id: 'planungsuebersicht', label: 'Planungsuebersicht', icon: '&#128200;', view: 'frm_VA_Planungsuebersicht.html' },
+                        { id: 'einsatzuebersicht', label: 'Einsatzuebersicht', icon: '&#127939;', view: 'frm_Einsatzuebersicht.html' },
+                        { id: 'ma_schnellauswahl', label: 'MA Schnellauswahl', icon: '&#9889;', view: 'frm_MA_VA_Schnellauswahl.html' }
+                    ]
+                },
+                {
+                    section: 'Personal',
+                    items: [
+                        { id: 'abwesenheit', label: 'Abwesenheit', icon: '&#128197;', view: 'frm_MA_Abwesenheit.html' },
+                        { id: 'zeitkonten', label: 'Zeitkonten', icon: '&#9201;', view: 'frm_MA_Zeitkonten.html' },
+                        { id: 'bewerber', label: 'Bewerber', icon: '&#128101;', view: 'frm_N_MA_Bewerber_Verarbeitung.html' }
+                    ]
+                },
+                {
+                    section: 'Lohn',
+                    items: [
+                        { id: 'lohnabrechnungen', label: 'Lohnabrechnungen', icon: '&#128176;', view: 'frm_N_Lohnabrechnungen.html' },
+                        { id: 'stundenauswertung', label: 'Stundenauswertung', icon: '&#128202;', view: 'frm_N_Stundenauswertung.html' }
+                    ]
+                },
+                {
+                    section: 'System',
+                    items: [
+                        { id: 'dashboard', label: 'Dashboard', icon: '&#127968;', view: 'frm_Menuefuehrung1.html' }
+                    ]
+                }
+            ];
+        },
+
+        /**
+         * Menu rendern
+         */
+        renderMenu() {
+            const container = document.getElementById('menuContent');
+            let html = '';
+
+            this.state.menu.forEach((section, index) => {
+                if (index > 0) {
+                    html += '<div class="menu-divider"></div>';
+                }
+                html += `
+                    <div class="menu-section">
+                        <div class="menu-section-title">${section.section}</div>
+                        ${section.items.map(item => `
+                            <a class="menu-item" data-route="${item.id}" onclick="ShellApp.navigateTo('${item.id}'); return false;">
+                                <span class="menu-item-icon">${item.icon}</span>
+                                <span class="menu-item-text">${item.label}</span>
+                            </a>
+                        `).join('')}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        },
+
+        /**
+         * Benutzer-Info rendern
+         */
+        renderUser() {
+            const user = this.state.user;
+            document.getElementById('userAvatar').textContent = user.initials || user.name.substring(0, 2).toUpperCase();
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('userRole').textContent = user.role;
+        },
+
+        /**
+         * Routing initialisieren
+         */
+        initRouting() {
+            window.addEventListener('hashchange', () => {
+                const route = window.location.hash.slice(1);
+                if (route && route !== this.state.activeRoute) {
+                    this.navigateTo(route);
+                }
+            });
+        },
+
+        /**
+         * Zu Route navigieren
+         */
+        async navigateTo(routeId) {
+            // View-Definition finden
+            let viewDef = null;
+            for (const section of this.state.menu) {
+                viewDef = section.items.find(item => item.id === routeId);
+                if (viewDef) break;
+            }
+
+            if (!viewDef) {
+                console.warn('Route nicht gefunden:', routeId);
+                return;
+            }
+
+            // Aktiven Menu-Punkt aktualisieren
+            document.querySelectorAll('#menu .menu-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.route === routeId);
+            });
+
+            // URL aktualisieren
+            window.location.hash = routeId;
+            this.state.activeRoute = routeId;
+
+            // View laden
+            await this.loadView(routeId, viewDef.view);
+        },
+
+        /**
+         * View laden (mit Caching)
+         */
+        async loadView(routeId, viewFile) {
+            const container = document.getElementById('viewContainer');
+
+            // Pruefen ob View bereits geladen
+            if (this.state.loadedViews.has(routeId)) {
+                this.activateView(routeId);
+                return;
+            }
+
+            // Iframe erstellen
+            const iframe = document.createElement('iframe');
+            iframe.id = 'view_' + routeId;
+            iframe.className = 'view-frame';
+            iframe.src = 'views/' + viewFile;
+
+            // Load-Handler
+            iframe.onload = () => {
+                this.injectShellAPI(iframe, routeId);
+                this.state.loadedViews.set(routeId, iframe);
+                this.activateView(routeId);
+            };
+
+            iframe.onerror = () => {
+                console.error('View konnte nicht geladen werden:', viewFile);
+            };
+
+            container.appendChild(iframe);
+        },
+
+        /**
+         * View aktivieren
+         */
+        activateView(routeId) {
+            document.querySelectorAll('.view-frame').forEach(frame => {
+                frame.classList.toggle('active', frame.id === 'view_' + routeId);
+            });
+
+            // View benachrichtigen
+            const iframe = this.state.loadedViews.get(routeId);
+            if (iframe && iframe.contentWindow && iframe.contentWindow.onViewActivated) {
+                iframe.contentWindow.onViewActivated();
+            }
+        },
+
+        /**
+         * Shell-API in View injizieren
+         */
+        injectShellAPI(iframe, routeId) {
+            try {
+                const win = iframe.contentWindow;
+                win.ShellNavigate = (targetRoute) => this.navigateTo(targetRoute);
+                win.SHELL_ROUTE_ID = routeId;
+                win.getUser = () => this.state.user;
+            } catch (e) {
+                // Cross-origin - ignorieren
+            }
+        },
+
+        /**
+         * Menu ein-/ausklappen
+         */
+        toggleMenu() {
+            document.getElementById('menu').classList.toggle('collapsed');
+        },
+
+        /**
+         * Loading Status aktualisieren
+         */
+        updateLoadingStatus(text) {
+            document.getElementById('loadingStatus').textContent = text;
+        },
+
+        /**
+         * Loading ausblenden
+         */
+        hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+    };
+
+    // Global verfuegbar machen
+    window.ShellApp = ShellApp;
+
+    // Shell starten
+    document.addEventListener('DOMContentLoaded', () => {
+        ShellApp.init();
+    });
+    </script>
+</body>
+</html>

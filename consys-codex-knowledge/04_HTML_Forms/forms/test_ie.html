@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Test IE Kompatibilitaet</title>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; padding: 20px; }
+        h1 { color: #333; }
+        .success { color: green; }
+        .info { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>HTML in Access - Test</h1>
+    <p class="success">Wenn Sie diesen Text sehen, funktioniert die Grundanzeige!</p>
+
+    <div class="info">
+        <strong>Browser Info:</strong>
+        <div id="browserInfo"></div>
+    </div>
+
+    <div class="info">
+        <strong>Datum/Uhrzeit:</strong>
+        <div id="datetime"></div>
+    </div>
+
+    <button onclick="testButton()">Test Button</button>
+    <div id="buttonResult"></div>
+
+    <script>
+        // ES5 kompatibel (kein const, let, arrow functions)
+        document.getElementById('browserInfo').innerHTML = navigator.userAgent;
+        document.getElementById('datetime').innerHTML = new Date().toLocaleString('de-DE');
+
+        function testButton() {
+            document.getElementById('buttonResult').innerHTML = 'Button funktioniert! ' + new Date().toLocaleTimeString();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antworten ausstehend (sub_MA_VA_Planung_Status)</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .datasheet-container {
+            flex: 1;
+            overflow: auto;
+        }
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .datasheet th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            padding: 5px 6px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .datasheet td {
+            border: 1px solid #ddd;
+            padding: 4px 6px;
+        }
+        .datasheet tbody tr:hover { background: #f0f0f0; }
+        .datasheet tbody tr.selected { background: #e8e8e8; }
+        .col-hidden { display: none; }
+        .col-lfd { width: 40px; text-align: center; }
+        .col-ma { min-width: 150px; }
+        .col-time { width: 60px; }
+        .col-std { width: 50px; text-align: center; }
+        .col-bemerk { min-width: 120px; }
+        .col-status { width: 100px; }
+    </style>
+</head>
+<body>
+    <div class="subform-container" id="sub_MA_VA_Planung_Status">
+        <div class="datasheet-container">
+            <table class="datasheet" id="tbl_Status">
+                <thead>
+                    <tr>
+                        <th class="col-hidden">ID</th>
+                        <th class="col-lfd">Lfd.</th>
+                        <th class="col-ma">Mitarbeiter</th>
+                        <th class="col-time">Beginn</th>
+                        <th class="col-time">Ende</th>
+                        <th class="col-std">Std</th>
+                        <th class="col-bemerk">Bemerkungen</th>
+                        <th class="col-status">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_Status">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script type="module" src="../logic/sub_MA_VA_Planung_Status.logic.js"></script>
+</body>
+</html>
+

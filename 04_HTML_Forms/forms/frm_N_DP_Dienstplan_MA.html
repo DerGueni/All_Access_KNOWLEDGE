@@ -1,0 +1,458 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplanübersicht - CONSEC</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 11px; background: #f0f0f0; overflow: hidden; }
+        
+        .form-container { width: 100%; height: 100vh; display: flex; flex-direction: column; }
+        
+        /* HEADER */
+        .header { background: linear-gradient(180deg, #5577aa 0%, #4466aa 100%); padding: 8px 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .header-logo { width: 40px; height: 40px; background: #1a3a6a; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+        .header-title { color: white; font-size: 16px; font-weight: bold; }
+        .header-btn { padding: 5px 10px; font-size: 11px; border: 1px solid #666; background: #f0f0f0; cursor: pointer; border-radius: 2px; }
+        .header-btn:hover { background: #e0e0e0; }
+        .header-btn.blue { background: #4488cc; color: white; }
+        .header-btn.green { background: #44aa44; color: white; }
+        .header-spacer { flex: 1; }
+        .date-control { display: flex; align-items: center; gap: 4px; background: white; padding: 4px 8px; border: 1px solid #888; border-radius: 3px; }
+        .date-control input { border: none; font-size: 11px; width: 90px; text-align: center; }
+        .date-control button { width: 20px; height: 20px; background: #f0f0f0; border: 1px solid #888; cursor: pointer; font-size: 10px; }
+        
+        /* SIDEBAR */
+        .main-wrapper { flex: 1; display: flex; overflow: hidden; }
+        .sidebar { width: 140px; background: linear-gradient(180deg, #8B0000 0%, #660000 100%); display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-title { color: white; font-size: 11px; font-weight: bold; text-align: center; padding: 8px; background: rgba(0,0,0,0.2); }
+        .sidebar-menu { flex: 1; padding: 4px; overflow-y: auto; }
+        .menu-btn { display: block; width: 100%; padding: 6px 4px; margin: 2px 0; background: #5577aa; color: white; border: 1px solid #3355aa; border-radius: 3px; cursor: pointer; font-size: 10px; text-align: center; }
+        .menu-btn:hover { background: #6688bb; }
+        .menu-btn.active { background: #3355aa; }
+        
+        /* CONTENT */
+        .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: white; }
+        
+        /* FILTER ROW */
+        .filter-row { background: #e8e8e8; padding: 6px 12px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #ccc; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 4px; }
+        .filter-group label { font-size: 10px; font-weight: bold; }
+        .filter-group select { font-size: 10px; padding: 2px 4px; border: 1px solid #888; min-width: 120px; }
+        .filter-group input[type="date"] { font-size: 10px; padding: 2px 4px; border: 1px solid #888; }
+        
+        /* DIENSTPLAN GRID */
+        .dp-container { flex: 1; overflow: auto; }
+        .dp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .dp-table th, .dp-table td { border: 1px solid #ccc; padding: 2px 4px; font-size: 10px; }
+        
+        /* Header Row */
+        .dp-table thead th { background: #4466aa; color: white; position: sticky; top: 0; z-index: 10; white-space: nowrap; }
+        .dp-table thead th.ma-col { width: 150px; background: #800000; }
+        .dp-table thead th.day-col { min-width: 180px; }
+        .dp-table thead th.day-col.weekend { background: #6688cc; }
+        .dp-table thead th.day-col.today { background: #ffcc00; color: black; }
+        
+        /* Sub-Header (Auftrag/von/bis) */
+        .dp-table thead tr:nth-child(2) th { background: #5588bb; font-weight: normal; font-size: 9px; }
+        .dp-table thead tr:nth-child(2) th.ma-col { background: #800000; }
+        
+        /* Data Rows */
+        .dp-table tbody tr:hover { background: #f0f8ff; }
+        .dp-table tbody td.ma-cell { background: #ffffcc; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: sticky; left: 0; z-index: 5; }
+        .dp-table tbody td.day-cell { vertical-align: top; padding: 2px; }
+        
+        /* Einsatz-Zellen */
+        .einsatz-entry { padding: 2px 4px; margin: 1px 0; border-radius: 2px; font-size: 9px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .einsatz-entry.normal { background: #d0e8ff; border-left: 3px solid #0066cc; }
+        .einsatz-entry.konflikt { background: #ffcccc; border-left: 3px solid #cc0000; }
+        .einsatz-entry.urlaub { background: #ffffcc; border-left: 3px solid #cccc00; }
+        .einsatz-entry.krank { background: #ffddcc; border-left: 3px solid #ff6600; }
+        .einsatz-entry:hover { opacity: 0.8; }
+        
+        /* FOOTER */
+        .footer { background: #4466aa; color: white; padding: 4px 12px; font-size: 10px; display: flex; justify-content: space-between; }
+        .version-info { color: #ccc; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-logo">◆</div>
+            <span class="header-title">Dienstplanübersicht</span>
+            <div class="date-control">
+                <button onclick="prevWeek()">◄</button>
+                <input type="date" id="startDate" onchange="loadDienstplan()">
+                <button onclick="nextWeek()">►</button>
+            </div>
+            <button class="header-btn" onclick="goToToday()">Ab Heute</button>
+            <div class="filter-group">
+                <select id="selAnstellung" onchange="loadDienstplan()">
+                    <option value="Festangestellte">Festangestellte</option>
+                    <option value="Minijobber">Minijobber</option>
+                    <option value="Alle">Alle</option>
+                </select>
+            </div>
+            <div class="header-spacer"></div>
+            <div style="color:white;">
+                <label>Dienstpläne senden bis:</label>
+                <input type="date" id="sendeBis" style="margin-left:4px;">
+            </div>
+            <button class="header-btn blue" onclick="sendDienstplaene()">Dienstpläne senden</button>
+            <button class="header-btn" onclick="printUebersicht()">Übersicht drucken</button>
+            <button class="header-btn green" onclick="einzelDienstplaene()">Einzeldienstpläne</button>
+        </div>
+        
+        <!-- MAIN WRAPPER -->
+        <div class="main-wrapper">
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <div class="sidebar-title">HAUPTMENÜ</div>
+                <div class="sidebar-menu">
+                    <button class="menu-btn active">Dienstplanübersicht</button>
+                    <button class="menu-btn" onclick="openMenu('planung')">Planungsübersicht</button>
+                    <button class="menu-btn" onclick="openMenu('auftrag')">Auftragsverwaltung</button>
+                    <button class="menu-btn" onclick="openMenu('mitarbeiter')">Mitarbeiterverwaltung</button>
+                    <button class="menu-btn" onclick="openMenu('mail')">Offene Mail Anfragen</button>
+                    <button class="menu-btn" onclick="openMenu('excel')">Excel Zeitkonten</button>
+                    <button class="menu-btn" onclick="openMenu('zeitkonten')">Zeitkonten</button>
+                    <button class="menu-btn" onclick="openMenu('abwesenheit')">Abwesenheitsplanung</button>
+                    <button class="menu-btn" onclick="openMenu('ausweis')">Dienstausweis erstellen</button>
+                    <button class="menu-btn" onclick="openMenu('stunden')">Stundenabgleich</button>
+                    <button class="menu-btn" onclick="openMenu('kunden')">Kundenverwaltung</button>
+                </div>
+            </div>
+            
+            <!-- CONTENT -->
+            <div class="content">
+                <div class="dp-container">
+                    <table class="dp-table" id="dpTable">
+                        <thead id="dpHead">
+                            <!-- Wird dynamisch generiert -->
+                        </thead>
+                        <tbody id="dpBody">
+                            <!-- Wird dynamisch generiert -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <span>Mitarbeiter: <span id="maCount">0</span> | Einsätze: <span id="einsatzCount">0</span></span>
+            <span class="version-info">FE | V1.55</span>
+        </div>
+    </div>
+    
+    <!-- WebView2 Bridge -->
+    <script src="../js/webview2-bridge.js"></script>
+    <script>
+        // =====================================================
+        // GLOBALE VARIABLEN
+        // =====================================================
+        let startDatum = new Date();
+        let anzahlTage = 7;
+        let mitarbeiter = [];
+        let einsaetze = [];
+        let abwesenheiten = [];
+        
+        // =====================================================
+        // INITIALISIERUNG
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Startdatum setzen
+            startDatum.setHours(0, 0, 0, 0);
+            document.getElementById('startDate').value = formatDateISO(startDatum);
+            
+            // Sende-Datum (1 Woche voraus)
+            const sendeBis = new Date(startDatum);
+            sendeBis.setDate(sendeBis.getDate() + 7);
+            document.getElementById('sendeBis').value = formatDateISO(sendeBis);
+            
+            // Bridge initialisieren
+            if (typeof Bridge !== 'undefined') {
+                Bridge.init();
+                Bridge.on('onDataReceived', handleReceivedData);
+            }
+            
+            // Daten laden (immer aus Access-Backend)
+            requestData();
+        });
+        
+        // =====================================================
+        // DATEN LADEN (API oder WebView2 Bridge)
+        // =====================================================
+        const API_BASE = 'http://localhost:5000/api';
+
+        async function requestData() {
+            const anstellung = document.getElementById('selAnstellung').value;
+
+            // WebView2 Bridge Modus
+            if (window.chrome && window.chrome.webview && typeof Bridge !== 'undefined' && Bridge.sendEvent) {
+                Bridge.sendEvent('loadDienstplan', {
+                    startDatum: formatDateISO(startDatum),
+                    anzahlTage: anzahlTage,
+                    anstellung: anstellung
+                });
+                return;
+            }
+
+            // REST API Modus (Browser)
+            try {
+                const params = new URLSearchParams({
+                    datum_von: formatDateISO(startDatum),
+                    tage: anzahlTage,
+                    anstellung: anstellung
+                });
+
+                const response = await fetch(`${API_BASE}/dienstplan/uebersicht?${params}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    handleReceivedData(result);
+                } else {
+                    console.error('[DP-MA] API Fehler:', result.error);
+                    alert('API-Fehler: ' + (result.error || 'Unbekannter Fehler'));
+                }
+            } catch (err) {
+                console.error('[DP-MA] API nicht erreichbar:', err.message);
+                alert('API-Server nicht erreichbar. Bitte starten Sie den API-Server.');
+            }
+        }
+
+        function handleReceivedData(data) {
+            console.log('[DP-MA] Daten empfangen:', data);
+
+            if (data.mitarbeiter) {
+                // Mapping für konsistente Feldnamen
+                mitarbeiter = data.mitarbeiter.map(m => ({
+                    id: m.ID || m.id,
+                    name: m.Name || m.name || `${m.Nachname}, ${m.Vorname}`,
+                    nachname: m.Nachname || m.nachname,
+                    vorname: m.Vorname || m.vorname
+                }));
+            }
+            if (data.einsaetze) {
+                // Datum-Strings normalisieren (ISO-Format)
+                einsaetze = data.einsaetze.map(e => ({
+                    maId: e.maId || e.MA_ID,
+                    datum: e.datum ? e.datum.split('T')[0] : null,
+                    auftrag: e.auftrag || e.Auftrag,
+                    ort: e.ort || e.Ort,
+                    vaId: e.vaId || e.VA_ID,
+                    von: e.von || e.Von,
+                    bis: e.bis || e.Bis,
+                    status: e.status || e.Status
+                }));
+            }
+            if (data.abwesenheiten) {
+                abwesenheiten = data.abwesenheiten.map(a => ({
+                    maId: a.maId || a.MA_ID,
+                    datumVon: a.datumVon ? a.datumVon.split('T')[0] : null,
+                    datumBis: a.datumBis ? a.datumBis.split('T')[0] : null,
+                    grund: a.grund || a.Grund
+                }));
+            }
+
+            renderDienstplan();
+        }
+        
+        // =====================================================
+        // RENDERING
+        // =====================================================
+        function renderDienstplan() {
+            renderHeader();
+            renderBody();
+            updateStats();
+        }
+        
+        function renderHeader() {
+            const thead = document.getElementById('dpHead');
+            
+            // Zeile 1: Datum
+            let row1 = '<tr><th class="ma-col" rowspan="2">Mitarbeiter</th>';
+            // Zeile 2: Auftrag/von/bis
+            let row2 = '<tr>';
+            
+            for (let i = 0; i < anzahlTage; i++) {
+                const d = new Date(startDatum);
+                d.setDate(d.getDate() + i);
+                
+                const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                const isToday = isSameDay(d, new Date());
+                
+                let dayClass = 'day-col';
+                if (isWeekend) dayClass += ' weekend';
+                if (isToday) dayClass += ' today';
+                
+                const dayName = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][d.getDay()];
+                const dateStr = dayName + '. ' + formatDateDE(d);
+                
+                row1 += `<th class="${dayClass}" colspan="3">${dateStr}</th>`;
+                row2 += `<th>Auftrag</th><th>von</th><th>bis</th>`;
+            }
+            
+            row1 += '</tr>';
+            row2 += '</tr>';
+            
+            thead.innerHTML = row1 + row2;
+        }
+        
+        function renderBody() {
+            const tbody = document.getElementById('dpBody');
+            tbody.innerHTML = '';
+            
+            mitarbeiter.forEach(ma => {
+                const tr = document.createElement('tr');
+                
+                // MA-Zelle
+                tr.innerHTML = `<td class="ma-cell">${ma.name}</td>`;
+                
+                // Tage
+                for (let i = 0; i < anzahlTage; i++) {
+                    const d = new Date(startDatum);
+                    d.setDate(d.getDate() + i);
+                    const dateStr = formatDateISO(d);
+                    
+                    // Einsätze für diesen MA an diesem Tag
+                    const maEinsaetze = einsaetze.filter(e => 
+                        e.maId === ma.id && e.datum === dateStr
+                    );
+                    
+                    // Abwesenheit prüfen (Datumsbereich)
+                    const abw = abwesenheiten.find(a =>
+                        a.maId === ma.id &&
+                        (a.datumVon ? a.datumVon <= dateStr : a.datum === dateStr) &&
+                        (a.datumBis ? a.datumBis >= dateStr : a.datum === dateStr)
+                    );
+                    
+                    if (abw) {
+                        tr.innerHTML += `
+                            <td colspan="3" class="day-cell">
+                                <div class="einsatz-entry urlaub">${abw.grund}</div>
+                            </td>
+                        `;
+                    } else if (maEinsaetze.length > 0) {
+                        let cellContent = '';
+                        maEinsaetze.forEach(e => {
+                            cellContent += `
+                                <div class="einsatz-entry normal" onclick="openEinsatz(${e.vaId})" title="${e.auftrag}">
+                                    ${e.auftrag}
+                                </div>
+                            `;
+                        });
+                        tr.innerHTML += `
+                            <td class="day-cell">${cellContent}</td>
+                            <td>${maEinsaetze.map(e => e.von).join('<br>')}</td>
+                            <td>${maEinsaetze.map(e => e.bis).join('<br>')}</td>
+                        `;
+                    } else {
+                        tr.innerHTML += '<td class="day-cell"></td><td></td><td></td>';
+                    }
+                }
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function updateStats() {
+            document.getElementById('maCount').textContent = mitarbeiter.length;
+            document.getElementById('einsatzCount').textContent = einsaetze.length;
+        }
+        
+        // =====================================================
+        // NAVIGATION
+        // =====================================================
+        function prevWeek() {
+            startDatum.setDate(startDatum.getDate() - 7);
+            document.getElementById('startDate').value = formatDateISO(startDatum);
+            loadDienstplan();
+        }
+        
+        function nextWeek() {
+            startDatum.setDate(startDatum.getDate() + 7);
+            document.getElementById('startDate').value = formatDateISO(startDatum);
+            loadDienstplan();
+        }
+        
+        function goToToday() {
+            startDatum = new Date();
+            startDatum.setHours(0, 0, 0, 0);
+            document.getElementById('startDate').value = formatDateISO(startDatum);
+            loadDienstplan();
+        }
+        
+        function loadDienstplan() {
+            const dateInput = document.getElementById('startDate').value;
+            if (dateInput) {
+                startDatum = new Date(dateInput);
+            }
+            
+            if (!window.chrome || !window.chrome.webview) {
+                loadDemoData();
+            } else {
+                requestData();
+            }
+        }
+        
+        // =====================================================
+        // AKTIONEN
+        // =====================================================
+        function sendDienstplaene() {
+            const bis = document.getElementById('sendeBis').value;
+            if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
+                Bridge.sendEvent('sendDienstplaene', { bis: bis });
+            }
+            alert('Dienstpläne werden gesendet...');
+        }
+        
+        function printUebersicht() {
+            window.print();
+        }
+        
+        function einzelDienstplaene() {
+            if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
+                Bridge.sendEvent('navigate', { target: 'einzeldienstplaene' });
+            }
+        }
+        
+        function openEinsatz(vaId) {
+            if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
+                Bridge.sendEvent('navigate', { target: 'auftragsverwaltung', vaId: vaId });
+            }
+        }
+        
+        function openMenu(target) {
+            const urls = {
+                'planung': 'frm_N_DP_Dienstplan_Objekt.html',
+                'auftrag': 'auftragsverwaltung/frm_N_VA_Auftragstamm.html',
+                'mitarbeiter': 'mitarbeiterverwaltung/frm_N_MA_Mitarbeiterstamm.html',
+                'kunden': 'kundenverwaltung/frm_N_KD_Kundenstamm.html'
+            };
+            if (urls[target]) window.location.href = urls[target];
+        }
+        
+        // =====================================================
+        // HILFSFUNKTIONEN
+        // =====================================================
+        function formatDateISO(d) {
+            return d.toISOString().split('T')[0];
+        }
+        
+        function formatDateDE(d) {
+            return ('0' + d.getDate()).slice(-2) + '.' + 
+                   ('0' + (d.getMonth() + 1)).slice(-2) + '.' + 
+                   (d.getFullYear() % 100);
+        }
+        
+        function isSameDay(d1, d2) {
+            return d1.getDate() === d2.getDate() && 
+                   d1.getMonth() === d2.getMonth() && 
+                   d1.getFullYear() === d2.getFullYear();
+        }
+    </script>
+</body>
+</html>

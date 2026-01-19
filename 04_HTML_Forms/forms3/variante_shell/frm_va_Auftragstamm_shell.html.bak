@@ -1,0 +1,685 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung</title>
+    <link rel="stylesheet" href="../css/fonts_override.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background-color: #8080c0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 2px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .title-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .title-bar-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 21px;
+            height: 21px;
+            background: #ece9d8;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-btn.close {
+            background: #c75050;
+            color: white;
+        }
+
+        /* Content Area - no sidebar, full width */
+        .content-area {
+            flex: 1;
+            background-color: #8080c0;
+            padding: 3px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Header Row */
+        .header-row {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4040a0, #8080c0);
+            border: 2px solid #404080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .title-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 8px;
+            margin-left: 5px;
+        }
+
+        .header-link {
+            color: #000080;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-green {
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+        }
+
+        .btn-yellow {
+            background: linear-gradient(to bottom, #e0e080, #c0c040);
+        }
+
+        .btn-red {
+            background: linear-gradient(to bottom, #e06060, #c04040);
+            color: white;
+        }
+
+        .gpt-box {
+            background: #ffe0e0;
+            border: 1px solid #a00000;
+            padding: 2px 6px;
+            font-size: 9px;
+            text-align: center;
+            line-height: 1.2;
+            position: absolute;
+            right: 10px;
+            top: 28px;
+        }
+
+        .header-row-wrapper {
+            position: relative;
+        }
+
+        /* Button Row */
+        .button-row {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            padding: 3px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+        }
+
+        .status-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: auto;
+        }
+
+        .form-label {
+            font-size: 10px;
+        }
+
+        .form-select, .form-input {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+            height: 18px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #000080;
+            box-shadow: 0 0 2px #000080;
+        }
+
+        .form-input.readonly {
+            background: #e0e0e0;
+        }
+
+        /* Form Section */
+        .form-section {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 8px 12px;
+            display: flex;
+            gap: 30px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .input-narrow { width: 80px; }
+        .input-medium { width: 200px; }
+        .input-wide { width: 250px; }
+
+        /* Work Area */
+        .work-area {
+            display: flex;
+            flex: 1;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        /* Tab Container */
+        .tab-container {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #8080b0;
+            border-bottom: 1px solid #606090;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            padding: 4px 12px;
+            background: #a0a0c0;
+            border: 1px solid #808080;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 10px;
+            margin-right: -1px;
+        }
+
+        .tab-btn.active {
+            background: #9090c0;
+            border-bottom: 1px solid #9090c0;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-content {
+            padding: 5px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+        }
+
+        .tab-page {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-page.active {
+            display: block;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 2px 5px;
+            display: flex;
+            gap: 10px;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .status-section {
+            border: 1px inset #808080;
+            padding: 1px 8px;
+            background: #e0e0e0;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+    </style>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="form-container">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <span>ðŸ“‹</span>
+                <span>Auftragsverwaltung</span>
+            </div>
+            <div class="title-bar-buttons">
+                <button class="title-btn" onclick="minimizeForm()">_</button>
+                <button class="title-btn">â˜</button>
+                <button class="title-btn close" onclick="closeForm()">âœ•</button>
+            </div>
+        </div>
+
+        <!-- Content Area (no sidebar!) -->
+        <div class="content-area">
+            <!-- Header Row -->
+            <div class="header-row-wrapper">
+                <div class="header-row">
+                    <div class="logo-box">A</div>
+                    <span class="title-text">Auftragsverwaltung</span>
+
+                    <div class="header-links">
+                        <a class="header-link" onclick="openKunde()">Kunde</a>
+                        <a class="header-link" onclick="openObjekt()">Objekt</a>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <button class="btn" id="btnErste" onclick="navFirst()">|&lt;</button>
+                    <button class="btn" id="btnVorige" onclick="navPrev()">&lt;</button>
+                    <button class="btn" id="btnNÃ¤chste" onclick="navNext()">&gt;</button>
+                    <button class="btn" id="btnLetzte" onclick="navLast()">&gt;|</button>
+
+                    <button class="btn" onclick="refreshData()">Aktualisieren</button>
+                    <button class="btn btn-green" onclick="neuerAuftrag()">Neuer Auftrag</button>
+                    <button class="btn btn-red" onclick="auftragLÃ¶schen()">LÃ¶schen</button>
+                    <button class="btn" onclick="speichern()">Speichern</button>
+                </div>
+                <div class="gpt-box">GPT | SHELL TEST<br><span id="lblDatum"></span></div>
+            </div>
+
+            <!-- Button Row -->
+            <div class="button-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="chkAktiv">
+                    <label>Aktiv</label>
+                </div>
+                <button class="btn" onclick="planungÃ–ffnen()">Planung</button>
+                <button class="btn" onclick="kalkulationÃ–ffnen()">Kalkulation</button>
+
+                <div class="status-group">
+                    <span class="form-label">Status:</span>
+                    <select class="form-select" id="selStatus" style="width: 150px;">
+                        <option>Offen</option>
+                        <option>In Bearbeitung</option>
+                        <option>Abgeschlossen</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Form Section -->
+            <div class="form-section">
+                <div class="form-column">
+                    <div class="form-row">
+                        <span class="form-label" style="min-width: 80px; text-align: right;">Auftrags-Nr:</span>
+                        <input type="text" class="form-input input-narrow readonly" id="auftragNr" readonly>
+                    </div>
+                    <div class="form-row">
+                        <span class="form-label" style="min-width: 80px; text-align: right;">Bezeichnung:</span>
+                        <input type="text" class="form-input input-wide" id="bezeichnung">
+                    </div>
+                    <div class="form-row">
+                        <span class="form-label" style="min-width: 80px; text-align: right;">Veranstalter:</span>
+                        <select class="form-select input-medium" id="veranstalter"></select>
+                    </div>
+                </div>
+
+                <div class="form-column">
+                    <div class="form-row">
+                        <span class="form-label" style="min-width: 90px; text-align: right;">Objekt:</span>
+                        <select class="form-select input-medium" id="objekt"></select>
+                    </div>
+                    <div class="form-row">
+                        <span class="form-label" style="min-width: 90px; text-align: right;">Von:</span>
+                        <input type="date" class="form-input input-narrow" id="vonDatum">
+                    </div>
+                    <div class="form-row">
+                        <span class="form-label" style="min-width: 90px; text-align: right;">Bis:</span>
+                        <input type="date" class="form-input input-narrow" id="bisDatum">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Work Area with Tabs -->
+            <div class="work-area">
+                <div class="tab-container">
+                    <div class="tab-header">
+                        <button class="tab-btn active" data-tab="einsatztage">Einsatztage</button>
+                        <button class="tab-btn" data-tab="schichten">Schichten</button>
+                        <button class="tab-btn" data-tab="kalkulation">Kalkulation</button>
+                        <button class="tab-btn" data-tab="dokumente">Dokumente</button>
+                    </div>
+                    <div class="tab-content">
+                        <!-- Tab: Einsatztage -->
+                        <div class="tab-page active" id="tab-einsatztage">
+                            <iframe src="../sub_VA_Einsatztage.html" style="width: 100%; height: 100%; border: none;"></iframe>
+                        </div>
+
+                        <!-- Tab: Schichten -->
+                        <div class="tab-page" id="tab-schichten">
+                            <iframe src="../sub_VA_Schichten.html" style="width: 100%; height: 100%; border: none;"></iframe>
+                        </div>
+
+                        <!-- Tab: Kalkulation -->
+                        <div class="tab-page" id="tab-kalkulation">
+                            <p style="padding: 10px;">Kalkulation wird hier angezeigt...</p>
+                        </div>
+
+                        <!-- Tab: Dokumente -->
+                        <div class="tab-page" id="tab-dokumente">
+                            <p style="padding: 10px;">Dokumente werden hier angezeigt...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-section">Erstellt</span>
+            <span class="status-section" id="erstelltVon">-</span>
+            <span class="status-section" id="erstelltAm">-</span>
+            <span class="status-section">GeÃ¤ndert</span>
+            <span class="status-section" id="geaendertVon">-</span>
+            <span class="status-section" id="geaendertAm">-</span>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        const API_BASE = 'http://localhost:5000/api';
+
+        // State
+        const state = {
+            auftraege: [],
+            currentIndex: 0,
+            currentRecord: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            document.getElementById('lblDatum').textContent = formatDate(new Date());
+
+            // Tab-Wechsel
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Daten laden
+            await loadAuftrÃ¤ge();
+            hideLoading();
+        });
+
+        // Navigation
+        function navFirst() { showRecord(0); }
+        function navPrev() { showRecord(Math.max(0, state.currentIndex - 1)); }
+        function navNext() { showRecord(Math.min(state.auftraege.length - 1, state.currentIndex + 1)); }
+        function navLast() { showRecord(state.auftraege.length - 1); }
+
+        async function loadAuftrÃ¤ge() {
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE}/auftraege`);
+                const result = await response.json();
+                state.auftraege = result.data || [];
+                if (state.auftraege.length > 0) {
+                    await showRecord(0);
+                }
+            } catch (e) {
+                console.error('AuftrÃ¤ge laden fehlgeschlagen:', e);
+            }
+            hideLoading();
+        }
+
+        async function showRecord(index) {
+            if (index < 0 || index >= state.auftraege.length) return;
+            state.currentIndex = index;
+            state.currentRecord = state.auftraege[index];
+
+            // Formular befÃ¼llen
+            document.getElementById('auftragNr').value = state.currentRecord.Auftrag || '';
+            document.getElementById('bezeichnung').value = state.currentRecord.Objekt || '';
+            // ... weitere Felder
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-page').forEach(page => {
+                page.classList.toggle('active', page.id === 'tab-' + tabName);
+            });
+        }
+
+        function neuerAuftrag() {
+            alert('Neuer Auftrag erstellen...');
+        }
+
+        function auftragLÃ¶schen() {
+            if (confirm('Auftrag wirklich lÃ¶schen?')) {
+                alert('LÃ¶schen...');
+            }
+        }
+
+        function speichern() {
+            alert('Speichern...');
+        }
+
+        function refreshData() {
+            loadAuftrÃ¤ge();
+        }
+
+        function openKunde() {
+            notifyParent('NAVIGATE', 'frm_KD_Kundenstamm_shell');
+        }
+
+        function openObjekt() {
+            notifyParent('NAVIGATE', 'frm_OB_Objekt_shell');
+        }
+
+        function planungÃ–ffnen() {
+            notifyParent('NAVIGATE', 'frm_VA_PlanungsÃ¼bersicht');
+        }
+
+        function kalkulationÃ–ffnen() {
+            alert('Kalkulation Ã¶ffnen...');
+        }
+
+        function minimizeForm() {
+            notifyParent('MINIMIZE');
+        }
+
+        function closeForm() {
+            notifyParent('CLOSE');
+        }
+
+        // Communicate with parent shell
+        function notifyParent(type, data) {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: type,
+                    formName: typeof data === 'string' ? data : undefined,
+                    data: typeof data === 'object' ? data : undefined
+                }, '*');
+            }
+        }
+
+        // Listen to messages from parent
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+
+            if (data.type === 'LOAD_DATA') {
+                // Parent sendet Daten
+                if (data.auftrag_id) {
+                    loadAuftragById(data.auftrag_id);
+                }
+            }
+        });
+
+        async function loadAuftragById(id) {
+            try {
+                const response = await fetch(`${API_BASE}/auftraege/${id}`);
+                const result = await response.json();
+                state.currentRecord = result.data;
+                // Formular befÃ¼llen...
+            } catch (e) {
+                console.error('Auftrag laden:', e);
+            }
+        }
+
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            return d.toLocaleDateString('de-DE');
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        console.log('[Auftragstamm Shell] Form loaded');
+    </script>
+    <!-- API-Server Lifecycle (fuer Standalone-Test) -->
+    <script src="../../js/api-lifecycle.js"></script>
+</body>
+</html>
+

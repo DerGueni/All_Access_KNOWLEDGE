@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abwesenheitsplanung - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_MA_Abwesenheit.css">
+</head>
+<body>
+    <div class="abw-container">
+        <!-- Linkes Menue -->
+        <aside class="abw-menu">
+            <div class="menu-header">HAUPTMENUE</div>
+            <nav class="menu-buttons">
+                <a href="frm_N_Dienstplanuebersicht.html" class="menu-btn">Dienstplanuebersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="menu-btn">Planungsuebersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="menu-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="menu-btn">Mitarbeiterverwaltung</a>
+                <a href="frm_N_Email_versenden.html" class="menu-btn">Offene Mail Anfragen</a>
+                <a href="frm_MA_Zeitkonten.html" class="menu-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="menu-btn">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="menu-btn active">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="menu-btn">Dienstausweis erstellen</a>
+                <a href="frm_N_Stundenauswertung.html" class="menu-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="menu-btn">Kundenverwaltung</a>
+                <a href="frm_KD_Kundenstamm.html" class="menu-btn">Verrechnungssaetze</a>
+                <a href="frm_N_Lohnabrechnungen.html" class="menu-btn">Sub Rechnungen</a>
+                <a href="frm_N_Email_versenden.html" class="menu-btn">E-Mail</a>
+                <a href="frm_Menuefuehrung.html" class="menu-btn secondary">Menue 2</a>
+                <a href="frm_N_Optimierung.html" class="menu-btn secondary">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Hauptbereich -->
+        <main class="abw-main">
+            <!-- Header -->
+            <header class="abw-header">
+                <div class="header-left">
+                    <div class="abw-logo"></div>
+                    <h1 class="abw-title">Abwesenheitsplanung</h1>
+                </div>
+                <div class="header-center">
+                    <button class="abw-btn-icon" id="btnRefresh" title="Aktualisieren">
+                        <span>&#8635;</span>
+                    </button>
+                    <button class="abw-btn-icon" id="btnExcel" title="Excel Export">
+                        <span>&#128196;</span>
+                    </button>
+                </div>
+                <div class="header-right">
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V1.55</span>
+                        <span id="lblDatum"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="abw-content">
+                <!-- Mitarbeiter Auswahl -->
+                <div class="abw-ma-row">
+                    <label class="abw-label">Mitarbeiter</label>
+                    <select id="cboMitarbeiter" class="abw-select-large">
+                        <option value="">-- Mitarbeiter waehlen --</option>
+                    </select>
+                </div>
+
+                <!-- Hauptbereich mit Eingabe und Liste -->
+                <div class="abw-main-content">
+                    <!-- Eingabebereich links -->
+                    <div class="abw-input-section">
+                        <div class="abw-fieldset">
+                            <div class="abw-field-row">
+                                <label class="abw-field-label">Grund:</label>
+                                <select id="cboGrund" class="abw-select">
+                                    <option value=""></option>
+                                    <option value="Urlaub">Urlaub</option>
+                                    <option value="Krank">Krankheit</option>
+                                    <option value="Privat verplant">Privat verplant</option>
+                                    <option value="Fortbildung">Fortbildung</option>
+                                    <option value="Sonstiges">Sonstiges</option>
+                                </select>
+                            </div>
+
+                            <div class="abw-field-row">
+                                <label class="abw-field-label">Bemerkung:</label>
+                                <input type="text" id="txtBemerkung" class="abw-input">
+                            </div>
+
+                            <div class="abw-field-row checkbox-row">
+                                <input type="checkbox" id="chkNurWerktags">
+                                <label for="chkNurWerktags">Nur Werktags (Mo - Fr, wenn kein Feiertag in Bayern)</label>
+                            </div>
+
+                            <div class="abw-field-row date-row">
+                                <label class="abw-field-label-small">von</label>
+                                <input type="date" id="datVon" class="abw-date-input">
+                                <label class="abw-field-label-small">bis</label>
+                                <input type="date" id="datBis" class="abw-date-input">
+                            </div>
+
+                            <div class="abw-field-row radio-row">
+                                <label class="radio-label">
+                                    <input type="radio" name="zeitart" id="radGanztaegig" checked>
+                                    Ganztaegig
+                                </label>
+                            </div>
+
+                            <div class="abw-field-row radio-row">
+                                <label class="radio-label">
+                                    <input type="radio" name="zeitart" id="radStundenweise">
+                                    Stundenweise
+                                </label>
+                            </div>
+
+                            <div class="abw-field-row time-row" id="rowZeiten">
+                                <label class="abw-field-label-small">von</label>
+                                <input type="text" id="txtZeitVon" class="abw-time-input" value="00:00" disabled>
+                                <label class="abw-field-label-small">bis</label>
+                                <input type="text" id="txtZeitBis" class="abw-time-input" value="00:00" disabled>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="abw-button-section">
+                            <button class="abw-btn primary" id="btnUebernehmen">Uebernehmen</button>
+                            <button class="abw-btn" id="btnMarkierteLoeschen">Markierte loeschen &lt;-</button>
+                            <button class="abw-btn" id="btnAlleLoeschen">Alle loeschen &lt;&lt;--</button>
+                        </div>
+                    </div>
+
+                    <!-- Abwesenheitszeiten rechts -->
+                    <div class="abw-list-section">
+                        <div class="abw-list-header">Abwesenheitszeiten:</div>
+                        <div class="abw-table-container">
+                            <table class="abw-table" id="tblAbwesenheiten">
+                                <thead>
+                                    <tr>
+                                        <th class="col-select"></th>
+                                        <th class="col-datvon">DatVon</th>
+                                        <th class="col-datbis">DatBis</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyAbwesenheiten">
+                                    <!-- Daten werden via JS geladen -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="abw-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblAnzahl">0 Eintraege</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Datum anzeigen
+        document.getElementById('lblDatum').textContent = new Date().toLocaleDateString('de-DE', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="frm_MA_Abwesenheit.logic.js"></script>
+</body>
+</html>

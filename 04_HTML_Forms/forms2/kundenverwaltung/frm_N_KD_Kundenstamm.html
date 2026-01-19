@@ -1,0 +1,254 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenstammblatt</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 12px; background: #d4d0c8; overflow: hidden; }
+        
+        .app-container { display: flex; height: 100vh; width: 100%; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 130px; min-width: 100px; background: linear-gradient(180deg, #8B0000 0%, #660000 100%); display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-logo { padding: 6px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .sidebar-logo-icon { width: 36px; height: 36px; margin: 0 auto; background: linear-gradient(135deg, #1a3a6a 0%, #2a4a8a 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; border: 2px solid #0a2a5a; }
+        .sidebar-title { color: white; font-size: 11px; font-weight: bold; text-align: center; padding: 6px 4px; background: rgba(0,0,0,0.2); }
+        .sidebar-menu { flex: 1; padding: 4px; overflow-y: auto; }
+        .menu-btn { display: block; width: 100%; padding: 5px 4px; margin: 2px 0; background: linear-gradient(180deg, #5577aa 0%, #4466aa 100%); color: white; border: 1px solid #3355aa; border-radius: 3px; cursor: pointer; font-size: 9px; text-align: center; }
+        .menu-btn:hover { background: linear-gradient(180deg, #6688bb 0%, #5577aa 100%); }
+        .menu-btn.active { background: linear-gradient(180deg, #3355aa 0%, #224499 100%); }
+        .menu-btn.highlight { background: #00cc66; color: black; border-color: #009944; }
+        
+        .main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        
+        /* HEADER */
+        .header-row1 { background: linear-gradient(180deg, #5577aa 0%, #4466aa 100%); padding: 4px 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #3355aa; }
+        .header-logo { width: 36px; height: 36px; background: linear-gradient(135deg, #1a3a6a 0%, #2a4a8a 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; border: 2px solid #0a2a5a; flex-shrink: 0; }
+        .header-title { color: white; font-size: 15px; font-weight: bold; margin-right: 8px; }
+        .nav-btns { display: flex; gap: 1px; flex-shrink: 0; }
+        .nav-btn { width: 24px; height: 24px; background: #f0f0f0; border: 1px solid #888; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+        .nav-btn:hover { background: #e0e0e0; }
+        .header-btn { padding: 4px 10px; font-size: 11px; border: 1px solid #666; background: linear-gradient(180deg, #f4f4f4 0%, #ddd 100%); cursor: pointer; border-radius: 2px; white-space: nowrap; }
+        .header-btn:hover { background: linear-gradient(180deg, #fff 0%, #eee 100%); }
+        .header-btn.blue { background: linear-gradient(180deg, #5588dd 0%, #4477cc 100%); color: white; border-color: #3366bb; }
+        .header-btn.green { background: linear-gradient(180deg, #44bb44 0%, #339933 100%); color: white; border-color: #228822; }
+        .header-btn.red { background: linear-gradient(180deg, #dd4444 0%, #cc3333 100%); color: white; border-color: #bb2222; }
+        .header-sep { width: 1px; height: 24px; background: rgba(255,255,255,0.3); margin: 0 4px; }
+        
+        .content { display: flex; flex: 1; min-height: 0; }
+        .form-area { flex: 1; display: flex; flex-direction: column; padding: 8px; min-width: 0; background: #d4d0c8; }
+        
+        /* KUNDE HEADER */
+        .kunde-header { background: white; border: 1px solid #888; padding: 10px 15px; margin-bottom: 8px; }
+        .kunde-firma { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 3px; }
+        .kunde-ansprech { font-size: 13px; color: #666; }
+        
+        /* TABS */
+        .tab-box { flex: 1; display: flex; flex-direction: column; background: white; border: 1px solid #888; min-height: 0; }
+        .tab-header { display: flex; background: #c8c4bc; border-bottom: 1px solid #888; }
+        .tab-btn { padding: 6px 16px; font-size: 11px; border: none; border-right: 1px solid #888; background: #c0bbb4; cursor: pointer; }
+        .tab-btn:hover { background: #d8d4cc; }
+        .tab-btn.active { background: white; font-weight: bold; }
+        .tab-body { flex: 1; display: none; overflow: auto; background: white; padding: 12px; }
+        .tab-body.active { display: block; }
+        
+        /* FORMULARFELDER */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .form-col { display: flex; flex-direction: column; gap: 5px; }
+        .field-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .lbl { font-size: 11px; min-width: 100px; text-align: right; color: #000; }
+        .inp { padding: 3px 6px; border: 1px solid #888; font-size: 11px; background: white; flex: 1; max-width: 280px; }
+        .inp:focus { border-color: #4477bb; outline: none; }
+        .inp[readonly] { background: #f0f0f0; }
+        .sel { padding: 3px 5px; border: 1px solid #888; font-size: 11px; background: white; flex: 1; max-width: 280px; }
+        .chk-row { display: flex; align-items: center; gap: 6px; margin-left: 108px; }
+        .inp-plz { max-width: 60px; }
+        .inp-link { color: #0066cc; text-decoration: underline; cursor: pointer; }
+        
+        /* RECHTE SIDEBAR */
+        .right-panel { width: 380px; min-width: 320px; background: #d4d0c8; border-left: 1px solid #888; display: flex; flex-direction: column; padding: 5px; flex-shrink: 0; }
+        
+        .kd-id-box { background: white; border: 1px solid #888; padding: 6px 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .kd-id-box .lbl { min-width: auto; }
+        .kd-id-box .inp { max-width: 60px; text-align: center; font-weight: bold; }
+        
+        .filter-bar { display: flex; align-items: center; gap: 4px; margin-bottom: 5px; flex-wrap: wrap; }
+        .filter-bar .lbl { min-width: auto; font-size: 10px; }
+        .filter-inp { width: 140px; padding: 2px 4px; border: 1px solid #888; font-size: 10px; }
+        
+        .kd-grid { flex: 1; border: 1px solid #888; background: white; overflow: auto; }
+        .kd-tbl { width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed; }
+        .kd-tbl th { background: #5577aa; color: white; border: 1px solid #4466aa; padding: 4px; position: sticky; top: 0; text-align: left; }
+        .kd-tbl td { border: 1px solid #ddd; padding: 3px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .kd-tbl tr:hover { background: #e0f0ff; cursor: pointer; }
+        .kd-tbl tr.sel { background: #3366cc; color: white; }
+        .kd-tbl .c-id { width: 45px; }
+        .kd-tbl .c-firma { width: auto; }
+        .kd-tbl .c-adr { width: 60px; }
+        
+        .footer { background: #c8c4bc; padding: 3px 8px; display: flex; justify-content: space-between; font-size: 9px; color: #333; border-top: 1px solid #888; }
+        
+        /* RESPONSIVE */
+        @media screen and (max-width: 1400px) {
+            .sidebar { width: 110px; }
+            .right-panel { width: 320px; min-width: 280px; }
+            .form-grid { gap: 15px; }
+            .lbl { min-width: 90px; font-size: 10px; }
+        }
+        @media screen and (min-width: 1700px) {
+            .right-panel { width: 420px; }
+            .kunde-header { padding: 12px 20px; }
+            .kunde-firma { font-size: 20px; }
+        }
+    </style>
+    <script src="../../data/kunden_data.js"></script>
+    <script src="../../data/kunden_echtdaten.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-logo"><div class="sidebar-logo-icon">◈</div></div>
+            <div class="sidebar-title">HAUPTMENÜ</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn" onclick="openMenu('Dienstplanuebersicht')">Dienstplanübersicht</button>
+                <button class="menu-btn" onclick="openMenu('Planungsuebersicht')">Planungsübersicht</button>
+                <button class="menu-btn" onclick="openMenu('Auftragsverwaltung')">Auftragsverwaltung</button>
+                <button class="menu-btn" onclick="openMenu('Mitarbeiterverwaltung')">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" onclick="openMenu('OffeneMailAnfragen')">Offene Mail Anfragen</button>
+                <button class="menu-btn" onclick="openMenu('ExcelZeitkonten')">Excel Zeitkonten</button>
+                <button class="menu-btn" onclick="openMenu('Zeitkonten')">Zeitkonten</button>
+                <button class="menu-btn" onclick="openMenu('Abwesenheitsplanung')">Abwesenheitsplanung</button>
+                <button class="menu-btn" onclick="openMenu('Dienstausweis')">Dienstausweis erstellen</button>
+                <button class="menu-btn" onclick="openMenu('Stundenabgleich')">Stundenabgleich</button>
+                <button class="menu-btn active">Kundenverwaltung</button>
+                <button class="menu-btn" onclick="openMenu('Verrechnungssaetze')">Verrechnungssätze</button>
+                <button class="menu-btn" onclick="openMenu('SubRechnungen')">Sub Rechnungen</button>
+                <button class="menu-btn" onclick="openMenu('EMail')">E-Mail</button>
+                <button class="menu-btn" onclick="openMenu('Menu2')">Menü 2</button>
+                <button class="menu-btn highlight">HTML Ansicht</button>
+            </div>
+        </div>
+        
+        <!-- HAUPTBEREICH -->
+        <div class="main-area">
+            <div class="header-row1">
+                <div class="header-logo">◈</div>
+                <span class="header-title">Kundenstammblatt</span>
+                <div class="nav-btns">
+                    <button class="nav-btn" onclick="navFirst()">⏮</button>
+                    <button class="nav-btn" onclick="navPrev()">◀</button>
+                    <button class="nav-btn" onclick="navNext()">▶</button>
+                    <button class="nav-btn" onclick="navLast()">⏭</button>
+                </div>
+                <div style="flex:1"></div>
+                <button class="header-btn blue" onclick="showVerrechnungssaetze()">Verrechnungssätze</button>
+                <button class="header-btn blue" onclick="showUmsatzauswertung()">Umsatzauswertung</button>
+                <div class="header-sep"></div>
+                <button class="header-btn red" onclick="deleteKunde()">Kunden löschen</button>
+                <button class="header-btn green" onclick="newKunde()">Neuer Kunde</button>
+            </div>
+            
+            <!-- CONTENT -->
+            <div class="content">
+                <div class="form-area">
+                    <!-- KUNDE HEADER -->
+                    <div class="kunde-header">
+                        <div class="kunde-firma" id="dispFirma">1 Agency</div>
+                        <div class="kunde-ansprech" id="dispAnsprech">Holger Rothe</div>
+                    </div>
+                    
+                    <div class="tab-box">
+                        <div class="tab-header">
+                            <button class="tab-btn active" onclick="showTab('stammdaten',this)">Stammdaten</button>
+                            <button class="tab-btn" onclick="showTab('konditionen',this)">Konditionen</button>
+                            <button class="tab-btn" onclick="showTab('auftraege',this)">Auftragsübersicht</button>
+                            <button class="tab-btn" onclick="showTab('dateien',this)">Zusatzdateien</button>
+                            <button class="tab-btn" onclick="showTab('bemerkungen',this)">Bemerkungen</button>
+                        </div>
+                        
+                        <div class="tab-body active" id="tab-stammdaten">
+                            <div class="chk-row" style="margin-left:0;margin-bottom:12px;">
+                                <label><input type="checkbox" id="chkAktiv"> Ist aktiv</label>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-col">
+                                    <div class="field-row"><span class="lbl">Kunden-Kürzel</span><input type="text" id="txtKuerzel" class="inp"></div>
+                                    <div class="field-row"><span class="lbl">Straße</span><input type="text" id="txtStrasse" class="inp"></div>
+                                    <div class="field-row"><span class="lbl">PLZ Ort</span><input type="text" id="txtPLZ" class="inp inp-plz"><input type="text" id="txtOrt" class="inp" placeholder="Ort"></div>
+                                    <div class="field-row"><span class="lbl">Land</span><select id="selLand" class="sel"><option value="DE">DE</option><option value="AT">AT</option><option value="CH">CH</option></select></div>
+                                    <div class="field-row"><span class="lbl">Telefon</span><input type="text" id="txtTelefon" class="inp"></div>
+                                    <div class="field-row"><span class="lbl">Mobil</span><input type="text" id="txtMobil" class="inp"></div>
+                                    <div class="field-row"><span class="lbl">E-Mail</span><input type="text" id="txtEmail" class="inp"></div>
+                                    <div class="field-row"><span class="lbl">Homepage</span><input type="text" id="txtHomepage" class="inp inp-link" onclick="openHomepage()"></div>
+                                    <div class="field-row"><span class="lbl">Anspr.Partner</span><select id="selAnsprPartner" class="sel"><option value="">--</option></select></div>
+                                    <div class="field-row"><span class="lbl">Mobil</span><input type="text" id="txtAnsprMobil" class="inp"></div>
+                                </div>
+                                
+                                <div class="form-col">
+                                    <div class="field-row"><span class="lbl">Kreditinstitut</span><input type="text" id="txtKreditinstitut" class="inp"></div>
+                                    <div class="field-row"><span class="lbl">IBAN</span><input type="text" id="txtIBAN" class="inp"></div>
+                                    <div class="field-row"><span class="lbl">BIC</span><input type="text" id="txtBIC" class="inp"></div>
+                                    <div class="field-row"><span class="lbl">UStIDNr.</span><input type="text" id="txtUstIdNr" class="inp"></div>
+                                    <div class="field-row"><span class="lbl">Zahlungsbed.</span><select id="selZahlbed" class="sel"><option value="">--</option><option value="Netto 7">Netto 7</option><option value="Netto 14">Netto 14</option><option value="Netto 30">Netto 30</option><option value="Netto 60">Netto 60</option></select></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-body" id="tab-konditionen"><div style="padding:20px;">Konditionen - wird geladen...</div></div>
+                        <div class="tab-body" id="tab-auftraege"><div style="padding:20px;">Auftragsübersicht - wird geladen...</div></div>
+                        <div class="tab-body" id="tab-dateien"><div style="padding:20px;">Zusatzdateien - wird geladen...</div></div>
+                        <div class="tab-body" id="tab-bemerkungen">
+                            <textarea id="txtMemo" style="width:100%;height:200px;border:1px solid #888;padding:8px;font-size:11px;resize:none;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- RECHTE SIDEBAR -->
+                <div class="right-panel">
+                    <div class="kd-id-box">
+                        <span class="lbl">Kunden-Nr.</span>
+                        <input type="text" id="txtKdNr" class="inp" readonly>
+                    </div>
+                    
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+                        <label><input type="checkbox" id="chkNurAktive" checked> Nur Aktive anzeigen</label>
+                    </div>
+                    
+                    <div class="filter-bar">
+                        <span class="lbl">Suche</span>
+                        <input type="text" class="filter-inp" id="txtSuche" placeholder="Suchen..." onkeyup="filterKunden()">
+                    </div>
+                    
+                    <div class="kd-grid">
+                        <table class="kd-tbl">
+                            <thead>
+                                <tr>
+                                    <th class="c-id">kun_Id</th>
+                                    <th class="c-firma">Firma</th>
+                                    <th class="c-adr">adr.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kdBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <span>Erstellt am: <span id="lblErstellt">Mo 30.01.2023</span> von <span id="lblErstVon">guenther.siegert</span></span>
+                <span>Geändert am: <span id="lblGeaendert">Mi 10.12.2025</span> von <span id="lblAendVon">guenther.siegert</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebView2 Bridge -->
+    <script src="../../js/webview2-bridge.js"></script>
+    <script src="../../js/kundenstamm-bridge.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rechnungskopf - Subform</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: white;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 11px;
+        }
+        .subform-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+        }
+        .field-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .field-row label {
+            width: 120px;
+            font-weight: 500;
+            color: #333;
+        }
+        .field-row input, .field-row select {
+            flex: 1;
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        .field-row input:focus, .field-row select:focus {
+            border-color: #4316B2;
+            outline: none;
+        }
+        .field-row input[readonly] {
+            background: #f5f5f5;
+        }
+        .field-group {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+        .field-group-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #4316B2;
+        }
+        .summe-row {
+            display: flex;
+            justify-content: flex-end;
+            padding: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+        .summe-label {
+            font-weight: 600;
+            margin-right: 12px;
+        }
+        .summe-value {
+            font-weight: 700;
+            font-size: 14px;
+            color: #4316B2;
+        }
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .btn {
+            padding: 4px 12px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .btn:hover {
+            background: #f0f0f0;
+        }
+        .btn-primary {
+            background: #4316B2;
+            color: white;
+            border-color: #4316B2;
+        }
+        .btn-primary:hover {
+            background: #3a13a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="toolbar">
+            <button class="btn" id="btnNeu">Neue Rechnung</button>
+            <button class="btn" id="btnLoeschen">Loeschen</button>
+            <button class="btn btn-primary" id="btnSpeichern">Speichern</button>
+        </div>
+
+        <div class="field-group">
+            <div class="field-group-title">Rechnungsdaten</div>
+            <div class="field-row">
+                <label>Rechnungs-Nr:</label>
+                <input type="text" id="Rch_Nr" readonly>
+            </div>
+            <div class="field-row">
+                <label>Rechnungsdatum:</label>
+                <input type="date" id="Rch_Datum">
+            </div>
+            <div class="field-row">
+                <label>Leistungszeitraum:</label>
+                <input type="date" id="Leistung_Von" style="width:45%;">
+                <span style="margin:0 8px;">bis</span>
+                <input type="date" id="Leistung_Bis" style="width:45%;">
+            </div>
+        </div>
+
+        <div class="field-group">
+            <div class="field-group-title">Kunde</div>
+            <div class="field-row">
+                <label>Kunde:</label>
+                <select id="Kunde_ID">
+                    <option value="">-- Kunde waehlen --</option>
+                </select>
+            </div>
+            <div class="field-row">
+                <label>Anschrift:</label>
+                <input type="text" id="Kunde_Anschrift" readonly>
+            </div>
+        </div>
+
+        <div class="field-group">
+            <div class="field-group-title">Zahlungsbedingungen</div>
+            <div class="field-row">
+                <label>Zahlungsziel:</label>
+                <select id="Zahlungsziel">
+                    <option value="14">14 Tage</option>
+                    <option value="30" selected>30 Tage</option>
+                    <option value="45">45 Tage</option>
+                </select>
+            </div>
+            <div class="field-row">
+                <label>MwSt-Satz:</label>
+                <select id="MwSt_Satz">
+                    <option value="19">19%</option>
+                    <option value="7">7%</option>
+                    <option value="0">0%</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="summe-row">
+            <span class="summe-label">Netto:</span>
+            <span class="summe-value" id="lblNetto">0,00 EUR</span>
+            <span class="summe-label" style="margin-left:20px;">MwSt:</span>
+            <span class="summe-value" id="lblMwSt">0,00 EUR</span>
+            <span class="summe-label" style="margin-left:20px;">Brutto:</span>
+            <span class="summe-value" id="lblBrutto">0,00 EUR</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Bridge } from '../js/webview2-bridge.js';
+
+        let currentRechnung = null;
+        let linkParams = { VA_ID: null };
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        function init() {
+            document.getElementById('btnNeu').addEventListener('click', neueRechnung);
+            document.getElementById('btnLoeschen').addEventListener('click', loeschenRechnung);
+            document.getElementById('btnSpeichern').addEventListener('click', speichern);
+            document.getElementById('Kunde_ID').addEventListener('change', loadKundeDetails);
+
+            window.addEventListener('message', handleMessage);
+            notifyParent('subform_ready', { name: 'sub_tbl_Rch_Kopf' });
+
+            loadKunden();
+        }
+
+        function handleMessage(event) {
+            const data = event.data;
+            if (!data || !data.type) return;
+
+            switch (data.type) {
+                case 'set_link_params':
+                    linkParams.VA_ID = data.VA_ID;
+                    loadData();
+                    break;
+                case 'requery':
+                    loadData();
+                    break;
+            }
+        }
+
+        async function loadKunden() {
+            try {
+                const result = await Bridge.kunden.list({ aktiv: true });
+                const kunden = result.data || result || [];
+                const select = document.getElementById('Kunde_ID');
+                select.innerHTML = '<option value="">-- Kunde waehlen --</option>';
+                kunden.forEach(k => {
+                    select.innerHTML += `<option value="${k.kun_Id}">${k.kun_Firma}</option>`;
+                });
+            } catch (error) {
+                console.error('[sub_tbl_Rch_Kopf] Kunden laden fehlgeschlagen:', error);
+            }
+        }
+
+        async function loadData() {
+            if (!linkParams.VA_ID) {
+                clearForm();
+                return;
+            }
+
+            try {
+                const result = await Bridge.execute('executeSQL', {
+                    sql: `SELECT * FROM tbl_Rch_Kopf WHERE VA_ID = ${linkParams.VA_ID} ORDER BY Rch_Datum DESC`,
+                    fetch: true
+                });
+
+                const rechnungen = (result && result.rows) || [];
+                if (rechnungen.length > 0) {
+                    currentRechnung = rechnungen[0];
+                    displayRechnung(currentRechnung);
+                } else {
+                    currentRechnung = null;
+                    clearForm();
+                }
+            } catch (error) {
+                console.error('[sub_tbl_Rch_Kopf] Fehler:', error);
+            }
+        }
+
+        function displayRechnung(rch) {
+            document.getElementById('Rch_Nr').value = rch.Rch_Nr || '';
+            document.getElementById('Rch_Datum').value = formatDateInput(rch.Rch_Datum);
+            document.getElementById('Leistung_Von').value = formatDateInput(rch.Leistung_Von);
+            document.getElementById('Leistung_Bis').value = formatDateInput(rch.Leistung_Bis);
+            document.getElementById('Kunde_ID').value = rch.Kunde_ID || '';
+            document.getElementById('Zahlungsziel').value = rch.Zahlungsziel || '30';
+            document.getElementById('MwSt_Satz').value = rch.MwSt_Satz || '19';
+
+            updateSummen(rch.Netto || 0, rch.MwSt_Satz || 19);
+            loadKundeDetails();
+        }
+
+        function clearForm() {
+            document.getElementById('Rch_Nr').value = '';
+            document.getElementById('Rch_Datum').value = '';
+            document.getElementById('Leistung_Von').value = '';
+            document.getElementById('Leistung_Bis').value = '';
+            document.getElementById('Kunde_ID').value = '';
+            document.getElementById('Kunde_Anschrift').value = '';
+            document.getElementById('Zahlungsziel').value = '30';
+            document.getElementById('MwSt_Satz').value = '19';
+            updateSummen(0, 19);
+        }
+
+        async function loadKundeDetails() {
+            const kundeId = document.getElementById('Kunde_ID').value;
+            if (!kundeId) {
+                document.getElementById('Kunde_Anschrift').value = '';
+                return;
+            }
+
+            try {
+                const result = await Bridge.execute('executeSQL', {
+                    sql: `SELECT * FROM tbl_KD_Kundenstamm WHERE kun_Id = ${kundeId}`,
+                    fetch: true
+                });
+                const kunde = (result && result.rows && result.rows[0]) || {};
+                const anschrift = `${kunde.kun_Strasse || ''}, ${kunde.kun_PLZ || ''} ${kunde.kun_Ort || ''}`;
+                document.getElementById('Kunde_Anschrift').value = anschrift.trim();
+            } catch (error) {
+                console.error('[sub_tbl_Rch_Kopf] Kunde laden fehlgeschlagen:', error);
+            }
+        }
+
+        function updateSummen(netto, mwstSatz) {
+            const mwst = netto * (mwstSatz / 100);
+            const brutto = netto + mwst;
+
+            document.getElementById('lblNetto').textContent = formatCurrency(netto);
+            document.getElementById('lblMwSt').textContent = formatCurrency(mwst);
+            document.getElementById('lblBrutto').textContent = formatCurrency(brutto);
+        }
+
+        async function neueRechnung() {
+            currentRechnung = null;
+            clearForm();
+            document.getElementById('Rch_Datum').value = formatDateInput(new Date());
+        }
+
+        async function speichern() {
+            try {
+                const data = {
+                    VA_ID: linkParams.VA_ID,
+                    Rch_Datum: document.getElementById('Rch_Datum').value,
+                    Leistung_Von: document.getElementById('Leistung_Von').value,
+                    Leistung_Bis: document.getElementById('Leistung_Bis').value,
+                    Kunde_ID: document.getElementById('Kunde_ID').value,
+                    Zahlungsziel: document.getElementById('Zahlungsziel').value,
+                    MwSt_Satz: document.getElementById('MwSt_Satz').value
+                };
+
+                if (currentRechnung && currentRechnung.ID) {
+                    data.ID = currentRechnung.ID;
+                }
+
+                await Bridge.save('rechnung', data);
+                await loadData();
+                notifyParent('data_changed', { name: 'sub_tbl_Rch_Kopf' });
+            } catch (error) {
+                console.error('[sub_tbl_Rch_Kopf] Speichern fehlgeschlagen:', error);
+                alert('Fehler beim Speichern: ' + error.message);
+            }
+        }
+
+        async function loeschenRechnung() {
+            if (!currentRechnung || !currentRechnung.ID) return;
+            if (!confirm('Rechnung wirklich loeschen?')) return;
+
+            try {
+                await Bridge.delete('rechnung', currentRechnung.ID);
+                currentRechnung = null;
+                clearForm();
+                notifyParent('data_changed', { name: 'sub_tbl_Rch_Kopf' });
+            } catch (error) {
+                console.error('[sub_tbl_Rch_Kopf] Loeschen fehlgeschlagen:', error);
+            }
+        }
+
+        function formatDateInput(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            if (isNaN(d)) return '';
+            return d.toISOString().split('T')[0];
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value || 0);
+        }
+
+        function notifyParent(type, data) {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type, ...data }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

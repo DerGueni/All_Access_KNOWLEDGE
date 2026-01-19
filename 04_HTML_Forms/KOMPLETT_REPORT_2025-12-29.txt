@@ -1,0 +1,112 @@
+﻿╔══════════════════════════════════════════════════════════════════════════════╗
+║           CONSEC HTML FORMULARE - VOLLSTÄNDIGER REPORT                       ║
+║                     Stand: 29.12.2025 19:23                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+================================================================================
+HEUTE ERSTELLTE FORMULARE (mit Datenbankanbindung)
+================================================================================
+
+SESSION 1 - Schnellauswahl & Dienstpläne:
+─────────────────────────────────────────
+1. frm_N_MA_VA_Schnellauswahl.html     24.581 Bytes  ✅
+   → Mitarbeiterauswahl für Aufträge
+   
+2. frm_N_DP_Dienstplan_MA.html         21.148 Bytes  ✅
+   → Wochenübersicht nach Mitarbeiter
+   
+3. frm_N_DP_Dienstplan_Objekt.html     20.531 Bytes  ✅
+   → Planungsübersicht nach Auftrag
+
+SESSION 2 - Zeitkonten & Verwaltung:
+────────────────────────────────────
+4. frm_N_Stundenauswertung.html        19.165 Bytes  ✅
+   → Datenimport Zeitkonten für Lexware
+   → 3 Tabs: Importierte Daten, Stundenvergleich, Importfehler
+   → Buttons: Einsätze übertragen (FA/MJ), Lexware Import
+   
+5. frm_N_Lohnabrechnungen_V2.html      11.960 Bytes  ✅
+   → Lohnabrechnungen laden & versenden
+   → Filter: Jahr, Monat, Anstellungsart
+   → Versand-Protokoll pro Mitarbeiter
+   
+6. frm_N_MA_Abwesenheiten.html         18.770 Bytes  ✅
+   → Abwesenheitsplanung komplett
+   → Urlaub, Krank, Privat, Fortbildung, Elternzeit
+   → Ganztägig oder stundenweise
+   → Nur Werktags Option
+
+VBA-MODULE:
+───────────
+mdl_N_WebView2Bridge_Forms.bas         20.515 Bytes  ✅
+  → OpenMitarbeiterSchnellauswahl(VA_ID)
+  → OpenDienstplanMA(startDatum)
+  → OpenPlanungsuebersicht(startDatum)
+  → OpenStundenauswertung()
+  → OpenLohnabrechnungen()
+  → OpenAbwesenheitsplanung(MA_ID)
+  → Alle DataService-Funktionen für DB-Zugriff
+
+================================================================================
+GESAMTÜBERSICHT ALLER NEUEN HTML-FORMULARE
+================================================================================
+
+STAMMDATEN-VERWALTUNG:
+  ✅ frm_N_MA_Mitarbeiterstamm_V2.html    61.945 Bytes (13 Tabs komplett)
+  ✅ frm_N_KD_Kundenstamm_V2.html         23.351 Bytes (8 Tabs komplett)
+  ✅ frm_N_VA_Auftragstamm_V2.html        29.557 Bytes (5 Tabs + Subforms)
+
+DIENSTPLANUNG:
+  ✅ frm_N_DP_Dienstplan_MA.html          21.148 Bytes
+  ✅ frm_N_DP_Dienstplan_Objekt.html      20.531 Bytes
+  ✅ frm_N_MA_VA_Schnellauswahl.html      24.581 Bytes
+
+ZEITERFASSUNG & ABRECHNUNG:
+  ✅ frm_N_Stundenauswertung.html         19.165 Bytes
+  ✅ frm_N_Lohnabrechnungen_V2.html       11.960 Bytes
+  ✅ frm_N_MA_Abwesenheiten.html          18.770 Bytes
+
+================================================================================
+INTEGRATION IN ACCESS
+================================================================================
+
+1. VBA-Modul importieren:
+   → Datei → Importieren → mdl_N_WebView2Bridge_Forms.bas
+
+2. Aufruf-Beispiele:
+
+   ' Mitarbeiter-Schnellauswahl für Auftrag
+   Call OpenMitarbeiterSchnellauswahl(Me.VA_ID)
+   
+   ' Dienstplan öffnen
+   Call OpenDienstplanMA(Date)
+   
+   ' Planungsübersicht öffnen
+   Call OpenPlanungsuebersicht(Date)
+   
+   ' Stundenauswertung öffnen
+   Call OpenStundenauswertung()
+   
+   ' Lohnabrechnungen öffnen
+   Call OpenLohnabrechnungen()
+   
+   ' Abwesenheitsplanung öffnen
+   Call OpenAbwesenheitsplanung(Me.MA_ID)
+
+================================================================================
+DATEIEN PFADE
+================================================================================
+
+HTML-Formulare:
+  C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\
+  04_HTML_Forms\forms\
+
+VBA-Module:
+  C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\
+  04_HTML_Forms\vba\
+
+Bridge JavaScript:
+  C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\
+  04_HTML_Forms\js\webview2-bridge.js
+
+================================================================================

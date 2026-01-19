@@ -1,0 +1,397 @@
+/**
+ * frm_va_Auftragstamm.css
+ * Formular-spezifische Styles
+ * Layout verwendet app-layout.css und consys_theme.css
+ */
+
+/* ========== VA-CONTENT LAYOUT ========== */
+.va-stammdaten {
+    padding: 8px 12px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ccc;
+}
+
+.stammdaten-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+}
+
+.field-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.field-group label {
+    font-size: 11px;
+    color: #555;
+    white-space: nowrap;
+}
+
+.field-group.wide {
+    grid-column: span 2;
+}
+
+.va-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    gap: 8px;
+    padding: 8px;
+}
+
+.va-tabs-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.va-auftragsliste {
+    width: 280px;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* ========== HEADER ERWEITERT ========== */
+.va-logo {
+    width: 40px;
+    height: 40px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2 L2 22 L22 22 Z" fill="%23fff"/></svg>') no-repeat center;
+    background-size: contain;
+}
+
+.va-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.va-btn {
+    padding: 5px 12px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.va-btn:hover {
+    background: linear-gradient(180deg, #f5f5f5 0%, #ddd 100%);
+}
+
+.va-btn.primary {
+    background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+    border-color: #2980b9;
+    color: white;
+}
+
+.va-btn.danger {
+    background: linear-gradient(180deg, #d9534f 0%, #c9302c 100%);
+    border-color: #c9302c;
+    color: white;
+}
+
+.va-btn-nav {
+    padding: 4px 8px;
+    min-width: 28px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.va-btn-small {
+    padding: 2px 6px;
+    font-size: 10px;
+    border: 1px solid #999;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    cursor: pointer;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.toolbar-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.version-info {
+    font-size: 10px;
+    opacity: 0.9;
+    text-align: right;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-row label {
+    font-size: 11px;
+    color: white;
+}
+
+.va-select {
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+    background: white;
+}
+
+.va-select.small {
+    width: 60px;
+}
+
+.va-select.wide {
+    min-width: 200px;
+}
+
+.va-input {
+    padding: 4px 6px;
+    border: 1px solid #999;
+    font-size: 11px;
+}
+
+.va-input.small {
+    width: 60px;
+}
+
+.va-input.readonly {
+    background: #f5f5f5;
+    color: #666;
+}
+
+/* ========== TABS ========== */
+.tab-nav {
+    display: flex;
+    background: #e8e8e8;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    font-size: 11px;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+    color: #333;
+    background: rgba(255,255,255,0.5);
+}
+
+.tab-btn.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    background: white;
+    font-weight: 600;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: hidden;
+}
+
+.tab-pane {
+    display: none;
+    height: 100%;
+    overflow: auto;
+    padding: 12px;
+}
+
+.tab-pane.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-toolbar {
+    padding: 8px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+    margin: -12px -12px 12px -12px;
+}
+
+/* ========== EINSATZLISTE ========== */
+.einsatzliste-layout {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+}
+
+.einsatzliste-left {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.einsatzliste-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.section-label {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #555;
+}
+
+.schichten-table-container,
+.absagen-table-container,
+.ma-zuordnung-container {
+    flex: 1;
+    overflow: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.va-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.va-table thead {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+}
+
+.va-table th {
+    background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.va-table td {
+    border: 1px solid #ddd;
+    padding: 5px 8px;
+}
+
+.va-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.va-table tbody tr:hover {
+    background: #e8f4ff;
+}
+
+.va-table tbody tr.selected {
+    background: #cce5ff !important;
+}
+
+/* ========== RECHNUNG TAB ========== */
+.summe-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background: #f5f5f5;
+    border-top: 2px solid #ccc;
+    margin-top: 12px;
+}
+
+.summe-row label {
+    font-weight: 600;
+    font-size: 11px;
+}
+
+/* ========== BEMERKUNGEN TAB ========== */
+.va-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    font-size: 11px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+/* ========== AUFTRAGSLISTE ========== */
+.liste-header {
+    padding: 8px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+}
+
+.liste-title {
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.liste-filter {
+    padding: 8px;
+    background: #fafafa;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.liste-filter label {
+    font-size: 11px;
+}
+
+.liste-table-container {
+    flex: 1;
+    overflow: auto;
+}
+
+.va-liste-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.va-liste-table thead {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+}
+
+.va-liste-table th {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.va-liste-table td {
+    border: 1px solid #ddd;
+    padding: 5px 8px;
+}
+
+.va-liste-table tbody tr:hover {
+    background: #e8f4ff;
+}
+
+.va-liste-table tbody tr.selected {
+    background: #cce5ff !important;
+}

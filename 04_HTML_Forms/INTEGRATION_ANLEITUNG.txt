@@ -1,0 +1,119 @@
+﻿================================================================================
+INTEGRATION DER HTML-FORMULARE IN MS ACCESS
+CONSEC Security Nürnberg
+Stand: 29.12.2025 21:34
+================================================================================
+
+1. ÜBERSICHT
+================================================================================
+
+Die HTML-Formulare sind vollständig vorbereitet für die Integration in das
+Access-Frontend. Sie können sowohl im Standard-Browser als auch über die
+WebView2-Komponente geöffnet werden.
+
+2. DATEIEN FÜR DEN IMPORT
+================================================================================
+
+VBA-Module (zu importieren in Access):
+--------------------------------------
+Pfad: C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\04_HTML_Forms\vba\
+
+✓ mdl_N_HTMLForms_Integration.bas    (14.9 KB) - HAUPTMODUL
+  Enthält alle OpenXXXHTML() Funktionen und JSON-Laden
+
+Optional (falls WebView2 genutzt wird):
+✓ mdl_N_WebView2Bridge_V4.bas        (17.6 KB)
+✓ mdl_N_DataService_Complete.bas     (28.6 KB)
+✓ mdl_N_DataService_Kunden.bas       (7.9 KB)
+
+3. SCHRITT-FÜR-SCHRITT ANLEITUNG
+================================================================================
+
+SCHRITT 1: VBA-Modul importieren
+--------------------------------
+1. Access-Datenbank öffnen
+2. Alt+F11 (VBA-Editor)
+3. Datei → Importieren...
+4. Wählen: mdl_N_HTMLForms_Integration.bas
+5. OK klicken
+
+SCHRITT 2: Button in Mitarbeiterstamm hinzufügen
+------------------------------------------------
+1. frm_MA_Mitarbeiterstamm im Entwurfsmodus öffnen
+2. Neuen Button erstellen (Position: neben "Zeitkonto")
+3. Eigenschaften:
+   - Name: btnHTMLAnsicht
+   - Beschriftung: HTML Ansicht
+   - Bei Klick: =OpenMitarbeiterstammHTML([ID])
+4. Formular speichern
+
+SCHRITT 3: Button in Kundenstamm hinzufügen
+-------------------------------------------
+1. frm_KD_Kundenstamm im Entwurfsmodus öffnen
+2. Neuen Button erstellen
+3. Eigenschaften:
+   - Name: btnHTMLAnsicht
+   - Beschriftung: HTML Ansicht
+   - Bei Klick: =OpenKundenstammHTML([kun_Id])
+4. Formular speichern
+
+SCHRITT 4: Button in Auftragsverwaltung hinzufügen
+--------------------------------------------------
+1. frm_VA_Auftragstamm im Entwurfsmodus öffnen
+2. Neuen Button erstellen
+3. Eigenschaften:
+   - Name: btnHTMLAnsicht
+   - Beschriftung: HTML Ansicht
+   - Bei Klick: =OpenAuftragsverwaltungHTML([ID])
+4. Formular speichern
+
+SCHRITT 5: Testen
+-----------------
+1. Mitarbeiterstamm öffnen
+2. Auf "HTML Ansicht" klicken
+3. HTML-Formular sollte im Browser öffnen
+4. Daten werden automatisch geladen
+
+4. VERFÜGBARE FUNKTIONEN
+================================================================================
+
+Zum Öffnen der HTML-Formulare:
+------------------------------
+OpenMitarbeiterstammHTML(MA_ID)      - Mitarbeiter mit ID
+OpenKundenstammHTML(KD_ID)           - Kunde mit ID
+OpenAuftragsverwaltungHTML(VA_ID)    - Auftrag mit ID
+OpenDienstplanMAHTML(Datum)          - Dienstplan ab Datum
+OpenDienstplanObjektHTML(Datum)      - Planungsübersicht ab Datum
+OpenStundenauswertungHTML()          - Stundenauswertung
+OpenSchnellauswahlHTML(VA_ID, Datum) - MA-Auswahl für Auftrag
+OpenAbwesenheitenHTML(MA_ID)         - Abwesenheiten
+OpenLohnabrechnungenHTML()           - Lohnabrechnungen
+
+5. TECHNISCHE DETAILS
+================================================================================
+
+Browser-Modus (Standard):
+- Öffnet HTML im Standard-Browser
+- Daten werden als URL-Parameter übergeben
+- Funktioniert sofort ohne weitere Konfiguration
+
+WebView2-Modus (Optional):
+- Benötigt ConsysWebView2.dll
+- Ermöglicht bidirektionale Kommunikation
+- Daten werden als JSON übergeben
+
+6. FEHLERBEHEBUNG
+================================================================================
+
+Problem: "Modul nicht gefunden"
+Lösung: Prüfen ob mdl_N_HTMLForms_Integration importiert wurde
+
+Problem: "HTML-Datei nicht gefunden"
+Lösung: Pfad in HTML_BASE Konstante prüfen
+
+Problem: "Daten werden nicht geladen"
+Lösung: JavaScript-Konsole im Browser prüfen (F12)
+
+================================================================================
+Ende der Dokumentation
+================================================================================

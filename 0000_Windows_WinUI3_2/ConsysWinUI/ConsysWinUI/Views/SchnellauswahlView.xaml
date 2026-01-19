@@ -1,0 +1,326 @@
+<Page
+    x:Class="ConsysWinUI.Views.SchnellauswahlView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="#F0F0F0">
+
+    <Page.Resources>
+        <Style x:Key="SidebarButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#A05050"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="MinHeight" Value="28"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="185"/>  <!-- Sidebar - Access Original: 185px -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- SIDEBAR -->
+        <Border Grid.Column="0" Background="#8B0000">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Border Background="White" BorderBrush="Black" BorderThickness="1" Margin="8,10" Padding="8,3">
+                        <TextBlock Text="HAUPTMENÜ" Foreground="Black" FontWeight="Bold" FontSize="11" HorizontalAlignment="Center"/>
+                    </Border>
+                    <Button Content="Dienstplanübersicht" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Planungsübersicht" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Auftragsverwaltung" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Schnellauswahl" Style="{StaticResource SidebarButtonStyle}" Margin="5,2" Background="#D4A574" Foreground="Black"/>
+                    <Button Content="Mitarbeiterstamm" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Kundenstamm" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Objektstamm" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Abwesenheiten" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Zeitkonten" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Lohnabrechnungen" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Bewerber" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                    <Button Content="Einstellungen" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Column="1" Padding="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+        <!-- Header: VA-Auswahl und Datum -->
+        <Border Grid.Row="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="VA:" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding AuftragListe}"
+                          SelectedItem="{Binding SelectedAuftrag, Mode=TwoWay}"
+                          DisplayMemberPath="DisplayText"
+                          PlaceholderText="Auftrag waehlen..."
+                          HorizontalAlignment="Stretch"/>
+
+                <TextBlock Grid.Column="2" Text="Datum:" VerticalAlignment="Center" Margin="16,0,12,0"/>
+                <ComboBox Grid.Column="3"
+                          ItemsSource="{Binding DatumListe}"
+                          SelectedItem="{Binding SelectedDatum, Mode=TwoWay}"
+                          DisplayMemberPath="DatumText"
+                          PlaceholderText="Datum waehlen..."/>
+
+                <Button Grid.Column="4" Content="E-Mail senden (Test)"
+                        Command="{Binding SendEmailCommand}"
+                        Margin="16,0,0,0"
+                        Style="{StaticResource AccentButtonStyle}"/>
+            </Grid>
+        </Border>
+
+        <!-- Auftrag-Info Banner -->
+        <Border Grid.Row="1" Background="{ThemeResource AccentFillColorDefaultBrush}" CornerRadius="8" Padding="16" Margin="0,0,0,16"
+                Visibility="{Binding HasAuftragSelected}">
+            <StackPanel>
+                <TextBlock Text="{Binding AuftragName}" Style="{StaticResource TitleTextBlockStyle}" Foreground="White"/>
+                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,8,0,0">
+                    <TextBlock Text="{Binding ObjektName}" Foreground="White"/>
+                    <TextBlock Text="{Binding SchichtZeit}" Foreground="White"/>
+                    <TextBlock Foreground="White">
+                        <Run Text="Benoetigt:"/>
+                        <Run Text="{Binding MaBenoetigt}" FontWeight="Bold"/>
+                        <Run Text=" | Zugeordnet:"/>
+                        <Run Text="{Binding MaZugeordnet}" FontWeight="Bold"/>
+                        <Run Text=" | Fehlt:"/>
+                        <Run Text="{Binding MaFehlt}" FontWeight="Bold"/>
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Filter-Optionen -->
+        <Border Grid.Row="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="16" CornerRadius="8" Margin="0,0,0,16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="16">
+                    <CheckBox Content="Nur Aktive" IsChecked="{Binding NurAktive, Mode=TwoWay}"/>
+                    <CheckBox Content="Nur Verfuegbare" IsChecked="{Binding FilterNurVerfuegbare, Mode=TwoWay}"/>
+                    <CheckBox Content="Verplant Verfuegbar" IsChecked="{Binding VerplantVerfuegbar, Mode=TwoWay}"/>
+                    <CheckBox Content="Nur 34a" IsChecked="{Binding Nur34a, Mode=TwoWay}"/>
+                    <TextBox Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PlaceholderText="Suche..." Width="200"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="16" Margin="0,8,0,0">
+                    <TextBlock Text="Anstellungsart:" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding AnstellungsartListe}"
+                              SelectedItem="{Binding SelectedAnstellungsart, Mode=TwoWay}"
+                              DisplayMemberPath="Name"
+                              Width="200"/>
+
+                    <TextBlock Text="Qualifikation:" VerticalAlignment="Center" Margin="16,0,0,0"/>
+                    <ComboBox ItemsSource="{Binding Qualifikationen}"
+                              SelectedItem="{Binding SelectedQualifikation, Mode=TwoWay}"
+                              DisplayMemberPath="Name"
+                              Width="200"/>
+
+                    <ProgressRing IsActive="{Binding IsLoading}" Width="16" Height="16" Margin="16,0,0,0"/>
+                    <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <!-- Haupt-Arbeitsbereich: Zeiten, Mitarbeiter, Zuordnung -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Linke Spalte: Zeiten & Parallele Einsätze -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Zeiten/Schichten Liste -->
+                <Border Grid.Row="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="12" Margin="0,0,8,4">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Zeiten" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,8"/>
+                        <ListView Grid.Row="1"
+                                  ItemsSource="{Binding ZeitenListe}"
+                                  SelectedItem="{Binding SelectedZeit, Mode=TwoWay}"
+                                  SelectionMode="Single">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding ZeitText}" FontSize="12"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
+                                            <TextBlock Text="{Binding Ist}" FontSize="10" Foreground="{ThemeResource SystemAccentColor}"/>
+                                            <TextBlock Text="/" FontSize="10"/>
+                                            <TextBlock Text="{Binding Soll}" FontSize="10"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <TextBlock Grid.Row="2" Margin="0,4,0,0">
+                            <Run Text="Gesamt MA:"/>
+                            <Run Text="{Binding GesamtMa}" FontWeight="Bold"/>
+                        </TextBlock>
+                    </Grid>
+                </Border>
+
+                <!-- Parallele Einsätze Liste -->
+                <Border Grid.Row="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="12" Margin="0,4,8,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Parallel-Einsätze" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,8"/>
+                        <ListView Grid.Row="1"
+                                  ItemsSource="{Binding ParallelEinsaetzeListe}"
+                                  SelectedItem="{Binding SelectedParallelEinsatz, Mode=TwoWay}"
+                                  SelectionMode="Single">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayText}" FontSize="12" TextWrapping="Wrap"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Verfügbare Mitarbeiter -->
+            <Border Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Margin="4,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Verfügbare Mitarbeiter" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                    <ListView Grid.Row="1"
+                              ItemsSource="{Binding VerfuegbareMitarbeiter}"
+                              SelectedItem="{Binding SelectedVerfuegbarer, Mode=TwoWay}"
+                              SelectionMode="Extended">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding TelMobil}" FontSize="12" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+
+            <!-- Zuordnungs-Buttons -->
+            <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="8" Margin="4,0">
+                <Button Command="{Binding ZuordnenSelectedCommand}" ToolTipService.ToolTip="Ausgewählte zuordnen" HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xE76C;" FontSize="20"/>
+                </Button>
+                <Button Command="{Binding EntfernenSelectedCommand}" ToolTipService.ToolTip="Ausgewählte entfernen" HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xE76B;" FontSize="20"/>
+                </Button>
+            </StackPanel>
+
+            <!-- Geplante Mitarbeiter -->
+            <Border Grid.Column="3" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Margin="4,0,4,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Geplante Mitarbeiter" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                    <ListView Grid.Row="1"
+                              ItemsSource="{Binding ZugeordneteMitarbeiter}"
+                              SelectedItem="{Binding SelectedZugeordneter, Mode=TwoWay}"
+                              SelectionMode="Extended">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8,12">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                                    <TextBlock Grid.Row="1" Text="{Binding ZeitText}" FontSize="11" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+
+            <!-- MA mit Zusage -->
+            <Border Grid.Column="4" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" Padding="16" Margin="4,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="MA mit Zusage" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                    <ListView Grid.Row="1"
+                              ItemsSource="{Binding MitarbeiterMitZusage}"
+                              SelectedItem="{Binding SelectedMitZusage, Mode=TwoWay}"
+                              SelectionMode="Single">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="8,12">
+                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Footer: Action Buttons -->
+        <Border Grid.Row="4" Padding="0,16,0,0" Margin="0,16,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                <Button Command="{Binding AktualisierenCommand}" Content="Aktualisieren"/>
+                <Button Command="{Binding SchliessenCommand}" Content="Schliessen"/>
+            </StackPanel>
+        </Border>
+        </Grid>
+    </Grid>
+</Page>

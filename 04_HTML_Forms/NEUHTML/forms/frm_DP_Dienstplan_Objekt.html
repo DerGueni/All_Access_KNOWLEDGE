@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planungsuebersicht - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        .app-header { background: #4316B2; min-height: 94px; }
+        .dp-grid { display: grid; grid-template-columns: 200px repeat(7, 1fr); gap: 1px; background: #ccc; }
+        .dp-header { background: #e8e8e8; padding: 8px 4px; font-weight: 600; text-align: center; font-size: 11px; }
+        .dp-header-date { font-size: 10px; color: #666; }
+        .dp-objekt { background: white; padding: 6px 8px; font-size: 11px; border-right: 2px solid #4316B2; }
+        .dp-objekt-name { font-weight: 600; }
+        .dp-objekt-kunde { font-size: 10px; color: #666; }
+        .dp-cell { background: white; min-height: 60px; padding: 2px; font-size: 10px; }
+        .dp-cell.weekend { background: #f5f5f5; }
+        .dp-schicht {
+            background: #f0f0f0;
+            border-left: 3px solid #4316B2;
+            padding: 2px 4px;
+            margin: 1px 0;
+            border-radius: 2px;
+        }
+        .dp-schicht .zeit { font-weight: 600; font-size: 10px; }
+        .dp-schicht .ma-count { font-size: 9px; }
+        .dp-schicht.besetzt { border-left-color: #4316B2; background: #f0f0f0; }
+        .dp-schicht.offen { border-left-color: #666666; background: #f0f0f0; }
+    </style>
+</head>
+<body data-active-menu="dienstplan">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Planungsuebersicht</h1>
+                </div>
+                <div class="header-center">
+                    <button class="btn btn-nav" id="btnVorwoche">&#9664;&#9664;</button>
+                    <span id="lblWoche" style="min-width:200px;text-align:center;font-weight:600;">KW --</span>
+                    <button class="btn btn-nav" id="btnNachwoche">&#9654;&#9654;</button>
+                    <button class="btn" id="btnHeute" style="margin-left:10px;">Heute</button>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Zeitraum:</label>
+                    <input type="date" id="datVon" class="form-control">
+                    <span style="margin:0 4px;">bis</span>
+                    <input type="date" id="datBis" class="form-control">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Objekt:</label>
+                    <select id="cboObjekt" class="form-control" style="width:180px;">
+                        <option value="">Alle Objekte</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Status:</label>
+                    <select id="cboStatus" class="form-control" style="width:120px;">
+                        <option value="">Alle</option>
+                        <option value="offen">Offen</option>
+                        <option value="besetzt">Besetzt</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnAktualisieren">Aktualisieren</button>
+                    <button class="btn" id="btnDrucken">Drucken</button>
+                </div>
+            </div>
+
+            <div class="app-content" style="padding:8px;overflow:auto;">
+                <div class="dp-grid" id="dpGrid">
+                    <!-- Header -->
+                    <div class="dp-header">Objekt</div>
+                    <div class="dp-header">Mo<br><span class="dp-header-date">01.01.</span></div>
+                    <div class="dp-header">Di<br><span class="dp-header-date">02.01.</span></div>
+                    <div class="dp-header">Mi<br><span class="dp-header-date">03.01.</span></div>
+                    <div class="dp-header">Do<br><span class="dp-header-date">04.01.</span></div>
+                    <div class="dp-header">Fr<br><span class="dp-header-date">05.01.</span></div>
+                    <div class="dp-header weekend">Sa<br><span class="dp-header-date">06.01.</span></div>
+                    <div class="dp-header weekend">So<br><span class="dp-header-date">07.01.</span></div>
+
+                    <!-- Beispiel -->
+                    <div class="dp-objekt">
+                        <div class="dp-objekt-name">Messe Stuttgart</div>
+                        <div class="dp-objekt-kunde">Landesmesse</div>
+                    </div>
+                    <div class="dp-cell">
+                        <div class="dp-schicht besetzt">
+                            <div class="zeit">08:00-16:00</div>
+                            <div class="ma-count">5/5 MA</div>
+                        </div>
+                    </div>
+                    <div class="dp-cell">
+                        <div class="dp-schicht offen">
+                            <div class="zeit">08:00-16:00</div>
+                            <div class="ma-count">3/5 MA</div>
+                        </div>
+                    </div>
+                    <div class="dp-cell"></div>
+                    <div class="dp-cell"></div>
+                    <div class="dp-cell"></div>
+                    <div class="dp-cell weekend"></div>
+                    <div class="dp-cell weekend"></div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Objekte | 0 Schichten</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+</body>
+</html>

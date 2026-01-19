@@ -1,0 +1,181 @@
+﻿â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  âš¡ DIALOG-KILLER (VOR ARBEIT STARTEN!)                         â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+Doppelklick auf: START_DialogKiller.bat
+ODER manuell:    powershell -File DialogKillerPermanent.ps1
+
+LÃ¤uft 60 Minuten im Hintergrund und schlieÃŸt ALLE Dialoge!
+Log: %TEMP%\DialogKiller.log
+
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  ACCESS BRIDGE v2.0 - PROJEKT-REFERENZ fÃ¼r Claude AI
+  Stand: 2025-11-28 | ALLE DIALOGE UNTERDRÃœCKT
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  â­ HAUPTZUGRIFF: AccessUniversal.ps1                           â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+PFAD: C:\Users\guenther.siegert\Documents\Access Bridge\AccessUniversal.ps1
+
+VERWENDUNG:
+  cd "C:\Users\guenther.siegert\Documents\Access Bridge"
+  & ".\AccessUniversal.ps1" -Action [ACTION] [PARAMETER]
+
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  VERFÃœGBARE ACTIONS                                             â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+INFORMATION:
+  test          â†’ Verbindungstest + Statistik
+  list-tables   â†’ Alle Tabellen auflisten
+  list-modules  â†’ Alle VBA-Module auflisten
+  list-forms    â†’ Alle Formulare auflisten
+
+SQL:
+  sql           â†’ SQL ausfÃ¼hren
+                  -Query "SELECT * FROM tbl_Name WHERE ..."
+                  -Query "INSERT INTO ... VALUES ..."
+                  -Query "UPDATE ... SET ... WHERE ..."
+                  -Query "DELETE FROM ... WHERE ..."
+
+VBA:
+  vba           â†’ VBA-Funktion ausfÃ¼hren
+                  -VBAFunction "FuncName" -VBAArgs 123
+                  -VBAFunction "FuncName" -VBAArgs @(1, "text")
+  
+  module        â†’ Modul lesen oder schreiben
+                  -Module "mdl_Name"              (lesen)
+                  -Module "mdl_Name" -Code "..."  (schreiben)
+  
+  module-delete â†’ Modul lÃ¶schen
+                  -Module "mdl_Name"
+  
+  eval          â†’ Access-Ausdruck auswerten
+                  -Query "Now()"
+                  -Query "DCount('*','tbl_Name')"
+
+FORMULARE:
+  form          â†’ Formular Ã¶ffnen
+                  -Form "frm_Name"
+  
+  form-close    â†’ Formular schlieÃŸen (ohne Speichern!)
+                  -Form "frm_Name"
+
+DATEN:
+  insert        â†’ Datensatz einfÃ¼gen (mit Datum-Autoformat!)
+                  -Table "tbl_Name" -Data @{Feld1="Wert"; Feld2=123; Datum=(Get-Date)}
+
+FORMULARE ERSTELLEN/LÃ–SCHEN:
+  create-form   â†’ Neues Formular mit optionalen Buttons
+                  -Form "FormName" -Data @{Buttons=@("Btn1","Btn2")}
+  
+  delete-form   â†’ Formular lÃ¶schen
+                  -Form "FormName"
+
+SPEICHERN:
+  save          â†’ Datenbank speichern
+  save-object   â†’ Objekt speichern
+                  -Form "frm_Name" oder -Module "mdl_Name"
+
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  BEISPIELE (Copy & Paste)                                       â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+# Verbindungstest
+& ".\AccessUniversal.ps1" -Action test
+
+# SQL SELECT
+& ".\AccessUniversal.ps1" -Action sql -Query "SELECT TOP 5 * FROM tbl_VA_Auftragstamm ORDER BY ID DESC"
+
+# SQL mit Datum (Datum wird AUTOMATISCH korrekt formatiert!)
+& ".\AccessUniversal.ps1" -Action sql -Query "SELECT * FROM tbl_VA_Auftragstamm WHERE Dat_VA_Von >= #11/01/2025#"
+
+# Insert mit Datum (DateTime-Objekte werden automatisch konvertiert!)
+$data = @{
+    Auftrag = "Testauftrag"
+    Ort = "Nuernberg"
+    Dat_VA_Von = (Get-Date)
+    Erst_am = (Get-Date)
+    Veranst_Status_ID = 1
+}
+& ".\AccessUniversal.ps1" -Action insert -Table "tbl_VA_Auftragstamm" -Data $data
+
+# VBA-Funktion aufrufen
+& ".\AccessUniversal.ps1" -Action vba -VBAFunction "MeineFunktion" -VBAArgs 42
+
+# VBA-Modul erstellen
+$code = @'
+Public Function Test() As String
+    Test = "Hello"
+End Function
+'@
+& ".\AccessUniversal.ps1" -Action module -Module "mdl_Test" -Code $code
+
+# Formular Ã¶ffnen
+& ".\AccessUniversal.ps1" -Action form -Form "frm_VA_Auftragstamm"
+
+# Formular schlieÃŸen (OHNE Speicherdialog!)
+& ".\AccessUniversal.ps1" -Action form-close -Form "frm_VA_Auftragstamm"
+
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  DIALOG-UNTERDRÃœCKUNG                                           â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+âœ… DoCmd.SetWarnings(False) â†’ ALLE Access-Warnungen aus
+âœ… Speicherdialoge werden automatisch behandelt
+âœ… Formulare schlieÃŸen OHNE "Speichern?"-Dialog
+âœ… Module werden OHNE BestÃ¤tigung gespeichert
+âœ… DELETE/UPDATE ohne "Sind Sie sicher?"-Dialog
+
+FÃ¼r zusÃ¤tzliche Sicherheit (bei komplexen Operationen):
+  DialogKiller.ps1 â†’ SchlieÃŸt ALLE Windows-Dialoge im Hintergrund
+  
+  # Starten (5 Minuten aktiv, prÃ¼ft alle 100ms):
+  Start-Job -FilePath ".\DialogKiller.ps1" -ArgumentList 300, 100
+
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  DATUMSFORMAT (WICHTIG!)                                        â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+Access erwartet US-Format: #MM/DD/YYYY# oder #MM/DD/YYYY HH:MM:SS#
+
+BEI INSERT: DateTime-Objekte werden AUTOMATISCH konvertiert!
+  -Data @{ Datum = (Get-Date) }  â†’ Funktioniert!
+
+BEI SQL: Manuell US-Format verwenden:
+  -Query "SELECT * FROM tbl WHERE Datum >= #11/28/2025#"
+  
+NICHT: #28.11.2025# oder #2025-11-28#
+
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  DATENBANK-PFADE                                                â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+Frontend (AKTUELL GEÃ–FFNET):
+  S:\CONSEC\CONSEC PLANUNG AKTUELL\B - DIVERSES\Consys_FE_N_Test_Claude_GPT.accdb
+
+Backend:
+  C:\Users\guenther.siegert\Documents\1__Projektordner\Consec_BE_TEST.accdb
+
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SCHNELLREFERENZ TABELLEN                                       â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+AUFTRÃ„GE:
+  tbl_VA_Auftragstamm    ID, Auftrag, Objekt, Ort, Dat_VA_Von/Bis
+  tbl_VA_AnzTage         VA_ID, VADatum, TVA_Soll
+  tbl_VA_Start           VA_ID, VADatum_ID, MA_Anzahl, VA_Start/Ende
+
+MITARBEITER:
+  tbl_MA_Mitarbeiterstamm ID, Nachname, Vorname, ...
+  tbl_MA_VA_Zuordnung     MA_ID, VA_ID, VADatum_ID, Bemerkungen
+
+KUNDEN:
+  tbl_KD_Kundenstamm      kun_Id, kun_Firma
+
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  KEINE DIALOGE MEHR! Vollautomatischer Betrieb garantiert.
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+

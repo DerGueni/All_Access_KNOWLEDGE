@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstammblatt - CONSEC</title>
+    <link rel="stylesheet" href="../../css/app-layout.css">
+    <link rel="stylesheet" href="../../theme/consys_theme.css">
+    <style>
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; font-family: Tahoma, Verdana, sans-serif; font-size: 10px; background: #F5F5F5; }
+
+        body.embedded .app-sidebar { display: none; }
+        body.embedded .app-main { margin-left: 0; }
+        
+        .app-container { display: flex; height: 100vh; }
+        .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Header */
+        .form-header { background: #4316B2; padding: 4px 6px; display: flex; align-items: center; gap: 6px; height: 94px; border-bottom: 2px solid #2a0d6e; color: #fff; }
+        .nav-control { display: flex; flex-direction: column; gap: 1px; background: #666; padding: 2px; border-radius: 1px; }
+        .nav-arrows { display: flex; gap: 1px; }
+        .nav-btn { width: 16px; height: 16px; background: #888; border: 1px solid #333; color: white; font-size: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .nav-btn:hover { background: #999; }
+        .header-title { font-size: 13px; font-weight: bold; color: #fff; margin: 0; letter-spacing: 0.5px; }
+        .header-meta { margin-left: auto; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; font-size: 8px; color: #fff; }
+        .header-meta span { display: block; }
+        .header-meta .version { font-weight: bold; }
+        .header-nav-group { display: flex; background: #999; padding: 1px; gap: 1px; border-radius: 1px; }
+        .header-nav-btn { width: 16px; height: 16px; background: white; border: 1px solid #666; font-size: 7px; cursor: pointer; padding: 0; }
+        .header-btn-group { display: flex; flex-direction: column; gap: 1px; }
+        .header-btn { padding: 2px 6px; font-size: 8px; background: #C0A080; border: 1px solid #888; cursor: pointer; margin: 0; line-height: 1; transition: background 0.2s; }
+        .header-btn:hover { background: #D4B896; }
+        .header-btn.blue { background: #4169E1; color: white; }
+        .header-btn.green { background: #7CFC00; }
+        .header-actions { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+        .header-action-btn { padding: 3px 8px; font-size: 8px; background: #F0F0F0; border: 1px solid #95B3D7; cursor: pointer; height: 20px; }
+        .header-action-btn.orange { background: #F7B580; }
+        .header-action-btn:active { background: #dbe7f7; }
+        .header-ma-nr { display: flex; align-items: center; gap: 3px; margin-left: auto; font-size: 9px; color: #fff; }
+        .header-ma-nr label { margin: 0; color: #fff; }
+        .header-ma-nr input { width: 45px; height: 16px; border: 1px solid #888; padding: 1px; text-align: center; font-size: 8px; }
+
+        /* Employee Info */
+        .employee-info { background: #D0D0D0; padding: 3px 6px; height: 42px; display: flex; align-items: center; border-bottom: 1px solid #888; }
+        .employee-name { font-size: 10px; font-weight: bold; color: #333; margin: 0; }
+
+        /* Form Area */
+        .form-area { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+        .tab-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .tab-headers { display: flex; background: #CCCCCC; border-bottom: 1px solid #888; padding: 1px; gap: 0px; overflow-x: auto; }
+        .tab-header { padding: 3px 10px; background: #CCCCCC; border: 1px solid #999; border-right: none; font-size: 8px; cursor: pointer; white-space: nowrap; margin: 0; line-height: 1.3; transition: background 0.2s; }
+        .tab-header:hover { background: #DDDDDD; }
+        .tab-header:last-child { border-right: 1px solid #999; }
+        .tab-header.active { background: white; border-bottom: 1px solid white; font-weight: bold; position: relative; z-index: 1; color: #000; }
+        .tab-content { flex: 1; overflow: hidden; }
+        .tab-page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+        .tab-page.active { display: flex; }
+
+        /* Form Body */
+        .form-body { flex: 1; display: flex; gap: 10px; padding: 6px 8px; overflow: hidden; background: white; }
+        .column { flex: 1 1 0; display: flex; flex-direction: column; gap: 0px; overflow-y: auto; overflow-x: hidden; }
+        
+        .form-row { display: flex; align-items: center; gap: 3px; height: 19px; margin: 0; }
+        .form-label { width: 105px; text-align: right; padding-right: 5px; font-size: 8px; flex-shrink: 0; margin: 0; white-space: nowrap; }
+        .form-input, .form-select { flex: 1; height: 16px; border: 1px solid #999; padding: 1px 2px; font-size: 8px; background: white; }
+        .form-input:focus, .form-select:focus { outline: none; border: 1px solid #4169E1; background: #FFFACD; }
+        .form-input.small { width: 45px; flex: none; }
+        .form-input.medium { width: 75px; flex: none; }
+        
+        .checkbox-row { margin-left: 105px; height: 16px; align-items: center; gap: 3px; margin-top: 1px; display: flex; }
+        .checkbox-row input[type="checkbox"] { width: 12px; height: 12px; margin: 0; cursor: pointer; }
+        .checkbox-row label { margin: 0; font-size: 8px; cursor: pointer; flex: 1; }
+
+        /* Photo Section */
+        .photo-section { position: absolute; right: 285px; top: 48px; display: flex; flex-direction: column; gap: 3px; background: white; padding: 5px; border: 1px solid #AAA; }
+        .photo-frame { width: 92px; height: 120px; border: 2px solid #999; background: #F5F5F5; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .photo-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .photo-btn { width: 92px; padding: 2px 3px; font-size: 7px; background: #7CFC00; border: 1px solid #999; cursor: pointer; line-height: 1.2; }
+
+        /* Employee List */
+        .employee-list { width: 280px; border-left: 1px solid #888; background: white; display: flex; flex-direction: column; min-height: 0; }
+        .list-header { padding: 5px 4px; background: #EFEFEF; border-bottom: 1px solid #888; }
+        .search-box { display: flex; gap: 2px; align-items: center; margin-bottom: 3px; margin: 0 0 3px 0; }
+        .search-box label { font-size: 7px; margin: 0; white-space: nowrap; }
+        .search-box input { flex: 1; height: 15px; border: 1px solid #999; padding: 1px; font-size: 7px; }
+        .filter-box { display: flex; gap: 2px; align-items: center; }
+        .filter-box label { font-size: 7px; margin: 0; white-space: nowrap; }
+        .filter-box select { flex: 1; height: 15px; border: 1px solid #999; font-size: 7px; }
+        .list-content { flex: 1; overflow-y: auto; min-height: 0; }
+        .list-table { width: 100%; border-collapse: collapse; font-size: 7px; }
+        .list-table th { background: #D0D0D0; padding: 2px 3px; text-align: left; border: 1px solid #888; position: sticky; top: 0; font-weight: bold; }
+        .list-table td { padding: 1px 2px; border: 1px solid #CCC; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .list-table tr:hover { background: #E8F4E8; }
+        .list-table tr.selected { background: #4A90D9; color: white; }
+
+        /* Status Bar */
+        .status-bar { background: #EFEFEF; padding: 2px 6px; border-top: 1px solid #888; font-size: 7px; color: #555; display: flex; justify-content: space-between; height: 16px; align-items: center; }
+    </style>
+</head>
+<body data-menu-style="access" data-active-menu="mitarbeiterverwaltung">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+        <main class="app-main">
+            <!-- Header -->
+            <div class="form-header">
+                <div class="nav-control">
+                    <div class="nav-btn" id="btnUp">▲</div>
+                    <div class="nav-arrows">
+                        <div class="nav-btn" id="btnFirst">◄◄</div>
+                        <div class="nav-btn" id="btnPrev">◄</div>
+                        <div class="nav-btn" id="btnNext">►</div>
+                        <div class="nav-btn" id="btnLast">►►</div>
+                    </div>
+                    <div class="nav-btn" id="btnDown">▼</div>
+                </div>
+                <div class="header-title" id="Auto_Kopfzeile0">Mitarbeiterstammblatt</div>
+                <div class="header-nav-group">
+                    <button class="header-nav-btn">⏮</button>
+                    <button class="header-nav-btn">◄</button>
+                    <button class="header-nav-btn">►</button>
+                    <button class="header-nav-btn">⏭</button>
+                </div>
+                <div class="header-nav-group">
+                    <button class="header-nav-btn" id="Befehl43">⏮</button>
+                    <button class="header-nav-btn" id="Befehl41">◄</button>
+                    <button class="header-nav-btn" id="Befehl40">►</button>
+                    <button class="header-nav-btn" id="Befehl39">⏭</button>
+                    <button class="header-nav-btn" id="Befehl46">⟲</button>
+                </div>
+                <div class="header-actions">
+                    <button class="header-action-btn" id="btnZeitkonto">Zeitkonto</button>
+                    <button class="header-action-btn" id="btnNeuMA">Neuer Mitarbeiter</button>
+                    <button class="header-action-btn" id="btnLoeschen">Mitarbeiter löschen</button>
+                    <button class="header-action-btn" id="btnEinsaetzeFA">Einsätze übertragen FA</button>
+                    <button class="header-action-btn" id="btnEinsaetzeMJ">Einsätze übertragen MJ</button>
+                    <button class="header-action-btn" id="btnListenDrucken">Listen drucken</button>
+                    <button class="header-action-btn" id="btnMATabelle">Mitarbeiter Tabelle</button>
+                </div>
+                <div class="header-btn-group">
+                    <button class="header-btn blue" id="btnDienstplan">Dienstplan</button>
+                    <button class="header-btn blue" id="btnEinsatzUebersicht">Einsatzübersicht</button>
+                </div>
+                <div class="header-btn-group">
+                    <button class="header-btn green" id="btnMapsOeffnen">Karte öffnen</button>
+                </div>
+                <div class="header-ma-nr">
+                    <label>MA-ID:</label>
+                    <input type="text" id="maNr" readonly>
+                </div>
+                <div class="header-btn-group">
+                    <button class="header-btn" id="btnSpeichern">Speichern</button>
+                    <button class="header-btn" id="btnMAAdresse">MA Adressen</button>
+                </div>
+                <div class="header-meta">
+                    <span id="lbl_Datum">--.--.----</span>
+                    <span class="version" id="lbl_Version">GPT | TEST</span>
+                </div>
+            </div>
+
+            <!-- Employee Info -->
+            <div class="employee-info">
+                <div class="employee-name"><span id="displayNachname">-</span> <span id="displayVorname">-</span></div>
+            </div>
+
+            <!-- Form Area -->
+            <div class="form-area">
+                <div class="tab-container">
+                    <div class="tab-headers">
+                        <div class="tab-header active" data-tab="0">Stammdaten</div>
+                        <div class="tab-header" data-tab="1">Einsatzübersicht</div>
+                        <div class="tab-header" data-tab="2">Dienstplan</div>
+                        <div class="tab-header" data-tab="3">Nicht Verfügbar</div>
+                        <div class="tab-header" data-tab="4">Bestand Dienstkleidung</div>
+                        <div class="tab-header" data-tab="5">Zeitkonto</div>
+                        <div class="tab-header" data-tab="6">Jahresübersicht</div>
+                        <div class="tab-header" data-tab="7">Stundenübersicht</div>
+                        <div class="tab-header" data-tab="8">Vordrucke</div>
+                        <div class="tab-header" data-tab="9">Briefkopf</div>
+                        <div class="tab-header" data-tab="10">Karte</div>
+                        <div class="tab-header" data-tab="11">Sub Rechnungen</div>
+                        <div class="tab-header" data-tab="12">Überhang Stunden</div>
+                    </div>
+
+                    <div class="tab-content">
+                        <!-- Stammdaten Tab -->
+                        <div class="tab-page active" style="position: relative;">
+                            <div class="form-body">
+                                <!-- Column 1 -->
+                                <div class="column">
+                                    <div class="form-row"><label class="form-label">PersNr:</label><input type="text" class="form-input small" id="ID" data-field="ID"></div>
+                                    <div class="form-row"><label class="form-label">LexNr:</label><input type="text" class="form-input small" id="LEXWare_ID" data-field="LEXWare_ID"></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="IstAktiv" data-field="IstAktiv"><label for="IstAktiv">Aktiv</label></div>
+                                    
+                                    <div class="form-row"><label class="form-label">Nachname:</label><input type="text" class="form-input" id="Nachname" data-field="Nachname"></div>
+                                    <div class="form-row"><label class="form-label">Vorname:</label><input type="text" class="form-input" id="Vorname" data-field="Vorname"></div>
+                                    <div class="form-row"><label class="form-label">Straße:</label><input type="text" class="form-input" id="Strasse" data-field="Strasse"></div>
+                                    <div class="form-row"><label class="form-label">Nr:</label><input type="text" class="form-input small" id="Nr" data-field="Nr"></div>
+                                    <div class="form-row"><label class="form-label">PLZ:</label><input type="text" class="form-input medium" id="PLZ" data-field="PLZ"></div>
+                                    <div class="form-row"><label class="form-label">Ort:</label><input type="text" class="form-input" id="Ort" data-field="Ort"></div>
+                                    <div class="form-row"><label class="form-label">Land:</label><select class="form-select" id="Land" data-field="Land"><option>Deutschland</option><option>Österreich</option><option>Schweiz</option></select></div>
+                                    <div class="form-row"><label class="form-label">Bundesland:</label><input type="text" class="form-input" id="Bundesland" data-field="Bundesland"></div>
+                                    <div class="form-row"><label class="form-label">Tel. Mobil:</label><input type="text" class="form-input" id="Tel_Mobil" data-field="Tel_Mobil"></div>
+                                    <div class="form-row"><label class="form-label">Tel. Festnetz:</label><input type="text" class="form-input" id="Tel_Festnetz" data-field="Tel_Festnetz"></div>
+                                    <div class="form-row"><label class="form-label">Email:</label><input type="text" class="form-input" id="Email" data-field="Email"></div>
+                                    <div class="form-row"><label class="form-label">Geschlecht:</label><select class="form-select" id="Geschlecht" data-field="Geschlecht"><option></option><option>männlich</option><option>weiblich</option></select></div>
+                                    <div class="form-row"><label class="form-label">Staatsangehörigkeit:</label><input type="text" class="form-input" id="Staatsang" data-field="Staatsang"></div>
+                                    <div class="form-row"><label class="form-label">Geb. Datum:</label><input type="text" class="form-input" id="Geb_Dat" data-field="Geb_Dat"></div>
+                                    <div class="form-row"><label class="form-label">Geb. Ort:</label><input type="text" class="form-input" id="Geb_Ort" data-field="Geb_Ort"></div>
+                                    <div class="form-row"><label class="form-label">Geb. Name:</label><input type="text" class="form-input" id="Geb_Name" data-field="Geb_Name"></div>
+                                    <div class="form-row"><label class="form-label">Eintrittsdatum:</label><input type="text" class="form-input" id="Eintrittsdatum" data-field="Eintrittsdatum"></div>
+                                    <div class="form-row"><label class="form-label">Austrittsdatum:</label><input type="text" class="form-input" id="Austrittsdatum" data-field="Austrittsdatum"></div>
+                                    <div class="form-row"><label class="form-label">Anstellungsart:</label><select class="form-select" id="Anstellungsart_ID" data-field="Anstellungsart_ID"><option></option><option value="3">Festangestellt</option><option value="4">Freiberufler</option><option value="5">Subunternehmer</option></select></div>
+                                    <div class="form-row"><label class="form-label">Kleidergröße:</label><select class="form-select" id="Kleidergroe" data-field="Kleidergroe"><option></option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Hat_Fahrerausweis" data-field="Hat_Fahrerausweis"><label for="Hat_Fahrerausweis">Fahrerausweis</label></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Hat_EigenerPKW" data-field="Hat_EigenerPKW"><label for="Hat_EigenerPKW">Eigener PKW</label></div>
+                                    
+                                    <div class="form-row"><label class="form-label">Dienstausweis:</label><input type="text" class="form-input" id="DienstausweisNr" data-field="DienstausweisNr"></div>
+                                    <div class="form-row"><label class="form-label">Letzte Überpr. OA:</label><input type="text" class="form-input" id="Letzte_Ueberpr_OA" data-field="Letzte_Ueberpr_OA"></div>
+                                    <div class="form-row"><label class="form-label">Personalausweis-Nr:</label><input type="text" class="form-input" id="Personalausweis_Nr" data-field="Personalausweis_Nr"></div>
+                                    <div class="form-row"><label class="form-label">DFB Epin:</label><input type="text" class="form-input" id="Epin_DFB" data-field="Epin_DFB"></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="DFB_Modul_1" data-field="DFB_Modul_1"><label for="DFB_Modul_1">DFB Modul 1</label></div>
+                                    <div class="form-row"><label class="form-label">Bewacher ID:</label><input type="text" class="form-input" id="Bewacher_ID" data-field="Bewacher_ID"></div>
+                                    <div class="form-row"><label class="form-label">Zuständige Behörde:</label><input type="text" class="form-input" id="Zustaendige_Behoerde" data-field="Zustaendige_Behoerde"></div>
+                                </div>
+
+                                <!-- Column 2 -->
+                                <div class="column">
+                                    <div class="form-row"><label class="form-label">Kontoinhaber:</label><input type="text" class="form-input" id="Kontoinhaber" data-field="Kontoinhaber"></div>
+                                    <div class="form-row"><label class="form-label">BIC:</label><input type="text" class="form-input" id="BIC" data-field="BIC"></div>
+                                    <div class="form-row"><label class="form-label">IBAN:</label><input type="text" class="form-input" id="IBAN" data-field="IBAN"></div>
+                                    <div class="form-row"><label class="form-label">Lohngruppe:</label><select class="form-select" id="Stundenlohn_brutto" data-field="Stundenlohn_brutto"><option></option><option>BY Lohn 2a/b Okl. 1</option></select></div>
+                                    <div class="form-row"><label class="form-label">Bezüge gezahlt als:</label><input type="text" class="form-input" id="Bezuege_gezahlt_als" data-field="Bezuege_gezahlt_als"></div>
+                                    <div class="form-row"><label class="form-label">Koordinaten:</label><input type="text" class="form-input" id="Koordinaten" data-field="Koordinaten"></div>
+                                    <div class="form-row"><label class="form-label">Steuer-ID:</label><input type="text" class="form-input" id="SteuerNr" data-field="SteuerNr"></div>
+                                    <div class="form-row"><label class="form-label">Tätigkeit Bez.:</label><select class="form-select" id="Taetigkeit_Bezeichnung" data-field="Taetigkeit_Bezeichnung"><option></option><option>Sicherheitspersonal</option></select></div>
+                                    <div class="form-row"><label class="form-label">Krankenkasse:</label><input type="text" class="form-input" id="KV_Kasse" data-field="KV_Kasse"></div>
+                                    <div class="form-row"><label class="form-label">Steuerklasse:</label><input type="text" class="form-input small" id="Steuerklasse" data-field="Steuerklasse"></div>
+                                    <div class="form-row"><label class="form-label">Urlaub pro Jahr:</label><input type="text" class="form-input small" id="Urlaubsanspr_pro_Jahr" data-field="Urlaubsanspr_pro_Jahr"></div>
+                                    <div class="form-row"><label class="form-label">Std. Monat max.:</label><input type="text" class="form-input small" id="StundenZahlMax" data-field="StundenZahlMax"></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Ist_RV_Befrantrag" data-field="Ist_RV_Befrantrag"><label for="Ist_RV_Befrantrag">RV Befreiung beantragt</label></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="IstNSB" data-field="IstNSB"><label for="IstNSB">Brutto-Std</label></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="eMail_Abrechnung" data-field="eMail_Abrechnung"><label for="eMail_Abrechnung">Abrechnung per eMail</label></div>
+                                    <div class="form-row"><label class="form-label">Lichtbild:</label><input type="text" class="form-input" id="Lichtbild" data-field="Lichtbild" placeholder="Dateiname"></div>
+                                    <div class="form-row"><label class="form-label">Signatur:</label><input type="text" class="form-input" id="Signatur" data-field="Signatur" placeholder="Dateiname"></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Unterweisungs_34a" data-field="Unterweisungs_34a"><label for="Unterweisungs_34a">Unterweisungs § 34a</label></div>
+                                    <div class="checkbox-row"><input type="checkbox" id="Sachkunde_34a" data-field="Sachkunde_34a"><label for="Sachkunde_34a">Sachkunde § 34a</label></div>
+                                    <div class="form-row"><label class="form-label">Abzüge:</label><input type="text" class="form-input" id="Abzuege" data-field="Abzuege"></div>
+                                    <div style="flex: 1;"></div>
+                                </div>
+
+                                <!-- Column 3 -->
+                                <div class="column">
+                                    <div class="form-row"><label class="form-label">Arbeitsstd. pro Tag:</label><input type="text" class="form-input small" id="Arbst_pro_Arbeitstag" data-field="Arbst_pro_Arbeitstag"></div>
+                                    <div class="form-row"><label class="form-label">Arbeitstage/Woche:</label><input type="text" class="form-input small" id="Arbeitstage_pro_Woche" data-field="Arbeitstage_pro_Woche"></div>
+                                    <div class="form-row"><label class="form-label">Ausweis Endedatum:</label><input type="text" class="form-input" id="Ausweis_Endedatum" data-field="Ausweis_Endedatum"></div>
+                                    <div class="form-row"><label class="form-label">Ausweis Funktion:</label><input type="text" class="form-input" id="Ausweis_Funktion" data-field="Ausweis_Funktion"></div>
+                                    <div style="flex: 1;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Photo Section -->
+                            <div class="photo-section">
+                                <div class="photo-frame">
+                                    <img id="maPhoto" src="" alt="Foto">
+                                </div>
+                                <button class="photo-btn">Maps öffnen</button>
+                            </div>
+                        </div>
+
+                        <!-- Other Tabs -->
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Einsatzübersicht</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Dienstplan</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Nicht Verfügbar</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Bestand Dienstkleidung</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Zeitkonto</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Jahresübersicht</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Stundenübersicht</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Vordrucke</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Briefkopf</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Karte</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Sub Rechnungen</p></div>
+                        <div class="tab-page"><p style="padding: 15px; color: #999;">Überhang Stunden</p></div>
+                    </div>
+                </div>
+
+                <!-- Employee List -->
+                <div class="employee-list">
+                    <div class="list-header">
+                        <div class="search-box">
+                            <label>Suche:</label>
+                            <input type="text" id="searchInput">
+                        </div>
+                        <div class="filter-box">
+                            <label>Filter:</label>
+                            <select id="filterSelect">
+                                <option value="aktiv">Alle Aktiven</option>
+                                <option value="alle">Alle</option>
+                                <option value="inaktiv">Inaktive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="list-content" tabindex="0">
+                        <table class="list-table">
+                            <thead>
+                                <tr><th>Nachname</th><th>Vorname</th><th>Ort</th></tr>
+                            </thead>
+                            <tbody id="maListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span>Erstellt am: <span id="erstelltAm">-</span> von <span id="erstelltVon">-</span></span>
+                <span>Geändert am: <span id="geaendertAm">-</span> von <span id="geaendertVon">-</span></span>
+            </div>
+        </main>
+    </div>
+
+    <!-- Access-ID Platzhalter (unsichtbar) -->
+    <div style="display:none;">
+        <input id="PersNr" data-field="ID">
+        <input id="Sozialvers_Nr" data-field="Sozialvers_Nr">
+        <input id="Resturl_Vorjahr" data-field="Resturl_Vorjahr">
+        <input id="tblBilddatei" data-field="Lichtbild">
+        <input id="tblSignaturdatei" data-field="Signatur">
+        <input id="Bemerkungen" data-field="Bemerkungen">
+        <input id="Amt_Pruefung" data-field="Amt_Pruefung">
+        <input id="Datum_Pruefung" data-field="Datum_Pruefung">
+        <input id="Erst_von" data-field="Erst_von">
+        <input id="Erst_am" data-field="Erst_am">
+        <input id="Aend_von" data-field="Aend_von">
+        <input id="Aend_am" data-field="Aend_am">
+        <select id="Anstellungsart" data-field="Anstellungsart_ID"></select>
+        <select id="Fahrerlaubnis" data-field="Fahrerlaubnis"></select>
+        <select id="Kleidergroesse" data-field="Kleidergroe"></select>
+        <select id="lst_MA"></select>
+        <input type="checkbox" id="IstSubunternehmer" data-field="IstSubunternehmer">
+        <input type="checkbox" id="Eigener_PKW" data-field="Eigener_PKW">
+        <input type="checkbox" id="Hat_keine_34a" data-field="Hat_keine_34a">
+        <input type="checkbox" id="HatSachkunde" data-field="HatSachkunde">
+        <input type="checkbox" id="Lex_Aktiv" data-field="Lex_Aktiv">
+        <input type="checkbox" id="cbMailAbrech" data-field="eMail_Abrechnung">
+        <input type="checkbox" id="Modul1_DFB" data-field="DFB_Modul_1">
+    </div>
+
+    <script src="../../js/sidebar.js"></script>
+    <script src="../../js/api-autostart.js"></script>
+    <script src="logic/access_aliases.js"></script>
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let mitarbeiterList = [];
+        let currentIndex = 0;
+        let currentRecord = null;
+        const photoEl = document.getElementById('maPhoto');
+
+        function resolvePhotoPath(value) {
+            if (!value) return '';
+            if (/^https?:/i.test(value) || /^file:/i.test(value)) return value;
+            if (/^[A-Za-z]:[\\/]/.test(value)) {
+                return `file:///${value.replace(/\\\\/g, '/')}`;
+            }
+            if (/^\\\\/.test(value)) {
+                return `file:${value.replace(/\\\\/g, '/')}`;
+            }
+            return `../media/mitarbeiter/${value}`;
+        }
+
+        function updatePhoto(value) {
+            if (!photoEl) return;
+            const src = resolvePhotoPath(value);
+            if (!src) {
+                photoEl.removeAttribute('src');
+                return;
+            }
+            photoEl.onerror = () => {
+                photoEl.removeAttribute('src');
+            };
+            photoEl.src = src;
+        }
+
+        function updateHeaderDate() {
+            const lbl = document.getElementById('lbl_Datum');
+            if (lbl) lbl.textContent = new Date().toLocaleDateString('de-DE');
+        }
+
+        function navigateToForm(formId, fallbackUrl) {
+            try {
+                if (window.parent && window.parent.ConsysShell && typeof window.parent.ConsysShell.showForm === 'function') {
+                    window.parent.ConsysShell.showForm(formId);
+                    return;
+                }
+            } catch (e) {}
+            if (fallbackUrl) {
+                window.location.href = fallbackUrl;
+            }
+        }
+
+        // Tab Switching
+        document.querySelectorAll('.tab-header').forEach((header, idx) => {
+            header.addEventListener('click', () => {
+                document.querySelectorAll('.tab-header').forEach(h => h.classList.remove('active'));
+                header.classList.add('active');
+                document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.tab-page')[idx].classList.add('active');
+            });
+        });
+
+        // Load Mitarbeiter
+        async function loadMitarbeiter() {
+            try {
+                const aktiv = document.getElementById('filterSelect').value;
+                let url = `${API_URL}/mitarbeiter`;
+                if (aktiv === 'aktiv') url += '?aktiv=true';
+                else if (aktiv === 'inaktiv') url += '?aktiv=false';
+
+                const response = await fetch(url);
+                const result = await response.json();
+                mitarbeiterList = result.data || [];
+                renderMitarbeiterList();
+                if (mitarbeiterList.length > 0) await showRecord(0);
+            } catch (error) {
+                console.error('Fehler:', error);
+            }
+        }
+
+        function renderMitarbeiterList() {
+            const tbody = document.getElementById('maListBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            mitarbeiterList.forEach((ma, index) => {
+                const name = (ma.Nachname || '') + ' ' + (ma.Vorname || '');
+                if (search && !name.toLowerCase().includes(search)) return;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${ma.Nachname || ''}</td><td>${ma.Vorname || ''}</td><td>${ma.Ort || ''}</td>`;
+                tr.addEventListener('click', async () => {
+                    document.querySelectorAll('.list-table tr').forEach(r => r.classList.remove('selected'));
+                    tr.classList.add('selected');
+                    await showRecord(index);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function showRecord(index) {
+            if (index < 0 || index >= mitarbeiterList.length) return;
+            currentIndex = index;
+            const maId = mitarbeiterList[index].ID;
+
+            try {
+                const response = await fetch(`${API_URL}/mitarbeiter/${maId}`);
+                const result = await response.json();
+                currentRecord = result.data?.mitarbeiter || result.data || mitarbeiterList[index];
+            } catch (error) {
+                currentRecord = mitarbeiterList[index];
+            }
+
+            document.getElementById('displayNachname').textContent = currentRecord.Nachname || '-';
+            document.getElementById('displayVorname').textContent = currentRecord.Vorname || '-';
+            document.getElementById('maNr').value = currentRecord.ID || '';
+
+            document.querySelectorAll('[data-field]').forEach(el => {
+                const field = el.dataset.field;
+                let value = currentRecord[field] || '';
+                if (value && typeof value === 'string' && value.includes('T')) {
+                    const date = new Date(value);
+                    if (!isNaN(date)) value = date.toLocaleDateString('de-DE');
+                }
+                if (el.type === 'checkbox') el.checked = !!value;
+                else el.value = value;
+            });
+
+            updatePhoto(currentRecord.Lichtbild || currentRecord.MA_Lichtbild);
+
+            if (currentRecord.Erst_am) {
+                const d = new Date(currentRecord.Erst_am);
+                document.getElementById('erstelltAm').textContent = d.toLocaleDateString('de-DE');
+            }
+            document.getElementById('erstelltVon').textContent = currentRecord.Erst_von || '-';
+            if (currentRecord.Aend_am) {
+                const d = new Date(currentRecord.Aend_am);
+                document.getElementById('geaendertAm').textContent = d.toLocaleDateString('de-DE');
+            }
+            document.getElementById('geaendertVon').textContent = currentRecord.Aend_von || '-';
+
+            const rows = document.querySelectorAll('.list-table tbody tr');
+            rows.forEach((row, i) => row.classList.toggle('selected', i === index));
+            rows[index]?.scrollIntoView({ block: 'nearest' });
+            if (window.AccessAliases) {
+                AccessAliases.setValue('lst_MA', maId);
+            }
+        }
+
+        function clearForm() {
+            document.querySelectorAll('[data-field]').forEach(el => {
+                if (el.type === 'checkbox') el.checked = false;
+                else el.value = '';
+            });
+            document.getElementById('displayNachname').textContent = '-';
+            document.getElementById('displayVorname').textContent = '-';
+            document.getElementById('maNr').value = '';
+            updatePhoto('');
+            currentRecord = null;
+        }
+
+        async function deleteMitarbeiter() {
+            if (!currentRecord?.ID) {
+                alert('Kein Mitarbeiter ausgewählt');
+                return;
+            }
+            if (!confirm('Mitarbeiter wirklich löschen?')) return;
+            try {
+                await fetch(`${API_URL}/mitarbeiter/${currentRecord.ID}`, { method: 'DELETE' });
+                await loadMitarbeiter();
+            } catch (error) {
+                alert('Löschen fehlgeschlagen');
+            }
+        }
+
+        document.getElementById('btnFirst')?.addEventListener('click', () => showRecord(0));
+        document.getElementById('btnPrev')?.addEventListener('click', () => showRecord(currentIndex - 1));
+        document.getElementById('btnNext')?.addEventListener('click', () => showRecord(currentIndex + 1));
+        document.getElementById('btnLast')?.addEventListener('click', () => showRecord(mitarbeiterList.length - 1));
+        document.getElementById('Befehl43')?.addEventListener('click', () => showRecord(0));
+        document.getElementById('Befehl41')?.addEventListener('click', () => showRecord(currentIndex - 1));
+        document.getElementById('Befehl40')?.addEventListener('click', () => showRecord(currentIndex + 1));
+        document.getElementById('Befehl39')?.addEventListener('click', () => showRecord(mitarbeiterList.length - 1));
+        document.getElementById('Befehl46')?.addEventListener('click', () => loadMitarbeiter());
+        document.getElementById('mcobtnDelete')?.addEventListener('click', deleteMitarbeiter);
+        document.getElementById('btnLoeschen')?.addEventListener('click', deleteMitarbeiter);
+        document.getElementById('btnNewMA')?.addEventListener('click', clearForm);
+        document.getElementById('btnNeuMA')?.addEventListener('click', clearForm);
+        document.getElementById('btnSpeichern')?.addEventListener('click', () => alert('Speichern: Funktion noch nicht implementiert.'));
+        document.getElementById('btnZeitkonto')?.addEventListener('click', () => navigateToForm('zeitkonten', '../frm_MA_Zeitkonten.html'));
+        document.getElementById('btnMATabelle')?.addEventListener('click', () => alert('Mitarbeiter Tabelle: Funktion noch nicht implementiert.'));
+        document.getElementById('btnListenDrucken')?.addEventListener('click', () => window.print());
+        document.getElementById('btnEinsaetzeFA')?.addEventListener('click', () => alert('Einsätze übertragen FA: Funktion noch nicht implementiert.'));
+        document.getElementById('btnEinsaetzeMJ')?.addEventListener('click', () => alert('Einsätze übertragen MJ: Funktion noch nicht implementiert.'));
+        document.getElementById('btnMAAdresse')?.addEventListener('click', () => alert('MA Adressen: Funktion noch nicht implementiert.'));
+        document.getElementById('searchInput')?.addEventListener('input', renderMitarbeiterList);
+        document.getElementById('filterSelect')?.addEventListener('change', loadMitarbeiter);
+        document.querySelector('.list-content')?.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                showRecord(Math.min(currentIndex + 1, mitarbeiterList.length - 1));
+            }
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                showRecord(Math.max(currentIndex - 1, 0));
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('embedded') === '1') {
+                document.body.classList.add('embedded');
+            }
+            if (window.ApiAutostart) {
+                await window.ApiAutostart.init();
+            }
+            if (window.AccessAliases) {
+                AccessAliases.link('PersNr', 'ID');
+                AccessAliases.link('lst_MA', 'ID');
+                AccessAliases.link('Kleidergroesse', 'Kleidergroe');
+                AccessAliases.link('Modul1_DFB', 'DFB_Modul_1');
+                AccessAliases.link('cbMailAbrech', 'eMail_Abrechnung');
+                AccessAliases.link('tblBilddatei', 'Lichtbild');
+                AccessAliases.link('tblSignaturdatei', 'Signatur');
+            }
+            updateHeaderDate();
+            loadMitarbeiter();
+        });
+    </script>
+<div id="__access_missing_controls" style="display:none">
+  <input type="text" id="Rechteck37" data-access-id="Rechteck37" />
+  <input type="text" id="mcobtnDelete" data-access-id="mcobtnDelete" />
+  <input type="text" id="lbl_Vorname" data-access-id="lbl_Vorname" />
+  <input type="text" id="lbl_Nachname" data-access-id="lbl_Nachname" />
+  <input type="text" id="lbl_PersNr" data-access-id="lbl_PersNr" />
+  <input type="text" id="btnLstDruck" data-access-id="btnLstDruck" />
+  <input type="text" id="DiDatumAb" data-access-id="DiDatumAb" />
+  <input type="text" id="btnMADienstpl" data-access-id="btnMADienstpl" />
+  <input type="text" id="btnRibbonAus" data-access-id="btnRibbonAus" />
+  <input type="text" id="btnRibbonEin" data-access-id="btnRibbonEin" />
+  <input type="text" id="btnDaBaEin" data-access-id="btnDaBaEin" />
+  <input type="text" id="btnDaBaAus" data-access-id="btnDaBaAus" />
+  <input type="text" id="lbl_ab" data-access-id="lbl_ab" />
+  <input type="text" id="lbl_Mitarbeitertabelle" data-access-id="lbl_Mitarbeitertabelle" />
+  <input type="text" id="Bezeichnungsfeld575" data-access-id="Bezeichnungsfeld575" />
+  <input type="text" id="Bezeichnungsfeld604" data-access-id="Bezeichnungsfeld604" />
+  <input type="text" id="btnZKFest" data-access-id="btnZKFest" />
+  <input type="text" id="btnZKMini" data-access-id="btnZKMini" />
+  <input type="text" id="Men" data-access-id="Men" />
+  <input type="text" id="Bezeichnungsfeld449" data-access-id="Bezeichnungsfeld449" />
+  <input type="text" id="Bezeichnungsfeld473" data-access-id="Bezeichnungsfeld473" />
+  <input type="text" id="reg_MA" data-access-id="reg_MA" />
+  <input type="text" id="pgAdresse" data-access-id="pgAdresse" />
+  <input type="text" id="Bezeichnungsfeld325" data-access-id="Bezeichnungsfeld325" />
+  <input type="text" id="Bezeichnungsfeld349" data-access-id="Bezeichnungsfeld349" />
+  <input type="text" id="Bezeichnungsfeld351" data-access-id="Bezeichnungsfeld351" />
+  <input type="text" id="Bezeichnungsfeld353" data-access-id="Bezeichnungsfeld353" />
+  <input type="text" id="Bezeichnungsfeld291" data-access-id="Bezeichnungsfeld291" />
+  <input type="text" id="Bezeichnungsfeld293" data-access-id="Bezeichnungsfeld293" />
+  <input type="text" id="Bezeichnungsfeld295" data-access-id="Bezeichnungsfeld295" />
+  <input type="text" id="Bezeichnungsfeld12" data-access-id="Bezeichnungsfeld12" />
+  <input type="text" id="Bezeichnungsfeld297" data-access-id="Bezeichnungsfeld297" />
+  <input type="text" id="Bezeichnungsfeld299" data-access-id="Bezeichnungsfeld299" />
+  <input type="text" id="Bezeichnungsfeld300" data-access-id="Bezeichnungsfeld300" />
+  <input type="text" id="Bezeichnungsfeld301" data-access-id="Bezeichnungsfeld301" />
+  <input type="text" id="Bezeichnungsfeld302" data-access-id="Bezeichnungsfeld302" />
+  <input type="text" id="Bezeichnungsfeld303" data-access-id="Bezeichnungsfeld303" />
+  <input type="text" id="Bezeichnungsfeld305" data-access-id="Bezeichnungsfeld305" />
+  <input type="text" id="Bezeichnungsfeld306" data-access-id="Bezeichnungsfeld306" />
+  <input type="text" id="Bezeichnungsfeld307" data-access-id="Bezeichnungsfeld307" />
+  <input type="text" id="Bezeichnungsfeld308" data-access-id="Bezeichnungsfeld308" />
+  <input type="text" id="Bezeichnungsfeld309" data-access-id="Bezeichnungsfeld309" />
+  <input type="text" id="Bezeichnungsfeld392" data-access-id="Bezeichnungsfeld392" />
+  <input type="text" id="Bezeichnungsfeld48" data-access-id="Bezeichnungsfeld48" />
+  <input type="text" id="Bezeichnungsfeld51" data-access-id="Bezeichnungsfeld51" />
+  <input type="text" id="Bezeichnungsfeld54" data-access-id="Bezeichnungsfeld54" />
+  <input type="text" id="Kostenstelle" data-access-id="Kostenstelle" />
+  <input type="text" id="Bezeichnungsfeld57" data-access-id="Bezeichnungsfeld57" />
+  <input type="text" id="MA_Bild" data-access-id="MA_Bild" />
+  <input type="text" id="sub_MA_ErsatzEmail" data-access-id="sub_MA_ErsatzEmail" />
+  <input type="text" id="Auszahlungsart" data-access-id="Auszahlungsart" />
+  <input type="text" id="Bezeichnungsfeld60" data-access-id="Bezeichnungsfeld60" />
+  <input type="text" id="Bankname" data-access-id="Bankname" />
+  <input type="text" id="Bezeichnungsfeld63" data-access-id="Bezeichnungsfeld63" />
+  <input type="text" id="Bankleitzahl" data-access-id="Bankleitzahl" />
+  <input type="text" id="Bezeichnungsfeld66" data-access-id="Bezeichnungsfeld66" />
+  <input type="text" id="Kontonummer" data-access-id="Kontonummer" />
+  <input type="text" id="Bezeichnungsfeld69" data-access-id="Bezeichnungsfeld69" />
+  <input type="text" id="Bezeichnungsfeld72" data-access-id="Bezeichnungsfeld72" />
+  <input type="text" id="Kosten_pro_MAStunde" data-access-id="Kosten_pro_MAStunde" />
+  <input type="text" id="Bezeichnungsfeld443" data-access-id="Bezeichnungsfeld443" />
+  <input type="text" id="Bezeichnungsfeld434" data-access-id="Bezeichnungsfeld434" />
+  <input type="text" id="Datum_34a" data-access-id="Datum_34a" />
+  <input type="text" id="Bezeichnungsfeld439" data-access-id="Bezeichnungsfeld439" />
+  <input type="text" id="btnDateisuch" data-access-id="btnDateisuch" />
+  <input type="text" id="sub_MA_Einsatz_Zuo" data-access-id="sub_MA_Einsatz_Zuo" />
+  <input type="text" id="Bezeichnungsfeld396" data-access-id="Bezeichnungsfeld396" />
+  <input type="text" id="btnDateisuch2" data-access-id="btnDateisuch2" />
+  <input type="text" id="MA_Signatur" data-access-id="MA_Signatur" />
+  <input type="text" id="Bezeichnungsfeld75" data-access-id="Bezeichnungsfeld75" />
+  <input type="text" id="Bezeichnungsfeld78" data-access-id="Bezeichnungsfeld78" />
+  <input type="text" id="Bezeichnungsfeld81" data-access-id="Bezeichnungsfeld81" />
+  <input type="text" id="Bezeichnungsfeld84" data-access-id="Bezeichnungsfeld84" />
+  <input type="text" id="Bezeichnungsfeld87" data-access-id="Bezeichnungsfeld87" />
+  <input type="text" id="Bezeichnungsfeld90" data-access-id="Bezeichnungsfeld90" />
+  <input type="text" id="Bezeichnungsfeld324" data-access-id="Bezeichnungsfeld324" />
+  <input type="text" id="Bezeichnungsfeld99" data-access-id="Bezeichnungsfeld99" />
+  <input type="text" id="Bezeichnungsfeld102" data-access-id="Bezeichnungsfeld102" />
+  <input type="text" id="Bezeichnungsfeld105" data-access-id="Bezeichnungsfeld105" />
+  <input type="text" id="Bezeichnungsfeld428" data-access-id="Bezeichnungsfeld428" />
+  <input type="text" id="Bezeichnungsfeld108" data-access-id="Bezeichnungsfeld108" />
+  <input type="text" id="Bezeichnungsfeld111" data-access-id="Bezeichnungsfeld111" />
+  <input type="text" id="Bezeichnungsfeld114" data-access-id="Bezeichnungsfeld114" />
+  <input type="text" id="Bezeichnungsfeld117" data-access-id="Bezeichnungsfeld117" />
+  <input type="text" id="Bezeichnungsfeld120" data-access-id="Bezeichnungsfeld120" />
+  <input type="text" id="Bezeichnungsfeld132" data-access-id="Bezeichnungsfeld132" />
+  <input type="text" id="Bezeichnungsfeld135" data-access-id="Bezeichnungsfeld135" />
+  <input type="text" id="Bezeichnungsfeld394" data-access-id="Bezeichnungsfeld394" />
+  <input type="text" id="Bezeichnungsfeld123" data-access-id="Bezeichnungsfeld123" />
+  <input type="text" id="Bezeichnungsfeld138" data-access-id="Bezeichnungsfeld138" />
+  <input type="text" id="Bezeichnungsfeld144" data-access-id="Bezeichnungsfeld144" />
+  <input type="text" id="Bezeichnungsfeld141" data-access-id="Bezeichnungsfeld141" />
+  <input type="text" id="Bezeichnungsfeld432" data-access-id="Bezeichnungsfeld432" />
+  <input type="text" id="Bezeichnungsfeld527" data-access-id="Bezeichnungsfeld527" />
+  <input type="text" id="Bezeichnungsfeld538" data-access-id="Bezeichnungsfeld538" />
+  <input type="text" id="Bezeichnungsfeld549" data-access-id="Bezeichnungsfeld549" />
+  <input type="text" id="Bezeichnungsfeld548" data-access-id="Bezeichnungsfeld548" />
+  <input type="text" id="btnMaps" data-access-id="btnMaps" />
+  <input type="text" id="btnZuAb" data-access-id="btnZuAb" />
+  <input type="text" id="Bezeichnungsfeld605" data-access-id="Bezeichnungsfeld605" />
+  <input type="text" id="Bezeichnungsfeld606" data-access-id="Bezeichnungsfeld606" />
+  <input type="text" id="Bezeichnungsfeld682" data-access-id="Bezeichnungsfeld682" />
+  <input type="text" id="lblMailAbrech" data-access-id="lblMailAbrech" />
+  <input type="text" id="Bezeichnungsfeld695" data-access-id="Bezeichnungsfeld695" />
+  <input type="text" id="pgMonat" data-access-id="pgMonat" />
+  <input type="text" id="Bezeichnungsfeld163" data-access-id="Bezeichnungsfeld163" />
+  <input type="text" id="lblDatum" data-access-id="lblDatum" />
+  <input type="text" id="Mon_aktdat" data-access-id="Mon_aktdat" />
+  <input type="text" id="btnXLZeitkto" data-access-id="btnXLZeitkto" />
+  <input type="text" id="btnLesen" data-access-id="btnLesen" />
+  <input type="text" id="btnUpdJahr" data-access-id="btnUpdJahr" />
+  <input type="text" id="EinsProMon" data-access-id="EinsProMon" />
+  <input type="text" id="Bezeichnungsfeld202" data-access-id="Bezeichnungsfeld202" />
+  <input type="text" id="TagProMon" data-access-id="TagProMon" />
+  <input type="text" id="Bezeichnungsfeld204" data-access-id="Bezeichnungsfeld204" />
+  <input type="text" id="cboMonat" data-access-id="cboMonat" />
+  <input type="text" id="cboJahr" data-access-id="cboJahr" />
+  <input type="text" id="sub_tbl_MA_Zeitkonto_Aktmon2" data-access-id="sub_tbl_MA_Zeitkonto_Aktmon2" />
+  <input type="text" id="lst_Tl1M" data-access-id="lst_Tl1M" />
+  <input type="text" id="Bezeichnungsfeld338" data-access-id="Bezeichnungsfeld338" />
+  <input type="text" id="lst_Tl2M" data-access-id="lst_Tl2M" />
+  <input type="text" id="sub_tbl_MA_Zeitkonto_Aktmon1" data-access-id="sub_tbl_MA_Zeitkonto_Aktmon1" />
+  <input type="text" id="pgJahr" data-access-id="pgJahr" />
+  <input type="text" id="lst_Tl1" data-access-id="lst_Tl1" />
+  <input type="text" id="Bezeichnungsfeld334" data-access-id="Bezeichnungsfeld334" />
+  <input type="text" id="lst_Tl2" data-access-id="lst_Tl2" />
+  <input type="text" id="Bezeichnungsfeld336" data-access-id="Bezeichnungsfeld336" />
+  <input type="text" id="cboJahrJa" data-access-id="cboJahrJa" />
+  <input type="text" id="btnXLJahr" data-access-id="btnXLJahr" />
+  <input type="text" id="pgAuftrUeb" data-access-id="pgAuftrUeb" />
+  <input type="text" id="btnXLEinsUeber" data-access-id="btnXLEinsUeber" />
+  <input type="text" id="btnZKeinzel" data-access-id="btnZKeinzel" />
+  <input type="text" id="Bezeichnungsfeld364" data-access-id="Bezeichnungsfeld364" />
+  <input type="text" id="Bericht_drucken" data-access-id="Bericht_drucken" />
+  <input type="text" id="btnAU_Lesen" data-access-id="btnAU_Lesen" />
+  <input type="text" id="cboFilterAuftrag" data-access-id="cboFilterAuftrag" />
+  <input type="text" id="Bezeichnungsfeld617" data-access-id="Bezeichnungsfeld617" />
+  <input type="text" id="lbSummeStunden" data-access-id="lbSummeStunden" />
+  <input type="text" id="lst_Zuo" data-access-id="lst_Zuo" />
+  <input type="text" id="txRechSub" data-access-id="txRechSub" />
+  <input type="text" id="lbRechSub" data-access-id="lbRechSub" />
+  <input type="text" id="btnRch" data-access-id="btnRch" />
+  <input type="text" id="btnCalc" data-access-id="btnCalc" />
+  <input type="text" id="txRechCheck" data-access-id="txRechCheck" />
+  <input type="text" id="lbRechCheck" data-access-id="lbRechCheck" />
+  <input type="text" id="txRechBezahlt" data-access-id="txRechBezahlt" />
+  <input type="text" id="lbRechBez" data-access-id="lbRechBez" />
+  <input type="text" id="pgStundenuebersicht" data-access-id="pgStundenuebersicht" />
+  <input type="text" id="btnXLUeberhangStd" data-access-id="btnXLUeberhangStd" />
+  <input type="text" id="btnau_lesen2" data-access-id="btnau_lesen2" />
+  <input type="text" id="frmStundenbersicht" data-access-id="frmStundenbersicht" />
+  <input type="text" id="pgPlan" data-access-id="pgPlan" />
+  <input type="text" id="Bezeichnungsfeld550" data-access-id="Bezeichnungsfeld550" />
+  <input type="text" id="txDatumDP" data-access-id="txDatumDP" />
+  <input type="text" id="btnAUPl_Lesen" data-access-id="btnAUPl_Lesen" />
+  <input type="text" id="btn_Diensplan_prnt" data-access-id="btn_Diensplan_prnt" />
+  <input type="text" id="btn_Dienstplan_send" data-access-id="btn_Dienstplan_send" />
+  <input type="text" id="btnXLDiePl" data-access-id="btnXLDiePl" />
+  <input type="text" id="lstPl_Zuo" data-access-id="lstPl_Zuo" />
+  <input type="text" id="pgnVerfueg" data-access-id="pgnVerfueg" />
+  <input type="text" id="btnMehrfachtermine" data-access-id="btnMehrfachtermine" />
+  <input type="text" id="TermineAbHeute" data-access-id="TermineAbHeute" />
+  <input type="text" id="Bezeichnungsfeld403" data-access-id="Bezeichnungsfeld403" />
+  <input type="text" id="sub_MA_tbl_MA_NVerfuegZeiten" data-access-id="sub_MA_tbl_MA_NVerfuegZeiten" />
+  <input type="text" id="Bezeichnungsfeld457" data-access-id="Bezeichnungsfeld457" />
+  <input type="text" id="btnXLNverfueg" data-access-id="btnXLNverfueg" />
+  <input type="text" id="pgDienstKl" data-access-id="pgDienstKl" />
+  <input type="text" id="btnReport_Dienstkleidung" data-access-id="btnReport_Dienstkleidung" />
+  <input type="text" id="sub_MA_Dienstkleidung" data-access-id="sub_MA_Dienstkleidung" />
+  <input type="text" id="pgVordr" data-access-id="pgVordr" />
+  <input type="text" id="sub_tbltmp_MA_Ausgef_Vorlagen" data-access-id="sub_tbltmp_MA_Ausgef_Vorlagen" />
+  <input type="text" id="btn_MA_EinlesVorlageDatei" data-access-id="btn_MA_EinlesVorlageDatei" />
+  <input type="text" id="btnXLVordrucke" data-access-id="btnXLVordrucke" />
+  <input type="text" id="pgBrief" data-access-id="pgBrief" />
+  <input type="text" id="Briefkopf" data-access-id="Briefkopf" />
+  <input type="text" id="Bezeichnungsfeld408" data-access-id="Bezeichnungsfeld408" />
+  <input type="text" id="IstBrfAuto" data-access-id="IstBrfAuto" />
+  <input type="text" id="Bezeichnungsfeld410" data-access-id="Bezeichnungsfeld410" />
+  <input type="text" id="Anr" data-access-id="Anr" />
+  <input type="text" id="Bezeichnungsfeld412" data-access-id="Bezeichnungsfeld412" />
+  <input type="text" id="Anr_Brief" data-access-id="Anr_Brief" />
+  <input type="text" id="Bezeichnungsfeld414" data-access-id="Bezeichnungsfeld414" />
+  <input type="text" id="Anr_eMail" data-access-id="Anr_eMail" />
+  <input type="text" id="Bezeichnungsfeld417" data-access-id="Bezeichnungsfeld417" />
+  <input type="text" id="pgStdUeberlaufstd" data-access-id="pgStdUeberlaufstd" />
+  <input type="text" id="Untergeordnet360" data-access-id="Untergeordnet360" />
+  <input type="text" id="Bezeichnungsfeld361" data-access-id="Bezeichnungsfeld361" />
+  <input type="text" id="pgJahrStdVorMon" data-access-id="pgJahrStdVorMon" />
+  <input type="text" id="pgMaps" data-access-id="pgMaps" />
+  <input type="text" id="ufrm_Maps" data-access-id="ufrm_Maps" />
+  <input type="text" id="Bezeichnungsfeld582" data-access-id="Bezeichnungsfeld582" />
+  <input type="text" id="pgSubRech" data-access-id="pgSubRech" />
+  <input type="text" id="subAuftragRech" data-access-id="subAuftragRech" />
+  <input type="text" id="subZuoStunden" data-access-id="subZuoStunden" />
+  <input type="text" id="Bezeichnungsfeld681" data-access-id="Bezeichnungsfeld681" />
+  <input type="text" id="EmptyCell683" data-access-id="EmptyCell683" />
+  <input type="text" id="Bezeichnungsfeld332" data-access-id="Bezeichnungsfeld332" />
+  <input type="text" id="cboAuswahl" data-access-id="cboAuswahl" />
+  <input type="text" id="NurAktiveMA" data-access-id="NurAktiveMA" />
+  <input type="text" id="MANameEingabe" data-access-id="MANameEingabe" />
+  <input type="text" id="Bezeichnungsfeld451" data-access-id="Bezeichnungsfeld451" />
+  <input type="text" id="cboIDSuche" data-access-id="cboIDSuche" />
+  <input type="text" id="Bezeichnungsfeld471" data-access-id="Bezeichnungsfeld471" />
+  <input type="text" id="Bezeichnungsfeld474" data-access-id="Bezeichnungsfeld474" />
+  <input type="text" id="Kombinationsfeld674" data-access-id="Kombinationsfeld674" />
+  <input type="text" id="Bezeichnungsfeld675" data-access-id="Bezeichnungsfeld675" />
+  <input type="text" id="Text676" data-access-id="Text676" />
+  <input type="text" id="Bezeichnungsfeld677" data-access-id="Bezeichnungsfeld677" />
+  <input type="text" id="Text678" data-access-id="Text678" />
+  <input type="text" id="Bezeichnungsfeld679" data-access-id="Bezeichnungsfeld679" />
+  <input type="text" id="cboZeitraum" data-access-id="cboZeitraum" />
+  <input type="text" id="Bezeichnungsfeld366" data-access-id="Bezeichnungsfeld366" />
+  <input type="text" id="AU_von" data-access-id="AU_von" />
+  <input type="text" id="Bezeichnungsfeld368" data-access-id="Bezeichnungsfeld368" />
+  <input type="text" id="AU_bis" data-access-id="AU_bis" />
+  <input type="text" id="Bezeichnungsfeld370" data-access-id="Bezeichnungsfeld370" />
+  <input type="text" id="Bezeichnungsfeld416" data-access-id="Bezeichnungsfeld416" />
+  <input type="text" id="Bezeichnungsfeld420" data-access-id="Bezeichnungsfeld420" />
+</div>
+</body>
+</html>

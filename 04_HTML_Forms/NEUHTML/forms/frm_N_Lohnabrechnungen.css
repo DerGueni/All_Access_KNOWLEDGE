@@ -1,0 +1,306 @@
+/* frm_N_Lohnabrechnungen.css - Lohnabrechnungen Formular */
+
+/* Container Layout mit Menu */
+.lohn-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background: #f5f5f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Linkes Menu */
+.lohn-menu {
+    width: 140px;
+    min-width: 140px;
+    background: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ccc;
+}
+
+.menu-header {
+    background: #4316B2;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 8px 4px;
+    text-align: center;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+.menu-btn {
+    background: #e8e8e8;
+    border: 1px solid #ccc;
+    padding: 6px 4px;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    color: #333;
+    border-radius: 2px;
+}
+
+.menu-btn:hover {
+    background: #d0d0d0;
+}
+
+.menu-btn.active {
+    background: #4316B2;
+    color: white;
+}
+
+.menu-btn.secondary {
+    background: #d0d0d0;
+    font-style: italic;
+}
+
+/* Hauptbereich */
+.lohn-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header */
+.lohn-header {
+    height: 60px;
+    min-height: 60px;
+    background: #4316B2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.lohn-logo {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 4px;
+}
+
+.lohn-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.header-right {
+    font-size: 12px;
+}
+
+/* Filter-Toolbar */
+.lohn-toolbar {
+    background: #e8e8e8;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #ccc;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-group label {
+    font-size: 11px;
+    color: #333;
+    white-space: nowrap;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 28px;
+    background: #ccc;
+}
+
+.lohn-select {
+    padding: 4px 8px;
+    font-size: 11px;
+    border: 1px solid #999;
+    background: white;
+    min-width: 100px;
+    border-radius: 3px;
+}
+
+.lohn-btn {
+    padding: 6px 14px;
+    font-size: 11px;
+    border: 1px solid #999;
+    background: #f5f5f5;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 3px;
+}
+
+.lohn-btn:hover {
+    background: #e0e0e0;
+}
+
+.lohn-btn.primary {
+    background: #4316B2;
+    color: white;
+    border-color: #3050c0;
+}
+
+.lohn-btn.primary:hover {
+    background: #3050c0;
+}
+
+/* Tabelle */
+.lohn-table-container {
+    flex: 1;
+    overflow: auto;
+    background: white;
+    margin: 0;
+    border: 1px solid #ccc;
+}
+
+.lohn-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.lohn-table thead {
+    background: #e0e0e0;
+    position: sticky;
+    top: 0;
+}
+
+.lohn-table th {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #999;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.lohn-table td {
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    vertical-align: middle;
+}
+
+.lohn-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.lohn-table tbody tr:hover {
+    background: #f0f5ff;
+}
+
+.col-monat {
+    width: 50px;
+    text-align: center;
+}
+
+.col-name {
+    width: 180px;
+}
+
+.col-versenden {
+    width: 70px;
+    text-align: center;
+}
+
+.col-datei {
+    min-width: 300px;
+}
+
+.col-versendet {
+    width: 140px;
+}
+
+.col-protokoll {
+    width: 220px;
+}
+
+.datei-cell {
+    font-size: 10px;
+    color: #666;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Checkbox styling */
+.lohn-table input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* Footer */
+.lohn-footer {
+    height: 28px;
+    min-height: 28px;
+    background: #4316B2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 11px;
+}
+
+.footer-left, .footer-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1400px) {
+    .lohn-menu {
+        width: 130px;
+        min-width: 130px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .lohn-menu {
+        width: 120px;
+        min-width: 120px;
+    }
+    .menu-btn {
+        font-size: 9px;
+        padding: 5px 3px;
+    }
+    .filter-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .lohn-menu {
+        width: 100px;
+        min-width: 100px;
+    }
+    .col-datei {
+        display: none;
+    }
+}

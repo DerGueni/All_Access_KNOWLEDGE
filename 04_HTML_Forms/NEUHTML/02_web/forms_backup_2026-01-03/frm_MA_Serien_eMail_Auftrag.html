@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einsatzliste senden - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        .app-header { background: #4316B2; min-height: 94px; }
+        .email-preview {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+        .email-header { border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
+        .email-field { display: flex; margin-bottom: 4px; font-size: 11px; }
+        .email-field label { width: 60px; color: #666; }
+        .email-body { min-height: 150px; font-size: 12px; white-space: pre-wrap; }
+    </style>
+</head>
+<body data-active-menu="email">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Einsatzliste senden</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Auftrag:</label>
+                    <select id="cboAuftrag" class="form-control" style="width:250px;">
+                        <option value="">-- Auftrag wählen --</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Vorlage:</label>
+                    <select id="cboVorlage" class="form-control" style="width:180px;">
+                        <option value="einsatzinfo">Einsatzinformation</option>
+                        <option value="anfrage">Anfrage</option>
+                        <option value="erinnerung">Erinnerung</option>
+                        <option value="absage">Absage</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnSenden">E-Mails senden</button>
+                    <button class="btn" id="btnVorschau">Vorschau</button>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="content-main" style="padding:12px;overflow:auto;">
+                    <fieldset class="fieldset">
+                        <legend>Empfaenger auswählen</legend>
+                        <div class="field-row">
+                            <label>
+                                <input type="checkbox" id="chkAlle" checked> Alle Mitarbeiter des Auftrags
+                            </label>
+                        </div>
+                        <div class="field-row">
+                            <label>
+                                <input type="checkbox" id="chkNurZugesagt"> Nur zugesagte
+                            </label>
+                            <label style="margin-left:16px;">
+                                <input type="checkbox" id="chkNurAnfrage"> Nur mit Anfrage
+                            </label>
+                        </div>
+                        <div style="margin-top:8px;">
+                            <table class="datasheet">
+                                <thead>
+                                    <tr>
+                                        <th style="width:30px;"><input type="checkbox" id="chkSelectAll" checked></th>
+                                        <th>Name</th>
+                                        <th style="width:180px;">E-Mail</th>
+                                        <th style="width:80px;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody_Empfaenger">
+                                    <tr><td colspan="4" style="text-align:center;color:#999;">Bitte Auftrag wählen</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="fieldset">
+                        <legend>E-Mail Inhalt</legend>
+                        <div class="field-row">
+                            <label style="width:60px;">Betreff:</label>
+                            <input type="text" id="txtBetreff" class="form-control" style="flex:1;" value="Einsatzinformation">
+                        </div>
+                        <div style="margin-top:8px;">
+                            <label>Nachricht:</label>
+                            <textarea id="txtNachricht" class="form-control" rows="8" style="width:100%;margin-top:4px;">Sehr geehrte/r {Anrede} {Nachname},
+
+hiermit erhalten Sie die Einsatzinformationen für den Auftrag {Auftrag}.
+
+Datum: {Datum}
+Zeit: {Zeit}
+Ort: {Ort}
+Treffpunkt: {Treffpunkt}
+
+Mit freundlichen Grüßen
+CONSYS Security</textarea>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="content-sidebar">
+                    <div class="detail-header" style="background:#4316B2;">
+                        <span class="detail-title">Vorschau</span>
+                    </div>
+                    <div class="detail-content">
+                        <div class="email-preview">
+                            <div class="email-header">
+                                <div class="email-field"><label>An:</label><span id="previewAn">-</span></div>
+                                <div class="email-field"><label>Betreff:</label><span id="previewBetreff">Einsatzinformation</span></div>
+                            </div>
+                            <div class="email-body" id="previewBody">
+                                Wählen Sie einen Empfaenger für die Vorschau...
+                            </div>
+                        </div>
+                        <div style="margin-top:12px;">
+                            <div class="stat-item" style="margin-bottom:8px;">
+                                <span class="stat-label">Ausgewählte Empfaenger:</span>
+                                <span class="stat-value" id="statEmpfaenger">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 E-Mails ausgewählt</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+</body>
+</html>

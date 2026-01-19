@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bewerber Verarbeitung - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        .app-header { background: #4316B2; min-height: 94px; }
+        .detail-header { background: #4316B2; }
+
+        /* Bewerber Card */
+        .bewerber-card {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .bewerber-card:hover { background: #f0f0f0; }
+        .bewerber-card.selected { background: #e8e8e8; border-left: 3px solid #4316B2; }
+
+        .bewerber-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #666;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .bewerber-info { flex: 1; }
+        .bewerber-name { font-weight: 600; font-size: 13px; }
+        .bewerber-meta { font-size: 10px; color: #666; margin-top: 2px; }
+        .bewerber-tags { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+        .bewerber-tag {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            background: #e8e8e8;
+            color: #666;
+        }
+        .bewerber-tag.quali { background: #e8e8e8; color: #333333; }
+
+        /* Status Badges - ALLE GRAU */
+        .status-neu { background: #e8e8e8; color: #333333; }
+        .status-kontakt { background: #e8e8e8; color: #333333; }
+        .status-eingeladen { background: #e8e8e8; color: #333333; }
+        .status-abgelehnt { background: #e8e8e8; color: #666666; }
+        .status-eingestellt { background: #e8e8e8; color: #333333; }
+
+        /* Detail Form */
+        .detail-form {
+            padding: 12px;
+        }
+
+        .form-section {
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .form-section:last-child { border-bottom: none; }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 12px;
+            color: #333333;
+            margin-bottom: 10px;
+        }
+
+        .form-row {
+            display: flex;
+            margin-bottom: 8px;
+            align-items: flex-start;
+        }
+        .form-row label {
+            width: 100px;
+            font-size: 11px;
+            color: #666;
+            padding-top: 4px;
+        }
+        .form-row .form-value {
+            flex: 1;
+            font-size: 11px;
+        }
+
+        /* Action Buttons im Detail */
+        .detail-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-top: 1px solid #ddd;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        .action-btn:hover { background: #d5d5d5; }
+        .action-btn.primary { background: #4316B2; color: white; border-color: #3558c0; }
+        .action-btn.success { background: #e8e8e8; color: #333333; border-color: #cccccc; }
+        .action-btn.danger { background: #e8e8e8; color: #333333; border-color: #cccccc; }
+    </style>
+</head>
+<body data-active-menu="bewerber">
+    <div class="app-container">
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Bewerber Verarbeitung</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Status:</label>
+                    <select id="cboStatus" class="form-control" style="width:150px;">
+                        <option value="">Alle</option>
+                        <option value="neu" selected>Neu</option>
+                        <option value="kontakt">Kontaktiert</option>
+                        <option value="eingeladen">Eingeladen</option>
+                        <option value="abgelehnt">Abgelehnt</option>
+                        <option value="eingestellt">Eingestellt</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Zeitraum:</label>
+                    <input type="date" id="datVon" class="form-control">
+                    <span>bis</span>
+                    <input type="date" id="datBis" class="form-control">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnNeuerBewerber">+ Neuer Bewerber</button>
+                    <button class="btn" id="btnAktualisieren">Aktualisieren</button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-bar">
+                <div class="stat-item stat-info"><span class="stat-value" id="statNeu">12</span><span class="stat-label">Neu</span></div>
+                <div class="stat-item stat-warn"><span class="stat-value" id="statKontakt">5</span><span class="stat-label">Kontaktiert</span></div>
+                <div class="stat-item"><span class="stat-value" id="statEingeladen">3</span><span class="stat-label">Eingeladen</span></div>
+                <div class="stat-item stat-ok"><span class="stat-value" id="statEingestellt">2</span><span class="stat-label">Eingestellt</span></div>
+                <div class="stat-item stat-err"><span class="stat-value" id="statAbgelehnt">8</span><span class="stat-label">Abgelehnt</span></div>
+            </div>
+
+            <div class="app-content">
+                <!-- Bewerber-Liste -->
+                <div class="content-main" style="overflow:auto;">
+                    <div class="bewerber-card selected">
+                        <div class="bewerber-avatar">MM</div>
+                        <div class="bewerber-info">
+                            <div class="bewerber-name">Mustermann, Max</div>
+                            <div class="bewerber-meta">Eingang: 15.12.2024 | Tel: 0170 1234567</div>
+                            <div class="bewerber-tags">
+                                <span class="bewerber-tag status-neu">Neu</span>
+                                <span class="bewerber-tag quali">34a</span>
+                                <span class="bewerber-tag quali">Führerschein</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bewerber-card">
+                        <div class="bewerber-avatar">SM</div>
+                        <div class="bewerber-info">
+                            <div class="bewerber-name">Schmidt, Maria</div>
+                            <div class="bewerber-meta">Eingang: 14.12.2024 | Tel: 0171 9876543</div>
+                            <div class="bewerber-tags">
+                                <span class="bewerber-tag status-kontakt">Kontaktiert</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bewerber-card">
+                        <div class="bewerber-avatar">KM</div>
+                        <div class="bewerber-info">
+                            <div class="bewerber-name">Müller, Klaus</div>
+                            <div class="bewerber-meta">Eingang: 12.12.2024 | Tel: 0172 5555555</div>
+                            <div class="bewerber-tags">
+                                <span class="bewerber-tag status-eingeladen">Eingeladen</span>
+                                <span class="bewerber-tag quali">34a</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bewerber-card">
+                        <div class="bewerber-avatar">TW</div>
+                        <div class="bewerber-info">
+                            <div class="bewerber-name">Weber, Thomas</div>
+                            <div class="bewerber-meta">Eingang: 10.12.2024 | Tel: 0173 7777777</div>
+                            <div class="bewerber-tags">
+                                <span class="bewerber-tag status-abgelehnt">Abgelehnt</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Panel -->
+                <div class="content-sidebar">
+                    <div class="detail-header">
+                        <span class="detail-title">Bewerber-Details</span>
+                        <button class="detail-close" id="btnCloseDetail">x</button>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-form">
+                            <div class="form-section">
+                                <div class="section-title">Persönliche Daten</div>
+                                <div class="form-row"><label>Name:</label><div class="form-value">Mustermann, Max</div></div>
+                                <div class="form-row"><label>Geburtsdatum:</label><div class="form-value">15.03.1990</div></div>
+                                <div class="form-row"><label>Adresse:</label><div class="form-value">Musterstr. 123<br>12345 Musterstadt</div></div>
+                            </div>
+                            <div class="form-section">
+                                <div class="section-title">Kontakt</div>
+                                <div class="form-row"><label>Telefon:</label><div class="form-value">0170 1234567</div></div>
+                                <div class="form-row"><label>E-Mail:</label><div class="form-value">max@example.com</div></div>
+                            </div>
+                            <div class="form-section">
+                                <div class="section-title">Qualifikationen</div>
+                                <div class="form-row"><label>34a:</label><div class="form-value">Ja (gültig bis 12/2025)</div></div>
+                                <div class="form-row"><label>Führerschein:</label><div class="form-value">Klasse B</div></div>
+                                <div class="form-row"><label>Erfahrung:</label><div class="form-value">3 Jahre Security</div></div>
+                            </div>
+                            <div class="form-section">
+                                <div class="section-title">Status</div>
+                                <div class="form-row"><label>Eingang:</label><div class="form-value">15.12.2024</div></div>
+                                <div class="form-row"><label>Status:</label><div class="form-value"><span class="badge badge-info">Neu</span></div></div>
+                                <div class="form-row"><label>Bearbeiter:</label><div class="form-value">-</div></div>
+                            </div>
+                            <div class="form-section">
+                                <div class="section-title">Notizen</div>
+                                <textarea class="form-control" id="txtNotizen" rows="3" style="width:100%;" placeholder="Notizen hier eingeben..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-actions">
+                        <button class="action-btn primary">Kontaktieren</button>
+                        <button class="action-btn">Einladen</button>
+                        <button class="action-btn success">Einstellen</button>
+                        <button class="action-btn danger">Ablehnen</button>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">30 Bewerber</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="frm_N_MA_Bewerber_Verarbeitung.logic.js"></script>
+</body>
+</html>

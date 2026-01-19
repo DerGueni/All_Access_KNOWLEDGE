@@ -1,0 +1,682 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <script>
+        // Global showTab function (wird vor den Tabs geladen)
+        function showTab(tabId) {
+            console.log('showTab:', tabId);
+            // Alle Tab-Inhalte verstecken
+            document.querySelectorAll('.tab-content').forEach(function(tab) {
+                tab.style.display = 'none';
+                tab.classList.remove('active');
+            });
+            // Alle Tab-Buttons deaktivieren
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            // Gewählten Tab anzeigen
+            var selectedTab = document.getElementById('tab-' + tabId);
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+                selectedTab.classList.add('active');
+            }
+            // Button aktivieren
+            event.target.classList.add('active');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstammblatt - CONSEC</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 12px; background: #d4d0c8; overflow: hidden; }
+        
+        .app-container { display: flex; height: 100vh; width: 100%; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 130px; min-width: 100px; background: linear-gradient(180deg, #8B0000 0%, #660000 100%); display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-logo { padding: 6px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .sidebar-logo-icon { width: 36px; height: 36px; margin: 0 auto; background: linear-gradient(135deg, #1a3a6a 0%, #2a4a8a 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; border: 2px solid #0a2a5a; }
+        .sidebar-title { color: white; font-size: 11px; font-weight: bold; text-align: center; padding: 6px 4px; background: rgba(0,0,0,0.2); }
+        .sidebar-menu { flex: 1; padding: 4px; overflow-y: auto; }
+        .menu-btn { display: block; width: 100%; padding: 5px 4px; margin: 2px 0; background: linear-gradient(180deg, #5577aa 0%, #4466aa 100%); color: white; border: 1px solid #3355aa; border-radius: 3px; cursor: pointer; font-size: 9px; text-align: center; }
+        .menu-btn:hover { background: linear-gradient(180deg, #6688bb 0%, #5577aa 100%); }
+        .menu-btn.active { background: linear-gradient(180deg, #3355aa 0%, #224499 100%); }
+        .menu-btn.highlight { background: #00cc66; color: black; border-color: #009944; }
+        
+        .main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        
+        /* HEADER */
+        .header-row1 { background: linear-gradient(180deg, #5577aa 0%, #4466aa 100%); padding: 4px 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #3355aa; flex-wrap: wrap; }
+        .header-logo { width: 36px; height: 36px; background: linear-gradient(135deg, #1a3a6a 0%, #2a4a8a 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; border: 2px solid #0a2a5a; flex-shrink: 0; }
+        .header-title { color: white; font-size: 15px; font-weight: bold; margin-right: 8px; }
+        .nav-btns { display: flex; gap: 1px; flex-shrink: 0; }
+        .nav-btn { width: 24px; height: 24px; background: #f0f0f0; border: 1px solid #888; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+        .nav-btn:hover { background: #e0e0e0; }
+        .header-btn { padding: 4px 10px; font-size: 11px; border: 1px solid #666; background: linear-gradient(180deg, #f4f4f4 0%, #ddd 100%); cursor: pointer; border-radius: 2px; white-space: nowrap; }
+        .header-btn:hover { background: linear-gradient(180deg, #fff 0%, #eee 100%); }
+        .header-btn.blue { background: linear-gradient(180deg, #4488cc 0%, #3366aa 100%); color: white; border-color: #2255aa; }
+        .header-btn.blue:hover { background: linear-gradient(180deg, #5599dd 0%, #4477bb 100%); }
+        .header-btn.red { background: linear-gradient(180deg, #cc4444 0%, #aa3333 100%); color: white; border-color: #882222; }
+        .header-btn.red:hover { background: linear-gradient(180deg, #dd5555 0%, #bb4444 100%); }
+        .header-btn.green { background: linear-gradient(180deg, #44aa44 0%, #338833 100%); color: white; border-color: #226622; }
+        .header-btn.cyan { background: linear-gradient(180deg, #00aaaa 0%, #008888 100%); color: white; border-color: #006666; }
+        .header-spacer { flex: 1; }
+        .name-display { background: white; padding: 4px 12px; font-size: 14px; font-weight: bold; min-width: 200px; border: 1px solid #888; }
+        .status-text { color: #ccc; font-size: 10px; }
+        .id-box { background: #0066cc; color: white; padding: 4px 8px; font-weight: bold; border-radius: 3px; }
+        
+        /* CONTENT */
+        .content-wrapper { flex: 1; display: flex; overflow: hidden; padding: 4px; gap: 4px; }
+        .content-left { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .content-right { width: 240px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; }
+        
+        /* TABS */
+        .tab-box { background: white; border: 1px solid #888; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .tab-header { display: flex; flex-wrap: wrap; background: #f0f0f0; border-bottom: 1px solid #888; padding: 2px 2px 0 2px; gap: 1px; }
+        .tab-btn { padding: 4px 8px; border: 1px solid #888; border-bottom: none; background: #e0e0e0; cursor: pointer; font-size: 10px; border-radius: 3px 3px 0 0; }
+        .tab-btn:hover { background: #d0d0d0; }
+        .tab-btn.active { background: white; border-bottom: 1px solid white; margin-bottom: -1px; font-weight: bold; }
+        .tab-body { display: none; flex: 1; overflow: auto; padding: 8px; }
+        .tab-body.active { display: block; }
+        
+        /* FORM ELEMENTS */
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .form-col { display: flex; flex-direction: column; gap: 4px; }
+        .form-row { display: flex; align-items: center; gap: 4px; }
+        .form-row label { width: 110px; font-size: 11px; flex-shrink: 0; text-align: right; padding-right: 4px; }
+        .form-row input, .form-row select { flex: 1; padding: 2px 4px; border: 1px solid #888; font-size: 11px; min-width: 0; }
+        .form-row input[type="checkbox"] { flex: 0; width: 16px; height: 16px; }
+        .checkbox-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+        .checkbox-row label { width: auto; }
+        .section-title { font-weight: bold; font-size: 11px; color: #333; padding: 4px 0; border-bottom: 1px solid #ccc; margin-bottom: 4px; }
+        
+        /* RIGHT PANEL */
+        .photo-box { width: 120px; height: 150px; border: 2px solid #888; background: #f8f8f8; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .photo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .photo-placeholder { color: #888; font-size: 10px; text-align: center; }
+        .filter-section { background: white; border: 1px solid #888; padding: 4px; }
+        .filter-row { display: flex; align-items: center; gap: 4px; margin: 2px 0; }
+        .filter-row label { font-size: 10px; width: 40px; }
+        .filter-row input, .filter-row select { flex: 1; font-size: 10px; padding: 2px; border: 1px solid #888; }
+        .ma-list { background: white; border: 1px solid #888; flex: 1; overflow: auto; }
+        .ma-list-header { display: grid; grid-template-columns: 1fr 1fr 80px; background: #4466aa; color: white; font-size: 10px; font-weight: bold; }
+        .ma-list-header div { padding: 3px 4px; border-right: 1px solid #3355aa; }
+        .ma-list-row { display: grid; grid-template-columns: 1fr 1fr 80px; font-size: 10px; border-bottom: 1px solid #ddd; cursor: pointer; }
+        .ma-list-row:hover { background: #e8f4ff; }
+        .ma-list-row.selected { background: #0066cc; color: white; }
+        .ma-list-row div { padding: 2px 4px; border-right: 1px solid #eee; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .stats-box { background: white; border: 1px solid #888; padding: 4px; font-size: 10px; }
+        .stats-row { display: flex; justify-content: space-between; padding: 2px 0; }
+        
+        /* FOOTER */
+        .footer { background: #4466aa; color: white; padding: 2px 8px; font-size: 10px; display: flex; justify-content: space-between; }
+        
+        /* SUBFORM TABLES */
+        .subform-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .subform-table th { background: #4466aa; color: white; padding: 4px; text-align: left; border: 1px solid #3355aa; }
+        .subform-table td { padding: 3px 4px; border: 1px solid #ddd; }
+        .subform-table tr:nth-child(even) { background: #f8f8f8; }
+        .subform-table tr:hover { background: #e8f4ff; }
+        
+        /* BUTTONS ROW */
+        .btn-row { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+        .btn-small { padding: 3px 8px; font-size: 10px; border: 1px solid #666; background: #f0f0f0; cursor: pointer; border-radius: 2px; }
+        .btn-small:hover { background: #e0e0e0; }
+        .btn-small.blue { background: #4488cc; color: white; border-color: #3366aa; }
+        .btn-small.green { background: #44aa44; color: white; border-color: #338833; }
+    </style>
+    <script src="../../data/mitarbeiter_echtdaten.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">◆</div>
+            </div>
+            <div class="sidebar-title">HAUPTMENÜ</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn" onclick="openMenu('dienstplan')">Dienstplanübersicht</button>
+                <button class="menu-btn" onclick="openMenu('planung')">Planungsübersicht</button>
+                <button class="menu-btn" onclick="openMenu('auftrag')">Auftragsverwaltung</button>
+                <button class="menu-btn active">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" onclick="openMenu('mail')">Offene Mail Anfragen</button>
+                <button class="menu-btn" onclick="openMenu('excel')">Excel Zeitkonten</button>
+                <button class="menu-btn" onclick="openMenu('zeitkonten')">Zeitkonten</button>
+                <button class="menu-btn" onclick="openMenu('abwesenheit')">Abwesenheitsplanung</button>
+                <button class="menu-btn" onclick="openMenu('ausweis')">Dienstausweis erstellen</button>
+                <button class="menu-btn highlight" onclick="openMenu('stunden')">Stundenabgleich</button>
+                <button class="menu-btn" onclick="openMenu('kunden')">Kundenverwaltung</button>
+            </div>
+        </div>
+        
+        <!-- MAIN AREA -->
+        <div class="main-area">
+            <!-- HEADER ROW 1 -->
+            <div class="header-row1">
+                <div class="header-logo">◆</div>
+                <span class="header-title">Mitarbeiterstammblatt</span>
+                <div class="nav-btns">
+                    <button class="nav-btn" onclick="navFirst()" title="Erster">|◄</button>
+                    <button class="nav-btn" onclick="navPrev()" title="Zurück">◄</button>
+                    <button class="nav-btn" onclick="navNext()" title="Weiter">►</button>
+                    <button class="nav-btn" onclick="navLast()" title="Letzter">►|</button>
+                </div>
+                <button class="header-btn blue" onclick="showAdressen()">MA Adressen</button>
+                <div class="header-spacer"></div>
+                <div class="name-display" id="maNameDisplay">Mustermann, Max</div>
+                <div class="status-text" id="maStatusText">Minijobber - Aktiv</div>
+                <span style="color:white;margin-left:8px;">MA - ID:</span>
+                <div class="id-box" id="maIdBox">1</div>
+                <button class="header-btn red" onclick="deleteMA()">Mitarbeiter löschen</button>
+                <button class="header-btn cyan" onclick="showZeitkonto()">Zeitkonto</button>
+                <button class="header-btn cyan" onclick="showZKFest()">ZK Fest</button>
+                <button class="header-btn cyan" onclick="showZKMini()">ZK Mini</button>
+                <button class="header-btn blue" onclick="newMA()">Neuer Mitarbeiter</button>
+                <button class="header-btn green" onclick="sendEinsaetze()">Einsätze übertragen</button>
+            </div>
+            
+            <!-- CONTENT -->
+            <div class="content-wrapper">
+                <div class="content-left">
+                    <div class="tab-box">
+                        <div class="tab-header">
+                            <button class="tab-btn active" onclick="showTab('stammdaten',this)">Stammdaten</button>
+                            <button class="tab-btn" onclick="showTab('einsatzmonat',this)">Einsatz Monat</button>
+                            <button class="tab-btn" onclick="showTab('einsatzjahr',this)">Einsatz Jahr</button>
+                            <button class="tab-btn" onclick="showTab('auftragueb',this)">Auftragsübersicht</button>
+                            <button class="tab-btn" onclick="showTab('stundenueb',this)">Stundenübersicht</button>
+                            <button class="tab-btn" onclick="showTab('dienstplan',this)">Dienstplan</button>
+                            <button class="tab-btn" onclick="showTab('nichtverfuegbar',this)">Nicht Verfügbar</button>
+                            <button class="tab-btn" onclick="showTab('kleidung',this)">Bestand Dienstkleidung</button>
+                            <button class="tab-btn" onclick="showTab('vordrucke',this)">Vordrucke</button>
+                            <button class="tab-btn" onclick="showTab('brief',this)">Brief</button>
+                            <button class="tab-btn" onclick="showTab('ueberhang',this)">Überhangstunden</button>
+                            <button class="tab-btn" onclick="showTab('maps',this)">Maps</button>
+                            <button class="tab-btn" onclick="showTab('subrech',this)">Sub Rechnungen</button>
+                        </div>
+                        
+                        <!-- TAB: STAMMDATEN -->
+                        <div class="tab-body active" id="tab-stammdaten">
+                            <div class="checkbox-row">
+                                <label>PersNr:</label><input type="text" id="PersNr" style="width:60px" readonly>
+                                <label>LexNr:</label><input type="text" id="LexNr" style="width:60px">
+                                <input type="checkbox" id="Aktiv" checked><label for="Aktiv">Aktiv</label>
+                                <input type="checkbox" id="Subunternehmer"><label for="Subunternehmer">Subunternehmer</label>
+                                <input type="checkbox" id="Lex_Aktiv" checked><label for="Lex_Aktiv">Lex_Aktiv</label>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <!-- LINKE SPALTE -->
+                                <div class="form-col">
+                                    <div class="section-title">Persönliche Daten</div>
+                                    <div class="form-row"><label>Nachname:</label><input type="text" id="Nachname"></div>
+                                    <div class="form-row"><label>Vorname:</label><input type="text" id="Vorname"></div>
+                                    <div class="form-row"><label>Strasse:</label><input type="text" id="Strasse"></div>
+                                    <div class="form-row"><label>Nr:</label><input type="text" id="Nr" style="width:50px"></div>
+                                    <div class="form-row"><label>PLZ:</label><input type="text" id="PLZ" style="width:60px"><label style="width:30px">Ort:</label><input type="text" id="Ort"></div>
+                                    <div class="form-row"><label>Land:</label><input type="text" id="Land" value="Deutschland"></div>
+                                    <div class="form-row"><label>Bundesland:</label><input type="text" id="Bundesland" value="Bayern"></div>
+                                    <div class="form-row"><label>Tel. Mobil:</label><input type="text" id="TelMobil"></div>
+                                    <div class="form-row"><label>Tel. Festnetz:</label><input type="text" id="TelFestnetz"></div>
+                                    <div class="form-row"><label>Email:</label><input type="email" id="Email"></div>
+                                    <div class="form-row"><label>Geschlecht:</label>
+                                        <select id="Geschlecht">
+                                            <option value="">-- wählen --</option>
+                                            <option value="männlich">männlich</option>
+                                            <option value="weiblich">weiblich</option>
+                                            <option value="divers">divers</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-row"><label>Staatsangehörigkeit:</label><input type="text" id="Staatsangehoerigkeit"></div>
+                                    <div class="form-row"><label>Geb. Datum:</label><input type="date" id="GebDatum"></div>
+                                    <div class="form-row"><label>Geb. Ort:</label><input type="text" id="GebOrt"></div>
+                                    <div class="form-row"><label>Geb. Name:</label><input type="text" id="GebName"></div>
+                                    <div class="form-row">
+                                        <label></label>
+                                        <button class="btn-small blue" onclick="openKoordinaten()">Koordinaten</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- RECHTE SPALTE -->
+                                <div class="form-col">
+                                    <div class="section-title">Bankdaten & Beschäftigung</div>
+                                    <div class="form-row"><label>Kontoinhaber:</label><input type="text" id="Kontoinhaber"></div>
+                                    <div class="form-row"><label>BIC:</label><input type="text" id="BIC"></div>
+                                    <div class="form-row"><label>IBAN:</label><input type="text" id="IBAN"></div>
+                                    <div class="form-row"><label>Lohngruppe:</label>
+                                        <select id="Lohngruppe">
+                                            <option value="">-- wählen --</option>
+                                            <option value="BY Lohn 1">BY Lohn 1</option>
+                                            <option value="BY Lohn 2a/b Okl. 1">BY Lohn 2a/b Okl. 1</option>
+                                            <option value="BY Lohn 2a/b Okl. 2">BY Lohn 2a/b Okl. 2</option>
+                                            <option value="BY Lohn 3">BY Lohn 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-row"><label>Bezüge gezahlt als:</label>
+                                        <select id="BezuegeGezahltAls">
+                                            <option value="Stundenlohn">Stundenlohn</option>
+                                            <option value="Monatslohn">Monatslohn</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-row"><label>Steuer-ID:</label><input type="text" id="SteuerID"></div>
+                                    <div class="form-row"><label>Tätigkeit:</label>
+                                        <select id="Taetigkeit">
+                                            <option value="Sicherheitspersonal">Sicherheitspersonal</option>
+                                            <option value="Ordnungsdienst">Ordnungsdienst</option>
+                                            <option value="Parkservice">Parkservice</option>
+                                            <option value="Catering">Catering</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-row"><label>Krankenkasse:</label><input type="text" id="Krankenkasse"></div>
+                                    <div class="form-row"><label>Steuerklasse:</label><input type="text" id="Steuerklasse" style="width:50px"></div>
+                                    <div class="form-row"><label>Urlaub p.a.:</label><input type="number" id="UrlaubProJahr" style="width:50px" value="28"></div>
+                                    <div class="form-row"><label>Std/Monat max.:</label><input type="number" id="StundenMonatMax" style="width:70px" step="0.01"></div>
+                                    <div class="checkbox-row" style="margin-left:114px;">
+                                        <input type="checkbox" id="RVBefreiung"><label for="RVBefreiung">RV Befreiung beantragt</label>
+                                    </div>
+                                    <div class="checkbox-row" style="margin-left:114px;">
+                                        <input type="checkbox" id="BruttoStd"><label for="BruttoStd">Brutto-Std</label>
+                                    </div>
+                                    <div class="checkbox-row" style="margin-left:114px;">
+                                        <input type="checkbox" id="AbrechnungEmail" checked><label for="AbrechnungEmail">Abrechnung per eMail</label>
+                                    </div>
+                                    <div class="form-row"><label>Lichtbild:</label><input type="text" id="Lichtbild" readonly style="flex:1"><button class="btn-small" onclick="selectPhoto()">...</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- TAB: EINSATZ MONAT -->
+                        <div class="tab-body" id="tab-einsatzmonat">
+                            <div class="btn-row">
+                                <label>Zeitraum:</label>
+                                <select id="cboZeitraumMonat" onchange="loadEinsatzMonat()" style="width:150px">
+                                    <option value="aktuell">Aktueller Monat</option>
+                                    <option value="vormonat">Vormonat</option>
+                                    <option value="quartal">Aktuelles Quartal</option>
+                                </select>
+                                <label style="margin-left:16px">Monat:</label>
+                                <select id="cboMonat" style="width:100px">
+                                    <option value="1">Januar</option><option value="2">Februar</option><option value="3">März</option>
+                                    <option value="4">April</option><option value="5">Mai</option><option value="6">Juni</option>
+                                    <option value="7">Juli</option><option value="8">August</option><option value="9">September</option>
+                                    <option value="10">Oktober</option><option value="11">November</option><option value="12" selected>Dezember</option>
+                                </select>
+                                <label style="margin-left:8px">Jahr:</label>
+                                <select id="cboJahr" style="width:80px">
+                                    <option value="2024">2024</option>
+                                    <option value="2025" selected>2025</option>
+                                </select>
+                                <button class="btn-small blue" onclick="loadEinsatzMonat()">Laden</button>
+                                <button class="btn-small green" onclick="exportXLEinsatz()">Excel Export</button>
+                            </div>
+                            <table class="subform-table" id="tblEinsatzMonat">
+                                <thead>
+                                    <tr>
+                                        <th>Datum</th>
+                                        <th>Auftrag</th>
+                                        <th>Ort</th>
+                                        <th>von</th>
+                                        <th>bis</th>
+                                        <th>Stunden</th>
+                                        <th>Nacht</th>
+                                        <th>Sonntag</th>
+                                        <th>Feiertag</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="einsatzMonatBody">
+                                    <tr><td colspan="9" style="text-align:center;padding:20px;">Daten werden geladen...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- TAB: EINSATZ JAHR -->
+                        <div class="tab-body" id="tab-einsatzjahr">
+                            <div class="btn-row">
+                                <label>Jahr:</label>
+                                <select id="cboJahrUeb" style="width:80px">
+                                    <option value="2024">2024</option>
+                                    <option value="2025" selected>2025</option>
+                                </select>
+                                <button class="btn-small blue" onclick="loadEinsatzJahr()">Laden</button>
+                                <button class="btn-small green" onclick="exportXLJahr()">Excel Export Jahr</button>
+                            </div>
+                            <table class="subform-table" id="tblEinsatzJahr">
+                                <thead>
+                                    <tr>
+                                        <th>Monat</th>
+                                        <th>Einsätze</th>
+                                        <th>Stunden</th>
+                                        <th>Nacht</th>
+                                        <th>Sonntag</th>
+                                        <th>Feiertag</th>
+                                        <th>Brutto</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="einsatzJahrBody">
+                                    <tr><td colspan="7" style="text-align:center;padding:20px;">Jahresdaten werden geladen...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- TAB: AUFTRAGSÜBERSICHT -->
+                        <div class="tab-body" id="tab-auftragueb">
+                            <div class="btn-row">
+                                <label>Zeitraum:</label>
+                                <select id="cboZeitraumAuftr" style="width:150px">
+                                    <option value="aktuell">Aktuelles Jahr</option>
+                                    <option value="alle">Alle Jahre</option>
+                                </select>
+                                <label style="margin-left:16px">von:</label>
+                                <input type="date" id="auftrVon" style="width:130px">
+                                <label>bis:</label>
+                                <input type="date" id="auftrBis" style="width:130px">
+                            </div>
+                            <table class="subform-table" id="tblAuftragueb">
+                                <thead>
+                                    <tr>
+                                        <th>Datum</th>
+                                        <th>Auftrag</th>
+                                        <th>Location</th>
+                                        <th>Ort</th>
+                                        <th>Betrag</th>
+                                        <th>RechNr.</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auftraguebBody">
+                                    <tr><td colspan="7" style="text-align:center;padding:20px;">Aufträge werden geladen...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- TAB: STUNDENÜBERSICHT -->
+                        <div class="tab-body" id="tab-stundenueb">
+                            <div class="btn-row">
+                                <label>Zeitraum:</label>
+                                <select id="cboZeitraumStd" style="width:150px">
+                                    <option value="aktuell">Aktueller Monat</option>
+                                    <option value="quartal">Quartal</option>
+                                    <option value="jahr">Jahr</option>
+                                </select>
+                                <button class="btn-small blue" onclick="calcStunden()">Berechnen</button>
+                            </div>
+                            <div class="form-grid" style="max-width:600px;">
+                                <div class="form-col">
+                                    <div class="form-row"><label>Summe Stunden:</label><input type="text" id="sumStunden" readonly></div>
+                                    <div class="form-row"><label>Nachtstunden:</label><input type="text" id="sumNacht" readonly></div>
+                                    <div class="form-row"><label>Sonntagsstunden:</label><input type="text" id="sumSonntag" readonly></div>
+                                    <div class="form-row"><label>Feiertagsstunden:</label><input type="text" id="sumFeiertag" readonly></div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-row"><label>SVS Betrag:</label><input type="text" id="sumSVS" readonly></div>
+                                    <div class="form-row"><label>NZ Betrag:</label><input type="text" id="sumNZ" readonly></div>
+                                    <div class="form-row"><label>SZ Betrag:</label><input type="text" id="sumSZ" readonly></div>
+                                    <div class="form-row"><label>FZ Betrag:</label><input type="text" id="sumFZ" readonly></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- TAB: DIENSTPLAN -->
+                        <div class="tab-body" id="tab-dienstplan">
+                            <div class="btn-row">
+                                <label>Ab Datum:</label>
+                                <input type="date" id="dpStartDate" style="width:130px">
+                                <button class="btn-small" onclick="dpToday()">Ab Heute</button>
+                                <button class="btn-small blue" onclick="printDienstplan()">Dienstplan drucken</button>
+                                <button class="btn-small green" onclick="sendDienstplan()">Dienstplan senden</button>
+                            </div>
+                            <table class="subform-table" id="tblDienstplan">
+                                <thead>
+                                    <tr>
+                                        <th>Datum</th>
+                                        <th>Tag</th>
+                                        <th>Auftrag</th>
+                                        <th>Ort</th>
+                                        <th>von</th>
+                                        <th>bis</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dienstplanBody">
+                                    <tr><td colspan="7" style="text-align:center;padding:20px;">Dienstplan wird geladen...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- TAB: NICHT VERFÜGBAR -->
+                        <div class="tab-body" id="tab-nichtverfuegbar">
+                            <div class="btn-row">
+                                <button class="btn-small blue" onclick="addNichtVerfuegbar()">+ Neu</button>
+                                <button class="btn-small red" onclick="deleteNichtVerfuegbar()">Löschen</button>
+                                <button class="btn-small green" onclick="exportXLNVerfueg()">Excel Export</button>
+                            </div>
+                            <table class="subform-table" id="tblNichtVerfueg">
+                                <thead>
+                                    <tr>
+                                        <th>Von</th>
+                                        <th>Bis</th>
+                                        <th>Grund</th>
+                                        <th>Ganztägig</th>
+                                        <th>Bemerkung</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="nichtVerfuegBody">
+                                    <tr><td colspan="5" style="text-align:center;padding:20px;">Keine Einträge vorhanden</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- TAB: BESTAND DIENSTKLEIDUNG -->
+                        <div class="tab-body" id="tab-kleidung">
+                            <div class="btn-row">
+                                <button class="btn-small blue" onclick="addKleidung()">+ Neu</button>
+                                <button class="btn-small" onclick="reportKleidung()">Report Dienstkleidung</button>
+                            </div>
+                            <table class="subform-table" id="tblKleidung">
+                                <thead>
+                                    <tr>
+                                        <th>Artikel</th>
+                                        <th>Größe</th>
+                                        <th>Anzahl</th>
+                                        <th>Ausgabe am</th>
+                                        <th>Rückgabe am</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="kleidungBody">
+                                    <tr><td colspan="6" style="text-align:center;padding:20px;">Keine Dienstkleidung erfasst</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- TAB: VORDRUCKE -->
+                        <div class="tab-body" id="tab-vordrucke">
+                            <div class="btn-row">
+                                <button class="btn-small blue" onclick="loadVordrucke()">Vorlagen laden</button>
+                                <button class="btn-small" onclick="selectVorlageDatei()">Vorlage-Datei einlesen</button>
+                                <button class="btn-small green" onclick="exportXLVordrucke()">Excel Export</button>
+                            </div>
+                            <table class="subform-table" id="tblVordrucke">
+                                <thead>
+                                    <tr>
+                                        <th>Vorlage</th>
+                                        <th>Erstellt am</th>
+                                        <th>Ausgefüllt</th>
+                                        <th>Datei</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vordruckeBody">
+                                    <tr><td colspan="4" style="text-align:center;padding:20px;">Keine Vordrucke vorhanden</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- TAB: BRIEF -->
+                        <div class="tab-body" id="tab-brief">
+                            <div class="form-row" style="margin-bottom:8px;">
+                                <label>Vorlage:</label>
+                                <select id="cboBriefVorlage" style="flex:1">
+                                    <option value="">-- Vorlage wählen --</option>
+                                    <option value="arbeitsvertrag">Arbeitsvertrag</option>
+                                    <option value="kuendigung">Kündigung</option>
+                                    <option value="abmahnung">Abmahnung</option>
+                                    <option value="zeugnis">Arbeitszeugnis</option>
+                                </select>
+                                <button class="btn-small blue" onclick="createBrief()">Brief erstellen</button>
+                                <button class="btn-small" onclick="openWord()">In Word öffnen</button>
+                            </div>
+                            <textarea id="briefText" style="width:100%;height:300px;font-family:monospace;font-size:11px;"></textarea>
+                        </div>
+                        
+                        <!-- TAB: ÜBERHANGSTUNDEN -->
+                        <div class="tab-body" id="tab-ueberhang">
+                            <div class="btn-row">
+                                <label>Jahr:</label>
+                                <select id="cboUeberhangJahr" style="width:80px">
+                                    <option value="2024">2024</option>
+                                    <option value="2025" selected>2025</option>
+                                </select>
+                                <button class="btn-small blue" onclick="loadUeberhang()">Laden</button>
+                                <button class="btn-small green" onclick="exportXLUeberhang()">Excel Export</button>
+                            </div>
+                            <table class="subform-table" id="tblUeberhang">
+                                <thead>
+                                    <tr>
+                                        <th>Monat</th>
+                                        <th>Soll-Std</th>
+                                        <th>Ist-Std</th>
+                                        <th>Differenz</th>
+                                        <th>Übertrag</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ueberhangBody">
+                                    <tr><td colspan="5" style="text-align:center;padding:20px;">Überhangstunden werden geladen...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- TAB: MAPS -->
+                        <div class="tab-body" id="tab-maps">
+                            <div class="btn-row">
+                                <button class="btn-small blue" onclick="openMaps()">Maps öffnen</button>
+                                <button class="btn-small" onclick="calcRoute()">Route berechnen</button>
+                                <button class="btn-small" onclick="geocodeAddress()">Adresse geocodieren</button>
+                            </div>
+                            <div style="display:flex;gap:16px;">
+                                <div style="flex:1;">
+                                    <div class="form-row"><label>Koordinaten:</label><input type="text" id="maKoordinaten" readonly></div>
+                                    <div class="form-row"><label>Latitude:</label><input type="text" id="maLatitude" style="width:120px"></div>
+                                    <div class="form-row"><label>Longitude:</label><input type="text" id="maLongitude" style="width:120px"></div>
+                                </div>
+                                <div id="mapContainer" style="flex:2;height:300px;background:#e0e0e0;border:1px solid #888;display:flex;align-items:center;justify-content:center;">
+                                    <span style="color:#666;">Karte wird hier angezeigt</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- TAB: SUB RECHNUNGEN -->
+                        <div class="tab-body" id="tab-subrech">
+                            <div class="btn-row">
+                                <label>Zeitraum:</label>
+                                <select id="cboZeitraumRech" style="width:150px">
+                                    <option value="aktuell">Aktuelles Jahr</option>
+                                    <option value="alle">Alle</option>
+                                </select>
+                                <label style="margin-left:16px">von:</label>
+                                <input type="date" id="rechVon" style="width:130px">
+                                <label>bis:</label>
+                                <input type="date" id="rechBis" style="width:130px">
+                                <button class="btn-small" onclick="openRechnung()">Rechnung öffnen</button>
+                            </div>
+                            <table class="subform-table" id="tblSubRech">
+                                <thead>
+                                    <tr>
+                                        <th>Datum</th>
+                                        <th>Auftrag</th>
+                                        <th>Location</th>
+                                        <th>Ort</th>
+                                        <th>Betrag</th>
+                                        <th>RechNr.</th>
+                                        <th>Geprüft</th>
+                                        <th>am</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subRechBody">
+                                    <tr><td colspan="9" style="text-align:center;padding:20px;">Rechnungen werden geladen...</td></tr>
+                                </tbody>
+                            </table>
+                            <div style="margin-top:8px;display:flex;gap:16px;">
+                                <div><strong>SVS:</strong> <span id="rechSVS">0,00 €</span></div>
+                                <div><strong>NZ:</strong> <span id="rechNZ">0,00 €</span></div>
+                                <div><strong>SZ:</strong> <span id="rechSZ">0,00 €</span></div>
+                                <div><strong>FZ:</strong> <span id="rechFZ">0,00 €</span></div>
+                                <div><strong>Summe:</strong> <span id="rechSumme">0,00 €</span></div>
+                                <div><strong>Betrag:</strong> <span id="rechBetrag">0,00 €</span></div>
+                                <div style="margin-left:auto;"><strong>Betrag gesamt:</strong> <span id="rechBetragGesamt" style="font-weight:bold;color:#0066cc;">0,00 €</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- RECHTE SEITE -->
+                <div class="content-right">
+                    <div class="photo-box" id="photoBox">
+                        <div class="photo-placeholder">Kein Foto<br>vorhanden</div>
+                    </div>
+                    <div style="text-align:center;margin:4px 0;">
+                        <input type="checkbox" id="nurAktive" checked onchange="filterMitarbeiter()">
+                        <label for="nurAktive" style="font-size:10px;">Nur Aktive anzeigen</label>
+                    </div>
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <label>Suche:</label>
+                            <input type="text" id="maSearch" placeholder="Name suchen..." oninput="filterMitarbeiter()">
+                        </div>
+                        <div class="filter-row">
+                            <label>Filter:</label>
+                            <select id="maFilter" onchange="filterMitarbeiter()">
+                                <option value="alle">Alle Aktiven</option>
+                                <option value="fest">Festangestellte</option>
+                                <option value="mini">Minijobber</option>
+                                <option value="sub">Subunternehmer</option>
+                                <option value="inaktiv">Inaktive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ma-list" id="maListContainer">
+                        <div class="ma-list-header">
+                            <div>Nachname</div>
+                            <div>Vorname</div>
+                            <div>Ort</div>
+                        </div>
+                        <div id="maListBody">
+                            <!-- Mitarbeiterliste wird hier eingefügt -->
+                        </div>
+                    </div>
+                    <div class="stats-box">
+                        <div class="stats-row"><span>Arbeitsstd. pro Arbeitstag:</span><span id="stdProTag">0,00</span></div>
+                        <div class="stats-row"><span>Arbeitstage pro Woche:</span><span id="tageProWoche">0,00</span></div>
+                    </div>
+                    <button class="btn-small blue" style="width:100%;margin-top:4px;" onclick="openMaps()">Maps öffnen</button>
+                </div>
+            </div>
+            
+            <!-- FOOTER -->
+            <div class="footer">
+                <span>Erstellt am: <span id="erstelltAm">-</span> von <span id="erstelltVon">-</span></span>
+                <span>Geändert am: <span id="geaendertAm">-</span> von <span id="geaendertVon">-</span></span>
+            </div>
+        </div>
+    </div>
+    
+        <!-- WebView2 Bridge -->
+    <script src="../../js/webview2-bridge.js"></script>
+    <script src="../../js/mitarbeiterstamm-bridge.js"></script>
+</body>
+</html>
+
+
+

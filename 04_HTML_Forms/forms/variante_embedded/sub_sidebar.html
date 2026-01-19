@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Navigation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            overflow-x: hidden;
+        }
+
+        .sidebar-menu {
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        .menu-section {
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #95a5a6;
+            margin-top: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-section:first-child {
+            margin-top: 0;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 16px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(52, 152, 219, 0.15);
+            border-left-color: #3498db;
+            padding-left: 20px;
+        }
+
+        .sidebar-menu a.active {
+            background-color: rgba(52, 152, 219, 0.25);
+            border-left-color: #3498db;
+            font-weight: 600;
+        }
+
+        .sidebar-menu a::before {
+            content: "›";
+            margin-right: 8px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .sidebar-menu a:hover::before,
+        .sidebar-menu a.active::before {
+            opacity: 1;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar-menu">
+        <!-- Dashboard -->
+        <div class="menu-section">Dashboard</div>
+        <a href="#" data-form="dashboard">Übersicht</a>
+
+        <!-- Personal -->
+        <div class="menu-section">Personal</div>
+        <a href="#" data-form="mitarbeiter">Mitarbeiterstamm</a>
+        <a href="#" data-form="abwesenheit">Abwesenheiten</a>
+        <a href="#" data-form="zeitkonten">Zeitkonten</a>
+        <a href="#" data-form="bewerber">Bewerberverwaltung</a>
+
+        <!-- Planung -->
+        <div class="menu-section">Planung</div>
+        <a href="#" data-form="auftrag">Auftragstamm</a>
+        <a href="#" data-form="planung">Planungsübersicht</a>
+        <a href="#" data-form="schnellauswahl">Schnellauswahl</a>
+        <a href="#" data-form="dienstplan">Dienstplanübersicht</a>
+        <a href="#" data-form="einsatz">Einsatzübersicht</a>
+
+        <!-- Stammdaten -->
+        <div class="menu-section">Stammdaten</div>
+        <a href="#" data-form="kunden">Kundenstamm</a>
+        <a href="#" data-form="objekte">Objektstamm</a>
+
+        <!-- Lohn -->
+        <div class="menu-section">Lohn</div>
+        <a href="#" data-form="lohnabrechnungen">Lohnabrechnungen</a>
+        <a href="#" data-form="stundenauswertung">Stundenauswertung</a>
+    </nav>
+
+    <script>
+        // Form mapping to actual file names
+        const FORM_MAP = {
+            'dashboard': 'frm_Menuefuehrung1_embedded.html',
+            'mitarbeiter': 'frm_MA_Mitarbeiterstamm_embedded.html',
+            'abwesenheit': 'frm_MA_Abwesenheit_embedded.html',
+            'zeitkonten': 'frm_MA_Zeitkonten_embedded.html',
+            'bewerber': 'frm_N_MA_Bewerber_Verarbeitung_embedded.html',
+            'auftrag': 'frm_va_Auftragstamm_embedded.html',
+            'planung': 'frm_VA_Planungsuebersicht_embedded.html',
+            'schnellauswahl': 'frm_MA_VA_Schnellauswahl_embedded.html',
+            'dienstplan': 'frm_N_Dienstplanuebersicht_embedded.html',
+            'einsatz': 'frm_Einsatzuebersicht_embedded.html',
+            'kunden': 'frm_KD_Kundenstamm_embedded.html',
+            'objekte': 'frm_OB_Objekt_embedded.html',
+            'lohnabrechnungen': 'frm_N_Lohnabrechnungen_embedded.html',
+            'stundenauswertung': 'frm_N_Stundenauswertung_embedded.html'
+        };
+
+        // Cache DOM references
+        const menuLinks = document.querySelectorAll('a[data-form]');
+
+        // Event delegation for menu clicks
+        document.querySelector('.sidebar-menu').addEventListener('click', (e) => {
+            const link = e.target.closest('a[data-form]');
+            if (!link) return;
+
+            e.preventDefault();
+            const formKey = link.dataset.form;
+            const fileName = FORM_MAP[formKey];
+
+            if (fileName) {
+                // Send navigation message to parent
+                window.parent.postMessage({
+                    type: 'NAVIGATE',
+                    form: formKey,
+                    file: fileName
+                }, '*');
+            }
+        });
+
+        // Listen for active menu updates from parent
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'SET_ACTIVE') {
+                setActiveMenuItem(e.data.form);
+            }
+        });
+
+        // Set active menu item
+        function setActiveMenuItem(formKey) {
+            menuLinks.forEach(link => {
+                if (link.dataset.form === formKey) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize - notify parent that sidebar is ready
+        window.addEventListener('DOMContentLoaded', () => {
+            window.parent.postMessage({
+                type: 'SIDEBAR_READY'
+            }, '*');
+        });
+    </script>
+</body>
+</html>

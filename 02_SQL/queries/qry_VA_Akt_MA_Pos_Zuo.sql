@@ -1,0 +1,4 @@
+SELECT tbl_VA_Akt_Objekt_Pos_MA.ID, tbl_VA_Akt_Objekt_Pos_MA.MA_ID, tbl_VA_Akt_Objekt_Pos.Abs_Beginn, tbl_VA_Akt_Objekt_Pos.Abs_Ende, [Nachname] & " " & [Vorname] AS MA_Name, tbl_VA_Akt_Objekt_Pos.Gruppe, tbl_VA_Akt_Objekt_Pos.Zusatztext, tbl_VA_Akt_Objekt_Pos.Geschlecht, tbl_VA_Akt_Objekt_Pos_MA.Bemerkung
+FROM (tbl_VA_Akt_Objekt_Pos_MA INNER JOIN tbl_MA_Mitarbeiterstamm ON tbl_VA_Akt_Objekt_Pos_MA.MA_ID = tbl_MA_Mitarbeiterstamm.ID) INNER JOIN tbl_VA_Akt_Objekt_Pos ON tbl_VA_Akt_Objekt_Pos_MA.VA_Akt_Objekt_Pos_ID = tbl_VA_Akt_Objekt_Pos.ID
+WHERE (((tbl_VA_Akt_Objekt_Pos_MA.MA_ID)>0) AND ((tbl_VA_Akt_Objekt_Pos.VA_Akt_Objekt_Kopf_ID)=Get_Priv_Property("prp_VA_Akt_Objekt_ID")));
+

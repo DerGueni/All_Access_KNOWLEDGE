@@ -1,0 +1,79 @@
+### Page state
+- Page URL: http://localhost:8081/frm_MA_VA_Positionszuordnung.html
+- Page Title: MA-VA Positionszuordnung - CONSYS
+- Page Snapshot:
+```yaml
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]: HAUPTMENÜ
+    - navigation [ref=e5]:
+      - generic [ref=e6] [cursor=pointer]: Dienstplanübersicht
+      - generic [ref=e7] [cursor=pointer]: Planungsübersicht
+      - generic [ref=e8] [cursor=pointer]: Auftragsverwaltung
+      - generic [ref=e9] [cursor=pointer]: Mitarbeiterverwaltung
+      - generic [ref=e10] [cursor=pointer]: Offene Anfragen
+      - generic [ref=e11] [cursor=pointer]: Offene Mail Anfragen
+      - generic [ref=e12] [cursor=pointer]: Excel Zeitkonten
+      - generic [ref=e14] [cursor=pointer]: Zeitkonten
+      - generic [ref=e15] [cursor=pointer]: Abwesenheitsplanung
+      - generic [ref=e16] [cursor=pointer]: Dienstausweis erstellen
+      - generic [ref=e17] [cursor=pointer]: Stundenabgleich
+      - generic [ref=e18] [cursor=pointer]: Stunden Lexware
+      - generic [ref=e20] [cursor=pointer]: Kundenverwaltung
+      - generic [ref=e21] [cursor=pointer]: Kundenpreise
+      - generic [ref=e22] [cursor=pointer]: Verrechnungssätze
+      - generic [ref=e23] [cursor=pointer]: Sub Rechnungen
+      - generic [ref=e24] [cursor=pointer]: E-Mail
+      - generic [ref=e26] [cursor=pointer]: Menü 2
+      - generic: HTML Ansicht
+      - generic: Datenbank wechseln
+  - main [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e30]: C
+        - generic [ref=e31]: MA-VA Positionszuordnung
+        - generic [ref=e32]:
+          - generic [ref=e33]: "Auftrag:"
+          - combobox [ref=e34]:
+            - option "-- Auftrag wählen --" [selected]
+          - generic [ref=e35]: "Datum:"
+          - combobox [ref=e36]:
+            - option "-- Datum --" [selected]
+          - button "Speichern" [ref=e37] [cursor=pointer]
+          - button "Aktualisieren" [ref=e38] [cursor=pointer]
+        - generic [ref=e39]: Sa., 17.01.2026
+      - generic [ref=e40]:
+        - text: CONSYS
+        - generic [ref=e41]: Web
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]: Positionen (2)
+        - generic [ref=e46]:
+          - generic [ref=e47] [cursor=pointer]:
+            - generic [ref=e48]:
+              - generic [ref=e49]: Einlass Tor 1
+              - generic [ref=e50]: 08:00 - 16:00 | 3 MA
+            - generic [ref=e51]: 0/3
+          - generic [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: Streife Innen
+              - generic [ref=e55]: 08:00 - 16:00 | 2 MA
+            - generic [ref=e56]: 2/2
+      - generic [ref=e57]:
+        - generic [ref=e58]: Verfügbare Mitarbeiter (1)
+        - generic [ref=e60] [cursor=pointer]:
+          - generic [ref=e61]:
+            - generic [ref=e62]: Mustermann, Max
+            - generic [ref=e63]: "Qualifikation: 34a"
+          - button "➜" [ref=e64]
+      - generic [ref=e65]:
+        - generic [ref=e66]: Zugeordnet (1)
+        - generic [ref=e68] [cursor=pointer]:
+          - generic [ref=e69]:
+            - generic [ref=e70]: Meier, Hans
+            - generic [ref=e71]: "Position: Streife Innen"
+          - button "✖" [ref=e72]
+    - generic [ref=e73]:
+      - generic [ref=e75]: Bereit
+      - generic [ref=e77]: 2 Positionen | 1 MA zugeordnet
+```

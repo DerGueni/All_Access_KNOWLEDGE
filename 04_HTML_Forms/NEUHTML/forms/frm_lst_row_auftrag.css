@@ -1,0 +1,21 @@
+/* frm_lst_row_auftrag.css - Auftragsliste */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; font-size: 10px; background: #f0f0f0; }
+.subform-container { background: #fff; border: 1px solid #999; height: 100%; display: flex; flex-direction: column; }
+.datasheet-container { flex: 1; overflow: auto; }
+.datasheet { width: 100%; border-collapse: collapse; font-size: 10px; }
+.datasheet thead { background: #e2e3e5; position: sticky; top: 0; }
+.datasheet th { padding: 3px 4px; text-align: left; border: 1px solid #c6c8ca; font-weight: bold; white-space: nowrap; }
+.datasheet td { padding: 2px 4px; border: 1px solid #d0d0d0; background: #fff; cursor: pointer; }
+.datasheet tr:hover td { background: #f0f0f0; }
+.datasheet tr.selected td { background: #e8e8e8; }
+.col-id { width: 40px; text-align: center; }
+.col-datum { width: 70px; }
+.col-auftrag { width: 120px; }
+.col-objekt { width: 120px; }
+.col-ort { width: 80px; }
+.col-soll { width: 35px; text-align: center; }
+.col-ist { width: 35px; text-align: center; }
+.soll-ok { color: #333333; }
+.soll-warn { color: #666666; }
+.soll-err { color: #333333; font-weight: bold; }

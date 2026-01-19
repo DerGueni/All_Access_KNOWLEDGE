@@ -1,0 +1,488 @@
+/*
+ * SIDEBAR VARIANTE 10: Colorful Icons
+ * Farbcodierung nach Funktionsbereich
+ * Personal=Blau, Auftraege=Gruen, Planung=Orange, System=Grau
+ *
+ * Verwendung: In shell.html einbinden nach main.css
+ * <link rel="stylesheet" href="css/sidebar_variants/sidebar_variant_10_colorful.css">
+ */
+
+/* ============================================
+   FARBPALETTE - CSS Custom Properties
+   ============================================ */
+:root {
+    /* Planung - Warm Orange */
+    --color-planung: #ff7043;
+    --color-planung-light: #ffab91;
+    --color-planung-dark: #e64a19;
+    --color-planung-bg: rgba(255, 112, 67, 0.12);
+
+    /* Stammdaten - Saphirblau */
+    --color-stamm: #42a5f5;
+    --color-stamm-light: #90caf9;
+    --color-stamm-dark: #1976d2;
+    --color-stamm-bg: rgba(66, 165, 245, 0.12);
+
+    /* Personal - Violett/Lila */
+    --color-personal: #ab47bc;
+    --color-personal-light: #ce93d8;
+    --color-personal-dark: #7b1fa2;
+    --color-personal-bg: rgba(171, 71, 188, 0.12);
+
+    /* Extras - Teal */
+    --color-extras: #26a69a;
+    --color-extras-light: #80cbc4;
+    --color-extras-dark: #00796b;
+    --color-extras-bg: rgba(38, 166, 154, 0.12);
+
+    /* Export - Gruen */
+    --color-export: #66bb6a;
+    --color-export-light: #a5d6a7;
+    --color-export-dark: #388e3c;
+    --color-export-bg: rgba(102, 187, 106, 0.12);
+
+    /* System - Blaugrau */
+    --color-system: #78909c;
+    --color-system-light: #b0bec5;
+    --color-system-dark: #455a64;
+    --color-system-bg: rgba(120, 144, 156, 0.12);
+
+    /* Auftraege Anlegen - Gold */
+    --color-auftraege: #ffa726;
+    --color-auftraege-light: #ffcc80;
+    --color-auftraege-dark: #f57c00;
+    --color-auftraege-bg: rgba(255, 167, 38, 0.12);
+}
+
+/* ============================================
+   SIDEBAR CONTAINER
+   ============================================ */
+.sidebar {
+    width: 182px;
+    background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+    border-right: 1px solid #dee2e6;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: width 0.3s ease;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.sidebar-header {
+    background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+    color: white;
+    padding: 14px 16px;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: left;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(26, 35, 126, 0.3);
+}
+
+/* ============================================
+   KATEGORIE-CONTAINER
+   ============================================ */
+.menu-categories {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 8px;
+    gap: 12px;
+}
+
+/* ============================================
+   KATEGORIE-BLOCK - Basis
+   ============================================ */
+.category-block {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ============================================
+   KATEGORIE-HEADER - Farbcodiert
+   ============================================ */
+.category-header {
+    padding: 10px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Farbiger Indikator-Punkt */
+.category-header::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   PLANUNG - Orange
+   ============================================ */
+.category-block:nth-child(1) .category-header {
+    background: linear-gradient(135deg, var(--color-planung) 0%, var(--color-planung-dark) 100%);
+    color: white;
+}
+
+.category-block:nth-child(1) .category-header::before {
+    background: white;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.category-block:nth-child(1) .menu-btn {
+    background: var(--color-planung-bg);
+    border-left: 3px solid var(--color-planung);
+}
+
+.category-block:nth-child(1) .menu-btn:hover {
+    background: rgba(255, 112, 67, 0.2);
+    border-left-color: var(--color-planung-dark);
+}
+
+.category-block:nth-child(1) .menu-btn.active {
+    background: rgba(255, 112, 67, 0.25);
+    color: var(--color-planung-dark);
+    border-left-width: 4px;
+}
+
+/* ============================================
+   STAMMDATEN - Blau
+   ============================================ */
+.category-block:nth-child(2) .category-header {
+    background: linear-gradient(135deg, var(--color-stamm) 0%, var(--color-stamm-dark) 100%);
+    color: white;
+}
+
+.category-block:nth-child(2) .category-header::before {
+    background: white;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.category-block:nth-child(2) .menu-btn {
+    background: var(--color-stamm-bg);
+    border-left: 3px solid var(--color-stamm);
+}
+
+.category-block:nth-child(2) .menu-btn:hover {
+    background: rgba(66, 165, 245, 0.2);
+    border-left-color: var(--color-stamm-dark);
+}
+
+.category-block:nth-child(2) .menu-btn.active {
+    background: rgba(66, 165, 245, 0.25);
+    color: var(--color-stamm-dark);
+    border-left-width: 4px;
+}
+
+/* ============================================
+   PERSONAL - Violett
+   ============================================ */
+.category-block:nth-child(3) .category-header {
+    background: linear-gradient(135deg, var(--color-personal) 0%, var(--color-personal-dark) 100%);
+    color: white;
+}
+
+.category-block:nth-child(3) .category-header::before {
+    background: white;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.category-block:nth-child(3) .menu-btn {
+    background: var(--color-personal-bg);
+    border-left: 3px solid var(--color-personal);
+}
+
+.category-block:nth-child(3) .menu-btn:hover {
+    background: rgba(171, 71, 188, 0.2);
+    border-left-color: var(--color-personal-dark);
+}
+
+.category-block:nth-child(3) .menu-btn.active {
+    background: rgba(171, 71, 188, 0.25);
+    color: var(--color-personal-dark);
+    border-left-width: 4px;
+}
+
+/* ============================================
+   EXTRAS - Teal
+   ============================================ */
+.category-block:nth-child(4) .category-header {
+    background: linear-gradient(135deg, var(--color-extras) 0%, var(--color-extras-dark) 100%);
+    color: white;
+}
+
+.category-block:nth-child(4) .category-header::before {
+    background: white;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.category-block:nth-child(4) .menu-btn {
+    background: var(--color-extras-bg);
+    border-left: 3px solid var(--color-extras);
+}
+
+.category-block:nth-child(4) .menu-btn:hover {
+    background: rgba(38, 166, 154, 0.2);
+    border-left-color: var(--color-extras-dark);
+}
+
+.category-block:nth-child(4) .menu-btn.active {
+    background: rgba(38, 166, 154, 0.25);
+    color: var(--color-extras-dark);
+    border-left-width: 4px;
+}
+
+/* ============================================
+   EXPORT - Gruen
+   ============================================ */
+.category-block:nth-child(5) .category-header {
+    background: linear-gradient(135deg, var(--color-export) 0%, var(--color-export-dark) 100%);
+    color: white;
+}
+
+.category-block:nth-child(5) .category-header::before {
+    background: white;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.category-block:nth-child(5) .menu-btn {
+    background: var(--color-export-bg);
+    border-left: 3px solid var(--color-export);
+}
+
+.category-block:nth-child(5) .menu-btn:hover {
+    background: rgba(102, 187, 106, 0.2);
+    border-left-color: var(--color-export-dark);
+}
+
+.category-block:nth-child(5) .menu-btn.active {
+    background: rgba(102, 187, 106, 0.25);
+    color: var(--color-export-dark);
+    border-left-width: 4px;
+}
+
+/* ============================================
+   SYSTEM - Blaugrau
+   ============================================ */
+.category-block:nth-child(6) .category-header {
+    background: linear-gradient(135deg, var(--color-system) 0%, var(--color-system-dark) 100%);
+    color: white;
+}
+
+.category-block:nth-child(6) .category-header::before {
+    background: white;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.category-block:nth-child(6) .menu-btn {
+    background: var(--color-system-bg);
+    border-left: 3px solid var(--color-system);
+}
+
+.category-block:nth-child(6) .menu-btn:hover {
+    background: rgba(120, 144, 156, 0.2);
+    border-left-color: var(--color-system-dark);
+}
+
+.category-block:nth-child(6) .menu-btn.active {
+    background: rgba(120, 144, 156, 0.25);
+    color: var(--color-system-dark);
+    border-left-width: 4px;
+}
+
+/* ============================================
+   AUFTRAEGE ANLEGEN - Gold
+   ============================================ */
+.category-block:nth-child(7) .category-header {
+    background: linear-gradient(135deg, var(--color-auftraege) 0%, var(--color-auftraege-dark) 100%);
+    color: white;
+}
+
+.category-block:nth-child(7) .category-header::before {
+    background: white;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.category-block:nth-child(7) .menu-btn {
+    background: var(--color-auftraege-bg);
+    border-left: 3px solid var(--color-auftraege);
+}
+
+.category-block:nth-child(7) .menu-btn:hover {
+    background: rgba(255, 167, 38, 0.2);
+    border-left-color: var(--color-auftraege-dark);
+}
+
+.category-block:nth-child(7) .menu-btn.active {
+    background: rgba(255, 167, 38, 0.25);
+    color: var(--color-auftraege-dark);
+    border-left-width: 4px;
+}
+
+/* ============================================
+   MENU BUTTONS - Basis
+   ============================================ */
+.menu-btn {
+    padding: 12px 14px;
+    min-height: 44px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: #37474f;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.menu-btn:last-child {
+    border-bottom: none;
+}
+
+/* ============================================
+   HOVER EFFEKT - Slide-In Animation
+   ============================================ */
+.menu-btn::after {
+    content: '';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-5px);
+    opacity: 0;
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform-origin: center;
+    transition: all 0.2s ease;
+}
+
+.menu-btn:hover::after {
+    opacity: 0.6;
+    transform: translateY(-50%) translateX(0) rotate(-45deg);
+}
+
+/* ============================================
+   ACTIVE STATE - Pulsierender Indikator
+   ============================================ */
+.menu-btn.active::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: translateY(-50%) scale(1.2);
+    }
+}
+
+/* ============================================
+   TOOLTIPS
+   ============================================ */
+.menu-btn[title]:hover::after {
+    content: none; /* Deaktiviere Standard-Pfeil bei Tooltip */
+}
+
+/* Custom Tooltip (optional, CSS-only) */
+
+/* ============================================
+   SCROLLBAR - Dezent
+   ============================================ */
+.menu-categories::-webkit-scrollbar {
+    width: 5px;
+}
+
+.menu-categories::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.menu-categories::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+}
+
+.menu-categories::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+/* ============================================
+   RESPONSIVE - Volle Hoehe nutzen
+   ============================================ */
+@media (min-height: 700px) {
+    .menu-btn {
+        min-height: 46px;
+        padding: 13px 14px;
+    }
+
+    .menu-categories {
+        justify-content: space-between;
+    }
+}
+
+@media (min-height: 900px) {
+    .menu-btn {
+        min-height: 50px;
+        padding: 15px 14px;
+        font-size: 13px;
+    }
+
+    .category-header {
+        padding: 12px 14px;
+        font-size: 11px;
+    }
+}
+
+/* ============================================
+   ICON SUPPORT (falls Icons hinzugefuegt werden)
+   ============================================ */
+.menu-btn .icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    opacity: 0.8;
+    flex-shrink: 0;
+}
+
+.menu-btn:hover .icon {
+    opacity: 1;
+}
+
+/* ============================================
+   RIPPLE EFFECT (Click Feedback)
+   ============================================ */
+.menu-btn {
+    overflow: hidden;
+}
+
+.menu-btn:active {
+    transform: scale(0.98);
+}

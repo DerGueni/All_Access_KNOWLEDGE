@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplanübersicht - CONSYS</title>
+    <style>
+        /* CSS Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8B0000;
+            overflow: hidden;
+        }
+
+        /* Window Frame Container */
+        .window-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #8B0000;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 3px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .title-bar-text {
+            color: white;
+        }
+
+        .title-bar-close {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 14px;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            background-color: #8B0000;
+        }
+
+        /* Left Menu - Dunkelrot */
+        .left-menu {
+            width: 180px;
+            background-color: #5c0000;
+            border-right: 2px solid #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            border-bottom: 1px solid #ffffff;
+        }
+
+        .menu-item {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 4px 8px;
+            margin: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            text-align: left;
+        }
+
+        .menu-item:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #8B0000;
+            padding: 4px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background-color: #b8b8d8;
+            padding: 4px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            height: 22px;
+        }
+
+        .btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .btn:hover {
+            filter: brightness(1.05);
+        }
+
+        /* Form Section */
+        .form-section {
+            background-color: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Calendar Header Row */
+        .calendar-header-row {
+            display: flex;
+            gap: 1px;
+            margin-bottom: 4px;
+        }
+
+        .calendar-header-cell {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 10px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .calendar-header-cell.weekend {
+            background: #8B0000;
+            color: white;
+        }
+
+        .calendar-header-cell.ma {
+            width: 180px;
+            flex: none;
+            text-align: left;
+        }
+
+        /* Calendar Grid */
+        .calendar-body {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 180px repeat(7, 1fr);
+            gap: 1px;
+            background: #808080;
+        }
+
+        .calendar-row-header {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #808080;
+        }
+
+        .calendar-cell {
+            background: white;
+            min-height: 28px;
+            padding: 2px;
+            font-size: 9px;
+            border: 1px solid #c0c0c0;
+            position: relative;
+        }
+
+        .calendar-cell.weekend {
+            background: #f8f8f8;
+        }
+
+        .calendar-cell.today {
+            background: #ffffd0;
+        }
+
+        .einsatz-entry {
+            background-color: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 2px;
+            padding: 1px 3px;
+            margin: 1px 0;
+            font-size: 9px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .einsatz-entry.abwesend {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .einsatz-entry.krank {
+            background-color: #ffc107;
+            border-color: #d39e00;
+        }
+
+        .einsatz-entry.urlaub {
+            background-color: #17a2b8;
+            border-color: #117a8b;
+            color: white;
+        }
+
+        .einsatz-entry.privat {
+            background-color: #6c757d;
+            border-color: #545b62;
+            color: white;
+        }
+
+        /* Input & Select Styles */
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+            height: 20px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            height: 23px;
+            margin-top: 4px;
+        }
+
+        .toolbar-separator {
+            width: 2px;
+            height: 18px;
+            background: linear-gradient(to right, #808080, #ffffff);
+            margin: 0 4px;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top-color: #8B0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <span class="title-bar-text">Dienstplanübersicht - CONSYS</span>
+            <button class="title-bar-close" onclick="window.close()">×</button>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+            <div class="left-menu">
+                <div class="menu-header">CONSYS</div>
+                <button class="menu-item">Dienstplanübersicht</button>
+                <button class="menu-item">Planungsübersicht</button>
+                <button class="menu-item">Auftragsverwaltung</button>
+                <button class="menu-item">Mitarbeiterverwaltung</button>
+                <button class="menu-item">Zeitkonten</button>
+                <button class="menu-item">Abwesenheitsplanung</button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <label style="font-size: 10px;">Startdatum:</label>
+                    <input type="date" id="dtStartdatum" class="form-input" style="width:110px;">
+                    <button class="btn" id="btnVor">►</button>
+                    <button class="btn" id="btnrueck">◄</button>
+                    <button class="btn" id="btn_Heute">Ab Heute</button>
+
+                    <div class="toolbar-separator"></div>
+
+                    <label style="font-size: 10px;">MA Filter:</label>
+                    <select id="NurAktiveMA" class="form-select" style="width:150px;">
+                        <option value="0">Alle anzeigen</option>
+                        <option value="1" selected>Alle aktiven</option>
+                        <option value="2">Festangestellte</option>
+                        <option value="3">Minijobber</option>
+                        <option value="4">Sub</option>
+                    </select>
+
+                    <div class="toolbar-separator"></div>
+
+                    <button class="btn" id="btnDPSenden">Dienstpläne senden</button>
+                    <input type="date" id="dtEnddatum" class="form-input" style="width:110px;">
+                    <button class="btn" id="btnMADienstpl">Einzeldienstpläne</button>
+                    <button class="btn" id="btnOutpExcel">Übersicht drucken</button>
+                </div>
+
+                <!-- Form Section -->
+                <div class="form-section">
+                    <!-- Calendar Header -->
+                    <div class="calendar-header-row">
+                        <div class="calendar-header-cell ma">Mitarbeiter</div>
+                        <div class="calendar-header-cell" id="lbl_Tag_1">Mo</div>
+                        <div class="calendar-header-cell" id="lbl_Tag_2">Di</div>
+                        <div class="calendar-header-cell" id="lbl_Tag_3">Mi</div>
+                        <div class="calendar-header-cell" id="lbl_Tag_4">Do</div>
+                        <div class="calendar-header-cell" id="lbl_Tag_5">Fr</div>
+                        <div class="calendar-header-cell weekend" id="lbl_Tag_6">Sa</div>
+                        <div class="calendar-header-cell weekend" id="lbl_Tag_7">So</div>
+                    </div>
+
+                    <!-- Calendar Body -->
+                    <div class="calendar-body" id="sub_DP_Grund">
+                        <div class="loading">Lade Dienstpläne...</div>
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span id="lblStatus">Bereit</span>
+                    <span id="timestamp"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateTimestamp() {
+            const now = new Date();
+            const elem = document.getElementById('timestamp');
+            if (elem) {
+                elem.textContent = now.toLocaleString('de-DE');
+            }
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+
+        // Datum-Label aktualisieren
+        const lbl_Datum = document.getElementById('lbl_Datum');
+        if (lbl_Datum) {
+            lbl_Datum.textContent = new Date().toLocaleDateString('de-DE');
+        }
+    </script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+
+    <!-- Logic-Modul (muss nach WebView2 Bridge geladen werden) -->
+    <script type="module" src="logic/frm_DP_Dienstplan_MA.logic.js"></script>
+</body>
+</html>

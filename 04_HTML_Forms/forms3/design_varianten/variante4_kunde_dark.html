@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenstamm - Dark Mode</title>
+    <style>
+        /* ===== DESIGN VARIANTE 4: DARK MODE - KUNDENSTAMM ===== */
+
+        :root {
+            /* Dark Theme Colors */
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --bg-card: rgba(33, 38, 45, 0.8);
+            --bg-input: rgba(255, 255, 255, 0.05);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+
+            --accent-primary: #58a6ff;
+            --accent-secondary: #3fb950;
+            --accent-tertiary: #f0883e;
+            --accent-purple: #a371f7;
+            --accent-glow: rgba(88, 166, 255, 0.4);
+
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-muted: #484f58;
+
+            --border-color: rgba(48, 54, 61, 0.8);
+            --border-glow: rgba(88, 166, 255, 0.3);
+
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 40px var(--accent-glow);
+
+            --transition-fast: 0.15s ease;
+            --transition-medium: 0.3s ease;
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f6f8fa;
+            --bg-tertiary: #eaeef2;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-input: rgba(0, 0, 0, 0.04);
+            --bg-hover: rgba(0, 0, 0, 0.06);
+
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --text-muted: #8c959f;
+
+            --border-color: rgba(208, 215, 222, 0.8);
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+            transition: background var(--transition-medium), color var(--transition-medium);
+        }
+
+        /* ===== NEOMORPHIC GLASS CARDS ===== */
+        .neo-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            transition: all var(--transition-medium);
+        }
+
+        .neo-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-3px);
+        }
+
+        /* ===== ANIMATED HEADER ===== */
+        .header {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(8px);
+            animation: logo-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logo-pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== THEME SWITCH ===== */
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px;
+            background: var(--bg-input);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .theme-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all var(--transition-fast);
+            color: var(--text-secondary);
+        }
+
+        .theme-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* ===== LAYOUT ===== */
+        .main-container {
+            display: grid;
+            grid-template-columns: 250px 1fr 320px;
+            gap: 20px;
+            padding: 20px 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .customer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+
+        .customer-item {
+            padding: 12px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid transparent;
+        }
+
+        .customer-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .customer-item.active {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: var(--accent-primary);
+        }
+
+        .customer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+        }
+
+        .customer-info h4 {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .customer-info span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* ===== ANIMATED BUTTONS ===== */
+        .btn {
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent-secondary), #2ea043);
+            color: white;
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 8px 25px rgba(63, 185, 80, 0.4);
+        }
+
+        /* Button Shine Effect */
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* ===== FORM TABS ===== */
+        .form-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: var(--bg-input);
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+
+        .form-tab {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+
+        .form-tab.active {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-tab:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        /* ===== FORM CONTENT ===== */
+        .form-content {
+            padding: 24px;
+        }
+
+        .form-section {
+            margin-bottom: 24px;
+        }
+
+        .form-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            background: var(--bg-hover);
+        }
+
+        /* Input with icon */
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon .form-control {
+            padding-left: 38px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* ===== ACTIVITY PANEL ===== */
+        .activity-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .activity-card {
+            padding: 16px;
+        }
+
+        .activity-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .activity-title .icon {
+            color: var(--accent-primary);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-input);
+            transition: all var(--transition-fast);
+        }
+
+        .activity-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.order { background: rgba(88, 166, 255, 0.2); color: var(--accent-primary); }
+        .activity-icon.invoice { background: rgba(63, 185, 80, 0.2); color: var(--accent-secondary); }
+        .activity-icon.contact { background: rgba(240, 136, 62, 0.2); color: var(--accent-tertiary); }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content h5 {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .activity-content span {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            padding: 16px;
+            text-align: center;
+            transition: all var(--transition-fast);
+        }
+
+        .stat-card:hover {
+            transform: scale(1.02);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== LOADING STATES ===== */
+        .skeleton {
+            background: linear-gradient(90deg,
+                var(--bg-input) 25%,
+                var(--bg-hover) 50%,
+                var(--bg-input) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-wave 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        @keyframes skeleton-wave {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ===== FLOATING ACTION BUTTON ===== */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transition: all var(--transition-fast);
+            z-index: 100;
+        }
+
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        /* ===== NOTIFICATION DOT ===== */
+        .notification-dot {
+            position: relative;
+        }
+
+        .notification-dot::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-tertiary);
+            border-radius: 50%;
+            border: 2px solid var(--bg-secondary);
+            animation: notification-pulse 2s infinite;
+        }
+
+        @keyframes notification-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-input);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo-icon">&#128101;</div>
+            <div>
+                <div class="header-title">Kundenstamm</div>
+                <div class="header-subtitle">Kundenverwaltung</div>
+            </div>
+        </div>
+
+        <div class="theme-switch">
+            <button class="theme-btn" id="darkBtn" onclick="setTheme('dark')">&#127769;</button>
+            <button class="theme-btn" id="lightBtn" onclick="setTheme('light')">&#9728;</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="neo-card" style="padding: 16px;">
+                <div class="search-box">
+                    <span class="search-icon">&#128269;</span>
+                    <input type="text" class="search-input" placeholder="Kunde suchen...">
+                </div>
+            </div>
+
+            <div class="neo-card" style="padding: 12px;">
+                <div class="customer-list">
+                    <div class="customer-item active">
+                        <div class="customer-avatar">MM</div>
+                        <div class="customer-info">
+                            <h4>Messe München</h4>
+                            <span>12 Aufträge</span>
+                        </div>
+                    </div>
+                    <div class="customer-item">
+                        <div class="customer-avatar" style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));">NM</div>
+                        <div class="customer-info">
+                            <h4>NürnbergMesse</h4>
+                            <span>8 Aufträge</span>
+                        </div>
+                    </div>
+                    <div class="customer-item">
+                        <div class="customer-avatar" style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-primary));">MF</div>
+                        <div class="customer-info">
+                            <h4>Messe Frankfurt</h4>
+                            <span>15 Aufträge</span>
+                        </div>
+                    </div>
+                    <div class="customer-item">
+                        <div class="customer-avatar" style="background: linear-gradient(135deg, var(--accent-tertiary), var(--accent-secondary));">BA</div>
+                        <div class="customer-info">
+                            <h4>BMW AG</h4>
+                            <span>6 Aufträge</span>
+                        </div>
+                    </div>
+                    <div class="customer-item">
+                        <div class="customer-avatar" style="background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));">SA</div>
+                        <div class="customer-info">
+                            <h4>Siemens AG</h4>
+                            <span>9 Aufträge</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1 class="content-title">Messe München GmbH</h1>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary">
+                        <span>&#128221;</span> Bearbeiten
+                    </button>
+                    <button class="btn btn-success">
+                        <span>&#128190;</span> Speichern
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-tabs">
+                <button class="form-tab active">Stammdaten</button>
+                <button class="form-tab">Kontakte</button>
+                <button class="form-tab">Aufträge</button>
+                <button class="form-tab">Rechnungen</button>
+            </div>
+
+            <div class="neo-card form-content">
+                <div class="form-section">
+                    <div class="form-section-title">Firmendaten</div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label class="form-label">Kundennummer</label>
+                            <input type="text" class="form-control" value="KD-2026-0001" readonly style="background: var(--bg-tertiary);">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Firma</label>
+                            <input type="text" class="form-control" value="Messe München GmbH">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field" style="grid-column: span 2;">
+                            <label class="form-label">Adresse</label>
+                            <input type="text" class="form-control" value="Am Messesee 2, 81829 München">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Kontaktdaten</div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label class="form-label">Telefon</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">&#128222;</span>
+                                <input type="tel" class="form-control" value="+49 89 949-0">
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">E-Mail</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">&#9993;</span>
+                                <input type="email" class="form-control" value="info@messe-muenchen.de">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label class="form-label">Website</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">&#127760;</span>
+                                <input type="url" class="form-control" value="www.messe-muenchen.de">
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Ansprechpartner</label>
+                            <input type="text" class="form-control" value="Dr. Reinhard Pfeiffer">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Bankverbindung</div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label class="form-label">IBAN</label>
+                            <input type="text" class="form-control" value="DE89 3704 0044 0532 0130 00">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">BIC</label>
+                            <input type="text" class="form-control" value="COBADEFFXXX">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Activity Panel -->
+        <aside class="activity-panel">
+            <div class="stats-grid">
+                <div class="neo-card stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Aufträge</div>
+                </div>
+                <div class="neo-card stat-card">
+                    <div class="stat-value">€48k</div>
+                    <div class="stat-label">Umsatz</div>
+                </div>
+                <div class="neo-card stat-card">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Offen</div>
+                </div>
+                <div class="neo-card stat-card">
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">Bewertung</div>
+                </div>
+            </div>
+
+            <div class="neo-card activity-card">
+                <div class="activity-title">
+                    <span class="icon">&#128197;</span>
+                    Letzte Aktivitäten
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon order">&#128196;</div>
+                        <div class="activity-content">
+                            <h5>Neuer Auftrag VA-2026-0042</h5>
+                            <span>Vor 2 Stunden</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon invoice">&#128176;</div>
+                        <div class="activity-content">
+                            <h5>Rechnung R-2026-0089 bezahlt</h5>
+                            <span>Gestern, 14:30</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon contact">&#128100;</div>
+                        <div class="activity-content">
+                            <h5>Kontakt aktualisiert</h5>
+                            <span>15.01.2026</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon order">&#128196;</div>
+                        <div class="activity-content">
+                            <h5>Auftrag VA-2026-0038 abgeschlossen</h5>
+                            <span>12.01.2026</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="neo-card activity-card">
+                <div class="activity-title">
+                    <span class="icon notification-dot">&#128276;</span>
+                    Erinnerungen
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-purple);">&#9200;</div>
+                        <div class="activity-content">
+                            <h5>Vertrag läuft aus</h5>
+                            <span>In 14 Tagen</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon contact">&#128222;</div>
+                        <div class="activity-content">
+                            <h5>Rückruf vereinbart</h5>
+                            <span>Morgen, 10:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" title="Neuer Kunde">
+        &#10133;
+    </button>
+
+    <script>
+        // Theme Management
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeButtons(theme);
+        }
+
+        function updateThemeButtons(theme) {
+            document.getElementById('darkBtn').classList.toggle('active', theme === 'dark');
+            document.getElementById('lightBtn').classList.toggle('active', theme === 'light');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            setTheme(savedTheme);
+
+            // Tab switching
+            document.querySelectorAll('.form-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                });
+            });
+
+            // Customer selection
+            document.querySelectorAll('.customer-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.customer-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

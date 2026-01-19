@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Master V06 - Minimalistisch / Power-User</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .menu-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Header mit Suchfeld */
+        .menu-header {
+            padding: 16px;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .menu-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-title .hint {
+            font-size: 10px;
+            font-weight: 400;
+            color: #999;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74,144,217,0.15);
+        }
+
+        .search-input::placeholder {
+            color: #aaa;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        /* Favoriten-Leiste */
+        .favorites-bar {
+            padding: 12px 16px;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .favorites-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .favorites-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .fav-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 8px 6px;
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: inherit;
+            color: #444;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .fav-btn:hover {
+            background: #fff;
+            border-color: #4a90d9;
+            color: #4a90d9;
+        }
+
+        .fav-btn:focus {
+            outline: 2px solid #4a90d9;
+            outline-offset: 1px;
+        }
+
+        .fav-btn:active {
+            background: #e8f0fa;
+        }
+
+        .fav-btn .shortcut {
+            display: block;
+            font-size: 9px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tabs-nav {
+            display: flex;
+            background: #fafafa;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 8px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 11px;
+            font-family: inherit;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .tab-btn.active {
+            color: #4a90d9;
+            border-bottom-color: #4a90d9;
+            background: #fff;
+        }
+
+        .tab-btn:focus {
+            outline: none;
+            background: #f0f0f0;
+        }
+
+        .tab-btn .tab-shortcut {
+            font-size: 9px;
+            color: #bbb;
+            margin-left: 4px;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            padding: 12px 16px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .menu-btn {
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menu-btn:hover {
+            background: #f8f9fa;
+            border-color: #ddd;
+        }
+
+        .menu-btn:focus {
+            outline: 2px solid #4a90d9;
+            outline-offset: 1px;
+        }
+
+        .menu-btn:active {
+            background: #f0f0f0;
+        }
+
+        .menu-btn .arrow {
+            color: #ccc;
+            font-size: 10px;
+        }
+
+        .menu-btn.filtered-out {
+            display: none;
+        }
+
+        /* Footer */
+        .menu-footer {
+            padding: 12px 16px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .keyboard-hints {
+            font-size: 10px;
+            color: #999;
+        }
+
+        .keyboard-hints kbd {
+            background: #e8e8e8;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 1px 4px;
+            font-family: inherit;
+            font-size: 9px;
+        }
+
+        .btn-close {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: inherit;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-close:hover {
+            background: #e8e8e8;
+            color: #333;
+        }
+
+        .btn-close:focus {
+            outline: 2px solid #4a90d9;
+            outline-offset: 1px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background-color: #4a8f4a; }
+        .toast.error { background-color: #c04040; }
+        .toast.warning { background-color: #c08040; }
+        .toast.info { background-color: #4080c0; }
+
+        /* No Results */
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            display: none;
+        }
+
+        .no-results.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <!-- Header mit Suchfeld -->
+        <div class="menu-header">
+            <div class="menu-title">
+                <span>Hauptmenü</span>
+                <span class="hint">Drücke / für Suche</span>
+            </div>
+            <div class="search-container">
+                <span class="search-icon">&#128269;</span>
+                <input type="text"
+                       class="search-input"
+                       id="searchInput"
+                       placeholder="Suchen... (Strg+F oder /)"
+                       autocomplete="off"
+                       data-testid="menu-v06-search">
+            </div>
+        </div>
+
+        <!-- Favoriten-Leiste -->
+        <div class="favorites-bar">
+            <div class="favorites-label">Favoriten</div>
+            <div class="favorites-buttons">
+                <button class="fav-btn"
+                        onclick="navigateTo('frm_N_Dienstplanuebersicht.html')"
+                        accesskey="1"
+                        data-testid="menu-v06-dienstplan">
+                    Dienstplan
+                    <span class="shortcut">Strg+1</span>
+                </button>
+                <button class="fav-btn"
+                        onclick="navigateTo('frm_va_Auftragstamm.html')"
+                        accesskey="2"
+                        data-testid="menu-v06-auftraege">
+                    Aufträge
+                    <span class="shortcut">Strg+2</span>
+                </button>
+                <button class="fav-btn"
+                        onclick="navigateTo('frm_MA_Mitarbeiterstamm.html')"
+                        accesskey="3"
+                        data-testid="menu-v06-mitarbeiter">
+                    Mitarbeiter
+                    <span class="shortcut">Strg+3</span>
+                </button>
+                <button class="fav-btn"
+                        onclick="navigateTo('frm_VA_Planungsuebersicht.html')"
+                        accesskey="4"
+                        data-testid="menu-v06-planung">
+                    Planung
+                    <span class="shortcut">Strg+4</span>
+                </button>
+                <button class="fav-btn"
+                        onclick="navigateTo('frm_N_Stundenauswertung.html')"
+                        accesskey="5"
+                        data-testid="menu-v06-stunden">
+                    Stunden
+                    <span class="shortcut">Strg+5</span>
+                </button>
+                <button class="fav-btn"
+                        onclick="navigateTo('frm_N_Email_versenden.html')"
+                        accesskey="6"
+                        data-testid="menu-v06-email">
+                    Email
+                    <span class="shortcut">Strg+6</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchTab(0)" data-testid="menu-v06-tab-stammdaten">
+                    Stammdaten<span class="tab-shortcut">1</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab(1)" data-testid="menu-v06-tab-planung">
+                    Planung<span class="tab-shortcut">2</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab(2)" data-testid="menu-v06-tab-personal">
+                    Personal<span class="tab-shortcut">3</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab(3)" data-testid="menu-v06-tab-tools">
+                    Tools<span class="tab-shortcut">4</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Contents -->
+        <!-- Tab 1: Stammdaten -->
+        <div class="tab-content active" id="tab-0">
+            <div class="tab-buttons">
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_KD_Kundenstamm.html')"
+                        data-searchable="Kunden Kundenstamm Kundenverwaltung"
+                        data-testid="menu-v06-kunden">
+                    <span>Kundenverwaltung</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_OB_Objekt.html')"
+                        data-searchable="Objekte Objektstamm Objektverwaltung"
+                        data-testid="menu-v06-objekte">
+                    <span>Objektverwaltung</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_MA_Mitarbeiterstamm.html')"
+                        data-searchable="Mitarbeiter Mitarbeiterstamm Mitarbeiterverwaltung Personal"
+                        data-testid="menu-v06-mitarbeiterverwaltung">
+                    <span>Mitarbeiterverwaltung</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 2: Planung -->
+        <div class="tab-content" id="tab-1">
+            <div class="tab-buttons">
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_N_Dienstplanuebersicht.html')"
+                        data-searchable="Dienstplan Dienstplanübersicht Schichten"
+                        data-testid="menu-v06-dienstplan-tab">
+                    <span>Dienstplanübersicht</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_VA_Planungsuebersicht.html')"
+                        data-searchable="Planung Planungsübersicht Disposition"
+                        data-testid="menu-v06-planungsuebersicht">
+                    <span>Planungsübersicht</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_MA_VA_Schnellauswahl.html')"
+                        data-searchable="Schnellauswahl MA Mitarbeiter Zuordnung"
+                        data-testid="menu-v06-schnellauswahl">
+                    <span>MA Schnellauswahl</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 3: Personal -->
+        <div class="tab-content" id="tab-2">
+            <div class="tab-buttons">
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_MA_Zeitkonten.html')"
+                        data-searchable="Zeitkonten Zeiten Stunden Arbeitszeit"
+                        data-testid="menu-v06-zeitkonten">
+                    <span>Zeitkonten</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_MA_Abwesenheit.html')"
+                        data-searchable="Abwesenheit Urlaub Krank Fehlzeiten"
+                        data-testid="menu-v06-abwesenheiten">
+                    <span>Abwesenheiten</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_N_Lohnabrechnungen.html')"
+                        data-searchable="Lohn Lohnabrechnung Gehalt Abrechnung"
+                        data-testid="menu-v06-lohnabrechnungen">
+                    <span>Lohnabrechnungen</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_N_Stundenauswertung.html')"
+                        data-searchable="Stunden Stundenauswertung Auswertung"
+                        data-testid="menu-v06-stundenauswertung">
+                    <span>Stundenauswertung</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_N_MA_Bewerber_Verarbeitung.html')"
+                        data-searchable="Bewerber Bewerbung Recruiting"
+                        data-testid="menu-v06-bewerber">
+                    <span>Bewerber</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 4: Tools -->
+        <div class="tab-content" id="tab-3">
+            <div class="tab-buttons">
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_N_Email_versenden.html')"
+                        data-searchable="Email E-Mail Nachricht senden"
+                        data-testid="menu-v06-email-tab">
+                    <span>E-Mail versenden</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_Einsatzuebersicht.html')"
+                        data-searchable="Einsatz Einsatzübersicht Report"
+                        data-testid="menu-v06-einsatzuebersicht">
+                    <span>Einsatzübersicht</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_KD_Verrechnungssaetze.html')"
+                        data-searchable="Verrechnungssätze Preise Tarife Sätze"
+                        data-testid="menu-v06-verrechnungssaetze">
+                    <span>Verrechnungssätze</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_Ausweis_Create.html')"
+                        data-searchable="Ausweis Dienstausweis Badge ID"
+                        data-testid="menu-v06-ausweis">
+                    <span>Dienstausweis erstellen</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+                <button class="menu-btn"
+                        onclick="navigateTo('frm_Systeminfo.html')"
+                        data-searchable="System Info Version Systeminfo"
+                        data-testid="menu-v06-systeminfo">
+                    <span>Systeminfo</span>
+                    <span class="arrow">&#8250;</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults">
+            Keine Einträge gefunden
+        </div>
+
+        <!-- Footer -->
+        <div class="menu-footer">
+            <div class="keyboard-hints">
+                <kbd>Esc</kbd> Schließen &nbsp;
+                <kbd>/</kbd> Suche &nbsp;
+                <kbd>1-4</kbd> Tabs
+            </div>
+            <button class="btn-close" onclick="closeForm()" data-testid="menu-v06-close">
+                Schließen
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================
+        // Menu Master V06 - Minimalistisch / Power-User
+        // ============================================
+
+        // State
+        let currentTab = 0;
+        const totalTabs = 4;
+
+        // DOM References (cached)
+        const searchInput = document.getElementById('searchInput');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const menuButtons = document.querySelectorAll('.menu-btn');
+        const noResults = document.getElementById('noResults');
+        const toast = document.getElementById('toast');
+
+        // ============================================
+        // Tab Navigation
+        // ============================================
+        function switchTab(index) {
+            if (index < 0 || index >= totalTabs) return;
+
+            currentTab = index;
+
+            // Update tab buttons
+            tabButtons.forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+
+            // Update tab contents
+            tabContents.forEach((content, i) => {
+                content.classList.toggle('active', i === index);
+            });
+        }
+
+        // ============================================
+        // Navigation
+        // ============================================
+        function navigateTo(formName) {
+            console.log('[MenuV06] navigateTo:', formName);
+
+            // Try PostMessage to parent (Shell/iframe integration)
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'NAVIGATE',
+                    form: formName,
+                    source: 'menu_master_V06'
+                }, '*');
+            }
+
+            // Try WebView2 bridge
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'navigate',
+                    form: formName
+                });
+            }
+
+            showToast('Öffne: ' + formName.replace('.html', '').replace('frm_', '').replace(/_/g, ' '), 'info');
+        }
+
+        // ============================================
+        // Close Menu
+        // ============================================
+        function closeForm() {
+            console.log('[MenuV06] closeForm');
+
+            // PostMessage to parent
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'CLOSE_MENU',
+                    source: 'menu_master_V06'
+                }, '*');
+            }
+
+            // WebView2 bridge
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'close'
+                });
+            }
+
+            showToast('Menü wird geschlossen...', 'info');
+        }
+
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'info') {
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // ============================================
+        // Search / Filter
+        // ============================================
+        function filterMenuItems(searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            let visibleCount = 0;
+
+            menuButtons.forEach(btn => {
+                const label = btn.querySelector('span:first-child').textContent.toLowerCase();
+                const searchable = (btn.dataset.searchable || '').toLowerCase();
+                const matches = term === '' || label.includes(term) || searchable.includes(term);
+
+                btn.classList.toggle('filtered-out', !matches);
+                if (matches) visibleCount++;
+            });
+
+            // Show/hide no results message
+            noResults.classList.toggle('show', visibleCount === 0 && term !== '');
+
+            // If searching, show all tabs content
+            if (term !== '') {
+                tabContents.forEach(content => content.classList.add('active'));
+            } else {
+                // Restore single tab view
+                tabContents.forEach((content, i) => {
+                    content.classList.toggle('active', i === currentTab);
+                });
+            }
+        }
+
+        // ============================================
+        // Keyboard Handler
+        // ============================================
+        function handleKeyboard(event) {
+            const key = event.key;
+            const ctrlKey = event.ctrlKey || event.metaKey;
+
+            // Esc - Close menu
+            if (key === 'Escape') {
+                event.preventDefault();
+                closeForm();
+                return;
+            }
+
+            // / - Focus search (when not in input)
+            if (key === '/' && document.activeElement !== searchInput) {
+                event.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+                return;
+            }
+
+            // Ctrl+1 to Ctrl+6 - Favorites
+            if (ctrlKey && key >= '1' && key <= '6') {
+                event.preventDefault();
+                const favTargets = [
+                    'frm_N_Dienstplanuebersicht.html',
+                    'frm_va_Auftragstamm.html',
+                    'frm_MA_Mitarbeiterstamm.html',
+                    'frm_VA_Planungsuebersicht.html',
+                    'frm_N_Stundenauswertung.html',
+                    'frm_N_Email_versenden.html'
+                ];
+                const index = parseInt(key) - 1;
+                if (favTargets[index]) {
+                    navigateTo(favTargets[index]);
+                }
+                return;
+            }
+
+            // 1-4 - Switch tabs (when not in input)
+            if (!ctrlKey && key >= '1' && key <= '4' && document.activeElement !== searchInput) {
+                event.preventDefault();
+                switchTab(parseInt(key) - 1);
+                return;
+            }
+
+            // F1-F4 - Also switch tabs
+            if (key >= 'F1' && key <= 'F4') {
+                event.preventDefault();
+                const tabIndex = parseInt(key.substring(1)) - 1;
+                switchTab(tabIndex);
+                return;
+            }
+        }
+
+        // ============================================
+        // Event Listeners
+        // ============================================
+
+        // Keyboard events
+        document.addEventListener('keydown', handleKeyboard);
+
+        // Search input
+        searchInput.addEventListener('input', (e) => {
+            filterMenuItems(e.target.value);
+        });
+
+        // Clear search on Escape in input
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (searchInput.value !== '') {
+                    e.stopPropagation();
+                    searchInput.value = '';
+                    filterMenuItems('');
+                }
+            }
+        });
+
+        // PostMessage listener (for parent communication)
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            if (!data || !data.type) return;
+
+            console.log('[MenuV06] Received message:', data);
+
+            switch (data.type) {
+                case 'FOCUS_SEARCH':
+                    searchInput.focus();
+                    searchInput.select();
+                    break;
+                case 'SWITCH_TAB':
+                    if (typeof data.index === 'number') {
+                        switchTab(data.index);
+                    }
+                    break;
+            }
+        });
+
+        // ============================================
+        // Initialization
+        // ============================================
+        function init() {
+            console.log('[MenuV06] Initialized - Keyboard shortcuts active');
+
+            // Auto-focus search on load
+            setTimeout(() => {
+                searchInput.focus();
+            }, 100);
+        }
+
+        // Run on DOMContentLoaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

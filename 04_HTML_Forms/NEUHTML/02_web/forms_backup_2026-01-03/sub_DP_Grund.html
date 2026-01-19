@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplan Grund - Subform</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .subform-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+        }
+        .subform-title { font-weight: 600; color: #333; }
+        .subform-content { flex: 1; overflow: auto; }
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .datasheet th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            padding: 5px 6px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .datasheet td {
+            border: 1px solid #ddd;
+            padding: 4px 6px;
+        }
+        .datasheet tbody tr:nth-child(even) { background: #fafafa; }
+        .datasheet tbody tr:hover { background: #f0f0f0; }
+        .datasheet tbody tr.selected { background: #e8e8e8; }
+        .grund-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 500;
+        }
+        .grund-urlaub { background: #e8e8e8; color: #333333; }
+        .grund-krank { background: #e8e8e8; color: #333333; }
+        .grund-frei { background: #e8e8e8; color: #333333; }
+        .grund-schulung { background: #e8e8e8; color: #333333; }
+        .grund-sonstiges { background: #e8e8e8; color: #333333; }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">
+            <span class="subform-title">Dienstplan-Gruende</span>
+            <span id="lblAnzahl">0 Einträge</span>
+        </div>
+
+        <div class="subform-content">
+            <table class="datasheet" id="tblGrund">
+                <thead>
+                    <tr>
+                        <th style="width:90px;">Datum</th>
+                        <th style="width:100px;">Grund</th>
+                        <th style="min-width:150px;">Beschreibung</th>
+                        <th style="width:60px;">Von</th>
+                        <th style="width:60px;">Bis</th>
+                        <th style="width:80px;">Erfasst am</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_Grund">
+                    <tr>
+                        <td>18.12.2024</td>
+                        <td><span class="grund-badge grund-urlaub">Urlaub</span></td>
+                        <td>Jahresurlaub</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>01.12.2024</td>
+                    </tr>
+                    <tr>
+                        <td>19.12.2024</td>
+                        <td><span class="grund-badge grund-urlaub">Urlaub</span></td>
+                        <td>Jahresurlaub</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>01.12.2024</td>
+                    </tr>
+                    <tr>
+                        <td>20.12.2024</td>
+                        <td><span class="grund-badge grund-krank">Krank</span></td>
+                        <td>Krankmeldung</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>20.12.2024</td>
+                    </tr>
+                    <tr>
+                        <td>23.12.2024</td>
+                        <td><span class="grund-badge grund-frei">Frei</span></td>
+                        <td>Freier Tag</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>15.12.2024</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="sub_DP_Grund.logic.js"></script>
+</body>
+</html>

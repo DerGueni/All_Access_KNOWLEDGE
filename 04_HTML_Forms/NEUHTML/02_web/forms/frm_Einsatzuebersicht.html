@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einsatzuebersicht - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_Einsatzuebersicht.css">
+</head>
+<body>
+    <div class="eu-container">
+        <!-- Linkes Menue -->
+        <aside class="eu-menu">
+            <div class="menu-header">HAUPTMENUE</div>
+            <nav class="menu-buttons">
+                <a href="frm_N_Dienstplanuebersicht.html" class="menu-btn">Dienstplanuebersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="menu-btn">Planungsuebersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="menu-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="menu-btn">Mitarbeiterverwaltung</a>
+                <a href="#" class="menu-btn">Offene Mail Anfragen</a>
+                <a href="#" class="menu-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="menu-btn">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="menu-btn">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="menu-btn">Dienstausweis erstellen</a>
+                <a href="#" class="menu-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="menu-btn">Kundenverwaltung</a>
+                <a href="#" class="menu-btn">Verrechnungssaetze</a>
+                <a href="#" class="menu-btn">Sub Rechnungen</a>
+                <a href="#" class="menu-btn">E-Mail</a>
+                <a href="#" class="menu-btn secondary">Menue 2</a>
+                <a href="#" class="menu-btn secondary">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Hauptbereich -->
+        <main class="eu-main">
+            <!-- Header -->
+            <header class="eu-header">
+                <div class="header-left">
+                    <div class="eu-logo"></div>
+                    <h1 class="eu-title">Einsatzuebersicht</h1>
+                </div>
+                <div class="header-right">
+                    <span id="lblDatum"></span>
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Toolbar -->
+            <div class="eu-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Datum:</label>
+                    <input type="date" id="datTag" class="eu-input">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Objekt:</label>
+                    <select id="cboObjekt" class="eu-select" style="width:180px;">
+                        <option value="">Alle Objekte</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Kunde:</label>
+                    <select id="cboKunde" class="eu-select" style="width:180px;">
+                        <option value="">Alle Kunden</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Status:</label>
+                    <select id="cboStatus" class="eu-select" style="width:100px;">
+                        <option value="">Alle</option>
+                        <option value="besetzt">Besetzt</option>
+                        <option value="offen">Offen</option>
+                        <option value="problem">Probleme</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button id="btnAktualisieren" class="eu-btn primary">Aktualisieren</button>
+                    <button id="btnExport" class="eu-btn">Export</button>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item"><span class="stat-value" id="statGesamt">0</span><span class="stat-label">Einsaetze</span></div>
+                <div class="stat-item stat-ok"><span class="stat-value" id="statBesetzt">0</span><span class="stat-label">Besetzt</span></div>
+                <div class="stat-item stat-warn"><span class="stat-value" id="statTeilweise">0</span><span class="stat-label">Teilweise</span></div>
+                <div class="stat-item stat-err"><span class="stat-value" id="statOffen">0</span><span class="stat-label">Offen</span></div>
+                <div class="stat-item"><span class="stat-value" id="statMASoll">0</span><span class="stat-label">MA Soll</span></div>
+                <div class="stat-item"><span class="stat-value" id="statMAIst">0</span><span class="stat-label">MA Ist</span></div>
+            </div>
+
+            <!-- Content -->
+            <div class="eu-content">
+                <!-- Einsatz-Tabelle -->
+                <div class="eu-table-container">
+                    <table class="eu-table" id="tblEinsaetze">
+                        <thead>
+                            <tr>
+                                <th style="width:100px;">Zeit</th>
+                                <th style="min-width:180px;">Objekt</th>
+                                <th style="min-width:150px;">Kunde</th>
+                                <th style="width:60px; text-align:center;">MA Soll</th>
+                                <th style="width:60px; text-align:center;">MA Ist</th>
+                                <th style="width:80px; text-align:center;">Status</th>
+                                <th style="min-width:200px;">Zugeordnete Mitarbeiter</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_Einsaetze">
+                            <tr><td colspan="7" style="text-align:center; padding:40px; color:#999;">Lade Daten...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Detail-Panel -->
+                <div class="eu-detail-panel" id="detailPanel">
+                    <div class="detail-header">
+                        <span class="detail-title">Einsatzdetails</span>
+                        <button class="detail-close" id="btnCloseDetail">x</button>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-section">
+                            <div class="detail-row"><label>Auftrag:</label><span id="detailAuftrag">-</span></div>
+                            <div class="detail-row"><label>Objekt:</label><span id="detailObjekt">-</span></div>
+                            <div class="detail-row"><label>Kunde:</label><span id="detailKunde">-</span></div>
+                            <div class="detail-row"><label>Zeit:</label><span id="detailZeit">-</span></div>
+                        </div>
+                        <div class="detail-section">
+                            <div class="detail-row"><label>MA Soll:</label><span id="detailSoll">-</span></div>
+                            <div class="detail-row"><label>MA Ist:</label><span id="detailIst">-</span></div>
+                            <div class="detail-row"><label>Fehlend:</label><span id="detailFehlend">-</span></div>
+                        </div>
+                        <div class="detail-section">
+                            <label style="font-weight:600; display:block; margin-bottom:6px;">Zugeordnete Mitarbeiter:</label>
+                            <ul id="detailMAListe" class="ma-liste">
+                                <li>Keine Mitarbeiter zugeordnet</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <label style="font-weight:600; display:block; margin-bottom:6px;">Verfuegbare Mitarbeiter:</label>
+                            <ul id="detailVerfuegbar" class="ma-liste verfuegbar">
+                                <li>Wird geladen...</li>
+                            </ul>
+                        </div>
+                        <div class="detail-actions">
+                            <button id="btnOeffnen" class="eu-btn primary">Auftrag oeffnen</button>
+                            <button id="btnMAZuordnen" class="eu-btn">MA zuordnen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="eu-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Einsaetze</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="frm_Einsatzuebersicht.logic.js"></script>
+</body>
+</html>

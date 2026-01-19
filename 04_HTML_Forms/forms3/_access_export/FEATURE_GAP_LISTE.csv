@@ -1,0 +1,81 @@
+;Kategorie;Funktionsname;Beschreibung;Quelle_Referenz;Nutzen_Sicherheitsdienst;Status_Access_FE;Prioritaet;Aufwand_Implementierung
+1;Planung;Drag-and-Drop Schichtplanung;Mitarbeiter per Drag-and-Drop auf Schichten ziehen statt manueller Eingabe;TimeCount, secplanet, Planday;Schnellere Planung, weniger Fehler, intuitive Bedienung;Fehlt;Hoch;Mittel
+2;Planung;Automatische Skill-basierte Zuordnung;System schlaegt MA basierend auf Qualifikationen, Erfahrung und Objektkenntnis vor;COMET, TimeCount;Passende MA fuer jeden Auftrag, weniger Reklamationen, Qualitaetssicherung;Fehlt;Hoch;Gross
+3;Planung;Verfuegbarkeitsabfrage per App;MA koennen Verfuegbarkeit direkt in App eintragen, keine manuelle Erfassung noetig;SESAM, Papershift, Planday;Weniger Telefonate, aktuelle Verfuegbarkeit, Zeitersparnis Disposition;Fehlt;Hoch;Gross
+4;Planung;Schichttausch zwischen MA;Mitarbeiter koennen untereinander Schichten tauschen mit Genehmigungsworkflow;Planday, Connecteam, Deputy;Flexibilitaet fuer MA, weniger Ausfaelle, Entlastung Disposition;Fehlt;Mittel;Mittel
+5;Planung;Ueberstunden-Warnung;Automatische Warnung bei Ueberschreitung von Wochenstunden oder Ruhezeiten;TimeCount, COMET, secplanet;Arbeitszeitgesetz-Compliance, Vermeidung von Bussgeldern;Teilweise;Hoch;Klein
+6;Planung;Qualifikations-Matrix;Uebersicht welcher MA welche Qualifikationen hat (34a, Ersthelfer, Brandschutz);secplanet, SESAM, TimeCount;Schnelle Zuordnung, Nachweis bei Kontrollen, Schulungsplanung;Teilweise;Hoch;Mittel
+7;Planung;Fahrzeit-Berechnung;Automatische Berechnung der Fahrzeit zwischen Wohnort MA und Einsatzort;Google Maps API, HERE;Realistische Planung, Fahrtkostenberechnung, Puenktlichkeit;Teilweise;Mittel;Mittel
+8;Planung;Konflikt-Erkennung;Automatische Erkennung von Doppelbuchungen, Ueberschneidungen, Ruhezeiten;TimeCount, COMET;Vermeidung von Planungsfehlern, Arbeitszeitgesetz-Compliance;Teilweise;Hoch;Mittel
+9;Planung;Rufdienst-Planung;Spezielle Planung fuer Bereitschaftsdienste mit Eskalationsstufen;secplanet, SESAM;Schnelle Reaktion bei Notfaellen, klare Verantwortlichkeiten;Fehlt;Mittel;Mittel
+10;Planung;Automatische Pausenberechnung;System berechnet automatisch gesetzliche Pausen basierend auf Schichtlaenge;TimeCount, DATEV;Gesetzeskonformitaet, korrekte Lohnabrechnung;Fehlt;Hoch;Klein
+11;Kommunikation;Push-Benachrichtigungen;Sofortige Benachrichtigung bei neuen Einsaetzen, Aenderungen, Absagen;Planday, Connecteam, Deputy;Schnelle Reaktion, weniger Missverstaendnisse, keine verpassten Infos;Fehlt;Hoch;Gross
+12;Kommunikation;In-App Messaging;Chat-Funktion zwischen Disposition und MA direkt in der Planungs-App;Slack, Teams, Connecteam;Dokumentierte Kommunikation, schnelle Abstimmung, weniger Telefonate;Fehlt;Hoch;Gross
+13;Kommunikation;Automatische Erinnerungen;SMS/Push vor Schichtbeginn, bei fehlender Rueckmeldung, Dokumentenablauf;TimeCount, SESAM;Weniger Ausfaelle, rechtzeitige Dokumentenerneuerung;Teilweise;Hoch;Mittel
+14;Kommunikation;WhatsApp Business Integration;Offizielle WhatsApp Business API fuer automatische Nachrichten;WhatsApp Business API;Hohe Erreichbarkeit, bevorzugter Kanal der MA, automatisierbar;Veraltet;Mittel;Mittel
+15;Kommunikation;Einsatz-Bestaetigung per App;MA bestaetigt Einsatz per Klick, Status sichtbar fuer Disposition;Planday, Deputy, Connecteam;Planungssicherheit, schnelle Reaktion bei Absagen;Fehlt;Hoch;Mittel
+16;Kommunikation;Broadcast-Nachrichten;Massenversand an alle MA oder gefilterte Gruppen;Mailchimp, Brevo, SMS-Gateways;Wichtige Infos schnell verbreiten, z.B. Corona-Regeln, neue Objekte;Teilweise;Mittel;Klein
+17;Kommunikation;Dokumenten-Upload durch MA;MA kann Fuehrerschein, 34a-Nachweis etc. direkt hochladen;Personio, HRworks, Connecteam;Weniger Papierkram, aktuelle Unterlagen, Self-Service;Fehlt;Mittel;Mittel
+18;Zeiterfassung;GPS-Stempeluhr;Ein-/Ausstempeln mit GPS-Standort zur Verifizierung;TimeCount, secplanet, Clockodo;Nachweis der Anwesenheit, Betrugsverhinderung, Compliance;Fehlt;Hoch;Gross
+19;Zeiterfassung;QR-Code Check-In;MA scannt QR-Code am Objekt zum Ein-/Ausstempeln;Timify, Clockodo, Deputy;Einfache Zeiterfassung ohne App-Kenntnisse, faelschungssicher;Fehlt;Hoch;Mittel
+20;Zeiterfassung;Geofencing;Automatischer Check-In wenn MA Objektbereich betritt;TimeCount, secplanet;Vollautomatische Zeiterfassung, keine vergessenen Stempel;Fehlt;Mittel;Gross
+21;Zeiterfassung;Pausenerfassung;Separate Erfassung von Pausenzeiten mit automatischer Berechnung;TimeCount, DATEV, Personio;Gesetzeskonforme Pausendokumentation, korrekte Abrechnung;Fehlt;Hoch;Klein
+22;Zeiterfassung;Echtzeit-Anwesenheit;Live-Dashboard wer gerade im Dienst ist und wo;secplanet, SESAM;Ueberblick fuer Disposition, schnelle Reaktion bei Problemen;Fehlt;Hoch;Mittel
+23;Zeiterfassung;Nachbuchungs-Workflow;MA kann vergessene Zeiten nachbuchen mit Genehmigungsworkflow;Personio, HRworks;Vollstaendige Zeiterfassung, kontrollierte Nachbuchungen;Fehlt;Mittel;Mittel
+24;Zeiterfassung;Schichtplan-Soll-Ist-Vergleich;Automatischer Vergleich geplante vs. tatsaechliche Zeiten;TimeCount, COMET;Abweichungen erkennen, Nachkalkulation, Lohnkontrolle;Teilweise;Hoch;Mittel
+25;Zeiterfassung;Offline-Stempeln;Zeiterfassung auch ohne Internetverbindung, spaetere Synchronisation;Clockodo, TimeCount;Funktioniert in Tiefgaragen, Kellern, laendlichen Gebieten;Fehlt;Mittel;Mittel
+26;Reporting;Echtzeit-Dashboard;Live-Ueberblick ueber alle laufenden Einsaetze, Besetzung, Ausfaelle;Tableau, Power BI, secplanet;Sofortige Handlungsfaehigkeit, Managementuebersicht;Fehlt;Hoch;Mittel
+27;Reporting;Automatische Monatsberichte;Monatliche Reports zu Stunden, Kosten, Auslastung automatisch generiert;DATEV, TimeCount;Zeitersparnis, konsistente Reports, keine manuelle Arbeit;Teilweise;Mittel;Mittel
+28;Reporting;KPI-Tracking;Kennzahlen wie Krankenquote, Fluktuation, Auslastung ueber Zeit;Power BI, Personio Analytics;Trends erkennen, Entscheidungsgrundlage, Benchmarking;Fehlt;Mittel;Mittel
+29;Reporting;Kostenstellenauswertung;Auswertung der Personalkosten nach Kostenstellen, Kunden, Objekten;SAP, DATEV, TimeCount;Deckungsbeitragsrechnung, Preiskalkulation, Controlling;Teilweise;Hoch;Mittel
+30;Reporting;Mandantenreporting;Automatische Reports fuer Kunden ueber geleistete Stunden;secplanet, SESAM;Professioneller Kundenservice, Transparenz, weniger Rueckfragen;Fehlt;Mittel;Mittel
+31;Reporting;Reviergang-Protokoll;Digitales Wachbuch mit Zeit, Ort, Ereignissen;secplanet, SESAM, Wachbuch-Apps;Lueckenlose Dokumentation, Nachweis bei Versicherungsfaellen;Fehlt;Hoch;Mittel
+32;Reporting;Ereignis-Statistik;Auswertung von Vorfaellen nach Typ, Objekt, Zeitraum;secplanet, BI-Tools;Gefaehrdungsbeurteilung, Praevention, Kundenberatung;Fehlt;Mittel;Mittel
+33;Reporting;Export in gaengige Formate;PDF, Excel, CSV Export aller Reports mit einem Klick;Standard in allen modernen Tools;Flexibilitaet, Weiterverarbeitung, Archivierung;Teilweise;Niedrig;Klein
+34;Mobile;Native Mitarbeiter-App;Eigene App fuer iOS und Android mit allen MA-Funktionen;Planday, Connecteam, Deputy;Moderne MA-Erwartung, hohe Akzeptanz, Wettbewerbsvorteil Recruiting;Fehlt;Hoch;Gross
+35;Mobile;Offline-Modus;App funktioniert ohne Internet, synchronisiert spaeter;TimeCount, Clockodo;Einsatz auch ohne Netz, keine verlorenen Daten;Fehlt;Hoch;Gross
+36;Mobile;Foto-Dokumentation;Fotos von Schaeden, Vorfaellen direkt in App mit Zeitstempel und GPS;secplanet, SESAM;Beweissicherung, schnelle Dokumentation, Versicherungsfaelle;Fehlt;Hoch;Mittel
+37;Mobile;Digitale Unterschrift;Kunden- und MA-Unterschrift direkt auf Smartphone;DocuSign, Adobe Sign, secplanet;Papierloses Arbeiten, rechtssichere Dokumentation;Fehlt;Mittel;Mittel
+38;Mobile;Digitales Wachbuch;Elektronische Erfassung von Kontrollgaengen, Ereignissen;secplanet, Wachbuch-Apps;Lueckenlose Protokollierung, keine verlorenen Zettel;Fehlt;Hoch;Mittel
+39;Mobile;Einsatzplan-Ansicht;MA sieht seinen persoenlichen Einsatzplan in der App;Planday, Deputy, TimeCount;Ueberblick fuer MA, weniger Rueckfragen, Eigenverantwortung;Fehlt;Hoch;Mittel
+40;Mobile;Dokumenten-Zugriff;Zugriff auf Objektanweisungen, Notfallplaene in der App;SharePoint, Confluence;Wichtige Infos immer dabei, auch ohne Internet (Offline);Fehlt;Mittel;Mittel
+41;Integration;DATEV-Export;Direkter Export der Lohndaten in DATEV-Format;DATEV, TimeCount, Personio;Automatische Lohnabrechnung, keine Doppelerfassung;Teilweise;Hoch;Mittel
+42;Integration;Lohnbuchhaltung-Schnittstelle;Schnittstelle zu Lexware, SAGE, SAP etc.;Standardschnittstellen;Medienbruchfreie Abrechnung, Zeitersparnis;Teilweise;Hoch;Mittel
+43;Integration;Kalender-Sync;Synchronisation mit Outlook, Google Calendar, iCal;Google Calendar API, Outlook;MA hat Einsaetze im privaten Kalender, Doppelbuchung vermeiden;Fehlt;Mittel;Mittel
+44;Integration;Buchhaltungs-Schnittstelle;Export von Rechnungsdaten an Buchhaltungssoftware;DATEV, Lexware, SAP;Automatische Verbuchung, weniger manuelle Arbeit;Teilweise;Mittel;Mittel
+45;Integration;HR-System Anbindung;Integration mit Personio, HRworks, etc.;REST APIs, Standardformate;Einheitliche Stammdaten, automatische Updates;Fehlt;Mittel;Gross
+46;Integration;Bewerbermanagement-Integration;Anbindung an Stellenboersen, Bewerbermanagement;Indeed, StepStone APIs;Schnellere Bewerbungsprozesse, automatischer Import;Fehlt;Niedrig;Mittel
+47;Integration;SSO - Single Sign-On;Einmaliges Anmelden fuer alle Systeme;Azure AD, LDAP, SAML;Einfachere Bedienung, weniger Passwoerter, Sicherheit;Fehlt;Niedrig;Gross
+48;Integration;Dokumentenmanagement-System;Anbindung an DMS wie SharePoint, DocuWare;REST APIs, WebDAV;Zentrale Dokumentenablage, Versionierung, Suche;Fehlt;Mittel;Mittel
+49;Automatisierung;Automatische Schichtbesetzung;KI schlaegt optimale Besetzung basierend auf vielen Faktoren vor;TimeCount AI, Deputy AI;Optimale Planung, Zeitersparnis, bessere Auslastung;Fehlt;Hoch;Gross
+50;Automatisierung;Regelbasierte Workflows;Automatische Aktionen bei definierten Ereignissen;Zapier, Power Automate;Weniger manuelle Eingriffe, konsistente Prozesse;Fehlt;Mittel;Mittel
+51;Automatisierung;Automatische Nachbesetzung;System schlaegt bei Absagen automatisch Ersatz vor;TimeCount, secplanet;Schnelle Reaktion bei Ausfaellen, weniger Stress;Fehlt;Hoch;Mittel
+52;Automatisierung;Dokumenten-Ablauf-Warnung;Automatische Warnung wenn 34a, Fuehrerschein etc. ablaeuft;Personio, HRworks;Compliance, keine abgelaufenen Dokumente, rechtzeitiges Handeln;Teilweise;Hoch;Klein
+53;Automatisierung;Auto-Archivierung;Automatische Archivierung abgeschlossener Auftraege und Daten;Standardfunktion moderne Systeme;Aufgeraeumte Datenbank, schnellere Suche, Compliance;Fehlt;Niedrig;Klein
+54;Automatisierung;Serienrechnung;Automatische Erstellung wiederkehrender Rechnungen;Lexware, SAP, sevDesk;Zeitersparnis, keine vergessenen Rechnungen;Teilweise;Mittel;Mittel
+55;Automatisierung;Automatische Zuschlagsberechnung;Berechnung von Nacht-, Feiertags-, Wochenendzuschlaegen;TimeCount, DATEV;Korrekte Abrechnung, Gesetzeskonformitaet;Teilweise;Hoch;Mittel
+56;Automatisierung;Email-Templates mit Variablen;Vordefinierte E-Mails mit automatischer Feldbefuellung;Standard in modernen CRMs;Professionelle Kommunikation, Zeitersparnis;Teilweise;Niedrig;Klein
+57;Sicherheit;Zwei-Faktor-Authentifizierung;2FA fuer Login mit SMS oder Authenticator-App;Google Authenticator, Microsoft Authenticator;Hoehere Sicherheit, Schutz sensibler Personaldaten;Fehlt;Hoch;Mittel
+58;Sicherheit;Rollen- und Rechtemanagement;Granulare Rechtevergabe fuer verschiedene Benutzergruppen;Standard in Enterprise-Software;Datenschutz, DSGVO-Compliance, Need-to-know Prinzip;Teilweise;Hoch;Mittel
+59;Sicherheit;Audit-Trail;Lueckenlose Protokollierung aller Aenderungen;SOX-Compliance, DSGVO;Nachvollziehbarkeit, Compliance, Beweissicherung;Teilweise;Hoch;Mittel
+60;Sicherheit;DSGVO-konforme Datenloeschung;Automatische Loeschung nach Ablauf der Aufbewahrungsfrist;DSGVO-Anforderung;Gesetzeskonformitaet, vermeidung von Bussgeldern;Fehlt;Hoch;Mittel
+61;Sicherheit;Verschluesselte Datenspeicherung;End-to-End Verschluesselung sensibler Daten;Branchenstandard;Schutz vor Datenlecks, Kundenvertrauen;Fehlt;Mittel;Gross
+62;Sicherheit;Passwort-Policy;Erzwungene Passwortkomplexitaet und regelmaessiger Wechsel;Active Directory, IAM-Systeme;Hoehere Sicherheit, Compliance;Fehlt;Mittel;Klein
+63;UX-Design;Responsive Design;Volle Funktionalitaet auf allen Geraeten (Desktop, Tablet, Phone);Webstandard;Flexibles Arbeiten, moderne Erwartungen;Teilweise;Hoch;Mittel
+64;UX-Design;Dark Mode;Dunkler Anzeigemodus fuer naechtliches Arbeiten;Moderne Apps;Augenschonung bei Nachtschichten, modernes Design;Fehlt;Niedrig;Klein
+65;UX-Design;Tastatur-Shortcuts;Schnelle Bedienung fuer Power-User;Standard in Profi-Software;Schnelleres Arbeiten, Effizienz;Fehlt;Niedrig;Klein
+66;UX-Design;Kontextuelle Hilfe;Hilfe-Tooltips und Erklaerungen direkt im Interface;Standard in SaaS-Software;Weniger Schulungsaufwand, bessere Akzeptanz;Fehlt;Niedrig;Klein
+67;UX-Design;Mehrsprachigkeit;Interface in mehreren Sprachen (DE, EN, TR, etc.);Internationaler Standard;Internationale MA, bessere Verstaendlichkeit;Fehlt;Mittel;Mittel
+68;UX-Design;Barrierefreiheit;WCAG-konforme Gestaltung fuer Menschen mit Einschraenkungen;WCAG 2.1, EU-Richtlinie;Inklusion, gesetzliche Anforderungen;Fehlt;Niedrig;Mittel
+69;Recruiting;Bewerber-Portal;Online-Bewerbungsformular mit automatischem Import;Personio, softgarden;Schnellere Bewerbungsprozesse, weniger manuelle Arbeit;Fehlt;Mittel;Mittel
+70;Recruiting;Onboarding-Workflow;Digitaler Onboarding-Prozess fuer neue MA;Personio, HRworks;Strukturierter Start, nichts vergessen, guter erster Eindruck;Fehlt;Mittel;Mittel
+71;Recruiting;Digitale Personalakte;Alle MA-Dokumente zentral digital gespeichert;Standard HR-Software;Schneller Zugriff, weniger Papier, DSGVO-konform;Teilweise;Hoch;Mittel
+72;Finanzen;Deckungsbeitragsrechnung;Automatische Berechnung des DB pro Auftrag, Kunde, Objekt;Controlling-Standard;Rentabilitaetsanalyse, Preisgestaltung;Fehlt;Hoch;Mittel
+73;Finanzen;Budget-Planung;Planung und Tracking von Budgets pro Kostenstelle;SAP, DATEV;Kostenkontrolle, Abweichungsanalyse;Fehlt;Mittel;Mittel
+74;Finanzen;Prognose-Funktion;Vorhersage von Personalkosten basierend auf Planung;BI-Tools, Excel;Liquiditaetsplanung, fruehzeitige Warnung;Fehlt;Mittel;Mittel
+75;Finanzen;Mahnwesen;Automatische Mahnungen bei ueberfaelligen Rechnungen;Lexware, sevDesk;Bessere Liquiditaet, weniger manuelle Arbeit;Fehlt;Mittel;Klein
+76;Kunden;Kunden-Portal;Self-Service Portal fuer Kunden mit Einsatz-Uebersicht;secplanet, SESAM;Professioneller Service, weniger Rueckfragen;Fehlt;Mittel;Gross
+77;Kunden;Online-Buchungsportal;Kunden koennen Einsaetze selbst buchen;Moderne Dienstleister-Portale;Weniger Telefonate, schnellere Buchung, 24/7 verfuegbar;Fehlt;Niedrig;Gross
+78;Kunden;Zufriedenheits-Umfragen;Automatische Umfragen nach Einsaetzen;SurveyMonkey, Typeform;Qualitaetsmessung, Verbesserungspotenzial erkennen;Fehlt;Niedrig;Mittel
+79;Kunden;Vertragsverwaltung;Digitale Verwaltung von Kundenvertraegen mit Laufzeiten;Standard CRM-Funktion;Uebersicht Kuendigungsfristen, automatische Verlaengerung;Teilweise;Mittel;Mittel
+80;Kunden;CRM-Funktionen;Kontakthistorie, Notizen, Aktivitaeten pro Kunde;Salesforce, HubSpot;Bessere Kundenbetreuung, keine verlorenen Informationen;Teilweise;Mittel;Mittel

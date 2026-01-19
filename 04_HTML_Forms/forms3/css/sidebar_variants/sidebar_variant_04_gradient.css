@@ -1,0 +1,514 @@
+/**
+ * CONSEC Sidebar - Variante 04: "Gradient Flow"
+ * =============================================
+ * Fliessende Farbverlaeufe mit animierten Hover-Effekten
+ *
+ * Farbpalette:
+ * - Gradient: #667eea -> #764ba2 -> #f093fb
+ * - Akzent: #00d4ff (Cyan)
+ * - Weiche Kanten, Premium-Look
+ *
+ * Anwendung: Diese Datei in shell.html einbinden:
+ * <link rel="stylesheet" href="css/sidebar_variants/sidebar_variant_04_gradient.css">
+ */
+
+/* ============================================
+   CSS VARIABLEN (Gradient Theme)
+   ============================================ */
+:root {
+    --gradient-start: #667eea;
+    --gradient-mid: #764ba2;
+    --gradient-end: #f093fb;
+    --gradient-accent: #00d4ff;
+    --gradient-accent-alt: #00f5a0;
+    --gradient-text-light: #ffffff;
+    --gradient-text-dark: #2d2d2d;
+    --gradient-glass: rgba(255, 255, 255, 0.15);
+    --gradient-glass-hover: rgba(255, 255, 255, 0.25);
+    --gradient-shadow: rgba(102, 126, 234, 0.4);
+    --gradient-border: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================
+   SIDEBAR CONTAINER - Animierter Gradient
+   ============================================ */
+.sidebar {
+    width: 200px;
+    background: linear-gradient(135deg,
+        var(--gradient-start) 0%,
+        var(--gradient-mid) 50%,
+        var(--gradient-end) 100%);
+    background-size: 200% 200%;
+    animation: gradient-flow 15s ease infinite;
+    border-right: none;
+    box-shadow:
+        4px 0 30px var(--gradient-shadow),
+        inset -1px 0 0 var(--gradient-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: width 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes gradient-flow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Subtle Pattern Overlay */
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ============================================
+   SIDEBAR HEADER
+   ============================================ */
+.sidebar-header {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: var(--gradient-text-light);
+    padding: 18px 20px;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+    border-bottom: 1px solid var(--gradient-border);
+}
+
+.sidebar-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--gradient-accent),
+        var(--gradient-accent-alt),
+        transparent);
+    border-radius: 2px;
+}
+
+/* ============================================
+   MENU CATEGORIES CONTAINER
+   ============================================ */
+.menu-categories {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 10px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Custom Scrollbar (Gradient Theme) */
+.menu-categories::-webkit-scrollbar {
+    width: 4px;
+}
+
+.menu-categories::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.menu-categories::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--gradient-accent), var(--gradient-accent-alt));
+    border-radius: 2px;
+}
+
+/* ============================================
+   CATEGORY BLOCKS
+   ============================================ */
+.category-block {
+    margin-bottom: 16px;
+}
+
+.category-block:last-child {
+    margin-bottom: 0;
+}
+
+/* ============================================
+   CATEGORY HEADER
+   ============================================ */
+.category-header {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--gradient-text-light);
+    padding: 10px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 12px 12px 0 0;
+    border: 1px solid var(--gradient-border);
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.category-header::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, var(--gradient-accent), var(--gradient-accent-alt));
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--gradient-accent);
+    animation: dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+/* ============================================
+   MENU BUTTONS - Touch-freundlich (min 44px)
+   ============================================ */
+.menu-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 46px;
+    padding: 14px 16px;
+    background: var(--gradient-glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--gradient-border);
+    border-top: none;
+    border-radius: 0;
+    color: var(--gradient-text-light);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.menu-btn:first-of-type {
+    border-top: 1px solid var(--gradient-border);
+}
+
+.menu-btn:last-of-type {
+    border-radius: 0 0 12px 12px;
+}
+
+/* Animated Gradient Border on Hover */
+.menu-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg,
+        var(--gradient-accent),
+        var(--gradient-accent-alt));
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0 2px 2px 0;
+}
+
+/* Shimmer Effect */
+.menu-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent);
+    transition: left 0.6s ease;
+}
+
+/* ============================================
+   HOVER STATE - Animierte Effekte
+   ============================================ */
+.menu-btn:hover {
+    background: var(--gradient-glass-hover);
+    padding-left: 24px;
+    transform: translateX(4px);
+    box-shadow:
+        0 8px 30px rgba(0, 212, 255, 0.2),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.menu-btn:hover::before {
+    transform: scaleY(1);
+    box-shadow: 0 0 15px var(--gradient-accent);
+}
+
+.menu-btn:hover::after {
+    left: 100%;
+}
+
+/* ============================================
+   ACTIVE STATE
+   ============================================ */
+.menu-btn.active {
+    background: linear-gradient(135deg,
+        rgba(0, 212, 255, 0.3) 0%,
+        rgba(0, 245, 160, 0.2) 100%);
+    color: white;
+    font-weight: 600;
+    padding-left: 24px;
+    border-color: var(--gradient-accent);
+    box-shadow:
+        0 0 25px rgba(0, 212, 255, 0.3),
+        inset 0 0 30px rgba(0, 212, 255, 0.1);
+}
+
+.menu-btn.active::before {
+    transform: scaleY(1);
+    background: linear-gradient(180deg,
+        var(--gradient-accent),
+        var(--gradient-accent-alt),
+        var(--gradient-accent));
+    background-size: 100% 200%;
+    animation: gradient-line 2s linear infinite;
+}
+
+@keyframes gradient-line {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 0% 200%;
+    }
+}
+
+/* ============================================
+   PRESSED STATE
+   ============================================ */
+.menu-btn:active {
+    transform: translateX(2px) scale(0.98);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   TOOLTIP (Gradient Theme)
+   ============================================ */
+.menu-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg,
+        var(--gradient-start),
+        var(--gradient-mid));
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 400;
+    white-space: nowrap;
+    z-index: 1000;
+    border: 1px solid var(--gradient-border);
+    box-shadow: 0 8px 30px var(--gradient-shadow);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    left: calc(100%);
+    width: auto;
+    height: auto;
+}
+
+.menu-btn[title]:hover::before {
+    content: '';
+    position: absolute;
+    left: calc(100% + 4px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-right-color: var(--gradient-start);
+    z-index: 1000;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 1200px) {
+    .sidebar {
+        width: 180px;
+    }
+
+    .menu-btn {
+        min-height: 44px;
+        padding: 12px 14px;
+    }
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        width: 70px;
+    }
+
+    .sidebar-header {
+        font-size: 0;
+        padding: 18px 10px;
+    }
+
+    .sidebar-header::before {
+        content: 'C';
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .category-header {
+        font-size: 0;
+        padding: 10px;
+        justify-content: center;
+    }
+
+    .category-header::before {
+        margin: 0;
+        width: 10px;
+        height: 10px;
+    }
+
+    .menu-btn {
+        padding: 14px 10px;
+        font-size: 0;
+        justify-content: center;
+        min-height: 50px;
+    }
+
+    .menu-btn::after {
+        content: '';
+        width: 24px;
+        height: 24px;
+        background: linear-gradient(135deg, var(--gradient-accent), var(--gradient-accent-alt));
+        border-radius: 6px;
+        opacity: 0.7;
+        left: 50%;
+        transform: translateX(-50%);
+        position: static;
+    }
+
+    .menu-btn:hover::after,
+    .menu-btn.active::after {
+        opacity: 1;
+        box-shadow: 0 0 15px var(--gradient-accent);
+    }
+
+    .menu-btn:hover {
+        padding-left: 10px;
+        transform: none;
+    }
+}
+
+/* ============================================
+   PREMIUM DEPTH & MOTION
+   ============================================ */
+
+/* Floating Animation fuer Active State */
+@keyframes float {
+    0%, 100% {
+        transform: translateX(4px) translateY(0);
+    }
+    50% {
+        transform: translateX(4px) translateY(-2px);
+    }
+}
+
+.menu-btn.active {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Ripple Effect on Click */
+.menu-btn {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Focus State fuer Accessibility */
+.menu-btn:focus {
+    outline: none;
+    box-shadow:
+        0 0 0 3px rgba(0, 212, 255, 0.5),
+        0 8px 30px rgba(0, 212, 255, 0.2);
+}
+
+.menu-btn:focus-visible {
+    outline: 2px solid var(--gradient-accent);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   FOOTER AREA (Optional)
+   ============================================ */
+.sidebar-footer {
+    padding: 12px;
+    border-top: 1px solid var(--gradient-border);
+    background: var(--gradient-glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* ============================================
+   HIGH CONTRAST / REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar {
+        animation: none;
+    }
+
+    .menu-btn,
+    .menu-btn::before,
+    .menu-btn::after,
+    .menu-btn.active,
+    .category-header::before {
+        animation: none;
+        transition: none;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .menu-btn {
+        border-width: 2px;
+    }
+
+    .menu-btn.active {
+        border-color: white;
+    }
+}

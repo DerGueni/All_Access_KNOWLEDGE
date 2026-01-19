@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo 5: Daten-Anzeige Komponenten</title>
+    <style>
+        /* ========== CSS VARIABLES ========== */
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius-sm: 4px;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+
+        /* ========== BASE STYLES ========== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.5;
+            padding: 20px;
+        }
+        .demo-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .demo-header h1 { font-size: 28px; margin-bottom: 8px; }
+        .demo-header p { opacity: 0.9; }
+
+        .section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .component-box {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+        .component-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        /* ========== 1. TABLES ========== */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius);
+        }
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .data-table th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-700);
+            position: sticky;
+            top: 0;
+        }
+        .data-table.striped tbody tr:nth-child(even) {
+            background: var(--gray-50);
+        }
+        .data-table.hover tbody tr:hover {
+            background: #eff6ff;
+        }
+        .data-table .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        .data-table .sortable::after {
+            content: '↕';
+            margin-left: 6px;
+            opacity: 0.4;
+            font-size: 12px;
+        }
+        .data-table .sortable.asc::after { content: '↑'; opacity: 1; }
+        .data-table .sortable.desc::after { content: '↓'; opacity: 1; }
+
+        /* Fixed Header Grid */
+        .data-grid {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+        }
+        .data-grid table { margin-bottom: 0; }
+        .data-grid th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            box-shadow: 0 1px 0 var(--gray-200);
+        }
+
+        /* ========== 2. CARDS ========== */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .card-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-body { padding: 16px; }
+        .card-footer {
+            padding: 12px 16px;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+        }
+        .card-img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary-light), var(--info));
+        }
+        .card-horizontal {
+            display: flex;
+        }
+        .card-horizontal .card-img {
+            width: 120px;
+            height: auto;
+            min-height: 100px;
+        }
+
+        /* ========== 3. LIST VIEWS ========== */
+        .list-view {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-200);
+            transition: background 0.15s;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: var(--gray-50); }
+        .list-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .list-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .list-content { flex: 1; min-width: 0; }
+        .list-title {
+            font-weight: 500;
+            color: var(--gray-800);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .list-subtitle {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+        .list-action {
+            color: var(--gray-400);
+            cursor: pointer;
+        }
+        .list-action:hover { color: var(--primary); }
+
+        /* ========== 4. TIMELINE ========== */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gray-200);
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        .timeline-dot.success { background: var(--success); box-shadow: 0 0 0 2px var(--success); }
+        .timeline-dot.warning { background: var(--warning); box-shadow: 0 0 0 2px var(--warning); }
+        .timeline-dot.danger { background: var(--danger); box-shadow: 0 0 0 2px var(--danger); }
+        .timeline-content {
+            background: var(--gray-50);
+            padding: 12px 16px;
+            border-radius: var(--radius);
+        }
+        .timeline-time {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 4px;
+        }
+        .timeline-text { color: var(--gray-700); }
+
+        /* ========== 5. KANBAN ========== */
+        .kanban-board {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .kanban-column {
+            min-width: 250px;
+            background: var(--gray-100);
+            border-radius: var(--radius);
+            padding: 12px;
+        }
+        .kanban-header {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .kanban-count {
+            background: var(--gray-300);
+            color: var(--gray-700);
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .kanban-card {
+            background: white;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            box-shadow: var(--shadow-sm);
+            cursor: grab;
+            border-left: 3px solid var(--primary);
+        }
+        .kanban-card:hover { box-shadow: var(--shadow); }
+        .kanban-card.priority-high { border-left-color: var(--danger); }
+        .kanban-card.priority-medium { border-left-color: var(--warning); }
+        .kanban-card-title { font-weight: 500; font-size: 14px; margin-bottom: 6px; }
+        .kanban-card-meta { font-size: 12px; color: var(--gray-500); }
+
+        /* ========== 6. CALENDAR ========== */
+        .calendar {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .calendar-header {
+            background: var(--primary);
+            color: white;
+            padding: 16px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .calendar-weekday {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 6px;
+            border-right: 1px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .calendar-day:hover { background: var(--gray-50); }
+        .calendar-day.other-month { color: var(--gray-400); }
+        .calendar-day.today {
+            background: #eff6ff;
+        }
+        .calendar-day.today .day-number {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .calendar-event {
+            width: 100%;
+            font-size: 10px;
+            padding: 2px 4px;
+            background: var(--primary-light);
+            color: white;
+            border-radius: 2px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ========== 7. GANTT CHART ========== */
+        .gantt {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .gantt-header {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .gantt-task-col {
+            padding: 10px 12px;
+            font-weight: 600;
+            font-size: 13px;
+            border-right: 1px solid var(--gray-200);
+        }
+        .gantt-timeline {
+            display: flex;
+        }
+        .gantt-day {
+            flex: 1;
+            min-width: 40px;
+            padding: 10px 4px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--gray-600);
+            border-right: 1px solid var(--gray-100);
+        }
+        .gantt-day.weekend { background: var(--gray-50); }
+        .gantt-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .gantt-row:last-child { border-bottom: none; }
+        .gantt-task-name {
+            padding: 12px;
+            font-size: 13px;
+            border-right: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+        }
+        .gantt-bars {
+            position: relative;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 39px,
+                var(--gray-100) 39px,
+                var(--gray-100) 40px
+            );
+        }
+        .gantt-bar {
+            position: absolute;
+            height: 24px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            color: white;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            white-space: nowrap;
+        }
+        .gantt-bar.success { background: linear-gradient(90deg, var(--success), #34d399); }
+        .gantt-bar.warning { background: linear-gradient(90deg, var(--warning), #fbbf24); }
+
+        /* ========== 8. KPI CARDS ========== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .kpi-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .kpi-label {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+        }
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--gray-800);
+            line-height: 1;
+        }
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        .kpi-trend.up { color: var(--success); }
+        .kpi-trend.down { color: var(--danger); }
+        .kpi-trend-icon {
+            font-size: 16px;
+        }
+        .kpi-card.highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        .kpi-card.highlight .kpi-label { color: rgba(255,255,255,0.8); }
+        .kpi-card.highlight .kpi-value { color: white; }
+        .kpi-card.highlight .kpi-trend { color: rgba(255,255,255,0.9); }
+
+        /* ========== 9. CSS BAR CHARTS ========== */
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .bar-label {
+            width: 80px;
+            font-size: 13px;
+            color: var(--gray-600);
+            flex-shrink: 0;
+        }
+        .bar-track {
+            flex: 1;
+            height: 24px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: white;
+            transition: width 0.5s ease;
+        }
+        .bar-fill.blue { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+        .bar-fill.green { background: linear-gradient(90deg, var(--success), #34d399); }
+        .bar-fill.orange { background: linear-gradient(90deg, var(--warning), #fbbf24); }
+        .bar-fill.red { background: linear-gradient(90deg, var(--danger), #f87171); }
+
+        /* Horizontal Bar Chart */
+        .hbar-chart {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 16px;
+            padding: 20px 0;
+        }
+        .hbar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .hbar-bar {
+            width: 100%;
+            max-width: 50px;
+            background: linear-gradient(180deg, var(--primary), var(--primary-light));
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+        .hbar-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+        .hbar-label {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        /* ========== 10. DONUT/PIE CHARTS ========== */
+        .donut-chart {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+        .donut-chart svg {
+            transform: rotate(-90deg);
+        }
+        .donut-ring {
+            fill: none;
+            stroke: var(--gray-200);
+            stroke-width: 20;
+        }
+        .donut-segment {
+            fill: none;
+            stroke-width: 20;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease;
+        }
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .donut-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        .donut-label {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* ========== 11. SPARKLINES ========== */
+        .sparkline {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 30px;
+        }
+        .sparkline-bar {
+            flex: 1;
+            background: var(--primary-light);
+            border-radius: 2px;
+            min-width: 4px;
+            transition: height 0.3s ease;
+        }
+        .sparkline-bar:hover {
+            background: var(--primary);
+        }
+        .sparkline-line {
+            position: relative;
+            height: 30px;
+            display: flex;
+            align-items: center;
+        }
+        .sparkline-line svg {
+            width: 100%;
+            height: 100%;
+        }
+        .sparkline-line path {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 2;
+        }
+        .sparkline-line .area {
+            fill: url(#sparkGradient);
+            stroke: none;
+        }
+
+        /* ========== 12. STAT COUNTERS ========== */
+        .stat-counter {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-counter.counting {
+            animation: countPulse 0.1s ease;
+        }
+        @keyframes countPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* ========== 13. AVATAR GROUPS ========== */
+        .avatar-group {
+            display: flex;
+        }
+        .avatar-group .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid white;
+            margin-left: -10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .avatar-group .avatar:first-child { margin-left: 0; }
+        .avatar-group .avatar:hover {
+            transform: scale(1.1);
+            z-index: 1;
+        }
+        .avatar-group .avatar-more {
+            background: var(--gray-400);
+        }
+        .avatar-lg { width: 48px !important; height: 48px !important; font-size: 16px !important; }
+
+        /* ========== 14. RATING STARS ========== */
+        .rating {
+            display: flex;
+            gap: 4px;
+        }
+        .rating-star {
+            font-size: 20px;
+            color: var(--gray-300);
+            cursor: pointer;
+            transition: color 0.15s, transform 0.15s;
+        }
+        .rating-star.filled { color: #fbbf24; }
+        .rating-star.half {
+            background: linear-gradient(90deg, #fbbf24 50%, var(--gray-300) 50%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rating-star:hover { transform: scale(1.2); }
+        .rating-interactive .rating-star:hover,
+        .rating-interactive .rating-star:hover ~ .rating-star { color: var(--gray-300); }
+        .rating-interactive:hover .rating-star { color: #fbbf24; }
+
+        /* ========== 15. TAG CLOUD ========== */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tag:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .tag.size-1 { font-size: 11px; }
+        .tag.size-2 { font-size: 13px; }
+        .tag.size-3 { font-size: 15px; font-weight: 500; }
+        .tag.size-4 { font-size: 17px; font-weight: 600; }
+        .tag.size-5 { font-size: 20px; font-weight: 700; }
+
+        /* ========== 16. COMPARISON TABLE ========== */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 14px 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .comparison-table th {
+            background: var(--gray-50);
+            font-weight: 600;
+        }
+        .comparison-table th.highlight {
+            background: var(--primary);
+            color: white;
+        }
+        .comparison-table td.feature-name {
+            text-align: left;
+            font-weight: 500;
+        }
+        .comparison-table .check { color: var(--success); font-size: 18px; }
+        .comparison-table .cross { color: var(--gray-400); font-size: 18px; }
+
+        /* ========== 17. PRICING TABLE ========== */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .pricing-card {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        .pricing-card.featured {
+            border-color: var(--primary);
+            position: relative;
+        }
+        .pricing-card.featured::before {
+            content: 'Beliebt';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .pricing-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+        .pricing-price {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        .pricing-price span {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--gray-500);
+        }
+        .pricing-features {
+            margin: 24px 0;
+            text-align: left;
+        }
+        .pricing-feature {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .pricing-feature::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 600;
+        }
+        .pricing-btn {
+            width: 100%;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+        .pricing-btn:hover {
+            background: var(--gray-200);
+        }
+        .pricing-card.featured .pricing-btn {
+            background: var(--primary);
+            color: white;
+        }
+        .pricing-card.featured .pricing-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ========== BADGES & STATUS ========== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-primary { background: #dbeafe; color: var(--primary); }
+        .badge-success { background: #d1fae5; color: var(--success); }
+        .badge-warning { background: #fef3c7; color: #b45309; }
+        .badge-danger { background: #fee2e2; color: var(--danger); }
+        .badge-gray { background: var(--gray-200); color: var(--gray-600); }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-dot.online { background: var(--success); }
+        .status-dot.offline { background: var(--gray-400); }
+        .status-dot.busy { background: var(--danger); }
+        .status-dot.away { background: var(--warning); }
+
+        /* ========== PROGRESS BARS ========== */
+        .progress {
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .progress-bar.primary { background: var(--primary); }
+        .progress-bar.success { background: var(--success); }
+        .progress-bar.warning { background: var(--warning); }
+        .progress-bar.danger { background: var(--danger); }
+        .progress-bar.striped {
+            background-image: linear-gradient(
+                45deg,
+                rgba(255,255,255,0.15) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255,255,255,0.15) 50%,
+                rgba(255,255,255,0.15) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 1rem 1rem;
+        }
+        .progress-bar.animated {
+            animation: progressStripes 1s linear infinite;
+        }
+        @keyframes progressStripes {
+            0% { background-position: 1rem 0; }
+            100% { background-position: 0 0; }
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .section { padding: 16px; }
+            .component-grid { grid-template-columns: 1fr; }
+            .kanban-board { flex-direction: column; }
+            .kanban-column { min-width: 100%; }
+            .pricing-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="demo-header">
+    <h1>Demo 5: Daten-Anzeige Komponenten</h1>
+    <p>Vanilla HTML/CSS/JS - Keine externen Bibliotheken</p>
+</div>
+
+<!-- SECTION 1: TABLES -->
+<div class="section">
+    <h2 class="section-title">1. Tabellen</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Striped + Hover + Sortierbar</div>
+            <div class="table-wrapper">
+                <table class="data-table striped hover" id="sortableTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-col="0">ID</th>
+                            <th class="sortable" data-col="1">Name</th>
+                            <th class="sortable" data-col="2">Status</th>
+                            <th class="sortable" data-col="3">Umsatz</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>001</td><td>Schmidt GmbH</td><td><span class="badge badge-success">Aktiv</span></td><td>€ 12.500</td></tr>
+                        <tr><td>002</td><td>Müller AG</td><td><span class="badge badge-warning">Pending</span></td><td>€ 8.300</td></tr>
+                        <tr><td>003</td><td>Weber KG</td><td><span class="badge badge-success">Aktiv</span></td><td>€ 15.200</td></tr>
+                        <tr><td>004</td><td>Fischer OHG</td><td><span class="badge badge-danger">Inaktiv</span></td><td>€ 3.100</td></tr>
+                        <tr><td>005</td><td>Meyer & Co</td><td><span class="badge badge-success">Aktiv</span></td><td>€ 22.800</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="component-box">
+            <div class="component-label">Data Grid mit Fixed Header</div>
+            <div class="data-grid">
+                <table class="data-table hover">
+                    <thead>
+                        <tr>
+                            <th>MA-Nr</th>
+                            <th>Nachname</th>
+                            <th>Vorname</th>
+                            <th>Abteilung</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>M001</td><td>Bauer</td><td>Thomas</td><td>Vertrieb</td></tr>
+                        <tr><td>M002</td><td>Klein</td><td>Maria</td><td>IT</td></tr>
+                        <tr><td>M003</td><td>Groß</td><td>Peter</td><td>HR</td></tr>
+                        <tr><td>M004</td><td>Neumann</td><td>Anna</td><td>Finanzen</td></tr>
+                        <tr><td>M005</td><td>Schwarz</td><td>Klaus</td><td>Vertrieb</td></tr>
+                        <tr><td>M006</td><td>Weiß</td><td>Lisa</td><td>Marketing</td></tr>
+                        <tr><td>M007</td><td>Braun</td><td>Michael</td><td>IT</td></tr>
+                        <tr><td>M008</td><td>Hoffmann</td><td>Sandra</td><td>HR</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 2: CARDS -->
+<div class="section">
+    <h2 class="section-title">2. Cards</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Standard Card</div>
+            <div class="card">
+                <div class="card-img"></div>
+                <div class="card-body">
+                    <h3 style="margin-bottom:8px;">Projekt Alpha</h3>
+                    <p style="color:var(--gray-500);font-size:14px;">Beschreibung des Projekts mit wichtigen Details.</p>
+                </div>
+                <div class="card-footer">
+                    <span class="badge badge-primary">In Arbeit</span>
+                </div>
+            </div>
+        </div>
+        <div class="component-box">
+            <div class="component-label">Horizontal Card</div>
+            <div class="card card-horizontal">
+                <div class="card-img"></div>
+                <div style="flex:1;">
+                    <div class="card-header">
+                        <strong>Event XYZ</strong>
+                        <span class="badge badge-success">Live</span>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size:14px;color:var(--gray-600);">15. Jan 2026 • 14:00 Uhr</p>
+                        <p style="font-size:13px;color:var(--gray-500);margin-top:4px;">München, Bayern</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 3: LIST VIEWS -->
+<div class="section">
+    <h2 class="section-title">3. List Views</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Mit Icons</div>
+            <div class="list-view">
+                <div class="list-item">
+                    <div class="list-icon" style="background:var(--primary);">📁</div>
+                    <div class="list-content">
+                        <div class="list-title">Dokumente</div>
+                        <div class="list-subtitle">24 Dateien</div>
+                    </div>
+                    <div class="list-action">→</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-icon" style="background:var(--success);">📊</div>
+                    <div class="list-content">
+                        <div class="list-title">Berichte</div>
+                        <div class="list-subtitle">12 Dateien</div>
+                    </div>
+                    <div class="list-action">→</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-icon" style="background:var(--warning);">📷</div>
+                    <div class="list-content">
+                        <div class="list-title">Bilder</div>
+                        <div class="list-subtitle">156 Dateien</div>
+                    </div>
+                    <div class="list-action">→</div>
+                </div>
+            </div>
+        </div>
+        <div class="component-box">
+            <div class="component-label">Mit Avatars</div>
+            <div class="list-view">
+                <div class="list-item">
+                    <div class="list-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">TS</div>
+                    <div class="list-content">
+                        <div class="list-title"><span class="status-dot online"></span>Thomas Schmidt</div>
+                        <div class="list-subtitle">Projektleiter</div>
+                    </div>
+                    <div class="list-action">✉</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c);">MK</div>
+                    <div class="list-content">
+                        <div class="list-title"><span class="status-dot busy"></span>Maria Klein</div>
+                        <div class="list-subtitle">Entwicklerin</div>
+                    </div>
+                    <div class="list-action">✉</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">PG</div>
+                    <div class="list-content">
+                        <div class="list-title"><span class="status-dot away"></span>Peter Groß</div>
+                        <div class="list-subtitle">Designer</div>
+                    </div>
+                    <div class="list-action">✉</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 4: TIMELINE -->
+<div class="section">
+    <h2 class="section-title">4. Timeline / Activity Feed</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Activity Timeline</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot success"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">Heute, 14:30</div>
+                        <div class="timeline-text"><strong>Auftrag #1234</strong> wurde abgeschlossen</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">Heute, 11:15</div>
+                        <div class="timeline-text">Neuer Mitarbeiter <strong>Max Mustermann</strong> hinzugefügt</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot warning"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">Gestern, 16:45</div>
+                        <div class="timeline-text">Warnung: <strong>3 offene Anfragen</strong> überfällig</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot danger"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">Gestern, 09:00</div>
+                        <div class="timeline-text">Kunde <strong>ABC GmbH</strong> hat storniert</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 5: KANBAN -->
+<div class="section">
+    <h2 class="section-title">5. Kanban Board</h2>
+    <div class="kanban-board">
+        <div class="kanban-column">
+            <div class="kanban-header">
+                <span>📋 Offen</span>
+                <span class="kanban-count">3</span>
+            </div>
+            <div class="kanban-card priority-high">
+                <div class="kanban-card-title">API-Integration</div>
+                <div class="kanban-card-meta">🔴 Hoch • Fällig: 18.01.</div>
+            </div>
+            <div class="kanban-card">
+                <div class="kanban-card-title">Dokumentation</div>
+                <div class="kanban-card-meta">🟢 Normal • Fällig: 20.01.</div>
+            </div>
+            <div class="kanban-card priority-medium">
+                <div class="kanban-card-title">UI Review</div>
+                <div class="kanban-card-meta">🟡 Mittel • Fällig: 19.01.</div>
+            </div>
+        </div>
+        <div class="kanban-column">
+            <div class="kanban-header">
+                <span>🔄 In Arbeit</span>
+                <span class="kanban-count">2</span>
+            </div>
+            <div class="kanban-card">
+                <div class="kanban-card-title">Dashboard Layout</div>
+                <div class="kanban-card-meta">🟢 Normal • 60%</div>
+            </div>
+            <div class="kanban-card priority-high">
+                <div class="kanban-card-title">Bugfix #789</div>
+                <div class="kanban-card-meta">🔴 Hoch • 80%</div>
+            </div>
+        </div>
+        <div class="kanban-column">
+            <div class="kanban-header">
+                <span>✅ Erledigt</span>
+                <span class="kanban-count">4</span>
+            </div>
+            <div class="kanban-card" style="opacity:0.7;">
+                <div class="kanban-card-title">Login-Seite</div>
+                <div class="kanban-card-meta">✓ Abgeschlossen</div>
+            </div>
+            <div class="kanban-card" style="opacity:0.7;">
+                <div class="kanban-card-title">Datenbank-Schema</div>
+                <div class="kanban-card-meta">✓ Abgeschlossen</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 6: CALENDAR -->
+<div class="section">
+    <h2 class="section-title">6. Kalender-Ansicht</h2>
+    <div class="component-grid">
+        <div class="component-box" style="max-width:400px;">
+            <div class="component-label">Monatsansicht</div>
+            <div class="calendar">
+                <div class="calendar-header">Januar 2026</div>
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday">Mo</div>
+                    <div class="calendar-weekday">Di</div>
+                    <div class="calendar-weekday">Mi</div>
+                    <div class="calendar-weekday">Do</div>
+                    <div class="calendar-weekday">Fr</div>
+                    <div class="calendar-weekday">Sa</div>
+                    <div class="calendar-weekday">So</div>
+                </div>
+                <div class="calendar-days" id="calendarDays">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 7: GANTT -->
+<div class="section">
+    <h2 class="section-title">7. Gantt-Chart</h2>
+    <div class="gantt">
+        <div class="gantt-header">
+            <div class="gantt-task-col">Aufgabe</div>
+            <div class="gantt-timeline">
+                <div class="gantt-day">Mo 13</div>
+                <div class="gantt-day">Di 14</div>
+                <div class="gantt-day">Mi 15</div>
+                <div class="gantt-day">Do 16</div>
+                <div class="gantt-day">Fr 17</div>
+                <div class="gantt-day weekend">Sa 18</div>
+                <div class="gantt-day weekend">So 19</div>
+            </div>
+        </div>
+        <div class="gantt-row">
+            <div class="gantt-task-name">Planung</div>
+            <div class="gantt-bars">
+                <div class="gantt-bar success" style="left:0;width:calc(2*40px + 2*1px);">100%</div>
+            </div>
+        </div>
+        <div class="gantt-row">
+            <div class="gantt-task-name">Entwicklung</div>
+            <div class="gantt-bars">
+                <div class="gantt-bar" style="left:calc(1*40px);width:calc(4*40px);">In Arbeit</div>
+            </div>
+        </div>
+        <div class="gantt-row">
+            <div class="gantt-task-name">Testing</div>
+            <div class="gantt-bars">
+                <div class="gantt-bar warning" style="left:calc(4*40px);width:calc(2*40px);">Geplant</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 8: KPI CARDS -->
+<div class="section">
+    <h2 class="section-title">8. KPI Cards mit Trend</h2>
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Umsatz</div>
+            <div class="kpi-value">€ 124.500</div>
+            <div class="kpi-trend up">
+                <span class="kpi-trend-icon">↑</span>
+                <span>+12.5% vs. Vormonat</span>
+            </div>
+        </div>
+        <div class="kpi-card highlight">
+            <div class="kpi-label">Aufträge</div>
+            <div class="kpi-value">847</div>
+            <div class="kpi-trend">
+                <span class="kpi-trend-icon">↑</span>
+                <span>+23 diese Woche</span>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Ø Bearbeitungszeit</div>
+            <div class="kpi-value">2.4h</div>
+            <div class="kpi-trend down">
+                <span class="kpi-trend-icon">↓</span>
+                <span>-8% verbessert</span>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Kundenzufriedenheit</div>
+            <div class="kpi-value">94%</div>
+            <div class="kpi-trend up">
+                <span class="kpi-trend-icon">↑</span>
+                <span>+2.3 Punkte</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 9: BAR CHARTS -->
+<div class="section">
+    <h2 class="section-title">9. Bar Charts (CSS only)</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Horizontal Bars</div>
+            <div class="bar-chart">
+                <div class="bar-item">
+                    <div class="bar-label">Vertrieb</div>
+                    <div class="bar-track">
+                        <div class="bar-fill blue" style="width:85%;">85%</div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Marketing</div>
+                    <div class="bar-track">
+                        <div class="bar-fill green" style="width:72%;">72%</div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">IT</div>
+                    <div class="bar-track">
+                        <div class="bar-fill orange" style="width:58%;">58%</div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">HR</div>
+                    <div class="bar-track">
+                        <div class="bar-fill red" style="width:34%;">34%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="component-box">
+            <div class="component-label">Vertical Bars</div>
+            <div class="hbar-chart">
+                <div class="hbar-item">
+                    <div class="hbar-value">120</div>
+                    <div class="hbar-bar" style="height:80%;"></div>
+                    <div class="hbar-label">Jan</div>
+                </div>
+                <div class="hbar-item">
+                    <div class="hbar-value">95</div>
+                    <div class="hbar-bar" style="height:63%;"></div>
+                    <div class="hbar-label">Feb</div>
+                </div>
+                <div class="hbar-item">
+                    <div class="hbar-value">150</div>
+                    <div class="hbar-bar" style="height:100%;"></div>
+                    <div class="hbar-label">Mär</div>
+                </div>
+                <div class="hbar-item">
+                    <div class="hbar-value">130</div>
+                    <div class="hbar-bar" style="height:87%;"></div>
+                    <div class="hbar-label">Apr</div>
+                </div>
+                <div class="hbar-item">
+                    <div class="hbar-value">110</div>
+                    <div class="hbar-bar" style="height:73%;"></div>
+                    <div class="hbar-label">Mai</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 10: DONUT CHARTS -->
+<div class="section">
+    <h2 class="section-title">10. Donut/Pie Charts (CSS only)</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Donut Chart</div>
+            <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+                <div class="donut-chart">
+                    <svg viewBox="0 0 160 160">
+                        <circle class="donut-ring" cx="80" cy="80" r="60"/>
+                        <circle class="donut-segment" cx="80" cy="80" r="60"
+                            stroke="#2563eb"
+                            stroke-dasharray="226 377"
+                            stroke-dashoffset="0"/>
+                        <circle class="donut-segment" cx="80" cy="80" r="60"
+                            stroke="#10b981"
+                            stroke-dasharray="94 377"
+                            stroke-dashoffset="-226"/>
+                        <circle class="donut-segment" cx="80" cy="80" r="60"
+                            stroke="#f59e0b"
+                            stroke-dasharray="57 377"
+                            stroke-dashoffset="-320"/>
+                    </svg>
+                    <div class="donut-center">
+                        <div class="donut-value">377</div>
+                        <div class="donut-label">Gesamt</div>
+                    </div>
+                </div>
+                <div class="chart-legend" style="flex-direction:column;">
+                    <div class="legend-item"><div class="legend-dot" style="background:#2563eb;"></div>Vertrieb (60%)</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div>Support (25%)</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b;"></div>Andere (15%)</div>
+                </div>
+            </div>
+        </div>
+        <div class="component-box">
+            <div class="component-label">Progress Ring</div>
+            <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                <div class="donut-chart" style="width:100px;height:100px;">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="donut-ring" cx="50" cy="50" r="40" stroke-width="12"/>
+                        <circle class="donut-segment" cx="50" cy="50" r="40"
+                            stroke="#10b981" stroke-width="12"
+                            stroke-dasharray="188 251"/>
+                    </svg>
+                    <div class="donut-center">
+                        <div class="donut-value" style="font-size:20px;">75%</div>
+                    </div>
+                </div>
+                <div class="donut-chart" style="width:100px;height:100px;">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="donut-ring" cx="50" cy="50" r="40" stroke-width="12"/>
+                        <circle class="donut-segment" cx="50" cy="50" r="40"
+                            stroke="#f59e0b" stroke-width="12"
+                            stroke-dasharray="113 251"/>
+                    </svg>
+                    <div class="donut-center">
+                        <div class="donut-value" style="font-size:20px;">45%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 11: SPARKLINES -->
+<div class="section">
+    <h2 class="section-title">11. Sparklines (Mini Charts)</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Bar Sparkline</div>
+            <div style="display:flex;align-items:center;gap:16px;">
+                <span style="font-weight:600;">Umsatz:</span>
+                <div class="sparkline" style="width:120px;">
+                    <div class="sparkline-bar" style="height:40%;"></div>
+                    <div class="sparkline-bar" style="height:65%;"></div>
+                    <div class="sparkline-bar" style="height:45%;"></div>
+                    <div class="sparkline-bar" style="height:80%;"></div>
+                    <div class="sparkline-bar" style="height:60%;"></div>
+                    <div class="sparkline-bar" style="height:90%;"></div>
+                    <div class="sparkline-bar" style="height:75%;"></div>
+                    <div class="sparkline-bar" style="height:100%;"></div>
+                </div>
+                <span style="color:var(--success);font-weight:500;">+12%</span>
+            </div>
+        </div>
+        <div class="component-box">
+            <div class="component-label">Line Sparkline</div>
+            <div style="display:flex;align-items:center;gap:16px;">
+                <span style="font-weight:600;">Trend:</span>
+                <div class="sparkline-line" style="width:120px;">
+                    <svg viewBox="0 0 120 30" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="sparkGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="rgba(37,99,235,0.3)"/>
+                                <stop offset="100%" stop-color="rgba(37,99,235,0)"/>
+                            </linearGradient>
+                        </defs>
+                        <path class="area" d="M0,25 L15,20 L30,22 L45,15 L60,18 L75,10 L90,12 L105,5 L120,8 L120,30 L0,30 Z"/>
+                        <path d="M0,25 L15,20 L30,22 L45,15 L60,18 L75,10 L90,12 L105,5 L120,8"/>
+                    </svg>
+                </div>
+                <span style="color:var(--success);font-weight:500;">↑</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 12: STAT COUNTERS -->
+<div class="section">
+    <h2 class="section-title">12. Stat Counters mit Animation</h2>
+    <div style="display:flex;gap:48px;flex-wrap:wrap;">
+        <div style="text-align:center;">
+            <div class="stat-counter" data-target="1247">0</div>
+            <div style="color:var(--gray-500);font-size:14px;">Kunden</div>
+        </div>
+        <div style="text-align:center;">
+            <div class="stat-counter" data-target="8934" style="color:var(--success);">0</div>
+            <div style="color:var(--gray-500);font-size:14px;">Aufträge</div>
+        </div>
+        <div style="text-align:center;">
+            <div class="stat-counter" data-target="156" style="color:var(--warning);">0</div>
+            <div style="color:var(--gray-500);font-size:14px;">Mitarbeiter</div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 13: AVATAR GROUPS -->
+<div class="section">
+    <h2 class="section-title">13. Avatar-Gruppen</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Überlappend</div>
+            <div class="avatar-group">
+                <div class="avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">TS</div>
+                <div class="avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c);">MK</div>
+                <div class="avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">PG</div>
+                <div class="avatar" style="background:linear-gradient(135deg,#43e97b,#38f9d7);">AN</div>
+                <div class="avatar avatar-more">+5</div>
+            </div>
+        </div>
+        <div class="component-box">
+            <div class="component-label">Große Avatars</div>
+            <div class="avatar-group">
+                <div class="avatar avatar-lg" style="background:linear-gradient(135deg,#fa709a,#fee140);">KS</div>
+                <div class="avatar avatar-lg" style="background:linear-gradient(135deg,#a8edea,#fed6e3);">LW</div>
+                <div class="avatar avatar-lg" style="background:linear-gradient(135deg,#d299c2,#fef9d7);">MB</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 14: RATING STARS -->
+<div class="section">
+    <h2 class="section-title">14. Rating Stars</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Statisch</div>
+            <div class="rating">
+                <span class="rating-star filled">★</span>
+                <span class="rating-star filled">★</span>
+                <span class="rating-star filled">★</span>
+                <span class="rating-star filled">★</span>
+                <span class="rating-star">★</span>
+            </div>
+            <span style="margin-left:8px;color:var(--gray-600);">4.0 / 5.0</span>
+        </div>
+        <div class="component-box">
+            <div class="component-label">Interaktiv (Hover)</div>
+            <div class="rating rating-interactive" id="interactiveRating">
+                <span class="rating-star" data-value="1">★</span>
+                <span class="rating-star" data-value="2">★</span>
+                <span class="rating-star" data-value="3">★</span>
+                <span class="rating-star" data-value="4">★</span>
+                <span class="rating-star" data-value="5">★</span>
+            </div>
+            <span id="ratingValue" style="margin-left:8px;color:var(--gray-600);">Bewerten</span>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 15: TAG CLOUD -->
+<div class="section">
+    <h2 class="section-title">15. Tag Cloud</h2>
+    <div class="tag-cloud">
+        <span class="tag size-5">JavaScript</span>
+        <span class="tag size-3">Python</span>
+        <span class="tag size-4">HTML</span>
+        <span class="tag size-2">CSS</span>
+        <span class="tag size-3">React</span>
+        <span class="tag size-1">Vue</span>
+        <span class="tag size-4">Node.js</span>
+        <span class="tag size-2">TypeScript</span>
+        <span class="tag size-1">Angular</span>
+        <span class="tag size-3">SQL</span>
+        <span class="tag size-2">Git</span>
+        <span class="tag size-4">Docker</span>
+        <span class="tag size-1">Kubernetes</span>
+        <span class="tag size-2">AWS</span>
+    </div>
+</div>
+
+<!-- SECTION 16: COMPARISON TABLE -->
+<div class="section">
+    <h2 class="section-title">16. Comparison Table</h2>
+    <div class="table-wrapper">
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Basis</th>
+                    <th class="highlight">Pro</th>
+                    <th>Enterprise</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="feature-name">Benutzer</td>
+                    <td>1</td>
+                    <td>10</td>
+                    <td>Unbegrenzt</td>
+                </tr>
+                <tr>
+                    <td class="feature-name">Speicher</td>
+                    <td>5 GB</td>
+                    <td>100 GB</td>
+                    <td>1 TB</td>
+                </tr>
+                <tr>
+                    <td class="feature-name">API Zugang</td>
+                    <td><span class="cross">✕</span></td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td class="feature-name">Support</td>
+                    <td>Email</td>
+                    <td>Email + Chat</td>
+                    <td>24/7 Telefon</td>
+                </tr>
+                <tr>
+                    <td class="feature-name">Analytics</td>
+                    <td><span class="cross">✕</span></td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- SECTION 17: PRICING TABLE -->
+<div class="section">
+    <h2 class="section-title">17. Pricing Table</h2>
+    <div class="pricing-grid">
+        <div class="pricing-card">
+            <div class="pricing-name">Starter</div>
+            <div class="pricing-price">€0<span>/Monat</span></div>
+            <div class="pricing-features">
+                <div class="pricing-feature">5 Projekte</div>
+                <div class="pricing-feature">1 GB Speicher</div>
+                <div class="pricing-feature">Community Support</div>
+            </div>
+            <button class="pricing-btn">Kostenlos starten</button>
+        </div>
+        <div class="pricing-card featured">
+            <div class="pricing-name">Professional</div>
+            <div class="pricing-price">€29<span>/Monat</span></div>
+            <div class="pricing-features">
+                <div class="pricing-feature">Unbegrenzte Projekte</div>
+                <div class="pricing-feature">100 GB Speicher</div>
+                <div class="pricing-feature">Priority Support</div>
+                <div class="pricing-feature">API Zugang</div>
+            </div>
+            <button class="pricing-btn">Jetzt upgraden</button>
+        </div>
+        <div class="pricing-card">
+            <div class="pricing-name">Enterprise</div>
+            <div class="pricing-price">€99<span>/Monat</span></div>
+            <div class="pricing-features">
+                <div class="pricing-feature">Alles aus Pro</div>
+                <div class="pricing-feature">1 TB Speicher</div>
+                <div class="pricing-feature">Dedicated Support</div>
+                <div class="pricing-feature">Custom Integrations</div>
+                <div class="pricing-feature">SLA Garantie</div>
+            </div>
+            <button class="pricing-btn">Kontakt aufnehmen</button>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 18: PROGRESS BARS -->
+<div class="section">
+    <h2 class="section-title">18. Progress Bars</h2>
+    <div class="component-grid">
+        <div class="component-box">
+            <div class="component-label">Standard</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <div class="progress"><div class="progress-bar primary" style="width:75%;"></div></div>
+                <div class="progress"><div class="progress-bar success" style="width:90%;"></div></div>
+                <div class="progress"><div class="progress-bar warning" style="width:45%;"></div></div>
+                <div class="progress"><div class="progress-bar danger" style="width:25%;"></div></div>
+            </div>
+        </div>
+        <div class="component-box">
+            <div class="component-label">Striped + Animated</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <div class="progress"><div class="progress-bar primary striped" style="width:65%;"></div></div>
+                <div class="progress"><div class="progress-bar success striped animated" style="width:80%;"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== TABLE SORTING ==========
+document.querySelectorAll('.sortable').forEach(th => {
+    th.addEventListener('click', function() {
+        const table = this.closest('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const colIndex = parseInt(this.dataset.col);
+        const isAsc = this.classList.contains('asc');
+
+        // Reset all headers
+        table.querySelectorAll('.sortable').forEach(h => h.classList.remove('asc', 'desc'));
+        this.classList.add(isAsc ? 'desc' : 'asc');
+
+        rows.sort((a, b) => {
+            const aVal = a.cells[colIndex].textContent.trim();
+            const bVal = b.cells[colIndex].textContent.trim();
+            const aNum = parseFloat(aVal.replace(/[^0-9.-]/g, ''));
+            const bNum = parseFloat(bVal.replace(/[^0-9.-]/g, ''));
+
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                return isAsc ? bNum - aNum : aNum - bNum;
+            }
+            return isAsc ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+    });
+});
+
+// ========== CALENDAR GENERATION ==========
+(function() {
+    const container = document.getElementById('calendarDays');
+    const year = 2026, month = 0; // January 2026
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = 17; // Simulated today
+
+    // Adjust for Monday start (0=Mon, 6=Sun)
+    const startDay = firstDay === 0 ? 6 : firstDay - 1;
+
+    // Previous month days
+    const prevMonthDays = new Date(year, month, 0).getDate();
+    for (let i = startDay - 1; i >= 0; i--) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day other-month';
+        day.innerHTML = `<span class="day-number">${prevMonthDays - i}</span>`;
+        container.appendChild(day);
+    }
+
+    // Current month days
+    const events = {15: 'Meeting', 17: 'Deadline', 22: 'Event'};
+    for (let i = 1; i <= daysInMonth; i++) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day' + (i === today ? ' today' : '');
+        day.innerHTML = `<span class="day-number">${i}</span>`;
+        if (events[i]) {
+            day.innerHTML += `<div class="calendar-event">${events[i]}</div>`;
+        }
+        container.appendChild(day);
+    }
+
+    // Next month days
+    const totalCells = container.children.length;
+    const remaining = 42 - totalCells;
+    for (let i = 1; i <= remaining; i++) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day other-month';
+        day.innerHTML = `<span class="day-number">${i}</span>`;
+        container.appendChild(day);
+    }
+})();
+
+// ========== STAT COUNTER ANIMATION ==========
+function animateCounter(el) {
+    const target = parseInt(el.dataset.target);
+    const duration = 2000;
+    const step = target / (duration / 16);
+    let current = 0;
+
+    const update = () => {
+        current += step;
+        if (current < target) {
+            el.textContent = Math.floor(current).toLocaleString('de-DE');
+            requestAnimationFrame(update);
+        } else {
+            el.textContent = target.toLocaleString('de-DE');
+        }
+    };
+    update();
+}
+
+// Intersection Observer for counters
+const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.dataset.animated) {
+            entry.target.dataset.animated = 'true';
+            animateCounter(entry.target);
+        }
+    });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.stat-counter[data-target]').forEach(el => {
+    counterObserver.observe(el);
+});
+
+// ========== INTERACTIVE RATING ==========
+const ratingContainer = document.getElementById('interactiveRating');
+const ratingValue = document.getElementById('ratingValue');
+
+ratingContainer.addEventListener('click', (e) => {
+    const star = e.target.closest('.rating-star');
+    if (!star) return;
+
+    const value = parseInt(star.dataset.value);
+    const stars = ratingContainer.querySelectorAll('.rating-star');
+
+    stars.forEach((s, i) => {
+        s.classList.toggle('filled', i < value);
+    });
+
+    ratingValue.textContent = `${value}.0 / 5.0`;
+});
+
+// ========== ANIMATE BARS ON SCROLL ==========
+const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const bars = entry.target.querySelectorAll('.bar-fill, .hbar-bar');
+            bars.forEach(bar => {
+                const width = bar.style.width || bar.style.height;
+                bar.style.width = '0';
+                bar.style.height = '0';
+                setTimeout(() => {
+                    if (bar.classList.contains('hbar-bar')) {
+                        bar.style.height = width;
+                    } else {
+                        bar.style.width = width;
+                    }
+                }, 100);
+            });
+        }
+    });
+}, { threshold: 0.3 });
+
+document.querySelectorAll('.bar-chart, .hbar-chart').forEach(chart => {
+    barObserver.observe(chart);
+});
+
+console.log('Demo 5: Daten-Anzeige Komponenten geladen');
+</script>
+
+</body>
+</html>

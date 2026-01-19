@@ -1,0 +1,169 @@
+﻿╔══════════════════════════════════════════════════════════════════════════════╗
+║          CONSEC HTML FORMULARE - VOLLSTÄNDIGKEITSANALYSE                     ║
+║                    Vergleich Access vs HTML                                   ║
+║                    Stand: 29.12.2025 18:30                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+================================================================================
+1. MITARBEITERSTAMMBLATT (frm_N_MA_Mitarbeiterstamm.html)
+================================================================================
+
+ACCESS FORMULAR: 290 Controls, 13 Pages, 41 Buttons, 59 Events
+
+TABS/PAGES VERGLEICH:
+┌─────────────────────────┬────────────┬─────────────────────────────────────┐
+│ ACCESS Page             │ HTML Tab   │ Status                              │
+├─────────────────────────┼────────────┼─────────────────────────────────────┤
+│ pgAdresse               │ Stammdaten │ ✅ IMPLEMENTIERT                    │
+│ pgMonat                 │ -          │ ❌ FEHLT (Einsatzübersicht Monat)   │
+│ pgJahr                  │ -          │ ❌ FEHLT (Einsatzübersicht Jahr)    │
+│ pgAuftrUeb              │ -          │ ❌ FEHLT (Auftragsübersicht)        │
+│ pgStundenuebersicht     │ -          │ ❌ FEHLT                            │
+│ pgPlan                  │ Dienstplan │ ✅ IMPLEMENTIERT (als Platzhalter)  │
+│ pgnVerfueg              │ N. Verfügb │ ✅ IMPLEMENTIERT (als Platzhalter)  │
+│ pgDienstKl              │ Best. DK   │ ✅ IMPLEMENTIERT (als Platzhalter)  │
+│ pgVordr                 │ -          │ ❌ FEHLT (Vordrucke)                │
+│ pgBrief                 │ -          │ ❌ FEHLT (Brief)                    │
+│ pgStdUeberlaufstd       │ -          │ ❌ FEHLT (Überhangstunden)          │
+│ pgMaps                  │ -          │ ❌ FEHLT (Google Maps)              │
+│ pgSubRech               │ -          │ ❌ FEHLT (Sub Rechnungen)           │
+└─────────────────────────┴────────────┴─────────────────────────────────────┘
+
+Tabs implementiert: 5/13 (38%)
+Tabs fehlen: 8
+
+WICHTIGE BUTTON-EVENTS:
+┌─────────────────────────────────┬─────────────────────────────────────────┐
+│ ACCESS Event                    │ HTML Implementation                     │
+├─────────────────────────────────┼─────────────────────────────────────────┤
+│ Befehl39-46_Click (Navigation)  │ ✅ navFirst/Prev/Next/Last             │
+│ lst_MA_Click                    │ ✅ selectMA()                          │
+│ mcobtnDelete_Click              │ ⚠️ deleteMA() - nur Stub               │
+│ btnZeitkonto_Click              │ ⚠️ showZeitkonto() - nur Stub          │
+│ btnZKFest_Click                 │ ❌ FEHLT                                │
+│ btnZKMini_Click                 │ ❌ FEHLT                                │
+│ btnXLZeitkto_Click              │ ❌ FEHLT (Excel Export)                 │
+│ btnXLJahr_Click                 │ ❌ FEHLT (Excel Jahr)                   │
+│ btnMaps_Click                   │ ❌ FEHLT (Maps öffnen)                  │
+│ btn_Diensplan_prnt_Click        │ ❌ FEHLT (Dienstplan drucken)          │
+│ btn_Dienstplan_send_Click       │ ❌ FEHLT (Dienstplan senden)           │
+│ btnLstDruck_Click               │ ❌ FEHLT (Listen drucken)              │
+│ btnReport_Dienstkleidung_Click  │ ❌ FEHLT                                │
+│ btnMehrfachtermine_Click        │ ❌ FEHLT                                │
+└─────────────────────────────────┴─────────────────────────────────────────┘
+
+FILTER (AfterUpdate Events):
+┌─────────────────────────────────┬─────────────────────────────────────────┐
+│ ACCESS Filter                   │ HTML Implementation                     │
+├─────────────────────────────────┼─────────────────────────────────────────┤
+│ cboMASuche_AfterUpdate          │ ⚠️ Suche vorhanden, aber vereinfacht   │
+│ cboIDSuche_AfterUpdate          │ ❌ FEHLT (ID-Suche)                     │
+│ Anstellungsart_AfterUpdate      │ ✅ filterMitarbeiter() mit Dropdown    │
+│ cboZeitraum_AfterUpdate         │ ❌ FEHLT (Zeitraumfilter)              │
+│ cboMonat/cboJahr_AfterUpdate    │ ❌ FEHLT (Monats/Jahresfilter)         │
+│ IstSubunternehmer_AfterUpdate   │ ❌ FEHLT                                │
+└─────────────────────────────────┴─────────────────────────────────────────┘
+
+================================================================================
+2. KUNDENSTAMMBLATT (frm_N_KD_Kundenstamm.html)
+================================================================================
+
+ACCESS FORMULAR: 187 Controls, 8 Pages, 17 Buttons, 36 Events
+
+TABS/PAGES VERGLEICH:
+┌─────────────────────────┬────────────────┬──────────────────────────────────┐
+│ ACCESS Page             │ HTML Tab       │ Status                           │
+├─────────────────────────┼────────────────┼──────────────────────────────────┤
+│ pgMain                  │ Stammdaten     │ ✅ IMPLEMENTIERT                 │
+│ pgPreise                │ Konditionen    │ ✅ IMPLEMENTIERT (Platzhalter)   │
+│ Auftragsübersicht       │ Auftragsübers. │ ✅ IMPLEMENTIERT (Platzhalter)   │
+│ pg_Rch_Kopf             │ -              │ ❌ FEHLT (Rechnungen)            │
+│ pg_Ang                  │ -              │ ❌ FEHLT (Angebote)              │
+│ pgAttach                │ Zusatzdateien  │ ✅ IMPLEMENTIERT (Platzhalter)   │
+│ pgAnsprech              │ -              │ ❌ FEHLT (Ansprechpartner)       │
+│ pgBemerk                │ Bemerkungen    │ ✅ IMPLEMENTIERT                 │
+└─────────────────────────┴────────────────┴──────────────────────────────────┘
+
+Tabs implementiert: 5/8 (62%)
+Tabs fehlen: 3
+
+WICHTIGE BUTTON-EVENTS:
+┌─────────────────────────────────┬─────────────────────────────────────────┐
+│ ACCESS Event                    │ HTML Implementation                     │
+├─────────────────────────────────┼─────────────────────────────────────────┤
+│ Befehl39-46_Click (Navigation)  │ ✅ navFirst/Prev/Next/Last             │
+│ lst_KD_Click                    │ ✅ selectKunde()                       │
+│ mcobtnDelete_Click              │ ⚠️ Stub vorhanden                      │
+│ btnUmsAuswert_Click             │ ❌ FEHLT (Umsatzauswertung)            │
+│ btnAuswertung_Click             │ ❌ FEHLT (Auswertung)                  │
+│ btnAufRchPDF_Click              │ ❌ FEHLT (PDF Export)                  │
+│ btnNeuAttach_Click              │ ❌ FEHLT (Anhang hinzufügen)           │
+│ btnOutlook_Click                │ ❌ FEHLT (Outlook öffnen)              │
+│ btnWord_Click                   │ ❌ FEHLT (Word öffnen)                 │
+│ btnGo_Click                     │ ❌ FEHLT (Navigation zu Auftrag)       │
+└─────────────────────────────────┴─────────────────────────────────────────┘
+
+================================================================================
+3. AUFTRAGSVERWALTUNG (frm_N_VA_Auftragstamm.html)
+================================================================================
+
+ACCESS FORMULAR: 136 Controls, 5 Pages, 45 Buttons, 92 Events
+
+TABS/PAGES VERGLEICH:
+┌─────────────────────────┬────────────────────┬──────────────────────────────┐
+│ ACCESS Page             │ HTML Tab           │ Status                       │
+├─────────────────────────┼────────────────────┼──────────────────────────────┤
+│ pgMA_Zusage             │ Einsatzliste       │ ✅ IMPLEMENTIERT             │
+│ pgMA_Plan               │ Antworten ausst.   │ ✅ IMPLEMENTIERT (Platzh.)   │
+│ pgAttach                │ -                  │ ❌ FEHLT (Zusatzdateien)     │
+│ pgRechnung              │ Rechnung           │ ✅ IMPLEMENTIERT (Platzh.)   │
+│ pgBemerk                │ -                  │ ❌ FEHLT (Bemerkungen)       │
+└─────────────────────────┴────────────────────┴──────────────────────────────┘
+
+Tabs implementiert: 3/5 (60%)
+Tabs fehlen: 2
+
+WICHTIGE BUTTON-EVENTS:
+┌─────────────────────────────────┬─────────────────────────────────────────┐
+│ ACCESS Event                    │ HTML Implementation                     │
+├─────────────────────────────────┼─────────────────────────────────────────┤
+│ btnSchnellPlan_Click            │ ⚠️ Button vorhanden, Funktion fehlt    │
+│ btnMailEins_Click               │ ⚠️ Button vorhanden (EL senden MA)     │
+│ btnMailSub_Click                │ ⚠️ Button vorhanden (EL senden SUB)    │
+│ btnDruckZusage_Click            │ ⚠️ Button vorhanden (EL drucken)       │
+│ mcobtnDelete_Click              │ ⚠️ Button vorhanden (Auftrag löschen)  │
+│ btnNeuVeranst_Click             │ ⚠️ Button vorhanden (Neuer Auftrag)    │
+│ btn_Autosend_BOS_Click          │ ⚠️ Button vorhanden (EL senden BOS)    │
+│ btnSyncErr_Click                │ ⚠️ Button vorhanden (Syncfehler)       │
+│ btn_Rueckmeld_Click             │ ⚠️ Button vorhanden (EL gesendet)      │
+│ btn_ListeStd_Click              │ ⚠️ Button vorhanden (Namensliste ESS)  │
+│ btnHeute_Click                  │ ⚠️ Button vorhanden (Ab Heute)         │
+│ btnTgVor/btnTgBack_Click        │ ✅ Datums-Navigation implementiert     │
+└─────────────────────────────────┴─────────────────────────────────────────┘
+
+================================================================================
+ZUSAMMENFASSUNG
+================================================================================
+
+FORMULAR           │ TABS    │ BUTTONS │ FILTER  │ GESAMT
+───────────────────┼─────────┼─────────┼─────────┼─────────
+Mitarbeiterstamm   │ 38%     │ ~20%    │ ~30%    │ ~30%
+Kundenstamm        │ 62%     │ ~25%    │ ~30%    │ ~40%
+Auftragsverwaltung │ 60%     │ ~40%    │ ~50%    │ ~50%
+
+KRITISCHE FEHLENDE FUNKTIONEN:
+1. Subformulare (Einsatzübersicht, Stundenübersicht, etc.)
+2. Excel-Export Funktionen
+3. PDF-Export Funktionen
+4. E-Mail/Outlook Integration
+5. Druckfunktionen
+6. Maps-Integration
+7. Zeitkonten-Verwaltung
+8. Komplexe Filter (Zeitraum, Status, etc.)
+
+NÄCHSTE SCHRITTE:
+1. Fehlende Tabs als Platzhalter hinzufügen
+2. Subformular-Daten laden (Einsätze, Stunden, etc.)
+3. Button-Click-Handler vervollständigen
+4. Filter-Logik erweitern
+5. WebView2-Bridge Events implementieren

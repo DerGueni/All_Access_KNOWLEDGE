@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Design Test - CONSYS Stammdaten</title>
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .demo-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #808080;
+            border-radius: 5px;
+        }
+        h1 { color: #000080; }
+        h2 { color: #0000c0; margin-top: 0; }
+        .viewport-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #000080;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        .demo-box {
+            background: #e0e0e0;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #808080;
+        }
+    </style>
+</head>
+<body>
+    <div class="viewport-info">
+        Viewport: <span id="viewport-width">0</span>px
+    </div>
+
+    <h1>Responsive Design Test - CONSYS Stammdaten-Formulare</h1>
+    <p>Ändern Sie die Fenstergröße, um die responsive Features zu testen.</p>
+
+    <div class="demo-section">
+        <h2>1. Form-Row (Horizontal → Vertikal bei Mobile)</h2>
+        <div class="form-row">
+            <div class="demo-box" style="flex: 1;">Feld 1</div>
+            <div class="demo-box" style="flex: 1;">Feld 2</div>
+            <div class="demo-box" style="flex: 1;">Feld 3</div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. Form-Columns (Multi-Column Layout)</h2>
+        <div class="form-columns">
+            <div class="form-column">
+                <div class="field-group">
+                    <label>Name:</label>
+                    <input type="text" value="Max Mustermann">
+                </div>
+                <div class="field-group">
+                    <label>Vorname:</label>
+                    <input type="text" value="Max">
+                </div>
+            </div>
+            <div class="form-column">
+                <div class="field-group">
+                    <label>E-Mail:</label>
+                    <input type="email" value="max@example.com">
+                </div>
+                <div class="field-group">
+                    <label>Telefon:</label>
+                    <input type="tel" value="+49 123 456789">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. Button-Group (Wrapping bei Mobile)</h2>
+        <div class="button-group">
+            <button class="btn">Speichern</button>
+            <button class="btn">Abbrechen</button>
+            <button class="btn">Löschen</button>
+            <button class="btn">Drucken</button>
+            <button class="btn">Export</button>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>4. Tab-Header (Wrapping)</h2>
+        <div class="tab-header">
+            <button class="tab-btn">Stammdaten</button>
+            <button class="tab-btn">Adresse</button>
+            <button class="tab-btn">Kontakt</button>
+            <button class="tab-btn">Dokumente</button>
+            <button class="tab-btn">Historie</button>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>5. Foto-Container (Zentriert, Max-Width)</h2>
+        <div class="foto-container">
+            <div class="foto-display" style="background: #ccc; display: flex; align-items: center; justify-content: center;">
+                Foto (3:4)
+            </div>
+            <div class="foto-buttons">
+                <button class="btn">Hochladen</button>
+                <button class="btn">Löschen</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>6. Address-Group (Flexible Felder)</h2>
+        <div class="address-group">
+            <div class="address-row">
+                <div class="field-group" style="flex: 2;">
+                    <label>Straße:</label>
+                    <input type="text" value="Hauptstraße">
+                </div>
+                <div class="field-group" style="flex: 1;">
+                    <label>Hausnummer:</label>
+                    <input type="text" value="123">
+                </div>
+            </div>
+            <div class="address-row">
+                <div class="field-group" style="flex: 1;">
+                    <label>PLZ:</label>
+                    <input type="text" value="12345">
+                </div>
+                <div class="field-group" style="flex: 2;">
+                    <label>Ort:</label>
+                    <input type="text" value="Musterstadt">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>7. Utility Classes</h2>
+        <div class="demo-box hide-mobile">Nur Desktop: Dieses Element wird auf Mobile ausgeblendet</div>
+        <div class="demo-box show-mobile">Nur Mobile: Dieses Element wird nur auf Mobile angezeigt</div>
+        <div class="demo-box text-truncate" style="max-width: 300px;">
+            Langer Text der abgeschnitten wird wenn er zu lang ist für den Container
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>8. Breakpoint-Übersicht</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background: #d0d0e0;">
+                <th style="padding: 8px; border: 1px solid #808080;">Breakpoint</th>
+                <th style="padding: 8px; border: 1px solid #808080;">Viewport</th>
+                <th style="padding: 8px; border: 1px solid #808080;">Sidebar</th>
+                <th style="padding: 8px; border: 1px solid #808080;">Layout</th>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #808080;">Mobile</td>
+                <td style="padding: 8px; border: 1px solid #808080;">&lt;768px</td>
+                <td style="padding: 8px; border: 1px solid #808080;">120px</td>
+                <td style="padding: 8px; border: 1px solid #808080;">Vertikal</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #808080;">Tablet</td>
+                <td style="padding: 8px; border: 1px solid #808080;">768-1024px</td>
+                <td style="padding: 8px; border: 1px solid #808080;">150px</td>
+                <td style="padding: 8px; border: 1px solid #808080;">Mixed</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #808080;">Desktop</td>
+                <td style="padding: 8px; border: 1px solid #808080;">&gt;1024px</td>
+                <td style="padding: 8px; border: 1px solid #808080;">185px</td>
+                <td style="padding: 8px; border: 1px solid #808080;">Horizontal</td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        // Viewport-Breite anzeigen
+        function updateViewport() {
+            document.getElementById('viewport-width').textContent = window.innerWidth;
+        }
+        window.addEventListener('resize', updateViewport);
+        updateViewport();
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+-- Query: qry_Auswertungsgrundlage_Ist
+-- Type: 0
+SELECT tbl_VA_Auftragstamm.Veranstalter_ID AS kun_id, tbl_KD_Kundenstamm.kun_Firma, tbl_VA_Auftragstamm.ID AS VA_ID, tbl_VA_Auftragstamm.Dat_VA_Von, tbl_VA_Auftragstamm.Dat_VA_Bis, tbl_VA_Auftragstamm.Auftrag, tbl_VA_Auftragstamm.Ort, tbl_VA_Auftragstamm.Objekt, tbl_MA_Mitarbeiterstamm.ID AS MA_ID, tbl_MA_Mitarbeiterstamm.Nachname, tbl_MA_Mitarbeiterstamm.Vorname, tbl_MA_VA_Zuordnung.VADatum, tbl_MA_VA_Zuordnung.MA_Netto_Std, tbl_MA_Mitarbeiterstamm.Stundenlohn_brutto, fctRound(Nz([MA_Netto_Std],0)*Nz([Stundenlohn_brutto],0)) AS Kosten_Ma, tbl_MA_VA_Zuordnung.PKW AS FahrtKosten, tbl_VA_Auftragstamm.Dummy, fctRound(Nz([Dummy],0)*Nz([MA_Netto_Std],0)) AS Umsatz_VA
+FROM (tbl_KD_Kundenstamm RIGHT JOIN tbl_VA_Auftragstamm ON tbl_KD_Kundenstamm.kun_Id = tbl_VA_Auftragstamm.Veranstalter_ID) LEFT JOIN (tbl_MA_Mitarbeiterstamm RIGHT JOIN tbl_MA_VA_Zuordnung ON tbl_MA_Mitarbeiterstamm.ID = tbl_MA_VA_Zuordnung.MA_ID) ON tbl_VA_Auftragstamm.ID = tbl_MA_VA_Zuordnung.VA_ID
+ORDER BY tbl_MA_VA_Zuordnung.VADatum DESC , tbl_VA_Auftragstamm.Dat_VA_Von DESC , tbl_VA_Auftragstamm.Dat_VA_Bis DESC , tbl_VA_Auftragstamm.Auftrag;
+

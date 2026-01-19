@@ -1,0 +1,8 @@
+-- Query: zqry_MA_VA_ZUO_PLAN_SUB
+-- Type: 0
+SELECT tbl_MA_Mitarbeiterstamm.[Nachname] & " " & [Vorname] AS Name, zqry_MA_VA_ZUO_PLAN_union.VADatum, [tbl_VA_Auftragstamm].[Auftrag] & " " & [tbl_VA_Auftragstamm].[Ort] & " " & [tbl_VA_Auftragstamm].[Objekt] AS Auftrag, Format([MA_Start],"Short Time") AS Beginn, Format([MA_Ende],"Short Time") AS Ende, zqry_MA_VA_ZUO_PLAN_union.MA_Brutto_Std2 AS Stunden, Count(zqry_MA_VA_ZUO_PLAN_union.MA_ID) AS AnzahlvonMA_ID
+FROM (zqry_MA_VA_ZUO_PLAN_union INNER JOIN tbl_VA_Auftragstamm ON zqry_MA_VA_ZUO_PLAN_union.VA_ID = tbl_VA_Auftragstamm.ID) INNER JOIN tbl_MA_Mitarbeiterstamm ON zqry_MA_VA_ZUO_PLAN_union.MA_ID = tbl_MA_Mitarbeiterstamm.ID
+GROUP BY tbl_MA_Mitarbeiterstamm.[Nachname] & " " & [Vorname], zqry_MA_VA_ZUO_PLAN_union.VADatum, [tbl_VA_Auftragstamm].[Auftrag] & " " & [tbl_VA_Auftragstamm].[Ort] & " " & [tbl_VA_Auftragstamm].[Objekt], Format([MA_Start],"Short Time"), Format([MA_Ende],"Short Time"), zqry_MA_VA_ZUO_PLAN_union.MA_Brutto_Std2, Right([Dat_VA_Von],4), zqry_MA_VA_ZUO_PLAN_union.VA_ID, zqry_MA_VA_ZUO_PLAN_union.MA_ID, tbl_MA_Mitarbeiterstamm.IstSubunternehmer
+HAVING (((Right([Dat_VA_Von],4))=Year(Now())) AND ((tbl_MA_Mitarbeiterstamm.IstSubunternehmer)=True))
+ORDER BY zqry_MA_VA_ZUO_PLAN_union.VADatum;
+

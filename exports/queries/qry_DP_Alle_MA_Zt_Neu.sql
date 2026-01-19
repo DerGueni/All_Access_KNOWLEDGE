@@ -1,0 +1,4 @@
+-- Query: qry_DP_Alle_MA_Zt_Neu
+-- Type: 128
+SELECT qry_DP_Alle.*, 1 AS Hlp FROM qry_DP_Alle WHERE (((qry_DP_Alle.VADatum) Between #2015-11-24# AND #2015-11-30#) AND ((qry_DP_Alle.MA_ID)>0)) ORDER BY qry_DP_Alle.MAName, qry_DP_Alle.VADatum, qry_DP_Alle.MA_Start, qry_DP_Alle.MA_Ende UNION SELECT -1 AS VA_ID, -1 AS ZuordID, 1 AS Anz_MA, tbl_MA_Zeittyp.ZeitTyp AS ObjOrt, CDate(Fix(CDbl([vonDat]))) AS VADatum, 1 AS Pos_Nr, tbl_MA_NVerfuegZeiten.vonDat AS MA_Start, tbl_MA_NVerfuegZeiten.bisDat AS MA_Ende, tbl_MA_NVerfuegZeiten.MA_ID, [Nachname] & ' ' & [Vorname] AS MAName, 0 AS IstFraglich, 1 AS Hlp FROM tbl_MA_Zeittyp INNER JOIN (tbl_MA_Mitarbeiterstamm RIGHT JOIN tbl_MA_NVerfuegZeiten ON tbl_MA_Mitarbeiterstamm.ID = tbl_MA_NVerfuegZeiten.MA_ID) ON tbl_MA_Zeittyp.Kuerzel_Datev = tbl_MA_NVerfuegZeiten.Zeittyp_ID WHERE (((CDate(Fix(CDbl([vonDat])))) Between #2015-11-24# AND #2015-11-30#));
+

@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplanübersicht</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 11px;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+
+        /* Hauptcontainer - exakt 1904px breit (28559 twips / 15) */
+        .form-container {
+            width: 100%;
+            height: 100%;
+            background-color: #8B0000;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section - 88px hoch (1314 twips), Dunkelrot */
+        .form-header {
+            position: relative;
+            height: 88px;
+            background-color: #8B0000;
+            border-bottom: 1px solid #5c0000;
+        }
+
+        /* Detail Section - 412px hoch (6182 twips), gleiche Hintergrundfarbe */
+        .form-detail {
+            position: relative;
+            height: calc(100% - 88px);
+            background-color: #8B0000;
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* ============================================ */
+        /* HEADER CONTROLS - Absolute Positionierung   */
+        /* ============================================ */
+
+        /* Schliessen Button */
+        #Befehl37 {
+            position: absolute;
+            left: 1871px;
+            top: 8px;
+            width: 20px;
+            height: 22px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Titel: Dienstplanübersicht */
+        #Bezeichnungsfeld96 {
+            position: absolute;
+            left: 125px;
+            top: 30px;
+            width: 193px;
+            height: 27px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Ribbon Buttons (klein, versteckt) */
+        #btnRibbonAus { position: absolute; left: 49px; top: 23px; width: 20px; height: 14px; font-size: 8px; display: none; }
+        #btnDaBaAus { position: absolute; left: 30px; top: 34px; width: 20px; height: 14px; font-size: 8px; display: none; }
+        #btnDaBaEin { position: absolute; left: 68px; top: 34px; width: 20px; height: 14px; font-size: 8px; display: none; }
+        #btnRibbonEin { position: absolute; left: 49px; top: 45px; width: 20px; height: 14px; font-size: 8px; display: none; }
+
+        /* Startdatum Bereich */
+        #Rechteck108 {
+            position: absolute;
+            left: 488px;
+            top: 22px;
+            width: 167px;
+            height: 45px;
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid #5c0000;
+            border-radius: 3px;
+        }
+
+        #dtStartdatum {
+            position: absolute;
+            left: 491px;
+            top: 26px;
+            width: 102px;
+            height: 17px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            padding: 1px 4px;
+            background-color: #fff;
+        }
+
+        #btnVor {
+            position: absolute;
+            left: 613px;
+            top: 28px;
+            width: 38px;
+            height: 15px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        #btnStartdatum {
+            position: absolute;
+            left: 492px;
+            top: 45px;
+            width: 103px;
+            height: 19px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 9px;
+            cursor: pointer;
+        }
+
+        #btnrueck {
+            position: absolute;
+            left: 613px;
+            top: 47px;
+            width: 38px;
+            height: 15px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        #btn_Heute {
+            position: absolute;
+            left: 669px;
+            top: 34px;
+            width: 77px;
+            height: 18px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* MA Filter ComboBox */
+        #NurAktiveMA {
+            position: absolute;
+            left: 869px;
+            top: 30px;
+            width: 158px;
+            height: 23px;
+            font-size: 10px;
+            border: 1px solid #ccc;
+        }
+
+        /* Dienstpläne senden Button */
+        #btnDPSenden {
+            position: absolute;
+            left: 1119px;
+            top: 15px;
+            width: 146px;
+            height: 31px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Einzeldienstpläne Button */
+        #btnMADienstpl {
+            position: absolute;
+            left: 1274px;
+            top: 15px;
+            width: 146px;
+            height: 22px;
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Enddatum */
+        #dtEnddatum {
+            position: absolute;
+            left: 1142px;
+            top: 57px;
+            width: 102px;
+            height: 17px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            padding: 1px 4px;
+            background-color: #fff;
+        }
+
+        /* Übersicht drucken Button */
+        #btnOutpExcel {
+            position: absolute;
+            left: 1274px;
+            top: 53px;
+            width: 146px;
+            height: 22px;
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Senden Button */
+        #Befehl20 {
+            position: absolute;
+            left: 1644px;
+            top: 15px;
+            width: 100px;
+            height: 21px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Übersicht senden Button */
+        #btnOutpExcelSend {
+            position: absolute;
+            left: 1625px;
+            top: 49px;
+            width: 118px;
+            height: 22px;
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Version Label */
+        #lbl_Version {
+            position: absolute;
+            left: 1765px;
+            top: 15px;
+            width: 139px;
+            height: 18px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Datum Label rechts */
+        #lbl_Datum {
+            position: absolute;
+            left: 1769px;
+            top: 38px;
+            width: 96px;
+            height: 19px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ============================================ */
+        /* DETAIL CONTROLS - Absolute Positionierung   */
+        /* ============================================ */
+
+        /* Subform Menuefuehrung (Sidebar) - ROT wie Screenshot */
+        #frm_Menuefuehrung {
+            position: absolute;
+            left: 2px;
+            top: 0px;
+            width: 176px;
+            height: 412px;
+            border: none;
+            background-color: #8B0000;
+        }
+
+        /* Mitarbeiter Label */
+        #lbl_Auftrag {
+            position: absolute;
+            left: 181px;
+            top: 0px;
+            width: 175px;
+            height: 28px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            background-color: #5c0000;
+            padding-left: 8px;
+        }
+
+        /* 7 Tages-Spalten Header - CYAN wie im Screenshot */
+        .day-header {
+            position: absolute;
+            top: 1px;
+            height: 28px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #000000;
+            background-color: #00CED1;
+            border: 1px solid #008B8B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lbl_Tag_1 {
+            left: 350px;
+            width: 226px;
+        }
+
+        #lbl_Tag_2 {
+            left: 574px;
+            width: 231px;
+        }
+
+        #lbl_Tag_3 {
+            left: 803px;
+            width: 225px;
+        }
+
+        #lbl_Tag_4 {
+            left: 1025px;
+            width: 212px;
+        }
+
+        #lbl_Tag_5 {
+            left: 1232px;
+            width: 225px;
+        }
+
+        /* Wochenende - ROT */
+        #lbl_Tag_6 {
+            left: 1445px;
+            width: 223px;
+            background-color: #8B0000;
+            color: #ffffff;
+            border-color: #5c0000;
+        }
+
+        #lbl_Tag_7 {
+            left: 1645px;
+            width: 227px;
+            background-color: #8B0000;
+            color: #ffffff;
+            border-color: #5c0000;
+        }
+
+        /* Subform DP_Grund (Kalender Grid) */
+        #sub_DP_Grund {
+            position: absolute;
+            left: 172px;
+            top: 26px;
+            width: 1732px;
+            height: 383px;
+            border: none;
+            background-color: #ffffff;
+        }
+
+        /* ============================================ */
+        /* KALENDER GRID STYLES                        */
+        /* ============================================ */
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 175px repeat(7, 1fr);
+            gap: 1px;
+            background-color: #ccc;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .calendar-header {
+            background-color: #00CED1;
+            color: #000;
+            font-weight: bold;
+            font-size: 11px;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .calendar-header.weekend {
+            background-color: #8B0000;
+            color: #fff;
+        }
+
+        .calendar-row {
+            display: contents;
+        }
+
+        .calendar-cell-name {
+            background-color: #f5f5f5;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+        }
+
+        .calendar-cell {
+            background-color: #ffffff;
+            padding: 2px;
+            font-size: 9px;
+            border-bottom: 1px solid #eee;
+            min-height: 28px;
+            position: relative;
+        }
+
+        .calendar-cell.weekend {
+            background-color: #00CED1;
+        }
+
+        .calendar-cell.today {
+            background-color: #ffffd0;
+        }
+
+        /* Einsatz-Eintrag im Kalender */
+        .einsatz-entry {
+            background-color: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 2px;
+            padding: 1px 3px;
+            margin: 1px 0;
+            font-size: 9px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .einsatz-entry.abwesend {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .einsatz-entry.krank {
+            background-color: #ffc107;
+            border-color: #d39e00;
+        }
+
+        .einsatz-entry.urlaub {
+            background-color: #17a2b8;
+            border-color: #117a8b;
+            color: white;
+        }
+
+        .einsatz-entry.privat {
+            background-color: #6c757d;
+            border-color: #545b62;
+            color: white;
+        }
+
+        /* MA Zeile alternierend */
+        .calendar-row:nth-child(even) .calendar-cell-name {
+            background-color: #eaeaea;
+        }
+
+        .calendar-row:hover .calendar-cell-name,
+        .calendar-row:hover .calendar-cell {
+            background-color: #e8f4fc;
+        }
+
+        /* ============================================ */
+        /* ALLGEMEINE STYLES                           */
+        /* ============================================ */
+
+        button {
+            font-family: inherit;
+        }
+
+        button:hover {
+            filter: brightness(0.95);
+        }
+
+        input[type="date"],
+        input[type="text"] {
+            font-family: inherit;
+        }
+
+        select {
+            font-family: inherit;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top-color: #8B0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">CONSYS</div>
+            <nav class="sidebar-menu">
+                <a href="frm_N_Dienstplanuebersicht.html" class="sidebar-btn active">Dienstplanübersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="sidebar-btn">Planungsübersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="sidebar-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="sidebar-btn">Mitarbeiterverwaltung</a>
+                <a href="frm_N_Email_versenden.html" class="sidebar-btn">Offene Mail Anfragen</a>
+                <a href="frm_MA_Zeitkonten.html" class="sidebar-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="sidebar-btn">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="sidebar-btn">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="sidebar-btn">Dienstausweis erstellen</a>
+                <a href="frm_N_Stundenauswertung.html" class="sidebar-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="sidebar-btn">Kundenverwaltung</a>
+                <a href="frm_KD_Kundenstamm.html" class="sidebar-btn">Verrechnungssätze</a>
+                <a href="frm_N_Lohnabrechnungen.html" class="sidebar-btn">Sub Rechnungen</a>
+                <a href="frm_N_Email_versenden.html" class="sidebar-btn">E-Mail</a>
+                <hr class="sidebar-divider">
+                <a href="frm_Menuefuehrung.html" class="sidebar-btn">Hauptmenü</a>
+                <a href="frm_N_Optimierung.html" class="sidebar-btn">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+    <div class="form-container">
+        <!-- HEADER SECTION -->
+        <div class="form-header">
+            <!-- Titel -->
+            <span id="Bezeichnungsfeld96">Dienstplanübersicht</span>
+
+            <!-- Schliessen Button -->
+            <button id="Befehl37" title="Schließen">&times;</button>
+
+            <!-- Version -->
+            <span id="lbl_Version">1 | V1.55</span>
+
+            <!-- Datum rechts -->
+            <span id="lbl_Datum"></span>
+
+            <!-- Startdatum Bereich -->
+            <div id="Rechteck108"></div>
+            <input type="date" id="dtStartdatum">
+            <button id="btnVor">&gt;</button>
+            <button id="btnStartdatum">Startdatum ändern</button>
+            <button id="btnrueck">&lt;</button>
+            <button id="btn_Heute">Ab Heute</button>
+
+            <!-- MA Filter -->
+            <select id="NurAktiveMA">
+                <option value="0">Alle anzeigen</option>
+                <option value="1" selected>Alle aktiven</option>
+                <option value="2">Festangestellte</option>
+                <option value="3">Minijobber</option>
+                <option value="4">Sub</option>
+            </select>
+
+            <!-- Senden Buttons -->
+            <button id="btnDPSenden">Dienstpläne senden bis</button>
+            <input type="date" id="dtEnddatum">
+
+            <button id="btnMADienstpl">Einzeldienstpläne</button>
+            <button id="btnOutpExcel">Übersicht drucken</button>
+
+            <button id="Befehl20">Senden</button>
+            <button id="btnOutpExcelSend">Übersicht senden</button>
+
+            <!-- Ribbon Buttons (versteckt) -->
+            <button id="btnRibbonAus">-</button>
+            <button id="btnDaBaAus">-</button>
+            <button id="btnDaBaEin">+</button>
+            <button id="btnRibbonEin">+</button>
+        </div>
+
+        <!-- DETAIL SECTION -->
+        <div class="form-detail">
+            <!-- Sidebar/Menu - ROT -->
+            <iframe id="frm_Menuefuehrung" src="frm_Menuefuehrung1.html"></iframe>
+
+            <!-- Mitarbeiter Spalte Header -->
+            <div id="lbl_Auftrag">Mitarbeiter</div>
+
+            <!-- 7 Tages-Spalten Header - CYAN für Wochentage, ROT für Wochenende -->
+            <div id="lbl_Tag_1" class="day-header"></div>
+            <div id="lbl_Tag_2" class="day-header"></div>
+            <div id="lbl_Tag_3" class="day-header"></div>
+            <div id="lbl_Tag_4" class="day-header"></div>
+            <div id="lbl_Tag_5" class="day-header"></div>
+            <div id="lbl_Tag_6" class="day-header"></div>
+            <div id="lbl_Tag_7" class="day-header"></div>
+
+            <!-- Kalender Grid (Subform) -->
+            <div id="sub_DP_Grund">
+                <div class="loading">Lade Dienstpläne...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // API & State
+        // =====================================================
+        const API_BASE = 'http://localhost:5000/api';
+
+        const state = {
+            startDate: new Date(),
+            mitarbeiter: [],
+            dienstplaene: {},
+            filter: 1
+        };
+
+        // Wochentage
+        const WOCHENTAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+        const WOCHENTAGE_LANG = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+
+        // =====================================================
+        // Init
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Aktuelles Datum auf Montag dieser Woche setzen
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Montag
+            state.startDate = new Date(today.setDate(today.getDate() + diff));
+
+            // Datum-Inputs setzen
+            updateDateInputs();
+
+            // Datum Label setzen
+            document.getElementById('lbl_Datum').textContent = new Date().toLocaleDateString('de-DE');
+
+            // Event Listener
+            setupEventListeners();
+
+            // Daten laden
+            await loadData();
+        });
+
+        // =====================================================
+        // Event Listeners
+        // =====================================================
+        function setupEventListeners() {
+            // Navigation
+            document.getElementById('btnVor').addEventListener('click', () => navigateWeek(1));
+            document.getElementById('btnrueck').addEventListener('click', () => navigateWeek(-1));
+            document.getElementById('btn_Heute').addEventListener('click', goToToday);
+
+            document.getElementById('dtStartdatum').addEventListener('change', (e) => {
+                state.startDate = new Date(e.target.value);
+                // Auf Montag der Woche setzen
+                const dayOfWeek = state.startDate.getDay();
+                const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                state.startDate.setDate(state.startDate.getDate() + diff);
+                updateDateInputs();
+                loadData();
+            });
+
+            // Filter
+            document.getElementById('NurAktiveMA').addEventListener('change', (e) => {
+                state.filter = parseInt(e.target.value);
+                loadData();
+            });
+
+            // Buttons
+            document.getElementById('Befehl37').addEventListener('click', () => window.close());
+            document.getElementById('btnDPSenden').addEventListener('click', () => alert('Dienstpläne senden'));
+            document.getElementById('btnMADienstpl').addEventListener('click', () => alert('Einzeldienstpläne öffnen'));
+            document.getElementById('btnOutpExcel').addEventListener('click', () => alert('Übersicht drucken'));
+            document.getElementById('btnOutpExcelSend').addEventListener('click', () => alert('Übersicht senden'));
+            document.getElementById('Befehl20').addEventListener('click', () => alert('Senden'));
+        }
+
+        // =====================================================
+        // Navigation
+        // =====================================================
+        function navigateWeek(direction) {
+            state.startDate.setDate(state.startDate.getDate() + (direction * 7));
+            updateDateInputs();
+            loadData();
+        }
+
+        function goToToday() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            state.startDate = new Date(today.setDate(today.getDate() + diff));
+            updateDateInputs();
+            loadData();
+        }
+
+        function updateDateInputs() {
+            document.getElementById('dtStartdatum').value = formatDateForInput(state.startDate);
+
+            // Enddatum = Startdatum + 6 Tage (Sonntag)
+            const endDate = new Date(state.startDate);
+            endDate.setDate(endDate.getDate() + 6);
+            document.getElementById('dtEnddatum').value = formatDateForInput(endDate);
+
+            // Header-Labels aktualisieren
+            updateHeaderLabels();
+        }
+
+        function updateHeaderLabels() {
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(state.startDate);
+                date.setDate(date.getDate() + i);
+
+                const dayName = WOCHENTAGE_LANG[date.getDay()];
+                const dateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+                document.getElementById(`lbl_Tag_${i + 1}`).textContent = `${dayName} ${dateStr}`;
+            }
+        }
+
+        // =====================================================
+        // Data Loading
+        // =====================================================
+        async function loadData() {
+            const container = document.getElementById('sub_DP_Grund');
+            container.innerHTML = '<div class="loading">Lade Dienstpläne...</div>';
+
+            try {
+                // Mitarbeiter laden
+                const maParams = new URLSearchParams();
+                if (state.filter === 1) maParams.append('aktiv', 'true');
+                // TODO: Weitere Filter für Festangestellte, Minijobber, Sub
+
+                const maResponse = await fetch(`${API_BASE}/mitarbeiter?${maParams}`);
+                const maResult = await maResponse.json();
+                state.mitarbeiter = maResult.data || [];
+
+                // Dienstpläne für Zeitraum laden
+                const startStr = formatDateForInput(state.startDate);
+                const endDate = new Date(state.startDate);
+                endDate.setDate(endDate.getDate() + 6);
+                const endStr = formatDateForInput(endDate);
+
+                // Für jeden Mitarbeiter den Dienstplan laden
+                state.dienstplaene = {};
+
+                // Batch-Laden wäre effizienter, aber erstmal einzeln
+                for (const ma of state.mitarbeiter.slice(0, 50)) { // Limit für Performance
+                    try {
+                        const dpResponse = await fetch(`${API_BASE}/dienstplan/ma/${ma.ID}?von=${startStr}&bis=${endStr}`);
+                        if (dpResponse.ok) {
+                            const dpResult = await dpResponse.json();
+                            state.dienstplaene[ma.ID] = dpResult.data || [];
+                        }
+                    } catch (e) {
+                        // Einzelne Fehler ignorieren
+                    }
+                }
+
+                renderCalendar();
+
+            } catch (error) {
+                console.error('Fehler beim Laden:', error);
+                container.innerHTML = '<div style="padding: 20px; color: red;">Fehler beim Laden der Daten</div>';
+            }
+        }
+
+        // =====================================================
+        // Rendering
+        // =====================================================
+        function renderCalendar() {
+            const container = document.getElementById('sub_DP_Grund');
+
+            if (state.mitarbeiter.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Keine Mitarbeiter gefunden</div>';
+                return;
+            }
+
+            // Kalender Grid erstellen
+            let html = '<div class="calendar-grid">';
+
+            // Header-Zeile
+            html += '<div class="calendar-header" style="background-color:#5c0000;color:#fff;">Mitarbeiter</div>';
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(state.startDate);
+                date.setDate(date.getDate() + i);
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+                html += `<div class="calendar-header ${isWeekend ? 'weekend' : ''}">
+                    ${WOCHENTAGE[date.getDay()]} ${date.getDate()}.${date.getMonth() + 1}
+                </div>`;
+            }
+
+            // MA Zeilen
+            for (const ma of state.mitarbeiter.slice(0, 50)) {
+                html += '<div class="calendar-row">';
+
+                // Name-Zelle
+                html += `<div class="calendar-cell-name">${ma.Nachname}, ${ma.Vorname}</div>`;
+
+                // 7 Tage
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(state.startDate);
+                    date.setDate(date.getDate() + i);
+                    const dateKey = formatDateForInput(date);
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                    const isToday = formatDateForInput(date) === formatDateForInput(new Date());
+
+                    let cellClass = 'calendar-cell';
+                    if (isWeekend) cellClass += ' weekend';
+                    if (isToday) cellClass += ' today';
+
+                    html += `<div class="${cellClass}">`;
+
+                    // Einträge für diesen Tag
+                    const eintraege = (state.dienstplaene[ma.ID] || []).filter(e => {
+                        const eDate = formatDateForInput(new Date(e.VADatum || e.Datum));
+                        return eDate === dateKey;
+                    });
+
+                    for (const eintrag of eintraege) {
+                        let entryClass = 'einsatz-entry';
+                        const typ = (eintrag.Typ || '').toLowerCase();
+                        if (typ.includes('krank')) entryClass += ' krank';
+                        else if (typ.includes('urlaub')) entryClass += ' urlaub';
+                        else if (typ.includes('privat')) entryClass += ' privat';
+                        else if (eintrag.Abwesend) entryClass += ' abwesend';
+
+                        const zeit = eintrag.VA_Start ? formatTime(eintrag.VA_Start) : '';
+                        const zeitEnde = eintrag.VA_Ende ? ' - ' + formatTime(eintrag.VA_Ende) : '';
+                        const text = eintrag.Auftrag || eintrag.Typ || eintrag.Bemerkung || '';
+
+                        html += `<div class="${entryClass}" title="${text}">
+                            ${zeit}${zeitEnde}<br>${text}
+                        </div>`;
+                    }
+
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // =====================================================
+        // Helpers
+        // =====================================================
+        function formatDateForInput(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const day = d.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatTime(t) {
+            if (!t) return '';
+            if (typeof t === 'number' && t < 1) {
+                const h = Math.floor(t * 24), m = Math.round((t * 24 - h) * 60);
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            }
+            return typeof t === 'string' && t.includes(':') ? t.substring(0, 5) : t;
+        }
+    </script>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-left">Ready</div>
+        <div class="status-right">
+            <span id="timestamp"></span>
+        </div>
+    </div>
+        </main>
+    </div>
+
+    <script type="module" src="../js/sidebar.js"></script>
+    <script>
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = now.toLocaleString('de-DE');
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+    </script>
+</body>
+</html>

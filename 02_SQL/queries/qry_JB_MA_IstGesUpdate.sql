@@ -1,0 +1,2 @@
+UPDATE tbl_MA_Jahresuebersicht INNER JOIN qry_JB_MA_VorMonatWert ON (tbl_MA_Jahresuebersicht.AktJahr = qry_JB_MA_VorMonatWert.AktJahr) AND (tbl_MA_Jahresuebersicht.MA_ID = qry_JB_MA_VorMonatWert.MA_ID) AND (tbl_MA_Jahresuebersicht.Mon = qry_JB_MA_VorMonatWert.AktMonat) SET tbl_MA_Jahresuebersicht.IstGes = fctRound([Ist]+[VorMonWert]), tbl_MA_Jahresuebersicht.UeberlaufAktMonat = [VorMonWert];
+

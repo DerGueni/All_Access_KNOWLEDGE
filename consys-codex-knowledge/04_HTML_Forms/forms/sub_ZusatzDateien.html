@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zusatzdateien (sub_ZusatzDateien)</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .datasheet-container {
+            flex: 1;
+            overflow: auto;
+        }
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .datasheet th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            padding: 5px 6px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .datasheet td {
+            border: 1px solid #ddd;
+            padding: 4px 6px;
+        }
+        .datasheet tbody tr:hover { background: #f0f0f0; }
+        .datasheet tbody tr.selected { background: #e8e8e8; }
+        .col-hidden { display: none; }
+        .col-datei { min-width: 200px; }
+        .col-datum { width: 90px; }
+        .col-länge { width: 80px; text-align: right; }
+        .col-typ { width: 80px; }
+        .col-beschreib { min-width: 150px; }
+    </style>
+</head>
+<body>
+    <div class="subform-container" id="sub_ZusatzDateien">
+        <div class="datasheet-container">
+            <table class="datasheet" id="tbl_Zusatz">
+                <thead>
+                    <tr>
+                        <th class="col-hidden">ZusatzNr</th>
+                        <th class="col-hidden">TabellenID</th>
+                        <th class="col-hidden">Überordnung</th>
+                        <th class="col-datei">Dateiname</th>
+                        <th class="col-datum">Dateidatum</th>
+                        <th class="col-länge">Größe</th>
+                        <th class="col-typ">Typ</th>
+                        <th class="col-beschreib">Kurzbeschreibung</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_Zusatz">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script type="module" src="logic/sub_ZusatzDateien.logic.js"></script>
+</body>
+</html>
+

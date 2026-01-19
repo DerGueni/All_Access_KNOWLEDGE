@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplanübersicht - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_N_Dienstplanuebersicht.css">
+</head>
+<body>
+    <div class="dp-container no-menu">
+        <main class="dp-main">
+            <!-- Header -->
+            <header class="dp-header">
+                <div class="header-left">
+                    <h1 class="dp-title">Dienstplanübersicht</h1>
+                </div>
+                <div class="header-center">
+                    <div class="date-nav-group">
+                        <button class="dp-btn-nav" id="btnVorwoche" title="2 Tage zurück">&#9664;</button>
+                        <div class="date-input-wrapper">
+                            <input type="text" id="datStartdatum" class="dp-date-input" value="19.12.2025" readonly>
+                            <button class="dp-btn-small" id="btnStartdatumAendern">Datum ändern</button>
+                        </div>
+                        <button class="dp-btn-nav" id="btnNachwoche" title="2 Tage vor">&#9654;</button>
+                    </div>
+                    <button class="dp-btn" id="btnAbHeute">Ab Heute</button>
+                    <select id="cboMitarbeiterTyp" class="dp-select">
+                        <option value="alle">Alle Mitarbeiter</option>
+                        <option value="fest" selected>Festangestellte</option>
+                        <option value="aushilfe">Aushilfen</option>
+                        <option value="sub">Subunternehmer</option>
+                    </select>
+                </div>
+                <div class="header-right">
+                    <div class="senden-group">
+                        <button class="dp-btn" id="btnDienstplaeneSenden">Dienstpläne senden bis</button>
+                        <input type="text" id="datSendenBis" class="dp-date-input" value="27.12.2025" readonly>
+                    </div>
+                    <div class="header-buttons">
+                        <button class="dp-btn" id="btnEinzeldienstplaene">Einzeldienstpläne</button>
+                        <button class="dp-btn" id="btnUebersichtDrucken">Übersicht drucken</button>
+                    </div>
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V1.55</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dienstplan Tabelle -->
+            <div class="dp-table-container">
+                <table class="dp-table" id="tblDienstplan">
+                    <thead>
+                        <tr class="dp-header-row">
+                            <th class="col-ma" rowspan="2">
+                                <div class="th-content cyan">Mitarbeiter</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag1">
+                                <div class="th-content">Do. 19.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag2">
+                                <div class="th-content">Fr. 20.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag3">
+                                <div class="th-content">Sa. 21.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag4">
+                                <div class="th-content">So. 22.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag5">
+                                <div class="th-content">Mo. 23.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag6">
+                                <div class="th-content">Di. 24.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag7">
+                                <div class="th-content">Mi. 25.12.25</div>
+                            </th>
+                            <th class="col-sum" rowspan="2">
+                                <div class="th-content">Stunden</div>
+                            </th>
+                        </tr>
+                        <tr class="dp-subheader-row">
+                            <th class="sub-col sub-auftrag">Auftrag</th>
+                            <th class="sub-col sub-zeit">von</th>
+                            <th class="sub-col sub-zeit">bis</th>
+                            <th class="sub-col sub-auftrag">Auftrag</th>
+                            <th class="sub-col sub-zeit">von</th>
+                            <th class="sub-col sub-zeit">bis</th>
+                            <th class="sub-col sub-auftrag">Auftrag</th>
+                            <th class="sub-col sub-zeit">von</th>
+                            <th class="sub-col sub-zeit">bis</th>
+                            <th class="sub-col sub-auftrag">Auftrag</th>
+                            <th class="sub-col sub-zeit">von</th>
+                            <th class="sub-col sub-zeit">bis</th>
+                            <th class="sub-col sub-auftrag">Auftrag</th>
+                            <th class="sub-col sub-zeit">von</th>
+                            <th class="sub-col sub-zeit">bis</th>
+                            <th class="sub-col sub-auftrag">Auftrag</th>
+                            <th class="sub-col sub-zeit">von</th>
+                            <th class="sub-col sub-zeit">bis</th>
+                            <th class="sub-col sub-auftrag">Auftrag</th>
+                            <th class="sub-col sub-zeit">von</th>
+                            <th class="sub-col sub-zeit">bis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyDienstplan">
+                        <!-- Wird dynamisch aus API geladen -->
+                        <tr class="dp-row">
+                            <td colspan="22" style="text-align:center; padding:20px; color:#666;">
+                                Daten werden geladen...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <footer class="dp-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblAnzMA">8 Mitarbeiter</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // API-Konfiguration
+        const API_BASE = 'http://localhost:5000/api';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const datStartdatum = document.getElementById('datStartdatum');
+            const datSendenBis = document.getElementById('datSendenBis');
+            const tbody = document.getElementById('tbodyDienstplan');
+            const lblStatus = document.getElementById('lblStatus');
+            const lblAnzMA = document.getElementById('lblAnzMA');
+            let currentDate = new Date();
+            let mitarbeiterData = [];
+
+            // Startdatum auf heute setzen
+            datStartdatum.value = formatGermanDate(currentDate);
+
+            function parseGermanDate(str) {
+                const parts = str.split('.');
+                if (parts.length === 3) {
+                    return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                }
+                return null;
+            }
+
+            function formatGermanDate(date) {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return day + '.' + month + '.' + year;
+            }
+
+            function formatISODate(date) {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                return date.getFullYear() + '-' + month + '-' + day;
+            }
+
+            function formatTime(timeStr) {
+                if (!timeStr) return '';
+                // Access liefert Zeitwerte manchmal als Date-String
+                if (typeof timeStr === 'string' && timeStr.includes('T')) {
+                    const d = new Date(timeStr);
+                    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+                }
+                return timeStr;
+            }
+
+            function updateTableHeaders() {
+                const wochentage = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+                for (let i = 1; i <= 7; i++) {
+                    const th = document.getElementById('thTag' + i);
+                    if (th) {
+                        const tagDatum = new Date(currentDate);
+                        tagDatum.setDate(currentDate.getDate() + (i - 1));
+                        const wt = wochentage[tagDatum.getDay()];
+                        const day = String(tagDatum.getDate()).padStart(2, '0');
+                        const month = String(tagDatum.getMonth() + 1).padStart(2, '0');
+                        const year = String(tagDatum.getFullYear()).slice(-2);
+                        th.querySelector('.th-content').textContent = wt + '. ' + day + '.' + month + '.' + year;
+                    }
+                }
+            }
+
+            // Daten vom API laden
+            async function loadDienstplanData() {
+                lblStatus.textContent = 'Lade Daten...';
+                tbody.innerHTML = '<tr><td colspan="22" style="text-align:center;padding:20px;">Lade Daten vom Server...</td></tr>';
+
+                try {
+                    const response = await fetch(API_BASE + '/dienstplan/uebersicht?limit=50');
+                    const result = await response.json();
+
+                    if (result.success && result.data) {
+                        mitarbeiterData = result.data;
+                        renderTable();
+                        lblStatus.textContent = 'Daten geladen';
+                        lblAnzMA.textContent = mitarbeiterData.length + ' Mitarbeiter';
+                    } else {
+                        throw new Error(result.error || 'Unbekannter Fehler');
+                    }
+                } catch (err) {
+                    console.error('API Fehler:', err);
+                    tbody.innerHTML = '<tr><td colspan="22" style="text-align:center;padding:20px;color:red;">Fehler beim Laden: ' + err.message + '<br>Ist der API-Server gestartet?</td></tr>';
+                    lblStatus.textContent = 'Fehler: ' + err.message;
+                }
+            }
+
+            // Tabelle rendern
+            function renderTable() {
+                if (!mitarbeiterData || mitarbeiterData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="22" style="text-align:center;padding:20px;">Keine Mitarbeiter gefunden</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                const tage = [];
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(currentDate);
+                    d.setDate(currentDate.getDate() + i);
+                    tage.push(formatISODate(d));
+                }
+
+                mitarbeiterData.forEach(ma => {
+                    const name = (ma.Nachname || '') + ' ' + (ma.Vorname || '');
+                    html += '<tr class="dp-row">';
+                    html += '<td class="col-ma">' + name.trim() + '</td>';
+
+                    let totalStunden = 0;
+
+                    tage.forEach(tagISO => {
+                        // Einsatz für diesen Tag finden
+                        const einsatz = (ma.einsaetze || []).find(e => {
+                            if (!e.VADatum) return false;
+                            const eDatum = e.VADatum.split('T')[0];
+                            return eDatum === tagISO;
+                        });
+
+                        if (einsatz) {
+                            const objekt = einsatz.Objekt || 'Einsatz';
+                            const von = formatTime(einsatz.VA_Start);
+                            const bis = formatTime(einsatz.VA_Ende);
+                            html += '<td class="einsatz">' + objekt + '</td>';
+                            html += '<td class="zeit">' + von + '</td>';
+                            html += '<td class="zeit">' + bis + '</td>';
+                            // Stunden berechnen (vereinfacht)
+                            if (von && bis) {
+                                const vonParts = von.split(':');
+                                const bisParts = bis.split(':');
+                                let std = parseInt(bisParts[0]) - parseInt(vonParts[0]);
+                                let min = parseInt(bisParts[1]) - parseInt(vonParts[1]);
+                                if (std < 0) std += 24; // Nachtschicht
+                                totalStunden += std + (min / 60);
+                            }
+                        } else {
+                            // Prüfen ob Abwesenheit
+                            const abwesend = (ma.abwesenheiten || []).find(a => {
+                                // TODO: Datumsbereich prüfen
+                                return false;
+                            });
+
+                            if (abwesend) {
+                                html += '<td class="einsatz abwesend">' + (abwesend.Grund || 'Abwesend') + '</td>';
+                                html += '<td class="zeit abwesend"></td>';
+                                html += '<td class="zeit abwesend"></td>';
+                            } else {
+                                html += '<td class="einsatz"></td>';
+                                html += '<td class="zeit"></td>';
+                                html += '<td class="zeit"></td>';
+                            }
+                        }
+                    });
+
+                    html += '<td class="col-sum">' + totalStunden.toFixed(2).replace('.', ',') + '</td>';
+                    html += '</tr>';
+                });
+
+                tbody.innerHTML = html;
+            }
+
+            // Event Handler
+            document.getElementById('btnVorwoche').addEventListener('click', function() {
+                currentDate.setDate(currentDate.getDate() - 2);
+                datStartdatum.value = formatGermanDate(currentDate);
+                updateTableHeaders();
+                renderTable();
+            });
+
+            document.getElementById('btnNachwoche').addEventListener('click', function() {
+                currentDate.setDate(currentDate.getDate() + 2);
+                datStartdatum.value = formatGermanDate(currentDate);
+                updateTableHeaders();
+                renderTable();
+            });
+
+            document.getElementById('btnAbHeute').addEventListener('click', function() {
+                currentDate = new Date();
+                datStartdatum.value = formatGermanDate(currentDate);
+                updateTableHeaders();
+                loadDienstplanData();
+            });
+
+            document.getElementById('btnStartdatumAendern').addEventListener('click', function() {
+                showDatePicker(datStartdatum, function(newDate) {
+                    currentDate = newDate;
+                    updateTableHeaders();
+                    renderTable();
+                });
+            });
+
+            datStartdatum.addEventListener('click', function() {
+                showDatePicker(datStartdatum, function(newDate) {
+                    currentDate = newDate;
+                    updateTableHeaders();
+                    renderTable();
+                });
+            });
+
+            datSendenBis.addEventListener('click', function() {
+                showDatePicker(datSendenBis);
+            });
+
+            document.getElementById('btnDienstplaeneSenden').addEventListener('click', function() {
+                alert('Dienstpläne werden gesendet bis: ' + datSendenBis.value);
+            });
+
+            document.getElementById('btnEinzeldienstplaene').addEventListener('click', function() {
+                alert('Einzeldienstpläne werden erstellt...');
+            });
+
+            document.getElementById('btnUebersichtDrucken').addEventListener('click', function() {
+                window.print();
+            });
+
+            document.getElementById('cboMitarbeiterTyp').addEventListener('change', function() {
+                lblStatus.textContent = 'Filter: ' + this.options[this.selectedIndex].text;
+                // TODO: Filter anwenden und Daten neu laden
+            });
+
+            // Kalender-Popup
+            function showDatePicker(inputElement, callback) {
+                const existing = document.getElementById('datePicker');
+                if (existing) existing.remove();
+
+                let selectedDate = parseGermanDate(inputElement.value) || new Date();
+                let viewDate = new Date(selectedDate);
+
+                const picker = document.createElement('div');
+                picker.id = 'datePicker';
+                picker.className = 'date-picker-popup';
+
+                function renderCalendar() {
+                    const year = viewDate.getFullYear();
+                    const month = viewDate.getMonth();
+                    const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                                       'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+                    const startDay = (firstDay.getDay() + 6) % 7;
+
+                    let html = '<div class="picker-header">';
+                    html += '<button type="button" class="picker-nav" id="pickerPrev">&#9664;</button>';
+                    html += '<span class="picker-title">' + monthNames[month] + ' ' + year + '</span>';
+                    html += '<button type="button" class="picker-nav" id="pickerNext">&#9654;</button>';
+                    html += '</div>';
+                    html += '<div class="picker-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>';
+                    html += '<div class="picker-days">';
+
+                    for (let i = 0; i < startDay; i++) {
+                        html += '<span class="picker-day empty"></span>';
+                    }
+
+                    for (let day = 1; day <= lastDay.getDate(); day++) {
+                        const isToday = (day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear());
+                        const isSelected = (day === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear());
+                        let cls = 'picker-day';
+                        if (isToday) cls += ' today';
+                        if (isSelected) cls += ' selected';
+                        html += '<span class="' + cls + '" data-day="' + day + '">' + day + '</span>';
+                    }
+
+                    html += '</div>';
+                    picker.innerHTML = html;
+
+                    picker.querySelector('#pickerPrev').addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        viewDate.setMonth(viewDate.getMonth() - 1);
+                        renderCalendar();
+                    });
+
+                    picker.querySelector('#pickerNext').addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        viewDate.setMonth(viewDate.getMonth() + 1);
+                        renderCalendar();
+                    });
+
+                    picker.querySelectorAll('.picker-day:not(.empty)').forEach(function(dayEl) {
+                        dayEl.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const day = parseInt(this.dataset.day);
+                            const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
+                            inputElement.value = formatGermanDate(newDate);
+                            if (callback) callback(newDate);
+                            picker.remove();
+                        });
+                    });
+                }
+
+                renderCalendar();
+
+                const rect = inputElement.getBoundingClientRect();
+                picker.style.position = 'fixed';
+                picker.style.top = (rect.bottom + 2) + 'px';
+                picker.style.left = rect.left + 'px';
+                picker.style.zIndex = '9999';
+
+                document.body.appendChild(picker);
+
+                setTimeout(function() {
+                    document.addEventListener('click', function closeHandler(e) {
+                        if (!picker.contains(e.target) && e.target !== inputElement) {
+                            picker.remove();
+                            document.removeEventListener('click', closeHandler);
+                        }
+                    });
+                }, 100);
+            }
+
+            // Initial laden
+            updateTableHeaders();
+            loadDienstplanData();
+        });
+    </script>
+</body>
+</html>

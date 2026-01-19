@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abwesenheitsübersicht - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        .app-header { background: #4316B2; min-height: 94px; }
+        .calendar-grid { display: grid; grid-template-columns: 200px repeat(7, 1fr); gap: 1px; background: #ccc; }
+        .calendar-header { background: #e8e8e8; padding: 8px; font-weight: 600; text-align: center; }
+        .calendar-ma { background: white; padding: 6px 8px; font-size: 11px; }
+        .calendar-cell { background: white; min-height: 30px; position: relative; }
+        .calendar-cell.absent { background: #f0f0f0; }
+        .calendar-cell.urlaub { background: #e8e8e8; }
+        .calendar-cell.krank { background: #e8e8e8; }
+        .calendar-cell.weekend { background: #f5f5f5; }
+    </style>
+</head>
+<body data-active-menu="abwesenheit">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Abwesenheitsübersicht</h1>
+                </div>
+                <div class="header-center">
+                    <button class="btn btn-nav" id="btnVorwoche">&#9664;&#9664;</button>
+                    <span id="lblWoche" style="min-width:200px;text-align:center;font-weight:600;">KW --</span>
+                    <button class="btn btn-nav" id="btnNachwoche">&#9654;&#9654;</button>
+                    <button class="btn" id="btnHeute" style="margin-left:10px;">Heute</button>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Monat:</label>
+                    <select id="cboMonat" class="form-control" style="width:120px;">
+                        <option value="1">Januar</option>
+                        <option value="2">Februar</option>
+                        <option value="3">Maerz</option>
+                        <option value="4">April</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Dezember</option>
+                    </select>
+                    <select id="cboJahr" class="form-control" style="width:80px;">
+                        <option value="2024">2024</option>
+                        <option value="2025" selected>2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Filter:</label>
+                    <select id="cboFilter" class="form-control" style="width:120px;">
+                        <option value="">Alle</option>
+                        <option value="Urlaub">Urlaub</option>
+                        <option value="Krank">Krankheit</option>
+                        <option value="Privat">Privat</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnAktualisieren">Aktualisieren</button>
+                    <button class="btn" id="btnExport">Export</button>
+                    <button class="btn" id="btnDrucken">Drucken</button>
+                </div>
+            </div>
+
+            <!-- Legende -->
+            <div class="stats-bar">
+                <div class="stat-item" style="border-left-color:#e8e8e8;">
+                    <span class="stat-label">Urlaub</span>
+                </div>
+                <div class="stat-item" style="border-left-color:#e8e8e8;">
+                    <span class="stat-label">Krankheit</span>
+                </div>
+                <div class="stat-item" style="border-left-color:#f0f0f0;">
+                    <span class="stat-label">Sonstiges</span>
+                </div>
+            </div>
+
+            <div class="app-content" style="padding:8px;overflow:auto;">
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Header -->
+                    <div class="calendar-header">Mitarbeiter</div>
+                    <div class="calendar-header">Mo</div>
+                    <div class="calendar-header">Di</div>
+                    <div class="calendar-header">Mi</div>
+                    <div class="calendar-header">Do</div>
+                    <div class="calendar-header">Fr</div>
+                    <div class="calendar-header">Sa</div>
+                    <div class="calendar-header">So</div>
+                    <!-- Wird dynamisch gefuellt -->
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Mitarbeiter</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+</body>
+</html>

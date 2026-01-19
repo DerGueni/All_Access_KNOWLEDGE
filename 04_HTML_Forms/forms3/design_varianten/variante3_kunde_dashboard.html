@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenstamm - Dashboard</title>
+    <style>
+        :root {
+            /* CONSEC Farbschema - Variante Kunde (Grün-Akzent) */
+            --primary-color: #2d6a4f;
+            --primary-dark: #1b4332;
+            --primary-light: #40916c;
+            --accent-color: #52b788;
+            --warning-color: #f77f00;
+            --danger-color: #d62828;
+            --info-color: #4895ef;
+
+            /* Neutralfarben */
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --text-muted: #adb5bd;
+
+            /* Schatten */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+            /* Abstände */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+
+            /* Radien */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .app-logo {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .app-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .app-subtitle {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+
+        .header-search {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 var(--spacing-xl);
+        }
+
+        .header-search input {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: none;
+            border-radius: var(--radius-lg);
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 13px;
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        .header-search input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .header-search input:focus {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-1px);
+        }
+
+        .header-btn.primary {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* === SPLIT VIEW === */
+        .split-container {
+            display: flex;
+            height: calc(100vh - 72px);
+        }
+
+        /* === LEFT PANEL === */
+        .list-panel {
+            width: 360px;
+            min-width: 280px;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-toolbar {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafbfc;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .view-toggle {
+            display: flex;
+            background: var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 2px;
+        }
+
+        .view-btn {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sort-select {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .list-stats {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .list-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Kunden-Karte */
+        .customer-card {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .customer-card:hover {
+            background: #f8f9fa;
+        }
+
+        .customer-card.active {
+            background: linear-gradient(90deg, rgba(45, 106, 79, 0.08) 0%, transparent 100%);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .customer-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .customer-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .customer-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .customer-rating {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-top: var(--spacing-xs);
+        }
+
+        .star {
+            color: #ffc107;
+            font-size: 12px;
+        }
+
+        .star.empty {
+            color: var(--border-color);
+        }
+
+        .customer-stats {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .customer-revenue {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+
+        .customer-orders {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* === SPLITTER === */
+        .splitter {
+            width: 6px;
+            background: var(--border-color);
+            cursor: col-resize;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .splitter:hover, .splitter.dragging {
+            background: var(--primary-color);
+        }
+
+        .splitter-grip {
+            width: 4px;
+            height: 40px;
+            background: repeating-linear-gradient(
+                0deg,
+                var(--text-muted),
+                var(--text-muted) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+            border-radius: 2px;
+            opacity: 0.5;
+        }
+
+        .splitter:hover .splitter-grip {
+            opacity: 1;
+            background: repeating-linear-gradient(
+                0deg,
+                white,
+                white 2px,
+                transparent 2px,
+                transparent 6px
+            );
+        }
+
+        /* === RIGHT PANEL === */
+        .dashboard-panel {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--bg-color);
+        }
+
+        /* === CUSTOMER HEADER === */
+        .customer-header {
+            background: white;
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .customer-header-left {
+            display: flex;
+            gap: var(--spacing-lg);
+        }
+
+        .large-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 28px;
+        }
+
+        .customer-header-info h1 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .customer-header-meta {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .customer-tags {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .tag {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .tag-vip { background: #fef3c7; color: #92400e; }
+        .tag-aktiv { background: #d1fae5; color: #065f46; }
+        .tag-stamm { background: #dbeafe; color: #1e40af; }
+
+        .customer-header-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .action-btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+            border-color: var(--primary-color);
+        }
+
+        .action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* === DASHBOARD CONTENT === */
+        .dashboard-content {
+            padding: var(--spacing-lg);
+        }
+
+        /* === KPI ROW === */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .kpi-card.green::before { background: var(--accent-color); }
+        .kpi-card.blue::before { background: var(--info-color); }
+        .kpi-card.yellow::before { background: var(--warning-color); }
+        .kpi-card.red::before { background: var(--danger-color); }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+
+        .kpi-change {
+            font-size: 12px;
+            margin-top: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kpi-change.positive { color: var(--accent-color); }
+        .kpi-change.negative { color: var(--danger-color); }
+
+        .kpi-sparkline {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 80px;
+            height: 40px;
+            opacity: 0.3;
+        }
+
+        /* === WIDGET GRID === */
+        .widget-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        /* === WIDGET === */
+        .widget {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .widget-header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-title {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .widget-title-icon {
+            width: 28px;
+            height: 28px;
+            background: rgba(45, 106, 79, 0.1);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .widget-tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .widget-tab {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+
+        .widget-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .widget-body {
+            padding: var(--spacing-lg);
+        }
+
+        /* === CHART PLACEHOLDER === */
+        .chart-container {
+            height: 250px;
+            background: linear-gradient(180deg, #f8f9fa 0%, white 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: var(--spacing-md);
+            gap: var(--spacing-sm);
+        }
+
+        .chart-bar {
+            width: 100%;
+            max-width: 40px;
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s ease;
+            position: relative;
+        }
+
+        .chart-bar:hover {
+            background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+        }
+
+        .chart-bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .chart-bar:hover::after {
+            opacity: 1;
+        }
+
+        /* === CONTACT LIST === */
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-md);
+            transition: background 0.2s;
+        }
+
+        .contact-item:hover {
+            background: #f8f9fa;
+        }
+
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .contact-details {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .contact-role {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .contact-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .contact-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* === ORDER LIST === */
+        .order-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .order-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(45, 106, 79, 0.1);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .order-details h4 {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .order-date {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .order-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-completed { background: #d1fae5; color: #065f46; }
+        .status-active { background: #dbeafe; color: #1e40af; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+
+        .order-amount {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1400px) {
+            .widget-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .kpi-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .split-container {
+                flex-direction: column;
+            }
+            .list-panel {
+                width: 100%;
+                max-width: none;
+                height: 35vh;
+            }
+            .splitter {
+                width: 100%;
+                height: 6px;
+                cursor: row-resize;
+            }
+            .header-search {
+                display: none;
+            }
+            .kpi-row {
+                grid-template-columns: 1fr;
+            }
+            .customer-header {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="app-logo">👥</div>
+            <div>
+                <div class="app-title">Kundenstamm</div>
+                <div class="app-subtitle">CRM Dashboard</div>
+            </div>
+        </div>
+        <div class="header-search">
+            <input type="text" placeholder="Kunden suchen... (Strg+K)">
+        </div>
+        <div class="header-actions">
+            <button class="header-btn">
+                <span>📊</span> Export
+            </button>
+            <button class="header-btn primary">
+                <span>+</span> Neuer Kunde
+            </button>
+        </div>
+    </header>
+
+    <!-- SPLIT VIEW -->
+    <div class="split-container">
+        <!-- LEFT: Kundenliste -->
+        <div class="list-panel" id="listPanel">
+            <div class="list-toolbar">
+                <div class="toolbar-left">
+                    <div class="view-toggle">
+                        <button class="view-btn active">Liste</button>
+                        <button class="view-btn">Karten</button>
+                    </div>
+                    <select class="sort-select">
+                        <option>Name A-Z</option>
+                        <option>Umsatz ↓</option>
+                        <option>Letzte Aktivität</option>
+                    </select>
+                </div>
+                <span class="list-stats">284 Kunden</span>
+            </div>
+            <div class="list-content">
+                <!-- Kunde 1 -->
+                <div class="customer-card active" onclick="selectCustomer(this, 1)">
+                    <div class="customer-avatar">MM</div>
+                    <div class="customer-info">
+                        <div class="customer-name">Messe München GmbH</div>
+                        <div class="customer-meta">
+                            <span>München</span>
+                            <span>Events</span>
+                        </div>
+                        <div class="customer-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                    </div>
+                    <div class="customer-stats">
+                        <div class="customer-revenue">€ 245.800</div>
+                        <div class="customer-orders">32 Aufträge</div>
+                    </div>
+                </div>
+                <!-- Kunde 2 -->
+                <div class="customer-card" onclick="selectCustomer(this, 2)">
+                    <div class="customer-avatar">BW</div>
+                    <div class="customer-info">
+                        <div class="customer-name">BMW AG</div>
+                        <div class="customer-meta">
+                            <span>München</span>
+                            <span>Automotive</span>
+                        </div>
+                        <div class="customer-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                    </div>
+                    <div class="customer-stats">
+                        <div class="customer-revenue">€ 189.500</div>
+                        <div class="customer-orders">18 Aufträge</div>
+                    </div>
+                </div>
+                <!-- Kunde 3 -->
+                <div class="customer-card" onclick="selectCustomer(this, 3)">
+                    <div class="customer-avatar">SI</div>
+                    <div class="customer-info">
+                        <div class="customer-name">Siemens AG</div>
+                        <div class="customer-meta">
+                            <span>Erlangen</span>
+                            <span>Technologie</span>
+                        </div>
+                        <div class="customer-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                    </div>
+                    <div class="customer-stats">
+                        <div class="customer-revenue">€ 156.200</div>
+                        <div class="customer-orders">24 Aufträge</div>
+                    </div>
+                </div>
+                <!-- Kunde 4 -->
+                <div class="customer-card" onclick="selectCustomer(this, 4)">
+                    <div class="customer-avatar">OH</div>
+                    <div class="customer-info">
+                        <div class="customer-name">Olympiahalle München</div>
+                        <div class="customer-meta">
+                            <span>München</span>
+                            <span>Veranstaltung</span>
+                        </div>
+                        <div class="customer-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                    </div>
+                    <div class="customer-stats">
+                        <div class="customer-revenue">€ 98.400</div>
+                        <div class="customer-orders">15 Aufträge</div>
+                    </div>
+                </div>
+                <!-- Kunde 5 -->
+                <div class="customer-card" onclick="selectCustomer(this, 5)">
+                    <div class="customer-avatar">HV</div>
+                    <div class="customer-info">
+                        <div class="customer-name">Hotel Vier Jahreszeiten</div>
+                        <div class="customer-meta">
+                            <span>München</span>
+                            <span>Hotellerie</span>
+                        </div>
+                        <div class="customer-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                    </div>
+                    <div class="customer-stats">
+                        <div class="customer-revenue">€ 87.600</div>
+                        <div class="customer-orders">28 Aufträge</div>
+                    </div>
+                </div>
+                <!-- Kunde 6 -->
+                <div class="customer-card" onclick="selectCustomer(this, 6)">
+                    <div class="customer-avatar">AA</div>
+                    <div class="customer-info">
+                        <div class="customer-name">Allianz Arena</div>
+                        <div class="customer-meta">
+                            <span>München</span>
+                            <span>Sport</span>
+                        </div>
+                        <div class="customer-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                    </div>
+                    <div class="customer-stats">
+                        <div class="customer-revenue">€ 76.300</div>
+                        <div class="customer-orders">12 Aufträge</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPLITTER -->
+        <div class="splitter" id="splitter">
+            <div class="splitter-grip"></div>
+        </div>
+
+        <!-- RIGHT: Dashboard -->
+        <div class="dashboard-panel">
+            <!-- Customer Header -->
+            <div class="customer-header">
+                <div class="customer-header-left">
+                    <div class="large-avatar">MM</div>
+                    <div class="customer-header-info">
+                        <h1>Messe München GmbH</h1>
+                        <div class="customer-header-meta">
+                            📍 Am Messesee 2, 81829 München | 📞 +49 89 949-0 | ✉️ info@messe-muenchen.de
+                        </div>
+                        <div class="customer-tags">
+                            <span class="tag tag-vip">⭐ VIP-Kunde</span>
+                            <span class="tag tag-aktiv">✓ Aktiv</span>
+                            <span class="tag tag-stamm">🔁 Stammkunde</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="customer-header-actions">
+                    <button class="action-btn">✉️ E-Mail</button>
+                    <button class="action-btn">📞 Anrufen</button>
+                    <button class="action-btn primary">📝 Bearbeiten</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- KPI Row -->
+                <div class="kpi-row">
+                    <div class="kpi-card green">
+                        <div class="kpi-label">Jahresumsatz 2024</div>
+                        <div class="kpi-value">€ 245.800</div>
+                        <div class="kpi-change positive">↑ 18% vs. Vorjahr</div>
+                        <svg class="kpi-sparkline" viewBox="0 0 80 40">
+                            <path d="M0,35 Q20,30 40,20 T80,5" fill="none" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="kpi-card blue">
+                        <div class="kpi-label">Aufträge (Jahr)</div>
+                        <div class="kpi-value">32</div>
+                        <div class="kpi-change positive">↑ 4 mehr als 2023</div>
+                    </div>
+                    <div class="kpi-card yellow">
+                        <div class="kpi-label">Offene Posten</div>
+                        <div class="kpi-value">€ 12.400</div>
+                        <div class="kpi-change negative">3 Rechnungen</div>
+                    </div>
+                    <div class="kpi-card red">
+                        <div class="kpi-label">Zahlungsziel</div>
+                        <div class="kpi-value">Ø 28</div>
+                        <div class="kpi-change">Tage</div>
+                    </div>
+                </div>
+
+                <!-- Widget Grid -->
+                <div class="widget-grid">
+                    <!-- Umsatz Chart -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <div class="widget-title">
+                                <div class="widget-title-icon">📈</div>
+                                Umsatzentwicklung
+                            </div>
+                            <div class="widget-tabs">
+                                <button class="widget-tab active">Monat</button>
+                                <button class="widget-tab">Quartal</button>
+                                <button class="widget-tab">Jahr</button>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="chart-container">
+                                <div class="chart-bar" style="height: 60%;" data-value="€ 18k"></div>
+                                <div class="chart-bar" style="height: 75%;" data-value="€ 22k"></div>
+                                <div class="chart-bar" style="height: 45%;" data-value="€ 14k"></div>
+                                <div class="chart-bar" style="height: 90%;" data-value="€ 28k"></div>
+                                <div class="chart-bar" style="height: 65%;" data-value="€ 20k"></div>
+                                <div class="chart-bar" style="height: 80%;" data-value="€ 24k"></div>
+                                <div class="chart-bar" style="height: 55%;" data-value="€ 17k"></div>
+                                <div class="chart-bar" style="height: 95%;" data-value="€ 30k"></div>
+                                <div class="chart-bar" style="height: 70%;" data-value="€ 21k"></div>
+                                <div class="chart-bar" style="height: 85%;" data-value="€ 26k"></div>
+                                <div class="chart-bar" style="height: 78%;" data-value="€ 23k"></div>
+                                <div class="chart-bar" style="height: 88%;" data-value="€ 27k"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ansprechpartner -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <div class="widget-title">
+                                <div class="widget-title-icon">👤</div>
+                                Ansprechpartner
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="contact-list">
+                                <div class="contact-item">
+                                    <div class="contact-avatar">👩</div>
+                                    <div class="contact-details">
+                                        <div class="contact-name">Dr. Maria Schmidt</div>
+                                        <div class="contact-role">Geschäftsführerin</div>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="contact-btn">📞</button>
+                                        <button class="contact-btn">✉️</button>
+                                    </div>
+                                </div>
+                                <div class="contact-item">
+                                    <div class="contact-avatar">👨</div>
+                                    <div class="contact-details">
+                                        <div class="contact-name">Thomas Weber</div>
+                                        <div class="contact-role">Eventmanager</div>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="contact-btn">📞</button>
+                                        <button class="contact-btn">✉️</button>
+                                    </div>
+                                </div>
+                                <div class="contact-item">
+                                    <div class="contact-avatar">👩</div>
+                                    <div class="contact-details">
+                                        <div class="contact-name">Lisa Müller</div>
+                                        <div class="contact-role">Buchhaltung</div>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="contact-btn">📞</button>
+                                        <button class="contact-btn">✉️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Letzte Aufträge -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <div class="widget-title">
+                                <div class="widget-title-icon">📋</div>
+                                Letzte Aufträge
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="order-list">
+                                <div class="order-item">
+                                    <div class="order-info">
+                                        <div class="order-icon">📦</div>
+                                        <div class="order-details">
+                                            <h4>VA-2024-001 - Hauptstand</h4>
+                                            <div class="order-date">15.01. - 20.01.2024</div>
+                                        </div>
+                                    </div>
+                                    <span class="order-status status-active">Aktiv</span>
+                                    <span class="order-amount">€ 45.600</span>
+                                </div>
+                                <div class="order-item">
+                                    <div class="order-info">
+                                        <div class="order-icon">📦</div>
+                                        <div class="order-details">
+                                            <h4>VA-2023-089 - Weihnachtsmesse</h4>
+                                            <div class="order-date">01.12. - 23.12.2023</div>
+                                        </div>
+                                    </div>
+                                    <span class="order-status status-completed">Abgeschlossen</span>
+                                    <span class="order-amount">€ 68.200</span>
+                                </div>
+                                <div class="order-item">
+                                    <div class="order-info">
+                                        <div class="order-icon">📦</div>
+                                        <div class="order-details">
+                                            <h4>VA-2023-078 - Automobilmesse</h4>
+                                            <div class="order-date">10.11. - 19.11.2023</div>
+                                        </div>
+                                    </div>
+                                    <span class="order-status status-completed">Abgeschlossen</span>
+                                    <span class="order-amount">€ 52.400</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notizen -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <div class="widget-title">
+                                <div class="widget-title-icon">📝</div>
+                                Notizen
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                                <strong style="font-size: 12px;">Wichtig:</strong>
+                                <p style="font-size: 12px; margin-top: 4px;">Rabattvereinbarung 15% ab 50.000€ Auftragsvolumen. Gültig bis 31.12.2024.</p>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                <strong>12.01.2024:</strong> Telefonat mit Hr. Weber - neue Messe im März geplant
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">
+                                <strong>08.01.2024:</strong> Angebot für Frühlingsmesse versendet
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Splitter Logic
+        const splitter = document.getElementById('splitter');
+        const listPanel = document.getElementById('listPanel');
+        let isResizing = false;
+
+        splitter.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            splitter.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const newWidth = e.clientX;
+            if (newWidth >= 280 && newWidth <= 480) {
+                listPanel.style.width = newWidth + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
+            splitter.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
+
+        // Customer Selection
+        function selectCustomer(element, id) {
+            document.querySelectorAll('.customer-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            element.classList.add('active');
+            console.log('Kunde ausgewählt:', id);
+        }
+
+        // View Toggle
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Widget Tabs
+        document.querySelectorAll('.widget-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                this.parentElement.querySelectorAll('.widget-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

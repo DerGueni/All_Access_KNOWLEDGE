@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsstatus (sub_VA_Anzeige)</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
+        }
+        .header-title {
+            color: #333;
+        }
+        .status-list {
+            flex: 1;
+            overflow: auto;
+        }
+        .status-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            gap: 8px;
+        }
+        .status-row:hover {
+            background: #f0f0f0;
+        }
+        .status-label {
+            flex: 1;
+            font-size: 11px;
+            color: #333;
+        }
+        .status-count {
+            font-size: 11px;
+            font-weight: 600;
+            color: #4316B2;
+            min-width: 40px;
+            text-align: right;
+        }
+        .btn-anzeigen {
+            padding: 3px 8px;
+            font-size: 9px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        .btn-anzeigen:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container" id="sub_VA_Anzeige">
+        <div class="status-header">
+            <span class="header-title">Auftragsstatus</span>
+            <span class="header-cols">Anzahl | Aktion</span>
+        </div>
+        <div class="status-list">
+            <div class="status-row">
+                <span class="status-label">In Planung</span>
+                <span class="status-count" id="AnzStatus1">0</span>
+                <button class="btn-anzeigen" id="btnAnz1">Anzeigen</button>
+            </div>
+            <div class="status-row">
+                <span class="status-label">In Bearbeitung</span>
+                <span class="status-count" id="AnzStatus2">0</span>
+                <button class="btn-anzeigen" id="btnAnz2">Anzeigen</button>
+            </div>
+            <div class="status-row">
+                <span class="status-label">Einsatzliste versendet</span>
+                <span class="status-count" id="AnzStatus3">0</span>
+                <button class="btn-anzeigen" id="btnAnz3">Anzeigen</button>
+            </div>
+            <div class="status-row">
+                <span class="status-label">Rechnung gestellt</span>
+                <span class="status-count" id="AnzStatus4">0</span>
+                <button class="btn-anzeigen" id="btnAnz4">Anzeigen</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="logic/sub_VA_Anzeige.logic.js"></script>
+</body>
+</html>
+

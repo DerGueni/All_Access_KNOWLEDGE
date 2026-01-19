@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter-Adressen - CONSYS</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; font-size: 11px; }
+        body { background-color: #8080c0; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .placeholder {
+            background: #d0d0e0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+        }
+        .placeholder h1 { color: #000080; margin-bottom: 20px; font-size: 24px; } /* Formulartitel +8px gemaess Anforderung */
+        .placeholder p { margin-bottom: 15px; color: #333; }
+        .btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+    </style>
+    <script src="js/webview2-bridge.js"></script>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body>
+    <div class="placeholder">
+        <h1>Mitarbeiter-Adressen</h1>
+        <p>Adressverwaltung fuer Mitarbeiter.</p>
+        <p><em>HTML-Version in Entwicklung</em></p>
+        <br>
+        <button class="btn" onclick="history.back()">Zurueck</button>
+        <button class="btn" onclick="Bridge.close()">Schliessen</button>
+    </div>
+</body>
+</html>
+

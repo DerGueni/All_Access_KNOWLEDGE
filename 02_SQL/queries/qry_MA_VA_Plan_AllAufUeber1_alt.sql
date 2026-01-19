@@ -1,0 +1,2 @@
+SELECT qry_MA_VA_Plan_All_AufUeber1a.* FROM qry_MA_VA_Plan_All_AufUeber1a UNION SELECT qry_MA_VA_Plan_All_AufUeber2.* FROM qry_MA_VA_Plan_All_AufUeber2;
+

@@ -1,0 +1,1531 @@
+/**
+ * RESPONSIVE.CSS - Umfassende Responsive-Optimierungen für 12-23+ Zoll Displays
+ * Datei: 04_HTML_Forms/forms3/css/responsive.css
+ * Erstellt: 2026-01-15
+ *
+ * Optimiert für:
+ * - 12 Zoll Laptop (1366x768)
+ * - 15-17 Zoll Laptop (1600x900 / 1920x1080)
+ * - 23 Zoll Full HD (1920x1080)
+ * - 23+ Zoll 2K/4K (2560x1440 / 3840x2160)
+ *
+ * Kombination aus:
+ * 1. Allgemeinen Responsive-Utilities
+ * 2. Shell.html spezifischen Regeln
+ * 3. Auftragstamm spezifischen Utilities
+ */
+
+/* ========================================
+   CSS CUSTOM PROPERTIES - BREAKPOINTS
+   ======================================== */
+
+:root {
+    /* Breakpoints */
+    --bp-laptop-small: 1366px;
+    --bp-laptop-medium: 1600px;
+    --bp-desktop-hd: 1920px;
+    --bp-desktop-2k: 2560px;
+    --bp-desktop-4k: 3840px;
+    --breakpoint-mobile: 768px;
+    --breakpoint-tablet: 1024px;
+    --breakpoint-desktop: 1440px;
+
+    /* Container Widths */
+    --container-max-width: 100%;
+    --content-max-width: 1600px;
+    --form-max-width: 1400px;
+
+    /* Spacing Scale */
+    --spacing-xs: clamp(0.25rem, 0.5vw, 0.5rem);
+    --spacing-sm: clamp(0.5rem, 1vw, 1rem);
+    --spacing-md: clamp(1rem, 2vw, 1.5rem);
+    --spacing-lg: clamp(1.5rem, 3vw, 2rem);
+    --spacing-xl: clamp(2rem, 4vw, 3rem);
+
+    /* Font Sizes */
+    --font-size-xs: clamp(0.625rem, 0.7vw, 0.75rem);    /* 10-12px */
+    --font-size-sm: clamp(0.75rem, 0.85vw, 0.875rem);   /* 12-14px */
+    --font-size-base: clamp(0.875rem, 1vw, 1rem);       /* 14-16px */
+    --font-size-md: clamp(1rem, 1.1vw, 1.125rem);       /* 16-18px */
+    --font-size-lg: clamp(1.125rem, 1.25vw, 1.25rem);   /* 18-20px */
+    --font-size-xl: clamp(1.25rem, 1.5vw, 1.5rem);      /* 20-24px */
+
+    /* Sidebar */
+    --sidebar-width: 200px;
+    --sidebar-collapsed-width: 60px;
+
+    /* Grid Gaps */
+    --grid-gap: clamp(0.5rem, 1vw, 1rem);
+    --grid-gap-lg: clamp(1rem, 2vw, 1.5rem);
+}
+
+
+/* ========================================
+   BASE RESPONSIVE CONTAINER
+   ======================================== */
+
+.app-container,
+.main-container,
+.content-wrapper {
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin-inline: auto;
+    padding-inline: var(--spacing-md);
+    box-sizing: border-box;
+}
+
+.form-container {
+    width: 100%;
+    max-width: var(--form-max-width);
+    margin-inline: auto;
+}
+
+
+/* ========================================
+   FLEXIBLE GRID SYSTEM
+   ======================================== */
+
+.grid {
+    display: grid;
+    gap: var(--grid-gap);
+    width: 100%;
+}
+
+.grid-auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+}
+
+.grid-auto-fill {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+}
+
+.grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+
+.grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+}
+
+.grid-4 {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+
+
+/* ========================================
+   FLEXIBLE FORM LAYOUTS
+   ======================================== */
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--grid-gap);
+    width: 100%;
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group,
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    flex: 1 1 auto;
+    min-width: 0; /* Verhindert Overflow */
+}
+
+.form-group label,
+.field-group label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea,
+.field-group input,
+.field-group select,
+.field-group textarea {
+    width: 100%;
+    max-width: 100%;
+    font-size: var(--font-size-base);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    box-sizing: border-box;
+}
+
+.form-columns {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.form-column {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Spalten-Basis-Klassen */
+.col-1 { flex: 0 0 8.333%; min-width: 100px; }
+.col-2 { flex: 0 0 16.666%; min-width: 120px; }
+.col-3 { flex: 0 0 25%; min-width: 150px; }
+.col-4 { flex: 0 0 33.333%; min-width: 180px; }
+.col-6 { flex: 0 0 50%; min-width: 200px; }
+.col-8 { flex: 0 0 66.666%; min-width: 250px; }
+.col-12 { flex: 0 0 100%; }
+
+
+/* ========================================
+   RESPONSIVE SIDEBAR (SHELL.HTML)
+   ======================================== */
+
+.app-sidebar,
+.sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    transition: width 0.3s ease, min-width 0.3s ease;
+    overflow: hidden;
+}
+
+.app-sidebar.collapsed,
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+    min-width: var(--sidebar-collapsed-width);
+}
+
+.app-sidebar.collapsed .menu-text,
+.sidebar.collapsed .menu-text {
+    display: none;
+}
+
+.app-sidebar.collapsed .menu-icon,
+.sidebar.collapsed .menu-icon {
+    margin-inline: auto;
+}
+
+/* Layout mit Sidebar */
+.layout-with-sidebar {
+    display: flex;
+    gap: var(--spacing-md);
+    width: 100%;
+}
+
+.layout-with-sidebar .main-content,
+.main-content {
+    flex: 1;
+    min-width: 0; /* Verhindert Overflow */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.left-menu {
+    width: 185px;
+    min-width: 185px;
+}
+
+
+/* ========================================
+   RESPONSIVE TAB CONTAINER
+   ======================================== */
+
+.tab-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+}
+
+.tab-header,
+.tab-bar {
+    display: flex;
+    gap: var(--spacing-xs);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    flex-wrap: wrap;
+    background: #d0d0e0;
+    padding: 5px;
+}
+
+.tab-button,
+.tab,
+.tab-btn {
+    flex: 0 0 auto;
+    flex-shrink: 0; /* Tabs nicht zusammenquetschen */
+    min-width: max-content;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+.tab-content {
+    width: 100%;
+    overflow-x: auto;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Scrollbare Tab-Bar */
+.tab-bar::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tab-bar::-webkit-scrollbar-track {
+    background: #d3d3d3;
+}
+
+.tab-bar::-webkit-scrollbar-thumb {
+    background: #a0a0c0;
+    border-radius: 4px;
+}
+
+.tab-bar::-webkit-scrollbar-thumb:hover {
+    background: #8080a0;
+}
+
+
+/* ========================================
+   RESPONSIVE TABLES / DATAGRIDS
+   ======================================== */
+
+.datasheet,
+.data-table {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    display: block;
+}
+
+.datasheet table,
+.data-table table {
+    width: 100%;
+    min-width: max-content;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+
+.datasheet th,
+.datasheet td,
+.data-table th,
+.data-table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* Responsive Table Wrapper */
+.table-responsive,
+.datasheet-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+    min-width: 600px; /* Minimale Breite für Lesbarkeit */
+}
+
+
+/* ========================================
+   RESPONSIVE BUTTONS
+   ======================================== */
+
+.button-group {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.btn,
+button,
+input[type="button"],
+input[type="submit"] {
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+    min-height: 32px;
+    cursor: pointer;
+}
+
+.btn-small {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    min-height: 28px;
+}
+
+.btn-large {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: var(--font-size-md);
+    min-height: 40px;
+}
+
+
+/* ========================================
+   RESPONSIVE CARDS
+   ======================================== */
+
+.card {
+    padding: var(--spacing-md);
+    border-radius: clamp(4px, 0.5vw, 8px);
+    box-sizing: border-box;
+}
+
+.card-header {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+.card-body {
+    font-size: var(--font-size-base);
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: var(--spacing-md);
+}
+
+
+/* ========================================
+   RESPONSIVE MODALS / DIALOGS
+   ======================================== */
+
+.modal-dialog,
+.dialog-container {
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    margin: auto;
+    overflow-y: auto;
+}
+
+.modal-header,
+.dialog-header {
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-md);
+}
+
+.modal-body,
+.dialog-body {
+    padding: var(--spacing-md);
+    font-size: var(--font-size-base);
+}
+
+.modal-footer,
+.dialog-footer {
+    padding: var(--spacing-md);
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+
+/* ========================================
+   HEADER BAR
+   ======================================== */
+
+.header-bar {
+    padding: 8px 15px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+/* ========================================
+   TOOLBAR
+   ======================================== */
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px;
+}
+
+
+/* ========================================
+   FOTO CONTAINER
+   ======================================== */
+
+.foto-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #ffffff;
+    border: 1px solid #808080;
+}
+
+.foto-display {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    border: 2px solid #808080;
+}
+
+.foto-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    width: 100%;
+    justify-content: center;
+}
+
+.foto-buttons .btn {
+    flex: 1;
+    min-width: 80px;
+}
+
+
+/* ========================================
+   ADDRESS GROUP
+   ======================================== */
+
+.address-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.address-row {
+    display: flex;
+    gap: 8px;
+}
+
+
+/* ========================================
+   SUBFORM CONTAINER
+   ======================================== */
+
+.subform-container {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    border: 2px solid #808080;
+    overflow: hidden;
+}
+
+.subform-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+
+/* ========================================
+   SCROLL CONTAINER
+   ======================================== */
+
+.scroll-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+}
+
+.scroll-container::-webkit-scrollbar {
+    width: 12px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
+/* ========================================
+   AUFTRAGSTAMM UTILITIES
+   ======================================== */
+
+/* Position Offset Classes */
+.offset-left-xs { position: relative; left: -50px; }
+.offset-left-sm { position: relative; left: -115px; }
+.offset-left-md { position: relative; left: -150px; }
+.offset-left-lg { position: relative; left: -214px; }
+.offset-left-xl { position: relative; left: -675px; }
+.offset-right-sm { position: relative; right: 115px; }
+.offset-right-md { position: relative; right: 600px; }
+.offset-right-lg { position: relative; right: 890px; }
+
+/* Width Utility Classes */
+.w-60 { width: 60px; }
+.w-80 { width: 80px; }
+.w-83 { width: 83px; }
+.w-95 { width: 95px; }
+.w-100 { width: 100px; }
+.w-110 { width: 110px; }
+.w-180 { width: 180px; }
+.w-184 { width: 184px; }
+.w-205 { width: 205px; }
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.w-fit { width: fit-content; }
+.w-min { width: min-content; }
+.w-max { width: max-content; }
+
+/* Height Utility Classes */
+.h-20 { height: 20px; }
+.h-23 { height: 23px; }
+.h-26 { height: 26px; }
+.h-full { height: 100%; }
+.h-auto { height: auto; }
+.h-fit { height: fit-content; }
+.h-screen { height: 100vh; }
+
+/* Margin Utility Classes */
+.ml-auto { margin-left: auto; }
+.ml-5 { margin-left: 5px; }
+.ml-10 { margin-left: 10px; }
+.ml-15 { margin-left: 15px; }
+.ml-100 { margin-left: 100px; }
+.mt-4 { margin-top: 4px; }
+.mt-5 { margin-top: 5px; }
+.mt-25 { margin-top: 25px; }
+
+/* Top Offset Classes */
+.top-minus-5 { position: relative; top: -5px; }
+.top-0 { position: relative; top: 0; }
+.top-25 { position: relative; top: 25px; }
+
+
+/* ========================================
+   ASPECT RATIO UTILITIES
+   ======================================== */
+
+.aspect-square { aspect-ratio: 1 / 1; }
+.aspect-video { aspect-ratio: 16 / 9; }
+.aspect-4-3 { aspect-ratio: 4 / 3; }
+.aspect-21-9 { aspect-ratio: 21 / 9; }
+
+
+/* ========================================
+   UTILITY CLASSES - VISIBILITY
+   ======================================== */
+
+/* Sichtbarkeit basierend auf Breakpoint */
+.hide-below-1366 { display: none; }
+@media (min-width: 1366px) { .hide-below-1366 { display: revert; } }
+
+.hide-below-1600 { display: none; }
+@media (min-width: 1600px) { .hide-below-1600 { display: revert; } }
+
+.hide-below-1920 { display: none; }
+@media (min-width: 1920px) { .hide-below-1920 { display: revert; } }
+
+.hide-above-1920 { display: revert; }
+@media (min-width: 1920px) { .hide-above-1920 { display: none; } }
+
+.hide-mobile {
+    display: block;
+}
+
+.show-mobile {
+    display: none;
+}
+
+/* Text Overflow */
+.text-ellipsis,
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-wrap { white-space: normal; }
+.text-nowrap { white-space: nowrap; }
+
+/* Flexible Spacing */
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.gap-lg { gap: var(--spacing-lg); }
+.gap-xl { gap: var(--spacing-xl); }
+
+/* Overflow Utilities */
+.overflow-auto { overflow: auto; }
+.overflow-hidden { overflow: hidden; }
+.overflow-x-auto { overflow-x: auto; overflow-y: hidden; }
+.overflow-y-auto { overflow-y: auto; overflow-x: hidden; }
+
+/* Flexbox Utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-nowrap { flex-wrap: nowrap; }
+.flex-center { justify-content: center; align-items: center; }
+.flex-between { justify-content: space-between; }
+.flex-around { justify-content: space-around; }
+.flex-start { justify-content: flex-start; }
+.flex-end { justify-content: flex-end; }
+
+/* Grid Utilities */
+.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+
+/* ========================================
+   FLEXIBLES LAYOUT FÜR SHELL.HTML
+   ======================================== */
+
+/* Flexibles Layout für Main Content */
+.content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0; /* Verhindert Overflow bei flex-Kindern */
+}
+
+.tabs-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    min-height: 0; /* Wichtig für flex-Container */
+}
+
+.tab-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+
+/* ========================================
+   MEDIA QUERY: 12 ZOLL LAPTOP (1366px)
+   ======================================== */
+
+@media (min-width: 1366px) {
+    :root {
+        --sidebar-width: 180px;
+        --font-size-base: 0.875rem; /* 14px */
+    }
+
+    .app-container {
+        padding-inline: var(--spacing-sm);
+    }
+
+    .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Sidebar bleibt sichtbar */
+    .app-sidebar,
+    .sidebar {
+        width: var(--sidebar-width);
+    }
+
+    .loading-overlay {
+        left: 180px;
+        width: calc(100% - 180px);
+    }
+
+    .menu-popup-iframe {
+        width: 180px;
+    }
+
+    /* Schriftgröße leicht reduzieren */
+    .menu-btn {
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+
+    .category-header {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .sidebar-header {
+        font-size: 12px;
+        padding: 7px 8px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: 15-17 ZOLL LAPTOP (1600px)
+   ======================================== */
+
+@media (min-width: 1600px) {
+    :root {
+        --sidebar-width: 200px;
+        --font-size-base: 0.9375rem; /* 15px */
+        --content-max-width: 1800px;
+    }
+
+    .app-container {
+        padding-inline: var(--spacing-md);
+    }
+
+    .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid-4 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Formular-Spalten optimiert */
+    .col-3 { min-width: 200px; }
+    .col-4 { min-width: 220px; }
+    .col-6 { min-width: 280px; }
+
+    /* Shell.html spezifisch */
+    .sidebar {
+        width: 200px;
+    }
+
+    .loading-overlay {
+        left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    .menu-popup-iframe {
+        width: 200px;
+    }
+
+    .menu-btn {
+        font-size: 12px;
+        padding: 7px 10px;
+    }
+
+    .category-header {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+
+    .sidebar-header {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    .category-block {
+        margin-bottom: 16px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: 23 ZOLL FULL HD (1920px)
+   ======================================== */
+
+@media (min-width: 1920px) {
+    :root {
+        --sidebar-width: 220px;
+        --font-size-base: 1rem; /* 16px */
+        --content-max-width: 2000px;
+        --spacing-md: 1.25rem;
+        --spacing-lg: 1.75rem;
+    }
+
+    .app-container {
+        padding-inline: var(--spacing-lg);
+    }
+
+    .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Mehr Platz für Tabellen */
+    .datasheet table,
+    .data-table table {
+        font-size: var(--font-size-base);
+    }
+
+    /* Buttons größer */
+    .btn {
+        min-height: 36px;
+        padding: var(--spacing-sm) var(--spacing-lg);
+    }
+
+    /* Modal größer */
+    .modal-dialog {
+        max-width: 1000px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: 23+ ZOLL 2K/4K (2560px)
+   ======================================== */
+
+@media (min-width: 2560px) {
+    :root {
+        --sidebar-width: 240px;
+        --font-size-base: 1.0625rem; /* 17px */
+        --content-max-width: 2400px;
+        --spacing-md: 1.5rem;
+        --spacing-lg: 2rem;
+        --spacing-xl: 3rem;
+    }
+
+    .app-container {
+        padding-inline: var(--spacing-xl);
+    }
+
+    .grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Größere Abstände in Formularen */
+    .form-row {
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    /* Größere Buttons */
+    .btn {
+        min-height: 40px;
+        font-size: var(--font-size-md);
+    }
+
+    /* Modal maximal groß */
+    .modal-dialog {
+        max-width: 1400px;
+    }
+
+    /* Tabellen mit mehr Padding */
+    .datasheet th,
+    .datasheet td,
+    .data-table th,
+    .data-table td {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    /* Shell.html spezifisch */
+    .sidebar {
+        width: 220px;
+    }
+
+    .loading-overlay {
+        left: 220px;
+        width: calc(100% - 220px);
+    }
+
+    .menu-btn {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .category-header {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+
+    .sidebar-header {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+
+    .tab {
+        max-width: 220px;
+        font-size: 13px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: 4K DISPLAYS (3840px+)
+   ======================================== */
+
+@media (min-width: 3840px) {
+    :root {
+        --sidebar-width: 280px;
+        --font-size-base: 1.125rem; /* 18px */
+        --content-max-width: 3200px;
+        --spacing-md: 2rem;
+        --spacing-lg: 2.5rem;
+        --spacing-xl: 4rem;
+    }
+
+    .app-container {
+        max-width: var(--content-max-width);
+    }
+
+    /* Ultra-große Abstände */
+    .form-row {
+        margin-bottom: var(--spacing-xl);
+    }
+
+    /* Größere Buttons */
+    .btn {
+        min-height: 48px;
+        font-size: var(--font-size-lg);
+        padding: var(--spacing-md) var(--spacing-xl);
+    }
+
+    /* Modal ultra-groß */
+    .modal-dialog {
+        max-width: 1800px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: DESKTOP 1200-1599PX
+   ======================================== */
+
+@media (min-width: 1200px) and (max-width: 1599px) {
+    .offset-left-sm { left: -80px; }
+    .offset-left-md { left: -100px; }
+    .offset-left-lg { left: -150px; }
+    .offset-left-xl { left: -500px; }
+    .offset-right-md { right: 500px; }
+    .offset-right-lg { right: 750px; }
+    .ml-100 { margin-left: 60px; }
+}
+
+
+/* ========================================
+   MEDIA QUERY: TABLET < 1200PX
+   ======================================== */
+
+@media (max-width: 1199px) {
+    /* ALLE Offsets entfernen */
+    .offset-left-xs,
+    .offset-left-sm,
+    .offset-left-md,
+    .offset-left-lg,
+    .offset-left-xl,
+    .offset-right-sm,
+    .offset-right-md,
+    .offset-right-lg {
+        left: 0 !important;
+        right: 0 !important;
+    }
+
+    /* Margins reduzieren */
+    .ml-100 { margin-left: 20px; }
+    .ml-15 { margin-left: 10px; }
+
+    /* Form-Section: 2 Spalten */
+    .form-section {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 15px !important;
+    }
+
+    /* Buttons-Grid: 4 Spalten */
+    .buttons-grid {
+        grid-template-columns: repeat(4, minmax(100px, 1fr)) !important;
+    }
+
+    /* Flexible Widths */
+    .w-205,
+    .w-184,
+    .w-180 {
+        width: 100%;
+        max-width: 205px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: TABLET 769-1024PX
+   ======================================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .left-menu {
+        width: 150px;
+        min-width: 150px;
+    }
+
+    .menu-btn {
+        font-size: 10px;
+        padding: 6px 8px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: TABLET PORTRAIT
+   ======================================== */
+
+@media (max-width: 1024px) and (orientation: portrait) {
+    .sidebar {
+        width: 150px;
+    }
+
+    .loading-overlay {
+        left: 150px;
+        width: calc(100% - 150px);
+    }
+
+    .menu-btn {
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+
+    .tab-bar {
+        flex-wrap: wrap;
+        min-height: auto;
+    }
+
+    .tab {
+        max-width: 100px;
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    .tab-close {
+        width: 12px;
+        height: 12px;
+        font-size: 10px;
+    }
+
+    .category-block {
+        margin-bottom: 8px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: MOBILE < 768PX
+   ======================================== */
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+
+    .show-mobile {
+        display: block !important;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .form-columns {
+        flex-direction: column;
+    }
+
+    .form-column {
+        min-width: 100%;
+    }
+
+    .header-bar {
+        font-size: 18px;
+        padding: 6px 10px;
+    }
+
+    .toolbar {
+        gap: 5px;
+        padding: 5px;
+    }
+
+    .toolbar input,
+    .toolbar select,
+    .toolbar .btn {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .tab-btn {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        padding: 6px 10px;
+        font-size: 10px;
+    }
+
+    .foto-display {
+        max-width: 150px;
+    }
+
+    .address-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .subform-container {
+        min-height: 200px;
+    }
+
+    .datasheet {
+        font-size: 10px;
+        min-width: 600px;
+    }
+
+    .datasheet th,
+    .datasheet td {
+        padding: 4px 2px;
+    }
+
+    .btn {
+        padding: 6px 10px;
+        font-size: 10px;
+    }
+
+    .button-group .btn {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .left-menu {
+        width: 120px;
+        min-width: 120px;
+    }
+
+    .menu-btn {
+        font-size: 9px;
+        padding: 5px 6px;
+    }
+
+    /* Sidebar kollabiert */
+    .sidebar {
+        width: 60px;
+        overflow: hidden;
+    }
+
+    .sidebar-header,
+    .category-header {
+        font-size: 0;
+        padding: 8px 5px;
+    }
+
+    .sidebar-header::before {
+        content: "CP";
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .menu-btn {
+        padding: 7px 5px;
+        font-size: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    /* Main Content nimmt vollen Raum */
+    .content-container {
+        width: calc(100vw - 60px);
+    }
+
+    .loading-overlay {
+        left: 60px;
+        width: calc(100% - 60px);
+    }
+
+    /* Tab-Bar: Tabs umbrechen */
+    .tab-bar {
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        max-width: 120px;
+        font-size: 11px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: MOBILE < 768PX (AUFTRAGSTAMM)
+   ======================================== */
+
+@media (max-width: 767px) {
+    /* ALLE Offsets entfernen */
+    .offset-left-xs,
+    .offset-left-sm,
+    .offset-left-md,
+    .offset-left-lg,
+    .offset-left-xl,
+    .offset-right-sm,
+    .offset-right-md,
+    .offset-right-lg {
+        position: static !important;
+        left: auto !important;
+        right: auto !important;
+    }
+
+    /* Top Offsets entfernen */
+    .top-minus-5,
+    .top-0,
+    .top-25 {
+        top: auto !important;
+    }
+
+    /* Margins minimieren */
+    .ml-100,
+    .ml-15,
+    .ml-10,
+    .ml-5 {
+        margin-left: 0 !important;
+    }
+
+    /* Form-Section: 1 Spalte */
+    .form-section {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    /* Buttons-Grid: 2 Spalten */
+    .buttons-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Alle Widths: 100% */
+    .w-205,
+    .w-184,
+    .w-180,
+    .w-110,
+    .w-100 {
+        width: 100% !important;
+        max-width: 100%;
+    }
+
+    .w-95,
+    .w-83,
+    .w-80 {
+        width: 100%;
+        max-width: 120px;
+    }
+
+    /* Buttons: Volle Breite */
+    .unified-btn {
+        width: 100% !important;
+        min-width: auto !important;
+    }
+
+    /* Extrem schmale Bildschirme (Querformat) */
+    .sidebar {
+        width: 50px;
+    }
+
+    .sidebar-header {
+        font-size: 0;
+        padding: 5px 2px;
+    }
+
+    .sidebar-header::before {
+        content: "C";
+        font-size: 10px;
+    }
+
+    .category-header {
+        display: none;
+    }
+
+    .menu-btn {
+        font-size: 9px;
+        padding: 5px 3px;
+    }
+
+    .content-container {
+        width: calc(100vw - 50px);
+    }
+
+    .loading-overlay {
+        left: 50px;
+        width: calc(100% - 50px);
+    }
+
+    .tab-bar {
+        min-height: 24px;
+        padding: 0 2px;
+    }
+
+    .tab {
+        max-width: 80px;
+        font-size: 9px;
+        padding: 2px 4px;
+    }
+}
+
+@media (max-width: 767px) and (orientation: landscape) {
+    .sidebar {
+        width: 50px;
+    }
+
+    .sidebar-header {
+        font-size: 0;
+        padding: 5px 2px;
+    }
+
+    .sidebar-header::before {
+        content: "C";
+        font-size: 10px;
+    }
+
+    .category-header {
+        display: none;
+    }
+
+    .menu-btn {
+        font-size: 9px;
+        padding: 5px 3px;
+    }
+
+    .content-container {
+        width: calc(100vw - 50px);
+    }
+
+    .loading-overlay {
+        left: 50px;
+        width: calc(100% - 50px);
+    }
+
+    .tab-bar {
+        min-height: 24px;
+        padding: 0 2px;
+    }
+
+    .tab {
+        max-width: 80px;
+        font-size: 9px;
+        padding: 2px 4px;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: MOBILE SMALL < 480PX
+   ======================================== */
+
+@media (max-width: 479px) {
+    /* Buttons-Grid: 1 Spalte */
+    .buttons-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
+/* ========================================
+   MEDIA QUERY: ZWISCHEN 1024-1599PX
+   ======================================== */
+
+@media (max-width: 1599px) {
+    .category-block {
+        margin-bottom: 12px;
+    }
+}
+
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    .app-sidebar,
+    .sidebar,
+    .tab-bar,
+    .loading-overlay,
+    .no-print,
+    .left-menu,
+    .toolbar,
+    .tab-header,
+    .btn {
+        display: none !important;
+    }
+
+    .content-container,
+    .main-content {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 0;
+    }
+
+    .tab-iframe {
+        position: static;
+        width: 100%;
+        height: auto;
+    }
+
+    .tab-content {
+        overflow: visible;
+    }
+
+    .page-break-before { page-break-before: always; }
+    .page-break-after { page-break-after: always; }
+    .page-break-avoid { page-break-inside: avoid; }
+
+    /* Auftragstamm Print */
+    .offset-left-xs,
+    .offset-left-sm,
+    .offset-left-md,
+    .offset-left-lg,
+    .offset-left-xl,
+    .offset-right-sm,
+    .offset-right-md,
+    .offset-right-lg {
+        left: 0 !important;
+        right: 0 !important;
+    }
+
+    .buttons-grid,
+    .header-links,
+    .fullscreen-btn {
+        display: none !important;
+    }
+}
+
+
+/* ========================================
+   ACCESSIBILITY - REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+
+/* ========================================
+   HIGH CONTRAST MODE
+   ======================================== */
+
+@media (prefers-contrast: high) {
+    :root {
+        --spacing-xs: 0.5rem;
+        --spacing-sm: 0.75rem;
+        --spacing-md: 1rem;
+    }
+
+    .btn,
+    button {
+        border: 2px solid currentColor;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea,
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+        border: 2px solid currentColor;
+    }
+}

@@ -1,0 +1,135 @@
+/**
+ * frm_Menuefuehrung.css
+ * CONSYS Hauptmenü - Seitenleiste
+ *
+ * ERLAUBTE FARBEN:
+ * - Menü-Header: BLAU (#4316B2)
+ * - Buttons: HELLGRAU (#e8e8e8)
+ * - Aktiver Button: BLAU (#4316B2)
+ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    font-size: 11px;
+    background: #f0f0f0;
+}
+
+/* Menü-Container */
+.menu-container {
+    background: #f0f0f0;
+    height: 100%;
+    width: 140px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #cccccc;
+}
+
+/* Menü-Header - BLAU */
+.menu-header {
+    background: #4316B2;
+    color: white;
+    font-weight: bold;
+    font-size: 11px;
+    text-align: center;
+    padding: 8px;
+}
+
+/* Button-Container */
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Menü-Buttons - HELLGRAU */
+.menu-btn {
+    padding: 6px 8px;
+    background: #e8e8e8;
+    color: #333333;
+    border: 1px solid #cccccc;
+    cursor: pointer;
+    text-align: left;
+    font-size: 10px;
+    border-radius: 2px;
+    text-decoration: none;
+}
+
+.menu-btn:hover {
+    background: #d5d5d5;
+}
+
+/* Aktiver Button - BLAU */
+.menu-btn.active {
+    background: #4316B2;
+    color: white;
+    border-color: #3558c0;
+}
+
+/* Sekundäre Buttons - HELLGRAU (etwas dunkler) */
+.menu-btn.secondary {
+    background: #d0d0d0;
+    color: #666666;
+    font-size: 9px;
+}
+
+.menu-btn.secondary:hover {
+    background: #c0c0c0;
+}
+
+/* Trennlinie */
+.menu-divider {
+    border: none;
+    border-top: 1px solid #cccccc;
+    margin: 4px 0;
+}
+
+/* ========== RESPONSIVE ========== */
+
+/* 21"-23" Monitore (1920px+) */
+@media (min-width: 1920px) {
+    .menu-container {
+        width: 160px;
+    }
+    .menu-btn {
+        font-size: 11px;
+        padding: 8px 10px;
+    }
+}
+
+/* 13"-14" Monitore (1200px-1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .menu-container {
+        width: 130px;
+    }
+    .menu-btn {
+        font-size: 9px;
+        padding: 5px 6px;
+    }
+}
+
+/* 11"-12" Monitore (1000px-1199px) */
+@media (min-width: 1000px) and (max-width: 1199px) {
+    .menu-container {
+        width: 110px;
+    }
+    .menu-btn {
+        font-size: 8px;
+        padding: 4px 5px;
+    }
+}
+
+/* Unter 1000px - Menü verstecken */
+@media (max-width: 999px) {
+    .menu-container {
+        display: none;
+    }
+}

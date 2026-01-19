@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplan Objekt - CONSYS (Optimiert)</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 13px;
+            background-color: #8080c0;
+            overflow: hidden;
+        }
+
+        /* ============================================ */
+        /* SIDEBAR - Referenz-Design (wie frm_va_Auftragstamm) */
+        /* ============================================ */
+        .app-container {
+            display: flex !important;
+            height: 100vh !important;
+            width: 100% !important;
+        }
+
+        .app-sidebar,
+        .left-menu {
+            width: 185px !important;
+            background-color: #6060a0 !important;
+            padding: 5px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex-shrink: 0 !important;
+            height: 100vh !important;
+        }
+
+        .sidebar-header,
+        .menu-header {
+            background-color: #000080 !important;
+            color: white !important;
+            padding: 6px !important;
+            text-align: center !important;
+            font-weight: bold !important;
+            font-size: 12px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .sidebar-menu,
+        .menu-buttons {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 !important;
+            justify-content: space-between !important;
+        }
+
+        .sidebar-btn,
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0) !important;
+            padding: 8px 10px !important;
+            text-align: center !important;
+            cursor: pointer !important;
+            font-size: 12px !important;
+            color: #000 !important;
+            font-weight: 500 !important;
+            position: relative !important;
+            border: none !important;
+            margin: 1px 0 !important;
+            overflow: visible !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            width: 100% !important;
+        }
+
+        /* Obere helle Kante - 4px nach rechts versetzt */
+        .sidebar-btn::before,
+        .menu-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: calc(100% - 4px) !important;
+            height: 2px !important;
+            background: #ffffff !important;
+            z-index: 1 !important;
+        }
+
+        /* Untere dunkle Kante - 4px nach links versetzt */
+        .sidebar-btn::after,
+        .menu-btn::after {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            right: 0 !important;
+            width: calc(100% - 4px) !important;
+            height: 2px !important;
+            background: #404070 !important;
+            z-index: 1 !important;
+        }
+
+        .sidebar-btn:hover,
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0) !important;
+        }
+
+        .sidebar-btn:active,
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0) !important;
+        }
+
+        .sidebar-btn:active::before,
+        .menu-btn:active::before {
+            background: #404070 !important;
+            left: 4px !important;
+            width: calc(100% - 4px) !important;
+        }
+
+        .sidebar-btn:active::after,
+        .menu-btn:active::after {
+            background: #ffffff !important;
+            right: 4px !important;
+            width: calc(100% - 4px) !important;
+        }
+
+        .sidebar-btn.active,
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0) !important;
+        }
+
+        .sidebar-btn.active::before,
+        .menu-btn.active::before {
+            background: #505080 !important;
+            left: 4px !important;
+            width: calc(100% - 4px) !important;
+        }
+
+        .sidebar-btn.active::after,
+        .menu-btn.active::after {
+            background: #c0c0d8 !important;
+            right: 4px !important;
+            width: calc(100% - 4px) !important;
+        }
+
+        .app-main {
+            flex: 1 !important;
+            overflow: hidden !important;
+        }
+
+        /* Hauptcontainer - Referenz-Farben */
+        .form-container {
+            width: 100%;
+            height: 100%;
+            background-color: #8080c0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section - Referenz-Design */
+        .form-header {
+            position: relative;
+            height: 70px;
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        /* Detail Section - Referenz-Design */
+        .form-detail {
+            display: flex;
+            height: calc(100% - 70px);
+            background-color: #b8b8d8;
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #606090;
+            margin: 2px;
+        }
+
+        /* ============================================ */
+        /* HEADER CONTROLS                             */
+        /* ============================================ */
+
+        .header-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000080;
+            margin-right: 20px;
+        }
+
+        .header-date-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid #606090;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+
+        .header-date-input {
+            width: 90px;
+            height: 22px;
+            font-size: 10px;
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+            margin-right: 5px;
+        }
+
+        .header-btn {
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            margin: 0 2px;
+        }
+
+        .header-btn-small {
+            width: 25px;
+            height: 18px;
+            padding: 0;
+            font-size: 12px;
+        }
+
+        .header-checkbox-group {
+            display: flex;
+            flex-direction: column;
+            margin-left: 15px;
+            color: #000;
+            font-size: 10px;
+        }
+
+        .header-checkbox-row {
+            display: flex;
+            align-items: center;
+            margin: 2px 0;
+        }
+
+        .header-checkbox-row input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .header-checkbox-row input[type="text"] {
+            width: 30px;
+            height: 18px;
+            font-size: 10px;
+            text-align: center;
+            margin: 0 5px;
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-btn-export {
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            padding: 6px 12px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .header-btn-close {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* ============================================ */
+        /* MAIN CONTENT                                */
+        /* ============================================ */
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 5px;
+            overflow: hidden;
+        }
+
+        /* Kalender Header - Referenz-Design (blau) */
+        .calendar-header-row {
+            display: flex;
+            height: 28px;
+            margin-bottom: 1px;
+        }
+
+        .col-auftrag-header {
+            width: 250px;
+            background-color: #000080;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .day-column-header {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 180px;
+        }
+
+        .day-title {
+            background-color: #000080;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 4px 8px;
+            text-align: center;
+            border-left: 1px solid #000060;
+        }
+
+        .day-title.weekend {
+            background-color: #4040a0;
+            color: white;
+        }
+
+        .day-sub-headers {
+            display: flex;
+            background-color: #9090c0;
+            font-size: 9px;
+            font-weight: bold;
+            border-left: 1px solid #606090;
+        }
+
+        .day-sub-headers span {
+            padding: 2px 4px;
+            text-align: center;
+        }
+
+        .sub-name {
+            flex: 2;
+            border-right: 1px solid #7070a0;
+        }
+
+        .sub-von {
+            width: 35px;
+            border-right: 1px solid #7070a0;
+        }
+
+        .sub-bis {
+            width: 35px;
+        }
+
+        /* Kalender Body */
+        .calendar-body {
+            flex: 1;
+            overflow-y: auto;
+            background: #f8f8fc;
+        }
+
+        .calendar-row {
+            display: flex;
+            border-bottom: 3px solid #606090;
+            min-height: 60px;
+        }
+
+        .calendar-row:nth-child(even) {
+            background-color: #f0f0f8;
+        }
+
+        .col-auftrag {
+            width: 250px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #d0d0e8;
+            border-right: 2px solid #9090c0;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .auftrag-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .auftrag-details {
+            font-weight: normal;
+            font-size: 9px;
+            color: #666;
+        }
+
+        .day-column {
+            flex: 1;
+            min-width: 180px;
+            border-right: 2px solid #9090c0;
+            padding: 3px;
+            font-size: 11px;
+        }
+
+        .day-column.weekend {
+            background-color: #e6ffe6;
+        }
+
+        /* MA-Eintrag in Tageszelle */
+        .ma-entry {
+            display: flex;
+            padding: 2px 4px;
+            border-bottom: 1px solid #ccc;
+            font-size: 11px;
+        }
+
+        .ma-entry:hover {
+            background-color: #e8f4fc;
+        }
+
+        /* Unbesetzte Position (gelb) */
+        .ma-entry.unbesetzt {
+            background-color: #ffffcc;
+        }
+
+        /* Fragliche Zusage (türkis) */
+        .ma-entry.fraglich {
+            background-color: #ccffff;
+        }
+
+        .ma-name {
+            flex: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+        }
+
+        .ma-von {
+            width: 40px;
+            text-align: center;
+            color: #009900;
+            font-weight: bold;
+        }
+
+        .ma-bis {
+            width: 40px;
+            text-align: center;
+        }
+
+        .ma-entry.storno .ma-name {
+            color: #cc0000;
+            font-weight: bold;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top-color: #8B0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Vollbild-Button oben rechts */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #606060 #606060 #ffffff;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .fullscreen-btn:active {
+            border-color: #606060 #ffffff #ffffff #606060;
+        }
+
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+
+    <link rel="stylesheet" href="../css/design-system.css">
+
+    <style>
+      /* Injected: basic CONSYS layout helpers */
+      .app-container{min-height:100vh;}
+      .app-sidebar{width:260px;}
+      .app-main{min-width:0;}
+      .app-content{padding:16px;}
+      /* keep small icon/nav buttons small */
+      .btn-nav, .btn-icon, button.btn-nav, button.btn-icon{padding:6px 10px; min-width:unset; width:auto;}
+    </style>
+</head>
+<body>
+    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">⛶</button>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">HAUPTMENU</div>
+            <nav class="sidebar-menu">
+                <button class="menu-btn" data-form="frm_DP_Dienstplan_MA">Dienstplanubersicht</button>
+                <button class="menu-btn active" data-form="frm_DP_Dienstplan_Objekt">Planungsubersicht</button>
+                <button class="menu-btn" data-form="frm_va_Auftragstamm">Auftragsverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_VA_Schnellauswahl">Offene Mail Anfragen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Excel Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_Abwesenheiten">Abwesenheitsplanung</button>
+                <button class="menu-btn">Dienstausweis erstellen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Stundenabgleich</button>
+                <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kundenverwaltung</button>
+                <button class="menu-btn">Verrechnungssatze</button>
+                <button class="menu-btn">Sub Rechnungen</button>
+                <button class="menu-btn" data-form="frmOff_Outlook_aufrufen">E-Mail</button>
+                <button class="menu-btn" data-form="frm_Menuefuehrung1">Menu 2</button>
+                <button class="menu-btn" onclick="openHtmlAnsicht()">HTML Ansicht</button>
+                <button class="menu-btn">System Info</button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+    <div class="form-container">
+        <!-- HEADER SECTION -->
+        <div class="form-header">
+            <span class="header-title">Planungsübersicht</span>
+
+            <div class="header-date-box">
+                <label style="font-size:11px; margin-right:5px;">KW:</label>
+                <select id="cboKW" style="width:60px; height:22px; font-size:11px; margin-right:10px;"></select>
+                <input type="date" class="header-date-input" id="dtStartdatum">
+                <div style="display:flex; flex-direction:column;">
+                    <button class="header-btn header-btn-small tiny-btn" id="btnVor">&gt;</button>
+                    <button class="header-btn header-btn-small tiny-btn" id="btnrueck">&lt;</button>
+                </div>
+            </div>
+
+            <button class="header-btn" id="btnStartdatum">Startdatum Ändern</button>
+            <button class="header-btn" id="btn_Heute">Ab Heute</button>
+
+            <div class="header-checkbox-group">
+                <div class="header-checkbox-row">
+                    <input type="checkbox" id="NurIstNichtZugeordnet">
+                    <label for="NurIstNichtZugeordnet">Nur freie Schichten anzeigen</label>
+                </div>
+                <div class="header-checkbox-row">
+                    <input type="checkbox" id="IstAuftrAusblend">
+                    <label for="IstAuftrAusblend">Nur Aufträge mit weniger als</label>
+                    <input type="text" id="PosAusblendAb" value="25">
+                    <label>Positionen anzeigen</label>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <button class="header-btn-export" id="btnOutpExcel">Übersicht drucken</button>
+                <button class="header-btn-close" id="Befehl37" title="Schließen">&times;</button>
+            </div>
+        </div>
+
+        <!-- DETAIL SECTION -->
+        <div class="form-detail">
+            <div class="main-content">
+                <!-- Kalender Header -->
+                <div class="calendar-header-row">
+                    <div class="col-auftrag-header">Auftrag / Veranstaltung</div>
+                    <div class="day-column-header" id="day_1">
+                        <div class="day-title">Mo. 28.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_2">
+                        <div class="day-title">Di. 29.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_3">
+                        <div class="day-title">Mi. 30.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_4">
+                        <div class="day-title">Do. 31.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_5">
+                        <div class="day-title">Fr. 01.08.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_6">
+                        <div class="day-title weekend">Sa. 02.08.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_7">
+                        <div class="day-title weekend">So. 03.08.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kalender Body -->
+                <div class="calendar-body" id="calendarBody">
+                    <div class="loading">Lade Planungsübersicht...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        const state = {
+            startDate: new Date(),
+            auftraege: [],
+            zuordnungen: {},
+            nurFreieSchichten: false,
+            posAusblendAb: 25,
+            istAuftrAusblend: false
+        };
+
+        const WOCHENTAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // KW-Dropdown befüllen (KW 1-53 für aktuelles Jahr)
+            populateKWDropdown();
+
+            // Aktuelles Datum auf Montag dieser Woche setzen
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            state.startDate = new Date(today.setDate(today.getDate() + diff));
+
+            updateDateInputs();
+            setupEventListeners();
+            await loadData();
+        });
+
+        // KW-Dropdown befüllen
+        function populateKWDropdown() {
+            const select = document.getElementById('cboKW');
+            const currentYear = new Date().getFullYear();
+
+            // KW 1-53
+            for (let kw = 1; kw <= 53; kw++) {
+                const option = document.createElement('option');
+                option.value = kw;
+                option.textContent = kw.toString().padStart(2, '0');
+                select.appendChild(option);
+            }
+
+            // Aktuelle KW auswählen
+            select.value = getWeekNumber(new Date());
+        }
+
+        // ISO Kalenderwoche berechnen
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // Montag einer bestimmten KW berechnen
+        function getMondayOfWeek(kw, year) {
+            const jan4 = new Date(year, 0, 4);
+            const dayOfWeek = jan4.getDay() || 7;
+            const monday = new Date(jan4);
+            monday.setDate(jan4.getDate() - dayOfWeek + 1 + (kw - 1) * 7);
+            return monday;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('btnVor').addEventListener('click', () => navigateWeek(1));
+            document.getElementById('btnrueck').addEventListener('click', () => navigateWeek(-1));
+            document.getElementById('btn_Heute').addEventListener('click', goToToday);
+
+            // KW-Dropdown Event: Bei Auswahl zur gewählten KW springen
+            document.getElementById('cboKW').addEventListener('change', (e) => {
+                const selectedKW = parseInt(e.target.value);
+                const year = state.startDate.getFullYear();
+                state.startDate = getMondayOfWeek(selectedKW, year);
+                updateDateInputs();
+                loadData();
+            });
+
+            document.getElementById('btnStartdatum').addEventListener('click', () => {
+                const newDate = document.getElementById('dtStartdatum').value;
+                if (newDate) {
+                    state.startDate = new Date(newDate);
+                    const dayOfWeek = state.startDate.getDay();
+                    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                    state.startDate.setDate(state.startDate.getDate() + diff);
+                    updateDateInputs();
+                    loadData();
+                }
+            });
+
+            document.getElementById('NurIstNichtZugeordnet').addEventListener('change', (e) => {
+                state.nurFreieSchichten = e.target.checked;
+                renderCalendar();
+            });
+
+            document.getElementById('IstAuftrAusblend').addEventListener('change', (e) => {
+                state.istAuftrAusblend = e.target.checked;
+                renderCalendar();
+            });
+
+            document.getElementById('PosAusblendAb').addEventListener('change', (e) => {
+                state.posAusblendAb = parseInt(e.target.value) || 25;
+                renderCalendar();
+            });
+
+            document.getElementById('Befehl37').addEventListener('click', () => window.close());
+            document.getElementById('btnOutpExcel').addEventListener('click', () => alert('Übersicht drucken'));
+        }
+
+        function navigateWeek(direction) {
+            // Nur 2 Tage vor/zurück statt 7
+            state.startDate.setDate(state.startDate.getDate() + (direction * 2));
+            updateDateInputs();
+            loadData();
+        }
+
+        function goToToday() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            state.startDate = new Date(today.setDate(today.getDate() + diff));
+            updateDateInputs();
+            loadData();
+        }
+
+        function updateDateInputs() {
+            document.getElementById('dtStartdatum').value = formatDateForInput(state.startDate);
+            // KW-Dropdown synchronisieren
+            document.getElementById('cboKW').value = getWeekNumber(state.startDate);
+            updateHeaderLabels();
+        }
+
+        function updateHeaderLabels() {
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(state.startDate);
+                date.setDate(date.getDate() + i);
+                const dayName = WOCHENTAGE[date.getDay()];
+                const dateStr = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear().toString().slice(-2)}`;
+                const dayHeader = document.querySelector(`#day_${i + 1} .day-title`);
+                if (dayHeader) {
+                    dayHeader.textContent = `${dayName}. ${dateStr}`;
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                    dayHeader.classList.toggle('weekend', isWeekend);
+                }
+            }
+        }
+
+        async function loadData() {
+            const container = document.getElementById('calendarBody');
+            container.innerHTML = '<div class="loading">Lade Planungsübersicht...</div>';
+
+            try {
+                const startStr = formatDateForInput(state.startDate);
+                const endDate = new Date(state.startDate);
+                endDate.setDate(endDate.getDate() + 6);
+                const endStr = formatDateForInput(endDate);
+
+                // Aufträge laden
+                const auftragResponse = await fetch(`${API_BASE}/auftraege?von=${startStr}&bis=${endStr}`);
+                const auftragResult = await auftragResponse.json();
+                state.auftraege = auftragResult.data || [];
+
+                // Zuordnungen laden
+                state.zuordnungen = {};
+                try {
+                    const zuordResponse = await fetch(`${API_BASE}/zuordnungen?von=${startStr}&bis=${endStr}`);
+                    if (zuordResponse.ok) {
+                        const zuordResult = await zuordResponse.json();
+                        for (const z of (zuordResult.data || [])) {
+                            const key = `${z.VA_ID}_${formatDateForInput(new Date(z.VADatum))}`;
+                            if (!state.zuordnungen[key]) {
+                                state.zuordnungen[key] = [];
+                            }
+                            state.zuordnungen[key].push(z);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Zuordnungen laden fehlgeschlagen:', e);
+                }
+
+                renderCalendar();
+            } catch (error) {
+                console.error('Fehler beim Laden:', error);
+                container.innerHTML = '<div style="padding: 20px; color: red;">Fehler beim Laden der Daten</div>';
+            }
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendarBody');
+
+            let auftraege = [...state.auftraege];
+
+            // Filter: Nur freie Schichten anzeigen
+            if (state.nurFreieSchichten) {
+                auftraege = auftraege.filter(auftrag => {
+                    // Prüfe ob mindestens ein Tag mit freien Positionen existiert
+                    for (let i = 0; i < 7; i++) {
+                        const date = new Date(state.startDate);
+                        date.setDate(date.getDate() + i);
+                        const dateKey = formatDateForInput(date);
+                        const key = `${auftrag.ID}_${dateKey}`;
+                        const zuordnungen = state.zuordnungen[key] || [];
+
+                        // Prüfe auf unbesetzte Positionen (MA_ID = 0 oder keine Nachname)
+                        const hatFreiePositionen = zuordnungen.some(z => !z.MA_ID || z.MA_ID === 0 || !z.Nachname);
+                        if (hatFreiePositionen || zuordnungen.length === 0) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }
+
+            // Filter: Aufträge mit weniger als X Positionen
+            if (state.istAuftrAusblend) {
+                auftraege = auftraege.filter(auftrag => {
+                    // Zähle alle Positionen über alle Tage
+                    let gesamtPositionen = 0;
+                    for (let i = 0; i < 7; i++) {
+                        const date = new Date(state.startDate);
+                        date.setDate(date.getDate() + i);
+                        const dateKey = formatDateForInput(date);
+                        const key = `${auftrag.ID}_${dateKey}`;
+                        gesamtPositionen += (state.zuordnungen[key] || []).length;
+                    }
+                    return gesamtPositionen < state.posAusblendAb;
+                });
+            }
+
+            if (auftraege.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Keine Aufträge im gewählten Zeitraum</div>';
+                return;
+            }
+
+            let html = '';
+
+            for (const auftrag of auftraege.slice(0, 50)) {
+                const auftragName = auftrag.Auftrag || auftrag.VA_Bezeichnung || 'Unbekannt';
+                const objekt = auftrag.Objekt || '';
+                const ort = auftrag.Ort || '';
+
+                html += '<div class="calendar-row">';
+                html += `<div class="col-auftrag">
+                    <span class="auftrag-name">${escapeHtml(auftragName)}</span>
+                    <span class="auftrag-details">${escapeHtml(objekt)} - ${escapeHtml(ort)}</span>
+                </div>`;
+
+                // 7 Tage
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(state.startDate);
+                    date.setDate(date.getDate() + i);
+                    const dateKey = formatDateForInput(date);
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+                    const key = `${auftrag.ID}_${dateKey}`;
+                    const zuordnungen = state.zuordnungen[key] || [];
+
+                    html += `<div class="day-column ${isWeekend ? 'weekend' : ''}">`;
+
+                    for (const z of zuordnungen) {
+                        // MA-Name: Nachname Vorname (ohne Komma)
+                        const nachname = z.Nachname || '';
+                        const vorname = z.Vorname || '';
+                        const maName = nachname && vorname
+                            ? `${nachname} ${vorname}`
+                            : (nachname || vorname || '(unbesetzt)');
+
+                        const von = formatTime(z.MA_Start || z.VA_Start);
+                        const bis = formatTime(z.MA_Ende || z.VA_Ende);
+                        const isStorno = (z.Status || '').toLowerCase().includes('storno');
+
+                        // Farbcodierung
+                        const isUnbesetzt = !z.MA_ID || z.MA_ID === 0 || !z.Nachname;
+                        const isFraglich = z.IstFraglich === true || z.IstFraglich === 1;
+
+                        let cssClass = 'ma-entry';
+                        if (isStorno) cssClass += ' storno';
+                        else if (isUnbesetzt) cssClass += ' unbesetzt';
+                        else if (isFraglich) cssClass += ' fraglich';
+
+                        html += `<div class="${cssClass}">
+                            <span class="ma-name">${escapeHtml(maName)}</span>
+                            <span class="ma-von">${von}</span>
+                            <span class="ma-bis">${bis}</span>
+                        </div>`;
+                    }
+
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function formatDateForInput(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const day = d.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatTime(t) {
+            if (!t) return '';
+
+            // Access-Zeit (Dezimalzahl < 1)
+            if (typeof t === 'number' && t < 1) {
+                const h = Math.floor(t * 24);
+                const m = Math.round((t * 24 - h) * 60);
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            }
+
+            // ISO DateTime String (z.B. "1899-12-30T18:30:00")
+            if (typeof t === 'string' && t.includes('T')) {
+                const timePart = t.split('T')[1];
+                if (timePart) {
+                    return timePart.substring(0, 5); // HH:MM
+                }
+            }
+
+            // Einfache Zeit-String (z.B. "18:30")
+            if (typeof t === 'string' && t.includes(':')) {
+                return t.substring(0, 5);
+            }
+
+            return '';
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // Vollbild-Toggle Funktion (Browser Fullscreen API)
+        function toggleFullscreen() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.title = 'Vollbild beenden';
+                }).catch(err => console.error('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen().then(() => {
+                    btn.title = 'Vollbild';
+                }).catch(err => console.error('Exit fullscreen error:', err));
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+    </script>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">Ready</div>
+                <div class="status-right">
+                    <span id="timestamp"></span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; padding:20px; border-radius:8px; text-align:center;">
+            <div style="font-size:14px; margin-bottom:10px;">Laden...</div>
+            <div style="width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid #3498db; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto;"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:10000;"></div>
+
+    <script type="module" src="../js/sidebar.js"></script>
+    <script>
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = now.toLocaleString('de-DE');
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+    </script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+    <script src="../js/global-handlers.js"></script>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>
+

@@ -1,0 +1,6 @@
+-- Query: qryHlp_Feiertag
+-- Type: 0
+SELECT [_tblAlleTage].dtDatum AS Feiertagsdat, [_tblAlleTage].Wochentag AS Wochentagnr, [_tblAlleTage].Feiertagsname, [_tblAlleTage].BBW AS BW, [_tblAlleTage].BBY AS [BY], [_tblAlleTage].BBE AS BE, [_tblAlleTage].BBB AS BB, [_tblAlleTage].BHB AS HB, [_tblAlleTage].BHH AS HH, [_tblAlleTage].BHE AS HE, [_tblAlleTage].BMV AS MV, [_tblAlleTage].BNI AS NI, [_tblAlleTage].BNW AS NW, [_tblAlleTage].BRP AS RP, [_tblAlleTage].BSL AS SL, [_tblAlleTage].BSN AS SN, [_tblAlleTage].BST AS ST, [_tblAlleTage].BSH AS SH, [_tblAlleTage].BTH AS TH
+FROM _tblAlleTage
+WHERE ((([_tblAlleTage].IstFeiertag)=True) AND (([_tblAlleTage].Werkname)="Std"));
+

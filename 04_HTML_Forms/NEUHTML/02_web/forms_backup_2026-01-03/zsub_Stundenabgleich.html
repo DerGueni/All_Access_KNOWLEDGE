@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stundenabgleich - Subform</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .subform-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+        }
+        .subform-title { font-weight: 600; color: #333; }
+        .subform-content { flex: 1; overflow: auto; }
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .datasheet th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            padding: 5px 6px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .datasheet td {
+            border: 1px solid #ddd;
+            padding: 4px 6px;
+        }
+        .datasheet tbody tr:nth-child(even) { background: #fafafa; }
+        .datasheet tbody tr:hover { background: #e8f4ff; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        /* Differenz-Styles */
+        .diff-ok { color: #28a745; }
+        .diff-warn { color: #ffc107; background: #fff8e1; }
+        .diff-err { color: #dc3545; background: #ffebee; font-weight: 600; }
+
+        .status-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 14px;
+            font-size: 10px;
+            color: white;
+        }
+        .status-icon.ok { background: #28a745; }
+        .status-icon.warn { background: #ffc107; color: #333; }
+        .status-icon.err { background: #dc3545; }
+
+        .sum-row {
+            background: #e8e8e8 !important;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">
+            <span class="subform-title">Stundenabgleich Soll/Ist</span>
+            <span id="lblAnzahl">0 Einträge</span>
+        </div>
+
+        <div class="subform-content">
+            <table class="datasheet" id="tblAbgleich">
+                <thead>
+                    <tr>
+                        <th style="width:90px;">Datum</th>
+                        <th style="min-width:120px;">Auftrag/Objekt</th>
+                        <th style="width:60px;" class="text-right">Soll</th>
+                        <th style="width:60px;" class="text-right">Ist</th>
+                        <th style="width:60px;" class="text-right">Diff</th>
+                        <th style="width:40px;" class="text-center">Status</th>
+                        <th style="min-width:100px;">Bemerkung</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_Abgleich">
+                    <tr>
+                        <td>18.12.2024</td>
+                        <td>Messe Frankfurt</td>
+                        <td class="text-right">8,00</td>
+                        <td class="text-right">8,00</td>
+                        <td class="text-right diff-ok">0,00</td>
+                        <td class="text-center"><span class="status-icon ok">&#10003;</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>17.12.2024</td>
+                        <td>Commerzbank Arena</td>
+                        <td class="text-right">6,00</td>
+                        <td class="text-right">6,50</td>
+                        <td class="text-right diff-warn">+0,50</td>
+                        <td class="text-center"><span class="status-icon warn">!</span></td>
+                        <td>Überzeit genehmigt</td>
+                    </tr>
+                    <tr>
+                        <td>16.12.2024</td>
+                        <td>Alte Oper</td>
+                        <td class="text-right">4,00</td>
+                        <td class="text-right">4,00</td>
+                        <td class="text-right diff-ok">0,00</td>
+                        <td class="text-center"><span class="status-icon ok">&#10003;</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>15.12.2024</td>
+                        <td>Messe Frankfurt</td>
+                        <td class="text-right">8,00</td>
+                        <td class="text-right">6,00</td>
+                        <td class="text-right diff-err">-2,00</td>
+                        <td class="text-center"><span class="status-icon err">&#10007;</span></td>
+                        <td>Frühzeitig beendet</td>
+                    </tr>
+                    <tr>
+                        <td>14.12.2024</td>
+                        <td>EZB Tower</td>
+                        <td class="text-right">10,00</td>
+                        <td class="text-right">10,00</td>
+                        <td class="text-right diff-ok">0,00</td>
+                        <td class="text-center"><span class="status-icon ok">&#10003;</span></td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="sum-row">
+                        <td colspan="2" style="text-align:right;">Summe:</td>
+                        <td id="sumSoll" class="text-right">36,00</td>
+                        <td id="sumIst" class="text-right">34,50</td>
+                        <td id="sumDiff" class="text-right">-1,50</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Subform: zsub_Stundenabgleich
+        // LinkMaster: MA_ID und Periode
+        const ZsubStundenabgleich = {
+            maId: null,
+            periode: null,
+
+            init() {
+                const params = new URLSearchParams(window.location.search);
+                this.maId = params.get('MA_ID') || params.get('ma_id');
+                this.periode = params.get('Periode') || params.get('periode');
+
+                if (this.maId) {
+                    this.ladeDaten();
+                }
+
+                window.addEventListener('message', (e) => {
+                    if (e.data && e.data.action === 'setMAID') {
+                        this.maId = e.data.maId;
+                        this.periode = e.data.periode;
+                        this.ladeDaten();
+                    }
+                    if (e.data && e.data.action === 'requery') {
+                        this.ladeDaten();
+                    }
+                });
+
+                this.updateCount();
+            },
+
+            async ladeDaten() {
+                // API-Aufruf hier
+                this.updateCount();
+            },
+
+            updateCount() {
+                const rows = document.querySelectorAll('#tbody_Abgleich tr');
+                document.getElementById('lblAnzahl').textContent =
+                    rows.length + ' Eintrag' + (rows.length !== 1 ? 'e' : '');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => ZsubStundenabgleich.init());
+    </script>
+</body>
+</html>

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Master V03 - Prozessorientiert - CONSYS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           PROCESS FLOW HEADER - Horizontale Schritte
+           ============================================ */
+        .process-header {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            padding: 15px 20px;
+            border-bottom: 2px solid #415a77;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .process-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #e0e1dd;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .process-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+
+        .process-step {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #2d3a4a, #1b263b);
+            border: 2px solid #415a77;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #778da9;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .step-circle::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: #778da9;
+            white-space: nowrap;
+            font-weight: normal;
+        }
+
+        .process-step:hover .step-circle {
+            background: linear-gradient(145deg, #415a77, #2d3a4a);
+            border-color: #778da9;
+            color: #e0e1dd;
+            transform: scale(1.1);
+        }
+
+        .process-step.active .step-circle {
+            background: linear-gradient(145deg, #e63946, #c1121f);
+            border-color: #f4a261;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(230, 57, 70, 0.5);
+        }
+
+        .step-arrow {
+            width: 30px;
+            height: 2px;
+            background: linear-gradient(90deg, #415a77, #778da9);
+            position: relative;
+            margin: 0 2px;
+        }
+
+        .step-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            border: 5px solid transparent;
+            border-left: 6px solid #778da9;
+        }
+
+        .process-step:hover + .step-arrow,
+        .process-step.active + .step-arrow {
+            background: linear-gradient(90deg, #f4a261, #e9c46a);
+        }
+
+        .process-step:hover + .step-arrow::after,
+        .process-step.active + .step-arrow::after {
+            border-left-color: #e9c46a;
+        }
+
+        /* ============================================
+           MAIN CONTENT - Category Cards
+           ============================================ */
+        .main-content {
+            padding: 30px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: linear-gradient(145deg, #1b263b, #0d1b2a);
+            border: 1px solid #415a77;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .category-card:nth-child(1) { animation-delay: 0.1s; }
+        .category-card:nth-child(2) { animation-delay: 0.15s; }
+        .category-card:nth-child(3) { animation-delay: 0.2s; }
+        .category-card:nth-child(4) { animation-delay: 0.25s; }
+        .category-card:nth-child(5) { animation-delay: 0.3s; }
+        .category-card:nth-child(6) { animation-delay: 0.35s; }
+        .category-card:nth-child(7) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border-color: #778da9;
+        }
+
+        .category-card.active {
+            border-color: #e63946;
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.3);
+        }
+
+        .category-header {
+            background: linear-gradient(90deg, #415a77, #1b263b);
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #415a77;
+        }
+
+        .category-number {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(145deg, #e63946, #c1121f);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .category-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #e0e1dd;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .category-body {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* ============================================
+           MENU BUTTONS
+           ============================================ */
+        .menu-btn {
+            width: 100%;
+            background: linear-gradient(145deg, #2d3a4a, #1b263b);
+            border: 1px solid #415a77;
+            border-radius: 6px;
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 11px;
+            text-align: left;
+            color: #e0e1dd;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(145deg, #415a77, #2d3a4a);
+            border-color: #778da9;
+            transform: translateX(5px);
+        }
+
+        .menu-btn:active {
+            transform: translateX(2px);
+            background: linear-gradient(145deg, #1b263b, #0d1b2a);
+        }
+
+        .menu-btn .icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .menu-btn.highlight {
+            background: linear-gradient(145deg, #e63946, #c1121f);
+            border-color: #f4a261;
+        }
+
+        .menu-btn.highlight:hover {
+            background: linear-gradient(145deg, #f4a261, #e63946);
+        }
+
+        .menu-btn.secondary {
+            background: linear-gradient(145deg, #1b263b, #0d1b2a);
+            border-style: dashed;
+            font-size: 10px;
+            padding: 8px 12px;
+            color: #778da9;
+        }
+
+        .menu-btn.secondary:hover {
+            color: #e0e1dd;
+            border-style: solid;
+        }
+
+        /* ============================================
+           SEPARATOR
+           ============================================ */
+        .separator {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #415a77, transparent);
+            margin: 6px 0;
+        }
+
+        /* ============================================
+           TOAST NOTIFICATION
+           ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(145deg, #1b263b, #0d1b2a);
+            color: #e0e1dd;
+            padding: 12px 24px;
+            border: 2px solid #415a77;
+            border-radius: 8px;
+            z-index: 10001;
+            font-size: 12px;
+            white-space: nowrap;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.success {
+            border-color: #2a9d8f;
+            background: linear-gradient(145deg, #264653, #1b263b);
+        }
+
+        .toast.error {
+            border-color: #e63946;
+            background: linear-gradient(145deg, #c1121f, #1b263b);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ============================================
+           CLOSE BUTTON (Fixed)
+           ============================================ */
+        .close-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(145deg, #c1121f, #780000);
+            border: 2px solid #e63946;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(198, 18, 31, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .close-fixed:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(198, 18, 31, 0.6);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .process-steps {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .step-arrow {
+                display: none;
+            }
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Process Flow Header -->
+    <header class="process-header">
+        <div class="process-title">CONSYS Workflow - Prozessschritte</div>
+        <nav class="process-steps">
+            <div class="process-step" data-step="1" onclick="scrollToCategory(1)">
+                <div class="step-circle" data-label="Anfrage">1</div>
+            </div>
+            <div class="step-arrow"></div>
+            <div class="process-step" data-step="2" onclick="scrollToCategory(2)">
+                <div class="step-circle" data-label="Angebot">2</div>
+            </div>
+            <div class="step-arrow"></div>
+            <div class="process-step" data-step="3" onclick="scrollToCategory(3)">
+                <div class="step-circle" data-label="Auftrag">3</div>
+            </div>
+            <div class="step-arrow"></div>
+            <div class="process-step active" data-step="4" onclick="scrollToCategory(4)">
+                <div class="step-circle" data-label="Planung">4</div>
+            </div>
+            <div class="step-arrow"></div>
+            <div class="process-step" data-step="5" onclick="scrollToCategory(5)">
+                <div class="step-circle" data-label="Durchführung">5</div>
+            </div>
+            <div class="step-arrow"></div>
+            <div class="process-step" data-step="6" onclick="scrollToCategory(6)">
+                <div class="step-circle" data-label="Abrechnung">6</div>
+            </div>
+            <div class="step-arrow"></div>
+            <div class="process-step" data-step="7" onclick="scrollToCategory(7)">
+                <div class="step-circle" data-label="Reporting">7</div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="category-grid">
+            <!-- 1. ANFRAGE -->
+            <section class="category-card" data-category="1" id="category-1">
+                <div class="category-header">
+                    <div class="category-number">1</div>
+                    <div class="category-title">Anfrage</div>
+                </div>
+                <div class="category-body">
+                    <button class="menu-btn" data-testid="menu-v03-kundenstamm" onclick="navigateTo('frm_KD_Kundenstamm')">
+                        <span class="icon">&#128100;</span> Kundenstamm
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-email" onclick="navigateTo('frm_Email')">
+                        <span class="icon">&#9993;</span> E-Mail
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-email-vorlagen" onclick="btn_mailvorlage_Click()">
+                        <span class="icon">&#128196;</span> E-Mail Vorlagen
+                    </button>
+                    <div class="separator"></div>
+                    <button class="menu-btn secondary" data-testid="menu-v03-bos-import" onclick="btn_BOS_Click()">
+                        <span class="icon">&#128229;</span> BOS Mail-Import
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-hirsch-import" onclick="btn_Hirsch_Click()">
+                        <span class="icon">&#128229;</span> Hirsch Import
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-stawa-email" onclick="btn_Stawa_Click()">
+                        <span class="icon">&#128231;</span> E-Mail zu Auftrag
+                    </button>
+                </div>
+            </section>
+
+            <!-- 2. ANGEBOT -->
+            <section class="category-card" data-category="2" id="category-2">
+                <div class="category-header">
+                    <div class="category-number">2</div>
+                    <div class="category-title">Angebot</div>
+                </div>
+                <div class="category-body">
+                    <button class="menu-btn" data-testid="menu-v03-auftragsverwaltung-angebot" onclick="navigateTo('frm_va_Auftragstamm')">
+                        <span class="icon">&#128203;</span> Auftragsverwaltung
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-verrechnungssaetze" onclick="navigateTo('frm_Verrechnungssätze')">
+                        <span class="icon">&#128176;</span> Verrechnungssätze
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-umsatzauswertung" onclick="navigateTo('frm_KD_Umsatzauswertung')">
+                        <span class="icon">&#128200;</span> Umsatzauswertung
+                    </button>
+                </div>
+            </section>
+
+            <!-- 3. AUFTRAG -->
+            <section class="category-card" data-category="3" id="category-3">
+                <div class="category-header">
+                    <div class="category-number">3</div>
+                    <div class="category-title">Auftrag</div>
+                </div>
+                <div class="category-body">
+                    <button class="menu-btn highlight" data-testid="menu-v03-auftragsverwaltung" onclick="navigateTo('frm_va_Auftragstamm')">
+                        <span class="icon">&#128203;</span> Auftragsverwaltung
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-objektverwaltung" onclick="navigateTo('frm_OB_Objekt')">
+                        <span class="icon">&#127970;</span> Objektverwaltung
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-einsatzuebersicht" onclick="navigateTo('frm_Einsatzübersicht')">
+                        <span class="icon">&#128197;</span> Einsatzübersicht
+                    </button>
+                    <div class="separator"></div>
+                    <button class="menu-btn secondary" data-testid="menu-v03-loewensaal-excel" onclick="btn_LöwensaalSync_Click()">
+                        <span class="icon">&#128259;</span> Löwensaal Sync (Excel)
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-loewensaal-hp" onclick="btn_Löwensaal_Sync_HP_Click()">
+                        <span class="icon">&#127760;</span> Löwensaal Sync (Homepage)
+                    </button>
+                </div>
+            </section>
+
+            <!-- 4. PLANUNG -->
+            <section class="category-card active" data-category="4" id="category-4">
+                <div class="category-header">
+                    <div class="category-number">4</div>
+                    <div class="category-title">Planung</div>
+                </div>
+                <div class="category-body">
+                    <button class="menu-btn highlight" data-testid="menu-v03-dienstplanuebersicht" onclick="navigateTo('frm_N_Dienstplanübersicht')">
+                        <span class="icon">&#128197;</span> Dienstplanübersicht
+                    </button>
+                    <button class="menu-btn highlight" data-testid="menu-v03-planungsuebersicht" onclick="navigateTo('frm_VA_Planungsübersicht')">
+                        <span class="icon">&#128200;</span> Planungsübersicht
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-schnellauswahl" onclick="navigateTo('frm_MA_VA_Schnellauswahl')">
+                        <span class="icon">&#9889;</span> Schnellauswahl / Mail-Anfragen
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-offene-anfragen" onclick="navigateTo('frm_MA_Offene_Anfragen')">
+                        <span class="icon">&#128276;</span> Offene Anfragen
+                    </button>
+                    <div class="separator"></div>
+                    <button class="menu-btn secondary" data-testid="menu-v03-auto-minijobber" onclick="btnAutoZuordnungSport_Click()">
+                        <span class="icon">&#129302;</span> Auto-Zuordnung Minijobber
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-festangestellte" onclick="btn_FA_eintragen_Click()">
+                        <span class="icon">&#128101;</span> Festangestellte zuordnen
+                    </button>
+                </div>
+            </section>
+
+            <!-- 5. DURCHFUEHRUNG -->
+            <section class="category-card" data-category="5" id="category-5">
+                <div class="category-header">
+                    <div class="category-number">5</div>
+                    <div class="category-title">Durchfuehrung</div>
+                </div>
+                <div class="category-body">
+                    <button class="menu-btn highlight" data-testid="menu-v03-mitarbeiterverwaltung" onclick="navigateTo('frm_MA_Mitarbeiterstamm')">
+                        <span class="icon">&#128101;</span> Mitarbeiterverwaltung
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-dienstplan-ma" onclick="navigateTo('frm_N_DP_Dienstplan_MA')">
+                        <span class="icon">&#128197;</span> Dienstplan MA
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-dienstausweis" onclick="navigateTo('frm_Dienstausweis')">
+                        <span class="icon">&#127380;</span> Dienstausweis
+                    </button>
+                    <div class="separator"></div>
+                    <button class="menu-btn secondary" data-testid="menu-v03-positionslisten" onclick="btnPositionslisten_Click()">
+                        <span class="icon">&#128203;</span> Positionslisten (Objekte)
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-namensliste" onclick="btnNamensliste_Click()">
+                        <span class="icon">&#128221;</span> Namensliste Fürth
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-fcn-meldeliste" onclick="btnFCN_Meldeliste_Click()">
+                        <span class="icon">&#9917;</span> FCN Meldeliste
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-telefonliste" onclick="openReport('rpt_telefonliste')">
+                        <span class="icon">&#128222;</span> Telefonliste drucken
+                    </button>
+                </div>
+            </section>
+
+            <!-- 6. ABRECHNUNG -->
+            <section class="category-card" data-category="6" id="category-6">
+                <div class="category-header">
+                    <div class="category-number">6</div>
+                    <div class="category-title">Abrechnung</div>
+                </div>
+                <div class="category-body">
+                    <button class="menu-btn" data-testid="menu-v03-zeitkonten" onclick="navigateTo('frm_MA_Zeitkonten')">
+                        <span class="icon">&#9201;</span> Zeitkonten
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-stundenauswertung" onclick="navigateTo('frm_N_Stundenauswertung')">
+                        <span class="icon">&#128202;</span> Stundenauswertung
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-lohnabrechnungen" onclick="navigateTo('frm_N_Lohnabrechnungen')">
+                        <span class="icon">&#128176;</span> Lohnabrechnungen
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-abwesenheiten" onclick="navigateTo('frm_Abwesenheiten')">
+                        <span class="icon">&#128197;</span> Abwesenheiten
+                    </button>
+                    <div class="separator"></div>
+                    <button class="menu-btn secondary" data-testid="menu-v03-lohnarten" onclick="btnLohnarten_Click()">
+                        <span class="icon">&#128178;</span> Lohnarten / Zuschläge
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-stunden-kreuztab" onclick="btnStundenMA_Click()">
+                        <span class="icon">&#128202;</span> Stunden MA Kreuztabelle
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-stunden-sub-export" onclick="btn_stunden_sub_Click()">
+                        <span class="icon">&#128229;</span> Stunden Sub Export
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-ma-stamm-excel" onclick="exportMAStamm()">
+                        <span class="icon">&#128196;</span> Mitarbeiterstamm Excel
+                    </button>
+                </div>
+            </section>
+
+            <!-- 7. REPORTING -->
+            <section class="category-card" data-category="7" id="category-7">
+                <div class="category-header">
+                    <div class="category-number">7</div>
+                    <div class="category-title">Reporting / System</div>
+                </div>
+                <div class="category-body">
+                    <button class="menu-btn" data-testid="menu-v03-monatsstunden" onclick="openReport('rpt_monatsstunden')">
+                        <span class="icon">&#128200;</span> Monatsstunden drucken
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-jahresuebersicht" onclick="openReport('rpt_jahresuebersicht_mitarbeiter')">
+                        <span class="icon">&#128197;</span> Jahresübersicht MA
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-rueckmeldungen" onclick="navigateTo('frm_Rueckmeldungen')">
+                        <span class="icon">&#128172;</span> Rueckmeldungen
+                    </button>
+                    <button class="menu-btn" data-testid="menu-v03-letzter-einsatz" onclick="btnLetzterEinsatz_Click()">
+                        <span class="icon">&#128269;</span> Letzter Einsatz MA
+                    </button>
+                    <div class="separator"></div>
+                    <button class="menu-btn secondary" data-testid="menu-v03-systeminfo" onclick="navigateTo('frm_SystemInfo')">
+                        <span class="icon">&#9881;</span> System Info
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-db-wechseln" onclick="navigateTo('frm_DBWechseln')">
+                        <span class="icon">&#128451;</span> Datenbank wechseln
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-weitere-masken" onclick="btn_weitere_Masken_Click()">
+                        <span class="icon">&#128193;</span> Weitere Masken
+                    </button>
+                    <button class="menu-btn secondary" data-testid="menu-v03-auswahl-master" onclick="btn_masterbtn_Click()">
+                        <span class="icon">&#128736;</span> Auswahl-Master
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Fixed Close Button -->
+    <button class="close-fixed" data-testid="menu-v03-close" onclick="closeForm()" title="Menu schliessen">X</button>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- WebView2 Bridge -->
+    <script src="../js/webview2-bridge.js"></script>
+    <!-- Global Handlers -->
+    <script src="../js/global-handlers.js"></script>
+
+    <script>
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        let activeStep = 4; // Default: Planung
+
+        // ============================================
+        // SCROLL TO CATEGORY
+        // ============================================
+        function scrollToCategory(stepNumber) {
+            // Update active state in header
+            document.querySelectorAll('.process-step').forEach(step => {
+                step.classList.remove('active');
+                if (parseInt(step.dataset.step) === stepNumber) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Update active state in cards
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('active');
+                if (parseInt(card.dataset.category) === stepNumber) {
+                    card.classList.add('active');
+                }
+            });
+
+            // Scroll to category
+            const target = document.getElementById('category-' + stepNumber);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            activeStep = stepNumber;
+            showToast('Schritt ' + stepNumber + ' ausgewaehlt', 'info');
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function navigateTo(formName) {
+            try {
+                // An Shell/Parent mitteilen
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'NAVIGATE',
+                        formName: formName
+                    }, '*');
+                    console.log('[MenuV03] NAVIGATE gesendet:', formName);
+                }
+
+                // WebView2 Bridge falls verfuegbar
+                if (window.Bridge) {
+                    Bridge.navigate(formName);
+                }
+
+                showToast('Oeffne ' + formName + '...', 'success');
+
+                // Popup schliessen nach kurzer Verzoegerung
+                setTimeout(closeMenu, 300);
+            } catch (error) {
+                console.error('Navigation-Fehler:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================
+        // CLOSE MENU
+        // ============================================
+        function closeMenu() {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'CLOSE_MENU' }, '*');
+                console.log('[MenuV03] CLOSE_MENU gesendet');
+            }
+        }
+
+        function closeForm() {
+            closeMenu();
+        }
+
+        // ============================================
+        // REPORT & EXPORT FUNCTIONS
+        // ============================================
+        function openReport(reportName, view = 'acViewPreview') {
+            try {
+                if (window.Bridge) {
+                    Bridge.sendEvent('openReport', { report: reportName, view: view });
+                    showToast('Report wird geoeffnet...', 'success');
+                } else {
+                    showToast('Report ' + reportName + ' - nur in Access verfuegbar', 'info');
+                }
+            } catch (error) {
+                console.error('Report-Fehler:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            }
+        }
+
+        async function exportMAStamm() {
+            const datum = new Date().toISOString().split('T')[0];
+            const dateiname = 'Mitarbeiterstamm_' + datum + '.xlsx';
+
+            try {
+                if (window.Bridge) {
+                    Bridge.sendEvent('export', { type: 'MAStamm', dateiname: dateiname });
+                    showToast('Export wird erstellt...', 'success');
+                } else {
+                    showToast('Export nur in Access verfuegbar', 'info');
+                }
+            } catch (error) {
+                console.error('Export-Fehler:', error);
+                showToast('Export-Funktion nur in Access verfuegbar', 'error');
+            }
+        }
+
+        // ============================================
+        // VBA BUTTON EVENTS
+        // ============================================
+        function btn_mailvorlage_Click() {
+            navigateTo('frm_ma_serien_email_vorlage');
+        }
+
+        function btnStundenMA_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openQuery', { query: 'zqry_MA_VA_Stunden_Plan_Ist_aktJahr_Kreuztabelle' });
+                showToast('Kreuztabelle wird geoeffnet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_stunden_sub_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('exportToExcel', {
+                    query: 'zqry_MA_VA_ZUO_PLAN_SUB',
+                    filename: 'Stunden_Sub_' + new Date().toISOString().split('T')[0] + '.xlsx'
+                });
+                showToast('Export wird erstellt...', 'success');
+            } else {
+                showToast('Export nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_LöwensaalSync_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'RunLöwensaalSync_WithWebScan' });
+                showToast('Synchronisation gestartet...', 'success');
+            } else {
+                showToast('Sync nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_Löwensaal_Sync_HP_Click() {
+            if (!confirm('Löwensaal-Events von der Homepage synchronisieren?\n\nDies kann einige Sekunden dauern.')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'mod_N_Löwensaal_HP.SyncLöwensaalEventsFromHomepage' });
+                showToast('Homepage-Synchronisation gestartet...', 'success');
+            } else {
+                showToast('Sync nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btnAutoZuordnungSport_Click() {
+            if (!confirm('Minijobber fuer Auftragsanfragen vorbereiten?')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Auto_MA_Zuordnung_Sport_Venues' });
+                showToast('Auto-Zuordnung gestartet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_FA_eintragen_Click() {
+            if (!confirm('Festangestellte Mitarbeiter automatisch zuordnen?')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Auto_Festangestellte_Zuordnen' });
+                showToast('Auto-Zuordnung Festangestellte...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_Stawa_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Email_Zu_Auftrag' });
+                showToast('E-Mail zu Auftrag...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_Hirsch_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'HirschImport_Starten' });
+                showToast('Hirsch Import gestartet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_BOS_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'MailToAuftrag_FromMailText' });
+                showToast('BOS Mail-Import...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btnNamensliste_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'btnNamensliste_Click' });
+                showToast('Namensliste wird erstellt...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar (benoetigt offenen Auftragstamm)', 'info');
+            }
+            closeForm();
+        }
+
+        function btnFCN_Meldeliste_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'btnFCN_Meldeliste_Click' });
+                showToast('FCN Meldeliste wird erstellt...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar (benoetigt offenen Auftragstamm)', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_weitere_Masken_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openForm', { form: '__frmHlpMenu_Weitere_Masken' });
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+        }
+
+        function btnLohnarten_Click() {
+            navigateTo('zfrm_ZK_Lohnarten_Zuschlag');
+        }
+
+        function btn_Abwesenheiten_Click() {
+            const jahr = prompt('Jahr eingeben (leer = aktuelles Jahr):', '');
+            if (jahr === null) return;
+
+            if (jahr === '' || jahr === new Date().getFullYear().toString()) {
+                navigateTo('frm_MA_Abwesenheiten_Urlaub_Gueni');
+            } else {
+                if (window.Bridge) {
+                    Bridge.sendEvent('openForm', { form: 'frm_MA_Abwesenheiten_krank_gueni_' + jahr });
+                } else {
+                    showToast('Jahresliste nur in Access verfuegbar', 'info');
+                }
+            }
+        }
+
+        function btnLetzterEinsatz_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openQuery', { query: 'qry_MA_letzter _Einsatz_Gueni' });
+                showToast('Abfrage wird geoeffnet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btnPositionslisten_Click() {
+            navigateTo('frm_OB_Objekt');
+        }
+
+        function btn_masterbtn_Click() {
+            navigateTo('frm_N_AuswahlMaster');
+        }
+
+        // ============================================
+        // TOAST NOTIFICATION
+        // ============================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeForm();
+            }
+            // Number keys 1-7 for quick step navigation
+            if (e.key >= '1' && e.key <= '7' && !e.ctrlKey && !e.altKey) {
+                scrollToCategory(parseInt(e.key));
+            }
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[MenuV03] Prozessorientiertes Menu initialisiert');
+            console.log('[MenuV03] 7 Prozessschritte, 39+ Buttons aktiv');
+            console.log('[MenuV03] Tastaturkuerzel: 1-7 fuer Prozessschritte, ESC zum Schliessen');
+
+            // Bridge Event Handler
+            if (window.Bridge) {
+                Bridge.on('onDataReceived', (data) => {
+                    console.log('[MenuV03] Daten empfangen:', data);
+                });
+            }
+        });
+    </script>
+
+    <!-- Shell-Detector -->
+    <script src="../js/shell-detector.js"></script>
+</body>
+</html>

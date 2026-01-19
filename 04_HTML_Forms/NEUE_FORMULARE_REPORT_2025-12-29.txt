@@ -1,0 +1,142 @@
+﻿╔══════════════════════════════════════════════════════════════════════════════╗
+║    NEUE HTML FORMULARE MIT DATENBANKANBINDUNG - REPORT                       ║
+║                      Stand: 29.12.2025 19:17                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+================================================================================
+ERSTELLTE DATEIEN
+================================================================================
+
+1. frm_N_MA_VA_Schnellauswahl.html (24.581 Bytes)
+   ──────────────────────────────────────────────
+   Pfad: forms\frm_N_MA_VA_Schnellauswahl.html
+   
+   FUNKTIONEN:
+   ✅ Auftragsinformationen anzeigen (Header)
+   ✅ Schichten-Liste mit Soll/Ist
+   ✅ Verfügbare Mitarbeiter filtern (Anstellung, Aktiv, Nur freie)
+   ✅ Mitarbeiter per Doppelklick zuweisen
+   ✅ Geplante Mitarbeiter entfernen
+   ✅ Nach Entfernung sortieren
+   ✅ Parallele Einsätze anzeigen
+   ✅ Anfragen senden (selektierte / alle)
+   
+   BRIDGE EVENTS:
+   - addMA: Mitarbeiter zuweisen
+   - removeMA: Mitarbeiter entfernen
+   - sortByDistance: Nach Entfernung sortieren
+   - sendRequests: Anfragen senden
+   - navigate: Zurück zum Auftrag
+
+--------------------------------------------------------------------------------
+
+2. frm_N_DP_Dienstplan_MA.html (21.148 Bytes)
+   ──────────────────────────────────────────────
+   Pfad: forms\frm_N_DP_Dienstplan_MA.html
+   
+   FUNKTIONEN:
+   ✅ Wochenübersicht für Mitarbeiter
+   ✅ Datumsnavigation (Vor/Zurück/Heute)
+   ✅ Filter nach Anstellungsart
+   ✅ Einsätze pro Tag und MA anzeigen
+   ✅ Abwesenheiten (Urlaub/Krank) markieren
+   ✅ Dienstpläne senden
+   ✅ Übersicht drucken
+   ✅ Einzeldienstpläne öffnen
+   
+   BRIDGE EVENTS:
+   - loadDienstplan: Daten für Zeitraum laden
+   - sendDienstplaene: Dienstpläne versenden
+   - navigate: Zu Auftrag/MA springen
+
+--------------------------------------------------------------------------------
+
+3. frm_N_DP_Dienstplan_Objekt.html (20.531 Bytes)
+   ──────────────────────────────────────────────
+   Pfad: forms\frm_N_DP_Dienstplan_Objekt.html
+   
+   FUNKTIONEN:
+   ✅ Wochenübersicht nach Auftrag/Veranstaltung
+   ✅ MA-Zuordnungen pro Tag anzeigen
+   ✅ Filter: Nur freie Schichten
+   ✅ Filter: Max. Positionen
+   ✅ Datumsnavigation
+   ✅ Klick auf Auftrag öffnet Auftragsverwaltung
+   ✅ Übersicht drucken
+   
+   BRIDGE EVENTS:
+   - loadPlanungsuebersicht: Daten laden
+   - navigate: Zu Auftrag springen
+
+================================================================================
+VBA-MODUL FÜR DATENBANKANBINDUNG
+================================================================================
+
+mdl_N_WebView2Bridge_Forms.bas (12.965 Bytes)
+Pfad: vba\mdl_N_WebView2Bridge_Forms.bas
+
+ENTHALTENE FUNKTIONEN:
+
+Schnellauswahl:
+  - OpenMitarbeiterSchnellauswahl(VA_ID)
+  - LoadSchnellauswahlData(VA_ID) → JSON
+  - LoadAuftragInfo, LoadSchichten, LoadVerfuegbareMitarbeiter
+  - LoadGeplanteMitarbeiter, LoadParalleleEinsaetze
+
+Dienstplan MA:
+  - OpenDienstplanMA(startDatum)
+  - LoadDienstplanMAData(startDatum, anzahlTage, anstellung) → JSON
+  - LoadMitarbeiterFuerDienstplan, LoadEinsaetzeFuerZeitraum
+
+Planungsübersicht:
+  - OpenPlanungsuebersicht(startDatum)
+  - LoadPlanungsuebersichtData(startDatum, anzahlTage) → JSON
+  - LoadAuftraegeFuerZeitraum
+
+================================================================================
+INTEGRATION IN ACCESS
+================================================================================
+
+1. VBA-Modul importieren:
+   - Öffne Access-Datenbank
+   - VBA-Editor (Alt+F11)
+   - Datei → Importieren → mdl_N_WebView2Bridge_Forms.bas
+
+2. Aufruf aus Access-Formular:
+
+   ' Schnellauswahl für Auftrag 9152 öffnen
+   Call OpenMitarbeiterSchnellauswahl(9152)
+   
+   ' Dienstplan ab heute öffnen
+   Call OpenDienstplanMA(Date)
+   
+   ' Planungsübersicht öffnen
+   Call OpenPlanungsuebersicht(Date)
+
+3. Button im Access-Formular:
+   
+   Private Sub btnMitarbeiterauswahl_Click()
+       Call OpenMitarbeiterSchnellauswahl(Me.VA_ID)
+   End Sub
+
+================================================================================
+DATENBANK-TABELLEN (verwendet)
+================================================================================
+
+- tbl_VA_Auftragstamm (Aufträge)
+- tbl_VA_Start (Schichten pro Auftrag)
+- tbl_MA_VA_Zuordnung (MA-Zuordnung zu Aufträgen)
+- tbl_MA_Mitarbeiterstamm (Mitarbeiter)
+
+================================================================================
+STANDALONE-TEST (ohne Access)
+================================================================================
+
+Die HTML-Dateien können im Browser getestet werden:
+
+  file:///C:/Users/guenther.siegert/Documents/0006_All_Access_KNOWLEDGE/
+        04_HTML_Forms/forms/frm_N_MA_VA_Schnellauswahl.html
+
+Im Standalone-Modus werden Demo-Daten geladen.
+
+================================================================================

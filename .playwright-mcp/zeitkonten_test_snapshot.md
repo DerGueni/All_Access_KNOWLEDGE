@@ -1,0 +1,313 @@
+### New console messages
+- [LOG] [Bridge] Health-Monitoring gestartet @ http://localhost:8081/js/webview2-bridge.js:1167
+- [LOG] [Shell] VBA Bridge Server nicht erreichbar, starte im Hintergrund... @ http://localhost:8081/s...
+- [LOG] [Shell] Browser-Modus: Starte VBA Bridge via API Server... @ http://localhost:8081/shell.html?...
+- [LOG] [Bridge] Health-Monitoring gestartet @ http://localhost:8081/js/webview2-bridge.js:1167
+- [LOG] [API-Lifecycle] Server nicht erreichbar, versuche Start... @ http://localhost:8081/js/api-life...
+- [LOG] [API-Lifecycle] Kein WebView2 - manueller Start erforderlich @ http://localhost:8081/js/api-li...
+- [LOG] ============================================================ @ http://localhost:8081/js/api-li...
+- [LOG] API-Server manuell starten: @ http://localhost:8081/js/api-lifecycle.js:275
+- [LOG]   Doppelklick auf: start_api_hidden.vbs @ http://localhost:8081/js/api-lifecycle.js:276
+- [LOG]   Pfad: C:\Users\guenther.siegert\Documents\Access Bridge\ @ http://localhost:8081/js/api-life...
+- [LOG] ============================================================ @ http://localhost:8081/js/api-li...
+- [WARNING] [API-Lifecycle] API-Server nicht verfuegbar @ http://localhost:8081/js/api-lifecycle.js:49
+- [LOG] [Watchdog] Prüfe Server-Verfügbarkeit... @ http://localhost:8081/js/server-watchdog.js:244
+- [WARNING] [Shell] VBA Bridge Start via API Server fehlgeschlagen: signal timed out @ http://localhos...
+- [LOG] ✅ [Watchdog] API Server läuft (http://localhost:5000) @ http://localhost:8081/js/server-watchd...
+- [LOG] [Watchdog] VBA Bridge nicht erreichbar, versuche Auto-Start... @ http://localhost:8081/js/serv...
+- [LOG] [Watchdog] Sende Start-Anfrage an API Server... @ http://localhost:8081/js/server-watchdog.js:...
+- [ERROR] Access to fetch at 'http://localhost:5000/api/start-vba-bridge' from origin 'http://localhos...
+- [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:5000/api/start-vba-bridge:0
+- [WARNING] [Watchdog] Auto-Start fehlgeschlagen: Failed to fetch @ http://localhost:8081/js/server-wa...
+- [WARNING] ⚠️ [Watchdog] VBA Bridge konnte nicht automatisch gestartet werden @ http://localhost:8081...
+- [WARNING] ⚠️ [Watchdog] E-Mail-Funktionen sind eingeschränkt @ http://localhost:8081/js/server-watch...
+- [WARNING] [Watchdog] Tipp: Access-Frontend öffnen oder start_vba_bridge.bat ausführen @ http://local...
+- [WARNING] ⚠️ [Watchdog] VBA Bridge nicht erreichbar - E-Mail-Funktionen evtl. eingeschränkt @ http:/...
+- [LOG] [Watchdog] Server-Check abgeschlossen @ http://localhost:8081/js/server-watchdog.js:260
+
+### Page state
+- Page URL: http://localhost:8081/shell.html?form=frm_MA_Zeitkonten
+- Page Title: CONSYS - Verwaltung
+- Page Snapshot:
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: CONSYS PLANUNG
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: PLANUNG
+        - button "Dienstplan MA" [ref=e8] [cursor=pointer]
+        - button "Planung Objekt" [ref=e9] [cursor=pointer]
+      - generic [ref=e10]:
+        - generic [ref=e11]: STAMMDATEN
+        - button "Aufträge" [ref=e12] [cursor=pointer]
+        - button "Mitarbeiter" [ref=e13] [cursor=pointer]
+        - button "Kunden" [ref=e14] [cursor=pointer]
+        - button "Objekte" [ref=e15] [cursor=pointer]
+      - generic [ref=e16]:
+        - generic [ref=e17]: PERSONAL
+        - button "Zeitkonten" [ref=e18] [cursor=pointer]
+        - button "Stundenauswertung" [ref=e19] [cursor=pointer]
+        - button "Abwesenheiten" [ref=e20] [cursor=pointer]
+        - button "Telefonliste" [ref=e21] [cursor=pointer]
+        - button "Letzter Einsatz" [ref=e22] [cursor=pointer]
+        - button "Lohnarten" [ref=e23] [cursor=pointer]
+      - generic [ref=e24]:
+        - generic [ref=e25]: EXTRAS
+        - button "Schnellauswahl" [ref=e26] [cursor=pointer]
+        - button "Einsatzübersicht" [ref=e27] [cursor=pointer]
+        - button "Vorlagen" [ref=e28] [cursor=pointer]
+      - generic [ref=e29]:
+        - generic [ref=e30]: EXPORT
+        - button "MA Stamm Excel" [ref=e31] [cursor=pointer]
+        - button "FCN Meldeliste" [ref=e32] [cursor=pointer]
+        - button "Fürth Namensliste" [ref=e33] [cursor=pointer]
+        - button "Sub Stunden" [ref=e34] [cursor=pointer]
+        - button "Stunden MA" [ref=e35] [cursor=pointer]
+      - generic [ref=e36]:
+        - generic [ref=e37]: SYSTEM
+        - button "Lex Aktiv" [ref=e38] [cursor=pointer]
+        - button "Löwensaal Sync" [ref=e39] [cursor=pointer]
+  - generic [ref=e40]:
+    - generic [ref=e42] [cursor=pointer]:
+      - generic "Zeitkonten" [ref=e43]
+      - button "Ã—" [ref=e44]
+    - iframe [ref=e46]:
+      - generic [active] [ref=f36e1]:
+        - button "⛶" [ref=f36e2] [cursor=pointer]
+        - main [ref=f36e4]:
+          - generic [ref=f36e5]:
+            - generic [ref=f36e6]:
+              - generic [ref=f36e7]: C
+              - generic [ref=f36e8]: Mitarbeiter-Zeitkonten
+              - generic [ref=f36e9]:
+                - button "Import ZK" [ref=f36e10] [cursor=pointer]
+                - button "Import Einzel" [ref=f36e11] [cursor=pointer]
+                - button "Export Lexware" [ref=f36e12] [cursor=pointer]
+                - button "ZK Fest" [ref=f36e13] [cursor=pointer]
+                - button "ZK Mini" [ref=f36e14] [cursor=pointer]
+                - button "ZK Einzel" [ref=f36e15] [cursor=pointer]
+                - button "Abgleich" [ref=f36e16] [cursor=pointer]
+                - button "Export Diff" [ref=f36e17] [cursor=pointer]
+            - generic [ref=f36e18]:
+              - text: CONSYS
+              - generic [ref=f36e19]: Web
+          - generic [ref=f36e20]:
+            - generic [ref=f36e21]:
+              - generic [ref=f36e22]: "Mitarbeiter:"
+              - combobox [ref=f36e23]:
+                - option "-- Mitarbeiter waehlen --" [selected]
+                - option "Akcay, Ediz"
+                - option "Alali, Ahmad"
+                - option "Alayoubi, Salim"
+                - option "Aldaba, Wesam"
+                - option "Alhajjaj, Mohammad"
+                - option "Ameri Targhi, Mohammad"
+                - option "Antakia Khalaf, Abd Alhaleem"
+                - option "Argentino, Luigi"
+                - option "Aykan, Metin"
+                - option "Badran, Ammar"
+                - option "Badran, Majd"
+                - option "Ballichar, Emily Sydney"
+                - option "Banut, Ioan"
+                - option "Banut, Sabin-Ioan"
+                - option "Bauersachs, Benjamin"
+                - option "Baumann, Margit"
+                - option "Baumann, Willibald"
+                - option "Bekdash, Abdulellah"
+                - option "Bruns, Nicole"
+                - option "Bruns, Sandra"
+                - option "Cengiz, Mert"
+                - option "Dambrosio, Maria"
+                - option "Degner-Seemann, Kristin"
+                - option "Dehm, Christian"
+                - option "Dehm, Heike"
+                - option "Dementiev, Artem"
+                - option "Demir, Hakan"
+                - option "Dogan, Berkan"
+                - option "Eberl, Julian"
+                - option "Engelhardt, Thomas"
+                - option "Esposito, Gennaro"
+                - option "Esposito, Ivan"
+                - option "Evrydoglou, Christodoulos"
+                - option "Fatah Al Souk, Mouaed"
+                - option "Frömmel, Christian"
+                - option "Früchtl, Kevin"
+                - option "Fuchs, Iris"
+                - option "Glatz, Michaela"
+                - option "Göschelbauer, Thomas"
+                - option "Grgan, Beate"
+                - option "Gürsoy, Akin"
+                - option "Haider, Johannes"
+                - option "Hamberger, Bernd"
+                - option "Hassas, Arman"
+                - option "Hassas, Gabriele"
+                - option "Haßler, Leon"
+                - option "Heberle, Leo"
+                - option "Hezer, Tufan"
+                - option "Hofmann, Thomas"
+                - option "Holfeld-Wörner, Erika"
+                - option "Holstein, Sergej"
+                - option "Huynh, Tony"
+                - option "Jones, Petra"
+                - option "Kallweit, Marco"
+                - option "Käppner, Benjamin"
+                - option "Kawtherry, Mahmoud"
+                - option "Kiki, Yazan"
+                - option "Kilbauch, Artur"
+                - option "Kocak, Gökalp"
+                - option "Koge, Aria"
+                - option "Koge, Juanita"
+                - option "Konrad, Eduard"
+                - option "Kupfer, Sabina"
+                - option "Kuypers, Johannes"
+                - option "Lazovic, Anke"
+                - option "Linnert, Markus"
+                - option "Lombardo, Giuseppe"
+                - option "Mahdi, Thomas"
+                - option "Marinelli, Vincenzo"
+                - option "Melzer, Dina"
+                - option "Merideno, Annette"
+                - option "Merideno, Francisco"
+                - option "Merideno, Pedro"
+                - option "Moriconi, Vincenzo"
+                - option "Müller, Wolfram"
+                - option "Nikolova, Monika"
+                - option "Oberndorfer, Melanie"
+                - option "Olimpio, Fabrizio"
+                - option "Olmo-Olmo, Emilio"
+                - option "Osseili, Hassan"
+                - option "Peter, Jürgen"
+                - option "Prastalo, Nenad"
+                - option "Prost, Guido"
+                - option "Rachiu, Cristian"
+                - option "Ranke, Maik"
+                - option "Reinl, Harald"
+                - option "Rieß, Johann"
+                - option "Ritter, Liam"
+                - option "Rosa, Chris"
+                - option "Sachs, Günter"
+                - option "Schelkopf, Nina"
+                - option "Schnabel, Alexandru"
+                - option "Schnabel, Katalin"
+                - option "Schott, Stefan"
+                - option "Schuckert, Michael"
+                - option "Seiler, Marion"
+                - option "Seiler, Stefan"
+                - option "Shaaban, Mohammad"
+                - option "Siegert, Günther"
+                - option "Sierocki, Laura"
+                - option "Sobchuk, Andrij"
+                - option "Soukup, Jürgen"
+                - option "Spencer, Gilbert"
+                - option "Steininger, Daniel"
+                - option "Strobel, Bernd"
+                - option "Sunar, Tan"
+                - option "Truckenbrodt, Melanie"
+                - option "Tsakmak, Moustafa"
+                - option "Türkseven, Ismail"
+                - option "Tusjak, Julia"
+                - option "Ulhan, Caner"
+                - option "Vermez, Meryem"
+                - option "Viehbeck, Armin"
+                - option "Wagner, Corinna"
+                - option "Wanko, Stefan"
+                - option "Weber, Ines"
+                - option "Weigl, Thomas"
+                - option "Wießner, Marco"
+                - option "Wilson, Jason"
+                - option "Xakidis, Konstantinos"
+                - option "Zeka, Brima"
+                - option "Zilling, Thomas"
+                - option "Zournatzidis, Viktor"
+            - generic [ref=f36e24]:
+              - generic [ref=f36e25]: "Anstellungsart:"
+              - combobox [ref=f36e26]:
+                - option "Alle"
+                - option "Festangestellt"
+                - option "Minijobber" [selected]
+                - option "Fest + Mini"
+            - generic [ref=f36e28]:
+              - generic [ref=f36e29]: "Zeitraum:"
+              - combobox [ref=f36e30]:
+                - option "Aktueller Monat" [selected]
+                - option "Letzter Monat"
+                - option "Aktuelles Quartal"
+                - option "Aktuelles Jahr"
+                - option "Letztes Jahr"
+          - generic [ref=f36e31]:
+            - generic [ref=f36e32]:
+              - generic [ref=f36e33]: Soll-Stunden
+              - generic [ref=f36e34]: 0:00
+            - generic [ref=f36e35]:
+              - generic [ref=f36e36]: Ist-Stunden
+              - generic [ref=f36e37]: 0:00
+            - generic [ref=f36e38]:
+              - generic [ref=f36e39]: Saldo
+              - generic [ref=f36e40]: 0:00
+            - generic [ref=f36e41]:
+              - generic [ref=f36e42]: Ueberstunden
+              - generic [ref=f36e43]: 0:00
+            - generic [ref=f36e44]:
+              - generic [ref=f36e45]: Urlaub (Tage)
+              - generic [ref=f36e46]: "0"
+            - generic [ref=f36e47]:
+              - generic [ref=f36e48]: Krank (Tage)
+              - generic [ref=f36e49]: "0"
+            - generic [ref=f36e50]:
+              - generic [ref=f36e51]: ZK Ausgezahlt
+              - generic [ref=f36e52]: 0,00
+          - generic [ref=f36e54]:
+            - button "Stunden" [ref=f36e55] [cursor=pointer]
+            - button "Abgleich" [ref=f36e56] [cursor=pointer]
+            - button "Importfehler" [ref=f36e57] [cursor=pointer]
+          - generic [ref=f36e58]:
+            - table [ref=f36e61]:
+              - rowgroup [ref=f36e62]:
+                - row "Datum Tag Objekt Beginn Ende Dauer Pause Netto Typ Bemerkung" [ref=f36e63]:
+                  - columnheader "Datum" [ref=f36e64]
+                  - columnheader "Tag" [ref=f36e65]
+                  - columnheader "Objekt" [ref=f36e66]
+                  - columnheader "Beginn" [ref=f36e67]
+                  - columnheader "Ende" [ref=f36e68]
+                  - columnheader "Dauer" [ref=f36e69]
+                  - columnheader "Pause" [ref=f36e70]
+                  - columnheader "Netto" [ref=f36e71]
+                  - columnheader "Typ" [ref=f36e72]
+                  - columnheader "Bemerkung" [ref=f36e73]
+              - rowgroup [ref=f36e74]:
+                - row "Bitte Mitarbeiter auswählen..." [ref=f36e75]:
+                  - cell "Bitte Mitarbeiter auswählen..." [ref=f36e76]
+              - rowgroup [ref=f36e77]:
+                - 'row "Summe: 0:00 0:00 0:00" [ref=f36e78]':
+                  - cell "Summe:" [ref=f36e79]:
+                    - strong [ref=f36e80]: "Summe:"
+                  - cell "0:00" [ref=f36e81]
+                  - cell "0:00" [ref=f36e82]
+                  - cell "0:00" [ref=f36e83]
+                  - cell [ref=f36e84]
+            - complementary [ref=f36e85]:
+              - generic [ref=f36e86]: Monatsauswertung
+              - generic [ref=f36e88]:
+                - generic [ref=f36e89]:
+                  - generic [ref=f36e90]: "Arbeitstage:"
+                  - generic [ref=f36e91]: "0"
+                - generic [ref=f36e92]:
+                  - generic [ref=f36e93]: "Einsaetze:"
+                  - generic [ref=f36e94]: "0"
+                - generic [ref=f36e95]:
+                  - generic [ref=f36e96]: "Durchschnitt/Tag:"
+                  - generic [ref=f36e97]: 0:00
+          - generic [ref=f36e98]:
+            - generic [ref=f36e99]: Daten geladen
+            - generic [ref=f36e100]: 0 Eintraege
+            - generic [ref=f36e101]: 1.1.2026 - 31.1.2026
+        - generic [ref=f36e103]:
+          - heading "API-Server nicht verfuegbar" [level=2] [ref=f36e104]
+          - paragraph [ref=f36e105]: Der API-Server auf Port 5000 antwortet nicht. Das Formular kann keine Daten laden.
+          - generic [ref=f36e106]:
+            - strong [ref=f36e107]: "Server starten:"
+            - code [ref=f36e108]: C:\Users\guenther.siegert\Documents\Access Bridge\start_api_hidden.vbs
+          - button "Erneut versuchen" [ref=f36e109] [cursor=pointer]
+          - button "Trotzdem fortfahren" [ref=f36e110] [cursor=pointer]
+```

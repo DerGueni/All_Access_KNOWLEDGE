@@ -1,0 +1,6 @@
+-- Query: qry_monatsstd
+-- Type: 0
+SELECT ([nachname] & " " & [Vorname]) AS Name, qry_MA_VA_Zuordnung_Stunden_Monat.Jahr, qry_MA_VA_Zuordnung_Stunden_Monat.MA_ID, qry_MA_VA_Zuordnung_Stunden_Monat.Monat, qry_MA_VA_Zuordnung_Stunden_Monat.SummevonMA_Brutto_Std2, qry_MA_VA_Zuordnung_Stunden_Monat.SummevonMA_Netto_Std2, [Kosten_pro_MAStunde]*[summevonMA_netto_std2] AS Personalkosten, tbl_MA_Mitarbeiterstamm.Stundenlohn_brutto, ([SummevonMA_Netto_Std2]*[stundenlohn_brutto]) AS MAVerdienst_brutto, ([MonKurz]) AS Monat1
+FROM _tblAlleMonate INNER JOIN (tbl_MA_Mitarbeiterstamm INNER JOIN qry_MA_VA_Zuordnung_Stunden_Monat ON tbl_MA_Mitarbeiterstamm.ID = qry_MA_VA_Zuordnung_Stunden_Monat.MA_ID) ON [_tblAlleMonate].MonNr = qry_MA_VA_Zuordnung_Stunden_Monat.Monat
+ORDER BY qry_MA_VA_Zuordnung_Stunden_Monat.Monat;
+

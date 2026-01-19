@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menü 2 - Personal & Lohn</title>
+    <style>
+        /* ========== ACCESS CLASSIC STYLE ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+        }
+
+        .window-frame {
+            background-color: #8080c0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 3px 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 26px;
+        }
+
+        .title-text {
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .title-btn {
+            width: 20px;
+            height: 20px;
+            background: #e0e0e0;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 8px;
+        }
+
+        .content-area {
+            background-color: #b8b8d8;
+            padding: 8px;
+        }
+
+        .form-container {
+            width: 180px;
+            background: #b8b8d8;
+            position: relative;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Rechtecke als Container */
+        .rectangle-container {
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background: #b8b8d8;
+            margin: 6px 4px;
+            padding: 8px;
+            position: relative;
+        }
+
+        .rectangle-18 {
+            /* Oberer Container: Vorlagen & Telefonliste */
+            min-height: 60px;
+        }
+
+        .rectangle-19 {
+            /* Mittlerer Container: Personal/Lohn Funktionen */
+            min-height: 200px;
+        }
+
+        .rectangle-20 {
+            /* Unterer Container: Abwesenheiten & Stunden */
+            min-height: 150px;
+        }
+
+        /* Button Styling - Classic Access */
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .menu-button {
+            width: 160px;
+            height: 20px;
+            margin: 4px 0;
+            padding: 2px 8px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 10px;
+            color: #000000;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .menu-button:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .menu-button:active {
+            background: linear-gradient(to bottom, #c0c0c0, #a0a0a0);
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .menu-button.hidden {
+            display: none;
+        }
+
+        /* Close Button */
+        .close-button {
+            width: 164px;
+            height: 24px;
+            margin: 8px 4px 4px 4px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <div class="title-bar">
+            <span class="title-text">Menü 2 - Personal & Lohn</span>
+            <button class="title-btn" onclick="closeForm()">×</button>
+        </div>
+        <div class="main-container">
+            <div class="content-area">
+                <div class="form-container">
+                    <!-- Rechteck 18: Oberer Bereich -->
+                    <div class="rectangle-container rectangle-18">
+                        <button type="button" class="menu-button" data-action="openForm" data-target="frmTop_neue_Vorlagen">
+                            Vorlagen
+                        </button>
+                        <button type="button" class="menu-button" data-action="openReport" data-target="rpt_telefonliste">
+                            Telefonliste
+                        </button>
+                    </div>
+
+                    <!-- Rechteck 19: Mittlerer Bereich (Personal/Lohn) -->
+                    <div class="rectangle-container rectangle-19">
+                        <button type="button" class="menu-button" data-action="openForm" data-target="zfrm_Lohnabrechnungen">
+                            Lohnabrechnungen
+                        </button>
+                        <button type="button" class="menu-button" data-action="openQuery" data-target="qry_MA_letzter _Einsatz_Gueni">
+                            Letzter Einsatz MA
+                        </button>
+                        <button type="button" class="menu-button" data-action="exportFCNMeldeliste">
+                            FCN Meldeliste
+                        </button>
+                        <button type="button" class="menu-button" data-action="exportNamensliste">
+                            Fürth Namensliste
+                        </button>
+                        <button type="button" class="menu-button" data-action="exportSubStunden">
+                            Sub Stunden
+                        </button>
+                        <button type="button" class="menu-button" data-action="exportMAStamm">
+                            Mitarbeiterstamm Excel
+                        </button>
+                        <button type="button" class="menu-button" data-action="openForm" data-target="frm_Lex_Aktiv">
+                            Lex Aktiv
+                        </button>
+                    </div>
+
+                    <!-- Rechteck 20: Unterer Bereich (Sync & Abwesenheiten) -->
+                    <div class="rectangle-container rectangle-20">
+                        <button type="button" class="menu-button" data-action="syncLoewensaal">
+                            Aufträge sync
+                        </button>
+                        <button type="button" class="menu-button" data-action="syncLoewensaalHP">
+                            Löwensaal Sync HP
+                        </button>
+                        <button type="button" class="menu-button" data-action="openForm" data-target="zfrm_ZK_Lohnarten_Zuschlag">
+                            Lohnarten
+                        </button>
+                        <button type="button" class="menu-button" data-action="openAbwesenheiten">
+                            Abwesenheiten
+                        </button>
+                        <button type="button" class="menu-button" data-action="openQuery" data-target="zqry_MA_VA_Stunden_Plan_Ist_aktJahr_Kreuztabelle">
+                            Stunden Mitarbeiter
+                        </button>
+                    </div>
+
+                    <!-- Close Button -->
+                    <button type="button" class="menu-button close-button" data-action="close">
+                        Menü 2 schliessen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Bridge Client Import (wenn vorhanden)
+        let Bridge = null;
+        try {
+            const module = await import('../api/bridgeClient.js');
+            Bridge = module.Bridge;
+        } catch (e) {
+            console.warn('Bridge client not available:', e);
+        }
+
+        // Button Event Handlers
+        document.addEventListener('click', async (e) => {
+            const button = e.target.closest('.menu-button');
+            if (!button) return;
+
+            const action = button.dataset.action;
+            const target = button.dataset.target;
+
+            try {
+                switch(action) {
+                    case 'openForm':
+                        await openForm(target);
+                        break;
+
+                    case 'openReport':
+                        await openReport(target);
+                        break;
+
+                    case 'openQuery':
+                        await openQuery(target);
+                        break;
+
+                    case 'exportFCNMeldeliste':
+                        await exportFCNMeldeliste();
+                        break;
+
+                    case 'exportNamensliste':
+                        await exportNamensliste();
+                        break;
+
+                    case 'exportSubStunden':
+                        await exportSubStunden();
+                        break;
+
+                    case 'exportMAStamm':
+                        await exportMAStamm();
+                        break;
+
+                    case 'syncLoewensaal':
+                        await syncLoewensaal();
+                        break;
+
+                    case 'syncLoewensaalHP':
+                        await syncLoewensaalHP();
+                        break;
+
+                    case 'openAbwesenheiten':
+                        await openAbwesenheiten();
+                        break;
+
+                    case 'close':
+                        closeForm();
+                        break;
+
+                    default:
+                        console.warn('Unknown action:', action);
+                }
+            } catch (error) {
+                console.error('Error executing action:', action, error);
+                showError(`Fehler bei ${button.textContent.trim()}: ${error.message}`);
+            }
+        });
+
+        // Navigation Functions
+        async function openForm(formName) {
+            if (Bridge) {
+                await Bridge.execute('openForm', { formName });
+            } else {
+                notifyAccess('OpenForm', { name: formName });
+            }
+        }
+
+        async function openReport(reportName) {
+            if (Bridge) {
+                await Bridge.execute('openReport', { reportName, view: 'acViewPreview' });
+            } else {
+                notifyAccess('OpenReport', { name: reportName, view: 'acViewPreview' });
+            }
+        }
+
+        async function openQuery(queryName) {
+            if (Bridge) {
+                await Bridge.execute('openQuery', { queryName });
+            } else {
+                notifyAccess('OpenQuery', { name: queryName });
+            }
+        }
+
+        // Export Functions
+        async function exportFCNMeldeliste() {
+            const va_id = prompt('VA_ID für FCN Meldeliste:');
+            if (!va_id) return;
+
+            if (Bridge) {
+                await Bridge.execute('exportFCNMeldeliste', { va_id: parseInt(va_id) });
+            } else {
+                notifyAccess('ExportFCNMeldeliste', { va_id: parseInt(va_id) });
+            }
+        }
+
+        async function exportNamensliste() {
+            const va_id = prompt('VA_ID für Namensliste:');
+            if (!va_id) return;
+
+            if (Bridge) {
+                await Bridge.execute('exportNamensliste', { va_id: parseInt(va_id) });
+            } else {
+                notifyAccess('ExportNamensliste', { va_id: parseInt(va_id) });
+            }
+        }
+
+        async function exportSubStunden() {
+            const dateiname = `Stunden_Sub_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+            if (Bridge) {
+                await Bridge.execute('exportSubStunden', { dateiname });
+            } else {
+                notifyAccess('ExportSubStunden', { dateiname });
+            }
+        }
+
+        async function exportMAStamm() {
+            const dateiname = `Mitarbeiterstamm_${new Date().toISOString().split('T')[0]}.xlsx`;
+            const oeffnen = confirm(`Datei: ${dateiname}\nwird erstellt - direkt öffnen?`);
+
+            if (Bridge) {
+                await Bridge.execute('exportMAStamm', { dateiname, oeffnen });
+            } else {
+                notifyAccess('ExportMAStamm', { dateiname, oeffnen });
+            }
+        }
+
+        // Sync Functions
+        async function syncLoewensaal() {
+            if (Bridge) {
+                await Bridge.execute('syncLoewensaal', { webUpdate: false });
+            } else {
+                notifyAccess('SyncLoewensaal', { webUpdate: false });
+            }
+        }
+
+        async function syncLoewensaalHP() {
+            const confirm_sync = confirm('Möchten Sie die Löwensaal-Events von der Homepage synchronisieren?\n\nDies kann einige Sekunden dauern.');
+            if (!confirm_sync) return;
+
+            if (Bridge) {
+                await Bridge.execute('syncLoewensaalHP');
+            } else {
+                notifyAccess('SyncLoewensaalHP');
+            }
+        }
+
+        // Abwesenheiten
+        async function openAbwesenheiten() {
+            const jahr = prompt('Jahr:', '');
+
+            if (jahr === null) return;
+
+            if (jahr === '') {
+                await openForm('frm_MA_Abwesenheiten_Urlaub_Gueni');
+            } else {
+                await openForm(`frm_MA_Abwesenheiten_krank_gueni_${jahr}`);
+            }
+        }
+
+        // Close Form
+        function closeForm() {
+            if (Bridge) {
+                Bridge.execute('closeForm', { formName: 'frm_Menuefuehrung1' });
+            } else {
+                notifyAccess('CloseForm', { name: 'frm_Menuefuehrung1' });
+            }
+
+            window.close();
+        }
+
+        // Notify Access/Parent
+        function notifyAccess(command, data) {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'ACCESS_COMMAND',
+                    command,
+                    data
+                }, '*');
+            }
+
+            console.log('Access Command:', command, data);
+        }
+
+        // Error Display
+        function showError(message) {
+            alert(message);
+        }
+
+        // Initialization
+        console.log('frm_Menuefuehrung1 initialized');
+    </script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+SELECT ztbl_Stunden_Lexware.Jahr, ztbl_Stunden_Lexware.Monat, tbl_MA_Mitarbeiterstamm.ID, tbl_MA_Mitarbeiterstamm.LEXWare_ID, [tbl_MA_Mitarbeiterstamm].[Nachname] & " " & [tbl_MA_Mitarbeiterstamm].[Vorname] AS Name, ztbl_Stunden_Lexware.Lohnartnummer, ztbl_Stunden_Lexware.Wert, Round([ztbl_Stunden_Lexware].[Stundensatz],2) AS Stundensatz, ztbl_Stunden_Lexware.Währung, tbl_MA_Mitarbeiterstamm.Anstellungsart_ID, DateAdd("h",0,FormatDateTime([monat] & "." & [jahr])) AS Datum, IIf([Wert]<0,[Wert]-0.01,[wert]) AS Wert_korr
+FROM ztbl_Stunden_Lexware INNER JOIN tbl_MA_Mitarbeiterstamm ON ztbl_Stunden_Lexware.Personalnummer = tbl_MA_Mitarbeiterstamm.LEXWare_ID
+GROUP BY ztbl_Stunden_Lexware.Jahr, ztbl_Stunden_Lexware.Monat, tbl_MA_Mitarbeiterstamm.ID, tbl_MA_Mitarbeiterstamm.LEXWare_ID, [tbl_MA_Mitarbeiterstamm].[Nachname] & " " & [tbl_MA_Mitarbeiterstamm].[Vorname], ztbl_Stunden_Lexware.Lohnartnummer, ztbl_Stunden_Lexware.Wert, Round([ztbl_Stunden_Lexware].[Stundensatz],2), ztbl_Stunden_Lexware.Währung, tbl_MA_Mitarbeiterstamm.Anstellungsart_ID, IIf([Wert]<0,[Wert]-0.01,[wert])
+HAVING (((ztbl_Stunden_Lexware.Lohnartnummer)<>77777 And (ztbl_Stunden_Lexware.Lohnartnummer)<>88888 And (ztbl_Stunden_Lexware.Lohnartnummer)<>99999 And (ztbl_Stunden_Lexware.Lohnartnummer)<>32))
+ORDER BY [tbl_MA_Mitarbeiterstamm].[Nachname] & " " & [tbl_MA_Mitarbeiterstamm].[Vorname];
+

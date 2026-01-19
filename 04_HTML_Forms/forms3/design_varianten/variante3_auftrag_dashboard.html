@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung - Dashboard</title>
+    <style>
+        :root {
+            /* CONSEC Farbschema */
+            --primary-color: #4a6fa5;
+            --primary-dark: #385a8a;
+            --primary-light: #6b8fc5;
+            --accent-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+
+            /* Neutralfarben */
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1a202c;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+
+            /* Schatten */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+
+            /* Abstände */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+
+            /* Radien */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .app-logo {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .app-subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* === SPLIT VIEW CONTAINER === */
+        .split-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        /* === LEFT PANEL (Liste) === */
+        .list-panel {
+            width: 380px;
+            min-width: 280px;
+            max-width: 500px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-header {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            background: #fafbfc;
+        }
+
+        .list-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            padding-left: 36px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            opacity: 0.5;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-sm);
+        }
+
+        .filter-tab {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            font-size: 11px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover, .filter-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .list-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .list-item:hover {
+            background: #f8fafc;
+        }
+
+        .list-item.active {
+            background: linear-gradient(90deg, rgba(74, 111, 165, 0.1) 0%, transparent 100%);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .item-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .badge-aktiv { background: #d4edda; color: #155724; }
+        .badge-planung { background: #fff3cd; color: #856404; }
+        .badge-abgeschlossen { background: #e2e3e5; color: #383d41; }
+
+        .item-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .item-stats {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xs);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* === RESIZABLE SPLITTER === */
+        .splitter {
+            width: 6px;
+            background: var(--border-color);
+            cursor: col-resize;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .splitter:hover, .splitter.dragging {
+            background: var(--primary-color);
+        }
+
+        .splitter::after {
+            content: "⋮";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* === RIGHT PANEL (Dashboard) === */
+        .dashboard-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-lg);
+            background: var(--bg-color);
+        }
+
+        /* === KPI WIDGETS === */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .kpi-widget {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .kpi-widget:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .kpi-icon.blue { background: rgba(74, 111, 165, 0.1); }
+        .kpi-icon.green { background: rgba(40, 167, 69, 0.1); }
+        .kpi-icon.yellow { background: rgba(255, 193, 7, 0.1); }
+        .kpi-icon.red { background: rgba(220, 53, 69, 0.1); }
+
+        .kpi-trend {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .trend-up { background: #d4edda; color: #155724; }
+        .trend-down { background: #f8d7da; color: #721c24; }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Sparkline SVG */
+        .sparkline {
+            margin-top: var(--spacing-sm);
+            height: 30px;
+        }
+
+        .sparkline path {
+            fill: none;
+            stroke: var(--primary-color);
+            stroke-width: 2;
+        }
+
+        .sparkline .area {
+            fill: rgba(74, 111, 165, 0.1);
+            stroke: none;
+        }
+
+        /* === DASHBOARD GRID === */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        /* === WIDGET === */
+        .widget {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .widget.span-2 {
+            grid-column: span 2;
+        }
+
+        .widget-header {
+            padding: var(--spacing-md);
+            background: #fafbfc;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .widget-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .widget-action {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .widget-action:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .widget-body {
+            padding: var(--spacing-md);
+        }
+
+        /* === DETAIL TABLE === */
+        .detail-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .detail-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-sm);
+            padding-bottom: var(--spacing-xs);
+            border-bottom: 2px solid var(--primary-color);
+            display: inline-block;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* === DATA TABLE === */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: var(--spacing-sm);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            background: #fafbfc;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: var(--spacing-sm);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+
+        /* === PROGRESS BAR === */
+        .progress-bar {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.green { background: var(--accent-color); }
+        .progress-fill.yellow { background: var(--warning-color); }
+        .progress-fill.red { background: var(--danger-color); }
+        .progress-fill.blue { background: var(--primary-color); }
+
+        /* === TIMELINE === */
+        .timeline {
+            position: relative;
+            padding-left: var(--spacing-lg);
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 4px;
+            bottom: 4px;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: var(--spacing-md);
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+
+        .timeline-time {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .timeline-content {
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        /* === STATUS INDICATORS === */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-dot.green { background: var(--accent-color); }
+        .status-dot.yellow { background: var(--warning-color); }
+        .status-dot.red { background: var(--danger-color); }
+        .status-dot.blue { background: var(--info-color); }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1200px) {
+            .kpi-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .widget.span-2 {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .split-container {
+                flex-direction: column;
+            }
+            .list-panel {
+                width: 100%;
+                max-width: none;
+                height: 40vh;
+            }
+            .splitter {
+                width: 100%;
+                height: 6px;
+                cursor: row-resize;
+            }
+            .kpi-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="app-logo">CS</div>
+            <div>
+                <div class="app-title">Auftragsverwaltung</div>
+                <div class="app-subtitle">Dashboard-Ansicht</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn">
+                <span>+</span> Neuer Auftrag
+            </button>
+            <button class="header-btn">
+                <span>↻</span> Aktualisieren
+            </button>
+            <button class="header-btn">
+                <span>⚙</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- SPLIT VIEW -->
+    <div class="split-container">
+        <!-- LEFT: Auftragsliste -->
+        <div class="list-panel" id="listPanel">
+            <div class="list-header">
+                <div class="list-title">Aufträge (47)</div>
+                <div class="search-box">
+                    <input type="text" placeholder="Auftrag suchen...">
+                </div>
+                <div class="filter-tabs">
+                    <button class="filter-tab active">Alle</button>
+                    <button class="filter-tab">Aktiv</button>
+                    <button class="filter-tab">Planung</button>
+                    <button class="filter-tab">Archiv</button>
+                </div>
+            </div>
+            <div class="list-content">
+                <!-- Auftrag 1 -->
+                <div class="list-item active" onclick="selectAuftrag(this, 1)">
+                    <div class="item-header">
+                        <span class="item-title">VA-2024-001</span>
+                        <span class="item-badge badge-aktiv">Aktiv</span>
+                    </div>
+                    <div class="item-meta">Messe München - Hauptstand</div>
+                    <div class="item-stats">
+                        <span class="stat-item">📅 15.01. - 20.01.2024</span>
+                        <span class="stat-item">👥 24 MA</span>
+                    </div>
+                </div>
+                <!-- Auftrag 2 -->
+                <div class="list-item" onclick="selectAuftrag(this, 2)">
+                    <div class="item-header">
+                        <span class="item-title">VA-2024-002</span>
+                        <span class="item-badge badge-planung">Planung</span>
+                    </div>
+                    <div class="item-meta">Konzert Olympiahalle</div>
+                    <div class="item-stats">
+                        <span class="stat-item">📅 22.01.2024</span>
+                        <span class="stat-item">👥 18/30 MA</span>
+                    </div>
+                </div>
+                <!-- Auftrag 3 -->
+                <div class="list-item" onclick="selectAuftrag(this, 3)">
+                    <div class="item-header">
+                        <span class="item-title">VA-2024-003</span>
+                        <span class="item-badge badge-aktiv">Aktiv</span>
+                    </div>
+                    <div class="item-meta">Firmenevent BMW</div>
+                    <div class="item-stats">
+                        <span class="stat-item">📅 18.01.2024</span>
+                        <span class="stat-item">👥 12 MA</span>
+                    </div>
+                </div>
+                <!-- Auftrag 4 -->
+                <div class="list-item" onclick="selectAuftrag(this, 4)">
+                    <div class="item-header">
+                        <span class="item-title">VA-2024-004</span>
+                        <span class="item-badge badge-abgeschlossen">Abgeschlossen</span>
+                    </div>
+                    <div class="item-meta">Sportgala Arena</div>
+                    <div class="item-stats">
+                        <span class="stat-item">📅 10.01.2024</span>
+                        <span class="stat-item">👥 8 MA</span>
+                    </div>
+                </div>
+                <!-- Auftrag 5 -->
+                <div class="list-item" onclick="selectAuftrag(this, 5)">
+                    <div class="item-header">
+                        <span class="item-title">VA-2024-005</span>
+                        <span class="item-badge badge-planung">Planung</span>
+                    </div>
+                    <div class="item-meta">Konferenz Hotel Vier Jahreszeiten</div>
+                    <div class="item-stats">
+                        <span class="stat-item">📅 25.01. - 27.01.2024</span>
+                        <span class="stat-item">👥 6/15 MA</span>
+                    </div>
+                </div>
+                <!-- Weitere Aufträge... -->
+                <div class="list-item" onclick="selectAuftrag(this, 6)">
+                    <div class="item-header">
+                        <span class="item-title">VA-2024-006</span>
+                        <span class="item-badge badge-aktiv">Aktiv</span>
+                    </div>
+                    <div class="item-meta">Produktpräsentation Siemens</div>
+                    <div class="item-stats">
+                        <span class="stat-item">📅 19.01.2024</span>
+                        <span class="stat-item">👥 10 MA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPLITTER -->
+        <div class="splitter" id="splitter"></div>
+
+        <!-- RIGHT: Dashboard -->
+        <div class="dashboard-panel">
+            <!-- KPI Widgets -->
+            <div class="kpi-row">
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-icon blue">📊</div>
+                        <span class="kpi-trend trend-up">↑ 12%</span>
+                    </div>
+                    <div class="kpi-value">47</div>
+                    <div class="kpi-label">Aktive Aufträge</div>
+                    <svg class="sparkline" viewBox="0 0 100 30">
+                        <path class="area" d="M0,25 L15,20 L30,22 L45,15 L60,18 L75,10 L90,12 L100,5 L100,30 L0,30 Z"/>
+                        <path d="M0,25 L15,20 L30,22 L45,15 L60,18 L75,10 L90,12 L100,5"/>
+                    </svg>
+                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-icon green">💶</div>
+                        <span class="kpi-trend trend-up">↑ 8%</span>
+                    </div>
+                    <div class="kpi-value">€ 284.500</div>
+                    <div class="kpi-label">Umsatz (Monat)</div>
+                    <svg class="sparkline" viewBox="0 0 100 30">
+                        <path class="area" d="M0,28 L20,22 L40,24 L60,15 L80,18 L100,8 L100,30 L0,30 Z"/>
+                        <path d="M0,28 L20,22 L40,24 L60,15 L80,18 L100,8"/>
+                    </svg>
+                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-icon yellow">👥</div>
+                        <span class="kpi-trend trend-down">↓ 3%</span>
+                    </div>
+                    <div class="kpi-value">156</div>
+                    <div class="kpi-label">MA eingeplant</div>
+                    <svg class="sparkline" viewBox="0 0 100 30">
+                        <path class="area" d="M0,15 L20,18 L40,12 L60,20 L80,15 L100,22 L100,30 L0,30 Z"/>
+                        <path d="M0,15 L20,18 L40,12 L60,20 L80,15 L100,22"/>
+                    </svg>
+                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-icon red">⚠️</div>
+                    </div>
+                    <div class="kpi-value">12</div>
+                    <div class="kpi-label">Offene Anfragen</div>
+                    <svg class="sparkline" viewBox="0 0 100 30">
+                        <path class="area" d="M0,20 L25,15 L50,25 L75,10 L100,18 L100,30 L0,30 Z"/>
+                        <path d="M0,20 L25,15 L50,25 L75,10 L100,18"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Auftragsdetails Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <span class="widget-title">📋 Auftragsdetails</span>
+                        <div class="widget-actions">
+                            <button class="widget-action" title="Bearbeiten">✏️</button>
+                            <button class="widget-action" title="Erweitern">⤢</button>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="detail-section">
+                            <div class="detail-section-title">Stammdaten</div>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Auftragsnummer</span>
+                                    <span class="detail-value">VA-2024-001</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Status</span>
+                                    <span class="detail-value"><span class="status-dot green"></span>Aktiv</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Kunde</span>
+                                    <span class="detail-value">Messe München GmbH</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Objekt</span>
+                                    <span class="detail-value">Hauptstand Halle A</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Zeitraum</span>
+                                    <span class="detail-value">15.01. - 20.01.2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Auftragswert</span>
+                                    <span class="detail-value">€ 45.600</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <div class="detail-section-title">Personalstatus</div>
+                            <div style="margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span>Besetzung</span>
+                                    <span>24/24 (100%)</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill green" style="width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schichten Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <span class="widget-title">🕐 Schichten heute</span>
+                        <div class="widget-actions">
+                            <button class="widget-action" title="Aktualisieren">↻</button>
+                            <button class="widget-action" title="Erweitern">⤢</button>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Zeit</th>
+                                    <th>Position</th>
+                                    <th>MA</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>06:00 - 14:00</td>
+                                    <td>Einlass</td>
+                                    <td>6</td>
+                                    <td><span class="status-dot green"></span>Komplett</td>
+                                </tr>
+                                <tr>
+                                    <td>08:00 - 16:00</td>
+                                    <td>Information</td>
+                                    <td>4</td>
+                                    <td><span class="status-dot green"></span>Komplett</td>
+                                </tr>
+                                <tr>
+                                    <td>10:00 - 18:00</td>
+                                    <td>Standbetreuung</td>
+                                    <td>8</td>
+                                    <td><span class="status-dot green"></span>Komplett</td>
+                                </tr>
+                                <tr>
+                                    <td>14:00 - 22:00</td>
+                                    <td>Einlass</td>
+                                    <td>6</td>
+                                    <td><span class="status-dot green"></span>Komplett</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Aktivitäten Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <span class="widget-title">📝 Letzte Aktivitäten</span>
+                        <div class="widget-actions">
+                            <button class="widget-action" title="Alle anzeigen">⋯</button>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-time">Heute, 09:45</div>
+                                <div class="timeline-content">Müller, Hans als Ersatz eingeplant</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-time">Heute, 08:30</div>
+                                <div class="timeline-content">Absage: Schmidt, Peter (krank)</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-time">Gestern, 16:20</div>
+                                <div class="timeline-content">BWN versendet an 24 MA</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-time">Gestern, 14:00</div>
+                                <div class="timeline-content">Planung abgeschlossen</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mitarbeiter Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <span class="widget-title">👥 Eingeplante Mitarbeiter</span>
+                        <div class="widget-actions">
+                            <button class="widget-action" title="MA hinzufügen">+</button>
+                            <button class="widget-action" title="Erweitern">⤢</button>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Schicht</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Maier, Anna</td>
+                                    <td>Teamleitung</td>
+                                    <td>08:00-18:00</td>
+                                    <td><span class="status-dot green"></span>Zugesagt</td>
+                                </tr>
+                                <tr>
+                                    <td>Weber, Thomas</td>
+                                    <td>Einlass</td>
+                                    <td>06:00-14:00</td>
+                                    <td><span class="status-dot green"></span>Zugesagt</td>
+                                </tr>
+                                <tr>
+                                    <td>Fischer, Maria</td>
+                                    <td>Information</td>
+                                    <td>08:00-16:00</td>
+                                    <td><span class="status-dot yellow"></span>Angefragt</td>
+                                </tr>
+                                <tr>
+                                    <td>Müller, Hans</td>
+                                    <td>Einlass</td>
+                                    <td>14:00-22:00</td>
+                                    <td><span class="status-dot blue"></span>Ersatz</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Splitter Resize Logic
+        const splitter = document.getElementById('splitter');
+        const listPanel = document.getElementById('listPanel');
+        let isResizing = false;
+
+        splitter.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            splitter.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const newWidth = e.clientX;
+            if (newWidth >= 280 && newWidth <= 500) {
+                listPanel.style.width = newWidth + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
+            splitter.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
+
+        // Auftrag Selection
+        function selectAuftrag(element, id) {
+            document.querySelectorAll('.list-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+            console.log('Auftrag ausgewählt:', id);
+            // Hier würde die Dashboard-Aktualisierung erfolgen
+        }
+
+        // Filter Tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

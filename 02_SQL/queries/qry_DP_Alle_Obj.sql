@@ -1,0 +1,3 @@
+SELECT tbl_VA_AnzTage.VA_ID, CLng(Nz([tbl_MA_VA_Zuordnung].[ID],0)) AS ZuordID, CLng(Nz([TVA_Soll],1)) AS Anz_MA, fObjektOrt3(Nz([Auftrag]),Nz([tbl_VA_Auftragstamm].[Ort]),Nz([Objekt])) AS ObjOrt, tbl_VA_AnzTage.VADatum, CLng(Nz([PosNr],1)) AS Pos_Nr, tbl_MA_VA_Zuordnung.MA_Start, tbl_MA_VA_Zuordnung.MA_Ende, tbl_MA_VA_Zuordnung.MA_ID, [Nachname] & " " & [Vorname] AS MAName, tbl_MA_VA_Zuordnung.IstFraglich
+FROM tbl_VA_Auftragstamm INNER JOIN ((tbl_MA_VA_Zuordnung LEFT JOIN tbl_MA_Mitarbeiterstamm ON tbl_MA_VA_Zuordnung.MA_ID = tbl_MA_Mitarbeiterstamm.ID) RIGHT JOIN tbl_VA_AnzTage ON tbl_MA_VA_Zuordnung.VADatum_ID = tbl_VA_AnzTage.ID) ON tbl_VA_Auftragstamm.ID = tbl_VA_AnzTage.VA_ID;
+

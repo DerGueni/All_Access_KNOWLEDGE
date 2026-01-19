@@ -1,0 +1,465 @@
+/**
+ * frm_N_Dienstplanuebersicht.css
+ * Styling für Dienstplanübersicht
+ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    background: #f0f0f0;
+    overflow: hidden;
+}
+
+/* ===== HAUPTCONTAINER ===== */
+.dp-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.dp-container.no-menu .dp-main {
+    width: 100%;
+}
+
+/* ===== HAUPTBEREICH ===== */
+.dp-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+/* ===== HEADER ===== */
+.dp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background: #4316B2;
+    min-height: 70px;
+    color: white;
+    border-bottom: 1px solid #3558c0;
+    gap: 20px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+/* Titel größer */
+.dp-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.header-center {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.version-info {
+    font-size: 10px;
+    color: rgba(255,255,255,0.8);
+}
+
+/* Date Navigation Group - Pfeil-Datum-Pfeil */
+.date-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.date-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Senden Group - einzeilig, weiter links */
+.senden-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Buttons */
+.dp-btn {
+    padding: 6px 14px;
+    background: #e8e8e8;
+    border: 1px solid #cccccc;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 3px;
+    color: #333333;
+    white-space: nowrap;
+}
+
+.dp-btn:hover {
+    background: #d5d5d5;
+}
+
+/* Kleiner Button unter Datum */
+.dp-btn-small {
+    padding: 2px 8px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    font-size: 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    color: white;
+}
+
+.dp-btn-small:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Nav Buttons */
+.dp-btn-nav {
+    padding: 6px 12px;
+    background: #e8e8e8;
+    border: 1px solid #cccccc;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 3px;
+}
+
+.dp-btn-nav:hover {
+    background: #d5d5d5;
+}
+
+/* Datum-Input gleich groß wie Buttons */
+.dp-date-input {
+    padding: 6px 10px;
+    border: 1px solid #cccccc;
+    font-size: 13px;
+    width: 100px;
+    background: white;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.dp-select {
+    padding: 6px 10px;
+    border: 1px solid #cccccc;
+    font-size: 13px;
+    min-width: 160px;
+    background: white;
+    border-radius: 3px;
+}
+
+/* ===== TABELLEN-CONTAINER ===== */
+.dp-table-container {
+    flex: 1;
+    overflow: auto;
+    background: white;
+    margin: 4px;
+    border: 1px solid #cccccc;
+}
+
+/* ===== DIENSTPLAN TABELLE ===== */
+.dp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: auto;
+}
+
+.dp-table th,
+.dp-table td {
+    border: 1px solid #cccccc;
+    padding: 4px 6px;
+    vertical-align: middle;
+}
+
+/* Dickere Trennstriche zwischen Tagen */
+.dp-table th.col-day,
+.dp-table td.einsatz {
+    border-left: 2px solid #999999;
+}
+
+/* Header Zeile */
+.dp-header-row th {
+    background: #e0e0e0;
+    font-weight: 600;
+    text-align: center;
+    height: 32px;
+    border-bottom: 2px solid #999999;
+}
+
+.dp-header-row .th-content {
+    padding: 4px;
+}
+
+/* Mitarbeiter-Spalte Header */
+.dp-header-row .th-content.cyan {
+    background: #4316B2;
+    color: white;
+    margin: -4px -6px;
+    padding: 8px 6px;
+}
+
+/* Subheader Zeile - fett und dunkleres grau */
+.dp-subheader-row th {
+    background: #c0c0c0;
+    font-weight: 700;
+    font-size: 12px;
+    text-align: center;
+    height: 24px;
+    color: #333333;
+    border-bottom: 2px solid #999999;
+}
+
+/* Auftrag-Spalte breiter */
+.sub-col.sub-auftrag {
+    min-width: 150px;
+    width: 150px;
+}
+
+/* von/bis Spalten schmaler */
+.sub-col.sub-zeit {
+    min-width: 40px;
+    width: 40px;
+    max-width: 45px;
+}
+
+/* Spaltenbreiten */
+.col-ma {
+    width: 160px;
+    min-width: 160px;
+    text-align: left;
+    font-weight: 500;
+    background: #fafafa;
+}
+
+.col-day {
+    text-align: center;
+    border-left: 2px solid #999999;
+}
+
+/* Stunden-Spalte - rechtsbündig */
+.col-sum {
+    width: 60px;
+    min-width: 60px;
+    text-align: right;
+    padding-right: 10px !important;
+    background: #f5f5f5;
+    font-weight: 500;
+    border-left: 2px solid #999999;
+}
+
+/* Datenzeilen */
+.dp-row td {
+    height: 26px;
+}
+
+/* Jede zweite Zeile dunkler */
+.dp-row:nth-child(odd) {
+    background: #ffffff;
+}
+
+.dp-row:nth-child(even) {
+    background: #f0f0f0;
+}
+
+.dp-row:hover {
+    background: #e8e8e8;
+}
+
+/* Einsatz-Zellen */
+.einsatz {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+    border-left: 2px solid #999999;
+}
+
+.zeit {
+    font-size: 12px;
+    text-align: center;
+    color: #444444;
+    white-space: nowrap;
+}
+
+/* Abwesenheit - einheitliche Farbe für Urlaub, Krank, Privat verplant */
+.abwesend {
+    background: #d8d8d8 !important;
+    color: #555555;
+    font-style: italic;
+}
+
+/* Entferne alte Klassen */
+.verplant {
+    background: #d8d8d8 !important;
+    color: #555555;
+    font-style: italic;
+}
+
+.highlight-cyan,
+.highlight-yellow,
+.highlight-green,
+.highlight-red {
+    background: transparent !important;
+}
+
+/* ===== FOOTER ===== */
+.dp-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 15px;
+    background: #4316B2;
+    color: white;
+    font-size: 12px;
+    min-height: 28px;
+}
+
+.footer-left,
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* ===== KALENDER POPUP - kleiner ===== */
+.date-picker-popup {
+    background: white;
+    border: 1px solid #999999;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    padding: 8px;
+    width: 220px;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+.picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+.picker-title {
+    font-weight: 600;
+    font-size: 12px;
+    color: #333333;
+}
+
+.picker-nav {
+    background: #e8e8e8;
+    border: 1px solid #cccccc;
+    padding: 3px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 11px;
+}
+
+.picker-nav:hover {
+    background: #d5d5d5;
+}
+
+.picker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: #666666;
+    margin-bottom: 4px;
+}
+
+.picker-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+}
+
+.picker-day {
+    text-align: center;
+    padding: 5px 2px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-size: 11px;
+}
+
+.picker-day:hover:not(.empty) {
+    background: #e8e8e8;
+}
+
+.picker-day.empty {
+    cursor: default;
+}
+
+.picker-day.today {
+    background: #4316B2;
+    color: white;
+    font-weight: 600;
+}
+
+.picker-day.selected {
+    background: #6b4ed8;
+    color: white;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1400px) {
+    .dp-title {
+        font-size: 18px;
+    }
+    .dp-table {
+        font-size: 12px;
+    }
+    .col-ma {
+        width: 140px;
+        min-width: 140px;
+    }
+    .sub-col.sub-auftrag {
+        min-width: 120px;
+        width: 120px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .dp-title {
+        font-size: 16px;
+    }
+    .header-right {
+        display: none;
+    }
+    .dp-table {
+        font-size: 11px;
+    }
+    .col-ma {
+        width: 120px;
+        min-width: 120px;
+    }
+}

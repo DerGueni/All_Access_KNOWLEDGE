@@ -1,0 +1,4 @@
+SELECT qry_JB_Neuberech_1.MA_ID, qry_JB_Neuberech_1.AktJ AS AktJahr, qry_JB_Neuberech_1.AktM1 AS AktMonat, qry_JB_MA_Zus2_xx.[34a_RZ], Sum(qry_JB_MA_Zus2_xx.Abschlag) AS SummevonAbschlag, Sum(qry_JB_MA_Zus2_xx.Nicht_Erscheinen) AS SummevonNicht_Erscheinen, Sum(qry_JB_MA_Zus2_xx.Kaution) AS SummevonKaution, Sum(qry_JB_MA_Zus2_xx.Sonst_Abzuege) AS SummevonSonst_Abzuege, Max(qry_JB_MA_Zus2_xx.Sonst_Abzuege_Grund) AS Sonst_Abzuege_Grund, Sum(qry_JB_MA_Zus2_xx.Monatslohn) AS SummevonMonatslohn, Max(qry_JB_MA_Zus2_xx.UeberwVon) AS MaxvonUeberwVon
+FROM qry_JB_Neuberech_1 LEFT JOIN qry_JB_MA_Zus2_xx ON (qry_JB_Neuberech_1.AktM1 = qry_JB_MA_Zus2_xx.AktMonat) AND (qry_JB_Neuberech_1.AktJ = qry_JB_MA_Zus2_xx.AktJahr) AND (qry_JB_Neuberech_1.MA_ID = qry_JB_MA_Zus2_xx.MA_ID)
+GROUP BY qry_JB_Neuberech_1.MA_ID, qry_JB_Neuberech_1.AktJ, qry_JB_Neuberech_1.AktM1, qry_JB_MA_Zus2_xx.[34a_RZ];
+

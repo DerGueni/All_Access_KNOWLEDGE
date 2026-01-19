@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Header - Button-Referenz</title>
+    <link rel="stylesheet" href="../css/unified-header.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #000080;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background-color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #d0d0d0;
+            border-radius: 5px;
+        }
+
+        .section h2 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000080;
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #d0d0d0;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .button-example {
+            padding: 15px;
+            background-color: #f8f8f8;
+            border: 1px solid #d0d0d0;
+            border-radius: 3px;
+        }
+
+        .button-example .label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #404040;
+            margin-bottom: 8px;
+        }
+
+        .button-example .code {
+            margin-top: 8px;
+            padding: 8px;
+            background-color: #e0e0e0;
+            border: 1px solid #c0c0c0;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #404040;
+            border-radius: 2px;
+            overflow-x: auto;
+        }
+
+        .color-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #606060;
+        }
+
+        .color-box {
+            width: 30px;
+            height: 20px;
+            border: 1px solid #808080;
+            border-radius: 2px;
+        }
+
+        .usage-info {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #fffff0;
+            border: 1px solid #e0e0a0;
+            font-size: 10px;
+            color: #606000;
+            border-radius: 2px;
+        }
+
+        .shortcut {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: #e0e0e0;
+            border: 1px solid #a0a0a0;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .icon-demo {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .state-example {
+            padding: 10px;
+            background-color: #f8f8f8;
+            border: 1px solid #d0d0d0;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .state-example .label {
+            font-size: 10px;
+            font-weight: bold;
+            color: #404040;
+            margin-bottom: 8px;
+        }
+
+        .table-reference {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 11px;
+        }
+
+        .table-reference th,
+        .table-reference td {
+            border: 1px solid #d0d0d0;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table-reference th {
+            background-color: #000080;
+            color: white;
+            font-weight: bold;
+        }
+
+        .table-reference tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+
+        code {
+            background-color: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-title">Unified Header - Button-Referenz</div>
+
+    <!-- ========================================
+         SEKTION 1: STANDARD-BUTTONS
+         ======================================== -->
+    <div class="section">
+        <h2>1. Standard-Buttons (Funktionsbezogen)</h2>
+        <p style="font-size: 12px; margin-bottom: 15px;">
+            Jeder Button hat eine feste Farbe basierend auf seiner Funktion.
+            Diese Farben sind in allen Formularen identisch.
+        </p>
+
+        <div class="button-grid">
+            <!-- Aktualisieren -->
+            <div class="button-example">
+                <div class="label">Aktualisieren</div>
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+                <div class="color-info">
+                    <div class="color-box" style="background: linear-gradient(to bottom, #90d0e0, #60a0b0);"></div>
+                    <span>Blau-Grün</span>
+                </div>
+                <div class="code">&lt;button class="form-btn form-btn-refresh"&gt;Aktualisieren&lt;/button&gt;</div>
+                <div class="usage-info">
+                    <strong>Verwendung:</strong> Daten neu laden, Formular aktualisieren<br>
+                    <strong>Shortcut:</strong> <span class="shortcut">Strg+R</span>
+                </div>
+            </div>
+
+            <!-- Neu -->
+            <div class="button-example">
+                <div class="label">Neu</div>
+                <button class="form-btn form-btn-new">Neu</button>
+                <div class="color-info">
+                    <div class="color-box" style="background: linear-gradient(to bottom, #90e090, #60b060);"></div>
+                    <span>Grün</span>
+                </div>
+                <div class="code">&lt;button class="form-btn form-btn-new"&gt;Neu&lt;/button&gt;</div>
+                <div class="usage-info">
+                    <strong>Verwendung:</strong> Neuen Datensatz erstellen<br>
+                    <strong>Shortcut:</strong> <span class="shortcut">Strg+N</span>
+                </div>
+            </div>
+
+            <!-- Kopieren -->
+            <div class="button-example">
+                <div class="label">Kopieren</div>
+                <button class="form-btn form-btn-copy">Kopieren</button>
+                <div class="color-info">
+                    <div class="color-box" style="background: linear-gradient(to bottom, #f0e080, #d0c060);"></div>
+                    <span>Gelb</span>
+                </div>
+                <div class="code">&lt;button class="form-btn form-btn-copy"&gt;Kopieren&lt;/button&gt;</div>
+                <div class="usage-info">
+                    <strong>Verwendung:</strong> Aktuellen Datensatz duplizieren<br>
+                    <strong>Shortcut:</strong> <span class="shortcut">Strg+K</span>
+                </div>
+            </div>
+
+            <!-- Speichern -->
+            <div class="button-example">
+                <div class="label">Speichern (Primär)</div>
+                <button class="form-btn form-btn-save">Speichern</button>
+                <div class="color-info">
+                    <div class="color-box" style="background: linear-gradient(to bottom, #8080f0, #5050d0);"></div>
+                    <span>Blau (Primär)</span>
+                </div>
+                <div class="code">&lt;button class="form-btn form-btn-save"&gt;Speichern&lt;/button&gt;</div>
+                <div class="usage-info">
+                    <strong>Verwendung:</strong> Änderungen speichern<br>
+                    <strong>Shortcut:</strong> <span class="shortcut">Strg+S</span>
+                </div>
+            </div>
+
+            <!-- Löschen -->
+            <div class="button-example">
+                <div class="label">Löschen (Gefährlich)</div>
+                <button class="form-btn form-btn-delete">Löschen</button>
+                <div class="color-info">
+                    <div class="color-box" style="background: linear-gradient(to bottom, #f08080, #d05050);"></div>
+                    <span>Rot</span>
+                </div>
+                <div class="code">&lt;button class="form-btn form-btn-delete"&gt;Löschen&lt;/button&gt;</div>
+                <div class="usage-info">
+                    <strong>Verwendung:</strong> Datensatz löschen (destruktive Aktion!)<br>
+                    <strong>Shortcut:</strong> <span class="shortcut">Strg+D</span>
+                </div>
+            </div>
+
+            <!-- Schließen -->
+            <div class="button-example">
+                <div class="label">Schließen (Neutral)</div>
+                <button class="form-btn form-btn-close">Schließen</button>
+                <div class="color-info">
+                    <div class="color-box" style="background: linear-gradient(to bottom, #d0d0d0, #b0b0b0);"></div>
+                    <span>Grau</span>
+                </div>
+                <div class="code">&lt;button class="form-btn form-btn-close"&gt;Schließen&lt;/button&gt;</div>
+                <div class="usage-info">
+                    <strong>Verwendung:</strong> Formular schließen<br>
+                    <strong>Shortcut:</strong> <span class="shortcut">Esc</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         SEKTION 2: BUTTON-STATES
+         ======================================== -->
+    <div class="section">
+        <h2>2. Button-States (Normal, Hover, Active, Disabled)</h2>
+        <p style="font-size: 12px; margin-bottom: 15px;">
+            Alle Buttons haben 4 verschiedene Zustände mit visuellen Feedback.
+        </p>
+
+        <div class="states-grid">
+            <div class="state-example">
+                <div class="label">Normal</div>
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+            </div>
+            <div class="state-example">
+                <div class="label">Hover (Maus darüber)</div>
+                <button class="form-btn form-btn-refresh" style="background: linear-gradient(to bottom, #a0e0f0, #70b0c0);">Aktualisieren</button>
+            </div>
+            <div class="state-example">
+                <div class="label">Active (geklickt)</div>
+                <button class="form-btn form-btn-refresh" style="background: linear-gradient(to bottom, #60a0b0, #90d0e0); border-color: #406070 #c0e0f0 #c0e0f0 #406070;">Aktualisieren</button>
+            </div>
+            <div class="state-example">
+                <div class="label">Disabled (deaktiviert)</div>
+                <button class="form-btn form-btn-refresh" disabled>Aktualisieren</button>
+            </div>
+            <div class="state-example">
+                <div class="label">Normal</div>
+                <button class="form-btn form-btn-delete">Löschen</button>
+            </div>
+            <div class="state-example">
+                <div class="label">Hover</div>
+                <button class="form-btn form-btn-delete" style="background: linear-gradient(to bottom, #ff9090, #e06060);">Löschen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         SEKTION 3: BUTTON-ICONS
+         ======================================== -->
+    <div class="section">
+        <h2>3. Button-Icons (automatisch via CSS)</h2>
+        <p style="font-size: 12px; margin-bottom: 15px;">
+            Icons werden automatisch über CSS <code>::before</code> Pseudo-Elemente hinzugefügt.
+        </p>
+
+        <div class="button-grid">
+            <div class="button-example">
+                <div class="label">Aktualisieren-Icon</div>
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+                <div class="code">content: '⟳';</div>
+            </div>
+            <div class="button-example">
+                <div class="label">Neu-Icon</div>
+                <button class="form-btn form-btn-new">Neu</button>
+                <div class="code">content: '+';</div>
+            </div>
+            <div class="button-example">
+                <div class="label">Kopieren-Icon</div>
+                <button class="form-btn form-btn-copy">Kopieren</button>
+                <div class="code">content: '⎘';</div>
+            </div>
+            <div class="button-example">
+                <div class="label">Löschen-Icon</div>
+                <button class="form-btn form-btn-delete">Löschen</button>
+                <div class="code">content: '×';</div>
+            </div>
+            <div class="button-example">
+                <div class="label">Speichern-Icon</div>
+                <button class="form-btn form-btn-save">Speichern</button>
+                <div class="code">content: '✓';</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         SEKTION 4: STATUS-BADGES
+         ======================================== -->
+    <div class="section">
+        <h2>4. Status-Badges</h2>
+        <p style="font-size: 12px; margin-bottom: 15px;">
+            Für Status-Anzeigen zwischen Titel und Buttons.
+        </p>
+
+        <div class="button-grid">
+            <div class="button-example">
+                <div class="label">Aktiv</div>
+                <span class="form-status-badge active">Aktiv</span>
+                <div class="code">&lt;span class="form-status-badge active"&gt;Aktiv&lt;/span&gt;</div>
+                <div class="color-info">
+                    <div class="color-box" style="background-color: #90e090;"></div>
+                    <span>Grün</span>
+                </div>
+            </div>
+            <div class="button-example">
+                <div class="label">Inaktiv</div>
+                <span class="form-status-badge inactive">Inaktiv</span>
+                <div class="code">&lt;span class="form-status-badge inactive"&gt;Inaktiv&lt;/span&gt;</div>
+                <div class="color-info">
+                    <div class="color-box" style="background-color: #f08080;"></div>
+                    <span>Rot</span>
+                </div>
+            </div>
+            <div class="button-example">
+                <div class="label">Ausstehend</div>
+                <span class="form-status-badge pending">Ausstehend</span>
+                <div class="code">&lt;span class="form-status-badge pending"&gt;Ausstehend&lt;/span&gt;</div>
+                <div class="color-info">
+                    <div class="color-box" style="background-color: #f0e080;"></div>
+                    <span>Gelb</span>
+                </div>
+            </div>
+            <div class="button-example">
+                <div class="label">Neutral</div>
+                <span class="form-status-badge">ID: 12345</span>
+                <div class="code">&lt;span class="form-status-badge"&gt;ID: 12345&lt;/span&gt;</div>
+                <div class="color-info">
+                    <div class="color-box" style="background-color: #ffffff;"></div>
+                    <span>Weiß</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         SEKTION 5: QUICK REFERENCE TABELLE
+         ======================================== -->
+    <div class="section">
+        <h2>5. Quick Reference - CSS-Klassen</h2>
+
+        <table class="table-reference">
+            <thead>
+                <tr>
+                    <th>CSS-Klasse</th>
+                    <th>Farbe</th>
+                    <th>Verwendung</th>
+                    <th>Shortcut</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>.form-btn-refresh</code></td>
+                    <td>Blau-Grün</td>
+                    <td>Daten aktualisieren</td>
+                    <td><code>Strg+R</code></td>
+                </tr>
+                <tr>
+                    <td><code>.form-btn-new</code></td>
+                    <td>Grün</td>
+                    <td>Neuer Datensatz</td>
+                    <td><code>Strg+N</code></td>
+                </tr>
+                <tr>
+                    <td><code>.form-btn-copy</code></td>
+                    <td>Gelb</td>
+                    <td>Datensatz kopieren</td>
+                    <td><code>Strg+K</code></td>
+                </tr>
+                <tr>
+                    <td><code>.form-btn-save</code></td>
+                    <td>Blau (Primär)</td>
+                    <td>Änderungen speichern</td>
+                    <td><code>Strg+S</code></td>
+                </tr>
+                <tr>
+                    <td><code>.form-btn-delete</code></td>
+                    <td>Rot</td>
+                    <td>Datensatz löschen</td>
+                    <td><code>Strg+D</code></td>
+                </tr>
+                <tr>
+                    <td><code>.form-btn-close</code></td>
+                    <td>Grau</td>
+                    <td>Formular schließen</td>
+                    <td><code>Esc</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ========================================
+         SEKTION 6: RESPONSIVE BUTTONS
+         ======================================== -->
+    <div class="section">
+        <h2>6. Responsive Verhalten</h2>
+        <p style="font-size: 12px; margin-bottom: 15px;">
+            Buttons passen sich automatisch an die Bildschirmgröße an.
+        </p>
+
+        <table class="table-reference">
+            <thead>
+                <tr>
+                    <th>Breakpoint</th>
+                    <th>Button-Höhe</th>
+                    <th>Font-Size</th>
+                    <th>Besonderheit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>>1280px (Desktop)</td>
+                    <td>32px</td>
+                    <td>12px</td>
+                    <td>Volle Darstellung</td>
+                </tr>
+                <tr>
+                    <td>1024px - 1280px (Tablet)</td>
+                    <td>28px</td>
+                    <td>11px</td>
+                    <td>Kompakter</td>
+                </tr>
+                <tr>
+                    <td><768px (Mobile)</td>
+                    <td>26px</td>
+                    <td>10px</td>
+                    <td>Icon-Only (Text versteckt)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ========================================
+         SEKTION 7: VERWENDUNGSBEISPIELE
+         ======================================== -->
+    <div class="section">
+        <h2>7. Code-Beispiele</h2>
+
+        <h3 style="font-size: 14px; margin: 20px 0 10px 0;">HTML (Direkt)</h3>
+        <pre style="background: #f8f8f8; padding: 15px; border: 1px solid #d0d0d0; border-radius: 3px; overflow-x: auto; font-size: 11px; font-family: 'Courier New', monospace;">&lt;div class="form-header-unified"&gt;
+    &lt;h1 class="form-title-unified"&gt;Auftragsverwaltung&lt;/h1&gt;
+    &lt;div class="form-header-controls-unified"&gt;
+        &lt;button class="form-btn form-btn-refresh" onclick="refreshData()"&gt;Aktualisieren&lt;/button&gt;
+        &lt;button class="form-btn form-btn-new" onclick="newRecord()"&gt;Neu&lt;/button&gt;
+        &lt;button class="form-btn form-btn-delete" onclick="deleteRecord()"&gt;Löschen&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+
+        <h3 style="font-size: 14px; margin: 20px 0 10px 0;">JavaScript (Dynamisch)</h3>
+        <pre style="background: #f8f8f8; padding: 15px; border: 1px solid #d0d0d0; border-radius: 3px; overflow-x: auto; font-size: 11px; font-family: 'Courier New', monospace;">// Option 1: Neue Instanz erstellen
+const header = new UnifiedHeader({
+    title: 'Auftragsverwaltung',
+    buttons: ['refresh', 'new', 'delete'],
+    onRefresh: () => loadData(),
+    onNew: () => createRecord(),
+    onDelete: () => deleteRecord()
+});
+
+// Option 2: Bestehenden Header verwenden
+const header = attachUnifiedHeader('.form-header-unified');
+header.on('refresh', () => loadData());
+header.on('new', () => createRecord());
+
+// Button-State ändern
+header.setButtonEnabled('delete', false);
+header.setButtonLabel('refresh', 'Lädt...');
+header.setStatus('Aktiv', 'active');</pre>
+    </div>
+
+    <script>
+        console.log('[Button Reference] Geladen');
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS - Verwaltung</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .shell-container {
+            display: flex;
+            height: 100vh;
+            background-color: #8080c0;
+        }
+
+        /* Left Sidebar - permanent */
+        .sidebar {
+            width: 220px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+            border-right: 2px solid #404080;
+        }
+
+        .sidebar-header {
+            background-color: #000080;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 2px;
+            overflow-y: auto;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 6px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+            overflow: visible;
+        }
+
+        /* Obere helle Kante - 4px nach rechts versetzt */
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        /* Untere dunkle Kante - 4px nach links versetzt */
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:active::before {
+            background: #404070;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn:active::after {
+            background: #ffffff;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.active::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        /* Right Content Area - iframe container */
+        .content-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            flex: 1;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 220px; /* nach Sidebar */
+            width: calc(100% - 220px);
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="shell-container">
+        <!-- Sidebar - permanent -->
+        <div class="sidebar">
+            <div>
+                <div class="sidebar-header">HAUPTMENU</div>
+            </div>
+            <div class="menu-buttons" id="menuButtons">
+                <button class="menu-btn" data-form="frm_N_Dienstplanuebersicht">Dienstplanübersicht</button>
+                <button class="menu-btn" data-form="frm_VA_Planungsuebersicht">Planungsübersicht</button>
+                <button class="menu-btn active" data-form="frm_va_Auftragstamm_shell">Auftragsverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm_shell">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_VA_Schnellauswahl">Offene Mail Anfragen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Excel Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_Abwesenheiten">Abwesenheitsplanung</button>
+                <button class="menu-btn">Dienstausweis erstellen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Stundenabgleich</button>
+                <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kundenverwaltung</button>
+                <button class="menu-btn" data-form="frm_OB_Objekt">Objektverwaltung</button>
+                <button class="menu-btn">Verrechnungssätze</button>
+                <button class="menu-btn">Sub Rechnungen</button>
+                <button class="menu-btn" data-form="frmOff_Outlook_aufrufen">E-Mail</button>
+                <button class="menu-btn" data-form="frm_Menuefuehrung1">Menu 2</button>
+                <button class="menu-btn">System Info</button>
+                <button class="menu-btn">Datenbank wechseln</button>
+            </div>
+        </div>
+
+        <!-- Content Area - iframe container -->
+        <div class="content-container">
+            <iframe id="contentFrame" class="content-iframe" src="frm_va_Auftragstamm_shell.html"></iframe>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        // State
+        const shellState = {
+            currentForm: 'frm_va_Auftragstamm_shell',
+            iframe: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            shellState.iframe = document.getElementById('contentFrame');
+
+            // Menu button click handlers
+            document.querySelectorAll('.menu-btn[data-form]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    loadForm(this.dataset.form);
+                });
+            });
+
+            // Listen to postMessage from iframes
+            window.addEventListener('message', handleIframeMessage);
+
+            // Listen to iframe load events
+            shellState.iframe.addEventListener('load', function() {
+                hideLoading();
+            });
+        });
+
+        /**
+         * Load a form into the iframe
+         */
+        function loadForm(formName) {
+            if (!formName) return;
+
+            // Update active menu button
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.querySelector(`[data-form="${formName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+
+            // Show loading
+            showLoading();
+
+            // Load form in iframe
+            shellState.currentForm = formName;
+            shellState.iframe.src = formName + '.html';
+
+            // Update browser history (optional)
+            if (window.history && window.history.pushState) {
+                window.history.pushState({form: formName}, '', `?form=${formName}`);
+            }
+        }
+
+        /**
+         * Handle messages from iframe
+         */
+        function handleIframeMessage(event) {
+            const data = event.data;
+
+            // Navigation request from iframe
+            if (data.type === 'NAVIGATE') {
+                loadForm(data.formName);
+            }
+
+            // Close request
+            if (data.type === 'CLOSE') {
+                // In shell mode, we might want to navigate to a default form
+                loadForm('frm_Menuefuehrung1');
+            }
+
+            // Data refresh request
+            if (data.type === 'REFRESH') {
+                // Reload current iframe
+                shellState.iframe.contentWindow.location.reload();
+            }
+
+            // Log events (for debugging)
+            if (data.type === 'LOG') {
+                console.log('[Shell] Message from iframe:', data.message);
+            }
+        }
+
+        /**
+         * Send message to iframe
+         */
+        function sendToIframe(message) {
+            if (shellState.iframe && shellState.iframe.contentWindow) {
+                shellState.iframe.contentWindow.postMessage(message, '*');
+            }
+        }
+
+        /**
+         * Loading indicators
+         */
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', function(event) {
+            if (event.state && event.state.form) {
+                loadForm(event.state.form);
+            }
+        });
+
+        // Handle URL parameters on initial load
+        const urlParams = new URLSearchParams(window.location.search);
+        const formParam = urlParams.get('form');
+        if (formParam) {
+            loadForm(formParam);
+        }
+
+        console.log('[Shell] Shell layout initialized');
+    </script>
+    <!-- API-Server Lifecycle (Auto-Start/Stop) - Shell verwaltet den Lifecycle -->
+    <script src="../../js/api-lifecycle.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Varianten Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            background: #f0f0f0;
+            border-left: 4px solid #0066cc;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Auftragstamm Varianten Generator</h1>
+    <p>Dieser Generator erstellt zwei Farbvarianten des frm_va_Auftragstamm.html Formulars.</p>
+
+    <div>
+        <button onclick="loadAndGenerate()">Varianten Generieren</button>
+    </div>
+
+    <div class="status" id="status">
+        Bereit zum Generieren...
+    </div>
+
+    <div id="downloads"></div>
+
+    <script>
+        const COLOR_MAPS = {
+            // Hauptfarben
+            '#8080c0': ['#00796B', '#1976D2'],
+            '#6060a0': ['#004D40', '#0D47A1'],
+            '#000080': ['#00695C', '#1565C0'],
+            '#1084d0': ['#26A69A', '#42A5F5'],
+
+            // Content Area
+            '#9090c0': ['#4DB6AC', '#64B5F6'],
+            '#b8b8d8': ['#80CBC4', '#90CAF9'],
+            '#a0a0c0': ['#80CBC4', '#90CAF9'],
+            '#8080b0': ['#26A69A', '#42A5F5'],
+
+            // Logo
+            '#4040a0': ['#00695C', '#1565C0'],
+
+            // Borders
+            '#606090': ['#00695C', '#1565C0'],
+            '#404080': ['#004D40', '#0D47A1'],
+            '#404070': ['#004D40', '#0D47A1'],
+            '#505080': ['#00695C', '#1565C0'],
+
+            // Menu Buttons
+            '#d0d0e0': ['#B2DFDB', '#BBDEFB'],
+            '#e0e0f0': ['#E0F2F1', '#E3F2FD'],
+            '#b0b0d0': ['#B2DFDB', '#BBDEFB'],
+            '#9090b0': ['#4DB6AC', '#64B5F6'],
+            '#a0a0d0': ['#80CBC4', '#90CAF9'],
+            '#c0c0d8': ['#B2DFDB', '#BBDEFB'],
+
+            // Table Headers
+            '#c0c0d0': ['#B2DFDB', '#BBDEFB'],
+            '#a0a0b0': ['#80CBC4', '#90CAF9'],
+
+            // Table Rows
+            '#e0e0ff': ['#E0F2F1', '#E3F2FD'],
+            '#f0f0ff': ['#E0F2F1', '#E3F2FD'],
+            '#d0d0ff': ['#B2DFDB', '#BBDEFB'],
+
+            // Status
+            '#c00000': ['#B71C1C', '#C62828'],
+
+            // Button Colors - Green
+            '#60c060': ['#26A69A', '#42A5F5'],
+            '#308030': ['#00796B', '#1976D2'],
+
+            // Button Colors - Yellow
+            '#e0e080': ['#FFD54F', '#FFD54F'],
+            '#c0c040': ['#FFC107', '#FFC107'],
+
+            // Button Colors - Red
+            '#e06060': ['#EF5350', '#EF5350'],
+            '#c04040': ['#E53935', '#E53935'],
+
+            // Cells
+            '#add8e6': ['#80DEEA', '#81D4FA'],
+            '#90ee90': ['#A5D6A7', '#A5D6A7'],
+            '#ffff90': ['#FFF59D', '#FFF59D'],
+            '#ffb0b0': ['#EF9A9A', '#EF9A9A'],
+
+            // GPT Box
+            '#ffe0e0': ['#FFEBEE', '#FFEBEE'],
+            '#a00000': ['#C62828', '#C62828'],
+
+            // Close Button
+            '#c75050': ['#EF5350', '#EF5350']
+        };
+
+        async function loadAndGenerate() {
+            const status = document.getElementById('status');
+            status.innerHTML = 'Lade Original-Datei...';
+
+            try {
+                const response = await fetch('../frm_va_Auftragstamm.html');
+                if (!response.ok) throw new Error('Datei konnte nicht geladen werden');
+
+                let content = await response.text();
+                status.innerHTML = 'Datei geladen. Erstelle Varianten...';
+
+                // Variante 1: Teal
+                const variant1 = createVariant(content, 'Teal Refresh', 0);
+                downloadFile(variant1, 'variante_09_teal.html');
+
+                // Variante 2: Ocean Blue
+                const variant2 = createVariant(content, 'Ocean Blue', 1);
+                downloadFile(variant2, 'variante_10_ocean_blue.html');
+
+                status.innerHTML = '<strong>Fertig!</strong> Beide Varianten wurden erstellt. Bitte die Downloads speichern.';
+
+            } catch (e) {
+                status.innerHTML = `<span style="color: red;">Fehler: ${e.message}</span>`;
+            }
+        }
+
+        function createVariant(content, variantName, colorIndex) {
+            // Titel ändern
+            content = content.replace(
+                '<title>Auftragsverwaltung</title>',
+                `<title>Auftragsverwaltung - ${variantName}</title>`
+            );
+
+            // Kommentar hinzufügen
+            content = content.replace(
+                '    <style>',
+                `    <!-- VARIANTE: ${variantName} -->\n    <style>`
+            );
+
+            // Farben ersetzen
+            let replacements = 0;
+            for (const [original, [teal, ocean]] of Object.entries(COLOR_MAPS)) {
+                const target = colorIndex === 0 ? teal : ocean;
+                const regex = new RegExp(original.replace('#', '\\#'), 'gi');
+                const matches = (content.match(regex) || []).length;
+                if (matches > 0) {
+                    content = content.replace(regex, target);
+                    replacements += matches;
+                }
+            }
+
+            console.log(`${variantName}: ${replacements} Farben ersetzt`);
+            return content;
+        }
+
+        function downloadFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.textContent = `Download ${filename}`;
+            a.style.display = 'block';
+            a.style.margin = '10px 0';
+            a.style.padding = '10px';
+            a.style.background = '#0066cc';
+            a.style.color = 'white';
+            a.style.textDecoration = 'none';
+            a.style.borderRadius = '4px';
+
+            document.getElementById('downloads').appendChild(a);
+            a.click();
+        }
+    </script>
+</body>
+</html>

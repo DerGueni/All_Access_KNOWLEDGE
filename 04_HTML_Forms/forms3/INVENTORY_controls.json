@@ -1,0 +1,1742 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-07",
+  "description": "Control-Inventar fuer E2E-Tests - Prioritaets-Formulare",
+  "forms": [
+    {
+      "name": "frm_va_Auftragstamm",
+      "file": "frm_va_Auftragstamm.html",
+      "description": "Auftragsverwaltung - Hauptformular",
+      "controls": [
+        {
+          "type": "button",
+          "selector": "#fullscreenBtn",
+          "fallback": ".fullscreen-btn",
+          "event": "click",
+          "expectedAction": "toggles fullscreen mode",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnAktualisieren",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "refreshes data from API",
+          "apiEndpoint": "GET /api/auftraege/{id}"
+        },
+        {
+          "type": "button",
+          "selector": "#btnSchnellPlan",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Mitarbeiterauswahl dialog",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnPositionen",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Positionen view",
+          "apiEndpoint": "GET /api/auftraege/{id}/positionen"
+        },
+        {
+          "type": "button",
+          "selector": "#btnNeuAuftrag",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "creates new Auftrag",
+          "apiEndpoint": "POST /api/auftraege"
+        },
+        {
+          "type": "button",
+          "selector": "#btnKopieren",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "copies current Auftrag",
+          "apiEndpoint": "POST /api/auftraege/{id}/copy"
+        },
+        {
+          "type": "button",
+          "selector": "#btnLöschen",
+          "fallback": ".btn-red",
+          "event": "click",
+          "expectedAction": "deletes current Auftrag with confirmation",
+          "apiEndpoint": "DELETE /api/auftraege/{id}"
+        },
+        {
+          "type": "button",
+          "selector": "#btnListeStd",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "prints Namensliste ESS",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnDruckZusage",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "prints Einsatzliste",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnMailEins",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "sends Einsatzliste to MA",
+          "apiEndpoint": "POST /api/email/einsatzliste/ma"
+        },
+        {
+          "type": "button",
+          "selector": "#btnMailBOS",
+          "fallback": ".btn-green",
+          "event": "click",
+          "expectedAction": "sends Einsatzliste to BOS",
+          "apiEndpoint": "POST /api/email/einsatzliste/bos"
+        },
+        {
+          "type": "button",
+          "selector": "#btnMailSub",
+          "fallback": ".btn-yellow",
+          "event": "click",
+          "expectedAction": "sends Einsatzliste to SUB",
+          "apiEndpoint": "POST /api/email/einsatzliste/sub"
+        },
+        {
+          "type": "button",
+          "selector": "#btnELGesendet",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "shows EL sent status",
+          "apiEndpoint": null
+        },
+        {
+          "type": "checkbox",
+          "selector": "#cbAutosendEL",
+          "fallback": "[name='Autosend_EL']",
+          "event": "change",
+          "expectedAction": "saves Autosend_EL field",
+          "apiEndpoint": "PUT /api/auftraege/{id}",
+          "validation": null
+        },
+        {
+          "type": "select",
+          "selector": "#Veranst_Status_ID",
+          "fallback": "[name='Veranst_Status_ID']",
+          "event": "change",
+          "expectedAction": "changes Veranstaltung status",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Rech_NR",
+          "fallback": "[name='Rech_NR']",
+          "event": "none",
+          "expectedAction": "displays Rechnungsnummer (readonly)",
+          "apiEndpoint": null,
+          "validation": "readonly"
+        },
+        {
+          "type": "date",
+          "selector": "#Dat_VA_Von",
+          "fallback": "[name='Dat_VA_Von']",
+          "event": "change",
+          "expectedAction": "sets VA start date",
+          "apiEndpoint": "PUT /api/auftraege/{id}",
+          "validation": "required"
+        },
+        {
+          "type": "date",
+          "selector": "#Dat_VA_Bis",
+          "fallback": "[name='Dat_VA_Bis']",
+          "event": "change",
+          "expectedAction": "sets VA end date",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#ID",
+          "fallback": "[name='ID']",
+          "event": "none",
+          "expectedAction": "displays Auftrag ID (readonly)",
+          "apiEndpoint": null,
+          "validation": "readonly"
+        },
+        {
+          "type": "input",
+          "selector": "#Auftrag",
+          "fallback": "[name='Auftrag']",
+          "event": "change",
+          "expectedAction": "updates Auftrag name with autocomplete",
+          "apiEndpoint": "PUT /api/auftraege/{id}",
+          "validation": "required"
+        },
+        {
+          "type": "input",
+          "selector": "#Ort",
+          "fallback": "[name='Ort']",
+          "event": "change",
+          "expectedAction": "updates Ort with autocomplete",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Objekt",
+          "fallback": "[name='Objekt']",
+          "event": "change",
+          "expectedAction": "updates Objekt with autocomplete",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "select",
+          "selector": "#Objekt_ID",
+          "fallback": "[name='Objekt_ID']",
+          "event": "change",
+          "expectedAction": "links Objekt by ID",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#PKW_Anzahl",
+          "fallback": "[name='PKW_Anzahl']",
+          "event": "change",
+          "expectedAction": "sets PKW count",
+          "apiEndpoint": "PUT /api/auftraege/{id}",
+          "validation": "number min=0"
+        },
+        {
+          "type": "input",
+          "selector": "#Fahrtkosten",
+          "fallback": "[name='Fahrtkosten']",
+          "event": "change",
+          "expectedAction": "saves Fahrtkosten",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "button",
+          "selector": "#btnDatumLeft",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to previous VA date",
+          "apiEndpoint": null
+        },
+        {
+          "type": "select",
+          "selector": "#cboVADatum",
+          "fallback": null,
+          "event": "change",
+          "expectedAction": "selects VA date from dropdown",
+          "apiEndpoint": "GET /api/auftraege/{id}/einsatztage"
+        },
+        {
+          "type": "button",
+          "selector": "#btnDatumRight",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to next VA date",
+          "apiEndpoint": null
+        },
+        {
+          "type": "input",
+          "selector": "#Treffp_Zeit",
+          "fallback": "[name='Treffp_Zeit']",
+          "event": "change",
+          "expectedAction": "saves Treffpunkt time",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Treffpunkt",
+          "fallback": "[name='Treffpunkt']",
+          "event": "change",
+          "expectedAction": "saves Treffpunkt location",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Dienstkleidung",
+          "fallback": "[name='Dienstkleidung']",
+          "event": "change",
+          "expectedAction": "saves Dienstkleidung with autocomplete",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Ansprechpartner",
+          "fallback": "[name='Ansprechpartner']",
+          "event": "change",
+          "expectedAction": "saves Ansprechpartner",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "select",
+          "selector": "#Veranstalter_ID",
+          "fallback": "[name='Veranstalter_ID']",
+          "event": "change",
+          "expectedAction": "links Veranstalter/Kunde",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='einsatzliste']",
+          "fallback": ".tab-btn:contains('Einsatzliste')",
+          "event": "click",
+          "expectedAction": "switches to Einsatzliste tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='antworten']",
+          "fallback": ".tab-btn:contains('Antworten')",
+          "event": "click",
+          "expectedAction": "switches to Antworten ausstehend tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='zusatzdateien']",
+          "fallback": ".tab-btn:contains('Zusatzdateien')",
+          "event": "click",
+          "expectedAction": "switches to Zusatzdateien tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='rechnung']",
+          "fallback": ".tab-btn:contains('Rechnung')",
+          "event": "click",
+          "expectedAction": "switches to Rechnung tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='bemerkungen']",
+          "fallback": ".tab-btn:contains('Bemerkungen')",
+          "event": "click",
+          "expectedAction": "switches to Bemerkungen tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='eventdaten']",
+          "fallback": ".tab-btn:contains('Eventdaten')",
+          "event": "click",
+          "expectedAction": "switches to Eventdaten tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "textarea",
+          "selector": "#Bemerkungen",
+          "fallback": "[name='Bemerkungen']",
+          "event": "change",
+          "expectedAction": "saves Bemerkungen",
+          "apiEndpoint": "PUT /api/auftraege/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#eventDatum",
+          "fallback": null,
+          "event": "none",
+          "expectedAction": "displays event date (readonly)",
+          "apiEndpoint": null,
+          "validation": "readonly"
+        },
+        {
+          "type": "input",
+          "selector": "#eventEinlass",
+          "fallback": null,
+          "event": "input",
+          "expectedAction": "edits Einlass time from web data",
+          "apiEndpoint": null
+        },
+        {
+          "type": "input",
+          "selector": "#eventBeginn",
+          "fallback": null,
+          "event": "input",
+          "expectedAction": "edits Beginn time from web data",
+          "apiEndpoint": null
+        },
+        {
+          "type": "input",
+          "selector": "#eventEnde",
+          "fallback": null,
+          "event": "input",
+          "expectedAction": "edits Ende time from web data",
+          "apiEndpoint": null
+        },
+        {
+          "type": "textarea",
+          "selector": "#eventInfo",
+          "fallback": null,
+          "event": "input",
+          "expectedAction": "edits event info from web data",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "button:contains('Web-Daten laden')",
+          "fallback": ".btn-green:contains('Web')",
+          "event": "click",
+          "expectedAction": "loads event data from web scraper",
+          "apiEndpoint": "GET /api/eventdaten/{objekt}"
+        },
+        {
+          "type": "button",
+          "selector": "button:contains('Speichern'):last",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "saves event data",
+          "apiEndpoint": "PUT /api/auftraege/{id}/eventdaten"
+        },
+        {
+          "type": "date",
+          "selector": "#Aufträge_ab",
+          "fallback": ".date-input",
+          "event": "change",
+          "expectedAction": "filters Auftraege list by date",
+          "apiEndpoint": null
+        },
+        {
+          "type": "table",
+          "selector": "#auftraegeTable tbody",
+          "fallback": ".auftraege-list tbody",
+          "event": "click",
+          "expectedAction": "selects Auftrag from list",
+          "apiEndpoint": "GET /api/auftraege/{id}"
+        }
+      ]
+    },
+    {
+      "name": "frm_MA_Mitarbeiterstamm",
+      "file": "frm_MA_Mitarbeiterstamm.html",
+      "description": "Mitarbeiterverwaltung - Stammdaten und Einsaetze",
+      "controls": [
+        {
+          "type": "button",
+          "selector": "#fullscreenBtn",
+          "fallback": ".fullscreen-btn",
+          "event": "click",
+          "expectedAction": "toggles fullscreen mode",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnErste",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to first record",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnVorige",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to previous record",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnNächste",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to next record",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnLetzte",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to last record",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnMAAdressen",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens MA Adressen view",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnAktualisieren",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "refreshes data from API",
+          "apiEndpoint": "GET /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "button",
+          "selector": "#btnZeitkonto",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Zeitkonto view",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnNeuMA",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "creates new Mitarbeiter",
+          "apiEndpoint": "POST /api/mitarbeiter"
+        },
+        {
+          "type": "button",
+          "selector": "#btnLöschen",
+          "fallback": ".btn-red",
+          "event": "click",
+          "expectedAction": "deletes current Mitarbeiter with confirmation",
+          "apiEndpoint": "DELETE /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "button",
+          "selector": "#btnEinsaetzeFA",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "transfers Einsaetze to FA",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnEinsaetzeMJ",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "transfers Einsaetze to MJ",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnListenDrucken",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "prints lists",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnMATabelle",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens MA Tabelle view",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnDienstplan",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Dienstplan view",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnEinsatzÜbersicht",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Einsatzuebersicht view",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnMapsÖffnen",
+          "fallback": ".btn-green:contains('Karte')",
+          "event": "click",
+          "expectedAction": "opens Google Maps with address",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnZKFest",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "processes Zeitkonten Festangestellte",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnZKMini",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "processes Zeitkonten Minijobber",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnZKeinzel",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "processes single Zeitkonto entry",
+          "apiEndpoint": null
+        },
+        {
+          "type": "select",
+          "selector": "#cboZeitraum",
+          "fallback": null,
+          "event": "change",
+          "expectedAction": "filters by time period",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnSpeichern",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "saves current Mitarbeiter",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#ID",
+          "fallback": "[data-field='ID']",
+          "event": "none",
+          "expectedAction": "displays MA ID (readonly)",
+          "apiEndpoint": null,
+          "validation": "readonly"
+        },
+        {
+          "type": "input",
+          "selector": "#LEXWare_ID",
+          "fallback": "[data-field='LEXWare_ID']",
+          "event": "change",
+          "expectedAction": "updates Lexware ID",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "checkbox",
+          "selector": "#IstAktiv",
+          "fallback": "[data-field='IstAktiv']",
+          "event": "change",
+          "expectedAction": "toggles active status",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "checkbox",
+          "selector": "#Lex_Aktiv",
+          "fallback": "[data-field='Lex_Aktiv']",
+          "event": "change",
+          "expectedAction": "toggles Lexware active status",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Nachname",
+          "fallback": "[data-field='Nachname']",
+          "event": "change",
+          "expectedAction": "updates Nachname",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}",
+          "validation": "required"
+        },
+        {
+          "type": "input",
+          "selector": "#Vorname",
+          "fallback": "[data-field='Vorname']",
+          "event": "change",
+          "expectedAction": "updates Vorname",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}",
+          "validation": "required"
+        },
+        {
+          "type": "input",
+          "selector": "#Strasse",
+          "fallback": "[data-field='Strasse']",
+          "event": "change",
+          "expectedAction": "updates Strasse",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#PLZ",
+          "fallback": "[data-field='PLZ']",
+          "event": "change",
+          "expectedAction": "updates PLZ",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}",
+          "validation": "pattern=[0-9]{5}"
+        },
+        {
+          "type": "input",
+          "selector": "#Ort",
+          "fallback": "[data-field='Ort']",
+          "event": "change",
+          "expectedAction": "updates Ort",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Tel_Mobil",
+          "fallback": "[data-field='Tel_Mobil']",
+          "event": "change",
+          "expectedAction": "updates mobile phone",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}",
+          "validation": "tel"
+        },
+        {
+          "type": "input",
+          "selector": "#Tel_Festnetz",
+          "fallback": "[data-field='Tel_Festnetz']",
+          "event": "change",
+          "expectedAction": "updates landline phone",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}",
+          "validation": "tel"
+        },
+        {
+          "type": "input",
+          "selector": "#Email",
+          "fallback": "[data-field='Email']",
+          "event": "change",
+          "expectedAction": "updates email",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}",
+          "validation": "email"
+        },
+        {
+          "type": "select",
+          "selector": "#Geschlecht",
+          "fallback": "[data-field='Geschlecht']",
+          "event": "change",
+          "expectedAction": "updates gender",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "date",
+          "selector": "#Geb_Dat",
+          "fallback": "[data-field='Geb_Dat']",
+          "event": "change",
+          "expectedAction": "updates birth date",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "date",
+          "selector": "#Eintrittsdatum",
+          "fallback": "[data-field='Eintrittsdatum']",
+          "event": "change",
+          "expectedAction": "updates entry date",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "date",
+          "selector": "#Austrittsdatum",
+          "fallback": "[data-field='Austrittsdatum']",
+          "event": "change",
+          "expectedAction": "updates exit date",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "select",
+          "selector": "#Anstellungsart_ID",
+          "fallback": "[data-field='Anstellungsart_ID']",
+          "event": "change",
+          "expectedAction": "updates employment type",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "checkbox",
+          "selector": "#IstSubunternehmer",
+          "fallback": "[data-field='IstSubunternehmer']",
+          "event": "change",
+          "expectedAction": "toggles subcontractor status",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "checkbox",
+          "selector": "#Hat_Fahrerausweis",
+          "fallback": "[data-field='Hat_Fahrerausweis']",
+          "event": "change",
+          "expectedAction": "toggles driver license",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "checkbox",
+          "selector": "#Eigener_PKW",
+          "fallback": "[data-field='Eigener_PKW']",
+          "event": "change",
+          "expectedAction": "toggles own car",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#IBAN",
+          "fallback": "[data-field='IBAN']",
+          "event": "change",
+          "expectedAction": "updates IBAN",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}",
+          "validation": "IBAN pattern"
+        },
+        {
+          "type": "input",
+          "selector": "#BIC",
+          "fallback": "[data-field='BIC']",
+          "event": "change",
+          "expectedAction": "updates BIC",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}",
+          "validation": "BIC pattern"
+        },
+        {
+          "type": "textarea",
+          "selector": "#Bemerkungen",
+          "fallback": "[data-field='Bemerkungen']",
+          "event": "change",
+          "expectedAction": "updates remarks",
+          "apiEndpoint": "PUT /api/mitarbeiter/{id}"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='stammdaten']",
+          "fallback": ".tab-btn:contains('Stammdaten')",
+          "event": "click",
+          "expectedAction": "switches to Stammdaten tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='einsatzübersicht']",
+          "fallback": ".tab-btn:contains('Einsatz')",
+          "event": "click",
+          "expectedAction": "switches to Einsatzuebersicht tab",
+          "apiEndpoint": "GET /api/mitarbeiter/{id}/einsaetze"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='dienstplan']",
+          "fallback": ".tab-btn:contains('Dienstplan')",
+          "event": "click",
+          "expectedAction": "switches to Dienstplan tab",
+          "apiEndpoint": "GET /api/dienstplan/ma/{id}"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='nichtverfügbar']",
+          "fallback": ".tab-btn:contains('Nicht Verf')",
+          "event": "click",
+          "expectedAction": "switches to Nicht Verfuegbar tab",
+          "apiEndpoint": "GET /api/abwesenheiten?ma_id={id}"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='dienstkleidung']",
+          "fallback": ".tab-btn:contains('Dienstkleidung')",
+          "event": "click",
+          "expectedAction": "switches to Dienstkleidung tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='zeitkonto']",
+          "fallback": ".tab-btn:contains('Zeitkonto')",
+          "event": "click",
+          "expectedAction": "switches to Zeitkonto tab",
+          "apiEndpoint": "GET /api/zeitkonten?ma_id={id}"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='qualifikationen']",
+          "fallback": ".tab-btn:contains('Qualifikationen')",
+          "event": "click",
+          "expectedAction": "switches to Qualifikationen tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='dokumente']",
+          "fallback": ".tab-btn:contains('Dokumente')",
+          "event": "click",
+          "expectedAction": "switches to Dokumente tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "input",
+          "selector": "#searchInput",
+          "fallback": "[placeholder='Name eingeben']",
+          "event": "input",
+          "expectedAction": "filters Mitarbeiter list",
+          "apiEndpoint": null
+        },
+        {
+          "type": "select",
+          "selector": "#filterSelect",
+          "fallback": null,
+          "event": "change",
+          "expectedAction": "filters Mitarbeiter by criteria",
+          "apiEndpoint": null
+        },
+        {
+          "type": "file",
+          "selector": "#fotoUploadInput",
+          "fallback": null,
+          "event": "change",
+          "expectedAction": "uploads photo",
+          "apiEndpoint": "POST /api/mitarbeiter/{id}/foto"
+        }
+      ]
+    },
+    {
+      "name": "frm_KD_Kundenstamm",
+      "file": "frm_KD_Kundenstamm.html",
+      "description": "Kundenverwaltung - Stammdaten und Konditionen",
+      "controls": [
+        {
+          "type": "button",
+          "selector": "#fullscreenBtn",
+          "fallback": ".fullscreen-btn",
+          "event": "click",
+          "expectedAction": "toggles fullscreen mode",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnAktualisieren",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "refreshes data from API",
+          "apiEndpoint": "GET /api/kunden/{id}"
+        },
+        {
+          "type": "button",
+          "selector": "#btnVerrechnungssaetze",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Verrechnungssaetze view",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnUmsatzauswertung",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Umsatzauswertung view",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnOutlook",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Outlook email",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnWord",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Word document",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnNeuKunde",
+          "fallback": ".btn-green:contains('Neuer')",
+          "event": "click",
+          "expectedAction": "creates new Kunde",
+          "apiEndpoint": "POST /api/kunden"
+        },
+        {
+          "type": "button",
+          "selector": "#btnLöschen",
+          "fallback": ".btn-red",
+          "event": "click",
+          "expectedAction": "deletes current Kunde with confirmation",
+          "apiEndpoint": "DELETE /api/kunden/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#cboKDNrSuche",
+          "fallback": null,
+          "event": "keydown",
+          "expectedAction": "searches Kunde by Nr",
+          "apiEndpoint": "GET /api/kunden?nr={nr}"
+        },
+        {
+          "type": "button",
+          "selector": "#btnSpeichern",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "saves current Kunde",
+          "apiEndpoint": "PUT /api/kunden/{id}"
+        },
+        {
+          "type": "checkbox",
+          "selector": "#kun_IstAktiv",
+          "fallback": "[data-field='kun_IstAktiv']",
+          "event": "change",
+          "expectedAction": "toggles active status",
+          "apiEndpoint": "PUT /api/kunden/{id}"
+        },
+        {
+          "type": "checkbox",
+          "selector": "#kun_IstSammelRechnung",
+          "fallback": "[data-field='kun_IstSammelRechnung']",
+          "event": "change",
+          "expectedAction": "toggles Sammelrechnung status",
+          "apiEndpoint": "PUT /api/kunden/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#kun_Firma",
+          "fallback": "[data-field='kun_Firma']",
+          "event": "change",
+          "expectedAction": "updates company name",
+          "apiEndpoint": "PUT /api/kunden/{id}",
+          "validation": "required"
+        },
+        {
+          "type": "input",
+          "selector": "#kun_bezeichnung",
+          "fallback": "[data-field='kun_bezeichnung']",
+          "event": "change",
+          "expectedAction": "updates designation",
+          "apiEndpoint": "PUT /api/kunden/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#kun_Matchcode",
+          "fallback": "[data-field='kun_Matchcode']",
+          "event": "change",
+          "expectedAction": "updates matchcode",
+          "apiEndpoint": "PUT /api/kunden/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#kun_Strasse",
+          "fallback": "[data-field='kun_Strasse']",
+          "event": "change",
+          "expectedAction": "updates street",
+          "apiEndpoint": "PUT /api/kunden/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#kun_PLZ",
+          "fallback": "[data-field='kun_PLZ']",
+          "event": "change",
+          "expectedAction": "updates PLZ",
+          "apiEndpoint": "PUT /api/kunden/{id}",
+          "validation": "pattern=[0-9]{5}"
+        },
+        {
+          "type": "input",
+          "selector": "#kun_Ort",
+          "fallback": "[data-field='kun_Ort']",
+          "event": "change",
+          "expectedAction": "updates city",
+          "apiEndpoint": "PUT /api/kunden/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#kun_telefon",
+          "fallback": "[data-field='kun_telefon']",
+          "event": "change",
+          "expectedAction": "updates phone",
+          "apiEndpoint": "PUT /api/kunden/{id}",
+          "validation": "tel"
+        },
+        {
+          "type": "input",
+          "selector": "#kun_email",
+          "fallback": "[data-field='kun_email']",
+          "event": "change",
+          "expectedAction": "updates email",
+          "apiEndpoint": "PUT /api/kunden/{id}",
+          "validation": "email"
+        },
+        {
+          "type": "input",
+          "selector": "#kun_iban",
+          "fallback": "[data-field='kun_iban']",
+          "event": "change",
+          "expectedAction": "updates IBAN",
+          "apiEndpoint": "PUT /api/kunden/{id}",
+          "validation": "IBAN pattern"
+        },
+        {
+          "type": "select",
+          "selector": "#kun_Zahlbed",
+          "fallback": "[data-field='kun_Zahlbed']",
+          "event": "change",
+          "expectedAction": "updates payment terms",
+          "apiEndpoint": "PUT /api/kunden/{id}"
+        },
+        {
+          "type": "select",
+          "selector": "#kun_IDF_PersonID",
+          "fallback": "[data-field='kun_IDF_PersonID']",
+          "event": "change",
+          "expectedAction": "updates main contact person",
+          "apiEndpoint": "PUT /api/kunden/{id}"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='stammdaten']",
+          "fallback": ".tab-btn:contains('Stammdaten')",
+          "event": "click",
+          "expectedAction": "switches to Stammdaten tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='objekte']",
+          "fallback": ".tab-btn:contains('Objekte')",
+          "event": "click",
+          "expectedAction": "switches to Objekte tab",
+          "apiEndpoint": "GET /api/kunden/{id}/objekte"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='konditionen']",
+          "fallback": ".tab-btn:contains('Konditionen')",
+          "event": "click",
+          "expectedAction": "switches to Konditionen tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='auftragübersicht']",
+          "fallback": ".tab-btn:contains('Auftrags')",
+          "event": "click",
+          "expectedAction": "switches to Auftragsübersicht tab",
+          "apiEndpoint": "GET /api/auftraege?kunde_id={id}"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='ansprechpartner']",
+          "fallback": ".tab-btn:contains('Ansprechpartner')",
+          "event": "click",
+          "expectedAction": "switches to Ansprechpartner tab",
+          "apiEndpoint": "GET /api/kunden/{id}/ansprechpartner"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='zusatzdateien']",
+          "fallback": ".tab-btn:contains('Zusatzdateien')",
+          "event": "click",
+          "expectedAction": "switches to Zusatzdateien tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='bemerkungen']",
+          "fallback": ".tab-btn:contains('Bemerkungen')",
+          "event": "click",
+          "expectedAction": "switches to Bemerkungen tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='preise']",
+          "fallback": ".tab-btn:contains('Preise')",
+          "event": "click",
+          "expectedAction": "switches to Preise tab",
+          "apiEndpoint": "GET /api/kunden/{id}/preise"
+        },
+        {
+          "type": "input",
+          "selector": "#searchInput",
+          "fallback": "[placeholder='Firma eingeben']",
+          "event": "input",
+          "expectedAction": "filters Kunden list",
+          "apiEndpoint": null
+        },
+        {
+          "type": "checkbox",
+          "selector": "#chkNurAktive",
+          "fallback": null,
+          "event": "change",
+          "expectedAction": "filters active customers only",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "button:contains('Neues Objekt')",
+          "fallback": ".btn-green:contains('Objekt')",
+          "event": "click",
+          "expectedAction": "creates new Objekt for Kunde",
+          "apiEndpoint": "POST /api/objekte"
+        },
+        {
+          "type": "button",
+          "selector": "button:contains('Neuer Ansprechpartner')",
+          "fallback": ".btn-green:contains('Ansprechpartner')",
+          "event": "click",
+          "expectedAction": "creates new Ansprechpartner",
+          "apiEndpoint": "POST /api/kunden/{id}/ansprechpartner"
+        }
+      ]
+    },
+    {
+      "name": "frm_OB_Objekt",
+      "file": "frm_OB_Objekt.html",
+      "description": "Objektverwaltung - Stammdaten und Positionen",
+      "controls": [
+        {
+          "type": "button",
+          "selector": "#fullscreenBtn",
+          "fallback": ".fullscreen-btn",
+          "event": "click",
+          "expectedAction": "toggles fullscreen mode",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".nav-btn:contains('|<')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to first record",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".nav-btn:contains('<'):not(:contains('|'))",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to previous record",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".nav-btn:contains('>'):not(:contains('|'))",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to next record",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".nav-btn:contains('>|')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to last record",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".btn-green:contains('Neu')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "creates new Objekt",
+          "apiEndpoint": "POST /api/objekte"
+        },
+        {
+          "type": "button",
+          "selector": ".btn-yellow:contains('Speichern')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "saves current Objekt",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "button",
+          "selector": ".btn-red:contains('Löschen')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "deletes current Objekt with confirmation",
+          "apiEndpoint": "DELETE /api/objekte/{id}"
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('Bericht')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "prints Objekt report",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('Neuer Veranstalter')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Kundenstamm for new Veranstalter",
+          "apiEndpoint": null
+        },
+        {
+          "type": "checkbox",
+          "selector": "#chkNurAktive",
+          "fallback": null,
+          "event": "change",
+          "expectedAction": "filters active objects only",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('Geocode')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "geocodes address via OSM",
+          "apiEndpoint": "PUT /api/objekte/{id}/geo"
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('?')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "shows help dialog",
+          "apiEndpoint": null
+        },
+        {
+          "type": "input",
+          "selector": "#ID",
+          "fallback": "[data-field='ID']",
+          "event": "none",
+          "expectedAction": "displays Objekt ID (readonly)",
+          "apiEndpoint": null,
+          "validation": "readonly"
+        },
+        {
+          "type": "input",
+          "selector": "#Objekt",
+          "fallback": "[data-field='Objekt']",
+          "event": "change",
+          "expectedAction": "updates Objekt name",
+          "apiEndpoint": "PUT /api/objekte/{id}",
+          "validation": "required"
+        },
+        {
+          "type": "input",
+          "selector": "#Strasse",
+          "fallback": "[data-field='Strasse']",
+          "event": "change",
+          "expectedAction": "updates street",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#PLZ",
+          "fallback": "[data-field='PLZ']",
+          "event": "change",
+          "expectedAction": "updates PLZ",
+          "apiEndpoint": "PUT /api/objekte/{id}",
+          "validation": "pattern=[0-9]{5}"
+        },
+        {
+          "type": "input",
+          "selector": "#Ort",
+          "fallback": "[data-field='Ort']",
+          "event": "change",
+          "expectedAction": "updates city",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#txtLat",
+          "fallback": "[data-field='Geo_Lat']",
+          "event": "none",
+          "expectedAction": "displays latitude (readonly)",
+          "apiEndpoint": null,
+          "validation": "readonly"
+        },
+        {
+          "type": "input",
+          "selector": "#txtLon",
+          "fallback": "[data-field='Geo_Lon']",
+          "event": "none",
+          "expectedAction": "displays longitude (readonly)",
+          "apiEndpoint": null,
+          "validation": "readonly"
+        },
+        {
+          "type": "input",
+          "selector": "#Treffpunkt",
+          "fallback": "[data-field='Treffpunkt']",
+          "event": "change",
+          "expectedAction": "updates meeting point",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Treffp_Zeit",
+          "fallback": "[data-field='Treffp_Zeit']",
+          "event": "change",
+          "expectedAction": "updates meeting time",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "textarea",
+          "selector": "#txtAnfahrt",
+          "fallback": "[data-field='Anfahrt']",
+          "event": "change",
+          "expectedAction": "updates directions",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Dienstkleidung",
+          "fallback": "[data-field='Dienstkleidung']",
+          "event": "change",
+          "expectedAction": "updates dress code",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Ansprechpartner",
+          "fallback": "[data-field='Ansprechpartner']",
+          "event": "change",
+          "expectedAction": "updates contact person",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#Text435",
+          "fallback": "[data-field='Text435']",
+          "event": "change",
+          "expectedAction": "updates phone",
+          "apiEndpoint": "PUT /api/objekte/{id}",
+          "validation": "tel"
+        },
+        {
+          "type": "select",
+          "selector": "#cboVeranstalter",
+          "fallback": "[data-field='Veranstalter_ID']",
+          "event": "change",
+          "expectedAction": "links Veranstalter/Kunde",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='tabPositionen']",
+          "fallback": ".tab-btn:contains('Positionen')",
+          "event": "click",
+          "expectedAction": "switches to Positionen tab",
+          "apiEndpoint": "GET /api/objekte/{id}/positionen"
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='tabAttach']",
+          "fallback": ".tab-btn:contains('Zusatzdateien')",
+          "event": "click",
+          "expectedAction": "switches to Zusatzdateien tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='tabBemerkungen']",
+          "fallback": ".tab-btn:contains('Bemerkungen')",
+          "event": "click",
+          "expectedAction": "switches to Bemerkungen tab",
+          "apiEndpoint": null
+        },
+        {
+          "type": "tab",
+          "selector": "[data-tab='tabAufträge']",
+          "fallback": ".tab-btn:contains('Aufträge')",
+          "event": "click",
+          "expectedAction": "switches to Auftraege tab",
+          "apiEndpoint": "GET /api/objekte/{id}/auftraege"
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('Neue Position')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "creates new Position",
+          "apiEndpoint": "POST /api/objekte/{id}/positionen"
+        },
+        {
+          "type": "button",
+          "selector": ".btn-red:contains('Position löschen')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "deletes selected Position",
+          "apiEndpoint": "DELETE /api/objekte/positionen/{id}"
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('Import')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "imports Positionen from file",
+          "apiEndpoint": "POST /api/objekte/{id}/positionen/import"
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('Excel')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "exports Positionen to Excel",
+          "apiEndpoint": "GET /api/objekte/{id}/positionen/export"
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('Kopieren')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "copies Positionen from another Objekt",
+          "apiEndpoint": "POST /api/objekte/{id}/positionen/copy"
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('Vorlage speichern')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "saves Positionen as template",
+          "apiEndpoint": "POST /api/objekte/vorlagen"
+        },
+        {
+          "type": "button",
+          "selector": ".btn:contains('Vorlage laden')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "loads Positionen from template",
+          "apiEndpoint": "POST /api/objekte/{id}/positionen/vorlage"
+        },
+        {
+          "type": "textarea",
+          "selector": "#Bemerkung",
+          "fallback": "[data-field='Bemerkung']",
+          "event": "change",
+          "expectedAction": "updates remarks",
+          "apiEndpoint": "PUT /api/objekte/{id}"
+        },
+        {
+          "type": "input",
+          "selector": "#searchInput",
+          "fallback": "[placeholder*='suchen']",
+          "event": "keyup",
+          "expectedAction": "filters Objekte list",
+          "apiEndpoint": null
+        },
+        {
+          "type": "table",
+          "selector": "#objekteBody",
+          "fallback": ".data-grid tbody",
+          "event": "click",
+          "expectedAction": "selects Objekt from list",
+          "apiEndpoint": "GET /api/objekte/{id}"
+        },
+        {
+          "type": "table",
+          "selector": "#positionenBody",
+          "fallback": ".positionen-grid tbody",
+          "event": "click",
+          "expectedAction": "selects Position",
+          "apiEndpoint": null
+        }
+      ]
+    },
+    {
+      "name": "frm_N_Dienstplanuebersicht",
+      "file": "frm_N_Dienstplanuebersicht.html",
+      "description": "Dienstplanuebersicht - 7-Tage Kalenderansicht",
+      "controls": [
+        {
+          "type": "button",
+          "selector": "#Befehl37",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "closes form",
+          "apiEndpoint": null
+        },
+        {
+          "type": "date",
+          "selector": "#dtStartdatum",
+          "fallback": null,
+          "event": "dblclick",
+          "expectedAction": "opens date picker",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnStartdatum",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "reloads Dienstplan data",
+          "apiEndpoint": "GET /api/zuordnungen?von={von}&bis={bis}"
+        },
+        {
+          "type": "button",
+          "selector": "#btnVor",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "advances 2 days forward",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnrück",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "goes 2 days back",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btn_Heute",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "jumps to today",
+          "apiEndpoint": null
+        },
+        {
+          "type": "select",
+          "selector": "#NurAktiveMA",
+          "fallback": null,
+          "event": "change",
+          "expectedAction": "filters MA list",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnDPSenden",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "sends Dienstplaene to MA",
+          "apiEndpoint": "POST /api/email/dienstplaene"
+        },
+        {
+          "type": "button",
+          "selector": "#btnMADienstpl",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Einzeldienstplaene view",
+          "apiEndpoint": null
+        },
+        {
+          "type": "date",
+          "selector": "#dtEnddatum",
+          "fallback": null,
+          "event": "none",
+          "expectedAction": "displays end date (readonly)",
+          "apiEndpoint": null,
+          "validation": "readonly"
+        },
+        {
+          "type": "button",
+          "selector": "#btnOutpExcel",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "exports Dienstplan to Excel",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#Befehl20",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "opens Outlook",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": "#btnOutpExcelSend",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "exports and sends Dienstplan via email",
+          "apiEndpoint": null
+        },
+        {
+          "type": "div",
+          "selector": "#lbl_Tag_1",
+          "fallback": ".day-header:nth-child(1)",
+          "event": "dblclick",
+          "expectedAction": "jumps to this day",
+          "apiEndpoint": null
+        },
+        {
+          "type": "div",
+          "selector": "#lbl_Tag_2",
+          "fallback": ".day-header:nth-child(2)",
+          "event": "dblclick",
+          "expectedAction": "jumps to this day",
+          "apiEndpoint": null
+        },
+        {
+          "type": "div",
+          "selector": "#lbl_Tag_3",
+          "fallback": ".day-header:nth-child(3)",
+          "event": "dblclick",
+          "expectedAction": "jumps to this day",
+          "apiEndpoint": null
+        },
+        {
+          "type": "div",
+          "selector": "#lbl_Tag_4",
+          "fallback": ".day-header:nth-child(4)",
+          "event": "dblclick",
+          "expectedAction": "jumps to this day",
+          "apiEndpoint": null
+        },
+        {
+          "type": "div",
+          "selector": "#lbl_Tag_5",
+          "fallback": ".day-header:nth-child(5)",
+          "event": "dblclick",
+          "expectedAction": "jumps to this day",
+          "apiEndpoint": null
+        },
+        {
+          "type": "div",
+          "selector": "#lbl_Tag_6",
+          "fallback": ".day-header:nth-child(6)",
+          "event": "dblclick",
+          "expectedAction": "jumps to this day (weekend)",
+          "apiEndpoint": null
+        },
+        {
+          "type": "div",
+          "selector": "#lbl_Tag_7",
+          "fallback": ".day-header:nth-child(7)",
+          "event": "dblclick",
+          "expectedAction": "jumps to this day (weekend)",
+          "apiEndpoint": null
+        },
+        {
+          "type": "div",
+          "selector": "#sub_DP_Grund",
+          "fallback": ".calendar-grid",
+          "event": "none",
+          "expectedAction": "displays calendar grid with MA and Einsaetze",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".menu-btn:contains('Planungsübersicht')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to Planungsuebersicht",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".menu-btn:contains('Auftragsverwaltung')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to Auftragsverwaltung",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".menu-btn:contains('Mitarbeiterverwaltung')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to Mitarbeiterverwaltung",
+          "apiEndpoint": null
+        },
+        {
+          "type": "button",
+          "selector": ".menu-btn:contains('Offene Anfragen')",
+          "fallback": null,
+          "event": "click",
+          "expectedAction": "navigates to Offene Anfragen",
+          "apiEndpoint": null
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalForms": 5,
+    "totalControls": 194,
+    "controlTypes": {
+      "button": 89,
+      "input": 53,
+      "select": 18,
+      "tab": 20,
+      "checkbox": 12,
+      "textarea": 5,
+      "date": 6,
+      "table": 3,
+      "div": 7,
+      "file": 1
+    }
+  }
+}

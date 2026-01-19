@@ -1,0 +1,6 @@
+-- Query: zqry_ZK_Stunden_Delta
+-- Type: 0
+SELECT zqry_ZK_Stunden_prepare.VA_ID, zqry_ZK_Stunden_prepare.VADatum_ID, zqry_ZK_Stunden_prepare.VAStart_ID, zqry_ZK_Stunden_prepare.ZUO_ID, zqry_ZK_Stunden_prepare.NV_ID, zqry_ZK_Stunden_prepare.Korr_ID, zqry_ZK_Stunden_prepare.MA_ID, zqry_ZK_Stunden_prepare.Veranstaltung, zqry_ZK_Stunden_prepare.VADatum, zqry_ZK_Stunden_prepare.Jahr, zqry_ZK_Stunden_prepare.Monat, zqry_ZK_Stunden_prepare.Lohnart_id, zqry_ZK_Stunden_prepare.Anz_Std, zqry_ZK_Stunden_prepare.Anz_Std_netto, zqry_ZK_Stunden_prepare.Satz, zqry_ZK_Stunden_prepare.Wert, zqry_ZK_Stunden_prepare.Beginn, zqry_ZK_Stunden_prepare.Ende, zqry_ZK_Stunden_prepare.gesperrt, zqry_ZK_Stunden_prepare.exportiert, zqry_ZK_Stunden_prepare.erstellt, zqry_ZK_Stunden_prepare.Ersteller, zqry_ZK_Stunden_prepare.geaendert, zqry_ZK_Stunden_prepare.Aenderer, zqry_ZK_Stunden_prepare.exportieren, zqry_ZK_Stunden_prepare.Korrektur, zqry_ZK_Stunden_prepare.Bemerkung
+FROM zqry_ZK_Stunden_prepare LEFT JOIN zqry_ZK_Stunden ON zqry_ZK_Stunden_prepare.[Delta_KEY] = zqry_ZK_Stunden.[Delta_KEY]
+WHERE (((zqry_ZK_Stunden.Delta_KEY) Is Null) AND ((zqry_ZK_Stunden.exportiert)=False Or (zqry_ZK_Stunden.exportiert) Is Null));
+

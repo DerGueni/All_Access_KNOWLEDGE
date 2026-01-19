@@ -1,0 +1,130 @@
+
+════════════════════════════════════════════════════════════════════════
+  RESPONSIVE DESIGN OPTIMIERUNG - STAMMDATEN-FORMULARE
+  Datum: 2026-01-15
+  Status: ERFOLGREICH ABGESCHLOSSEN
+════════════════════════════════════════════════════════════════════════
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ OPTIMIERTE FORMULARE (4)                                             │
+└──────────────────────────────────────────────────────────────────────┘
+
+  ✓ frm_MA_Mitarbeiterstamm.html    - Mitarbeiter (mit Foto)
+  ✓ frm_KD_Kundenstamm.html         - Kunden (mit Adressen)
+  ✓ frm_OB_Objekt.html               - Objekte (mit Subforms)
+  ✓ frm_N_Bewerber.html              - Bewerber (mit Foto)
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ NEUE DATEIEN                                                          │
+└──────────────────────────────────────────────────────────────────────┘
+
+  • css/responsive.css                - Gemeinsame Responsive-Regeln
+  • RESPONSIVE_DESIGN_REPORT.md       - Vollständige Dokumentation
+  • _test/responsive_test.html        - Test-Seite für Features
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ DURCHGEFÜHRTE ÄNDERUNGEN PRO FORMULAR                                │
+└──────────────────────────────────────────────────────────────────────┘
+
+  1. CSS-Link eingebunden
+     <link rel="stylesheet" href="css/responsive.css">
+
+  2. Flexible Container
+     - .main-container: min-width: 0
+     - .form-content: width: 100%
+     - .content-area: width: 100%
+
+  3. Tab-System optimiert
+     - .tab-header: flex-wrap: wrap
+     - .tab-container: flex: 1
+
+  4. Foto-Bereiche (MA + Bewerber)
+     - max-width: 200px
+     - aspect-ratio: 3/4
+     - margin: 0 auto (zentriert)
+
+  5. Adress-Felder (KD + OB)
+     - display: flex, flex-wrap: wrap
+     - gap: 10px
+
+  6. Subforms responsive
+     - width: 100%
+     - min-height: 300px (200px Mobile)
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ BREAKPOINT-SYSTEM                                                     │
+└──────────────────────────────────────────────────────────────────────┘
+
+  Mobile    (<768px)      Tablet    (768-1024px)    Desktop   (>1024px)
+  ──────────────────────  ────────────────────────  ───────────────────
+  • Sidebar: 120px        • Sidebar: 150px          • Sidebar: 185px
+  • Header: 18px          • Mixed Layout            • Standard Layout
+  • Vertikal gestapelt    • Wrapping aktiv          • Nebeneinander
+  • Buttons: 100% Breite  • Foto: 150px             • Foto: 200px
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ RESPONSIVE CSS FEATURES                                               │
+└──────────────────────────────────────────────────────────────────────┘
+
+  Klasse               Funktion                     Mobile-Verhalten
+  ──────────────────── ──────────────────────────── ─────────────────
+  .form-row            Horizontal Layout            → Vertikal
+  .form-columns        Multi-Column                 → Single Column
+  .field-group         Label + Input                → 100% Breite
+  .toolbar             Button-Container             → Wrapping
+  .tab-header          Tab-Navigation               → Wrapping/Stack
+  .foto-container      Foto-Bereich                 → 150px max
+  .address-row         Adress-Zeile                 → Vertikal
+  .button-group        Button-Gruppe                → Wrapping
+  .hide-mobile         Immer sichtbar               → display: none
+  .show-mobile         Immer versteckt              → display: block
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ VERIFIKATION                                                          │
+└──────────────────────────────────────────────────────────────────────┘
+
+  Formular                     responsive.css  min-width:0  flex-wrap
+  ──────────────────────────── ─────────────── ─────────── ──────────
+  frm_MA_Mitarbeiterstamm.html       ✓             ✓           ✓
+  frm_KD_Kundenstamm.html            ✓             ✓           ✓
+  frm_OB_Objekt.html                 ✓             ✓           ✓
+  frm_N_Bewerber.html                ✓             ✓           ✓
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ TESTEN                                                                │
+└──────────────────────────────────────────────────────────────────────┘
+
+  1. Öffnen Sie: _test/responsive_test.html
+  2. Ändern Sie die Fenstergröße
+  3. Prüfen Sie alle 8 Demo-Bereiche
+  4. Testen Sie auf verschiedenen Geräten
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ KOMPATIBILITÄT                                                        │
+└──────────────────────────────────────────────────────────────────────┘
+
+  ✓ Chrome/Edge (Vollständig)
+  ✓ Firefox (Vollständig)
+  ✓ Safari (Vollständig, iOS 15+ für aspect-ratio)
+  ✓ WebView2 (Vollständig)
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ WICHTIGE HINWEISE                                                     │
+└──────────────────────────────────────────────────────────────────────┘
+
+  ⚠ responsive.css IMMER nach unified-header.css einbinden
+  ⚠ Geschützte Bereiche NICHT ändern (siehe CLAUDE.md)
+  ⚠ UTF-8 Encoding beibehalten
+  ⚠ Kein Breaking Change für Access-Integration
+
+┌──────────────────────────────────────────────────────────────────────┐
+│ NÄCHSTE SCHRITTE (OPTIONAL)                                           │
+└──────────────────────────────────────────────────────────────────────┘
+
+  □ Weitere Formulare optimieren (Auftragstamm, Dienstplan, etc.)
+  □ Performance-Tests durchführen
+  □ User Testing auf echten Geräten
+  □ Dark Mode Integration
+  □ Touch-Optimierung für Tablets
+
+════════════════════════════════════════════════════════════════════════

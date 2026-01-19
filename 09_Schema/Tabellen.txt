@@ -1,0 +1,3130 @@
+﻿============================================================================
+TABELLEN DER DATENBANK
+============================================================================
+
+----------------------------------------
+TABELLE: ___Vorlagen_einlesen
+----------------------------------------
+  ID (Long, Size: 4)
+  BytesAnz (Long, Size: 4)
+  DateiName (Memo, Size: 0)
+  Kurztext (Text, Size: 100)
+  Langtext (Memo, Size: 0)
+  Picture (Type11, Size: 0)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: _FindReplace
+----------------------------------------
+  Suchlauf (Long, Size: 4)
+  FindText (Text, Size: 255)
+  ReplaceText (Text, Size: 255)
+  WholeWord (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: _int_tblFrmFeldnamen
+----------------------------------------
+  frmTyp (Text, Size: 255)
+  frmName (Text, Size: 255)
+  ControlName (Text, Size: 255)
+  ControlTypeID (Long, Size: 4)
+  ControlType (Text, Size: 255)
+  IsVisible (Boolean, Size: 1)
+  ControlCaption (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: _int_tblObjektNamen
+----------------------------------------
+  ID (Long, Size: 4)
+  Art (Text, Size: 50)
+  ModulName (Text, Size: 250)
+  FunktionsArt (Text, Size: 50)
+  FunktionsName (Text, Size: 250)
+  FunktionsParam (Memo, Size: 0)
+  FunktionsRueck (Text, Size: 250)
+  Priv (Boolean, Size: 1)
+  Tabelle1 (Text, Size: 50)
+  Tabelle2 (Text, Size: 50)
+  bspFormular (Text, Size: 50)
+  Frage (Text, Size: 250)
+  Beschreibung (Memo, Size: 0)
+  Herkunft (Text, Size: 50)
+  VersionsNr (Text, Size: 10)
+  MBF (Boolean, Size: 1)
+  DemoFormName (Text, Size: 250)
+  VerDatum (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: _int_tblQueryMain
+----------------------------------------
+  Qry_Name (Text, Size: 250)
+  qry_SQL (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: _int_tblTabellenBeschreibung
+----------------------------------------
+  Tabellenname (Text, Size: 250)
+  Feldname (Text, Size: 250)
+  Indexname (Text, Size: 250)
+  IsIndex (Boolean, Size: 1)
+  FldNr (Single, Size: 4)
+  FeldTyp (Text, Size: 25)
+  FeldTypNr (Single, Size: 4)
+  Feldattribute (Text, Size: 50)
+  Feldgroesse (Single, Size: 4)
+  Feldbeschreibung (Text, Size: 250)
+
+----------------------------------------
+TABELLE: _tbl_excel_Umrech
+----------------------------------------
+  ExcelZahl (Long, Size: 4)
+  ExcelBuchstabe (Text, Size: 255)
+
+----------------------------------------
+TABELLE: _tbl_HiddenObjects
+----------------------------------------
+  ObjektName (Text, Size: 255)
+  Typ (Long, Size: 4)
+
+----------------------------------------
+TABELLE: _tbl_Hilfe
+----------------------------------------
+  ID (Long, Size: 4)
+  Formularname (Text, Size: 255)
+  SeiteNr (Long, Size: 4)
+  SpracheID (Text, Size: 7)
+  Hilfetext (Memo, Size: 0)
+  Beschreibung (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  jn (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: _tbl_Hilfe_Org
+----------------------------------------
+  ID (Long, Size: 4)
+  Formularname (Text, Size: 255)
+  SeiteNr (Long, Size: 4)
+  SpracheID (Text, Size: 7)
+  Hilfetext (Memo, Size: 0)
+  Beschreibung (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  jn (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: _tbl_Info_zu Abfragen
+----------------------------------------
+  Abfragetyp (Text, Size: 255)
+  Abfragename (Text, Size: 150)
+  Bmerkung (Text, Size: 255)
+  SortNr (Long, Size: 4)
+
+----------------------------------------
+TABELLE: _tblAlleJahre
+----------------------------------------
+  JahrNr (Long, Size: 4)
+
+----------------------------------------
+TABELLE: _tblAlleMonate
+----------------------------------------
+  MonNr (Long, Size: 4)
+  MonKurz (Text, Size: 50)
+  MonLang (Text, Size: 50)
+
+----------------------------------------
+TABELLE: _tblAlleTage
+----------------------------------------
+  JJJJMMTT (Long, Size: 4)
+  Werkname (Text, Size: 10)
+  dtDatum (Date/Time, Size: 8)
+  IstFeiertag (Long, Size: 4)
+  Feiertagsname (Text, Size: 255)
+  JahrNr (Long, Size: 4)
+  Quartal (Long, Size: 4)
+  MonatNr (Long, Size: 4)
+  TagNr (Long, Size: 4)
+  Wochentag (Long, Size: 4)
+  KW_D (Long, Size: 4)
+  TDJ (Long, Size: 4)
+  JJJJMM (Long, Size: 4)
+  JJJJKW (Long, Size: 4)
+  JJJJQrt (Long, Size: 4)
+  KW_US (Long, Size: 4)
+  WN_KalMon (Long, Size: 4)
+  WN_KalTag (Long, Size: 4)
+  Arbeitszeit (Double, Size: 8)
+  LfdTagNrAcc (Long, Size: 4)
+  BBW (Long, Size: 4)
+  BBY (Long, Size: 4)
+  BBE (Long, Size: 4)
+  BBB (Long, Size: 4)
+  BHB (Long, Size: 4)
+  BHH (Long, Size: 4)
+  BHE (Long, Size: 4)
+  BMV (Long, Size: 4)
+  BNI (Long, Size: 4)
+  BNW (Long, Size: 4)
+  BRP (Long, Size: 4)
+  BSL (Long, Size: 4)
+  BSN (Long, Size: 4)
+  BST (Long, Size: 4)
+  BSH (Long, Size: 4)
+  BTH (Long, Size: 4)
+  FBW (Long, Size: 4)
+  FBY (Long, Size: 4)
+  FBE (Long, Size: 4)
+  FBB (Long, Size: 4)
+  FHB (Long, Size: 4)
+  FHH (Long, Size: 4)
+  FHE (Long, Size: 4)
+  FMV (Long, Size: 4)
+  FNI (Long, Size: 4)
+  FNW (Long, Size: 4)
+  FRP (Long, Size: 4)
+  FSL (Long, Size: 4)
+  FSN (Long, Size: 4)
+  FST (Long, Size: 4)
+  FSH (Long, Size: 4)
+  FTH (Long, Size: 4)
+  LfdNr (Long, Size: 4)
+  FeldCount (Long, Size: 4)
+
+----------------------------------------
+TABELLE: _tblEigeneFIrma
+----------------------------------------
+  FirmenID (Long, Size: 4)
+  Fa_Matchcode (Text, Size: 25)
+  Fa_firma (Text, Size: 255)
+  Fa_bezeichnung (Text, Size: 255)
+  Fa_IDF_PersonID (Long, Size: 4)
+  Fa_strasse (Text, Size: 64)
+  Fa_plz (Text, Size: 8)
+  Fa_ort (Text, Size: 32)
+  Fa_LKZ (Text, Size: 3)
+  Fa_BriefKopf (Memo, Size: 0)
+  Fa_ans_manuell (Boolean, Size: 1)
+  Fa_land_vorwahl (Text, Size: 255)
+  Fa_telefon (Text, Size: 16)
+  Fa_telefax (Text, Size: 255)
+  Fa_mobil (Text, Size: 16)
+  Fa_email (Text, Size: 60)
+  Fa_URL (Memo, Size: 0)
+  Fa_kreditinstitut (Text, Size: 255)
+  Fa_blz (Text, Size: 15)
+  Fa_kontonummer (Text, Size: 255)
+  Fa_iban (Text, Size: 255)
+  Fa_bic (Text, Size: 255)
+  Fa_memo (Memo, Size: 0)
+  MwStPrz (Single, Size: 4)
+  PosFussErkl (Text, Size: 255)
+  Fa_SteuerNr (Text, Size: 255)
+  Fa_ustidnr (Text, Size: 255)
+  Fa_GlaeubigerNr (Text, Size: 255)
+  Fa_GF1 (Text, Size: 255)
+  Fa_GF2 (Text, Size: 255)
+  Fa_Amtsgericht (Text, Size: 255)
+  TabellenNr (Long, Size: 4)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  Ang_Gueltig_Bis_AnzTage (Long, Size: 4)
+  Mahn1Tage (Long, Size: 4)
+  Mahn2Tage (Long, Size: 4)
+  Mahn3Tage (Long, Size: 4)
+
+----------------------------------------
+TABELLE: _tblEigeneFirma_Fusszeile
+----------------------------------------
+  ID (Long, Size: 4)
+  Auftragsart (Long, Size: 4)
+  Fusszeile (Text, Size: 255)
+  FirmenID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: _tblEigeneFirma_Mitarbeiter
+----------------------------------------
+  ID (Long, Size: 4)
+  Firmen_ID (Long, Size: 4)
+  Int_Login (Text, Size: 255)
+  int_Computer (Text, Size: 255)
+  Int_PersonalNr (Text, Size: 255)
+  Int_Nachname (Text, Size: 255)
+  Int_Vorname (Text, Size: 255)
+  int_Brief_Absender (Text, Size: 255)
+  int_eMail_Absender (Text, Size: 255)
+  int_SMS_Absender (Text, Size: 255)
+  Int_Unser_Zeichen (Text, Size: 255)
+  Int_Brf_Tel_Name (Text, Size: 255)
+  Int_Tel (Text, Size: 255)
+  Int_Handy (Text, Size: 255)
+  Int_eMail (Text, Size: 255)
+  int_Fax (Text, Size: 255)
+  int_Geburtstag (Date/Time, Size: 8)
+  int_Bemerkung (Text, Size: 255)
+  Erst_von (Text, Size: 255)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 255)
+  Aend_am (Date/Time, Size: 8)
+  Int_User_Fkt (Text, Size: 255)
+  int_Immer (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: _tblEigeneFirma_Pfade
+----------------------------------------
+  ID (Long, Size: 4)
+  FirmenID (Long, Size: 4)
+  Pfad (Memo, Size: 0)
+  PfadArt (Text, Size: 50)
+  Bemerkungen (Text, Size: 50)
+
+----------------------------------------
+TABELLE: _tblEigeneFirma_TB_Dok_Dateinamen
+----------------------------------------
+  ID (Long, Size: 4)
+  DocTyp (Long, Size: 4)
+  DocPfad (Text, Size: 255)
+  Docname (Text, Size: 255)
+
+----------------------------------------
+TABELLE: _tblEigeneFirma_TB_Dok_Feldnamen
+----------------------------------------
+  ID (Long, Size: 4)
+  DokNr (Long, Size: 4)
+  Feldname (Text, Size: 255)
+
+----------------------------------------
+TABELLE: _tblEigeneFirma_TB_Dok_Typ
+----------------------------------------
+  ID (Long, Size: 4)
+  DokTyp (Text, Size: 255)
+  Feldname1 (Text, Size: 255)
+  Feldname2 (Text, Size: 255)
+  Feldname3 (Text, Size: 255)
+
+----------------------------------------
+TABELLE: _tblEigeneFirma_Word_Nummernkreise
+----------------------------------------
+  ID (Long, Size: 4)
+  FirmenID (Long, Size: 4)
+  Praefix (Text, Size: 255)
+  Praefix1 (Text, Size: 255)
+  NummernKreis (Long, Size: 4)
+  DocPath (Memo, Size: 0)
+  Bemerkungen (Text, Size: 255)
+
+----------------------------------------
+TABELLE: _tblEigeneFirma_Word_TextmarkeZuord
+----------------------------------------
+  ID (Long, Size: 4)
+  FirmenID (Long, Size: 4)
+  Insert (Long, Size: 4)
+  TypNr (Long, Size: 4)
+  Textmarke (Text, Size: 255)
+  PgmParameter (Text, Size: 255)
+
+----------------------------------------
+TABELLE: _tblEigeneFirma_Zahlungsbedingungen
+----------------------------------------
+  ID (Long, Size: 4)
+  Zahlungsbedingung (Text, Size: 255)
+  AnzTage (Long, Size: 4)
+  Zahlbar_bis_Text (Text, Size: 255)
+  Teil2_Text (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+  FirmenID (Long, Size: 4)
+  Skonto (Single, Size: 4)
+  Teil3_Text (Text, Size: 255)
+
+----------------------------------------
+TABELLE: _tblFarben
+----------------------------------------
+  FarbID (Long, Size: 4)
+  FarbNrHint (Long, Size: 4)
+  TxtFarbHint (Text, Size: 255)
+  FarbNrText (Long, Size: 4)
+  TxtFarbText (Text, Size: 255)
+  Verwendung (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: _tblHlp_InfoTable_2015_08_26
+----------------------------------------
+  Tabellenname (Text, Size: 255)
+  Datenbankname (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+
+----------------------------------------
+TABELLE: _tblHTMLIEAdresse
+----------------------------------------
+  Adresse (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: _tblInternalSystemBE
+----------------------------------------
+  ID (Long, Size: 4)
+  BackEndVersion (Text, Size: 50)
+  FrontEndVersion (Text, Size: 50)
+  ThrowOutUser (Boolean, Size: 1)
+  ThrowOutUserMsg (Text, Size: 255)
+  ThrowOutRestartTime (Date/Time, Size: 8)
+  NewVersionLink (Memo, Size: 0)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  ThrowOutSeconds (Long, Size: 4)
+  AllowNewUser (Integer, Size: 2)
+
+----------------------------------------
+TABELLE: _tblInternalSystemFE
+----------------------------------------
+  ID (Long, Size: 4)
+  BackEndVersion (Text, Size: 50)
+  FrontEndVersion (Text, Size: 50)
+  Erst_von (Text, Size: 50)
+  Erst_am (Text, Size: 255)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: _tblPicture
+----------------------------------------
+  ID (Long, Size: 4)
+  BytesAnz (Long, Size: 4)
+  DateiName (Memo, Size: 0)
+  Kurztext (Text, Size: 100)
+  Langtext (Memo, Size: 0)
+  Picture (Type11, Size: 0)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: _tblProperty
+----------------------------------------
+  PropName (Text, Size: 50)
+  PropUser (Text, Size: 50)
+  PropInhalt (Memo, Size: 0)
+  Beschreibung (Text, Size: 255)
+  GueltigAb (Date/Time, Size: 8)
+  IstPrivat (Long, Size: 4)
+  NachschlagTyp (Long, Size: 4)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: _tblTabFelder
+----------------------------------------
+  ID (Long, Size: 4)
+  Datenbankname (Text, Size: 255)
+  Tabellenname (Text, Size: 250)
+  TabFeldname (Text, Size: 250)
+  FldTypNr (Long, Size: 4)
+  FldTypDesc (Text, Size: 50)
+  FldLaenge (Long, Size: 4)
+  FldDesc (Text, Size: 250)
+
+----------------------------------------
+TABELLE: _tblTabIndexFeld
+----------------------------------------
+  ID (Long, Size: 4)
+  Datenbankname (Text, Size: 255)
+  Tabellenname (Text, Size: 255)
+  Feldname (Text, Size: 255)
+  IstPK (Boolean, Size: 1)
+  Indexname (Text, Size: 255)
+  IndexIstUnique (Boolean, Size: 1)
+  IndexIstReferentiell (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: _tblZeitraumAngaben
+----------------------------------------
+  ID (Long, Size: 4)
+  Bemerkung (Text, Size: 255)
+  iSort (Long, Size: 4)
+  Anzeige (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: _Umsatz_Gesamt
+----------------------------------------
+  ID1 (Long, Size: 4)
+  ID (Double, Size: 8)
+  ReDat (Date/Time, Size: 8)
+  Kunde (Text, Size: 255)
+  kun_ID (Double, Size: 8)
+  PLZ (Text, Size: 255)
+  ORT (Text, Size: 255)
+  Veranstaltung (Text, Size: 255)
+  Arbeit (Double, Size: 8)
+  Fk (Double, Size: 8)
+  Bänder (Double, Size: 8)
+  RchNr (Text, Size: 255)
+  Summe_Netto (Double, Size: 8)
+  VA_ID (Long, Size: 4)
+  strVA (Text, Size: 255)
+
+----------------------------------------
+TABELLE: _YesNo
+----------------------------------------
+  JnValue (Boolean, Size: 1)
+  JNText (Text, Size: 255)
+
+----------------------------------------
+TABELLE: Acc_Acc_tblVerknuepfungstabellen
+----------------------------------------
+  tblName (Text, Size: 255)
+  jn (Boolean, Size: 1)
+  ID (Long, Size: 4)
+  Kommentar (Text, Size: 255)
+
+----------------------------------------
+TABELLE: Acc_SQL_tblVerknuepfungstabellen
+----------------------------------------
+  tblName (Text, Size: 255)
+  tblname_org (Text, Size: 255)
+  jn (Boolean, Size: 1)
+  Indexfkt (Text, Size: 255)
+  ID (Long, Size: 4)
+  IDSort (Long, Size: 4)
+  Bemerkungen (Text, Size: 255)
+  SQLConnectionstring (Text, Size: 255)
+
+----------------------------------------
+TABELLE: Rpt_Kostenberechnung
+----------------------------------------
+  ID (Long, Size: 4)
+  Feld1 (Text, Size: 36)
+
+----------------------------------------
+TABELLE: sysLanguage
+----------------------------------------
+  ID (Long, Size: 4)
+  TextunitID (Long, Size: 4)
+  IsBasic (Boolean, Size: 1)
+  Graphic1 (Type11, Size: 0)
+  Graphic2 (Type11, Size: 0)
+  Link (Memo, Size: 0)
+  Order (Long, Size: 4)
+
+----------------------------------------
+TABELLE: sysOfficeLanguage
+----------------------------------------
+  ID (Long, Size: 4)
+  LanguageID (Long, Size: 4)
+  OfficeLanguageID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: sysText
+----------------------------------------
+  ID (Long, Size: 4)
+  LanguageID (Long, Size: 4)
+  Wording (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: sysTextunit
+----------------------------------------
+  ID (Long, Size: 4)
+  LanguageID (Long, Size: 4)
+  TextID (Long, Size: 4)
+  Standard (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: sysTextunitObject
+----------------------------------------
+  ID (Long, Size: 4)
+  Formularname (Text, Size: 255)
+  Objectname (Text, Size: 255)
+  ObjecttypeID (Byte, Size: 1)
+  prpName (Text, Size: 40)
+  Prefix (Memo, Size: 0)
+  TextunitID (Long, Size: 4)
+  Suffix (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: T_PersonalObject
+----------------------------------------
+  Id (Long, Size: 4)
+  Type (Integer, Size: 2)
+  Name (Text, Size: 255)
+  Version (Text, Size: 255)
+  Date (Date/Time, Size: 8)
+  Data (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: tbl_eMail_Template_complete
+----------------------------------------
+  ID (Long, Size: 4)
+  TemplateName (Text, Size: 255)
+  StartBild (Memo, Size: 0)
+  TO (Text, Size: 255)
+  CC (Text, Size: 255)
+  BCC (Text, Size: 255)
+  Betreff (Text, Size: 255)
+  TextAls (Long, Size: 4)
+  TextInhalt (Memo, Size: 0)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tbl_ErrorLog
+----------------------------------------
+  ID (Long, Size: 4)
+  Datum (Date/Time, Size: 8)
+  Zeit (Date/Time, Size: 8)
+  Benutzer (Text, Size: 255)
+  User (Text, Size: 255)
+  ComputerName (Text, Size: 255)
+  RDPHOST (Text, Size: 255)
+  Anwendung (Text, Size: 255)
+  Pfad (Text, Size: 255)
+  Objekt (Text, Size: 255)
+  Funktion (Text, Size: 255)
+  CallStackInfo (Memo, Size: 0)
+  AktivesElement (Text, Size: 255)
+  LetztesElement (Text, Size: 255)
+  LastDllError (Text, Size: 255)
+  FehlerNr (Text, Size: 255)
+  FehlerText (Text, Size: 255)
+  OffeneObjekte (Text, Size: 255)
+  WeitereFehler (Memo, Size: 0)
+  AccessVersion (Text, Size: 255)
+  Betriebssystem (Text, Size: 255)
+  IstRuntime (Text, Size: 255)
+  IstMDE (Text, Size: 255)
+  IstADP (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_Erweiterungen
+----------------------------------------
+  Erweiterungen (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: tbl_hlp_Absender
+----------------------------------------
+  ID (Long, Size: 4)
+  Absender (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_Hlp_CONSEC_Brieffuss
+----------------------------------------
+  F1 (Memo, Size: 0)
+  F2 (Memo, Size: 0)
+  F3 (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: tbl_Hlp_Fehlertext
+----------------------------------------
+  ID (Long, Size: 4)
+  Fehlertyp_ID (Long, Size: 4)
+  FehlerNr (Long, Size: 4)
+  FehlerText (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_hlp_KD_Mengeneinheit
+----------------------------------------
+  Mengeneinheit (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_hlp_MA_Anstellungsart
+----------------------------------------
+  ID (Long, Size: 4)
+  Anstellungsart (Text, Size: 255)
+  Sortierung (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_Hlp_MA_Geschlecht
+----------------------------------------
+  ID (Text, Size: 1)
+  Geschlecht (Text, Size: 255)
+  AnredeKurz (Text, Size: 255)
+  AnredeBrief (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_hlp_MwStSatz
+----------------------------------------
+  ID (Long, Size: 4)
+  MwStSatz (Single, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_hlp_Voting
+----------------------------------------
+  Voting (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_int_Linkliste
+----------------------------------------
+  ID (Long, Size: 4)
+  Linkname (Memo, Size: 0)
+  Beschreibung (Text, Size: 255)
+  SortID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_KD_Adressart
+----------------------------------------
+  ID (Long, Size: 4)
+  kun_AdressArt (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_KD_Anrede
+----------------------------------------
+  Anr_ID (Long, Size: 4)
+  Anr_Weiblich (Boolean, Size: 1)
+  Anr_Anrede (Text, Size: 255)
+  Anr_Anrede_Brf (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_KD_Ansprechpartner
+----------------------------------------
+  adr_ID (Long, Size: 4)
+  kun_Id (Long, Size: 4)
+  adr_Nachname (Text, Size: 255)
+  adr_Vorname (Text, Size: 255)
+  adr_akad_Grad (Text, Size: 255)
+  adr_Matchcode (Text, Size: 25)
+  adr_Tel (Text, Size: 40)
+  adr_Handy (Text, Size: 255)
+  adr_eMail (Text, Size: 255)
+  adr_Fax (Text, Size: 255)
+  adr_Homepage (Text, Size: 255)
+  adr_Geburtstag (Date/Time, Size: 8)
+  adr_Bemerkung (Memo, Size: 0)
+  adr_P_Tel (Text, Size: 255)
+  adr_P_Handy (Text, Size: 255)
+  adr_P_eMail (Text, Size: 255)
+  adr_P_Fax (Text, Size: 255)
+  adr_P_Url (Text, Size: 255)
+  adr_P_Str (Text, Size: 50)
+  adr_P_LKZ (Text, Size: 10)
+  adr_P_PLZ (Text, Size: 10)
+  adr_P_Ort (Text, Size: 50)
+  adr_AnredeID (Long, Size: 4)
+  adr_Name1 (Text, Size: 250)
+  adr_Anschreiben (Text, Size: 255)
+  adr_P_Anschrift (Memo, Size: 0)
+  adr_P_ans_manuell (Boolean, Size: 1)
+  TabellenNr (Long, Size: 4)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  adr_P_Bild (Text, Size: 255)
+  adr_Nationalitaet_ID (Text, Size: 3)
+  adr_Groesse (Single, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_KD_Artikelbeschreibung
+----------------------------------------
+  ID (Long, Size: 4)
+  Beschreibung (Text, Size: 255)
+  MwSt_Satz (Long, Size: 4)
+  Mengenheit (Text, Size: 255)
+  cbo_Beschreibung (Text, Size: 255)
+  IstPersonal (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbl_KD_Kundenstamm
+----------------------------------------
+  kun_Id (Long, Size: 4)
+  kun_AdressArt (Long, Size: 4)
+  kun_Firma (Text, Size: 255)
+  kun_Bezeichnung (Text, Size: 255)
+  kun_Matchcode (Text, Size: 255)
+  kun_Strasse (Text, Size: 255)
+  kun_PLZ (Text, Size: 255)
+  kun_Ort (Text, Size: 255)
+  kun_LKZ (Text, Size: 3)
+  kun_BriefKopf (Memo, Size: 0)
+  kun_ans_manuell (Boolean, Size: 1)
+  kun_Anschreiben (Text, Size: 255)
+  kun_land_vorwahl (Text, Size: 255)
+  kun_telefon (Text, Size: 255)
+  kun_telefax (Text, Size: 255)
+  kun_mobil (Text, Size: 255)
+  kun_email (Text, Size: 255)
+  kun_URL (Memo, Size: 0)
+  kun_kreditinstitut (Text, Size: 255)
+  kun_blz (Text, Size: 10)
+  kun_kontonummer (Text, Size: 255)
+  kun_iban (Text, Size: 255)
+  kun_bic (Text, Size: 255)
+  kun_ustidnr (Text, Size: 255)
+  kun_memo (Memo, Size: 0)
+  kun_geloescht (Date/Time, Size: 8)
+  kun_Probleme (Memo, Size: 0)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  kun_IDF_PersonID (Long, Size: 4)
+  kun_Zahlbed (Long, Size: 4)
+  kun_IstSammelRechnung (Boolean, Size: 1)
+  kun_IstAktiv (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbl_KD_Standardpreise
+----------------------------------------
+  ID (Long, Size: 4)
+  kun_ID (Long, Size: 4)
+  Bemerkung (Text, Size: 255)
+  Preisart_ID (Long, Size: 4)
+  StdPreis (Currency, Size: 8)
+  GeaendertAm (Date/Time, Size: 8)
+  Aenderer (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_Log_eMail_Sent
+----------------------------------------
+  ID (Long, Size: 4)
+  SendDate (Date/Time, Size: 8)
+  Absender (Text, Size: 255)
+  Voting (Text, Size: 255)
+  Betreff (Text, Size: 255)
+  MailText (Memo, Size: 0)
+  ReportJN (Boolean, Size: 1)
+  BCC (Memo, Size: 0)
+  SendPrio (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  IstHTML (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbl_MA_Dienstkleidung
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Dienstkleidung_ID (Long, Size: 4)
+  Anzahl (Long, Size: 4)
+  Groesse (Text, Size: 255)
+  Kautionsbetrag (Currency, Size: 8)
+  Ausgabedatum (Date/Time, Size: 8)
+  Bemerkungen (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tbl_MA_Dienstkleidung_Vorlage
+----------------------------------------
+  ID (Long, Size: 4)
+  Dienstkleidung (Text, Size: 255)
+  Kautionsbetrag (Currency, Size: 8)
+  Bemerkungen (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_MA_Dokumente
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Dokumenttyp (Text, Size: 50)
+  Dateiname (Text, Size: 255)
+  Dateipfad (Memo, Size: 0)
+  UploadDatum (Date/Time, Size: 8)
+  UploadVon (Text, Size: 50)
+  Dateigroesse (Long, Size: 4)
+  Beschreibung (Memo, Size: 0)
+  IstAktiv (Boolean, Size: 1)
+  Versionsnummer (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_MA_Einsatz_Zuo
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Quali_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_MA_Einsatzart
+----------------------------------------
+  ID (Long, Size: 4)
+  QualiName (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_MA_ErsatzEmailAdressen
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  email_2 (Text, Size: 255)
+  Name_2 (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_MA_Geo
+----------------------------------------
+  MA_ID (Long, Size: 4)
+  Strasse (Text, Size: 100)
+  PLZ (Text, Size: 10)
+  Ort (Text, Size: 50)
+  Land (Text, Size: 50)
+  Lat (Double, Size: 8)
+  Lon (Double, Size: 8)
+
+----------------------------------------
+TABELLE: tbl_MA_Jahresuebersicht
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  AktJahr (Long, Size: 4)
+  AktMon (Long, Size: 4)
+  Brutto_Std (Single, Size: 4)
+  Ist (Double, Size: 8)
+  RestAusVormonat (Single, Size: 4)
+  IstGes (Double, Size: 8)
+  UeberlaufAktMonat (Single, Size: 4)
+  HabVerr (Double, Size: 8)
+  InfBrutto (Currency, Size: 8)
+  Lst (Currency, Size: 8)
+  InfNetto (Currency, Size: 8)
+  InfGesamt (Currency, Size: 8)
+  Lohn (Currency, Size: 8)
+  LohnVon (Text, Size: 255)
+  RestGut (Currency, Size: 8)
+  Fahrtko (Currency, Size: 8)
+  RL_34a (Currency, Size: 8)
+  RZ_34a (Currency, Size: 8)
+  Abschlag (Currency, Size: 8)
+  NichtDa (Currency, Size: 8)
+  Kaution (Currency, Size: 8)
+  Sonstig (Currency, Size: 8)
+  SonstFuer (Text, Size: 255)
+  RV_freiw (Type20, Size: 16)
+  RL34a (Type20, Size: 16)
+  rv (Currency, Size: 8)
+
+----------------------------------------
+TABELLE: tbl_MA_Mitarbeiterstamm
+----------------------------------------
+  ID (Long, Size: 4)
+  LEXWare_ID (Long, Size: 4)
+  IstAktiv (Boolean, Size: 1)
+  IstSubunternehmer (Boolean, Size: 1)
+  Nachname (Text, Size: 255)
+  Vorname (Text, Size: 255)
+  Strasse (Text, Size: 255)
+  Nr (Text, Size: 255)
+  PLZ (Text, Size: 255)
+  Ort (Text, Size: 255)
+  Land (Text, Size: 255)
+  Bundesland (Text, Size: 255)
+  Tel_Mobil (Text, Size: 255)
+  Tel_Festnetz (Text, Size: 255)
+  Email (Text, Size: 255)
+  Geschlecht (Text, Size: 1)
+  Staatsang (Text, Size: 255)
+  Geb_Dat (Date/Time, Size: 8)
+  Geb_Ort (Text, Size: 255)
+  Geb_Name (Text, Size: 255)
+  Eintrittsdatum (Date/Time, Size: 8)
+  Austrittsdatum (Date/Time, Size: 8)
+  Anstellungsart_ID (Long, Size: 4)
+  Kostenstelle (Text, Size: 255)
+  Auszahlungsart (Text, Size: 255)
+  Bankname (Text, Size: 255)
+  Bankleitzahl (Text, Size: 255)
+  Kontonummer (Text, Size: 255)
+  BIC (Text, Size: 255)
+  IBAN (Text, Size: 255)
+  Kontoinhaber (Text, Size: 255)
+  Stundenlohn_brutto (Integer, Size: 2)
+  Bezuege_gezahlt_als (Text, Size: 255)
+  Sozialvers_Nr (Text, Size: 255)
+  SteuerNr (Text, Size: 255)
+  Taetigkeit_Bezeichnung (Text, Size: 255)
+  Personengruppe (Long, Size: 4)
+  KV_Kasse (Text, Size: 255)
+  Ist_RV_Befrantrag (Boolean, Size: 1)
+  Steuerklasse (Text, Size: 255)
+  Arbst_pro_Arbeitstag (Double, Size: 8)
+  Arbeitstage_pro_Woche (Double, Size: 8)
+  Resturl_Vorjahr (Double, Size: 8)
+  Urlaubsanspr_pro_Jahr (Double, Size: 8)
+  StundenZahlMax (Single, Size: 4)
+  Hat_keine_34a (Boolean, Size: 1)
+  Kleidergroesse (Text, Size: 255)
+  Fahrerlaubnis (Text, Size: 255)
+  Eigener_PKW (Boolean, Size: 1)
+  HatSachkunde (Boolean, Size: 1)
+  DienstausweisNr (Text, Size: 255)
+  tblBilddatei (Text, Size: 255)
+  Bemerkungen (Memo, Size: 0)
+  Briefkopf (Memo, Size: 0)
+  IstBrfAuto (Boolean, Size: 1)
+  Anr (Text, Size: 255)
+  Anr_Brief (Text, Size: 255)
+  Anr_eMail (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  AUsweis_Funktion (Text, Size: 255)
+  IstNSB (Boolean, Size: 1)
+  Datum_34a (Date/Time, Size: 8)
+  Ausweis_Endedatum (Date/Time, Size: 8)
+  Kosten_pro_MAStunde (Currency, Size: 8)
+  Verfuebgarkeit_ID (Long, Size: 4)
+  Epin_DFB (Text, Size: 255)
+  tblSignaturdatei (Text, Size: 255)
+  Bewacher_ID (Text, Size: 255)
+  Datum_DP (Date/Time, Size: 8)
+  Datum_Pruefung (Date/Time, Size: 8)
+  Amt_Pruefung (Text, Size: 255)
+  Lex_Aktiv (Boolean, Size: 1)
+  eMail_Abrechnung (Boolean, Size: 1)
+  Modul1_DFB (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbl_MA_Mitarbeiterstamm_Exportfehler
+----------------------------------------
+  Fehler (Text, Size: 255)
+  Feld (Text, Size: 255)
+  Zeile (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_MA_NVerfuegZeiten
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Zeittyp_ID (Text, Size: 255)
+  vonDat (Date/Time, Size: 8)
+  bisDat (Date/Time, Size: 8)
+  Bemerkung (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  vonTag (Date/Time, Size: 8)
+  bisTag (Date/Time, Size: 8)
+  vonZeit (Date/Time, Size: 8)
+  bisZeit (Date/Time, Size: 8)
+  vonTagZahl (Long, Size: 4)
+  KopfID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_MA_Objekt_Entfernung
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Objekt_ID (Long, Size: 4)
+  Entf_KM (Double, Size: 8)
+  Fahrzeit_Min (Long, Size: 4)
+  LetzteAktualisierung (Date/Time, Size: 8)
+  Quelle (Text, Size: 50)
+
+----------------------------------------
+TABELLE: tbl_MA_Plan_Status
+----------------------------------------
+  ID (Long, Size: 4)
+  Status (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_MA_Serien_eMail_Vorlage
+----------------------------------------
+  ID (Long, Size: 4)
+  eMail_Vorlage (Text, Size: 255)
+  Absenden_als (Text, Size: 255)
+  Voting_Text (Text, Size: 255)
+  BetreffZeile (Text, Size: 255)
+  Textinhalt (Memo, Size: 0)
+  IstHTML (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbl_MA_Tageszusatzwerte
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  AktDat (Date/Time, Size: 8)
+  34a_RZ (Currency, Size: 8)
+  Abschlag (Currency, Size: 8)
+  Nicht_Erscheinen (Currency, Size: 8)
+  Kaution (Currency, Size: 8)
+  Dienstkleidung (Text, Size: 255)
+  Sonst_Abzuege (Currency, Size: 8)
+  Sonst_Abzuege_Grund (Text, Size: 255)
+  Monatslohn (Currency, Size: 8)
+  UeberwVon (Text, Size: 255)
+  Bemerkungen (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tbl_MA_UeberlaufStunden
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  AktJahr (Long, Size: 4)
+  M1 (Single, Size: 4)
+  M2 (Single, Size: 4)
+  M3 (Single, Size: 4)
+  M4 (Single, Size: 4)
+  M5 (Single, Size: 4)
+  M6 (Single, Size: 4)
+  M7 (Single, Size: 4)
+  M8 (Single, Size: 4)
+  M9 (Single, Size: 4)
+  M10 (Single, Size: 4)
+  M11 (Single, Size: 4)
+  M12 (Single, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_MA_VA_Planung
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  PosNr (Long, Size: 4)
+  VA_Start (Date/Time, Size: 8)
+  VA_Ende (Date/Time, Size: 8)
+  MA_ID (Long, Size: 4)
+  Status_ID (Long, Size: 4)
+  Status_Datum (Date/Time, Size: 8)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  VADatum (Date/Time, Size: 8)
+  MVA_Start (Date/Time, Size: 8)
+  MVA_Ende (Date/Time, Size: 8)
+  Bemerkungen (Text, Size: 255)
+  MA_Brutto_Std (Single, Size: 4)
+  MA_Netto_Std (Single, Size: 4)
+  PKW (Currency, Size: 8)
+  Ma_brutto_std2 (Double, Size: 8)
+  MA_Netto_std2 (Type20, Size: 16)
+  Anfragezeitpunkt (Date/Time, Size: 8)
+  Rueckmeldezeitpunkt (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tbl_MA_VA_Zuordnung
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  PosNr (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  MA_Brutto_Std (Single, Size: 4)
+  PKW (Currency, Size: 8)
+  Bemerkungen (Text, Size: 255)
+  MA_Netto_Std (Single, Size: 4)
+  RL_34a (Currency, Size: 8)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  VADatum (Date/Time, Size: 8)
+  MVA_Start (Date/Time, Size: 8)
+  MVA_Ende (Date/Time, Size: 8)
+  PreisArt_ID (Long, Size: 4)
+  Rch_Erstellt (Boolean, Size: 1)
+  PKW_Anzahl (Single, Size: 4)
+  IstFraglich (Boolean, Size: 1)
+  MA_Brutto_Std2 (Double, Size: 8)
+  MA_Netto_Std2 (Double, Size: 8)
+  RL34a (Type20, Size: 16)
+  Info (Text, Size: 255)
+  Position (Text, Size: 255)
+  Anfragezeitpunkt (Date/Time, Size: 8)
+  Rueckmeldezeitpunkt (Date/Time, Size: 8)
+  Einsatzleitung (Boolean, Size: 1)
+  Auswahl (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbl_MA_Zeittyp
+----------------------------------------
+  ID (Long, Size: 4)
+  Zeittyp (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+  Kuerzel_Datev (Text, Size: 255)
+  SortNr (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_Menue_quer
+----------------------------------------
+  ID (Long, Size: 4)
+  Funktion (Text, Size: 255)
+  Anzeige (Text, Size: 255)
+  Menue_Nr (Long, Size: 4)
+  Sortierung (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_Menuefuehrung_Neu
+----------------------------------------
+  ID (Long, Size: 4)
+  MenueNr (Long, Size: 4)
+  SortNr (Long, Size: 4)
+  Funktionsaufruf (Text, Size: 255)
+  Makroaufruf (Text, Size: 255)
+  Anzeige (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+  FormLoesch (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbl_menuefuehrung2
+----------------------------------------
+  ID (Long, Size: 4)
+  MenueNr (Long, Size: 4)
+  SortNr (Long, Size: 4)
+  Funktionsaufruf (Text, Size: 255)
+  Makroaufruf (Text, Size: 255)
+  Anzeige (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+  Formloesch (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_Mitarbeiterstamm_34a
+----------------------------------------
+  ID (Long, Size: 4)
+  LEXWare_ID (Long, Size: 4)
+  IstAktiv (Boolean, Size: 1)
+  IstSubunternehmer (Boolean, Size: 1)
+  Nachname (Text, Size: 255)
+  Vorname (Text, Size: 255)
+  Strasse (Text, Size: 255)
+  Nr (Text, Size: 255)
+  PLZ (Text, Size: 255)
+  Ort (Text, Size: 255)
+  Land (Text, Size: 255)
+  Bundesland (Text, Size: 255)
+  Tel_Mobil (Text, Size: 255)
+  Tel_Festnetz (Text, Size: 255)
+  Email (Text, Size: 255)
+  Geschlecht (Text, Size: 1)
+  Staatsang (Text, Size: 255)
+  Geb_Dat (Date/Time, Size: 8)
+  Geb_Ort (Text, Size: 255)
+  Geb_Name (Text, Size: 255)
+  Eintrittsdatum (Date/Time, Size: 8)
+  Austrittsdatum (Date/Time, Size: 8)
+  Anstellungsart_ID (Long, Size: 4)
+  Kostenstelle (Text, Size: 255)
+  Auszahlungsart (Text, Size: 255)
+  Bankname (Text, Size: 255)
+  Bankleitzahl (Text, Size: 255)
+  Kontonummer (Text, Size: 255)
+  BIC (Text, Size: 255)
+  IBAN (Text, Size: 255)
+  Kontoinhaber (Text, Size: 255)
+  Stundenlohn_brutto (Currency, Size: 8)
+  Bezuege_gezahlt_als (Text, Size: 255)
+  Sozialvers_Nr (Text, Size: 255)
+  SteuerNr (Text, Size: 255)
+  Taetigkeit_Bezeichnung (Text, Size: 255)
+  Personengruppe (Long, Size: 4)
+  KV_Kasse (Text, Size: 255)
+  Ist_RV_Befrantrag (Boolean, Size: 1)
+  Steuerklasse (Text, Size: 255)
+  Arbst_pro_Arbeitstag (Double, Size: 8)
+  Arbeitstage_pro_Woche (Double, Size: 8)
+  Resturl_Vorjahr (Double, Size: 8)
+  Urlaubsanspr_pro_Jahr (Double, Size: 8)
+  StundenZahlMax (Single, Size: 4)
+  Hat_keine_34a (Boolean, Size: 1)
+  Kleidergroesse (Text, Size: 255)
+  Fahrerlaubnis (Text, Size: 255)
+  Eigener_PKW (Boolean, Size: 1)
+  HatSachkunde (Boolean, Size: 1)
+  DienstausweisNr (Text, Size: 255)
+  tblBilddatei (Text, Size: 255)
+  Bemerkungen (Memo, Size: 0)
+  Briefkopf (Memo, Size: 0)
+  IstBrfAuto (Boolean, Size: 1)
+  Anr (Text, Size: 255)
+  Anr_Brief (Text, Size: 255)
+  Anr_eMail (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  AUsweis_Funktion (Text, Size: 255)
+  IstNSB (Boolean, Size: 1)
+  Datum_34a (Date/Time, Size: 8)
+  Ausweis_Endedatum (Date/Time, Size: 8)
+  Kosten_pro_MAStunde (Currency, Size: 8)
+  Verfuebgarkeit_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_Mitarbeiterstamm_für Meldung
+----------------------------------------
+  ID (Long, Size: 4)
+  LEXWare_ID (Long, Size: 4)
+  IstAktiv (Boolean, Size: 1)
+  IstSubunternehmer (Boolean, Size: 1)
+  Nachname (Text, Size: 255)
+  Vorname (Text, Size: 255)
+  Strasse (Text, Size: 255)
+  Nr (Text, Size: 255)
+  PLZ (Text, Size: 255)
+  Ort (Text, Size: 255)
+  Land (Text, Size: 255)
+  Bundesland (Text, Size: 255)
+  Tel_Mobil (Text, Size: 255)
+  Tel_Festnetz (Text, Size: 255)
+  Email (Text, Size: 255)
+  Geschlecht (Text, Size: 1)
+  Staatsang (Text, Size: 255)
+  Geb_Dat (Date/Time, Size: 8)
+  Geb_Ort (Text, Size: 255)
+  Geb_Name (Text, Size: 255)
+  Eintrittsdatum (Date/Time, Size: 8)
+  Austrittsdatum (Date/Time, Size: 8)
+  Anstellungsart_ID (Long, Size: 4)
+  Kostenstelle (Text, Size: 255)
+  Auszahlungsart (Text, Size: 255)
+  Bankname (Text, Size: 255)
+  Bankleitzahl (Text, Size: 255)
+  Kontonummer (Text, Size: 255)
+  BIC (Text, Size: 255)
+  IBAN (Text, Size: 255)
+  Kontoinhaber (Text, Size: 255)
+  Stundenlohn_brutto (Currency, Size: 8)
+  Bezuege_gezahlt_als (Text, Size: 255)
+  Sozialvers_Nr (Text, Size: 255)
+  SteuerNr (Text, Size: 255)
+  Taetigkeit_Bezeichnung (Text, Size: 255)
+  Personengruppe (Long, Size: 4)
+  KV_Kasse (Text, Size: 255)
+  Ist_RV_Befrantrag (Boolean, Size: 1)
+  Steuerklasse (Text, Size: 255)
+  Arbst_pro_Arbeitstag (Double, Size: 8)
+  Arbeitstage_pro_Woche (Double, Size: 8)
+  Resturl_Vorjahr (Double, Size: 8)
+  Urlaubsanspr_pro_Jahr (Double, Size: 8)
+  StundenZahlMax (Single, Size: 4)
+  Hat_keine_34a (Boolean, Size: 1)
+  Kleidergroesse (Text, Size: 255)
+  Fahrerlaubnis (Text, Size: 255)
+  Eigener_PKW (Boolean, Size: 1)
+  HatSachkunde (Boolean, Size: 1)
+  DienstausweisNr (Text, Size: 255)
+  tblBilddatei (Text, Size: 255)
+  Bemerkungen (Memo, Size: 0)
+  Briefkopf (Memo, Size: 0)
+  IstBrfAuto (Boolean, Size: 1)
+  Anr (Text, Size: 255)
+  Anr_Brief (Text, Size: 255)
+  Anr_eMail (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  AUsweis_Funktion (Text, Size: 255)
+  IstNSB (Boolean, Size: 1)
+  Datum_34a (Date/Time, Size: 8)
+  Ausweis_Endedatum (Date/Time, Size: 8)
+  Kosten_pro_MAStunde (Currency, Size: 8)
+  Verfuebgarkeit_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_Mitarbeiterstamm_Telefonliste
+----------------------------------------
+  ID (Long, Size: 4)
+  LEXWare_ID (Long, Size: 4)
+  IstAktiv (Boolean, Size: 1)
+  IstSubunternehmer (Boolean, Size: 1)
+  Nachname (Text, Size: 255)
+  Vorname (Text, Size: 255)
+  Strasse (Text, Size: 255)
+  Nr (Text, Size: 255)
+  PLZ (Text, Size: 255)
+  Ort (Text, Size: 255)
+  Land (Text, Size: 255)
+  Bundesland (Text, Size: 255)
+  Tel_Mobil (Text, Size: 255)
+  Tel_Festnetz (Text, Size: 255)
+  Email (Text, Size: 255)
+  Geschlecht (Text, Size: 1)
+  Staatsang (Text, Size: 255)
+  Geb_Dat (Date/Time, Size: 8)
+  Geb_Ort (Text, Size: 255)
+  Geb_Name (Text, Size: 255)
+  Eintrittsdatum (Date/Time, Size: 8)
+  Austrittsdatum (Date/Time, Size: 8)
+  Anstellungsart_ID (Long, Size: 4)
+  Kostenstelle (Text, Size: 255)
+  Auszahlungsart (Text, Size: 255)
+  Bankname (Text, Size: 255)
+  Bankleitzahl (Text, Size: 255)
+  Kontonummer (Text, Size: 255)
+  BIC (Text, Size: 255)
+  IBAN (Text, Size: 255)
+  Kontoinhaber (Text, Size: 255)
+  Stundenlohn_brutto (Currency, Size: 8)
+  Bezuege_gezahlt_als (Text, Size: 255)
+  Sozialvers_Nr (Text, Size: 255)
+  SteuerNr (Text, Size: 255)
+  Taetigkeit_Bezeichnung (Text, Size: 255)
+  Personengruppe (Long, Size: 4)
+  KV_Kasse (Text, Size: 255)
+  Ist_RV_Befrantrag (Boolean, Size: 1)
+  Steuerklasse (Text, Size: 255)
+  Arbst_pro_Arbeitstag (Double, Size: 8)
+  Arbeitstage_pro_Woche (Double, Size: 8)
+  Resturl_Vorjahr (Double, Size: 8)
+  Urlaubsanspr_pro_Jahr (Double, Size: 8)
+  StundenZahlMax (Single, Size: 4)
+  Hat_keine_34a (Boolean, Size: 1)
+  Kleidergroesse (Text, Size: 255)
+  Fahrerlaubnis (Text, Size: 255)
+  Eigener_PKW (Boolean, Size: 1)
+  HatSachkunde (Boolean, Size: 1)
+  DienstausweisNr (Text, Size: 255)
+  tblBilddatei (Text, Size: 255)
+  Bemerkungen (Memo, Size: 0)
+  Briefkopf (Memo, Size: 0)
+  IstBrfAuto (Boolean, Size: 1)
+  Anr (Text, Size: 255)
+  Anr_Brief (Text, Size: 255)
+  Anr_eMail (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  AUsweis_Funktion (Text, Size: 255)
+  IstNSB (Boolean, Size: 1)
+  Datum_34a (Date/Time, Size: 8)
+  Ausweis_Endedatum (Date/Time, Size: 8)
+  Kosten_pro_MAStunde (Currency, Size: 8)
+  Verfuebgarkeit_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_OB_Geo
+----------------------------------------
+  Objekt_ID (Long, Size: 4)
+  Strasse (Text, Size: 100)
+  PLZ (Text, Size: 10)
+  Ort (Text, Size: 50)
+  Land (Text, Size: 50)
+  Lat (Double, Size: 8)
+  Lon (Double, Size: 8)
+
+----------------------------------------
+TABELLE: tbl_OB_Objekt
+----------------------------------------
+  ID (Long, Size: 4)
+  Objekt (Text, Size: 255)
+  Strasse (Text, Size: 255)
+  PLZ (Text, Size: 255)
+  Ort (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+  Treffpunkt (Text, Size: 255)
+  Treffp_Zeit (Date/Time, Size: 8)
+  Dienstkleidung (Text, Size: 255)
+  Ansprechpartner (Text, Size: 255)
+  Treffpunkt2 (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  VA_ID_alt (Long, Size: 4)
+  VA_ID_Akt (Long, Size: 4)
+  Zeit1_Label (Text, Size: 20)
+  Zeit2_Label (Text, Size: 20)
+  Zeit3_Label (Text, Size: 20)
+  Zeit4_Label (Text, Size: 20)
+
+----------------------------------------
+TABELLE: tbl_OB_Objekt_Positionen
+----------------------------------------
+  ID (Long, Size: 4)
+  OB_Objekt_Kopf_ID (Long, Size: 4)
+  Gruppe (Text, Size: 255)
+  Zusatztext (Text, Size: 255)
+  Zusatztext2 (Text, Size: 255)
+  Geschlecht (Text, Size: 255)
+  Anzahl (Long, Size: 4)
+  Rel_Beginn (Date/Time, Size: 8)
+  Rel_Ende (Date/Time, Size: 8)
+  TagesArt (Long, Size: 4)
+  TagesNr (Long, Size: 4)
+  Sort (Long, Size: 4)
+  PosNr (Long, Size: 4)
+  Zeit1 (Long, Size: 4)
+  Zeit2 (Long, Size: 4)
+  Zeit3 (Long, Size: 4)
+  Zeit4 (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_Protokoll
+----------------------------------------
+  pDatenbank (Text, Size: 250)
+  pFormularName (Text, Size: 100)
+  pDSID (Text, Size: 250)
+  pFeldName (Text, Size: 100)
+  pAlterWert (Memo, Size: 0)
+  pNeuerWert (Memo, Size: 0)
+  pGeaendertAm (Date/Time, Size: 8)
+  pGeaendertVon (Text, Size: 100)
+  pRueckgaengig (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbl_Rch_Kopf
+----------------------------------------
+  ID (Long, Size: 4)
+  RchTyp (Long, Size: 4)
+  VorlageDokNr (Long, Size: 4)
+  RchNr_Ext (Text, Size: 255)
+  RchDatum (Date/Time, Size: 8)
+  kun_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Dateiname (Text, Size: 255)
+  IstSammelRch (Boolean, Size: 1)
+  Leist_Datum_von (Date/Time, Size: 8)
+  Leist_Datum_Bis (Date/Time, Size: 8)
+  Ang_Gueltig_Bis (Date/Time, Size: 8)
+  Zwi_Sum1 (Currency, Size: 8)
+  MwSt19_Sum1 (Currency, Size: 8)
+  MwSt7_Sum1 (Currency, Size: 8)
+  MwSt_Sum1 (Currency, Size: 8)
+  Gesamtsumme1 (Currency, Size: 8)
+  ZahlBed_ID (Long, Size: 4)
+  ZahlBetrag_Netto1 (Currency, Size: 8)
+  Zahlung_Bis (Date/Time, Size: 8)
+  IstBezahlt (Boolean, Size: 1)
+  Zahlung_am (Date/Time, Size: 8)
+  Zahlbetrag1 (Currency, Size: 8)
+  M1MahnDok (Text, Size: 255)
+  M1Mahndat (Date/Time, Size: 8)
+  M1MahnVon (Text, Size: 255)
+  M1Mahnbetrag1 (Currency, Size: 8)
+  M1Mahn_Bemerkungen (Memo, Size: 0)
+  M1IstGemahnt1 (Boolean, Size: 1)
+  M2MahnDok (Text, Size: 255)
+  M2Mahndat (Date/Time, Size: 8)
+  M2MahnVon (Text, Size: 255)
+  M2Mahnbetrag1 (Currency, Size: 8)
+  M2Mahn_Bemerkungen (Memo, Size: 0)
+  M2IstGemahnt1 (Boolean, Size: 1)
+  M3MahnDok (Text, Size: 255)
+  M3Mahndat (Date/Time, Size: 8)
+  M3MahnVon (Text, Size: 255)
+  M3Mahnbetrag1 (Currency, Size: 8)
+  M3Mahn_Bemerkungen (Memo, Size: 0)
+  M3IstGemahnt1 (Boolean, Size: 1)
+  Bemerkungen (Memo, Size: 0)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  VA_ID (Long, Size: 4)
+  FahrtkostenNetto (Currency, Size: 8)
+  SonstigesNetto (Currency, Size: 8)
+  Auftrag (Text, Size: 255)
+  Rch_Status_ID (Long, Size: 4)
+  Rch_Status (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_Rch_Pos_Auftrag
+----------------------------------------
+  ID (Long, Size: 4)
+  VorlageNr (Long, Size: 4)
+  kun_ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  VADatum (Date/Time, Size: 8)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  Menge (Double, Size: 8)
+  EzPreis (Currency, Size: 8)
+  Mengenheit (Text, Size: 255)
+  MwSt (Long, Size: 4)
+  Beschreibung (Text, Size: 255)
+  PreisArt_ID (Long, Size: 4)
+  GesPreis (Currency, Size: 8)
+  Rch_ID (Long, Size: 4)
+  Anz_MA (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_Rch_Pos_Geschrieben
+----------------------------------------
+  ID (Long, Size: 4)
+  VorlageNr (Long, Size: 4)
+  kun_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  PosNr (Long, Size: 4)
+  Int_ArtNr (Long, Size: 4)
+  Art_Beschreibung (Text, Size: 255)
+  Menge (Single, Size: 4)
+  ME (Text, Size: 255)
+  MwStSatz (Long, Size: 4)
+  EZPreis (Currency, Size: 8)
+  GesPreis (Currency, Size: 8)
+  Rch_ID (Long, Size: 4)
+  Anz_MA (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_Rch_Status
+----------------------------------------
+  ID (Long, Size: 4)
+  Status (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_Rch_VA_Kopf
+----------------------------------------
+  ID (Long, Size: 4)
+  VorlageNr (Long, Size: 4)
+  kun_ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  Rch_ID (Long, Size: 4)
+  Ges_Netto (Currency, Size: 8)
+  rch_Dat (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tbl_Textbaustein_Herkunft
+----------------------------------------
+  ID (Long, Size: 4)
+  Herkunftsname (Text, Size: 255)
+  Beschreibung (Text, Size: 255)
+  P1 (Text, Size: 255)
+  P1Typ (Long, Size: 4)
+  P2 (Text, Size: 255)
+  P2Typ (Long, Size: 4)
+  P3 (Text, Size: 255)
+  P3Typ (Long, Size: 4)
+  P1_Test (Text, Size: 255)
+  P2_Test (Text, Size: 255)
+  P3_Test (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_Textbaustein_Namen
+----------------------------------------
+  IntID (Long, Size: 4)
+  Herkunft_ID (Long, Size: 4)
+  ID (Long, Size: 4)
+  TB_Name (Text, Size: 255)
+  Feldname (Text, Size: 255)
+  Feldtyp (Long, Size: 4)
+  Bemerkung (Text, Size: 255)
+  TB_Name_Kl (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_Textbaustein_Typen
+----------------------------------------
+  Feldtyp (Long, Size: 4)
+  Beschreibung (Text, Size: 255)
+  Todo (Long, Size: 4)
+  Bemerkung (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_VA_Akt_Objekt_Kopf
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  OB_Objekt_Kopf_ID (Long, Size: 4)
+  VADatum (Date/Time, Size: 8)
+  VADatum_ID (Long, Size: 4)
+  VA_Start_Abs (Date/Time, Size: 8)
+  VA_Ende_Abs (Date/Time, Size: 8)
+  Bemerkung (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_VA_Akt_Objekt_Pos
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_Akt_Objekt_Kopf_ID (Long, Size: 4)
+  OB_Objekt_Pos_ID (Long, Size: 4)
+  OB_Objekt_Kopf_ID (Long, Size: 4)
+  Gruppe (Text, Size: 255)
+  Zusatztext (Text, Size: 255)
+  Zusatztext2 (Text, Size: 255)
+  Geschlecht (Text, Size: 255)
+  Anzahl (Long, Size: 4)
+  Rel_Beginn (Date/Time, Size: 8)
+  Rel_Ende (Date/Time, Size: 8)
+  Abs_Beginn (Date/Time, Size: 8)
+  Abs_Ende (Date/Time, Size: 8)
+  Bemerkung (Text, Size: 255)
+  Sort (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_VA_Akt_Objekt_Pos_MA
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_Akt_Objekt_Kopf_ID (Long, Size: 4)
+  VA_Akt_Objekt_Pos_ID (Long, Size: 4)
+  PosNr (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Bemerkung (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_VA_AnzTage
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum (Date/Time, Size: 8)
+  TVA_Soll (Long, Size: 4)
+  TVA_Ist (Long, Size: 4)
+  TVA_Offen (Boolean, Size: 1)
+  PKW_Anzahl (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_VA_Auftragstamm
+----------------------------------------
+  ID (Long, Size: 4)
+  Auftrag (Text, Size: 255)
+  Veranstalter_ID (Long, Size: 4)
+  Objekt (Text, Size: 255)
+  Strasse (Text, Size: 255)
+  PLZ (Text, Size: 255)
+  Ort (Text, Size: 255)
+  Dat_VA_Von (Date/Time, Size: 8)
+  Dat_VA_Bis (Date/Time, Size: 8)
+  Dummy (Currency, Size: 8)
+  Bemerkungen (Memo, Size: 0)
+  Rch_Dat (Date/Time, Size: 8)
+  Rch_Nr (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+  Treffpunkt (Text, Size: 255)
+  Treffpunkt2 (Text, Size: 255)
+  Treffp_Zeit (Date/Time, Size: 8)
+  Dienstkleidung (Text, Size: 255)
+  Ansprechpartner (Text, Size: 255)
+  Veranst_Status_ID (Long, Size: 4)
+  Objekt_ID (Long, Size: 4)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  AnzTg (Long, Size: 4)
+  Excel_Dateiname (Text, Size: 255)
+  Excel_Path (Text, Size: 255)
+  Abschlussdatum (Date/Time, Size: 8)
+  Fahrtkosten (Currency, Size: 8)
+  Kun_Firma (Text, Size: 255)
+  Rech_NR (Text, Size: 255)
+  Autosend_EL (Boolean, Size: 1)
+  Sub_send (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbl_VA_Start
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  MA_Anzahl (Long, Size: 4)
+  VA_Start (Date/Time, Size: 8)
+  VA_Ende (Date/Time, Size: 8)
+  Bemerkungen (Text, Size: 255)
+  VADatum (Date/Time, Size: 8)
+  MVA_Start (Date/Time, Size: 8)
+  MVA_Ende (Date/Time, Size: 8)
+  VA_Treffpunkt (Text, Size: 255)
+  VA_Zeitpunkt (Date/Time, Size: 8)
+  MA_Anzahl_Ist (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbl_VA_Status
+----------------------------------------
+  ID (Long, Size: 4)
+  Fortschritt (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_Veranst_Status
+----------------------------------------
+  ID (Long, Size: 4)
+  Fortschritt (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbl_VersionsHistorie
+----------------------------------------
+  Version (Text, Size: 50)
+  Historie (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: tbl_ZusatzDateien
+----------------------------------------
+  ZusatzNr (Long, Size: 4)
+  TabellenID (Long, Size: 4)
+  Ueberordnung (Long, Size: 4)
+  Dateiname (Text, Size: 255)
+  DFiledate (Date/Time, Size: 8)
+  DLaenge (Long, Size: 4)
+  Texttyp (Text, Size: 5)
+  Kurzbeschreibung (Text, Size: 250)
+  Langtext (Memo, Size: 0)
+  JNVerteiler (Boolean, Size: 1)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tblFensterpositionen
+----------------------------------------
+  FormName (Text, Size: 255)
+  Left (Long, Size: 4)
+  Top (Long, Size: 4)
+  Right (Long, Size: 4)
+  Bottom (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tblGrafiken
+----------------------------------------
+  ID_Grafik (Long, Size: 4)
+  Grafik (Type11, Size: 0)
+  Beschreibung (Text, Size: 50)
+  BildNr (Long, Size: 4)
+  Gr (Long, Size: 4)
+  FarbNr (Long, Size: 4)
+  Hexwert (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tblImp_Excel_0_Spez
+----------------------------------------
+  ID (Long, Size: 4)
+  Importspez (Text, Size: 255)
+  ImportListe_tabName (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tblImp_Excel_1_Kopf
+----------------------------------------
+  ID (Long, Size: 4)
+  Kopf_ID (Long, Size: 4)
+  Importname (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tblImp_Excel_2_Feldamen
+----------------------------------------
+  ID (Long, Size: 4)
+  Kopf_ID (Long, Size: 4)
+  Feldname (Text, Size: 255)
+  Beschreibung (Text, Size: 255)
+  IstID (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tblImp_Excel_3_Feldinhalt
+----------------------------------------
+  ID (Long, Size: 4)
+  Feld_ID (Long, Size: 4)
+  Anzahl (Long, Size: 4)
+  Fe_Spalte (Text, Size: 255)
+  Fe_Spalte_Nr (Long, Size: 4)
+  Fe_Zeile (Long, Size: 4)
+  Fe_Typ_org (Long, Size: 4)
+  Fe_Typ_tmp (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_AnzStd
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  AnzahlvonMA_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_Attachfile
+----------------------------------------
+  ID (Long, Size: 4)
+  Attachfile (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbltmp_AuswahlMonat_Datum
+----------------------------------------
+  ID (Long, Size: 4)
+  AuswMonatDat (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tbltmp_AusweisMA_ID
+----------------------------------------
+  MA_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_DP_Grund
+----------------------------------------
+  ID (Long, Size: 4)
+  Startdat (Date/Time, Size: 8)
+  ObjOrt (Text, Size: 255)
+  ObjOrt_Anzeige (Text, Size: 255)
+  Pos_Nr (Long, Size: 4)
+  Tag1_Zuo_ID (Long, Size: 4)
+  Tag1_MA_ID (Long, Size: 4)
+  Tag1_Name (Text, Size: 255)
+  Tag1_fraglich (Boolean, Size: 1)
+  Tag1_von (Text, Size: 255)
+  Tag1_bis (Text, Size: 255)
+  Tag2_Zuo_ID (Long, Size: 4)
+  Tag2_MA_ID (Long, Size: 4)
+  Tag2_Name (Text, Size: 255)
+  Tag2_fraglich (Boolean, Size: 1)
+  Tag2_von (Text, Size: 255)
+  Tag2_bis (Text, Size: 255)
+  Tag3_Zuo_ID (Long, Size: 4)
+  Tag3_MA_ID (Long, Size: 4)
+  Tag3_Name (Text, Size: 255)
+  Tag3_fraglich (Boolean, Size: 1)
+  Tag3_von (Text, Size: 255)
+  Tag3_bis (Text, Size: 255)
+  Tag4_Zuo_ID (Long, Size: 4)
+  Tag4_MA_ID (Long, Size: 4)
+  Tag4_Name (Text, Size: 255)
+  Tag4_fraglich (Boolean, Size: 1)
+  Tag4_von (Text, Size: 255)
+  Tag4_bis (Text, Size: 255)
+  Tag5_Zuo_ID (Long, Size: 4)
+  Tag5_MA_ID (Long, Size: 4)
+  Tag5_Name (Text, Size: 255)
+  Tag5_fraglich (Boolean, Size: 1)
+  Tag5_von (Text, Size: 255)
+  Tag5_bis (Text, Size: 255)
+  Tag6_Zuo_ID (Long, Size: 4)
+  Tag6_MA_ID (Long, Size: 4)
+  Tag6_Name (Text, Size: 255)
+  Tag6_fraglich (Boolean, Size: 1)
+  Tag6_von (Text, Size: 255)
+  Tag6_bis (Text, Size: 255)
+  Tag7_Zuo_ID (Long, Size: 4)
+  Tag7_MA_ID (Long, Size: 4)
+  Tag7_Name (Text, Size: 255)
+  Tag7_fraglich (Boolean, Size: 1)
+  Tag7_von (Text, Size: 255)
+  Tag7_bis (Text, Size: 255)
+  sortID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_DP_Grund_2
+----------------------------------------
+  ID (Long, Size: 4)
+  Startdat (Date/Time, Size: 8)
+  ObjOrt (Text, Size: 255)
+  ObjOrt_Anzeige (Text, Size: 255)
+  Pos_Nr (Long, Size: 4)
+  Tag1_Zuo_ID (Long, Size: 4)
+  Tag1_MA_ID (Long, Size: 4)
+  Tag1_Name (Text, Size: 255)
+  Tag1_fraglich (Boolean, Size: 1)
+  Tag1_von (Text, Size: 255)
+  Tag1_bis (Text, Size: 255)
+  Tag2_Zuo_ID (Long, Size: 4)
+  Tag2_MA_ID (Long, Size: 4)
+  Tag2_Name (Text, Size: 255)
+  Tag2_fraglich (Boolean, Size: 1)
+  Tag2_von (Text, Size: 255)
+  Tag2_bis (Text, Size: 255)
+  Tag3_Zuo_ID (Long, Size: 4)
+  Tag3_MA_ID (Long, Size: 4)
+  Tag3_Name (Text, Size: 255)
+  Tag3_fraglich (Boolean, Size: 1)
+  Tag3_von (Text, Size: 255)
+  Tag3_bis (Text, Size: 255)
+  Tag4_Zuo_ID (Long, Size: 4)
+  Tag4_MA_ID (Long, Size: 4)
+  Tag4_Name (Text, Size: 255)
+  Tag4_fraglich (Boolean, Size: 1)
+  Tag4_von (Text, Size: 255)
+  Tag4_bis (Text, Size: 255)
+  Tag5_Zuo_ID (Long, Size: 4)
+  Tag5_MA_ID (Long, Size: 4)
+  Tag5_Name (Text, Size: 255)
+  Tag5_fraglich (Boolean, Size: 1)
+  Tag5_von (Text, Size: 255)
+  Tag5_bis (Text, Size: 255)
+  Tag6_Zuo_ID (Long, Size: 4)
+  Tag6_MA_ID (Long, Size: 4)
+  Tag6_Name (Text, Size: 255)
+  Tag6_fraglich (Boolean, Size: 1)
+  Tag6_von (Text, Size: 255)
+  Tag6_bis (Text, Size: 255)
+  Tag7_Zuo_ID (Long, Size: 4)
+  Tag7_MA_ID (Long, Size: 4)
+  Tag7_Name (Text, Size: 255)
+  Tag7_fraglich (Boolean, Size: 1)
+  Tag7_von (Text, Size: 255)
+  Tag7_bis (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbltmp_DP_Grund_Sort
+----------------------------------------
+  ID (Long, Size: 4)
+  ObjOrt (Text, Size: 255)
+  MaxvonTag1_Zuo_ID (Long, Size: 4)
+  MaxvonTag2_Zuo_ID (Long, Size: 4)
+  MaxvonTag3_Zuo_ID (Long, Size: 4)
+  MaxvonTag4_Zuo_ID (Long, Size: 4)
+  MaxvonTag5_Zuo_ID (Long, Size: 4)
+  MaxvonTag6_Zuo_ID (Long, Size: 4)
+  MaxvonTag7_Zuo_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_DP_Grund_Sort_MA
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  MAName (Text, Size: 255)
+  MaxvonTag1_Zuo_ID (Long, Size: 4)
+  MaxvonTag2_Zuo_ID (Long, Size: 4)
+  MaxvonTag3_Zuo_ID (Long, Size: 4)
+  MaxvonTag4_Zuo_ID (Long, Size: 4)
+  MaxvonTag5_Zuo_ID (Long, Size: 4)
+  MaxvonTag6_Zuo_ID (Long, Size: 4)
+  MaxvonTag7_Zuo_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_DP_MA_1
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  ZuordID (Long, Size: 4)
+  Anz_MA (Text, Size: 255)
+  ObjOrt (Text, Size: 255)
+  VADatum (Date/Time, Size: 8)
+  Pos_Nr (Text, Size: 255)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  MA_ID (Long, Size: 4)
+  MAName (Text, Size: 255)
+  IstFraglich (Boolean, Size: 1)
+  Hlp (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_DP_MA_Grund
+----------------------------------------
+  ID (Long, Size: 4)
+  Startdat (Date/Time, Size: 8)
+  MA_ID (Long, Size: 4)
+  MAName (Text, Size: 255)
+  Hlp (Long, Size: 4)
+  IDSort (Long, Size: 4)
+  Tag1_Zuo_ID (Long, Size: 4)
+  Tag1_MA_ID (Long, Size: 4)
+  Tag1_Name (Text, Size: 255)
+  Tag1_fraglich (Boolean, Size: 1)
+  Tag1_von (Text, Size: 255)
+  Tag1_bis (Text, Size: 255)
+  Tag2_Zuo_ID (Long, Size: 4)
+  Tag2_MA_ID (Long, Size: 4)
+  Tag2_Name (Text, Size: 255)
+  Tag2_fraglich (Boolean, Size: 1)
+  Tag2_von (Text, Size: 255)
+  Tag2_bis (Text, Size: 255)
+  Tag3_Zuo_ID (Long, Size: 4)
+  Tag3_MA_ID (Long, Size: 4)
+  Tag3_Name (Text, Size: 255)
+  Tag3_fraglich (Boolean, Size: 1)
+  Tag3_von (Text, Size: 255)
+  Tag3_bis (Text, Size: 255)
+  Tag4_Zuo_ID (Long, Size: 4)
+  Tag4_MA_ID (Long, Size: 4)
+  Tag4_Name (Text, Size: 255)
+  Tag4_fraglich (Boolean, Size: 1)
+  Tag4_von (Text, Size: 255)
+  Tag4_bis (Text, Size: 255)
+  Tag5_Zuo_ID (Long, Size: 4)
+  Tag5_MA_ID (Long, Size: 4)
+  Tag5_Name (Text, Size: 255)
+  Tag5_fraglich (Boolean, Size: 1)
+  Tag5_von (Text, Size: 255)
+  Tag5_bis (Text, Size: 255)
+  Tag6_Zuo_ID (Long, Size: 4)
+  Tag6_MA_ID (Long, Size: 4)
+  Tag6_Name (Text, Size: 255)
+  Tag6_fraglich (Boolean, Size: 1)
+  Tag6_von (Text, Size: 255)
+  Tag6_bis (Text, Size: 255)
+  Tag7_Zuo_ID (Long, Size: 4)
+  Tag7_MA_ID (Long, Size: 4)
+  Tag7_Name (Text, Size: 255)
+  Tag7_fraglich (Boolean, Size: 1)
+  Tag7_von (Text, Size: 255)
+  Tag7_bis (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbltmp_DP_MA_Grund_FI
+----------------------------------------
+  ID (Long, Size: 4)
+  Startdat (Date/Time, Size: 8)
+  MA_ID (Long, Size: 4)
+  MAName (Text, Size: 255)
+  Hlp (Long, Size: 4)
+  Tag1_Zuo_ID (Long, Size: 4)
+  Tag1_MA_ID (Long, Size: 4)
+  Tag1_Name (Text, Size: 255)
+  Tag1_fraglich (Boolean, Size: 1)
+  Tag1_von (Text, Size: 255)
+  Tag1_bis (Text, Size: 255)
+  Tag2_Zuo_ID (Long, Size: 4)
+  Tag2_MA_ID (Long, Size: 4)
+  Tag2_Name (Text, Size: 255)
+  Tag2_fraglich (Boolean, Size: 1)
+  Tag2_von (Text, Size: 255)
+  Tag2_bis (Text, Size: 255)
+  Tag3_Zuo_ID (Long, Size: 4)
+  Tag3_MA_ID (Long, Size: 4)
+  Tag3_Name (Text, Size: 255)
+  Tag3_fraglich (Boolean, Size: 1)
+  Tag3_von (Text, Size: 255)
+  Tag3_bis (Text, Size: 255)
+  Tag4_Zuo_ID (Long, Size: 4)
+  Tag4_MA_ID (Long, Size: 4)
+  Tag4_Name (Text, Size: 255)
+  Tag4_fraglich (Boolean, Size: 1)
+  Tag4_von (Text, Size: 255)
+  Tag4_bis (Text, Size: 255)
+  Tag5_Zuo_ID (Long, Size: 4)
+  Tag5_MA_ID (Long, Size: 4)
+  Tag5_Name (Text, Size: 255)
+  Tag5_fraglich (Boolean, Size: 1)
+  Tag5_von (Text, Size: 255)
+  Tag5_bis (Text, Size: 255)
+  Tag6_Zuo_ID (Long, Size: 4)
+  Tag6_MA_ID (Long, Size: 4)
+  Tag6_Name (Text, Size: 255)
+  Tag6_fraglich (Boolean, Size: 1)
+  Tag6_von (Text, Size: 255)
+  Tag6_bis (Text, Size: 255)
+  Tag7_Zuo_ID (Long, Size: 4)
+  Tag7_MA_ID (Long, Size: 4)
+  Tag7_Name (Text, Size: 255)
+  Tag7_fraglich (Boolean, Size: 1)
+  Tag7_von (Text, Size: 255)
+  Tag7_bis (Text, Size: 255)
+  Stunden_gesamt (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_DP_MA_Neu_1
+----------------------------------------
+  VADatum (Date/Time, Size: 8)
+  MAName (Text, Size: 255)
+  Pos_Nr (Long, Size: 4)
+  ObjOrt (Text, Size: 255)
+  MA_ID (Long, Size: 4)
+  IstAktiv (Boolean, Size: 1)
+  IstSubunternehmer (Boolean, Size: 1)
+  Anstellungsart_ID (Long, Size: 4)
+  IstFraglich (Boolean, Size: 1)
+  ZuordID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  MVA_Start (Date/Time, Size: 8)
+  Hlp (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_DP_MA_Neu_2
+----------------------------------------
+  VADatum (Date/Time, Size: 8)
+  MAName (Text, Size: 255)
+  Pos_Nr (Long, Size: 4)
+  ObjOrt (Text, Size: 255)
+  MA_ID (Long, Size: 4)
+  IstAktiv (Boolean, Size: 1)
+  IstSubunternehmer (Boolean, Size: 1)
+  Anstellungsart_ID (Long, Size: 4)
+  IstFraglich (Boolean, Size: 1)
+  ZuordID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  MVA_Start (Date/Time, Size: 8)
+  Hlp (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_Fehlzeiten
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  AbwesenArt (Text, Size: 255)
+  Bemerk (Text, Size: 255)
+  DatVon (Date/Time, Size: 8)
+  DatBis (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tbltmp_Ins_Aktmon_Zuord
+----------------------------------------
+  ID (Long, Size: 4)
+  VADatum (Date/Time, Size: 8)
+  VA_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Auftrag_Ort (Text, Size: 255)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  Brutto_Std (Single, Size: 4)
+  Netto_Std (Single, Size: 4)
+  Fahrtko (Currency, Size: 8)
+  RL_34a (Currency, Size: 8)
+  ma_Brutto_std2 (Double, Size: 8)
+  netto_std2 (Type20, Size: 16)
+
+----------------------------------------
+TABELLE: tbltmp_MA_Ausgef_Vorlagen
+----------------------------------------
+  Ordner (Text, Size: 255)
+  Dateiname (Text, Size: 255)
+  Version (Text, Size: 50)
+  Datum (Date/Time, Size: 8)
+  Länge (Double, Size: 8)
+
+----------------------------------------
+TABELLE: tbltmp_MA_Auswahl
+----------------------------------------
+  Auswahl (Boolean, Size: 1)
+  MA_ID (Long, Size: 4)
+  Status (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_MA_Fehleingaben
+----------------------------------------
+  MA_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_MA_Maint_ZuoAend
+----------------------------------------
+  Zuo_ID (Long, Size: 4)
+  MA_ID_Alt (Long, Size: 4)
+  MA_ID_Neu (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_MA_Monat_Einzel
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  34a_RZ (Currency, Size: 8)
+  Abschlag (Currency, Size: 8)
+  Nicht_Erscheinen (Currency, Size: 8)
+  Kaution (Currency, Size: 8)
+  Dienstkleidung (Text, Size: 255)
+  Sonst_Abzuege (Currency, Size: 8)
+  Sonst_Abzuege_Grund (Text, Size: 255)
+  Monatslohn (Currency, Size: 8)
+  UeberwVon (Text, Size: 255)
+  Bemerkungen (Text, Size: 255)
+  Auftrag_Ort (Text, Size: 255)
+  AktDat (Date/Time, Size: 8)
+  VAStart_ID (Long, Size: 4)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  Brutto_Std (Single, Size: 4)
+  Netto_Std (Single, Size: 4)
+  Fahrtko (Currency, Size: 8)
+  RL_34a (Currency, Size: 8)
+
+----------------------------------------
+TABELLE: tbltmp_MA_Tageszusatzwerte
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  AktDat (Date/Time, Size: 8)
+  X34a_RZ (Currency, Size: 8)
+  Abschlag (Currency, Size: 8)
+  Nicht_Erscheinen (Currency, Size: 8)
+  Kaution (Currency, Size: 8)
+  Dienstkleidung (Text, Size: 255)
+  Sonst_Abzuege (Currency, Size: 8)
+  Sonst_Abzuege_Grund (Text, Size: 255)
+  Monatslohn (Currency, Size: 8)
+  UeberwVon (Text, Size: 255)
+  Bemerkungen (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tbltmp_MA_VA_Zuordnung
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  PosNr (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  MA_Brutto_Std (Single, Size: 4)
+  PKW (Currency, Size: 8)
+  Bemerkungen (Text, Size: 255)
+  MA_Netto_Std (Single, Size: 4)
+  RL_34a (Currency, Size: 8)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  VADatum (Date/Time, Size: 8)
+  MVA_Start (Date/Time, Size: 8)
+  MVA_Ende (Date/Time, Size: 8)
+  PreisArt_ID (Long, Size: 4)
+  Rch_Erstellt (Boolean, Size: 1)
+  PKW_Anzahl (Single, Size: 4)
+  IstFraglich (Boolean, Size: 1)
+  ma_brutto_std2 (Double, Size: 8)
+  ma_netto_std2 (Type20, Size: 16)
+  RL34a (Type20, Size: 16)
+
+----------------------------------------
+TABELLE: tbltmp_MA_VaStart_AnzTag
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  AnzahlvonMA_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_MA_VaStart_AnzTag_Soll
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  SummevonMA_Anzahl (Double, Size: 8)
+
+----------------------------------------
+TABELLE: tbltmp_MA_Verfueg_tmp
+----------------------------------------
+  ID (Long, Size: 4)
+  IstAktiv (Boolean, Size: 1)
+  IstSubunternehmer (Boolean, Size: 1)
+  Anstellungsart_ID (Long, Size: 4)
+  IstVerfuegbar (Long, Size: 4)
+  MAName (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tbltmp_Neuberech_Fuer
+----------------------------------------
+  AktJ (Long, Size: 4)
+  AktM1 (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_Pos_Bericht
+----------------------------------------
+  ID (Long, Size: 4)
+  VorlageNr (Long, Size: 4)
+  kun_ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  VADatum (Date/Time, Size: 8)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  Menge (Double, Size: 8)
+  EzPreis (Currency, Size: 8)
+  Mengenheit (Text, Size: 255)
+  MwSt (Long, Size: 4)
+  Beschreibung (Text, Size: 255)
+  PreisArt_ID (Long, Size: 4)
+  GesPreis (Currency, Size: 8)
+  Rch_ID (Long, Size: 4)
+  Anz_MA (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_Position
+----------------------------------------
+  ID (Long, Size: 4)
+  VorlageNr (Long, Size: 4)
+  kun_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  PosNr (Long, Size: 4)
+  Int_ArtNr (Long, Size: 4)
+  Art_Beschreibung (Text, Size: 255)
+  Menge (Single, Size: 4)
+  ME (Text, Size: 255)
+  MwStSatz (Long, Size: 4)
+  EZPreis (Currency, Size: 8)
+  GesPreis (Currency, Size: 8)
+  Rch_ID (Long, Size: 4)
+  Anz_MA (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_PosNr_create
+----------------------------------------
+  VADatum (Date/Time, Size: 8)
+  VA_ID (Long, Size: 4)
+  VA_Start_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  LfdNr_Start (Long, Size: 4)
+  MaxPos (Long, Size: 4)
+  PosNr (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_Textbaustein_Ersetzung
+----------------------------------------
+  ID (Long, Size: 4)
+  DokNr (Long, Size: 4)
+  TB_Name_Kl (Text, Size: 255)
+  Feldname (Text, Size: 255)
+  Ersetzung (Memo, Size: 0)
+  qryName (Text, Size: 255)
+  QryFeldname (Text, Size: 255)
+  P1 (Text, Size: 255)
+  P1Typ (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_VA_Soll_Ist
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  VADatum (Date/Time, Size: 8)
+  Soll (Double, Size: 8)
+  Ist (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_VA_Status_Setzen
+----------------------------------------
+  ID (Long, Size: 4)
+  Veranst_Status_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_VA_Tag_All
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VADatum (Date/Time, Size: 8)
+  Auftrag (Text, Size: 255)
+  Objekt (Text, Size: 255)
+  MA_SPI (Text, Size: 255)
+  MA_Hour (Memo, Size: 0)
+  TVA_Offen (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: tbltmp_VA_Tag_txt
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VA_Hour_Txt (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: tbltmp_VAStart_Ist
+----------------------------------------
+  VAStart_ID (Long, Size: 4)
+  SummevonIst (Double, Size: 8)
+
+----------------------------------------
+TABELLE: tbltmp_Vergleichszeiten
+----------------------------------------
+  VGL_Start (Date/Time, Size: 8)
+  VGL_Ende (Date/Time, Size: 8)
+  VGL_VA_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tbltmp_VV_Belegt
+----------------------------------------
+  MA_ID (Long, Size: 4)
+  MAName (Text, Size: 255)
+  VADatum (Date/Time, Size: 8)
+  MVA_Start (Date/Time, Size: 8)
+  MVA_Ende (Date/Time, Size: 8)
+  Art (Text, Size: 255)
+  ObjektOrt (Text, Size: 255)
+
+----------------------------------------
+TABELLE: tblZZZ_XL_AnzTage
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  VA_Datum (Date/Time, Size: 8)
+  Anz_Soll (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tblZZZ_XL_Auftrag
+----------------------------------------
+  ID (Long, Size: 4)
+  Auftrag (Text, Size: 255)
+  Ort (Text, Size: 255)
+  Location (Text, Size: 255)
+  DatumVonStr (Text, Size: 255)
+  DatumBisStr (Text, Size: 255)
+  TreffpZeitStr (Text, Size: 255)
+  TreffpOrtstr (Text, Size: 255)
+  Dienstkleidung (Text, Size: 255)
+  Auftraggeber (Text, Size: 255)
+  Std_satz_KD_1_Nettostr (Text, Size: 255)
+  Std_satz_KD_3_Nettostr (Text, Size: 255)
+  Std_Lohn_nettostr (Text, Size: 255)
+  Fahrtkost_MA_Nettostr (Text, Size: 255)
+  Fahrtkost_KD_NettoStr (Text, Size: 255)
+  Ansprechpartner (Text, Size: 255)
+  Fahrtkostenerstatt (Text, Size: 255)
+  Anz_PKW (Long, Size: 4)
+  Dateipfad (Text, Size: 50)
+  Dateiname (Text, Size: 255)
+  Auftraggeber_ID (Long, Size: 4)
+  DatumVon (Date/Time, Size: 8)
+  DatumBis (Date/Time, Size: 8)
+  Std_satz_KD_1_Netto (Currency, Size: 8)
+  Std_satz_KD_3_Netto (Currency, Size: 8)
+  Std_Lohn_netto (Currency, Size: 8)
+  Fahrtkost_MA_Netto (Currency, Size: 8)
+  Fahrtkost_KD_Netto (Currency, Size: 8)
+  TreffpOrt (Text, Size: 255)
+  TreffpZeit (Date/Time, Size: 8)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  Zl_PKW (Long, Size: 4)
+  Zl_Auftraggeber (Text, Size: 255)
+  Import_OK_Stufe_1 (Boolean, Size: 1)
+  Import_OK_Stufe_2 (Boolean, Size: 1)
+  Import_OK_Stufe_3 (Boolean, Size: 1)
+  ImportAlt_Vorhanden (Boolean, Size: 1)
+  NeuImport (Boolean, Size: 1)
+  Fehlerprotokoll (Memo, Size: 0)
+
+----------------------------------------
+TABELLE: tblZZZ_XL_Auftrag_MA_Einsatz
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VA_Datumstr (Text, Size: 255)
+  VA_Lfd (Long, Size: 4)
+  Mitarbeiter (Text, Size: 255)
+  Beginnstr (Text, Size: 255)
+  Endestr (Text, Size: 255)
+  MA_Stdstr (Text, Size: 255)
+  MA_PKW (Text, Size: 255)
+  MA_PKWAnz (Single, Size: 4)
+  MA_Info1 (Text, Size: 255)
+  MA_Info2 (Text, Size: 255)
+  VA_Datum (Date/Time, Size: 8)
+  MA_Std (Single, Size: 4)
+  MA_ID (Long, Size: 4)
+  Beginn (Date/Time, Size: 8)
+  Ende (Date/Time, Size: 8)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  PKWKost (Currency, Size: 8)
+  MA_NZug (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tblZZZ_XL_Auftrag_ZeitVorgabe
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  Anz_MA (Long, Size: 4)
+  vonStr (Text, Size: 255)
+  bisStr (Text, Size: 255)
+  Anz_Stdstr (Text, Size: 255)
+  Info (Text, Size: 255)
+  Anz_Std (Single, Size: 4)
+  von (Date/Time, Size: 8)
+  bis (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tblZZZ_XL_Start
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  VA_Datum (Date/Time, Size: 8)
+  Anz_MA (Long, Size: 4)
+  Beginn (Date/Time, Size: 8)
+  MinEnde (Date/Time, Size: 8)
+  MaxEnde (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: tmp_FormularBasis
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Dokumenttyp (Text, Size: 50)
+  Dateiname (Text, Size: 255)
+  Dateipfad (Memo, Size: 0)
+  UploadDatum (Date/Time, Size: 8)
+  UploadVon (Text, Size: 50)
+  Dateigroesse (Long, Size: 4)
+  Beschreibung (Memo, Size: 0)
+  IstAktiv (Boolean, Size: 1)
+  Versionsnummer (Long, Size: 4)
+
+----------------------------------------
+TABELLE: tmptbl_ZK
+----------------------------------------
+  MA_ID (Long, Size: 4)
+  Datum (Date/Time, Size: 8)
+  Veranstaltung (Text, Size: 255)
+  Beginn (Date/Time, Size: 8)
+  Ende (Date/Time, Size: 8)
+  AW (Double, Size: 8)
+  AZ (Double, Size: 8)
+  AZ_andere (Double, Size: 8)
+  AZ_Reinigung (Double, Size: 8)
+  U (Double, Size: 8)
+  AU (Double, Size: 8)
+  WerktagNacht (Double, Size: 8)
+  Sonntag (Double, Size: 8)
+  SonntagNacht (Double, Size: 8)
+  Feiertag (Double, Size: 8)
+  FeiertagNacht (Double, Size: 8)
+  andere_Nacht (Double, Size: 8)
+  andere_So_FT (Double, Size: 8)
+  Reiseko (Currency, Size: 8)
+  p_Fahrk (Currency, Size: 8)
+  Abzüge (Currency, Size: 8)
+  Auszahlung (Currency, Size: 8)
+
+----------------------------------------
+TABELLE: USysRegInfo
+----------------------------------------
+  SubKey (Text, Size: 255)
+  Type (Long, Size: 4)
+  ValName (Text, Size: 255)
+  Value (Text, Size: 255)
+
+----------------------------------------
+TABELLE: ztbl_CloseAll
+----------------------------------------
+  close (Boolean, Size: 1)
+  check (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: ztbl_Gesamtliste
+----------------------------------------
+  ID (Long, Size: 4)
+  Datum (Date/Time, Size: 8)
+  Auftrag (Text, Size: 255)
+  Std_brutto (Long, Size: 4)
+  Std_netto (Long, Size: 4)
+  Anzahl_MA (Long, Size: 4)
+  Personalkosten (Currency, Size: 8)
+  Umsatz (Currency, Size: 8)
+  Fahrtkosten_KD (Currency, Size: 8)
+  Fahrtkosten_MA (Currency, Size: 8)
+  Ertrag_Brutto-Netto (Currency, Size: 8)
+  Ertrag_tba (Currency, Size: 8)
+  Ertrag_FK (Currency, Size: 8)
+  Rohertrag (Currency, Size: 8)
+  Gesamtertrag (Currency, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_Gesamtliste1
+----------------------------------------
+  ID (Long, Size: 4)
+  Datum (Date/Time, Size: 8)
+  Auftrag (Text, Size: 255)
+  Std_brutto (Long, Size: 4)
+  Std_netto (Long, Size: 4)
+  Anzahl_MA (Long, Size: 4)
+  Personalkosten (Currency, Size: 8)
+  Umsatz (Currency, Size: 8)
+  Fahrtkosten_KD (Currency, Size: 8)
+  Fahrtkosten_MA (Currency, Size: 8)
+  Ertrag_Brutto-Netto (Currency, Size: 8)
+  Ertrag_tba (Currency, Size: 8)
+  Ertrag_FK (Currency, Size: 8)
+  Rohertrag (Currency, Size: 8)
+  Gesamtertrag (Currency, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_KD_Standardpreise_Historie
+----------------------------------------
+  ID (Long, Size: 4)
+  kun_ID (Long, Size: 4)
+  Bemerkung (Text, Size: 255)
+  Preisart_ID (Long, Size: 4)
+  StdPreis (Currency, Size: 8)
+  GeaendertAm (Date/Time, Size: 8)
+  Aenderer (Text, Size: 255)
+
+----------------------------------------
+TABELLE: ztbl_Log
+----------------------------------------
+  ID (Long, Size: 4)
+  Mitarbeiter (Text, Size: 255)
+  Status (Text, Size: 255)
+
+----------------------------------------
+TABELLE: ztbl_Lohnabrechnungen
+----------------------------------------
+  ID (Long, Size: 4)
+  Jahr (Integer, Size: 2)
+  Monat (Integer, Size: 2)
+  Lex_ID (Long, Size: 4)
+  Datei (Text, Size: 255)
+  versenden (Boolean, Size: 1)
+  versendet_am (Date/Time, Size: 8)
+  Protokoll (Text, Size: 255)
+
+----------------------------------------
+TABELLE: ztbl_MA_Mitarbeiterstamm_ZUAB
+----------------------------------------
+  MA_ID (Long, Size: 4)
+  Lohnart_ID (Long, Size: 4)
+  Wert (Currency, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_MA_NVerfuegZeiten_FE
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  Zeittyp_ID (Text, Size: 255)
+  vonDat (Date/Time, Size: 8)
+  bisDat (Date/Time, Size: 8)
+  Bemerkung (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  vonTag (Date/Time, Size: 8)
+  bisTag (Date/Time, Size: 8)
+  vonZeit (Date/Time, Size: 8)
+  bisZeit (Date/Time, Size: 8)
+  vonTagZahl (Long, Size: 4)
+  KopfID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: ztbl_MA_Schnellauswahl
+----------------------------------------
+  ID (Long, Size: 4)
+  IstSubunternehmer (Boolean, Size: 1)
+  Name (Text, Size: 255)
+  Std (Text, Size: 255)
+  Beginn (Date/Time, Size: 8)
+  Ende (Date/Time, Size: 8)
+  Grund (Text, Size: 255)
+  Anstellungsart_ID (Long, Size: 4)
+  IstAktiv (Boolean, Size: 1)
+  Stunden (Double, Size: 8)
+  istVerfuegbar (Integer, Size: 2)
+  istVerplant (Integer, Size: 2)
+  Quali_ID (Integer, Size: 2)
+  Hat_keine_34a (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: ztbl_MA_VA_Planung_FE
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  PosNr (Long, Size: 4)
+  VA_Start (Date/Time, Size: 8)
+  VA_Ende (Date/Time, Size: 8)
+  MA_ID (Long, Size: 4)
+  Status_ID (Long, Size: 4)
+  Status_Datum (Date/Time, Size: 8)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  VADatum (Date/Time, Size: 8)
+  MVA_Start (Date/Time, Size: 8)
+  MVA_Ende (Date/Time, Size: 8)
+  Bemerkungen (Text, Size: 255)
+  MA_Brutto_Std (Single, Size: 4)
+  MA_Netto_Std (Single, Size: 4)
+  PKW (Currency, Size: 8)
+  Ma_brutto_std2 (Double, Size: 8)
+  MA_Netto_std2 (Type20, Size: 16)
+  Anfragezeitpunkt (Date/Time, Size: 8)
+  Rueckmeldezeitpunkt (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_MA_VA_Zuordnung_FE
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  PosNr (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  MA_Start (Date/Time, Size: 8)
+  MA_Ende (Date/Time, Size: 8)
+  MA_Brutto_Std (Single, Size: 4)
+  PKW (Currency, Size: 8)
+  Bemerkungen (Text, Size: 255)
+  MA_Netto_Std (Single, Size: 4)
+  RL_34a (Currency, Size: 8)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Aend_von (Text, Size: 50)
+  Aend_am (Date/Time, Size: 8)
+  VADatum (Date/Time, Size: 8)
+  MVA_Start (Date/Time, Size: 8)
+  MVA_Ende (Date/Time, Size: 8)
+  PreisArt_ID (Long, Size: 4)
+  Rch_Erstellt (Boolean, Size: 1)
+  PKW_Anzahl (Single, Size: 4)
+  IstFraglich (Boolean, Size: 1)
+  MA_Brutto_Std2 (Double, Size: 8)
+  MA_Netto_Std2 (Double, Size: 8)
+  RL34a (Type20, Size: 16)
+  Info (Text, Size: 255)
+  Position (Text, Size: 255)
+  Anfragezeitpunkt (Date/Time, Size: 8)
+  Rueckmeldezeitpunkt (Date/Time, Size: 8)
+  Einsatzleitung (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: ztbl_MA_Verfuegbarkeit
+----------------------------------------
+  MA_ID (Long, Size: 4)
+  Beginn (Date/Time, Size: 8)
+  Ende (Date/Time, Size: 8)
+  Grund (Text, Size: 255)
+
+----------------------------------------
+TABELLE: ztbl_MA_ZK_Korrekturen
+----------------------------------------
+  ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  Jahr (Integer, Size: 2)
+  Monat (Integer, Size: 2)
+  Lohnart_ID (Long, Size: 4)
+  Anz_Std (Double, Size: 8)
+  Satz (Double, Size: 8)
+  Wert (Double, Size: 8)
+  erstellt (Date/Time, Size: 8)
+  Ersteller (Text, Size: 255)
+  geaendert (Date/Time, Size: 8)
+  Aenderer (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+  exportieren (Boolean, Size: 1)
+  exportiert (Boolean, Size: 1)
+  Korr_ID_ref (Long, Size: 4)
+  gesperrt (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: ztbl_MA_ZK_Korrekturen_FE
+----------------------------------------
+  ID (Long, Size: 4)
+  Ma_ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  Jahr (Integer, Size: 2)
+  Monat (Integer, Size: 2)
+  Lohnart_ID (Long, Size: 4)
+  Anz_Std (Double, Size: 8)
+  Satz (Double, Size: 8)
+  Wert (Double, Size: 8)
+  erstellt (Date/Time, Size: 8)
+  Ersteller (Text, Size: 255)
+  geaendert (Date/Time, Size: 8)
+  Aenderer (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+  exportieren (Boolean, Size: 1)
+  gesperrt (Boolean, Size: 1)
+  exportiert (Boolean, Size: 1)
+  Korr_ID_ref (Long, Size: 4)
+  vonDat (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_Rueckmeldezeiten
+----------------------------------------
+  MA_ID (Long, Size: 4)
+  Anfragezeitpunkt (Date/Time, Size: 8)
+  Rueckmeldezeitpunkt (Date/Time, Size: 8)
+  Reaktionszeit (Long, Size: 4)
+  Status_ID (Long, Size: 4)
+
+----------------------------------------
+TABELLE: ztbl_Stunden_Lexware
+----------------------------------------
+  Jahr (Integer, Size: 2)
+  Monat (Integer, Size: 2)
+  Personalnummer (Long, Size: 4)
+  Lohnartnummer (Long, Size: 4)
+  Wert (Double, Size: 8)
+  Stundensatz (Double, Size: 8)
+  Währung (Text, Size: 4)
+
+----------------------------------------
+TABELLE: ztbl_sync
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  ZUSAGE (Boolean, Size: 1)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  Sync (Boolean, Size: 1)
+  md5hash (Memo, Size: 0)
+  Bemerkung (Memo, Size: 0)
+  Rueckzeit (Date/Time, Size: 8)
+  Anfragezeitpunkt (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_WA_Reminder
+----------------------------------------
+  WA_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  VADatum (Date/Time, Size: 8)
+  VA_Bezeichnung (Text, Size: 255)
+  VA_Start (Date/Time, Size: 8)
+  VA_Ende (Date/Time, Size: 8)
+  VA_Ort (Text, Size: 255)
+  WhatsAppNr (Text, Size: 50)
+  Vorname (Text, Size: 50)
+  MsgText (Memo, Size: 0)
+  PayloadJa (Text, Size: 255)
+  PayloadNein (Text, Size: 255)
+  Status (Text, Size: 50)
+  WA_MessageID (Text, Size: 255)
+  Erst_von (Text, Size: 50)
+  Erst_am (Date/Time, Size: 8)
+  Geaendert_am (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_WhatsApp
+----------------------------------------
+  MA_ID (Long, Size: 4)
+  MA_Name (Text, Size: 255)
+  Telefonnummer (Text, Size: 255)
+  Nachricht (Text, Size: 255)
+  Anhang (Text, Size: 255)
+  Status (Text, Size: 255)
+
+----------------------------------------
+TABELLE: ztbl_ZK_Daten
+----------------------------------------
+  ZK_MA_ID (Integer, Size: 2)
+  ZKDatum (Date/Time, Size: 8)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  ZUO_ID (Long, Size: 4)
+  NV_ID (Long, Size: 4)
+  Korr_ID (Long, Size: 4)
+  MA_ID (Integer, Size: 2)
+  VADatum (Date/Time, Size: 8)
+  Veranstaltung (Text, Size: 255)
+  Jahr (Integer, Size: 2)
+  Monat (Integer, Size: 2)
+  Bemerkung (Text, Size: 255)
+  Beginn (Date/Time, Size: 8)
+  Ende (Date/Time, Size: 8)
+  Kreuz_KEY (Text, Size: 255)
+  Feiertag (Double, Size: 8)
+  FeiertagNacht (Double, Size: 8)
+  Nacht (Double, Size: 8)
+  Normal (Double, Size: 8)
+  Sonntag (Double, Size: 8)
+  SonntagNacht (Double, Size: 8)
+  Zulage (Double, Size: 8)
+  Wert (Currency, Size: 8)
+  Urlaub (Double, Size: 8)
+  Krank (Double, Size: 8)
+  Reisekosten (Currency, Size: 8)
+  gesperrt (Boolean, Size: 1)
+  exportieren (Boolean, Size: 1)
+  exportiert (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: ztbl_ZK_Fehler
+----------------------------------------
+  MA_ID (Long, Size: 4)
+  Datum (Date/Time, Size: 8)
+  Veranstaltung (Text, Size: 255)
+  Beginn (Date/Time, Size: 8)
+  Ende (Date/Time, Size: 8)
+  AW (Double, Size: 8)
+  AZ (Double, Size: 8)
+  AZ_andere (Double, Size: 8)
+  AZ_Reinigung (Double, Size: 8)
+  U (Double, Size: 8)
+  AU (Double, Size: 8)
+  WerktagNacht (Double, Size: 8)
+  Sonntag (Double, Size: 8)
+  SonntagNacht (Double, Size: 8)
+  Feiertag (Double, Size: 8)
+  FeiertagNacht (Double, Size: 8)
+  andere_Nacht (Double, Size: 8)
+  andere_So_FT (Double, Size: 8)
+  Reiseko (Currency, Size: 8)
+  p_Fahrk (Currency, Size: 8)
+  Abzüge (Currency, Size: 8)
+  Auszahlung (Currency, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_ZK_Importfehler
+----------------------------------------
+  Datei (Text, Size: 255)
+  Jahr (Integer, Size: 2)
+  Monat (Integer, Size: 2)
+  MA_ID (Text, Size: 255)
+  Fehler (Text, Size: 255)
+  Bemerkung (Text, Size: 255)
+  Bearbeiter (Text, Size: 255)
+  Zeitpunkt (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_ZK_Log
+----------------------------------------
+  Zeitstempel (Date/Time, Size: 8)
+  Bearbeiter (Text, Size: 255)
+  Eintrag (Text, Size: 255)
+
+----------------------------------------
+TABELLE: ztbl_ZK_Lohnarten
+----------------------------------------
+  ID (Long, Size: 4)
+  Nummer (Text, Size: 10)
+  Bezeichnung (Text, Size: 255)
+  Anzeige_MAStamm (Boolean, Size: 1)
+  Bezeichnung_kurz (Text, Size: 255)
+  Ist_Zeit (Boolean, Size: 1)
+  Vorzeichen (Text, Size: 2)
+  ID_Folgelohnart (Long, Size: 4)
+  Anzeige_Korrekturen (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: ztbl_ZK_Stunden
+----------------------------------------
+  ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  ZUO_ID (Long, Size: 4)
+  NV_ID (Long, Size: 4)
+  Korr_ID (Integer, Size: 2)
+  MA_ID (Integer, Size: 2)
+  Veranstaltung (Text, Size: 255)
+  VADatum (Date/Time, Size: 8)
+  Jahr (Integer, Size: 2)
+  Monat (Integer, Size: 2)
+  Lohnart_ID (Integer, Size: 2)
+  Anz_Std (Double, Size: 8)
+  Anz_Std_netto (Double, Size: 8)
+  Satz (Double, Size: 8)
+  Wert (Double, Size: 8)
+  Beginn (Date/Time, Size: 8)
+  Ende (Date/Time, Size: 8)
+  gesperrt (Boolean, Size: 1)
+  exportiert (Boolean, Size: 1)
+  erstellt (Date/Time, Size: 8)
+  Ersteller (Text, Size: 255)
+  geaendert (Date/Time, Size: 8)
+  Aenderer (Text, Size: 255)
+  exportieren (Boolean, Size: 1)
+  Korrektur (Boolean, Size: 1)
+  Bemerkung (Text, Size: 255)
+
+----------------------------------------
+TABELLE: ztbl_ZK_Stunden_prepare
+----------------------------------------
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  ZUO_ID (Long, Size: 4)
+  NV_ID (Long, Size: 4)
+  Korr_ID (Integer, Size: 2)
+  MA_ID (Integer, Size: 2)
+  Veranstaltung (Text, Size: 255)
+  VADatum (Date/Time, Size: 8)
+  Jahr (Integer, Size: 2)
+  Monat (Integer, Size: 2)
+  Lohnart_ID (Integer, Size: 2)
+  Anz_Std (Double, Size: 8)
+  Anz_Std_netto (Double, Size: 8)
+  Satz (Double, Size: 8)
+  Wert (Double, Size: 8)
+  Beginn (Date/Time, Size: 8)
+  Ende (Date/Time, Size: 8)
+  gesperrt (Boolean, Size: 1)
+  exportiert (Boolean, Size: 1)
+  erstellt (Date/Time, Size: 8)
+  Ersteller (Text, Size: 255)
+  geaendert (Date/Time, Size: 8)
+  Aenderer (Text, Size: 255)
+  exportieren (Boolean, Size: 1)
+  Korrektur (Boolean, Size: 1)
+  Bemerkung (Text, Size: 255)
+  Anstellungsart_ID (Integer, Size: 2)
+  Bezeichnung_kurz (Text, Size: 255)
+
+----------------------------------------
+TABELLE: ztbl_ZK_Stundensatz
+----------------------------------------
+  Lohnart_ID (Long, Size: 4)
+  DatumVon (Date/Time, Size: 8)
+  DatumBis (Date/Time, Size: 8)
+  Grundlohn (Double, Size: 8)
+  Faktor (Double, Size: 8)
+  Satz (Currency, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_ZK_Tage_Zeitraum
+----------------------------------------
+  ZK_MA_ID (Long, Size: 4)
+  ZKDatum (Date/Time, Size: 8)
+
+----------------------------------------
+TABELLE: ztbl_ZUO_Stunden
+----------------------------------------
+  ID (Long, Size: 4)
+  Zuo_ID (Long, Size: 4)
+  NV_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  Stunden_netto (Double, Size: 8)
+  Stunden_brutto (Double, Size: 8)
+  Bezeichnung_Kurz (Text, Size: 255)
+  Lohnart_ID (Long, Size: 4)
+  Preisart_ID (Long, Size: 4)
+  Bemerkung (Text, Size: 255)
+  Satz (Double, Size: 8)
+  Lohn (Double, Size: 8)
+  Preis (Double, Size: 8)
+  Lohnstunden_brutto (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: ztbl_ZUO_Stunden_FE
+----------------------------------------
+  ID (Long, Size: 4)
+  Zuo_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  NV_ID (Long, Size: 4)
+  Stunden_netto (Double, Size: 8)
+  Stunden_brutto (Double, Size: 8)
+  Bezeichnung_Kurz (Text, Size: 255)
+  Lohnart_ID (Long, Size: 4)
+  Preisart_ID (Long, Size: 4)
+  Bemerkung (Text, Size: 255)
+  Satz (Double, Size: 8)
+  Lohn (Double, Size: 8)
+  Preis (Double, Size: 8)
+  Lohnstunden_brutto (Boolean, Size: 1)
+
+----------------------------------------
+TABELLE: zztbl_ZK_Anzeige_Zeitkonto
+----------------------------------------
+  ZUO_ID (Long, Size: 4)
+  NV_ID (Long, Size: 4)
+  MA_ID (Long, Size: 4)
+  VA_ID (Long, Size: 4)
+  VADatum_ID (Long, Size: 4)
+  VAStart_ID (Long, Size: 4)
+  Beginn (Date/Time, Size: 8)
+  Ende (Date/Time, Size: 8)
+  AW (Long, Size: 4)
+  AZ (Long, Size: 4)
+  F/G-U (Long, Size: 4)
+  U (Long, Size: 4)
+  AU (Long, Size: 4)
+  Nacht (Long, Size: 4)
+  Sonntag (Long, Size: 4)
+  SonntagNacht (Long, Size: 4)
+  Feiertag (Long, Size: 4)
+  FeiertagNacht (Long, Size: 4)
+  AndereNacht (Long, Size: 4)
+  Reisekosten (Long, Size: 4)
+  Auszahlung (Currency, Size: 8)
+  Abzüge (Currency, Size: 8)
+  Bemerkung (Text, Size: 255)
+  Ersteller (Text, Size: 255)
+  erstellt (Date/Time, Size: 8)
+  Aenderer (Text, Size: 255)
+  geaendert (Date/Time, Size: 8)
+  Korrektursatz (Boolean, Size: 1)
+  Vorschuss (Currency, Size: 8)
+  exportieren (Boolean, Size: 1)
+  Veranstaltung (Text, Size: 255)
+  VADatum (Date/Time, Size: 8)
+  Monat (Integer, Size: 2)
+  Jahr (Integer, Size: 2)
+

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragseingabe - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        body {
+            background: #e8e8e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dialog-container {
+            background: white;
+            border: 1px solid #999;
+            border-radius: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            width: 600px;
+            max-width: 95vw;
+        }
+
+        .dialog-header {
+            padding: 12px 16px;
+            background: #4316B2;
+            color: white;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dialog-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .dialog-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+        .dialog-close:hover { opacity: 1; }
+
+        .dialog-content {
+            padding: 16px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .form-fieldset {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .form-fieldset legend {
+            font-weight: 600;
+            font-size: 11px;
+            color: #333333;
+            padding: 0 6px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+        .form-row:last-child { margin-bottom: 0; }
+
+        .form-label {
+            min-width: 120px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .form-input {
+            flex: 1;
+        }
+
+        .time-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .day-btn {
+            width: 36px;
+            height: 28px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .day-btn:hover { background: #f0f0f0; }
+        .day-btn.selected { background: #4316B2; color: white; border-color: #3558c0; }
+
+        .ma-count-control {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .ma-count-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #ccc;
+            background: #f5f5f5;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .ma-count-btn:hover { background: #e8e8e8; }
+        .ma-count-input {
+            width: 50px;
+            text-align: center;
+        }
+
+        .dialog-footer {
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            border-radius: 0 0 6px 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer-info {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dialog-container">
+        <div class="dialog-header">
+            <span class="dialog-title">Neue Schicht / Auftragseingabe</span>
+            <button class="dialog-close" onclick="window.close()">x</button>
+        </div>
+
+        <div class="dialog-content">
+            <fieldset class="form-fieldset">
+                <legend>Auftrag</legend>
+                <div class="form-row">
+                    <label class="form-label">Kunde:</label>
+                    <select class="form-control form-input" id="cboKunde">
+                        <option value="">-- Kunde wählen --</option>
+                        <option value="1">Messe Frankfurt GmbH</option>
+                        <option value="2">Eintracht Frankfurt</option>
+                        <option value="3">Alte Oper Frankfurt</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Objekt:</label>
+                    <select class="form-control form-input" id="cboObjekt">
+                        <option value="">-- Objekt wählen --</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Auftrag:</label>
+                    <select class="form-control form-input" id="cboAuftrag">
+                        <option value="">-- Auftrag wählen oder neu --</option>
+                        <option value="neu">+ Neuer Auftrag</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-fieldset">
+                <legend>Datum &amp; Zeit</legend>
+                <div class="form-row">
+                    <label class="form-label">Datum:</label>
+                    <input type="date" class="form-control" id="datDatum" style="width:140px;">
+                    <span style="margin:0 8px;color:#666;">oder</span>
+                    <label style="font-size:11px;"><input type="checkbox" id="chkSerie"> Serie</label>
+                </div>
+                <div class="form-row" id="serieOptionen" style="display:none;">
+                    <label class="form-label">Serie von:</label>
+                    <input type="date" class="form-control" id="datVon" style="width:130px;">
+                    <span style="margin:0 4px;">bis</span>
+                    <input type="date" class="form-control" id="datBis" style="width:130px;">
+                </div>
+                <div class="form-row" id="tageOptionen" style="display:none;">
+                    <label class="form-label">Wochentage:</label>
+                    <div class="day-selector">
+                        <button class="day-btn selected" data-day="1">Mo</button>
+                        <button class="day-btn selected" data-day="2">Di</button>
+                        <button class="day-btn selected" data-day="3">Mi</button>
+                        <button class="day-btn selected" data-day="4">Do</button>
+                        <button class="day-btn selected" data-day="5">Fr</button>
+                        <button class="day-btn" data-day="6">Sa</button>
+                        <button class="day-btn" data-day="0">So</button>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Schichtzeit:</label>
+                    <div class="time-group">
+                        <input type="time" class="form-control" id="timeVon" value="08:00" style="width:100px;">
+                        <span>bis</span>
+                        <input type="time" class="form-control" id="timeBis" value="16:00" style="width:100px;">
+                        <span style="margin-left:8px;font-size:11px;color:#666;">= <span id="lblStunden">8,00</span> Std</span>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-fieldset">
+                <legend>Personal</legend>
+                <div class="form-row">
+                    <label class="form-label">MA Anzahl:</label>
+                    <div class="ma-count-control">
+                        <button class="ma-count-btn" onclick="changeMACount(-1)">-</button>
+                        <input type="number" class="form-control ma-count-input" id="numMA" value="1" min="1">
+                        <button class="ma-count-btn" onclick="changeMACount(1)">+</button>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Position:</label>
+                    <select class="form-control form-input" id="cboPosition">
+                        <option value="">-- Position wählen --</option>
+                        <option value="1">Einlasskontrolle</option>
+                        <option value="2">Streifendienst</option>
+                        <option value="3">Empfang</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Qualifikation:</label>
+                    <select class="form-control" id="cboQuali" style="width:120px;">
+                        <option value="">Keine</option>
+                        <option value="34a" selected>34a</option>
+                        <option value="fachkraft">Fachkraft</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-fieldset">
+                <legend>Bemerkungen</legend>
+                <textarea class="form-control" id="txtBemerkung" rows="2" style="width:100%;" placeholder="Optionale Bemerkungen..."></textarea>
+            </fieldset>
+        </div>
+
+        <div class="dialog-footer">
+            <div class="footer-info">
+                <span id="lblPreview">1 Schicht wird erstellt</span>
+            </div>
+            <div class="footer-buttons">
+                <button class="btn" onclick="window.close()">Abbrechen</button>
+                <button class="btn btn-success" id="btnSpeichern">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Serie Checkbox Toggle
+        document.getElementById('chkSerie').addEventListener('change', function() {
+            document.getElementById('serieOptionen').style.display = this.checked ? 'flex' : 'none';
+            document.getElementById('tageOptionen').style.display = this.checked ? 'flex' : 'none';
+        });
+
+        // Day Buttons Toggle
+        document.querySelectorAll('.day-btn').forEach(btn => {
+            btn.addEventListener('click', () => btn.classList.toggle('selected'));
+        });
+
+        // MA Count Control
+        function changeMACount(delta) {
+            const input = document.getElementById('numMA');
+            let val = parseInt(input.value) + delta;
+            if (val < 1) val = 1;
+            input.value = val;
+        }
+
+        // Stunden berechnen
+        function calcHours() {
+            const von = document.getElementById('timeVon').value;
+            const bis = document.getElementById('timeBis').value;
+            if (von && bis) {
+                const [hVon, mVon] = von.split(':').map(Number);
+                const [hBis, mBis] = bis.split(':').map(Number);
+                let minuten = (hBis * 60 + mBis) - (hVon * 60 + mVon);
+                if (minuten < 0) minuten += 24 * 60; // Nachtschicht
+                const stunden = minuten / 60;
+                document.getElementById('lblStunden').textContent = stunden.toFixed(2);
+            }
+        }
+        document.getElementById('timeVon').addEventListener('change', calcHours);
+        document.getElementById('timeBis').addEventListener('change', calcHours);
+
+        // Set default date
+        document.getElementById('datDatum').valueAsDate = new Date();
+    </script>
+</body>
+</html>

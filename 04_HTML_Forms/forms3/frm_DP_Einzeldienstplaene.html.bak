@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einzeldienstpläne - CONSYS</title>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        body { background-color: #8080c0; font-family: 'Segoe UI', sans-serif; font-size: 11px; }
+        .placeholder-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+        }
+        .placeholder-icon { font-size: 64px; margin-bottom: 20px; }
+        .placeholder-title { font-size: 32px; font-weight: bold; margin-bottom: 10px; } /* Formulartitel +8px gemaess Anforderung */
+        .placeholder-text { font-size: 14px; opacity: 0.8; }
+        .placeholder-params { margin-top: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; }
+    </style>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body>
+    <div class="placeholder-container">
+        <div class="placeholder-icon">ðŸ“‹</div>
+        <div class="placeholder-title">Einzeldienstpläne</div>
+        <div class="placeholder-text">Diese Ansicht wird noch implementiert.</div>
+        <div class="placeholder-params" id="params"></div>
+    </div>
+    <script>
+        // Parse URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const paramsDiv = document.getElementById('params');
+        if (params.toString()) {
+            paramsDiv.innerHTML = '<strong>Parameter:</strong><br>' +
+                Array.from(params.entries()).map(([k, v]) => `${k}: ${v}`).join('<br>');
+        }
+    </script>
+</body>
+</html>
+

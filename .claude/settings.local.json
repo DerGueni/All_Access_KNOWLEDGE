@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(dir:*)",
+      "Bash(start /min cmd /c \"python api_server.py\")",
+      "Bash(reg query \"HKEY_CLASSES_ROOT\\\\Consys.WebView2Host\")",
+      "Bash(python -c \"\nfrom access_bridge_ultimate import AccessBridge\n\n# Modul-Code lesen\nwith open\\(r''C:\\\\Users\\\\guenther.siegert\\\\Documents\\\\0006_All_Access_KNOWLEDGE\\\\01_VBA\\\\mod_N_WebView2_forms3.bas'', ''r'', encoding=''utf-8''\\) as f:\n    code = f.read\\(\\)\n\n# Attribute-Zeile entfernen \\(wird von Bridge automatisch gesetzt\\)\nlines = code.split\\(''\\\\n''\\)\nif lines[0].startswith\\(''Attribute VB_Name''\\):\n    code = ''\\\\n''.join\\(lines[1:]\\)\n\nwith AccessBridge\\(\\) as bridge:\n    # Pruefen ob Modul existiert\n    if bridge.module_exists\\(''mod_N_WebView2_forms3''\\):\n        print\\(''Modul existiert bereits - wird aktualisiert...''\\)\n        bridge.delete_module\\(''mod_N_WebView2_forms3''\\)\n    \n    # Modul importieren \\(auto_prefix=False da Name bereits korrekt\\)\n    result = bridge.import_vba_module\\(''mod_N_WebView2_forms3'', code, auto_prefix=False\\)\n    print\\(f''Import Ergebnis: {result}''\\)\n    \n    # Alle Module auflisten zur Bestaetigung\n    modules = bridge.list_modules\\(\\)\n    print\\(f''\\\\nAlle Module \\({len\\(modules\\)}\\):''\\)\n    for m in modules:\n        if ''WebView'' in m or ''HTML'' in m:\n            print\\(f''  - {m}''\\)\n\")",
+      "Bash(python:*)",
+      "Bash(reg query \"HKEY_CLASSES_ROOT\\\\Consys.WebView2Host\" /s)",
+      "Bash(reg query \"HKEY_CLASSES_ROOT\\\\ConsysWV2.WebView2Host\" /s)",
+      "Bash(reg query \"HKEY_CLASSES_ROOT\" /f \"WebView2\" /k)",
+      "Bash(timeout /t 3)",
+      "Bash(ping:*)",
+      "Bash(start \"\" \"C:\\\\Users\\\\guenther.siegert\\\\Documents\\\\0006_All_Access_KNOWLEDGE\\\\WebView2_Access\\\\COM_Wrapper\\\\WebView2App\\\\bin\\\\Release\\\\net48\\\\WebView2App.exe\" \"C:\\\\Users\\\\guenther.siegert\\\\Documents\\\\0006_All_Access_KNOWLEDGE\\\\04_HTML_Forms\\\\forms3\\\\frm_va_Auftragstamm.html\" --title \"Auftragsverwaltung\" --width 1500 --height 900)",
+      "Bash(curl:*)",
+      "Bash(start \"\" \"http://localhost:8080/frm_va_Auftragstamm.html\")",
+      "Bash(copy:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_evaluate"
+    ],
+    "default": "allow"
+  }
+}

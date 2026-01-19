@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragstamm Design-Varianten - Index</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .item-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .item-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-desc {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-ready {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-warning {
+            background: #FFC107;
+            color: #333;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .steps {
+            margin-top: 20px;
+        }
+
+        .step {
+            background: #f5f7fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Auftragstamm Design-Varianten</h1>
+
+        <!-- Schnellstart -->
+        <div class="card">
+            <h2>⚡ Schnellstart</h2>
+            <div class="steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <div>
+                        <strong>Scripts ausführen</strong><br>
+                        <span style="font-size: 13px; color: #666;">Doppelklick auf <code>VARIANTEN_ERSTELLEN.cmd</code></span>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <div>
+                        <strong>Varianten testen</strong><br>
+                        <span style="font-size: 13px; color: #666;">Öffne die HTML-Dateien im Browser</span>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <div>
+                        <strong>API-Server starten (optional)</strong><br>
+                        <span style="font-size: 13px; color: #666;">Für echte Daten aus der Datenbank</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Design-Varianten -->
+        <div class="card">
+            <h2>🎨 Design-Varianten <span class="status status-warning">⚠️ Script ausführen!</span></h2>
+            <div class="grid">
+                <div class="item" onclick="window.open('variante_05_dark_mode.html', '_blank')">
+                    <div class="item-icon">🌙</div>
+                    <div class="item-title">Variante 5: Dark Mode</div>
+                    <div class="item-desc">Dunkles Design für Nachtarbeit. Akzent: Lila (#BB86FC)</div>
+                </div>
+
+                <div class="item" onclick="window.open('variante_06_enterprise.html', '_blank')">
+                    <div class="item-icon">🏢</div>
+                    <div class="item-title">Variante 6: Enterprise</div>
+                    <div class="item-desc">Professionelles Blaugrau-Design. Akzent: Blau (#0288D1)</div>
+                </div>
+
+                <div class="item" onclick="window.open('../frm_va_Auftragstamm.html', '_blank')">
+                    <div class="item-icon">📋</div>
+                    <div class="item-title">Original</div>
+                    <div class="item-desc">Windows XP/Access Style (Referenz)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dokumentation -->
+        <div class="card">
+            <h2>📚 Dokumentation <span class="status status-ready">✅ Bereit</span></h2>
+            <div class="grid">
+                <div class="item" onclick="window.open('ZUSAMMENFASSUNG.md', '_blank')">
+                    <div class="item-icon">📄</div>
+                    <div class="item-title">ZUSAMMENFASSUNG.md</div>
+                    <div class="item-desc">Vollständige Übersicht des Projekts</div>
+                </div>
+
+                <div class="item" onclick="window.open('ANLEITUNG.md', '_blank')">
+                    <div class="item-icon">📖</div>
+                    <div class="item-title">ANLEITUNG.md</div>
+                    <div class="item-desc">Schritt-für-Schritt Anleitung</div>
+                </div>
+
+                <div class="item" onclick="window.open('README.md', '_blank')">
+                    <div class="item-icon">📝</div>
+                    <div class="item-title">README.md</div>
+                    <div class="item-desc">Technische Dokumentation</div>
+                </div>
+
+                <div class="item" onclick="window.open('FARBPALETTEN.html', '_blank')">
+                    <div class="item-icon">🎨</div>
+                    <div class="item-title">FARBPALETTEN.html</div>
+                    <div class="item-desc">Visuelle Farbübersicht</div>
+                </div>
+
+                <div class="item" onclick="window.open('STATUS.md', '_blank')">
+                    <div class="item-icon">📊</div>
+                    <div class="item-title">STATUS.md</div>
+                    <div class="item-desc">Aktueller Projektstatus</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <div class="card">
+            <h2>⚙️ Scripts <span class="status status-ready">✅ Bereit</span></h2>
+            <div class="grid">
+                <div class="item">
+                    <div class="item-icon">🖱️</div>
+                    <div class="item-title">VARIANTEN_ERSTELLEN.cmd</div>
+                    <div class="item-desc">Windows Batch - Doppelklick zum Ausführen (empfohlen)</div>
+                </div>
+
+                <div class="item">
+                    <div class="item-icon">💻</div>
+                    <div class="item-title">create_variants.ps1</div>
+                    <div class="item-desc">PowerShell-Script für Windows</div>
+                </div>
+
+                <div class="item">
+                    <div class="item-icon">🐍</div>
+                    <div class="item-title">create_variants.py</div>
+                    <div class="item-desc">Python-Script (plattformunabhängig)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weitere Varianten -->
+        <div class="card">
+            <h2>🎨 Weitere Varianten (bereits vorhanden)</h2>
+            <div class="grid">
+                <div class="item" onclick="window.open('variante_03_material.html', '_blank')">
+                    <div class="item-icon">📱</div>
+                    <div class="item-title">Variante 3: Material</div>
+                    <div class="item-desc">Google Material Design</div>
+                </div>
+
+                <div class="item" onclick="window.open('variante_04_flat_green.html', '_blank')">
+                    <div class="item-icon">🌿</div>
+                    <div class="item-title">Variante 4: Flat Green</div>
+                    <div class="item-desc">Flaches Grün-Design</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wichtige Hinweise -->
+        <div class="card" style="background: #FFF3CD; border-left: 4px solid #FFC107;">
+            <h2 style="color: #856404; border-color: #FFC107;">⚠️ Wichtige Hinweise</h2>
+            <ul style="margin-left: 20px; color: #856404; line-height: 1.8;">
+                <li>Die Varianten-Dateien <strong>existieren bereits</strong>, enthalten aber noch die Original-Farben</li>
+                <li>Führen Sie <code>VARIANTEN_ERSTELLEN.cmd</code> aus, um die CSS-Änderungen anzuwenden</li>
+                <li>Für echte Daten aus der Datenbank: API-Server starten (<code>python api_server.py</code>)</li>
+                <li>Alle Varianten haben identische Funktionalität - nur CSS wurde geändert</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>Erstellt: 2026-01-02 | Auftragstamm Design-Varianten</p>
+            <p style="margin-top: 10px;">Powered by Claude Sonnet 4.5</p>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scroll animation
+        document.querySelectorAll('.item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

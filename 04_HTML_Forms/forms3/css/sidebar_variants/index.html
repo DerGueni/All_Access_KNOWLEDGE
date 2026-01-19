@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSEC Sidebar Design-Varianten - Vorschau</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #e0e0e0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            color: #a0a0b0;
+        }
+
+        .variants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .variant-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .variant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .variant-preview {
+            height: 320px;
+            position: relative;
+            overflow: hidden;
+            background: #8080c0;
+        }
+
+        .variant-preview iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            transform: scale(0.5);
+            transform-origin: top left;
+            border: none;
+            pointer-events: none;
+        }
+
+        .variant-info {
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .variant-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+
+        .variant-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        .variant-description {
+            font-size: 12px;
+            color: #a0a0b0;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .variant-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 12px;
+        }
+
+        .feature-tag {
+            background: rgba(255, 255, 255, 0.1);
+            color: #c0c0d0;
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+
+        .variant-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .variant-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .usage-section {
+            max-width: 900px;
+            margin: 60px auto 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .usage-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .code-block {
+            background: #0d0d15;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .tag {
+            color: #569cd6;
+        }
+
+        .code-block .attr {
+            color: #9cdcfe;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        /* Placeholder fuer fehlende Previews */
+        .preview-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #a0a0b0;
+            font-size: 14px;
+            background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%);
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .variants-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>CONSEC Sidebar Design-Varianten</h1>
+        <p>10 professionelle Designs - Klicken Sie auf eine Variante, um die CSS-Datei zu sehen</p>
+    </div>
+
+    <div class="variants-grid">
+        <!-- Variante 01: Minimal Clean -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_01_minimal.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_01_minimal.html" loading="lazy" onerror="this.parentElement.innerHTML='<div class=preview-placeholder>Vorschau</div>'"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 01</span>
+                <h3 class="variant-name">Minimal Clean</h3>
+                <p class="variant-description">Sauberes, minimalistisches Design. Fokus auf Inhalt und Lesbarkeit.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Minimal</span>
+                    <span class="feature-tag">Clean</span>
+                    <span class="feature-tag">Light</span>
+                </div>
+                <a href="sidebar_variant_01_minimal.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+
+        <!-- Variante 02: Corporate Blue -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_02_corporate.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_02_corporate.html" loading="lazy" onerror="this.parentElement.innerHTML='<div class=preview-placeholder>Vorschau</div>'"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 02</span>
+                <h3 class="variant-name">Corporate Blue</h3>
+                <p class="variant-description">Professioneller Business-Look mit klassischem Blau-Schema.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Corporate</span>
+                    <span class="feature-tag">Blue</span>
+                    <span class="feature-tag">Professional</span>
+                </div>
+                <a href="sidebar_variant_02_corporate.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+
+        <!-- Variante 03: Dark Professional -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_03_dark.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_03_dark.html" loading="lazy"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 03</span>
+                <h3 class="variant-name">Dark Professional</h3>
+                <p class="variant-description">Dunkles Theme mit Neon-Akzenten und Glasmorphism. Ideal fuer lange Arbeitssitzungen.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Dark Mode</span>
+                    <span class="feature-tag">Neon</span>
+                    <span class="feature-tag">Glasmorphism</span>
+                </div>
+                <a href="sidebar_variant_03_dark.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+
+        <!-- Variante 04: Gradient Flow -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_04_gradient.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_04_gradient.html" loading="lazy"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 04</span>
+                <h3 class="variant-name">Gradient Flow</h3>
+                <p class="variant-description">Fliessende Farbverlaeufe mit animierten Hover-Effekten. Premium-Look.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Gradient</span>
+                    <span class="feature-tag">Animation</span>
+                    <span class="feature-tag">Premium</span>
+                </div>
+                <a href="sidebar_variant_04_gradient.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+
+        <!-- Variante 05: Material Design -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_05_material.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_05_material.html" loading="lazy" onerror="this.parentElement.innerHTML='<div class=preview-placeholder>Vorschau</div>'"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 05</span>
+                <h3 class="variant-name">Material Design</h3>
+                <p class="variant-description">Google Material Design inspiriert. Elevation und Ripple-Effekte.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Material</span>
+                    <span class="feature-tag">Elevation</span>
+                    <span class="feature-tag">Ripple</span>
+                </div>
+                <a href="sidebar_variant_05_material.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+
+        <!-- Variante 06: Accordion Style -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_06_accordion.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_06_accordion.html" loading="lazy" onerror="this.parentElement.innerHTML='<div class=preview-placeholder>Vorschau</div>'"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 06</span>
+                <h3 class="variant-name">Accordion Style</h3>
+                <p class="variant-description">Ausklappbare Kategorien. Ideal fuer viele Menue-Punkte.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Accordion</span>
+                    <span class="feature-tag">Collapsible</span>
+                    <span class="feature-tag">Organized</span>
+                </div>
+                <a href="sidebar_variant_06_accordion.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+
+        <!-- Variante 07: Floating Pills -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_07_pills.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_07_pills.html" loading="lazy"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 07</span>
+                <h3 class="variant-name">Floating Pills</h3>
+                <p class="variant-description">Schwebende, abgerundete Pill-Buttons mit Scale-Effekten.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Pill Buttons</span>
+                    <span class="feature-tag">Floating</span>
+                    <span class="feature-tag">Scale</span>
+                </div>
+                <a href="sidebar_variant_07_pills.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+
+        <!-- Variante 08: Left Border Indicator -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_08_indicator.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_08_indicator.html" loading="lazy"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 08</span>
+                <h3 class="variant-name">Left Border Indicator</h3>
+                <p class="variant-description">Minimalistisch mit linkem Farbbalken als Indikator. Klare Hierarchie.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Minimal</span>
+                    <span class="feature-tag">Border Indicator</span>
+                    <span class="feature-tag">Dark</span>
+                </div>
+                <a href="sidebar_variant_08_indicator.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+
+        <!-- Variante 09: Glassmorphism Premium -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_09_glass.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_09_glass.html" loading="lazy"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 09</span>
+                <h3 class="variant-name">Glassmorphism Premium</h3>
+                <p class="variant-description">Glaseffekt mit Blur und Transparency. Elegante Lichtreflexe.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Glassmorphism</span>
+                    <span class="feature-tag">Blur</span>
+                    <span class="feature-tag">Light Reflections</span>
+                    <span class="feature-tag">Premium</span>
+                </div>
+                <a href="sidebar_variant_09_glass.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+
+        <!-- Variante 10: Colorful Icons -->
+        <div class="variant-card" onclick="window.open('sidebar_variant_10_colorful.css', '_blank')">
+            <div class="variant-preview">
+                <iframe src="preview_10_colorful.html" loading="lazy"></iframe>
+            </div>
+            <div class="variant-info">
+                <span class="variant-number">VARIANTE 10</span>
+                <h3 class="variant-name">Colorful Icons</h3>
+                <p class="variant-description">Jede Kategorie mit eigener Akzentfarbe. Visuelle Gruppierung.</p>
+                <div class="variant-features">
+                    <span class="feature-tag">Color-Coded</span>
+                    <span class="feature-tag">Category Colors</span>
+                    <span class="feature-tag">Visual Grouping</span>
+                    <span class="feature-tag">Pulse Animation</span>
+                </div>
+                <a href="sidebar_variant_10_colorful.css" class="variant-link" onclick="event.stopPropagation()">CSS anzeigen</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="usage-section">
+        <h2>Verwendung</h2>
+        <p style="margin-bottom: 20px; color: #a0a0b0;">
+            Um eine Variante zu verwenden, fuegen Sie den entsprechenden Link in shell.html ein:
+        </p>
+        <div class="code-block">
+            <span class="comment">&lt;!-- In shell.html nach dem &lt;style&gt;-Block einfuegen: --&gt;</span><br><br>
+            <span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"css/sidebar_variants/sidebar_variant_09_glass.css"</span><span class="tag">&gt;</span><br><br>
+            <span class="comment">&lt;!-- ODER fuer Colorful Icons: --&gt;</span><br>
+            <span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"css/sidebar_variants/sidebar_variant_10_colorful.css"</span><span class="tag">&gt;</span>
+        </div>
+        <p style="margin-top: 20px; color: #707080; font-size: 12px;">
+            Hinweis: Die Varianten-CSS ueberschreibt die Standard-Sidebar-Styles. Reihenfolge der &lt;link&gt;-Tags beachten!
+        </p>
+    </div>
+
+    <script>
+        // Fallback fuer fehlende Preview-Dateien
+        document.querySelectorAll('.variant-preview iframe').forEach(iframe => {
+            iframe.addEventListener('error', function() {
+                this.parentElement.innerHTML = '<div class="preview-placeholder">Vorschau laden...</div>';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,476 @@
+﻿<Page x:ConnectionId='1'
+    x:Class="ConsysWinUI.Views.MitarbeiterstammView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ConsysWinUI.Views"
+    xmlns:vm="using:ConsysWinUI.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="#F0F0F0">
+
+    <Page.Resources>
+        <!-- Sidebar Button Style - Dunkelrot -->
+        <Style x:Key="SidebarButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#A05050"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="MinHeight" Value="26"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+
+        <!-- Access TextBox Style -->
+        <Style x:Key="AccessTextBoxStyle" TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="#7F7F7F"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="2,1"/>
+            <Setter Property="Height" Value="21"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <!-- Access ComboBox Style -->
+        <Style x:Key="AccessComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="BorderBrush" Value="#7F7F7F"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="21"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+
+        <!-- Access Label Style -->
+        <Style x:Key="AccessLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+
+        <!-- Blue Button Style #95B3D7 -->
+        <Style x:Key="BlueButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#95B3D7"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Height" Value="23"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#000000"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+
+        <!-- Light Blue Button #CAD9EB -->
+        <Style x:Key="LightBlueButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#CAD9EB"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Height" Value="23"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#000000"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+
+        <!-- Green Button #92D050 -->
+        <Style x:Key="GreenButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#92D050"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Height" Value="23"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#000000"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="280"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ==================== SIDEBAR LINKS (140px) ==================== -->
+        <Border Grid.Column="0" Background="#8B0000">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- HAUPTMENÜ Label -->
+                <Border Grid.Row="0" Background="White" BorderBrush="Black" BorderThickness="1" Margin="6,8" Padding="4,2">
+                    <TextBlock Text="HAUPTMENÜ" Foreground="Black" FontWeight="Bold" FontSize="10" HorizontalAlignment="Center"/>
+                </Border>
+
+                <!-- Menu Buttons -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="4,0">
+                        <Button Content="Dienstplanübersicht" Style="{StaticResource SidebarButtonStyle}" Margin="0,2"/>
+                        <Button Content="Planungsübersicht" Style="{StaticResource SidebarButtonStyle}" Margin="0,2"/>
+                        <Button Content="Auftragsverwaltung" Style="{StaticResource SidebarButtonStyle}" Margin="0,2"/>
+                        <Button Content="Mitarbeiterverwaltung" Style="{StaticResource SidebarButtonStyle}" Margin="0,2" Background="#D4A574" Foreground="Black"/>
+                        <Button Content="Offene Mail Anfragen" Style="{StaticResource SidebarButtonStyle}" Margin="0,2"/>
+                        <Button Content="Excel Zeitkonten" Style="{StaticResource SidebarButtonStyle}" Margin="0,2"/>
+                        <Button Content="Zeitkonten" Style="{StaticResource SidebarButtonStyle}" Margin="0,2"/>
+                        <Button Content="Abwesenheitsplanung" Style="{StaticResource SidebarButtonStyle}" Margin="0,2"/>
+                        <Button Content="Dienstausweis erstellen" Style="{StaticResource SidebarButtonStyle}" Margin="0,2"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- ==================== HAUPTBEREICH (Mitte) ==================== -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- HEADER mit Lila Hintergrund #6B4D8C -->
+            <Border Grid.Row="0" Background="#6B4D8C" Padding="8,4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Zeile 1: Titel + Navigation + Buttons -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Logo Icon -->
+                        <Border Grid.Column="0" Background="White" Width="40" Height="40" Margin="0,0,8,0">
+                            <TextBlock Text="👤" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- Titel -->
+                        <TextBlock Grid.Column="1" Text="Mitarbeiterstammblatt" Foreground="White" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,16,0"/>
+
+                        <!-- Navigation Buttons -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- MA Adressen Button (Grün) -->
+                            <Button Content="MA Adressen" Style="{StaticResource GreenButtonStyle}" Width="100" Margin="0,0,8,0"/>
+
+                            <!-- Navigation Pfeile -->
+                            <Border Background="Black" CornerRadius="0" Padding="2" Margin="0,0,4,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:ConnectionId='39'                                                   Width="16" Height="18" Padding="0" Background="White" BorderThickness="0">
+                                        <FontIcon Glyph="&#xE892;" FontSize="10"/>
+                                    </Button>
+                                    <Button x:ConnectionId='40'                                                      Width="16" Height="18" Padding="0" Background="White" BorderThickness="0">
+                                        <FontIcon Glyph="&#xE76B;" FontSize="10"/>
+                                    </Button>
+                                    <Button x:ConnectionId='41'                                                  Width="16" Height="18" Padding="0" Background="White" BorderThickness="0">
+                                        <FontIcon Glyph="&#xE76C;" FontSize="10"/>
+                                    </Button>
+                                    <Button x:ConnectionId='42'                                                  Width="16" Height="18" Padding="0" Background="White" BorderThickness="0">
+                                        <FontIcon Glyph="&#xE893;" FontSize="10"/>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Action Buttons rechts -->
+                        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4">
+                            <Button x:ConnectionId='37' Content="Mitarbeiter löschen" Style="{StaticResource BlueButtonStyle}" Width="120"                                           />
+                            <Button Content="Zeitkonto" Style="{StaticResource LightBlueButtonStyle}" Width="80"/>
+                            <Button x:ConnectionId='38' Content="Neuer Mitarbeiter" Style="{StaticResource BlueButtonStyle}" Width="120"                                              />
+                            <Button Content="Einsätze übertragen" Style="{StaticResource BlueButtonStyle}" Width="120"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Zeile 2: Name Display -->
+                    <Grid Grid.Row="1" Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Nachname (weiße Box) -->
+                        <Border Grid.Column="0" Background="White" MinWidth="180" Height="30" Margin="48,0,4,0">
+                            <TextBlock x:ConnectionId='36'                                                 FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Padding="8,0"/>
+                        </Border>
+
+                        <!-- Vorname (weiße Box) -->
+                        <Border Grid.Column="1" Background="White" MinWidth="180" Height="30" Margin="0,0,16,0">
+                            <TextBlock x:ConnectionId='35'                                                FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Padding="8,0"/>
+                        </Border>
+
+                        <!-- MA-ID Label -->
+                        <TextBlock Grid.Column="2" Text="MA - ID:" Foreground="White" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <Border Grid.Column="3" Background="White" Width="60" Height="20">
+                            <TextBlock x:ConnectionId='34'                                             FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- TABS -->
+            <Border Grid.Row="1" Background="#D9D9D9" BorderBrush="#7F7F7F" BorderThickness="0,0,0,1">
+                <TabView Background="#D9D9D9" IsAddTabButtonVisible="False" TabWidthMode="SizeToContent">
+
+                    <!-- TAB: Stammdaten -->
+                    <TabViewItem Header="Stammdaten">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <Grid Background="White" Padding="12" MinWidth="800">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="30"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Zeile 0: PersNr, LexNr, Checkboxen -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="PersNr" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='7' Grid.Row="0" Grid.Column="1"                                               Style="{StaticResource AccessTextBoxStyle}" Width="60" HorizontalAlignment="Left"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="LexNr:" Style="{StaticResource AccessLabelStyle}" Margin="80,4,0,4"/>
+                                <TextBox x:ConnectionId='8' Grid.Row="0" Grid.Column="1"                                                  Style="{StaticResource AccessTextBoxStyle}" Width="40" Margin="80,0,0,0" HorizontalAlignment="Left"/>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="140,0,0,0">
+                                    <CheckBox x:ConnectionId='31' Content="Aktiv"                                                      FontSize="11"/>
+                                    <CheckBox x:ConnectionId='32' Content="Subunternehmer"                                                               FontSize="11" Margin="8,0,0,0"/>
+                                    <CheckBox x:ConnectionId='33' Content="Lex_Aktiv"                                                      FontSize="11" Margin="8,0,0,0"/>
+                                </StackPanel>
+
+                                <!-- Zeile 1: Nachname -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Nachname" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='9' Grid.Row="1" Grid.Column="1"                                                 Style="{StaticResource AccessTextBoxStyle}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="3" Text="Kontoinhaber" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='10' Grid.Row="1" Grid.Column="4"                                                     Style="{StaticResource AccessTextBoxStyle}"/>
+
+                                <!-- Zeile 2: Vorname -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Vorname" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='11' Grid.Row="2" Grid.Column="1"                                                Style="{StaticResource AccessTextBoxStyle}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="3" Text="BIC" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='12' Grid.Row="2" Grid.Column="4"                                            Style="{StaticResource AccessTextBoxStyle}"/>
+
+                                <!-- Zeile 3: Strasse -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Strasse" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='13' Grid.Row="3" Grid.Column="1"                                                Style="{StaticResource AccessTextBoxStyle}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="3" Text="IBAN" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='14' Grid.Row="3" Grid.Column="4"                                             Style="{StaticResource AccessTextBoxStyle}"/>
+
+                                <!-- Zeile 4: Nr -->
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Nr" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='15' Grid.Row="4" Grid.Column="1"                                           Style="{StaticResource AccessTextBoxStyle}" Width="60" HorizontalAlignment="Left"/>
+                                <TextBlock Grid.Row="4" Grid.Column="3" Text="Lohngruppe" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <ComboBox Grid.Row="4" Grid.Column="4" Style="{StaticResource AccessComboBoxStyle}" Width="200"/>
+
+                                <!-- Zeile 5: PLZ -->
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="PLZ" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='16' Grid.Row="5" Grid.Column="1"                                            Style="{StaticResource AccessTextBoxStyle}" Width="80" HorizontalAlignment="Left"/>
+                                <TextBlock Grid.Row="5" Grid.Column="3" Text="Bezüge gezahlt als" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='17' Grid.Row="5" Grid.Column="4"                                                          Style="{StaticResource AccessTextBoxStyle}"/>
+
+                                <!-- Zeile 6: Ort -->
+                                <TextBlock Grid.Row="6" Grid.Column="0" Text="Ort" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='18' Grid.Row="6" Grid.Column="1"                                            Style="{StaticResource AccessTextBoxStyle}"/>
+                                <TextBlock Grid.Row="6" Grid.Column="3" Text="Stundenlohn" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='19' Grid.Row="6" Grid.Column="4"                                                    Style="{StaticResource AccessTextBoxStyle}" Width="80" HorizontalAlignment="Left"/>
+
+                                <!-- Zeile 7: Land -->
+                                <TextBlock Grid.Row="7" Grid.Column="0" Text="Land" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='20' Grid.Row="7" Grid.Column="1"                                             Style="{StaticResource AccessTextBoxStyle}"/>
+                                <TextBlock Grid.Row="7" Grid.Column="3" Text="Koordinaten" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox Grid.Row="7" Grid.Column="4" Style="{StaticResource AccessTextBoxStyle}"/>
+
+                                <!-- Zeile 8: Bundesland -->
+                                <TextBlock Grid.Row="8" Grid.Column="0" Text="Bundesland" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <ComboBox Grid.Row="8" Grid.Column="1" Style="{StaticResource AccessComboBoxStyle}" Width="200"/>
+                                <TextBlock Grid.Row="8" Grid.Column="3" Text="Steuer-ID" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='21' Grid.Row="8" Grid.Column="4"                                                 Style="{StaticResource AccessTextBoxStyle}"/>
+
+                                <!-- Zeile 9: Tel. Mobil -->
+                                <TextBlock Grid.Row="9" Grid.Column="0" Text="Tel. Mobil" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='22' Grid.Row="9" Grid.Column="1"                                                 Style="{StaticResource AccessTextBoxStyle}"/>
+                                <TextBlock Grid.Row="9" Grid.Column="3" Text="Tätigkeit Bezeichnung" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <ComboBox Grid.Row="9" Grid.Column="4" Style="{StaticResource AccessComboBoxStyle}" Width="200"/>
+
+                                <!-- Zeile 10: Tel. Festnetz -->
+                                <TextBlock Grid.Row="10" Grid.Column="0" Text="Tel. Festnetz" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='23' Grid.Row="10" Grid.Column="1"                                                    Style="{StaticResource AccessTextBoxStyle}"/>
+                                <TextBlock Grid.Row="10" Grid.Column="3" Text="Krankenkasse" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <ComboBox Grid.Row="10" Grid.Column="4" Style="{StaticResource AccessComboBoxStyle}" Width="200"/>
+
+                                <!-- Zeile 11: Email -->
+                                <TextBlock Grid.Row="11" Grid.Column="0" Text="Email" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='24' Grid.Row="11" Grid.Column="1"                                              Style="{StaticResource AccessTextBoxStyle}"/>
+                                <TextBlock Grid.Row="11" Grid.Column="3" Text="Steuerklasse" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='25' Grid.Row="11" Grid.Column="4"                                                     Style="{StaticResource AccessTextBoxStyle}" Width="80" HorizontalAlignment="Left"/>
+
+                                <!-- Zeile 12: Geschlecht -->
+                                <TextBlock Grid.Row="12" Grid.Column="0" Text="Geschlecht" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <ComboBox Grid.Row="12" Grid.Column="1" Style="{StaticResource AccessComboBoxStyle}" Width="120" HorizontalAlignment="Left"/>
+                                <TextBlock Grid.Row="12" Grid.Column="3" Text="Urlaubsanspruch pro Jahr" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='26' Grid.Row="12" Grid.Column="4"                                                               Style="{StaticResource AccessTextBoxStyle}" Width="60" HorizontalAlignment="Left"/>
+
+                                <!-- Zeile 13: Staatsangehörigkeit -->
+                                <TextBlock Grid.Row="13" Grid.Column="0" Text="Staatsangehörigkeit" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='27' Grid.Row="13" Grid.Column="1"                                                             Style="{StaticResource AccessTextBoxStyle}"/>
+                                <TextBlock Grid.Row="13" Grid.Column="3" Text="Stundenzahl Monat max." Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <TextBox x:ConnectionId='28' Grid.Row="13" Grid.Column="4"                                                            Style="{StaticResource AccessTextBoxStyle}" Width="80" HorizontalAlignment="Left"/>
+
+                                <!-- Zeile 14: Geb. Datum -->
+                                <TextBlock Grid.Row="14" Grid.Column="0" Text="Geb. Datum" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <CalendarDatePicker x:ConnectionId='29' Grid.Row="14" Grid.Column="1"                                                     Height="21" FontSize="11"/>
+                                <TextBlock Grid.Row="14" Grid.Column="3" Text="RV Befreiung beantragt" Style="{StaticResource AccessLabelStyle}" Margin="0,4"/>
+                                <CheckBox x:ConnectionId='30' Grid.Row="14" Grid.Column="4"                                                                 />
+                            </Grid>
+                        </ScrollViewer>
+                    </TabViewItem>
+
+                    <!-- TAB: Einsatzübersicht -->
+                    <TabViewItem Header="Einsatzübersicht">
+                        <Grid Background="White" Padding="12">
+                            <TextBlock Text="Einsatzübersicht - Hier werden die Einsätze des Mitarbeiters angezeigt" FontSize="11"/>
+                        </Grid>
+                    </TabViewItem>
+
+                    <!-- TAB: Dienstplan -->
+                    <TabViewItem Header="Dienstplan">
+                        <Grid Background="White" Padding="12">
+                            <TextBlock Text="Dienstplan - Hier wird der Dienstplan des Mitarbeiters angezeigt" FontSize="11"/>
+                        </Grid>
+                    </TabViewItem>
+
+                    <!-- TAB: Nicht Verfügbar -->
+                    <TabViewItem Header="Nicht Verfügbar">
+                        <Grid Background="White" Padding="12">
+                            <TextBlock Text="Nicht verfügbare Zeiten des Mitarbeiters" FontSize="11"/>
+                        </Grid>
+                    </TabViewItem>
+
+                    <!-- TAB: Bestand Dienstkleidung -->
+                    <TabViewItem Header="Bestand Dienstkleidung">
+                        <Grid Background="White" Padding="12">
+                            <TextBlock Text="Dienstkleidung Bestand" FontSize="11"/>
+                        </Grid>
+                    </TabViewItem>
+                </TabView>
+            </Border>
+
+            <!-- Foto-Bereich und zusätzliche Felder -->
+            <Grid Grid.Row="2" Background="White" Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Zusätzliche Felder unten -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,8" Spacing="16">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Arbeitsstd. pro Arbeitstag" Style="{StaticResource AccessLabelStyle}" Margin="0,0,8,0"/>
+                        <TextBox x:ConnectionId='6'                                                                Style="{StaticResource AccessTextBoxStyle}" Width="60"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Arbeitstage pro Woche" Style="{StaticResource AccessLabelStyle}" Margin="0,0,8,0"/>
+                        <TextBox x:ConnectionId='5'                                                            Style="{StaticResource AccessTextBoxStyle}" Width="60"/>
+                    </StackPanel>
+                    <Button Content="Maps öffnen" Style="{StaticResource BlueButtonStyle}" Width="100"/>
+                </StackPanel>
+
+                <!-- Foto rechts -->
+                <Border Grid.Column="1" Width="120" Height="150" Background="#F0F0F0" BorderBrush="#7F7F7F" BorderThickness="1" Margin="12">
+                    <TextBlock Text="Foto" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" Foreground="Gray"/>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- ==================== MITARBEITERLISTE RECHTS (280px) ==================== -->
+        <Border Grid.Column="2" Background="White" BorderBrush="#7F7F7F" BorderThickness="1,0,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header: Suche -->
+                <Border Grid.Row="0" Background="#6B4D8C" Padding="8,4">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="Suche:" Foreground="White" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBox x:ConnectionId='4'                                                   Width="150" Height="20" FontSize="11"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Filter:" Foreground="White" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <ComboBox Width="150" Height="20" FontSize="11">
+                                <ComboBoxItem Content="Alle Aktiven" IsSelected="True"/>
+                                <ComboBoxItem Content="Alle"/>
+                                <ComboBoxItem Content="Inaktive"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Liste Header -->
+                <Grid Grid.Row="1" Background="#D9D9D9" Padding="4,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="80"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Nachname" FontSize="10" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="1" Text="Vorname" FontSize="10" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="2" Text="Ort" FontSize="10" FontWeight="SemiBold"/>
+                </Grid>
+
+                <!-- Mitarbeiterliste -->
+                <ListView x:ConnectionId='2' Grid.Row="2"
+                                                                                   
+                                                                                            
+                          SelectionMode="Single">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="4,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="80"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Nachname}" FontSize="10" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Vorname}" FontSize="10" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Ort}" FontSize="10" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>
+

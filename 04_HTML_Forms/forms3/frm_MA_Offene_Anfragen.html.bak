@@ -1,0 +1,403 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offene Anfragen</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <style>
+        /* Formular-spezifische Styles */
+        .form-header {
+            padding: 12px 16px;
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-title {
+            font-size: 24px; /* Formulartitel +8px gemaess Anforderung */
+            font-weight: 600;
+            color: #333;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .anfragen-container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+        }
+
+        .anfragen-table-wrapper {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .anfragen-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .anfragen-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+        }
+
+        .anfragen-table th {
+            border: 1px solid #ccc;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .anfragen-table td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            color: #333;
+        }
+
+        .anfragen-table tbody tr {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .anfragen-table tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .anfragen-table tbody tr:hover {
+            background: #e8f4ff;
+        }
+
+        .anfragen-table tbody tr.selected {
+            background: #cce5ff !important;
+            font-weight: 600;
+        }
+
+        /* Spalten-spezifische Breiten */
+        .col-name {
+            width: 180px;
+        }
+
+        .col-datum {
+            width: 100px;
+        }
+
+        .col-auftrag {
+            width: 280px;
+        }
+
+        .col-ort {
+            width: 200px;
+        }
+
+        .col-von {
+            width: 80px;
+        }
+
+        .col-bis {
+            width: 80px;
+        }
+
+        .col-anfragezeitpunkt {
+            width: 120px;
+        }
+
+        /* Keine Ergebnisse */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #3498db;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status Badges */
+        .badge-pending {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #fcf8e3;
+            color: #8a6d3b;
+        }
+
+        .badge-urgent {
+            background: #f2dede;
+            color: #a94442;
+        }
+
+        /* Datum Formatierung */
+        .date-future {
+            color: #5cb85c;
+            font-weight: 500;
+        }
+
+        .date-soon {
+            color: #f0ad4e;
+            font-weight: 500;
+        }
+
+        .date-past {
+            color: #d9534f;
+            font-weight: 500;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+            overflow: visible;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:active::before {
+            background: #404070;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn:active::after {
+            background: #ffffff;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.active::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        /* Button Success Style */
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-active-menu="offene_anfragen">
+    <div class="app-container">
+        <!-- Left Menu -->
+
+        <!-- Main Content -->
+        <div class="app-main">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="header-left">
+                    <span class="app-title">Offene MA-Anfragen</span>
+                </div>
+                <div class="header-center"></div>
+                <div class="header-right">
+                    <span class="header-date" id="currentDate"></span>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnRefresh">
+                        Aktualisieren
+                    </button>
+                    <button class="btn btn-success" id="btnAnfragen" title="Ausgewählte Mitarbeiter erneut anfragen">
+                        Erneut anfragen
+                    </button>
+                    <button class="btn" id="btnFilter">
+                        Filter
+                    </button>
+                    <button class="btn" id="btnExport">
+                        Export
+                    </button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <span class="toolbar-label">Anzeigen:</span>
+                    <select class="form-control form-control-sm" id="filterView">
+                        <option value="all">Alle Anfragen</option>
+                        <option value="future">Nur zukuenftige</option>
+                        <option value="next7days">Naechste 7 Tage</option>
+                        <option value="next30days">Naechste 30 Tage</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <span class="toolbar-label" id="recordCount">Lade Daten...</span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="app-content">
+                <div class="content-main">
+                    <div class="anfragen-container">
+                        <div class="anfragen-table-wrapper">
+                            <table class="anfragen-table" id="anfrageTable">
+                                <thead>
+                                    <tr>
+                                        <th class="col-name">Mitarbeiter</th>
+                                        <th class="col-datum">Datum</th>
+                                        <th class="col-auftrag">Auftrag</th>
+                                        <th class="col-ort">Ort</th>
+                                        <th class="col-von">Von</th>
+                                        <th class="col-bis">Bis</th>
+                                        <th class="col-anfragezeitpunkt">Angefragt am</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="anfrageTableBody">
+                                    <tr>
+                                        <td colspan="7" class="loading">
+                                            <div class="spinner"></div>
+                                            <div>Lade offene Anfragen...</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <div class="footer-left">
+                    <span class="footer-status" id="footerStatus">Bereit</span>
+                </div>
+                <div class="footer-center"></div>
+                <div class="footer-right">
+                    <span id="lastUpdate"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/sidebar.js"></script>
+    <script src="logic/frm_MA_Offene_Anfragen.logic.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objektpositionen - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_OB_Objekt.css">
+</head>
+<body>
+    <div class="ob-container">
+        <!-- Linkes Menue -->
+        <aside class="ob-menu">
+            <div class="menu-header">HAUPTMENUE</div>
+            <nav class="menu-buttons">
+                <a href="frm_N_Dienstplanuebersicht.html" class="menu-btn">Dienstplanuebersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="menu-btn">Planungsuebersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="menu-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="menu-btn">Mitarbeiterverwaltung</a>
+                <a href="#" class="menu-btn">Offene Mail Anfragen</a>
+                <a href="#" class="menu-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="menu-btn">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="menu-btn">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="menu-btn">Dienstausweis erstellen</a>
+                <a href="#" class="menu-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="menu-btn">Kundenverwaltung</a>
+                <a href="#" class="menu-btn">Verrechnungssaetze</a>
+                <a href="#" class="menu-btn">Sub Rechnungen</a>
+                <a href="#" class="menu-btn">E-Mail</a>
+                <a href="#" class="menu-btn secondary">Menue 2</a>
+                <a href="#" class="menu-btn secondary">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Hauptbereich -->
+        <main class="ob-main">
+            <!-- Header -->
+            <header class="ob-header">
+                <div class="header-left">
+                    <div class="ob-logo"></div>
+                    <h1 class="ob-title">Objektpositionen</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Toolbar -->
+            <div class="ob-toolbar">
+                <div class="toolbar-group">
+                    <button class="ob-btn-nav" id="btnErster" title="Erster">|&lt;</button>
+                    <button class="ob-btn-nav" id="btnZurueck" title="Zurueck">&lt;</button>
+                    <span id="lblNavigation" style="padding:0 8px;font-size:11px;">1 / 50</span>
+                    <button class="ob-btn-nav" id="btnVor" title="Vor">&gt;</button>
+                    <button class="ob-btn-nav" id="btnLetzter" title="Letzter">&gt;|</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <input type="text" id="txtSuche" class="ob-input" placeholder="Objekt suchen..." style="width:180px;">
+                    <button class="ob-btn" id="btnSuchen">Suchen</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="ob-btn primary" id="btnNeu">+ Neu</button>
+                    <button class="ob-btn" id="btnSpeichern">Speichern</button>
+                    <button class="ob-btn danger" id="btnLoeschen">Loeschen</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="ob-content">
+                <!-- Objekt-Liste links -->
+                <div class="ob-liste">
+                    <div class="objekt-karte selected">
+                        <div class="objekt-icon">&#127970;</div>
+                        <div class="objekt-info">
+                            <div class="objekt-name">Messe Frankfurt Halle 1</div>
+                            <div class="objekt-adresse">Ludwig-Erhard-Anlage 1, 60327 Frankfurt</div>
+                            <div class="objekt-kunde">Messe Frankfurt GmbH</div>
+                        </div>
+                        <span class="objekt-status aktiv">Aktiv</span>
+                    </div>
+                    <div class="objekt-karte">
+                        <div class="objekt-icon">&#127919;</div>
+                        <div class="objekt-info">
+                            <div class="objekt-name">Commerzbank Arena</div>
+                            <div class="objekt-adresse">Moerfelder Landstr. 362, 60528 Frankfurt</div>
+                            <div class="objekt-kunde">Eintracht Frankfurt</div>
+                        </div>
+                        <span class="objekt-status aktiv">Aktiv</span>
+                    </div>
+                    <div class="objekt-karte">
+                        <div class="objekt-icon">&#127963;</div>
+                        <div class="objekt-info">
+                            <div class="objekt-name">Alte Oper Frankfurt</div>
+                            <div class="objekt-adresse">Opernplatz 1, 60313 Frankfurt</div>
+                            <div class="objekt-kunde">Alte Oper Frankfurt GmbH</div>
+                        </div>
+                        <span class="objekt-status aktiv">Aktiv</span>
+                    </div>
+                    <div class="objekt-karte">
+                        <div class="objekt-icon">&#127981;</div>
+                        <div class="objekt-info">
+                            <div class="objekt-name">EZB Tower</div>
+                            <div class="objekt-adresse">Sonnemannstr. 20, 60314 Frankfurt</div>
+                            <div class="objekt-kunde">EZB</div>
+                        </div>
+                        <span class="objekt-status inaktiv">Inaktiv</span>
+                    </div>
+                </div>
+
+                <!-- Detail rechts -->
+                <div class="ob-detail">
+                    <div class="tabs">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-tab="tabStamm">Stammdaten</button>
+                            <button class="tab-btn" data-tab="tabPositionen">Positionen</button>
+                            <button class="tab-btn" data-tab="tabKontakte">Kontakte</button>
+                            <button class="tab-btn" data-tab="tabDokumente">Dokumente</button>
+                        </div>
+                        <div class="tab-content">
+                            <!-- Tab Stammdaten -->
+                            <div class="tab-pane active" id="tabStamm">
+                                <div style="padding:12px;overflow:auto;height:100%;">
+                                    <fieldset class="info-fieldset">
+                                        <legend>Objektdaten</legend>
+                                        <div class="info-row">
+                                            <span class="info-label">Objekt-Nr:</span>
+                                            <input type="text" class="ob-input" id="txtObjNr" value="OBJ-001" style="width:100px;" readonly>
+                                            <span class="info-label" style="margin-left:16px;">Status:</span>
+                                            <select class="ob-select" id="cboStatus">
+                                                <option value="1" selected>Aktiv</option>
+                                                <option value="0">Inaktiv</option>
+                                            </select>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Bezeichnung:</span>
+                                            <input type="text" class="ob-input" id="txtBezeichnung" value="Messe Frankfurt Halle 1" style="flex:1;">
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Kurzbezeichnung:</span>
+                                            <input type="text" class="ob-input" id="txtKurz" value="Messe FFM H1" style="width:200px;">
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="info-fieldset">
+                                        <legend>Adresse</legend>
+                                        <div class="info-row">
+                                            <span class="info-label">Strasse:</span>
+                                            <input type="text" class="ob-input" id="txtStrasse" value="Ludwig-Erhard-Anlage 1" style="flex:1;">
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">PLZ / Ort:</span>
+                                            <input type="text" class="ob-input" id="txtPLZ" value="60327" style="width:70px;">
+                                            <input type="text" class="ob-input" id="txtOrt" value="Frankfurt am Main" style="flex:1;margin-left:8px;">
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="info-fieldset">
+                                        <legend>Zuordnung</legend>
+                                        <div class="info-row">
+                                            <span class="info-label">Kunde:</span>
+                                            <select class="ob-select" id="cboKunde" style="flex:1;">
+                                                <option value="">-- Kunde waehlen --</option>
+                                                <option value="1" selected>Messe Frankfurt GmbH</option>
+                                                <option value="2">Eintracht Frankfurt</option>
+                                            </select>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Objektleiter:</span>
+                                            <select class="ob-select" id="cboObjektleiter" style="width:200px;">
+                                                <option value="">-- waehlen --</option>
+                                                <option value="1">Mueller, Klaus</option>
+                                                <option value="2" selected>Schmidt, Peter</option>
+                                            </select>
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="info-fieldset">
+                                        <legend>Bemerkungen</legend>
+                                        <textarea class="ob-textarea" id="txtBemerkungen" rows="3">Zugang ueber Eingang West. Anmeldung am Pfoertner erforderlich.</textarea>
+                                    </fieldset>
+                                </div>
+                            </div>
+
+                            <!-- Tab Positionen -->
+                            <div class="tab-pane" id="tabPositionen">
+                                <div style="padding:12px;">
+                                    <div style="margin-bottom:8px;">
+                                        <button class="ob-btn" id="btnNeuePosition">+ Neue Position</button>
+                                        <button class="ob-btn" id="btnPositionLoeschen">Loeschen</button>
+                                    </div>
+                                    <table class="positionen-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:60px;">Pos-Nr</th>
+                                                <th>Bezeichnung</th>
+                                                <th style="width:80px;">MA Soll</th>
+                                                <th style="width:100px;">Qualifikation</th>
+                                                <th style="width:80px;">Stundensatz</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>P01</td>
+                                                <td>Einlasskontrolle</td>
+                                                <td>4</td>
+                                                <td>34a</td>
+                                                <td>25,00 EUR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P02</td>
+                                                <td>Streifendienst</td>
+                                                <td>2</td>
+                                                <td>34a</td>
+                                                <td>23,00 EUR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P03</td>
+                                                <td>Empfang</td>
+                                                <td>1</td>
+                                                <td>-</td>
+                                                <td>20,00 EUR</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Tab Kontakte -->
+                            <div class="tab-pane" id="tabKontakte">
+                                <div style="padding:12px;">
+                                    <p style="color:#999;text-align:center;padding:40px;">Kontaktdaten werden hier angezeigt</p>
+                                </div>
+                            </div>
+
+                            <!-- Tab Dokumente -->
+                            <div class="tab-pane" id="tabDokumente">
+                                <div style="padding:12px;">
+                                    <p style="color:#999;text-align:center;padding:40px;">Dokumente werden hier angezeigt</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="ob-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">50 Objekte</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+
+        // Tab-Switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tabId)?.classList.add('active');
+            });
+        });
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="frm_OB_Objekt.logic.js"></script>
+</body>
+</html>

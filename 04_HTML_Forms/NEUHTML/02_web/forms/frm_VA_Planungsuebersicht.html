@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planungsuebersicht - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_VA_Planungsuebersicht.css">
+</head>
+<body>
+    <div class="dp-container no-menu">
+        <!-- Hauptbereich (ohne Menu - wird aus Access geoeffnet) -->
+        <main class="dp-main">
+            <!-- Header -->
+            <header class="dp-header">
+                <div class="header-left">
+                    <div class="dp-logo"></div>
+                    <h1 class="dp-title">Planungsuebersicht</h1>
+                </div>
+                <div class="header-center">
+                    <input type="date" id="datStartdatum" class="dp-date-input" value="">
+                    <button class="dp-btn" id="btnStartdatumAendern">Startdatum Aendern</button>
+                    <button class="dp-btn-nav" id="btnVorwoche">&#9664;</button>
+                    <button class="dp-btn-nav" id="btnNachwoche">&#9654;</button>
+                    <button class="dp-btn" id="btnAbHeute">Ab Heute</button>
+                </div>
+                <div class="header-right">
+                    <div class="filter-options">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="chkNurFreieSchichten">
+                            Nur freie Schichten anzeigen
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="chkWenigerAls">
+                            Nur Auftraege mit weniger als
+                            <input type="number" id="txtPositionen" class="dp-input-small" value="25" min="1" max="100">
+                            Positionen anzeigen
+                        </label>
+                    </div>
+                    <button class="dp-btn" id="btnUebersichtDrucken">Uebersicht drucken</button>
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V1.55</span>
+                        <span id="lblDatum">05.04.2015</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Planungs Tabelle -->
+            <div class="dp-table-container">
+                <table class="dp-table" id="tblPlanung">
+                    <thead>
+                        <tr class="dp-header-row">
+                            <th class="col-auftrag" rowspan="2">
+                                <div class="th-content cyan">Auftrag / Veranstaltung</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag1">
+                                <div class="th-content">Do. 18.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag2">
+                                <div class="th-content">Fr. 19.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag3">
+                                <div class="th-content">Sa. 20.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag4">
+                                <div class="th-content">So. 21.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag5">
+                                <div class="th-content">Mo. 22.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag6">
+                                <div class="th-content">Di. 23.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag7">
+                                <div class="th-content">Mi. 24.12.25</div>
+                            </th>
+                        </tr>
+                        <tr class="dp-subheader-row">
+                            <th class="sub-col auftrag-sub">Auftrag Objekt Ort</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyPlanung">
+                        <!-- NERVY, Nuernberg -->
+                        <tr class="dp-row auftrag-row">
+                            <td class="col-auftrag" rowspan="4">NERVY, Nuernberg</td>
+                            <td class="ma-name highlight-cyan">Alali Ahmad</td>
+                            <td class="zeit highlight-cyan">12:00</td>
+                            <td class="zeit highlight-cyan">23:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name">Alayoubi Salim</td>
+                            <td class="zeit">17:00</td>
+                            <td class="zeit">23:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name">Goeschelbauer Thomas</td>
+                            <td class="zeit">17:00</td>
+                            <td class="zeit">23:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name">STORNO</td>
+                            <td class="zeit">17:30</td>
+                            <td class="zeit">17:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+
+                        <!-- Faaschtbaenkler, Neumarkt -->
+                        <tr class="dp-row auftrag-row">
+                            <td class="col-auftrag" rowspan="3">Faaschtbaenkler, Neumarkt</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name">Linnert Markus</td>
+                            <td class="zeit">16:00</td>
+                            <td class="zeit">23:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name">Siegert Guenther</td>
+                            <td class="zeit">16:00</td>
+                            <td class="zeit">19:00</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name">Alali Ahmad</td>
+                            <td class="zeit">18:30</td>
+                            <td class="zeit">23:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+
+                        <!-- 1. FC Nuernberg Frauen -->
+                        <tr class="dp-row auftrag-row">
+                            <td class="col-auftrag" rowspan="5">1. Fc Nuernberg Frauen - 1. Fc Union Berlin</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name highlight-yellow"></td>
+                            <td class="zeit highlight-yellow">11:45</td>
+                            <td class="zeit highlight-yellow">16:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name">Badran Majd</td>
+                            <td class="zeit">12:30</td>
+                            <td class="zeit">16:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name">Cengiz Mert</td>
+                            <td class="zeit">12:30</td>
+                            <td class="zeit">16:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name">Haider Johannes</td>
+                            <td class="zeit">12:30</td>
+                            <td class="zeit">16:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name">Kupfer Sabina</td>
+                            <td class="zeit">12:30</td>
+                            <td class="zeit">16:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+
+                        <!-- Studentenverbindung -->
+                        <tr class="dp-row auftrag-row">
+                            <td class="col-auftrag" rowspan="2">Studentenverbindung, Nuernberg</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name">Goeschelbauer Thomas</td>
+                            <td class="zeit">18:00</td>
+                            <td class="zeit">05:00</td>
+                            <td class="ma-name">Goeschelbauer Thomas</td>
+                            <td class="zeit">22:30</td>
+                            <td class="zeit">05:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name">Oberndorfer Melanie</td>
+                            <td class="zeit">18:00</td>
+                            <td class="zeit">05:00</td>
+                            <td class="ma-name">Oberndorfer Melanie</td>
+                            <td class="zeit">22:30</td>
+                            <td class="zeit">05:30</td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="ma-name"></td><td class="zeit"></td><td class="zeit"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <footer class="dp-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblAnzAuftraege">8 Auftraege</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="frm_VA_Planungsuebersicht.logic.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+### Page state
+- Page URL: http://localhost:8081/zfrm_MA_Stunden_Lexware.html
+- Page Title: Lexware Stunden Import/Export
+- Page Snapshot:
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: Lexware Stunden Import/Export
+    - button "✕" [ref=e5] [cursor=pointer]
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - generic [ref=e8]: "Mitarbeiter:"
+      - combobox [ref=e9]:
+        - option "-- Alle --" [selected]
+    - generic [ref=e10]:
+      - generic [ref=e11]: "Zeitraum:"
+      - combobox [ref=e12]:
+        - option "Aktueller Monat" [selected]
+        - option "Vormonat"
+        - option "Aktuelles Quartal"
+        - option "Aktuelles Jahr"
+        - option "Benutzerdefiniert"
+    - generic [ref=e13]:
+      - generic [ref=e14]: "Anstellungsart:"
+      - combobox [ref=e15]:
+        - option "-- Alle --" [selected]
+        - option "Festangestellt (3)"
+        - option "Subunternehmer (5)"
+    - generic [ref=e17]:
+      - generic [ref=e18]: "Von:"
+      - textbox [ref=e19]: 2026-01-01
+    - generic [ref=e20]:
+      - generic [ref=e21]: "Bis:"
+      - textbox [ref=e22]: 2026-01-31
+    - button "📥 Import" [ref=e24] [cursor=pointer]
+    - button "📤 Export" [active] [ref=e25] [cursor=pointer]
+    - button "ZK Mini" [ref=e26] [cursor=pointer]
+    - button "ZK Fest" [ref=e27] [cursor=pointer]
+    - button "ZK Einzeln" [ref=e28] [cursor=pointer]
+    - button "Export Diff" [ref=e29] [cursor=pointer]
+    - button "ZK Mini Abrech" [ref=e30] [cursor=pointer]
+    - button "ZK Fest Abrech" [ref=e31] [cursor=pointer]
+  - generic [ref=e32]:
+    - generic [ref=e33]:
+      - button "Importierte Stunden" [ref=e34] [cursor=pointer]
+      - button "Abgleich" [ref=e35] [cursor=pointer]
+      - button "Importfehler" [ref=e36] [cursor=pointer]
+    - table [ref=e40]:
+      - rowgroup [ref=e41]:
+        - row "MA-Nr Nachname Vorname Datum Stunden Zuschlag Auftrag Status" [ref=e42]:
+          - columnheader "MA-Nr" [ref=e43]
+          - columnheader "Nachname" [ref=e44]
+          - columnheader "Vorname" [ref=e45]
+          - columnheader "Datum" [ref=e46]
+          - columnheader "Stunden" [ref=e47]
+          - columnheader "Zuschlag" [ref=e48]
+          - columnheader "Auftrag" [ref=e49]
+          - columnheader "Status" [ref=e50]
+      - rowgroup [ref=e51]:
+        - row "Keine Daten vorhanden. Bitte Import durchführen." [ref=e52]:
+          - cell "Keine Daten vorhanden. Bitte Import durchführen." [ref=e53]
+  - generic [ref=e54]:
+    - generic [ref=e55]: "Stunden geladen: 0"
+    - generic [ref=e56]: "Datensätze: 0"
+```

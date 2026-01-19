@@ -1,0 +1,4418 @@
+<!DOCTYPE html>
+<!-- saved from url=(0114)file:///C:/Users/guenther.siegert/Documents/0006_All_Access_KNOWLEDGE/04_HTML_Forms/forms/frm_va_Auftragstamm.html -->
+<html lang="de"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .window-frame {
+            background-color: #8080c0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 2px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .title-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .title-bar-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 21px;
+            height: 21px;
+            background: #ece9d8;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-btn.close {
+            background: #c75050;
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 155px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 1px solid;
+            border-color: #e0e0f0 #606090 #606090 #e0e0f0;
+            padding: 5px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+            color: #000;
+            font-weight: 500;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+            border-color: #606090 #e0e0f0 #e0e0f0 #606090;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            background-color: #8080c0;
+            padding: 3px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Header Row */
+        .header-row {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4040a0, #8080c0);
+            border: 2px solid #404080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .title-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 8px;
+            margin-left: 5px;
+        }
+
+        .header-link {
+            color: #000080;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-green {
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+        }
+
+        .btn-yellow {
+            background: linear-gradient(to bottom, #e0e080, #c0c040);
+        }
+
+        .btn-red {
+            background: linear-gradient(to bottom, #e06060, #c04040);
+            color: white;
+        }
+
+        /* GPT Box */
+        .gpt-box {
+            background: #ffe0e0;
+            border: 1px solid #a00000;
+            padding: 2px 6px;
+            font-size: 9px;
+            text-align: center;
+            line-height: 1.2;
+            position: absolute;
+            right: 10px;
+            top: 28px;
+        }
+
+        .header-row-wrapper {
+            position: relative;
+        }
+
+        /* Button Row */
+        .button-row {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            padding: 3px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+        }
+
+        .status-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: auto;
+        }
+
+        .form-label {
+            font-size: 10px;
+        }
+
+        .form-select, .form-input {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #000080;
+            box-shadow: 0 0 2px #000080;
+        }
+
+        .form-input.readonly {
+            background: #e0e0e0;
+        }
+
+        /* Form Section */
+        .form-section {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 8px 12px;
+            display: flex;
+            gap: 30px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-column.left .form-label {
+            min-width: 45px;
+            text-align: right;
+        }
+
+        .form-column.middle .form-label {
+            min-width: 110px;
+            text-align: right;
+        }
+
+        .form-column.right .form-label {
+            min-width: 90px;
+            text-align: right;
+        }
+
+        .input-narrow { width: 80px; }
+        .input-medium { width: 200px; }
+        .input-wide { width: 250px; }
+
+        /* Work Area */
+        .work-area {
+            display: flex;
+            flex: 1;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        /* Left Work Panel */
+        .left-work-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Tab Container */
+        .tab-container {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #8080b0;
+            border-bottom: 1px solid #606090;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            padding: 4px 12px;
+            background: #a0a0c0;
+            border: 1px solid #808080;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 10px;
+            margin-right: -1px;
+        }
+
+        .tab-btn.active {
+            background: #9090c0;
+            border-bottom: 1px solid #9090c0;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-content {
+            padding: 5px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-page {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-page.active {
+            display: flex;
+        }
+
+        .bwn-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
+
+        .status-red {
+            color: #c00000;
+            font-weight: bold;
+        }
+
+        /* Grid Area */
+        .grid-area {
+            display: flex;
+            gap: 3px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Subform */
+        .subform-left {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .subform-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .grid-wrapper {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #808080;
+            background: white;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .data-grid th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 4px 6px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .data-grid th:hover {
+            background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+        }
+
+        .data-grid td {
+            border: 1px solid #c0c0c0;
+            padding: 3px 5px;
+            height: 22px;
+        }
+
+        .data-grid tr:hover {
+            background: #e0e0ff;
+        }
+
+        .data-grid tr.selected {
+            background: #000080;
+            color: white;
+        }
+
+        .data-grid input, .data-grid select {
+            border: none;
+            width: 100%;
+            padding: 0;
+            font-size: 11px;
+            background: transparent;
+        }
+
+        .cell-blue { background-color: #add8e6; }
+        .cell-green { background-color: #90ee90; }
+        .cell-yellow { background-color: #ffff90; }
+        .cell-red { background-color: #ffb0b0; }
+
+        /* Absagen Section */
+        .absagen-section {
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+        .absagen-label {
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+
+        .absagen-grid-wrapper {
+            height: 120px;
+            overflow: auto;
+            border: 1px solid #808080;
+            background: white;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 420px;
+            background: #9090c0;
+            border: 1px solid #606090;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .right-header {
+            padding: 5px;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+        }
+
+        .status-table {
+            width: 100%;
+            font-size: 10px;
+            border-collapse: collapse;
+        }
+
+        .status-table td {
+            padding: 2px 4px;
+        }
+
+        .status-table .count {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .anzeigen-btn {
+            background: #e0e0e0;
+            border: 1px solid #808080;
+            padding: 1px 6px;
+            font-size: 9px;
+            cursor: pointer;
+        }
+
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 6px;
+            background: #a0a0c0;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+            font-size: 10px;
+        }
+
+        .date-input {
+            width: 75px;
+            border: 1px solid #808080;
+            padding: 2px 4px;
+            font-size: 10px;
+        }
+
+        .nav-btn {
+            background: #d0d0d0;
+            border: 1px solid #808080;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .nav-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .auftraege-wrapper {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .auftraege-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+
+        .auftraege-table th {
+            background: linear-gradient(to bottom, #c0c0d0, #a0a0b0);
+            border: 1px solid #808080;
+            padding: 3px 5px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-weight: bold;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .auftraege-table td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 4px;
+            white-space: nowrap;
+            background: white;
+            height: 20px;
+        }
+
+        .auftraege-table tr:nth-child(even) td {
+            background: #f0f0ff;
+        }
+
+        .auftraege-table tr:hover td {
+            background: #d0d0ff;
+        }
+
+        .auftraege-table tr.selected td {
+            background: #000080;
+            color: white;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 2px 5px;
+            display: flex;
+            gap: 10px;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .status-section {
+            border: 1px inset #808080;
+            padding: 1px 8px;
+            background: #e0e0e0;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #fff #808080 #808080 #fff;
+            padding: 10px;
+            min-width: 300px;
+        }
+
+        .modal-header {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 4px 8px;
+            margin: -10px -10px 10px -10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-body {
+            padding: 10px 0;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #808080;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 30px;
+            right: 10px;
+            z-index: 1002;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+        .toast.warning { background: #f57f17; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body style=""><vis-bug tutsbaseurl="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts" color-scheme="auto" color-mode="hex" popover="manual" style="transition: none; left: 66px; top: 44px;"><template shadowrootmode="closed">
+      <visbug-hotkeys><hotkeys-guides><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M21,6H3C1.9,6,1,6.9,1,8v8c0,1.1,0.9,2,2,2h18c1.1,0,2-0.9,2-2V8C23,6.9,22.1,6,21,6z M21,16H3V8h2v4h2V8h2v4h2V8h2v4h2V8
+    h2v4h2V8h2V16z"></path>
+  </svg>
+
+            guides Tool
+          </span>
+        </div>
+        <div command="">
+          coming soon
+        </div>
+      </article>
+    </template></hotkeys-guides><hotkeys-inspector><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <g>
+      <rect x="11" y="7" width="2" height="2"></rect>
+      <rect x="11" y="11" width="2" height="6"></rect>
+      <path d="M12,2C6.48,2,2,6.48,2,12c0,5.52,4.48,10,10,10s10-4.48,10-10C22,6.48,17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8
+        c0-4.41,3.59-8,8-8s8,3.59,8,8C20,16.41,16.41,20,12,20z"></path>
+    </g>
+  </svg>
+
+            inspector Tool
+          </span>
+        </div>
+        <div command="">
+          coming soon
+        </div>
+      </article>
+    </template></hotkeys-inspector><hotkeys-accessibility><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M12,2c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S10.9,2,12,2z M21,9h-6v13h-2v-6h-2v6H9V9H3V7h18V9z"></path>
+  </svg>
+
+            accessibility Tool
+          </span>
+        </div>
+        <div command="">
+          coming soon
+        </div>
+      </article>
+    </template></hotkeys-accessibility><hotkeys-move><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z"></path>
+  </svg>
+
+            move Tool
+          </span>
+        </div>
+        <div command="">
+          
+      <span tool="">move</span>
+      <span side="">[arrow key]</span>
+    
+        </div>
+        <div card="">
+          <div keyboard="">
+            
+              
+              
+              
+              
+              
+              <section num="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span `="" style="flex:1;">`</span>
+              
+                <span 1="" style="flex:1;">1</span>
+              
+                <span 2="" style="flex:1;">2</span>
+              
+                <span 3="" style="flex:1;">3</span>
+              
+                <span 4="" style="flex:1;">4</span>
+              
+                <span 5="" style="flex:1;">5</span>
+              
+                <span 6="" style="flex:1;">6</span>
+              
+                <span 7="" style="flex:1;">7</span>
+              
+                <span 8="" style="flex:1;">8</span>
+              
+                <span 9="" style="flex:1;">9</span>
+              
+                <span 0="" style="flex:1;">0</span>
+              
+                <span -="" style="flex:1;">-</span>
+              
+                <span =="" style="flex:2;">=</span>
+              
+                <span delete="" style="flex:1;">delete</span>
+              
+              </section>
+            
+              <section tab="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span tab="" style="flex:2;">tab</span>
+              
+                <span q="" style="flex:1;">q</span>
+              
+                <span w="" style="flex:1;">w</span>
+              
+                <span e="" style="flex:1;">e</span>
+              
+                <span r="" style="flex:1;">r</span>
+              
+                <span t="" style="flex:1;">t</span>
+              
+                <span y="" style="flex:1;">y</span>
+              
+                <span u="" style="flex:1;">u</span>
+              
+                <span i="" style="flex:1;">i</span>
+              
+                <span o="" style="flex:1;">o</span>
+              
+                <span p="" style="flex:1;">p</span>
+              
+                <span [="" style="flex:1;">[</span>
+              
+                <span ]="" style="flex:1;">]</span>
+              
+                <span \="" style="flex:1;">\</span>
+              
+              </section>
+            
+              <section caps="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span caps="" style="flex:3;">caps</span>
+              
+                <span a="" style="flex:1;">a</span>
+              
+                <span s="" style="flex:1;">s</span>
+              
+                <span d="" style="flex:1;">d</span>
+              
+                <span f="" style="flex:1;">f</span>
+              
+                <span g="" style="flex:1;">g</span>
+              
+                <span h="" style="flex:1;">h</span>
+              
+                <span j="" style="flex:1;">j</span>
+              
+                <span k="" style="flex:1;">k</span>
+              
+                <span l="" style="flex:1;">l</span>
+              
+                <span '="" style="flex:1;">'</span>
+              
+                <span return="" style="flex:3;">return</span>
+              
+              </section>
+            
+              <section shift="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span shift="" style="flex:6;">shift</span>
+              
+                <span z="" style="flex:1;">z</span>
+              
+                <span x="" style="flex:1;">x</span>
+              
+                <span c="" style="flex:1;">c</span>
+              
+                <span v="" hotkey="" title="Tool Shortcut Hotkey" style="flex:1;">v</span>
+              
+                <span b="" style="flex:1;">b</span>
+              
+                <span n="" style="flex:1;">n</span>
+              
+                <span m="" style="flex:1;">m</span>
+              
+                <span ,="" style="flex:1;">,</span>
+              
+                <span .="" style="flex:1;">.</span>
+              
+                <span style="flex:1;">/</span>
+              
+                <span shift="" style="flex:6;">shift</span>
+              
+              </section>
+            
+              <section space="">
+                
+                
+                
+                
+                
+                <span alt="" style="flex:1;">alt</span>
+              
+                <span ctrl="" style="flex:1;">ctrl</span>
+              
+                <span spacebar="" style="flex:10;">spacebar</span>
+              
+                <span ctrl="" style="flex:1;">ctrl</span>
+              
+                <span alt="" style="flex:1;">alt</span>
+              
+              </section>
+            
+          </div>
+          <div>
+            <section arrows="">
+              <span up="" used="">↑</span>
+              <span down="" used="">↓</span>
+              <span left="" used="">←</span>
+              <span right="" used="">→</span>
+            </section>
+          </div>
+        </div>
+      </article>
+    </template></hotkeys-move><hotkeys-margin><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M9 7H7v2h2V7zm0 4H7v2h2v-2zm0-8c-1.11 0-2 .9-2 2h2V3zm4 12h-2v2h2v-2zm6-12v2h2c0-1.1-.9-2-2-2zm-6 0h-2v2h2V3zM9 17v-2H7c0 1.1.89 2 2 2zm10-4h2v-2h-2v2zm0-4h2V7h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2zM5 7H3v12c0 1.1.89 2 2 2h12v-2H5V7zm10-2h2V3h-2v2zm0 12h2v-2h-2v2z"></path>
+  </svg>
+
+            margin Tool
+          </span>
+        </div>
+        <div command="">
+          
+      <span negative="">±[alt]  </span>
+      <span tool="">margin</span>
+      <span light="">  to  </span>
+      <span side="">[arrow key]</span>
+      <span light=""> by </span>
+      <span amount="">1</span>
+    
+        </div>
+        <div card="">
+          <div keyboard="">
+            
+              
+              
+              
+              
+              
+              <section num="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span `="" style="flex:1;">`</span>
+              
+                <span 1="" style="flex:1;">1</span>
+              
+                <span 2="" style="flex:1;">2</span>
+              
+                <span 3="" style="flex:1;">3</span>
+              
+                <span 4="" style="flex:1;">4</span>
+              
+                <span 5="" style="flex:1;">5</span>
+              
+                <span 6="" style="flex:1;">6</span>
+              
+                <span 7="" style="flex:1;">7</span>
+              
+                <span 8="" style="flex:1;">8</span>
+              
+                <span 9="" style="flex:1;">9</span>
+              
+                <span 0="" style="flex:1;">0</span>
+              
+                <span -="" style="flex:1;">-</span>
+              
+                <span =="" style="flex:2;">=</span>
+              
+                <span delete="" style="flex:1;">delete</span>
+              
+              </section>
+            
+              <section tab="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span tab="" style="flex:2;">tab</span>
+              
+                <span q="" style="flex:1;">q</span>
+              
+                <span w="" style="flex:1;">w</span>
+              
+                <span e="" style="flex:1;">e</span>
+              
+                <span r="" style="flex:1;">r</span>
+              
+                <span t="" style="flex:1;">t</span>
+              
+                <span y="" style="flex:1;">y</span>
+              
+                <span u="" style="flex:1;">u</span>
+              
+                <span i="" style="flex:1;">i</span>
+              
+                <span o="" style="flex:1;">o</span>
+              
+                <span p="" style="flex:1;">p</span>
+              
+                <span [="" style="flex:1;">[</span>
+              
+                <span ]="" style="flex:1;">]</span>
+              
+                <span \="" style="flex:1;">\</span>
+              
+              </section>
+            
+              <section caps="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span caps="" style="flex:3;">caps</span>
+              
+                <span a="" style="flex:1;">a</span>
+              
+                <span s="" style="flex:1;">s</span>
+              
+                <span d="" style="flex:1;">d</span>
+              
+                <span f="" style="flex:1;">f</span>
+              
+                <span g="" style="flex:1;">g</span>
+              
+                <span h="" style="flex:1;">h</span>
+              
+                <span j="" style="flex:1;">j</span>
+              
+                <span k="" style="flex:1;">k</span>
+              
+                <span l="" style="flex:1;">l</span>
+              
+                <span '="" style="flex:1;">'</span>
+              
+                <span return="" style="flex:3;">return</span>
+              
+              </section>
+            
+              <section shift="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+                <span z="" style="flex:1;">z</span>
+              
+                <span x="" style="flex:1;">x</span>
+              
+                <span c="" style="flex:1;">c</span>
+              
+                <span v="" style="flex:1;">v</span>
+              
+                <span b="" style="flex:1;">b</span>
+              
+                <span n="" style="flex:1;">n</span>
+              
+                <span m="" hotkey="" title="Tool Shortcut Hotkey" style="flex:1;">m</span>
+              
+                <span ,="" style="flex:1;">,</span>
+              
+                <span .="" style="flex:1;">.</span>
+              
+                <span style="flex:1;">/</span>
+              
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+              </section>
+            
+              <section space="">
+                
+                
+                
+                
+                
+                <span alt="" used="" style="flex:1;">alt</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span spacebar="" style="flex:10;">spacebar</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span alt="" used="" style="flex:1;">alt</span>
+              
+              </section>
+            
+          </div>
+          <div>
+            <section arrows="">
+              <span up="" used="">↑</span>
+              <span down="" used="">↓</span>
+              <span left="" used="">←</span>
+              <span right="" used="">→</span>
+            </section>
+          </div>
+        </div>
+      </article>
+    </template></hotkeys-margin><hotkeys-padding><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm2 4v-2H3c0 1.1.89 2 2 2zM3 9h2V7H3v2zm12 12h2v-2h-2v2zm4-18H9c-1.11 0-2 .9-2 2v10c0 1.1.89 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 12H9V5h10v10zm-8 6h2v-2h-2v2zm-4 0h2v-2H7v2z"></path>
+  </svg>
+
+            padding Tool
+          </span>
+        </div>
+        <div command="">
+          
+      <span negative="">±[alt]  </span>
+      <span tool="">padding</span>
+      <span light="">  to  </span>
+      <span side="">[arrow key]</span>
+      <span light=""> by </span>
+      <span amount="">1</span>
+    
+        </div>
+        <div card="">
+          <div keyboard="">
+            
+              
+              
+              
+              
+              
+              <section num="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span `="" style="flex:1;">`</span>
+              
+                <span 1="" style="flex:1;">1</span>
+              
+                <span 2="" style="flex:1;">2</span>
+              
+                <span 3="" style="flex:1;">3</span>
+              
+                <span 4="" style="flex:1;">4</span>
+              
+                <span 5="" style="flex:1;">5</span>
+              
+                <span 6="" style="flex:1;">6</span>
+              
+                <span 7="" style="flex:1;">7</span>
+              
+                <span 8="" style="flex:1;">8</span>
+              
+                <span 9="" style="flex:1;">9</span>
+              
+                <span 0="" style="flex:1;">0</span>
+              
+                <span -="" style="flex:1;">-</span>
+              
+                <span =="" style="flex:2;">=</span>
+              
+                <span delete="" style="flex:1;">delete</span>
+              
+              </section>
+            
+              <section tab="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span tab="" style="flex:2;">tab</span>
+              
+                <span q="" style="flex:1;">q</span>
+              
+                <span w="" style="flex:1;">w</span>
+              
+                <span e="" style="flex:1;">e</span>
+              
+                <span r="" style="flex:1;">r</span>
+              
+                <span t="" style="flex:1;">t</span>
+              
+                <span y="" style="flex:1;">y</span>
+              
+                <span u="" style="flex:1;">u</span>
+              
+                <span i="" style="flex:1;">i</span>
+              
+                <span o="" style="flex:1;">o</span>
+              
+                <span p="" hotkey="" title="Tool Shortcut Hotkey" style="flex:1;">p</span>
+              
+                <span [="" style="flex:1;">[</span>
+              
+                <span ]="" style="flex:1;">]</span>
+              
+                <span \="" style="flex:1;">\</span>
+              
+              </section>
+            
+              <section caps="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span caps="" style="flex:3;">caps</span>
+              
+                <span a="" style="flex:1;">a</span>
+              
+                <span s="" style="flex:1;">s</span>
+              
+                <span d="" style="flex:1;">d</span>
+              
+                <span f="" style="flex:1;">f</span>
+              
+                <span g="" style="flex:1;">g</span>
+              
+                <span h="" style="flex:1;">h</span>
+              
+                <span j="" style="flex:1;">j</span>
+              
+                <span k="" style="flex:1;">k</span>
+              
+                <span l="" style="flex:1;">l</span>
+              
+                <span '="" style="flex:1;">'</span>
+              
+                <span return="" style="flex:3;">return</span>
+              
+              </section>
+            
+              <section shift="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+                <span z="" style="flex:1;">z</span>
+              
+                <span x="" style="flex:1;">x</span>
+              
+                <span c="" style="flex:1;">c</span>
+              
+                <span v="" style="flex:1;">v</span>
+              
+                <span b="" style="flex:1;">b</span>
+              
+                <span n="" style="flex:1;">n</span>
+              
+                <span m="" style="flex:1;">m</span>
+              
+                <span ,="" style="flex:1;">,</span>
+              
+                <span .="" style="flex:1;">.</span>
+              
+                <span style="flex:1;">/</span>
+              
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+              </section>
+            
+              <section space="">
+                
+                
+                
+                
+                
+                <span alt="" used="" style="flex:1;">alt</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span spacebar="" style="flex:10;">spacebar</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span alt="" used="" style="flex:1;">alt</span>
+              
+              </section>
+            
+          </div>
+          <div>
+            <section arrows="">
+              <span up="" used="">↑</span>
+              <span down="" used="">↓</span>
+              <span left="" used="">←</span>
+              <span right="" used="">→</span>
+            </section>
+          </div>
+        </div>
+      </article>
+    </template></hotkeys-padding><hotkeys-align><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24" style="transform:rotateZ(90deg);">
+    <path d="M10 20h4V4h-4v16zm-6 0h4v-8H4v8zM16 9v11h4V9h-4z"></path>
+  </svg>
+
+            align Tool
+          </span>
+        </div>
+        <div command="">
+          
+      <span tool="">align</span>
+      <span light=""> as </span>
+      <span>row:</span>
+      <span side="">[arrow key]</span>
+      <span light="">, distributed </span>
+      <span amount="">normal,</span>
+      <span light=""> with </span>
+      <span>±[alt] </span>
+    
+        </div>
+        <div card="">
+          <div keyboard="">
+            
+              
+              
+              
+              
+              
+              <section num="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span `="" style="flex:1;">`</span>
+              
+                <span 1="" style="flex:1;">1</span>
+              
+                <span 2="" style="flex:1;">2</span>
+              
+                <span 3="" style="flex:1;">3</span>
+              
+                <span 4="" style="flex:1;">4</span>
+              
+                <span 5="" style="flex:1;">5</span>
+              
+                <span 6="" style="flex:1;">6</span>
+              
+                <span 7="" style="flex:1;">7</span>
+              
+                <span 8="" style="flex:1;">8</span>
+              
+                <span 9="" style="flex:1;">9</span>
+              
+                <span 0="" style="flex:1;">0</span>
+              
+                <span -="" style="flex:1;">-</span>
+              
+                <span =="" style="flex:2;">=</span>
+              
+                <span delete="" style="flex:1;">delete</span>
+              
+              </section>
+            
+              <section tab="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span tab="" style="flex:2;">tab</span>
+              
+                <span q="" style="flex:1;">q</span>
+              
+                <span w="" style="flex:1;">w</span>
+              
+                <span e="" style="flex:1;">e</span>
+              
+                <span r="" style="flex:1;">r</span>
+              
+                <span t="" style="flex:1;">t</span>
+              
+                <span y="" style="flex:1;">y</span>
+              
+                <span u="" style="flex:1;">u</span>
+              
+                <span i="" style="flex:1;">i</span>
+              
+                <span o="" style="flex:1;">o</span>
+              
+                <span p="" style="flex:1;">p</span>
+              
+                <span [="" style="flex:1;">[</span>
+              
+                <span ]="" style="flex:1;">]</span>
+              
+                <span \="" style="flex:1;">\</span>
+              
+              </section>
+            
+              <section caps="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span caps="" style="flex:3;">caps</span>
+              
+                <span a="" hotkey="" title="Tool Shortcut Hotkey" style="flex:1;">a</span>
+              
+                <span s="" style="flex:1;">s</span>
+              
+                <span d="" style="flex:1;">d</span>
+              
+                <span f="" style="flex:1;">f</span>
+              
+                <span g="" style="flex:1;">g</span>
+              
+                <span h="" style="flex:1;">h</span>
+              
+                <span j="" style="flex:1;">j</span>
+              
+                <span k="" style="flex:1;">k</span>
+              
+                <span l="" style="flex:1;">l</span>
+              
+                <span '="" style="flex:1;">'</span>
+              
+                <span return="" style="flex:3;">return</span>
+              
+              </section>
+            
+              <section shift="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+                <span z="" style="flex:1;">z</span>
+              
+                <span x="" style="flex:1;">x</span>
+              
+                <span c="" style="flex:1;">c</span>
+              
+                <span v="" style="flex:1;">v</span>
+              
+                <span b="" style="flex:1;">b</span>
+              
+                <span n="" style="flex:1;">n</span>
+              
+                <span m="" style="flex:1;">m</span>
+              
+                <span ,="" style="flex:1;">,</span>
+              
+                <span .="" style="flex:1;">.</span>
+              
+                <span style="flex:1;">/</span>
+              
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+              </section>
+            
+              <section space="">
+                
+                
+                
+                
+                
+                <span alt="" style="flex:1;">alt</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span spacebar="" style="flex:10;">spacebar</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span alt="" style="flex:1;">alt</span>
+              
+              </section>
+            
+          </div>
+          <div>
+            <section arrows="">
+              <span up="" used="">↑</span>
+              <span down="" used="">↓</span>
+              <span left="" used="">←</span>
+              <span right="" used="">→</span>
+            </section>
+          </div>
+        </div>
+      </article>
+    </template></hotkeys-align><hotkeys-hueshift><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path>
+  </svg>
+
+            hueshift Tool
+          </span>
+        </div>
+        <div command="">
+          
+      <span negative="">[increase/decrease]</span>
+      <span side="" tool="">[arrow key]</span>
+      <span light=""> by </span>
+      <span amount="">1</span>
+    
+        </div>
+        <div card="">
+          <div keyboard="">
+            
+              
+              
+              
+              
+              
+              <section num="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span `="" style="flex:1;">`</span>
+              
+                <span 1="" style="flex:1;">1</span>
+              
+                <span 2="" style="flex:1;">2</span>
+              
+                <span 3="" style="flex:1;">3</span>
+              
+                <span 4="" style="flex:1;">4</span>
+              
+                <span 5="" style="flex:1;">5</span>
+              
+                <span 6="" style="flex:1;">6</span>
+              
+                <span 7="" style="flex:1;">7</span>
+              
+                <span 8="" style="flex:1;">8</span>
+              
+                <span 9="" style="flex:1;">9</span>
+              
+                <span 0="" style="flex:1;">0</span>
+              
+                <span -="" style="flex:1;">-</span>
+              
+                <span =="" style="flex:2;">=</span>
+              
+                <span delete="" style="flex:1;">delete</span>
+              
+              </section>
+            
+              <section tab="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span tab="" style="flex:2;">tab</span>
+              
+                <span q="" style="flex:1;">q</span>
+              
+                <span w="" style="flex:1;">w</span>
+              
+                <span e="" style="flex:1;">e</span>
+              
+                <span r="" style="flex:1;">r</span>
+              
+                <span t="" style="flex:1;">t</span>
+              
+                <span y="" style="flex:1;">y</span>
+              
+                <span u="" style="flex:1;">u</span>
+              
+                <span i="" style="flex:1;">i</span>
+              
+                <span o="" style="flex:1;">o</span>
+              
+                <span p="" style="flex:1;">p</span>
+              
+                <span [="" style="flex:1;">[</span>
+              
+                <span ]="" style="flex:1;">]</span>
+              
+                <span \="" style="flex:1;">\</span>
+              
+              </section>
+            
+              <section caps="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span caps="" style="flex:3;">caps</span>
+              
+                <span a="" style="flex:1;">a</span>
+              
+                <span s="" style="flex:1;">s</span>
+              
+                <span d="" style="flex:1;">d</span>
+              
+                <span f="" style="flex:1;">f</span>
+              
+                <span g="" style="flex:1;">g</span>
+              
+                <span h="" hotkey="" title="Tool Shortcut Hotkey" style="flex:1;">h</span>
+              
+                <span j="" style="flex:1;">j</span>
+              
+                <span k="" style="flex:1;">k</span>
+              
+                <span l="" style="flex:1;">l</span>
+              
+                <span '="" style="flex:1;">'</span>
+              
+                <span return="" style="flex:3;">return</span>
+              
+              </section>
+            
+              <section shift="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+                <span z="" style="flex:1;">z</span>
+              
+                <span x="" style="flex:1;">x</span>
+              
+                <span c="" style="flex:1;">c</span>
+              
+                <span v="" style="flex:1;">v</span>
+              
+                <span b="" style="flex:1;">b</span>
+              
+                <span n="" style="flex:1;">n</span>
+              
+                <span m="" style="flex:1;">m</span>
+              
+                <span ,="" style="flex:1;">,</span>
+              
+                <span .="" style="flex:1;">.</span>
+              
+                <span style="flex:1;">/</span>
+              
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+              </section>
+            
+              <section space="">
+                
+                
+                
+                
+                
+                <span alt="" style="flex:1;">alt</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span spacebar="" style="flex:10;">spacebar</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span alt="" style="flex:1;">alt</span>
+              
+              </section>
+            
+          </div>
+          <div>
+            <section arrows="">
+              <span up="" used="">↑</span>
+              <span down="" used="">↓</span>
+              <span left="" used="">←</span>
+              <span right="" used="">→</span>
+            </section>
+          </div>
+        </div>
+      </article>
+    </template></hotkeys-hueshift><hotkeys-boxshadow><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6z"></path>
+  </svg>
+
+            boxshadow Tool
+          </span>
+        </div>
+        <div command="">
+          coming soon
+        </div>
+      </article>
+    </template></hotkeys-boxshadow><hotkeys-position><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M15.54 5.54L13.77 7.3 12 5.54 10.23 7.3 8.46 5.54 12 2zm2.92 10l-1.76-1.77L18.46 12l-1.76-1.77 1.76-1.77L22 12zm-10 2.92l1.77-1.76L12 18.46l1.77-1.76 1.77 1.76L12 22zm-2.92-10l1.76 1.77L5.54 12l1.76 1.77-1.76 1.77L2 12z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+  </svg>
+
+            position Tool
+          </span>
+        </div>
+        <div command="">
+          coming soon
+        </div>
+      </article>
+    </template></hotkeys-position><hotkeys-font><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"></path>
+  </svg>
+
+            font Tool
+          </span>
+        </div>
+        <div command="">
+          
+      <span negative="">[increase/decrease]</span>
+      <span side="" tool="">[arrow key]</span>
+      <span light=""> by </span>
+      <span amount="">1</span>
+    
+        </div>
+        <div card="">
+          <div keyboard="">
+            
+              
+              
+              
+              
+              
+              <section num="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span `="" style="flex:1;">`</span>
+              
+                <span 1="" style="flex:1;">1</span>
+              
+                <span 2="" style="flex:1;">2</span>
+              
+                <span 3="" style="flex:1;">3</span>
+              
+                <span 4="" style="flex:1;">4</span>
+              
+                <span 5="" style="flex:1;">5</span>
+              
+                <span 6="" style="flex:1;">6</span>
+              
+                <span 7="" style="flex:1;">7</span>
+              
+                <span 8="" style="flex:1;">8</span>
+              
+                <span 9="" style="flex:1;">9</span>
+              
+                <span 0="" style="flex:1;">0</span>
+              
+                <span -="" style="flex:1;">-</span>
+              
+                <span =="" style="flex:2;">=</span>
+              
+                <span delete="" style="flex:1;">delete</span>
+              
+              </section>
+            
+              <section tab="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span tab="" style="flex:2;">tab</span>
+              
+                <span q="" style="flex:1;">q</span>
+              
+                <span w="" style="flex:1;">w</span>
+              
+                <span e="" style="flex:1;">e</span>
+              
+                <span r="" style="flex:1;">r</span>
+              
+                <span t="" style="flex:1;">t</span>
+              
+                <span y="" style="flex:1;">y</span>
+              
+                <span u="" style="flex:1;">u</span>
+              
+                <span i="" style="flex:1;">i</span>
+              
+                <span o="" style="flex:1;">o</span>
+              
+                <span p="" style="flex:1;">p</span>
+              
+                <span [="" style="flex:1;">[</span>
+              
+                <span ]="" style="flex:1;">]</span>
+              
+                <span \="" style="flex:1;">\</span>
+              
+              </section>
+            
+              <section caps="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span caps="" style="flex:3;">caps</span>
+              
+                <span a="" style="flex:1;">a</span>
+              
+                <span s="" style="flex:1;">s</span>
+              
+                <span d="" style="flex:1;">d</span>
+              
+                <span f="" hotkey="" title="Tool Shortcut Hotkey" style="flex:1;">f</span>
+              
+                <span g="" style="flex:1;">g</span>
+              
+                <span h="" style="flex:1;">h</span>
+              
+                <span j="" style="flex:1;">j</span>
+              
+                <span k="" style="flex:1;">k</span>
+              
+                <span l="" style="flex:1;">l</span>
+              
+                <span '="" style="flex:1;">'</span>
+              
+                <span return="" style="flex:3;">return</span>
+              
+              </section>
+            
+              <section shift="">
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+                <span z="" style="flex:1;">z</span>
+              
+                <span x="" style="flex:1;">x</span>
+              
+                <span c="" style="flex:1;">c</span>
+              
+                <span v="" style="flex:1;">v</span>
+              
+                <span b="" style="flex:1;">b</span>
+              
+                <span n="" style="flex:1;">n</span>
+              
+                <span m="" style="flex:1;">m</span>
+              
+                <span ,="" style="flex:1;">,</span>
+              
+                <span .="" style="flex:1;">.</span>
+              
+                <span style="flex:1;">/</span>
+              
+                <span shift="" used="" style="flex:6;">shift</span>
+              
+              </section>
+            
+              <section space="">
+                
+                
+                
+                
+                
+                <span alt="" style="flex:1;">alt</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span spacebar="" style="flex:10;">spacebar</span>
+              
+                <span ctrl="" used="" style="flex:1;">ctrl</span>
+              
+                <span alt="" style="flex:1;">alt</span>
+              
+              </section>
+            
+          </div>
+          <div>
+            <section arrows="">
+              <span up="" used="">↑</span>
+              <span down="" used="">↓</span>
+              <span left="" used="">←</span>
+              <span right="" used="">→</span>
+            </section>
+          </div>
+        </div>
+      </article>
+    </template></hotkeys-font><hotkeys-text><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+  </svg>
+
+            text Tool
+          </span>
+        </div>
+        <div command="">
+          coming soon
+        </div>
+      </article>
+    </template></hotkeys-text><hotkeys-search><template shadowrootmode="closed">
+      <article>
+        <div tool-icon="">
+          <span>
+            
+  <svg viewBox="0 0 24 24">
+    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+  </svg>
+
+            search Tool
+          </span>
+        </div>
+        <div command="">
+          coming soon
+        </div>
+      </article>
+    </template></hotkeys-search></visbug-hotkeys>
+      <ol constructible-support="true" style="cursor: grab;">
+        
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          <li aria-label="&lt;span&gt;&lt;u&gt;G&lt;/u&gt;uides&lt;/span&gt; Tool" aria-description="Verify alignment &amp; measure distances" aria-hotkey="g" data-tool="guides" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M21,6H3C1.9,6,1,6.9,1,8v8c0,1.1,0.9,2,2,2h18c1.1,0,2-0.9,2-2V8C23,6.9,22.1,6,21,6z M21,16H3V8h2v4h2V8h2v4h2V8h2v4h2V8
+    h2v4h2V8h2V16z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside guides="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/guides.gif" alt="Verify alignment &amp; measure distances" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;"><u style="cursor: pointer;">G</u>uides</span>
+              <span hotkey="" style="cursor: pointer;">g</span>
+            </h2>
+            <p style="cursor: pointer;">Verify alignment &amp; measure distances</p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Element Guides:</b>
+                      <span style="cursor: pointer;">hover</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Measure:</b>
+                      <span style="cursor: pointer;">click+hover</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Measure many:</b>
+                      <span style="cursor: pointer;">shift+click</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Clear:</b>
+                      <span style="cursor: pointer;">esc</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;&lt;u&gt;I&lt;/u&gt;nspect&lt;/span&gt; Tool" aria-description="Inspect the common styles of an element" aria-hotkey="i" data-tool="inspector" data-active="false" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <g style="cursor: pointer;">
+      <rect x="11" y="7" width="2" height="2" style="cursor: pointer;"></rect>
+      <rect x="11" y="11" width="2" height="6" style="cursor: pointer;"></rect>
+      <path d="M12,2C6.48,2,2,6.48,2,12c0,5.52,4.48,10,10,10s10-4.48,10-10C22,6.48,17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8
+        c0-4.41,3.59-8,8-8s8,3.59,8,8C20,16.41,16.41,20,12,20z" style="cursor: pointer;"></path>
+    </g>
+  </svg>
+
+            
+      <aside inspector="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/inspector.gif" alt="Inspect the common styles of an element" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;"><u style="cursor: pointer;">I</u>nspect</span>
+              <span hotkey="" style="cursor: pointer;">i</span>
+            </h2>
+            <p style="cursor: pointer;">Inspect the common styles of an element</p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Pin it:</b>
+                      <span style="cursor: pointer;">click</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Pin many:</b>
+                      <span style="cursor: pointer;">shift+click</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Position it:</b>
+                      <span style="cursor: pointer;">click &amp; drag by the header area</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Clear:</b>
+                      <span style="cursor: pointer;">esc</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="Accessibility Tool" aria-description="Inspect attributes &amp; contrast compliance" aria-hotkey="x" data-tool="accessibility" data-active="false" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M12,2c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S10.9,2,12,2z M21,9h-6v13h-2v-6h-2v6H9V9H3V7h18V9z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside accessibility="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/accessibility.gif" alt="Inspect attributes &amp; contrast compliance" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              Accessibility
+              <span hotkey="" style="cursor: pointer;">x</span>
+            </h2>
+            <p style="cursor: pointer;">Inspect attributes &amp; contrast compliance</p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Pin it:</b>
+                      <span style="cursor: pointer;">click</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Pin many:</b>
+                      <span style="cursor: pointer;">shift+click</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Clear:</b>
+                      <span style="cursor: pointer;">esc</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="Position Tool" aria-description="Grab and position elements anywhere" aria-hotkey="l" data-tool="position" data-active="false" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M15.54 5.54L13.77 7.3 12 5.54 10.23 7.3 8.46 5.54 12 2zm2.92 10l-1.76-1.77L18.46 12l-1.76-1.77 1.76-1.77L22 12zm-10 2.92l1.77-1.76L12 18.46l1.77-1.76 1.77 1.76L12 22zm-2.92-10l1.76 1.77L5.54 12l1.76 1.77-1.76 1.77L2 12z" style="cursor: pointer;"></path>
+    <circle cx="12" cy="12" r="3" style="cursor: pointer;"></circle>
+  </svg>
+
+            
+      <aside position="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/position.gif" alt="Grab and position elements anywhere" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              Position
+              <span hotkey="" style="cursor: pointer;">l</span>
+            </h2>
+            <p style="cursor: pointer;">Grab and position elements anywhere</p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Nudge:</b>
+                      <span style="cursor: pointer;">◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Place:</b>
+                      <span style="cursor: pointer;">Click &amp; drag</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Restore:</b>
+                      <span style="cursor: pointer;">alt + delete</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;&lt;u&gt;M&lt;/u&gt;argin&lt;/span&gt; Tool" aria-description="Adjust spacing outside" aria-hotkey="m" data-tool="margin" data-active="false" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M9 7H7v2h2V7zm0 4H7v2h2v-2zm0-8c-1.11 0-2 .9-2 2h2V3zm4 12h-2v2h2v-2zm6-12v2h2c0-1.1-.9-2-2-2zm-6 0h-2v2h2V3zM9 17v-2H7c0 1.1.89 2 2 2zm10-4h2v-2h-2v2zm0-4h2V7h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2zM5 7H3v12c0 1.1.89 2 2 2h12v-2H5V7zm10-2h2V3h-2v2zm0 12h2v-2h-2v2z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside margin="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/margin.gif" alt="Adjust spacing outside" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;"><u style="cursor: pointer;">M</u>argin</span>
+              <span hotkey="" style="cursor: pointer;">m</span>
+            </h2>
+            <p style="cursor: pointer;">Adjust spacing outside</p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">+ Margin:</b>
+                      <span style="cursor: pointer;">◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">- Margin:</b>
+                      <span style="cursor: pointer;">alt + ◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">All Sides:</b>
+                      <span style="cursor: pointer;">ctrl +  ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Trainer:</b>
+                      <span style="cursor: pointer;">shift + /</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;&lt;u&gt;P&lt;/u&gt;adding&lt;/span&gt; Tool" aria-description="Adjust spacing within" aria-hotkey="p" data-tool="padding" data-active="false" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm2 4v-2H3c0 1.1.89 2 2 2zM3 9h2V7H3v2zm12 12h2v-2h-2v2zm4-18H9c-1.11 0-2 .9-2 2v10c0 1.1.89 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 12H9V5h10v10zm-8 6h2v-2h-2v2zm-4 0h2v-2H7v2z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside padding="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/padding.gif" alt="Adjust spacing within" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;"><u style="cursor: pointer;">P</u>adding</span>
+              <span hotkey="" style="cursor: pointer;">p</span>
+            </h2>
+            <p style="cursor: pointer;">Adjust spacing within</p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">+ Padding:</b>
+                      <span style="cursor: pointer;">◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">- Padding:</b>
+                      <span style="cursor: pointer;">alt + ◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">All Sides:</b>
+                      <span style="cursor: pointer;">ctrl +  ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Trainer:</b>
+                      <span style="cursor: pointer;">shift + /</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;Flexbox &lt;u&gt;A&lt;/u&gt;lign&lt;/span&gt; Tool" aria-description="Adjust flexbox layout features" aria-hotkey="a" data-tool="align" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="transform: rotateZ(90deg); cursor: pointer;">
+    <path d="M10 20h4V4h-4v16zm-6 0h4v-8H4v8zM16 9v11h4V9h-4z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside align="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/align.gif" alt="Adjust flexbox layout features" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;">Flexbox <u style="cursor: pointer;">A</u>lign</span>
+              <span hotkey="" style="cursor: pointer;">a</span>
+            </h2>
+            <p style="cursor: pointer;">Adjust flexbox layout features</p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Rows:</b>
+                      <span style="cursor: pointer;">ctrl + ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Columns:</b>
+                      <span style="cursor: pointer;">ctrl + ▶</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Alignment:</b>
+                      <span style="cursor: pointer;">◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Distribution:</b>
+                      <span style="cursor: pointer;">Shift + ◀ ▶</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Order:</b>
+                      <span style="cursor: pointer;">ctrl + shift + ◀ ▶</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Wrapping:</b>
+                      <span style="cursor: pointer;">ctrl + shift + ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Trainer:</b>
+                      <span style="cursor: pointer;">shift + /</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;Mo&lt;u&gt;v&lt;/u&gt;e&lt;/span&gt; Tool" aria-description="Change the position of elements" aria-hotkey="v" data-tool="move" data-active="true" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside move="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/move.gif" alt="Change the position of elements" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;">Mo<u style="cursor: pointer;">v</u>e</span>
+              <span hotkey="" style="cursor: pointer;">v</span>
+            </h2>
+            <p style="cursor: pointer;">Change the position of elements</p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Lateral:</b>
+                      <span style="cursor: pointer;">click container ⇒ drag child</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Lateral:</b>
+                      <span style="cursor: pointer;">◀ ▶</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Out and above:</b>
+                      <span style="cursor: pointer;">▲</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Down+in, out+under:</b>
+                      <span style="cursor: pointer;">▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Trainer:</b>
+                      <span style="cursor: pointer;">shift + /</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;&lt;u&gt;H&lt;/u&gt;ue Shift&lt;/span&gt; Tool" aria-description="" aria-hotkey="h" data-tool="hueshift" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside hueshift="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/hueshift.gif" alt="" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;"><u style="cursor: pointer;">H</u>ue Shift</span>
+              <span hotkey="" style="cursor: pointer;">h</span>
+            </h2>
+            <p style="cursor: pointer;"></p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Saturation:</b>
+                      <span style="cursor: pointer;">◀ ▶</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Brightness:</b>
+                      <span style="cursor: pointer;">▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Hue:</b>
+                      <span style="cursor: pointer;">ctrl +  ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Opacity:</b>
+                      <span style="cursor: pointer;">ctrl +  ◀ ▶</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Trainer:</b>
+                      <span style="cursor: pointer;">shift + /</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;Box Sha&lt;u&gt;d&lt;/u&gt;ows&lt;/span&gt; Tool" aria-description="" aria-hotkey="d" data-tool="boxshadow" data-active="false" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside boxshadow="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/boxshadow.gif" alt="" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;">Box Sha<u style="cursor: pointer;">d</u>ows</span>
+              <span hotkey="" style="cursor: pointer;">d</span>
+            </h2>
+            <p style="cursor: pointer;"></p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">X/Y Position:</b>
+                      <span style="cursor: pointer;">◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Blur:</b>
+                      <span style="cursor: pointer;">alt + ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Spread:</b>
+                      <span style="cursor: pointer;">alt + ◀ ▶</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Opacity:</b>
+                      <span style="cursor: pointer;">ctrl + ◀ ▶</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;&lt;u&gt;F&lt;/u&gt;ont Styles&lt;/span&gt; Tool" aria-description="" aria-hotkey="f" data-tool="font" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside font="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/font.gif" alt="" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;"><u style="cursor: pointer;">F</u>ont Styles</span>
+              <span hotkey="" style="cursor: pointer;">f</span>
+            </h2>
+            <p style="cursor: pointer;"></p>
+            <div table="" style="cursor: pointer;">
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Size:</b>
+                      <span style="cursor: pointer;">▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Alignment:</b>
+                      <span style="cursor: pointer;">◀ ▶</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Leading:</b>
+                      <span style="cursor: pointer;">Shift + ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Letter-spacing:</b>
+                      <span style="cursor: pointer;">Shift + ◀ ▶</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Weight:</b>
+                      <span style="cursor: pointer;">ctrl + ▲ ▼</span>
+                    </div>
+                    <div style="cursor: pointer;">
+                      <b style="cursor: pointer;">Trainer:</b>
+                      <span style="cursor: pointer;">shift + /</span>
+                    </div>
+                  </div>
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;&lt;u&gt;E&lt;/u&gt;dit Text&lt;/span&gt; Tool" aria-description="Just &lt;b&gt;Double click&lt;/b&gt; any text on the page" aria-hotkey="e" data-tool="text" data-active="false" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside text="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/text.gif" alt="Just &lt;b&gt;Double click&lt;/b&gt; any text on the page" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;"><u style="cursor: pointer;">E</u>dit Text</span>
+              <span hotkey="" style="cursor: pointer;">e</span>
+            </h2>
+            <p style="cursor: pointer;">Just <b style="cursor: pointer;">Double click</b> any text on the page</p>
+            
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+          <li aria-label="&lt;span&gt;&lt;u&gt;S&lt;/u&gt;earch&lt;/span&gt; Tool" aria-description="Select elements programatically by searching for them or use built in plugins with special commands" aria-hotkey="s" data-tool="search" data-active="false" style="cursor: pointer;">
+            
+  <svg viewBox="0 0 24 24" style="cursor: pointer;">
+    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" style="cursor: pointer;"></path>
+  </svg>
+
+            
+      <aside search="" style="cursor: pointer;">
+        <figure style="cursor: pointer;">
+          <img src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/tuts/search.gif" alt="Select elements programatically by searching for them or use built in plugins with special commands" style="cursor: pointer;">
+          <figcaption style="cursor: pointer;">
+            <h2 style="cursor: pointer;">
+              <span style="cursor: pointer;"><u style="cursor: pointer;">S</u>earch</span>
+              <span hotkey="" style="cursor: pointer;">s</span>
+            </h2>
+            <p style="cursor: pointer;">Select elements programatically by searching for them or use built in plugins with special commands</p>
+            
+          </figcaption>
+        </figure>
+      </aside>
+    
+          </li>
+        
+      </ol>
+      <ol colors="">
+        <li class="color" id="foreground" aria-label="Text" aria-description="Change the text color" style="--contextual_color: ; --icon_color: ; box-shadow: 0 0 0 2px var(--theme-bg), rgba(0, 0, 0, 0.25) 0px 0.25em 0.5em;">
+          <input type="color" value="#000000">
+          
+  <svg viewBox="3 -2 19 25">
+    <path d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"></path>
+  </svg>
+
+        </li>
+        <li class="color" id="background" aria-label="Background or Fill" aria-description="Change the background color or fill of svg" style="--contextual_color: #ffffff; --icon_color: black; box-shadow: 0 0 0 2px var(--theme-bg), rgba(0, 0, 0, 0.25) 0px 0.25em 0.5em;">
+          <input type="color" value="#ffffff">
+          
+  <svg viewBox="0 0 24 18">
+    <path d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"></path>
+  </svg>
+
+        </li>
+        <li class="color" id="border" aria-label="Border or Stroke" aria-description="Change the border color or stroke of svg" style="--contextual_color: #808080; --icon_color: black; box-shadow: 0 0 0 2px var(--theme-bg), rgba(0, 0, 0, 0.25) 0px 0.25em 0.5em;">
+          <input type="color" value="#808080">
+          
+  <svg viewBox="0 0 24 18">
+    <path d="M17.75 7L14 3.25l-10 10V17h3.75l10-10zm2.96-2.96c.39-.39.39-1.02 0-1.41L18.37.29c-.39-.39-1.02-.39-1.41 0L15 2.25 18.75 6l1.96-1.96z"></path>
+  </svg>
+
+        </li>
+      </ol>
+    </template></vis-bug>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <span>📋</span>
+                <span>Auftragsverwaltung</span>
+            </div>
+            <div class="title-bar-buttons">
+                <button class="title-btn" onclick="Bridge.sendEvent(&#39;minimize&#39;)">_</button>
+                <button class="title-btn" onclick="toggleMaximize()">□</button>
+                <button class="title-btn close" onclick="closeForm()">✕</button>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Header Row 1 -->
+                <div class="header-row-wrapper">
+                    <div class="header-row" style="background-color: rgb(207, 207, 207);">
+                        <div class="logo-box">C</div>
+                        <span class="title-text" style="font-size: 16px;">Auftragsverwaltung</span>
+                        <div class="header-links">
+                            <span class="header-link" onclick="openRueckmeldStatistik()">Ruckmelde-Statistik</span>
+                            <span class="header-link" onclick="openSyncfehler()">Syncfehler</span>
+                        </div>
+                        <button class="btn" id="btnAktualisieren" onclick="refreshData()" style="font-size: 13px;">Aktualisieren</button>
+                        <button class="btn" onclick="openHtmlAnsicht()" style="font-size: 14px;">HTML</button>
+                        <button class="btn" id="btnSchnellPlan" onclick="openMitarbeiterauswahl()" style="font-size: 13px;">Mitarbeiterauswahl</button>
+                        <button class="btn" id="btnPositionen" onclick="openPositionen()" style="font-size: 14px;">Positionen</button>
+                        <button class="btn" id="btnKopieren" onclick="auftragKopieren()" style="font-size: 14px;">Auftrag kopieren</button>
+                        <button class="btn" id="btnLoeschen" onclick="auftragLoeschen()" style="font-size: 13px;">Auftrag loschen</button>
+                        <button class="btn" id="btnMailEins" onclick="sendeEinsatzlisteMA()" style="font-size: 14px;">Einsatzliste senden MA</button>
+                        <button class="btn btn-green" id="btnMailBOS" onclick="sendeEinsatzlisteBOS()" style="font-size: 12px;">Einsatzliste senden BOS</button>
+                        <button class="btn btn-yellow" id="btnMailSub" onclick="sendeEinsatzlisteSUB()" style="font-size: 12px;">Einsatzliste senden SUB</button>
+                    </div>
+                    <div class="gpt-box">GPT | TEST<br><span id="lblDatum">1.1.2026</span></div>
+                </div>
+
+                <!-- Header Row 2 -->
+                <div class="button-row" style="background-color: rgb(208, 205, 205);">
+                    <button class="btn" id="btnNeuAuftrag" onclick="neuerAuftrag()" style="font-size: 12px;">Neuer Auftrag</button>
+                    <button class="btn" id="btnListeStd" onclick="namenslisteESS()" style="font-size: 12px;">Namensliste ESS</button>
+                    <button class="btn" id="btnDruckZusage" onclick="einsatzlisteDrucken()" style="font-size: 11px;">Einsatzliste drucken</button>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="cbAutosendEL" name="Autosend_EL" onchange="saveField(&#39;Autosend_EL&#39;, this.checked)">
+                        <label for="cbAutosendEL" style="font-size: 12px;">EL Autosend</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <button class="btn" id="btnELGesendet" onclick="showELGesendet()" style="font-size: 11px;">EL gesendet</button>
+                    </div>
+                    <div class="status-group">
+                        <span class="form-label">Auftragsstatus:</span>
+                        <select class="form-select" id="Veranst_Status_ID" name="Veranst_Status_ID" style="width: 120px;" onchange="statusChanged()"></select>
+                        <span class="form-label" style="margin-left: 15px;">Rechnung Nr.:</span>
+                        <input type="text" class="form-input readonly" id="Rech_NR" name="Rech_NR" style="width: 100px;" readonly="">
+                    </div>
+                </div>
+
+                <!-- Form Fields Section -->
+                <div class="form-section">
+                    <!-- Left Column -->
+                    <div class="form-column left">
+                        <div class="form-row">
+                            <span class="form-label">Datum:</span>
+                            <input type="date" class="form-input input-narrow" id="Dat_VA_Von" name="Dat_VA_Von" onchange="datumChanged()">
+                            <span>-</span>
+                            <input type="date" class="form-input input-narrow" id="Dat_VA_Bis" name="Dat_VA_Bis" onchange="datumBisChanged()">
+                            <span style="margin-left: 15px;">Nr.</span>
+                            <input type="text" class="form-input readonly" id="ID" name="ID" style="width: 60px; display: flex; justify-content: center;" readonly="">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Auftrag:</span>
+                            <input type="text" class="form-input input-medium" id="Auftrag" name="Auftrag" list="auftragListe" onchange="auftragChanged()" onfocus="auftragGotFocus()">
+                            <datalist id="auftragListe"></datalist>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Ort:</span>
+                            <input type="text" class="form-input input-medium" id="Ort" name="Ort" list="ortListe" onchange="ortChanged()" onfocus="ortGotFocus()">
+                            <datalist id="ortListe"></datalist>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Objekt:</span>
+                            <input type="text" class="form-input" id="Objekt" name="Objekt" list="objektListe" style="width: 150px;" onchange="objektChanged()">
+                            <datalist id="objektListe"></datalist>
+                            <select class="form-select" id="Objekt_ID" name="Objekt_ID" style="width: 50px;" onchange="objektIdChanged()"></select>
+                            <!-- Datum Navigation fur Mehrtagesauftrage -->
+                            <button class="nav-btn" id="btnDatumLeft" onclick="datumNavLeft()" style="padding: 1px 4px;">◀</button>
+                            <select class="form-select" id="cboVADatum" style="width: 100px;" onchange="vaDatumChanged()"></select>
+                            <button class="nav-btn" id="btnDatumRight" onclick="datumNavRight()" style="padding: 1px 4px;">▶</button>
+                        </div>
+                    </div>
+
+                    <!-- Middle Column -->
+                    <div class="form-column middle" style="width: 207px; height: 89.5px; border-color: rgb(144, 144, 192);">
+                        <div class="form-row">
+                            <span class="form-label">PKW Anzahl:</span>
+                            <input type="number" class="form-input input-narrow" id="PKW_Anzahl" name="PKW_Anzahl" value="0" min="0">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Fahrtkosten pro PKW:</span>
+                            <input type="text" class="form-input input-narrow" id="Fahrtkosten" name="Fahrtkosten" value="0,00" onchange="saveField(&#39;Fahrtkosten&#39;, this.value)">
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="form-column right">
+                        <div class="form-row">
+                            <span class="form-label">Treffzeit:</span>
+                            <input type="time" class="form-input" id="Treffp_Zeit" name="Treffp_Zeit" style="width: 70px;" onchange="saveField(&#39;Treffp_Zeit&#39;, this.value)">
+                            <span class="form-label">Treffpunkt:</span>
+                            <input type="text" class="form-input input-wide" id="Treffpunkt" name="Treffpunkt" onchange="saveField(&#39;Treffpunkt&#39;, this.value)">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Dienstkleidung:</span>
+                            <input type="text" class="form-input input-wide" id="Dienstkleidung" name="Dienstkleidung" list="kleidungListe" onchange="saveField(&#39;Dienstkleidung&#39;, this.value)">
+                            <datalist id="kleidungListe"></datalist>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Ansprechpartner:</span>
+                            <input type="text" class="form-input input-wide" id="Ansprechpartner" name="Ansprechpartner" onchange="saveField(&#39;Ansprechpartner&#39;, this.value)">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Auftraggeber:</span>
+                            <select class="form-select input-wide" id="Veranstalter_ID" name="Veranstalter_ID" onchange="veranstalterChanged()"><option value="">-- Wahlen --</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Work Area -->
+                <div class="work-area">
+                    <!-- Left Work Panel -->
+                    <div class="left-work-panel">
+                        <div class="tab-container">
+                            <div class="tab-header" style="background-color: rgb(146, 155, 221);">
+                                <button class="tab-btn active" data-tab="einsatzliste" style="font-size: 14px;">Einsatzliste</button>
+                                <button class="tab-btn" data-tab="antworten" style="font-size: 14px;">Antworten ausstehend</button>
+                                <button class="tab-btn" data-tab="zusatzdateien" style="font-size: 14px;">Zusatzdateien</button>
+                                <button class="tab-btn" data-tab="rechnung" style="font-size: 14px;">Rechnung</button>
+                                <button class="tab-btn" data-tab="bemerkungen" style="font-size: 13px;">Bemerkungen</button>
+                            </div>
+                            <div class="tab-content">
+                                <!-- Tab 1: Einsatzliste -->
+                                <div class="tab-page active" id="tab-einsatzliste">
+                                    <div class="bwn-row" style="background-color: rgb(142, 150, 210);">
+                                        <button class="btn" onclick="bwnDrucken()">BWN drucken</button>
+                                        <span class="status-red" id="lblKeineEingabe" style="display: none;">Auftrag bereits berechnet</span>
+                                    </div>
+
+                                    <div class="grid-area">
+                                        <!-- Left Subform: Schichten -->
+                                        <div class="subform-left">
+                                            <div class="grid-wrapper">
+                                                <table class="data-grid" id="gridSchichten">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 30px;">Anz</th>
+                                                            <th style="width: 60px;">von</th>
+                                                            <th style="width: 60px;">bis</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="schichtenBody">
+                                                        <!-- Wird dynamisch gefullt -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- Absagen -->
+                                            <div class="absagen-section">
+                                                <div class="absagen-label">Absagen:</div>
+                                                <div class="absagen-grid-wrapper">
+                                                    <table class="data-grid" id="gridAbsagen">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20px;"></th>
+                                                                <th>Mitarbeiter</th>
+                                                                <th>Bemerkung</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="absagenBody">
+                                                            <!-- Wird dynamisch gefullt -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Subform: MA-Zuordnungen -->
+                                        <div class="subform-right">
+                                            <div class="grid-wrapper" style="background-color: rgb(255, 255, 255);" data-selected="true" data-label-id="0">
+                                                <table class="data-grid" id="gridZuordnungen">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 35px;">Lfd</th>
+                                                            <th style="width: 222px;">Mitarbeiter</th>
+                                                            <th style="width: 55px;">von</th>
+                                                            <th style="width: 55px;">bis</th>
+                                                            <th style="width: 65.7656px;">Std</th>
+                                                            <th style="width: 597.328px; transform: translate(1px, 0px);">Bemerkungen</th>
+                                                            <th style="width: 25px;" title="Info gesendet">I</th>
+                                                            <th style="width: 45px;">PKW</th>
+                                                            <th style="width: 25px;" title="Eingesetzt">E</th>
+                                                            <th style="width: 25px;" title="Ruckmeldung">R</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="zuordnungenBody">
+                                                        <!-- Wird dynamisch gefullt -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 2: Antworten ausstehend -->
+                                <div class="tab-page" id="tab-antworten">
+                                    <div class="bwn-row">
+                                        <span class="form-label">Mitarbeiter geplant:</span>
+                                    </div>
+                                    <div class="grid-wrapper" style="flex: 1;">
+                                        <table class="data-grid" id="gridStatus">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mitarbeiter</th>
+                                                    <th>Status</th>
+                                                    <th>Angefragt am</th>
+                                                    <th>Antwort</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="statusBody">
+                                                <!-- Wird dynamisch gefullt -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 3: Zusatzdateien -->
+                                <div class="tab-page" id="tab-zusatzdateien">
+                                    <div class="bwn-row">
+                                        <span class="form-label">Doppelklick auf Dateinamen zeigt Inhalt an bzw. offnet Office-Pgm</span>
+                                        <button class="btn" onclick="neuenAttachHinzufuegen()">Neuen Attach hinzufugen</button>
+                                    </div>
+                                    <div class="grid-wrapper" style="flex: 1;">
+                                        <table class="data-grid" id="gridAttach">
+                                            <thead>
+                                                <tr>
+                                                    <th>Dateiname</th>
+                                                    <th>Typ</th>
+                                                    <th>Grose</th>
+                                                    <th>Datum</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="attachBody">
+                                                <!-- Wird dynamisch gefullt -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 4: Rechnung -->
+                                <div class="tab-page" id="tab-rechnung">
+                                    <div class="bwn-row">
+                                        <button class="btn" onclick="rechnungPDF()">Rechnung PDF</button>
+                                        <button class="btn" onclick="berechnungslistePDF()">Berechnungsliste PDF</button>
+                                        <button class="btn" onclick="rechnungDatenLaden()">Daten laden</button>
+                                        <button class="btn" onclick="rechnungLexware()">Rechnung in Lexware erstellen</button>
+                                    </div>
+                                    <div class="form-row" style="margin: 10px 0;">
+                                        <span class="form-label">Rechnungspositionen:</span>
+                                    </div>
+                                    <div class="grid-wrapper" style="height: 100px;">
+                                        <table class="data-grid" id="gridRechPos">
+                                            <thead>
+                                                <tr>
+                                                    <th>Pos</th>
+                                                    <th>Beschreibung</th>
+                                                    <th>Menge</th>
+                                                    <th>Einzelpreis</th>
+                                                    <th>Summe</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="rechPosBody"></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="form-row" style="margin: 10px 0;">
+                                        <span class="form-label">Berechnungsliste:</span>
+                                        <span style="margin-left: auto;">Gesamtsumme Netto:</span>
+                                        <input type="text" class="form-input readonly" id="PosGesamtsumme" style="width: 100px; text-align: right;" readonly="">
+                                    </div>
+                                    <div class="grid-wrapper" style="flex: 1;">
+                                        <table class="data-grid" id="gridBerech">
+                                            <thead>
+                                                <tr>
+                                                    <th>Datum</th>
+                                                    <th>Mitarbeiter</th>
+                                                    <th>von</th>
+                                                    <th>bis</th>
+                                                    <th>Stunden</th>
+                                                    <th>Satz</th>
+                                                    <th>Summe</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="berechBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 5: Bemerkungen -->
+                                <div class="tab-page" id="tab-bemerkungen">
+                                    <textarea id="Bemerkungen" name="Bemerkungen" style="width: 100%; height: 100%; resize: none; font-size: 11px;" onchange="saveField(&#39;Bemerkungen&#39;, this.value)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Auftragsliste -->
+                    <div class="right-panel">
+                        <div class="right-header">
+                            <table class="status-table" id="statusOverview">
+                                <tbody><tr>
+                                    <td><strong>Auftragsstatus</strong></td>
+                                    <td class="count"><strong>Anzahl</strong></td>
+                                    <td><strong>Aktion</strong></td>
+                                </tr>
+                                <tr data-status="1">
+                                    <td>In Planung</td>
+                                    <td class="count" id="countPlanung">0</td>
+                                    <td><button class="anzeigen-btn" onclick="filterByStatus(1)">Anzeigen</button></td>
+                                </tr>
+                                <tr data-status="3">
+                                    <td>Auftrag beendet, Zeiten noch in Bearbeitung</td>
+                                    <td class="count" id="countBeendet">0</td>
+                                    <td><button class="anzeigen-btn" onclick="filterByStatus(3)">Anzeigen</button></td>
+                                </tr>
+                                <tr data-status="2">
+                                    <td>Einsatzliste versendet</td>
+                                    <td class="count" id="countVersendet">0</td>
+                                    <td><button class="anzeigen-btn" onclick="filterByStatus(2)">Anzeigen</button></td>
+                                </tr>
+                            </tbody></table>
+                        </div>
+
+                        <div class="date-nav">
+                            <span>Auftrage ab:</span>
+                            <input type="date" class="date-input" id="Auftraege_ab" onchange="filterAuftraege()">
+                            <button class="nav-btn" onclick="filterAuftraege()">Go</button>
+                            <button class="nav-btn" onclick="tageZurueck()">&lt;&lt;</button>
+                            <button class="nav-btn" onclick="tageVor()">&gt;&gt;</button>
+                            <button class="nav-btn" onclick="abHeute()">Ab Heute</button>
+                        </div>
+
+                        <div class="auftraege-wrapper" style="border-color: rgb(217, 217, 231); background-color: rgb(248, 246, 246);">
+                            <table class="auftraege-table" id="auftraegeTable">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortAuftraege(&#39;datum&#39;)">Datum</th>
+                                        <th onclick="sortAuftraege(&#39;auftrag&#39;)">Auftrag</th>
+                                        <th onclick="sortAuftraege(&#39;objekt&#39;)">Objekt</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auftraegeBody">
+                                    <!-- Wird dynamisch gefullt -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-section">Erstellt</span>
+            <span class="status-section" id="Erst_von"></span>
+            <span class="status-section" id="Erst_am"></span>
+            <span class="status-section">Geandert</span>
+            <span class="status-section" id="Aend_von"></span>
+            <span class="status-section" id="Aend_am"></span>
+        </div>
+    </div>
+
+    <!-- Bestatigungsdialog -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="confirmTitle">Bestatigung</span>
+                <button class="title-btn close" onclick="closeModal(&#39;confirmModal&#39;)">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="confirmYes">Ja</button>
+                <button class="btn" onclick="closeModal(&#39;confirmModal&#39;)">Nein</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebView2 Bridge -->
+    <script src="./Auftragsverwaltung2_files/webview2-bridge.js"></script>
+
+    <script>
+        'use strict';
+
+        // ============================================
+        // KONFIGURATION
+        // ============================================
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Aktueller State
+        const state = {
+            currentAuftragId: null,
+            currentVADatumId: null,
+            auftraege: [],
+            schichten: [],
+            zuordnungen: [],
+            absagen: [],
+            lookups: {
+                status: [],
+                kunden: [],
+                objekte: [],
+                orte: [],
+                auftraege: [],
+                dienstkleidung: []
+            },
+            filterStatus: null,
+            sortColumn: 'datum',
+            sortDir: 'asc'
+        };
+
+        // ============================================
+        // INITIALISIERUNG
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Datum setzen
+            document.getElementById('lblDatum').textContent = formatDate(new Date());
+            document.getElementById('Auftraege_ab').value = formatDateISO(new Date());
+
+            // Tab-Wechsel
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Menu-Navigation
+            document.querySelectorAll('.menu-btn[data-form]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    navigateToForm(this.dataset.form);
+                });
+            });
+
+            // Bridge-Events registrieren
+            Bridge.on('onDataReceived', function(data) {
+                if (data.auftrag) {
+                    loadAuftragData(data.auftrag);
+                }
+                if (data.action === 'load' && data.va_id) {
+                    loadAuftrag(data.va_id, data.vadatum_id);
+                }
+            });
+
+            // Lookups und Daten laden
+            await loadLookups();
+            await loadAuftraegeListe();
+
+            // URL-Parameter pruefen (va_id)
+            const params = new URLSearchParams(window.location.search);
+            const vaId = params.get('va_id');
+            if (vaId) {
+                await loadAuftrag(parseInt(vaId));
+            } else if (state.auftraege.length > 0) {
+                // Ersten Auftrag laden
+                await loadAuftrag(state.auftraege[0].ID);
+            }
+
+            hideLoading();
+        });
+
+        // ============================================
+        // API-FUNKTIONEN
+        // ============================================
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method: method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (data && method !== 'GET') {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'API-Fehler');
+                }
+                return result;
+            } catch (e) {
+                console.error('API Error:', e);
+                showToast('API-Fehler: ' + e.message, 'error');
+                throw e;
+            }
+        }
+
+        async function loadLookups() {
+            try {
+                // Parallel laden
+                const [statusRes, kundenRes] = await Promise.all([
+                    apiCall('/status').catch(() => ({ data: [] })),
+                    apiCall('/kunden?aktiv=true').catch(() => ({ data: [] }))
+                ]);
+
+                state.lookups.status = statusRes.data || [];
+                state.lookups.kunden = kundenRes.data || [];
+
+                // Status-Dropdown fullen
+                fillStatusDropdown();
+                fillKundenDropdown();
+
+                // Vorschlaege laden
+                await loadVorschlaege();
+
+            } catch (e) {
+                console.error('Lookups laden fehlgeschlagen:', e);
+            }
+        }
+
+        async function loadVorschlaege() {
+            try {
+                const [orteRes, objRes, auftrRes, kleidRes] = await Promise.all([
+                    apiCall('/auftraege/vorschlaege?feld=ort').catch(() => ({ data: [] })),
+                    apiCall('/auftraege/vorschlaege?feld=objekt').catch(() => ({ data: [] })),
+                    apiCall('/auftraege/vorschlaege?feld=auftrag').catch(() => ({ data: [] })),
+                    apiCall('/auftraege/vorschlaege?feld=dienstkleidung').catch(() => ({ data: [] }))
+                ]);
+
+                fillDatalist('ortListe', orteRes.data || []);
+                fillDatalist('objektListe', objRes.data || []);
+                fillDatalist('auftragListe', auftrRes.data || []);
+                fillDatalist('kleidungListe', kleidRes.data || []);
+            } catch (e) {
+                console.error('Vorschlaege laden fehlgeschlagen:', e);
+            }
+        }
+
+        async function loadAuftraegeListe() {
+            showLoading();
+            try {
+                const datumAb = document.getElementById('Auftraege_ab').value;
+                let url = '/auftraege?limit=100';
+                if (datumAb) {
+                    url += `&ab=${datumAb}`;
+                }
+                if (state.filterStatus) {
+                    url += `&status=${state.filterStatus}`;
+                }
+
+                const result = await apiCall(url);
+                state.auftraege = result.data || [];
+                renderAuftraegeListe();
+                updateStatusCounts();
+            } catch (e) {
+                console.error('Auftragsliste laden fehlgeschlagen:', e);
+            }
+            hideLoading();
+        }
+
+        async function loadAuftrag(vaId, vadatumId = null) {
+            if (!vaId) return;
+
+            showLoading();
+            state.currentAuftragId = vaId;
+
+            try {
+                // Auftragsdaten laden
+                const result = await apiCall(`/auftraege/${vaId}`);
+                const auftrag = result.data;
+
+                if (auftrag) {
+                    loadAuftragData(auftrag);
+
+                    // Einsatztage laden
+                    const tageResult = await apiCall(`/auftraege/${vaId}/tage`);
+                    fillVADatumDropdown(tageResult.data || []);
+
+                    // Wenn vadatumId gegeben, diesen wahlen
+                    if (vadatumId) {
+                        document.getElementById('cboVADatum').value = vadatumId;
+                        state.currentVADatumId = vadatumId;
+                    } else if (tageResult.data && tageResult.data.length > 0) {
+                        state.currentVADatumId = tageResult.data[0].ID;
+                        document.getElementById('cboVADatum').value = state.currentVADatumId;
+                    }
+
+                    // Subformular-Daten laden
+                    await loadSubformData();
+
+                    // Zeile in Liste markieren
+                    markSelectedAuftrag(vaId);
+                }
+            } catch (e) {
+                console.error('Auftrag laden fehlgeschlagen:', e);
+                showToast('Auftrag konnte nicht geladen werden', 'error');
+            }
+            hideLoading();
+        }
+
+        function loadAuftragData(auftrag) {
+            // Felder fullen
+            document.getElementById('ID').value = auftrag.ID || '';
+            document.getElementById('Dat_VA_Von').value = auftrag.Dat_VA_Von ? auftrag.Dat_VA_Von.substring(0, 10) : '';
+            document.getElementById('Dat_VA_Bis').value = auftrag.Dat_VA_Bis ? auftrag.Dat_VA_Bis.substring(0, 10) : '';
+            document.getElementById('Auftrag').value = auftrag.Auftrag || '';
+            document.getElementById('Ort').value = auftrag.Ort || '';
+            document.getElementById('Objekt').value = auftrag.Objekt || '';
+            document.getElementById('Objekt_ID').value = auftrag.Objekt_ID || '';
+            document.getElementById('Treffp_Zeit').value = auftrag.Treffp_Zeit || '';
+            document.getElementById('Treffpunkt').value = auftrag.Treffpunkt || '';
+            document.getElementById('Dienstkleidung').value = auftrag.Dienstkleidung || '';
+            document.getElementById('Ansprechpartner').value = auftrag.Ansprechpartner || '';
+            document.getElementById('Veranstalter_ID').value = auftrag.Veranstalter_ID || '';
+            document.getElementById('Veranst_Status_ID').value = auftrag.Veranst_Status_ID || '1';
+            document.getElementById('PKW_Anzahl').value = auftrag.PKW_Anzahl || 0;
+            document.getElementById('Fahrtkosten').value = formatCurrency(auftrag.Fahrtkosten);
+            document.getElementById('Rech_NR').value = auftrag.Rech_NR || '';
+            document.getElementById('cbAutosendEL').checked = auftrag.Autosend_EL || false;
+            document.getElementById('Bemerkungen').value = auftrag.Bemerkungen || '';
+
+            // Audit-Felder
+            document.getElementById('Erst_von').textContent = auftrag.Erst_von || '';
+            document.getElementById('Erst_am').textContent = formatDateTime(auftrag.Erst_am);
+            document.getElementById('Aend_von').textContent = auftrag.Aend_von || '';
+            document.getElementById('Aend_am').textContent = formatDateTime(auftrag.Aend_am);
+
+            // Status pruefen: Read-Only wenn >= 3
+            const statusId = parseInt(auftrag.Veranst_Status_ID) || 1;
+            setFormReadOnly(statusId >= 3);
+
+            // Bridge informieren
+            Bridge.setFormValue('va_id', auftrag.ID);
+        }
+
+        async function loadSubformData() {
+            const vaId = state.currentAuftragId;
+            const vadatumId = state.currentVADatumId;
+            if (!vaId) return;
+
+            try {
+                // Parallel laden
+                const [schichtenRes, zuordRes, absagenRes] = await Promise.all([
+                    apiCall(`/auftraege/${vaId}/schichten${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(() => ({ data: [] })),
+                    apiCall(`/auftraege/${vaId}/zuordnungen${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(() => ({ data: [] })),
+                    apiCall(`/auftraege/${vaId}/absagen${vadatumId ? '?vadatum_id=' + vadatumId : ''}`).catch(() => ({ data: [] }))
+                ]);
+
+                state.schichten = schichtenRes.data || [];
+                state.zuordnungen = zuordRes.data || [];
+                state.absagen = absagenRes.data || [];
+
+                renderSchichten();
+                renderZuordnungen();
+                renderAbsagen();
+
+            } catch (e) {
+                console.error('Subform-Daten laden fehlgeschlagen:', e);
+            }
+        }
+
+        // ============================================
+        // RENDERING-FUNKTIONEN
+        // ============================================
+        function renderAuftraegeListe() {
+            const tbody = document.getElementById('auftraegeBody');
+            tbody.innerHTML = '';
+
+            const sortedAuftraege = [...state.auftraege].sort((a, b) => {
+                let aVal = a[state.sortColumn] || '';
+                let bVal = b[state.sortColumn] || '';
+                if (state.sortColumn === 'datum') {
+                    aVal = a.Dat_VA_Von || '';
+                    bVal = b.Dat_VA_Von || '';
+                }
+                const cmp = aVal.localeCompare(bVal);
+                return state.sortDir === 'asc' ? cmp : -cmp;
+            });
+
+            sortedAuftraege.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.dataset.id = a.ID;
+                if (a.ID === state.currentAuftragId) {
+                    tr.classList.add('selected');
+                }
+                tr.innerHTML = `
+                    <td>${formatDateShort(a.Dat_VA_Von)}</td>
+                    <td>${escapeHtml(a.Auftrag || '')}</td>
+                    <td>${escapeHtml(a.Objekt || '')}</td>
+                `;
+                tr.addEventListener('click', () => loadAuftrag(a.ID));
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderSchichten() {
+            const tbody = document.getElementById('schichtenBody');
+            tbody.innerHTML = '';
+
+            state.schichten.forEach((s, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${s.MA_Anzahl || ''}</td>
+                    <td>${formatTime(s.VA_Start)}</td>
+                    <td class="cell-blue">${formatTime(s.VA_Ende)}</td>
+                `;
+                tr.addEventListener('click', () => selectSchicht(idx));
+                tbody.appendChild(tr);
+            });
+
+            // Neue Zeile fur Eingabe
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>*</td>
+                <td><input type="time" class="schicht-input" data-field="VA_Start"></td>
+                <td><input type="time" class="schicht-input" data-field="VA_Ende"></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        function renderZuordnungen() {
+            const tbody = document.getElementById('zuordnungenBody');
+            tbody.innerHTML = '';
+
+            state.zuordnungen.forEach((z, idx) => {
+                const tr = document.createElement('tr');
+                const stunden = calculateStunden(z.VA_Start, z.VA_Ende);
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td>${escapeHtml(z.MA_Name || z.Nachname + ', ' + z.Vorname || '')}</td>
+                    <td>${formatTime(z.VA_Start)}</td>
+                    <td>${formatTime(z.VA_Ende)}</td>
+                    <td>${stunden.toFixed(1)}</td>
+                    <td>${escapeHtml(z.Bemerkung || '')}</td>
+                    <td>${z.InfoGesendet ? '&#10003;' : ''}</td>
+                    <td>${z.PKW ? '&#10003;' : ''}</td>
+                    <td>${z.Eingesetzt ? '&#10003;' : ''}</td>
+                    <td class="${z.Rueckmeldung ? 'cell-green' : ''}">${z.Rueckmeldung ? '&#10003;' : ''}</td>
+                `;
+                tr.dataset.id = z.ID;
+                tr.addEventListener('click', () => selectZuordnung(idx));
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderAbsagen() {
+            const tbody = document.getElementById('absagenBody');
+            tbody.innerHTML = '';
+
+            state.absagen.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td></td>
+                    <td>${escapeHtml(a.MA_Name || '')}</td>
+                    <td>${escapeHtml(a.Bemerkung || '')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Neue Zeile
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>*</td>
+                <td><select class="form-select" style="width: 100%;"></select></td>
+                <td><input type="text" style="width: 100%;"></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        function fillStatusDropdown() {
+            const sel = document.getElementById('Veranst_Status_ID');
+            sel.innerHTML = '';
+            state.lookups.status.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.ID;
+                opt.textContent = s.Fortschritt;
+                sel.appendChild(opt);
+            });
+        }
+
+        function fillKundenDropdown() {
+            const sel = document.getElementById('Veranstalter_ID');
+            sel.innerHTML = '<option value="">-- Wahlen --</option>';
+            state.lookups.kunden.forEach(k => {
+                const opt = document.createElement('option');
+                opt.value = k.kun_Id;
+                opt.textContent = k.kun_Firma;
+                sel.appendChild(opt);
+            });
+        }
+
+        function fillVADatumDropdown(tage) {
+            const sel = document.getElementById('cboVADatum');
+            sel.innerHTML = '';
+            tage.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.ID;
+                opt.textContent = formatDateShort(t.VADatum);
+                sel.appendChild(opt);
+            });
+        }
+
+        function fillDatalist(id, items) {
+            const dl = document.getElementById(id);
+            if (!dl) return;
+            dl.innerHTML = '';
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = typeof item === 'string' ? item : item.value;
+                dl.appendChild(opt);
+            });
+        }
+
+        function markSelectedAuftrag(vaId) {
+            document.querySelectorAll('#auftraegeBody tr').forEach(tr => {
+                tr.classList.toggle('selected', parseInt(tr.dataset.id) === vaId);
+            });
+        }
+
+        function updateStatusCounts() {
+            // Einfache Zahlung basierend auf lokalen Daten
+            let planung = 0, beendet = 0, versendet = 0;
+            state.auftraege.forEach(a => {
+                const status = parseInt(a.Veranst_Status_ID) || 1;
+                if (status === 1) planung++;
+                else if (status === 2) versendet++;
+                else if (status === 3) beendet++;
+            });
+            document.getElementById('countPlanung').textContent = planung;
+            document.getElementById('countBeendet').textContent = beendet;
+            document.getElementById('countVersendet').textContent = versendet;
+        }
+
+        // ============================================
+        // EVENT-HANDLER
+        // ============================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-page').forEach(page => {
+                page.classList.toggle('active', page.id === 'tab-' + tabName);
+            });
+
+            // Lazy Loading: Daten laden wenn Tab aktiviert wird
+            switch (tabName) {
+                case 'antworten':
+                    loadAntworten();
+                    break;
+                case 'zusatzdateien':
+                    loadAttachments();
+                    break;
+                case 'rechnung':
+                    loadRechnungsdaten();
+                    break;
+            }
+        }
+
+        function navigateToForm(formName) {
+            if (window.chrome && window.chrome.webview) {
+                Bridge.navigate(formName);
+            } else {
+                // Fallback: Direkter Link
+                window.location.href = formName + '.html';
+            }
+        }
+
+        async function saveField(fieldName, value) {
+            if (!state.currentAuftragId) return;
+
+            try {
+                await apiCall(`/auftraege/${state.currentAuftragId}`, 'PUT', { [fieldName]: value });
+                showToast('Gespeichert', 'success');
+            } catch (e) {
+                showToast('Speichern fehlgeschlagen', 'error');
+            }
+        }
+
+        async function statusChanged() {
+            const statusId = document.getElementById('Veranst_Status_ID').value;
+            await saveField('Veranst_Status_ID', statusId);
+            setFormReadOnly(parseInt(statusId) >= 3);
+            await loadAuftraegeListe();
+        }
+
+        function setFormReadOnly(readonly) {
+            const lblKeine = document.getElementById('lblKeineEingabe');
+            lblKeine.style.display = readonly ? 'inline' : 'none';
+
+            // Buttons deaktivieren
+            const btns = ['btnNeuAuftrag', 'btnKopieren', 'btnLoeschen'];
+            btns.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = readonly;
+            });
+        }
+
+        async function datumChanged() {
+            const datVon = document.getElementById('Dat_VA_Von').value;
+            await saveField('Dat_VA_Von', datVon);
+        }
+
+        async function datumBisChanged() {
+            const datBis = document.getElementById('Dat_VA_Bis').value;
+            await saveField('Dat_VA_Bis', datBis);
+            // Tage neu laden wenn sich Datumsbereich andert
+            await loadAuftrag(state.currentAuftragId);
+        }
+
+        async function vaDatumChanged() {
+            state.currentVADatumId = document.getElementById('cboVADatum').value;
+            await loadSubformData();
+        }
+
+        function datumNavLeft() {
+            const sel = document.getElementById('cboVADatum');
+            if (sel.selectedIndex > 0) {
+                sel.selectedIndex--;
+                vaDatumChanged();
+            }
+        }
+
+        function datumNavRight() {
+            const sel = document.getElementById('cboVADatum');
+            if (sel.selectedIndex < sel.options.length - 1) {
+                sel.selectedIndex++;
+                vaDatumChanged();
+            }
+        }
+
+        // Template-Erkennung bei Auftragsnamen
+        function auftragChanged() {
+            const auftrag = document.getElementById('Auftrag').value.toLowerCase();
+            applyTemplate(auftrag);
+            saveField('Auftrag', document.getElementById('Auftrag').value);
+        }
+
+        function ortGotFocus() {
+            // Template-Erkennung aktivieren
+            const auftrag = document.getElementById('Auftrag').value.toLowerCase();
+            applyTemplate(auftrag);
+        }
+
+        function applyTemplate(auftrag) {
+            const templates = {
+                'kaufland': { Treffpunkt: '15 min vor Ort', Dienstkleidung: 'Schwarz neutral', Veranstalter_ID: 20770 },
+                'greuther': { Ort: 'Furth', Objekt: 'Sportpark am Ronhof', Treffpunkt: '15 min vor DB Tor F', Dienstkleidung: 'Schwarz neutral', Veranstalter_ID: 20737 },
+                '1.fcn': { Ort: 'Nurnberg', Objekt: 'Max-Morlock-Stadion', Treffpunkt: '15 min vor DB Eingang Nord West', Dienstkleidung: 'Schwarz neutral', Veranstalter_ID: 20771 },
+                'konzert': { Ort: 'Nurnberg', Objekt: 'Hirsch', Treffpunkt: '15 min vor DB vor Ort', Dienstkleidung: 'Consec', Veranstalter_ID: 10233 },
+                'clubbing': { Ort: 'Nurnberg', Objekt: 'Hirsch', Treffpunkt: '15 min vor DB vor Ort', Dienstkleidung: 'Consec', Veranstalter_ID: 10337 },
+                'hc erlangen': { Ort: 'Nurnberg', Objekt: 'Arena', Treffpunkt: '15 min vor DB Arena Ecke Kurt-Leucht', Dienstkleidung: 'Schwarz neutral', Veranstalter_ID: 20761 }
+            };
+
+            for (const [key, template] of Object.entries(templates)) {
+                if (auftrag.includes(key)) {
+                    for (const [field, value] of Object.entries(template)) {
+                        const el = document.getElementById(field);
+                        if (el && !el.value) {
+                            el.value = value;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Auftragsliste-Filter
+        function filterAuftraege() {
+            loadAuftraegeListe();
+        }
+
+        function filterByStatus(status) {
+            state.filterStatus = status;
+            loadAuftraegeListe();
+        }
+
+        function tageZurueck() {
+            const input = document.getElementById('Auftraege_ab');
+            const date = new Date(input.value);
+            date.setDate(date.getDate() - 7);
+            input.value = formatDateISO(date);
+            loadAuftraegeListe();
+        }
+
+        function tageVor() {
+            const input = document.getElementById('Auftraege_ab');
+            const date = new Date(input.value);
+            date.setDate(date.getDate() + 7);
+            input.value = formatDateISO(date);
+            loadAuftraegeListe();
+        }
+
+        function abHeute() {
+            document.getElementById('Auftraege_ab').value = formatDateISO(new Date());
+            state.filterStatus = null;
+            loadAuftraegeListe();
+        }
+
+        function sortAuftraege(column) {
+            if (state.sortColumn === column) {
+                state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sortColumn = column;
+                state.sortDir = 'asc';
+            }
+            renderAuftraegeListe();
+        }
+
+        // ============================================
+        // AKTIONS-FUNKTIONEN
+        // ============================================
+        async function neuerAuftrag() {
+            showLoading();
+            try {
+                const today = formatDateISO(new Date());
+                const result = await apiCall('/auftraege', 'POST', {
+                    Auftrag: 'Neuer Auftrag',
+                    Dat_VA_Von: today,
+                    Dat_VA_Bis: today,
+                    Veranst_Status_ID: 1
+                });
+                if (result.data && result.data.ID) {
+                    await loadAuftraegeListe();
+                    await loadAuftrag(result.data.ID);
+                    showToast('Neuer Auftrag erstellt', 'success');
+                }
+            } catch (e) {
+                showToast('Auftrag konnte nicht erstellt werden', 'error');
+            }
+            hideLoading();
+        }
+
+        async function auftragKopieren() {
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewahlt', 'warning');
+                return;
+            }
+
+            showConfirm('Auftrag kopieren', 'Mochten Sie diesen Auftrag kopieren?', async () => {
+                showLoading();
+                try {
+                    const result = await apiCall(`/auftraege/${state.currentAuftragId}/kopieren`, 'POST');
+                    if (result.data && result.data.ID) {
+                        await loadAuftraegeListe();
+                        await loadAuftrag(result.data.ID);
+                        showToast('Auftrag kopiert (ID: ' + result.data.ID + ')', 'success');
+                    }
+                } catch (e) {
+                    showToast('Kopieren fehlgeschlagen', 'error');
+                }
+                hideLoading();
+            });
+        }
+
+        async function auftragLoeschen() {
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewahlt', 'warning');
+                return;
+            }
+
+            showConfirm('Auftrag loschen', 'Mochten Sie diesen Auftrag wirklich loschen?', async () => {
+                showLoading();
+                try {
+                    await apiCall(`/auftraege/${state.currentAuftragId}`, 'DELETE');
+                    state.currentAuftragId = null;
+                    await loadAuftraegeListe();
+                    if (state.auftraege.length > 0) {
+                        await loadAuftrag(state.auftraege[0].ID);
+                    }
+                    showToast('Auftrag geloscht', 'success');
+                } catch (e) {
+                    showToast('Loschen fehlgeschlagen', 'error');
+                }
+                hideLoading();
+            });
+        }
+
+        async function refreshData() {
+            await loadAuftraegeListe();
+            if (state.currentAuftragId) {
+                await loadAuftrag(state.currentAuftragId, state.currentVADatumId);
+            }
+            showToast('Daten aktualisiert', 'success');
+        }
+
+        // Email-Funktionen
+        async function sendeEinsatzlisteMA() {
+            if (!state.currentAuftragId) return;
+            Bridge.sendEvent('email', {
+                type: 'einsatzliste_ma',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+            showToast('Einsatzliste wird an MA gesendet...', 'success');
+        }
+
+        async function sendeEinsatzlisteBOS() {
+            if (!state.currentAuftragId) return;
+            Bridge.sendEvent('email', {
+                type: 'einsatzliste_bos',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+            showToast('Einsatzliste wird an BOS gesendet...', 'success');
+        }
+
+        async function sendeEinsatzlisteSUB() {
+            if (!state.currentAuftragId) return;
+            Bridge.sendEvent('email', {
+                type: 'einsatzliste_sub',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+            showToast('Einsatzliste wird an SUB gesendet...', 'success');
+        }
+
+        function einsatzlisteDrucken() {
+            Bridge.sendEvent('print', {
+                type: 'einsatzliste',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+        }
+
+        function namenslisteESS() {
+            Bridge.sendEvent('print', {
+                type: 'namensliste_ess',
+                va_id: state.currentAuftragId
+            });
+        }
+
+        function bwnDrucken() {
+            Bridge.sendEvent('print', {
+                type: 'bwn',
+                va_id: state.currentAuftragId,
+                vadatum_id: state.currentVADatumId
+            });
+        }
+
+        function openMitarbeiterauswahl() {
+            Bridge.navigate('frm_MA_VA_Schnellauswahl', state.currentAuftragId);
+        }
+
+        function openPositionen() {
+            Bridge.sendEvent('openPositionen', {
+                objekt_id: document.getElementById('Objekt_ID').value
+            });
+        }
+
+        function openRueckmeldStatistik() {
+            Bridge.navigate('zfrm_Rueckmeldungen');
+        }
+
+        function openSyncfehler() {
+            Bridge.navigate('zfrm_SyncError');
+        }
+
+        function showELGesendet() {
+            // TODO: Zeigt Dialog mit gesendeten Einsatzlisten
+            showToast('Funktion noch nicht implementiert', 'warning');
+        }
+
+        function openHtmlAnsicht() {
+            window.open('frm_va_Auftragstamm.html?va_id=' + state.currentAuftragId, '_blank');
+        }
+
+        function closeForm() {
+            Bridge.close();
+            if (!window.chrome || !window.chrome.webview) {
+                window.close();
+            }
+        }
+
+        function toggleMaximize() {
+            // TODO: Fullscreen toggle
+        }
+
+        // Rechnung-Funktionen
+        function rechnungPDF() {
+            Bridge.sendEvent('pdf', { type: 'rechnung', va_id: state.currentAuftragId });
+        }
+
+        function berechnungslistePDF() {
+            Bridge.sendEvent('pdf', { type: 'berechnungsliste', va_id: state.currentAuftragId });
+        }
+
+        function rechnungDatenLaden() {
+            // TODO: Rechnungsdaten laden
+            showToast('Rechnungsdaten werden geladen...', 'success');
+        }
+
+        function rechnungLexware() {
+            Bridge.sendEvent('lexware', { va_id: state.currentAuftragId });
+        }
+
+        async function neuenAttachHinzufuegen() {
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewählt', 'warning');
+                return;
+            }
+
+            // File-Input erstellen und Klick simulieren
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.accept = '.pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.txt';
+
+            input.onchange = async (e) => {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+
+                showLoading();
+                for (const file of files) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('va_id', state.currentAuftragId);
+
+                        const response = await fetch(`${API_BASE}/auftraege/${state.currentAuftragId}/attachments`, {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Upload fehlgeschlagen');
+                        }
+
+                        showToast(`${file.name} hochgeladen`, 'success');
+                    } catch (err) {
+                        showToast(`Fehler bei ${file.name}: ${err.message}`, 'error');
+                    }
+                }
+                hideLoading();
+                await loadAttachments();
+            };
+
+            input.click();
+        }
+
+        async function loadAttachments() {
+            if (!state.currentAuftragId) return;
+
+            try {
+                const result = await apiCall(`/auftraege/${state.currentAuftragId}/attachments`);
+                const attachments = result.data || [];
+
+                const tbody = document.getElementById('attachBody');
+                tbody.innerHTML = '';
+
+                attachments.forEach(att => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="cursor: pointer; color: #000080; text-decoration: underline;"
+                            ondblclick="openAttachment(${att.ID})">${escapeHtml(att.Dateiname || '')}</td>
+                        <td>${escapeHtml(att.Typ || '')}</td>
+                        <td>${formatFileSize(att.Groesse)}</td>
+                        <td>${formatDateShort(att.Erstellt_am)}</td>
+                    `;
+                    tr.dataset.id = att.ID;
+
+                    // Kontextmenü
+                    tr.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        showAttachContextMenu(e, att.ID, att.Dateiname);
+                    });
+
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.error('Attachments laden fehlgeschlagen:', e);
+            }
+        }
+
+        function openAttachment(attachId) {
+            if (window.chrome && window.chrome.webview) {
+                Bridge.sendEvent('openAttachment', { attachment_id: attachId });
+            } else {
+                // Fallback: Download
+                window.open(`${API_BASE}/auftraege/${state.currentAuftragId}/attachments/${attachId}/download`, '_blank');
+            }
+        }
+
+        async function deleteAttachment(attachId) {
+            showConfirm('Datei löschen', 'Möchten Sie diese Datei wirklich löschen?', async () => {
+                try {
+                    await apiCall(`/auftraege/${state.currentAuftragId}/attachments/${attachId}`, 'DELETE');
+                    showToast('Datei gelöscht', 'success');
+                    await loadAttachments();
+                } catch (e) {
+                    showToast('Löschen fehlgeschlagen', 'error');
+                }
+            });
+        }
+
+        function downloadAttachment(attachId) {
+            window.open(`${API_BASE}/auftraege/${state.currentAuftragId}/attachments/${attachId}/download`, '_blank');
+        }
+
+        function showAttachContextMenu(event, attachId, filename) {
+            // Bestehendes Menü entfernen
+            const existing = document.querySelector('.context-menu');
+            if (existing) existing.remove();
+
+            const menu = document.createElement('div');
+            menu.className = 'context-menu';
+            menu.style.cssText = `
+                position: fixed;
+                left: ${event.clientX}px;
+                top: ${event.clientY}px;
+                background: #c0c0c0;
+                border: 2px solid;
+                border-color: #fff #808080 #808080 #fff;
+                padding: 2px;
+                z-index: 2000;
+            `;
+            menu.innerHTML = `
+                <div class="ctx-item" onclick="openAttachment(${attachId})">Öffnen</div>
+                <div class="ctx-item" onclick="downloadAttachment(${attachId})">Herunterladen</div>
+                <hr style="margin: 2px 0; border: 0; border-top: 1px solid #808080;">
+                <div class="ctx-item" onclick="deleteAttachment(${attachId})">Löschen</div>
+            `;
+
+            // Styling für Items
+            menu.querySelectorAll('.ctx-item').forEach(item => {
+                item.style.cssText = 'padding: 4px 20px; cursor: pointer; font-size: 11px;';
+                item.onmouseover = () => item.style.background = '#000080'; item.style.color = 'white';
+                item.onmouseout = () => { item.style.background = ''; item.style.color = ''; };
+            });
+
+            document.body.appendChild(menu);
+
+            // Menü schließen bei Klick außerhalb
+            document.addEventListener('click', function closeMenu() {
+                menu.remove();
+                document.removeEventListener('click', closeMenu);
+            }, { once: true });
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return '';
+            const kb = bytes / 1024;
+            if (kb < 1024) return kb.toFixed(1) + ' KB';
+            return (kb / 1024).toFixed(1) + ' MB';
+        }
+
+        // ============================================
+        // ANTWORTEN-TAB FUNKTIONEN
+        // ============================================
+        async function loadAntworten() {
+            if (!state.currentAuftragId) return;
+
+            try {
+                const result = await apiCall(`/auftraege/${state.currentAuftragId}/anfragen`);
+                const anfragen = result.data || [];
+
+                const tbody = document.getElementById('statusBody');
+                tbody.innerHTML = '';
+
+                anfragen.forEach(a => {
+                    const tr = document.createElement('tr');
+
+                    // Status-Farbe
+                    let statusColor = '';
+                    let statusText = '';
+                    switch (a.Status) {
+                        case 0: statusText = 'Angefragt'; statusColor = 'cell-yellow'; break;
+                        case 1: statusText = 'Zugesagt'; statusColor = 'cell-green'; break;
+                        case 2: statusText = 'Abgesagt'; statusColor = 'cell-red'; break;
+                        case 3: statusText = 'Keine Antwort'; statusColor = ''; break;
+                        default: statusText = '-'; break;
+                    }
+
+                    tr.innerHTML = `
+                        <td>${escapeHtml(a.MA_Name || (a.Nachname + ', ' + a.Vorname) || '')}</td>
+                        <td class="${statusColor}">${statusText}</td>
+                        <td>${formatDateTime(a.Angefragt_am)}</td>
+                        <td>${escapeHtml(a.Antwort || '')}</td>
+                    `;
+                    tr.dataset.id = a.ID;
+                    tbody.appendChild(tr);
+                });
+
+                // Anzahl ausstehende Antworten aktualisieren
+                const ausstehend = anfragen.filter(a => a.Status === 0 || a.Status === 3).length;
+                const headerLabel = document.querySelector('#tab-antworten .form-label');
+                if (headerLabel) {
+                    headerLabel.textContent = `Mitarbeiter geplant: ${anfragen.length} | Ausstehend: ${ausstehend}`;
+                }
+
+            } catch (e) {
+                console.error('Antworten laden fehlgeschlagen:', e);
+            }
+        }
+
+        // ============================================
+        // RECHNUNG-TAB FUNKTIONEN
+        // ============================================
+        async function loadRechnungsdaten() {
+            if (!state.currentAuftragId) return;
+
+            try {
+                // Rechnungspositionen laden
+                const posResult = await apiCall(`/auftraege/${state.currentAuftragId}/rechnungspositionen`).catch(() => ({ data: [] }));
+                renderRechnungspositionen(posResult.data || []);
+
+                // Berechnungsliste laden
+                const berechResult = await apiCall(`/auftraege/${state.currentAuftragId}/berechnungsliste`).catch(() => ({ data: [] }));
+                renderBerechnungsliste(berechResult.data || []);
+
+            } catch (e) {
+                console.error('Rechnungsdaten laden fehlgeschlagen:', e);
+            }
+        }
+
+        function renderRechnungspositionen(positionen) {
+            const tbody = document.getElementById('rechPosBody');
+            tbody.innerHTML = '';
+
+            let gesamtsumme = 0;
+
+            positionen.forEach((pos, idx) => {
+                const summe = (pos.Menge || 0) * (pos.Einzelpreis || 0);
+                gesamtsumme += summe;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td>${escapeHtml(pos.Beschreibung || '')}</td>
+                    <td style="text-align: right;">${pos.Menge || 0}</td>
+                    <td style="text-align: right;">${formatCurrency(pos.Einzelpreis)}</td>
+                    <td style="text-align: right;">${formatCurrency(summe)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('PosGesamtsumme').value = formatCurrency(gesamtsumme) + ' €';
+        }
+
+        function renderBerechnungsliste(eintraege) {
+            const tbody = document.getElementById('berechBody');
+            tbody.innerHTML = '';
+
+            eintraege.forEach(e => {
+                const tr = document.createElement('tr');
+                const stunden = calculateStunden(e.VA_Start, e.VA_Ende);
+                const summe = stunden * (e.Verrechnungssatz || 0);
+
+                tr.innerHTML = `
+                    <td>${formatDateShort(e.VADatum)}</td>
+                    <td>${escapeHtml(e.MA_Name || '')}</td>
+                    <td>${formatTime(e.VA_Start)}</td>
+                    <td>${formatTime(e.VA_Ende)}</td>
+                    <td style="text-align: right;">${stunden.toFixed(2)}</td>
+                    <td style="text-align: right;">${formatCurrency(e.Verrechnungssatz)}</td>
+                    <td style="text-align: right;">${formatCurrency(summe)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function rechnungDatenLaden() {
+            loadRechnungsdaten();
+            showToast('Rechnungsdaten werden geladen...', 'success');
+        }
+
+        // ============================================
+        // HELPER-FUNKTIONEN
+        // ============================================
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            return d.toLocaleDateString('de-DE');
+        }
+
+        function formatDateISO(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            return d.toISOString().substring(0, 10);
+        }
+
+        function formatDateShort(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+            return days[d.getDay()] + '. ' + d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleString('de-DE');
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '';
+            if (typeof timeStr === 'string' && timeStr.includes(':')) {
+                return timeStr.substring(0, 5);
+            }
+            return timeStr;
+        }
+
+        function formatCurrency(value) {
+            if (!value) return '0,00';
+            const num = parseFloat(value);
+            return num.toFixed(2).replace('.', ',');
+        }
+
+        function calculateStunden(von, bis) {
+            if (!von || !bis) return 0;
+            const [vh, vm] = von.split(':').map(Number);
+            const [bh, bm] = bis.split(':').map(Number);
+            let diff = (bh * 60 + bm) - (vh * 60 + vm);
+            if (diff < 0) diff += 24 * 60; // Uber Mitternacht
+            return diff / 60;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showConfirm(title, message, onConfirm) {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmYes').onclick = () => {
+                closeModal('confirmModal');
+                onConfirm();
+            };
+            modal.classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function selectSchicht(idx) {
+            // TODO: Schicht bearbeiten
+        }
+
+        function selectZuordnung(idx) {
+            // TODO: Zuordnung bearbeiten
+        }
+
+        // Placeholder fur ungenutzte Funktionen
+        function auftragGotFocus() {}
+        function ortChanged() { saveField('Ort', document.getElementById('Ort').value); }
+        function objektChanged() { saveField('Objekt', document.getElementById('Objekt').value); }
+        function objektIdChanged() { saveField('Objekt_ID', document.getElementById('Objekt_ID').value); }
+        function veranstalterChanged() { saveField('Veranstalter_ID', document.getElementById('Veranstalter_ID').value); }
+
+        console.log('[Auftragsverwaltung] Script geladen');
+    </script>
+
+
+<script type="module" src="chrome-extension://cdockenadnadldjbbgcallicgledbeoc/toolbar/bundle.min.js"></script><visbug-gridlines popover="manual" style="display: none;"><template shadowrootmode="closed">
+      <svg width="100%" viewBox="0 0 1920 919" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <rect fill="none" width="145px" height="613.5" x="5" y="486.421875" style="display:none;"></rect>
+        <line x1="5" y1="0" x2="5" y2="919"></line>
+        <line x1="150" y1="0" x2="150" y2="919"></line>
+        <line x1="0" y1="486.421875" x2="1920" y2="486.421875"></line>
+        <line x1="0" y1="513.421875" x2="1920" y2="513.421875"></line>
+      </svg>
+    </template></visbug-gridlines><visbug-offscreen-label id="↑" data-label-id="label_1767291561081" style="--top: 1rem; --left: calc(50vw - 0.5rem); --max-width: 1900px; --position: fixed; --count: &quot;\00a0 1&quot;; --hover-text: &quot;\00a0 offscreen label: div .title-bar&quot;; --label-bg: var(--theme-purple); display: none;"><template shadowrootmode="closed"><span offscreen-label=""></span></template></visbug-offscreen-label><visbug-handles data-label-id="0" popover="manual" style="--top: 279.5px; --left: 367px; --position: absolute; --width: 1121px; --height: 606.5px;"><template shadowrootmode="closed">
+      <svg class="visbug-handles" width="1121" height="606.5" viewBox="0 0 1121 606.5" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <rect stroke="var(--neon-pink)" fill="none" width="100%" height="100%"></rect>
+      </svg>
+      <visbug-handle placement="top-start"><template shadowrootmode="closed">
+      <button type="button" aria-label="Resize"></button>
+    </template></visbug-handle>
+      <visbug-handle placement="top-center"><template shadowrootmode="closed">
+      <button type="button" aria-label="Resize"></button>
+    </template></visbug-handle>
+      <visbug-handle placement="top-end"><template shadowrootmode="closed">
+      <button type="button" aria-label="Resize"></button>
+    </template></visbug-handle>
+      <visbug-handle placement="middle-start"><template shadowrootmode="closed">
+      <button type="button" aria-label="Resize"></button>
+    </template></visbug-handle>
+      <visbug-handle placement="middle-end"><template shadowrootmode="closed">
+      <button type="button" aria-label="Resize"></button>
+    </template></visbug-handle>
+      <visbug-handle placement="bottom-start"><template shadowrootmode="closed">
+      <button type="button" aria-label="Resize"></button>
+    </template></visbug-handle>
+      <visbug-handle placement="bottom-center"><template shadowrootmode="closed">
+      <button type="button" aria-label="Resize"></button>
+    </template></visbug-handle>
+      <visbug-handle placement="bottom-end"><template shadowrootmode="closed">
+      <button type="button" aria-label="Resize"></button>
+    </template></visbug-handle>
+    </template></visbug-handles></body></html>

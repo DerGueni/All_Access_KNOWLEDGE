@@ -1,0 +1,1 @@
+Start-Process -FilePath "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe" -ArgumentList "C:\Users\guenther.siegert\Documents\WebView2_Access\COM_Wrapper\ConsysWV2\bin\Release\net48\ConsysWV2.dll","/codebase","/tlb" -Verb RunAs -Wait

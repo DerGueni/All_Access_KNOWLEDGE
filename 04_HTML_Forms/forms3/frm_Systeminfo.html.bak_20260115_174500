@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Systeminfo - CONSYS</title>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        body { background-color: #8080c0; font-family: 'Segoe UI', sans-serif; font-size: 11px; margin: 0; }
+        .window-frame { height: 100vh; display: flex; flex-direction: column; }
+        .title-bar {
+            display: none; /* ausgeblendet gemaess Anforderung */
+        }
+        .content { flex: 1; padding: 20px; overflow: auto; }
+        .info-section { background: white; border: 2px solid #404080; padding: 15px; margin-bottom: 15px; }
+        .info-section h3 { margin: 0 0 10px 0; color: #000080; border-bottom: 1px solid #c0c0c0; padding-bottom: 5px; }
+        .info-row { display: flex; padding: 4px 0; border-bottom: 1px solid #f0f0f0; }
+        .info-label { width: 200px; font-weight: bold; color: #404040; }
+        .info-value { flex: 1; }
+        .btn-close {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 2px outset #c0c0c0; padding: 5px 20px; cursor: pointer;
+            font-size: 11px; margin-top: 10px;
+        }
+    </style>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-form="frm_Systeminfo">
+    <div class="window-frame">
+        <div class="title-bar">
+            <span>Ã¢â€žÂ¹Ã¯Â¸Â Systeminfo - CONSYS</span>
+            <button onclick="window.close()" style="background:red;color:white;border:none;padding:2px 8px;cursor:pointer;">Ãƒâ€”</button>
+        </div>
+        <div class="content">
+            <div class="info-section">
+                <h3>Ã°Å¸â€œÅ  System</h3>
+                <div class="info-row"><span class="info-label">Browser:</span><span class="info-value" id="browser"></span></div>
+                <div class="info-row"><span class="info-label">Plattform:</span><span class="info-value" id="platform"></span></div>
+                <div class="info-row"><span class="info-label">Bildschirm:</span><span class="info-value" id="screen"></span></div>
+                <div class="info-row"><span class="info-label">Sprache:</span><span class="info-value" id="language"></span></div>
+            </div>
+            <div class="info-section">
+                <h3>Ã°Å¸Å’Â API Server</h3>
+                <div class="info-row"><span class="info-label">URL:</span><span class="info-value">http://localhost:5000</span></div>
+                <div class="info-row"><span class="info-label">Status:</span><span class="info-value" id="apiStatus">Prüfe...</span></div>
+            </div>
+            <div class="info-section">
+                <h3>Ã°Å¸â€œâ€š Anwendung</h3>
+                <div class="info-row"><span class="info-label">Version:</span><span class="info-value">CONSYS HTML v1.0</span></div>
+                <div class="info-row"><span class="info-label">Forms-Pfad:</span><span class="info-value" id="formsPath"></span></div>
+            </div>
+            <button class="btn-close" onclick="window.close()">Schließen</button>
+        </div>
+    </div>
+    <script>
+        document.getElementById('browser').textContent = navigator.userAgent.split(' ').slice(-2).join(' ');
+        document.getElementById('platform').textContent = navigator.platform;
+        document.getElementById('screen').textContent = `${screen.width} x ${screen.height}`;
+        document.getElementById('language').textContent = navigator.language;
+        document.getElementById('formsPath').textContent = window.location.pathname;
+
+        fetch('http://localhost:5000/api/tables')
+            .then(r => r.ok ? 'Online' : 'Fehler')
+            .then(s => document.getElementById('apiStatus').textContent = s)
+            .catch(() => document.getElementById('apiStatus').textContent = 'Offline');
+    </script>
+</body>
+</html>
+
+

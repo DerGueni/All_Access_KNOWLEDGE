@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farbpaletten - Varianten 7 & 8</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #212121;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #757575;
+            margin-bottom: 40px;
+        }
+
+        .variants {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .variant {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .variant h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .variant .description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .palette-section {
+            margin-bottom: 30px;
+        }
+
+        .palette-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #424242;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .color-box {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .color-swatch {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .color-info {
+            padding: 12px;
+            background: #fafafa;
+        }
+
+        .color-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: #212121;
+            margin-bottom: 4px;
+        }
+
+        .color-hex {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #757575;
+        }
+
+        .color-usage {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .variants {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark variant styling */
+        .variant.dark {
+            background: #2E3440;
+            color: #ECEFF4;
+        }
+
+        .variant.dark h2,
+        .variant.dark h3 {
+            color: #ECEFF4;
+        }
+
+        .variant.dark .description {
+            color: #D8DEE9;
+        }
+
+        .variant.dark .color-info {
+            background: #3B4252;
+        }
+
+        .variant.dark .color-name {
+            color: #ECEFF4;
+        }
+
+        .variant.dark .color-hex,
+        .variant.dark .color-usage {
+            color: #D8DEE9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Design-Varianten Farbpaletten</h1>
+        <p class="subtitle">Übersicht der Farben für Variante 7 (Minimalist White) und Variante 8 (Nord Theme)</p>
+
+        <div class="variants">
+            <!-- VARIANTE 7: MINIMALIST WHITE -->
+            <div class="variant">
+                <h2>Variante 7: Minimalist White</h2>
+                <p class="description">
+                    Ultra-cleanes Design mit viel Weißraum und dezenter Farbgebung.
+                    Perfekt für professionelle Business-Anwendungen und Tageslicht-Nutzung.
+                </p>
+
+                <div class="palette-section">
+                    <h3>Hintergründe</h3>
+                    <div class="color-grid">
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #FAFAFA; color: #212121;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Haupt-Hintergrund</div>
+                                <div class="color-hex">#FAFAFA</div>
+                                <div class="color-usage">Body, Content Area</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #FFFFFF; color: #212121;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Panels & Cards</div>
+                                <div class="color-hex">#FFFFFF</div>
+                                <div class="color-usage">Header, Forms, Tables</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #F5F5F5; color: #212121;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Hover-State</div>
+                                <div class="color-hex">#F5F5F5</div>
+                                <div class="color-usage">Button/Menu Hover</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <h3>Texte</h3>
+                    <div class="color-grid">
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #212121;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Primärtext</div>
+                                <div class="color-hex">#212121</div>
+                                <div class="color-usage">Überschriften, Haupt-Content</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #757575;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Sekundärtext</div>
+                                <div class="color-hex">#757575</div>
+                                <div class="color-usage">Labels, Platzhalter</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <h3>Akzente & Funktionen</h3>
+                    <div class="color-grid">
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #1565C0;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Primär-Akzent</div>
+                                <div class="color-hex">#1565C0</div>
+                                <div class="color-usage">Links, Active States, Focus</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #4CAF50;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Success / Grün</div>
+                                <div class="color-hex">#4CAF50</div>
+                                <div class="color-usage">Success Messages, Green Buttons</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #FFC107; color: #212121;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Warning / Gelb</div>
+                                <div class="color-hex">#FFC107</div>
+                                <div class="color-usage">Warnings, Yellow Buttons</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #F44336;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Error / Rot</div>
+                                <div class="color-hex">#F44336</div>
+                                <div class="color-usage">Errors, Delete, Close</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <h3>Borders & Dividers</h3>
+                    <div class="color-grid">
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #E0E0E0; color: #212121;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Standard Border</div>
+                                <div class="color-hex">#E0E0E0</div>
+                                <div class="color-usage">Alle Rahmen, Divider</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #BDBDBD; color: #FFF;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">Hover Border</div>
+                                <div class="color-hex">#BDBDBD</div>
+                                <div class="color-usage">Border auf Hover</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VARIANTE 8: NORD THEME -->
+            <div class="variant dark">
+                <h2>Variante 8: Nord Theme</h2>
+                <p class="description">
+                    Basiert auf dem Nord Color Scheme (nordtheme.com). Dunkles, augenschonendes Design mit harmonischer Farbpalette.
+                    Perfekt für Entwickler und lange Bildschirmarbeit.
+                </p>
+
+                <div class="palette-section">
+                    <h3>Polar Night (Hintergründe)</h3>
+                    <div class="color-grid">
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #2E3440;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord0 - Dunkelster</div>
+                                <div class="color-hex">#2E3440</div>
+                                <div class="color-usage">Body, Haupt-Hintergrund</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #3B4252;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord1 - Panels</div>
+                                <div class="color-hex">#3B4252</div>
+                                <div class="color-usage">Panels, Cards, Sidebar</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #434C5E;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord2 - Controls</div>
+                                <div class="color-hex">#434C5E</div>
+                                <div class="color-usage">Buttons, Inputs</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #4C566A;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord3 - Borders</div>
+                                <div class="color-hex">#4C566A</div>
+                                <div class="color-usage">Borders, Hover</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <h3>Snow Storm (Texte)</h3>
+                    <div class="color-grid">
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #D8DEE9; color: #2E3440;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord4 - Normaltext</div>
+                                <div class="color-hex">#D8DEE9</div>
+                                <div class="color-usage">Standard Text</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #E5E9F0; color: #2E3440;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord5 - Hover</div>
+                                <div class="color-hex">#E5E9F0</div>
+                                <div class="color-usage">Hover Text</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #ECEFF4; color: #2E3440;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord6 - Highlights</div>
+                                <div class="color-hex">#ECEFF4</div>
+                                <div class="color-usage">Weißer Text, Logo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <h3>Frost (Akzente)</h3>
+                    <div class="color-grid">
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #8FBCBB;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord7 - Cyan</div>
+                                <div class="color-hex">#8FBCBB</div>
+                                <div class="color-usage">Selten, dezente Akzente</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #88C0D0;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord8 - Hellblau</div>
+                                <div class="color-hex">#88C0D0</div>
+                                <div class="color-usage">Primär-Akzent, Links, Active</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #81A1C1;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord9 - Blau</div>
+                                <div class="color-hex">#81A1C1</div>
+                                <div class="color-usage">Sekundär-Akzent, Active Menu</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #5E81AC;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord10 - Dunkelblau</div>
+                                <div class="color-hex">#5E81AC</div>
+                                <div class="color-usage">Selten verwendet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <h3>Aurora (Funktionale Farben)</h3>
+                    <div class="color-grid">
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #BF616A;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord11 - Rot</div>
+                                <div class="color-hex">#BF616A</div>
+                                <div class="color-usage">Errors, Close, Delete</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #D08770;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord12 - Orange</div>
+                                <div class="color-hex">#D08770</div>
+                                <div class="color-usage">Selten verwendet</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #EBCB8B; color: #2E3440;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord13 - Gelb</div>
+                                <div class="color-hex">#EBCB8B</div>
+                                <div class="color-usage">Warnings, GPT-Box</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #A3BE8C;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord14 - Grün</div>
+                                <div class="color-hex">#A3BE8C</div>
+                                <div class="color-usage">Success, Green Buttons</div>
+                            </div>
+                        </div>
+                        <div class="color-box">
+                            <div class="color-swatch" style="background: #B48EAD;">Aa</div>
+                            <div class="color-info">
+                                <div class="color-name">nord15 - Lila</div>
+                                <div class="color-hex">#B48EAD</div>
+                                <div class="color-usage">Selten verwendet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 60px; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h2 style="font-size: 20px; margin-bottom: 15px; color: #212121;">Verwendung</h2>
+            <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
+                Um die Design-Varianten zu erstellen, führen Sie das Python-Script aus:
+            </p>
+            <pre style="background: #2E3440; color: #ECEFF4; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 13px;">cd "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\04_HTML_Forms\forms"
+python create_design_variants.py</pre>
+            <p style="color: #666; margin-top: 20px; line-height: 1.6;">
+                Oder nutzen Sie einfach: <strong>VARIANTEN_ERSTELLEN.bat</strong> per Doppelklick.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

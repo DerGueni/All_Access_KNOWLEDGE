@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Master V01 - Klassisch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+            background-color: #6060a0;
+            color: #000;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .menu-container {
+            max-width: 250px;
+            margin: 0 auto;
+        }
+
+        .menu-header {
+            background: linear-gradient(to bottom, #8080c0, #6060a0);
+            color: #fff;
+            padding: 10px 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 4px 4px 0 0;
+            border: 1px solid #4040a0;
+            border-bottom: none;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .menu-section {
+            background-color: #c0c0d0;
+            border: 1px solid #4040a0;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .section-title {
+            background: linear-gradient(to bottom, #8080b0, #6060a0);
+            color: #fff;
+            padding: 6px 10px;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #4040a0;
+        }
+
+        .section-content {
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #e8e8f0, #d0d0e0);
+            border: 1px solid #8080a0;
+            border-radius: 3px;
+            padding: 8px 12px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 11px;
+            font-family: inherit;
+            color: #000;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #f0f0ff, #e0e0f0);
+            border-color: #6060a0;
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #c0c0d0, #b0b0c0);
+            border-color: #4040a0;
+        }
+
+        .menu-btn:focus {
+            outline: 2px solid #4040a0;
+            outline-offset: 1px;
+        }
+
+        .menu-btn .icon {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .menu-btn .label {
+            flex: 1;
+        }
+
+        .btn-close {
+            background: linear-gradient(to bottom, #d08080, #c06060);
+            color: #fff;
+            border-color: #a04040;
+            margin-top: 10px;
+        }
+
+        .btn-close:hover {
+            background: linear-gradient(to bottom, #e09090, #d07070);
+        }
+
+        .btn-close:active {
+            background: linear-gradient(to bottom, #b05050, #a04040);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            max-width: 220px;
+            text-align: center;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background-color: #4a8f4a;
+        }
+
+        .toast.error {
+            background-color: #a04040;
+        }
+
+        .toast.info {
+            background-color: #4a6a8f;
+        }
+
+        /* Responsive */
+        @media (max-width: 280px) {
+            .menu-container {
+                max-width: 100%;
+            }
+
+            .menu-btn {
+                padding: 6px 8px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <div class="menu-header">CONSYS Menu</div>
+
+        <!-- 1. Navigation -->
+        <div class="menu-section">
+            <div class="section-title">Navigation</div>
+            <div class="section-content">
+                <button class="menu-btn" data-testid="menu-v01-dienstplan" onclick="navigateTo('frm_N_Dienstplanuebersicht')">
+                    <span class="icon">&#128197;</span>
+                    <span class="label">Dienstplan</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-planung" onclick="navigateTo('frm_VA_Planungsuebersicht')">
+                    <span class="icon">&#128203;</span>
+                    <span class="label">Planung</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-auftraege" onclick="navigateTo('frm_va_Auftragstamm')">
+                    <span class="icon">&#128196;</span>
+                    <span class="label">Auftraege</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-mitarbeiter" onclick="navigateTo('frm_MA_Mitarbeiterstamm')">
+                    <span class="icon">&#128100;</span>
+                    <span class="label">Mitarbeiter</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-kunden" onclick="navigateTo('frm_KD_Kundenstamm')">
+                    <span class="icon">&#128101;</span>
+                    <span class="label">Kunden</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-objekte" onclick="navigateTo('frm_OB_Objekt')">
+                    <span class="icon">&#127970;</span>
+                    <span class="label">Objekte</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. Personal -->
+        <div class="menu-section">
+            <div class="section-title">Personal</div>
+            <div class="section-content">
+                <button class="menu-btn" data-testid="menu-v01-zeitkonten" onclick="navigateTo('frm_MA_Zeitkonten')">
+                    <span class="icon">&#9200;</span>
+                    <span class="label">Zeitkonten</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-abwesenheiten" onclick="navigateTo('frm_MA_Abwesenheit')">
+                    <span class="icon">&#128197;</span>
+                    <span class="label">Abwesenheiten</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-stunden" onclick="navigateTo('frm_N_Stundenauswertung')">
+                    <span class="icon">&#128200;</span>
+                    <span class="label">Stundenauswertung</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-lohn" onclick="navigateTo('frm_N_Lohnabrechnungen')">
+                    <span class="icon">&#128176;</span>
+                    <span class="label">Lohnabrechnungen</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-ausweis" onclick="navigateTo('frm_MA_Ausweis')">
+                    <span class="icon">&#128179;</span>
+                    <span class="label">Ausweis</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. Extras & Tools -->
+        <div class="menu-section">
+            <div class="section-title">Extras &amp; Tools</div>
+            <div class="section-content">
+                <button class="menu-btn" data-testid="menu-v01-schnellauswahl" onclick="navigateTo('frm_MA_VA_Schnellauswahl')">
+                    <span class="icon">&#9889;</span>
+                    <span class="label">Schnellauswahl</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-email" onclick="openEmailDialog()">
+                    <span class="icon">&#9993;</span>
+                    <span class="label">Email senden</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-exporte" onclick="openExportDialog()">
+                    <span class="icon">&#128229;</span>
+                    <span class="label">Exporte</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-reports" onclick="openReportsDialog()">
+                    <span class="icon">&#128202;</span>
+                    <span class="label">Reports</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. Automatisierung -->
+        <div class="menu-section">
+            <div class="section-title">Automatisierung</div>
+            <div class="section-content">
+                <button class="menu-btn" data-testid="menu-v01-sync" onclick="runSync()">
+                    <span class="icon">&#128260;</span>
+                    <span class="label">Sync</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-autozuordnung" onclick="runAutoZuordnung()">
+                    <span class="icon">&#9881;</span>
+                    <span class="label">Auto-Zuordnung</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-imports" onclick="openImportDialog()">
+                    <span class="icon">&#128228;</span>
+                    <span class="label">Imports</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. Spezial -->
+        <div class="menu-section">
+            <div class="section-title">Spezial</div>
+            <div class="section-content">
+                <button class="menu-btn" data-testid="menu-v01-listen" onclick="navigateTo('frm_Listen')">
+                    <span class="icon">&#128209;</span>
+                    <span class="label">Listen</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-masken" onclick="navigateTo('frm_Masken')">
+                    <span class="icon">&#128193;</span>
+                    <span class="label">Masken</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-lohnarten" onclick="navigateTo('frm_Lohnarten')">
+                    <span class="icon">&#128181;</span>
+                    <span class="label">Lohnarten</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 6. System -->
+        <div class="menu-section">
+            <div class="section-title">System</div>
+            <div class="section-content">
+                <button class="menu-btn" data-testid="menu-v01-info" onclick="showSystemInfo()">
+                    <span class="icon">&#8505;</span>
+                    <span class="label">Info</span>
+                </button>
+                <button class="menu-btn" data-testid="menu-v01-dbwechsel" onclick="openDBWechsel()">
+                    <span class="icon">&#128450;</span>
+                    <span class="label">DB-Wechsel</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Schliessen Button -->
+        <button class="menu-btn btn-close" data-testid="menu-v01-schliessen" onclick="closeForm()">
+            <span class="icon">&#10006;</span>
+            <span class="label">Schliessen</span>
+        </button>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        /**
+         * Menu Master V01 - Klassisch / Access-nahe
+         * Navigation und Funktionen
+         */
+
+        // Toast anzeigen
+        function showToast(message, type = 'info', duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+
+            // Toast einblenden
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Toast ausblenden
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // Navigation zu Formular
+        function navigateTo(formName) {
+            console.log('[Menu V01] navigateTo:', formName);
+
+            // WebView2 Kommunikation
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'navigate',
+                    form: formName
+                });
+                showToast('Oeffne ' + formName + '...', 'info');
+            }
+            // Fallback: Parent iframe Kommunikation
+            else if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'NAVIGATE',
+                    form: formName,
+                    source: 'menu_master_V01'
+                }, '*');
+                showToast('Oeffne ' + formName + '...', 'info');
+            }
+            // Browser-Modus: Direkt navigieren
+            else {
+                const formPath = '../' + formName + '.html';
+                showToast('Oeffne ' + formName + '...', 'info');
+                setTimeout(() => {
+                    window.location.href = formPath;
+                }, 500);
+            }
+        }
+
+        // Formular schliessen
+        function closeForm() {
+            console.log('[Menu V01] closeForm');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'close'
+                });
+            } else if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'CLOSE',
+                    source: 'menu_master_V01'
+                }, '*');
+            } else {
+                showToast('Fenster wird geschlossen...', 'info');
+                setTimeout(() => window.close(), 500);
+            }
+        }
+
+        // Email Dialog
+        function openEmailDialog() {
+            console.log('[Menu V01] openEmailDialog');
+            showToast('Email-Dialog wird geoeffnet...', 'info');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'openDialog',
+                    dialog: 'email'
+                });
+            }
+        }
+
+        // Export Dialog
+        function openExportDialog() {
+            console.log('[Menu V01] openExportDialog');
+            showToast('Export-Dialog wird geoeffnet...', 'info');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'openDialog',
+                    dialog: 'export'
+                });
+            }
+        }
+
+        // Reports Dialog
+        function openReportsDialog() {
+            console.log('[Menu V01] openReportsDialog');
+            showToast('Reports-Dialog wird geoeffnet...', 'info');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'openDialog',
+                    dialog: 'reports'
+                });
+            }
+        }
+
+        // Sync ausfuehren
+        function runSync() {
+            console.log('[Menu V01] runSync');
+            showToast('Synchronisierung gestartet...', 'info');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'runSync'
+                });
+            }
+        }
+
+        // Auto-Zuordnung
+        function runAutoZuordnung() {
+            console.log('[Menu V01] runAutoZuordnung');
+            showToast('Auto-Zuordnung wird ausgefuehrt...', 'info');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'runAutoZuordnung'
+                });
+            }
+        }
+
+        // Import Dialog
+        function openImportDialog() {
+            console.log('[Menu V01] openImportDialog');
+            showToast('Import-Dialog wird geoeffnet...', 'info');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'openDialog',
+                    dialog: 'import'
+                });
+            }
+        }
+
+        // System Info
+        function showSystemInfo() {
+            console.log('[Menu V01] showSystemInfo');
+            const info = 'CONSYS Menu Master V01\nVersion: 1.0.0\nVariante: Klassisch / Access-nahe';
+            showToast('System Info angezeigt', 'info');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'showInfo',
+                    message: info
+                });
+            } else {
+                alert(info);
+            }
+        }
+
+        // DB-Wechsel Dialog
+        function openDBWechsel() {
+            console.log('[Menu V01] openDBWechsel');
+            showToast('DB-Wechsel Dialog...', 'info');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    action: 'openDialog',
+                    dialog: 'dbwechsel'
+                });
+            }
+        }
+
+        // WebView2 Message Handler
+        if (window.chrome && window.chrome.webview) {
+            window.chrome.webview.addEventListener('message', function(event) {
+                console.log('[Menu V01] WebView2 message:', event.data);
+
+                if (event.data.type === 'TOAST') {
+                    showToast(event.data.message, event.data.level || 'info');
+                }
+            });
+        }
+
+        // Parent Message Handler (iframe)
+        window.addEventListener('message', function(event) {
+            console.log('[Menu V01] postMessage:', event.data);
+
+            if (event.data.type === 'TOAST') {
+                showToast(event.data.message, event.data.level || 'info');
+            }
+        });
+
+        // Init
+        console.log('[Menu V01] Initialisiert - Klassisch/Access-nahe Variante');
+    </script>
+</body>
+</html>

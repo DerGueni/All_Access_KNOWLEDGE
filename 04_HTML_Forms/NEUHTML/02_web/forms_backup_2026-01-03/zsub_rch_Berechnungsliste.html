@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berechnungsliste - Subform</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 4px;
+        }
+        .subform-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 6px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+        }
+        .subform-header-title {
+            font-weight: 600;
+            color: #333;
+        }
+        .subform-content {
+            flex: 1;
+            overflow: auto;
+        }
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        .datasheet th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            padding: 4px 5px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .datasheet td {
+            border: 1px solid #ddd;
+            padding: 3px 5px;
+        }
+        .datasheet tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+        .datasheet tbody tr:hover {
+            background: #e8f4ff;
+        }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .sum-row {
+            background: #e8e8e8 !important;
+            font-weight: 600;
+        }
+        .highlight-row {
+            background: #fff3cd !important;
+        }
+        .info-text {
+            font-size: 10px;
+            color: #666;
+            padding: 4px 6px;
+            background: #f9f9f9;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <!-- Header -->
+        <div class="subform-header">
+            <span class="subform-header-title">Berechnungsliste</span>
+            <span id="lblAnzahl">0 Einträge</span>
+        </div>
+
+        <!-- Tabelle -->
+        <div class="subform-content">
+            <table class="datasheet" id="tblBerechnung">
+                <thead>
+                    <tr>
+                        <th style="width:90px;">Datum</th>
+                        <th style="width:60px;">Von</th>
+                        <th style="width:60px;">Bis</th>
+                        <th style="width:50px;" class="text-right">Std</th>
+                        <th style="min-width:140px;">Mitarbeiter</th>
+                        <th style="width:70px;">Funktion</th>
+                        <th style="width:70px;" class="text-right">Stundensatz</th>
+                        <th style="width:80px;" class="text-right">Betrag</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_Berechnung">
+                    <tr><td colspan="8" style="text-align:center;padding:20px;color:#999;">Keine Berechnungsdaten</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr class="sum-row">
+                        <td colspan="3" style="text-align:right;">Summe:</td>
+                        <td id="sumStunden" class="text-right">0,00</td>
+                        <td colspan="3"></td>
+                        <td id="sumBetrag" class="text-right">0,00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Info-Zeile -->
+        <div class="info-text">
+            <span id="lblInfo">Berechnung basierend auf geplanten Einsaetzen</span>
+        </div>
+    </div>
+
+    <script>
+        // Subform: zsub_rch_Berechnungsliste
+        // LinkMaster: ID -> LinkChild: VA_ID
+
+        const BerechnungsListe = {
+            vaId: null,
+            daten: [],
+
+            init() {
+                // Parameter aus URL holen
+                const params = new URLSearchParams(window.location.search);
+                this.vaId = params.get('VA_ID') || params.get('va_id');
+
+                // Daten laden falls VA_ID vorhanden
+                if (this.vaId) {
+                    this.ladeDaten();
+                }
+
+                // PostMessage für Parent-Kommunikation
+                window.addEventListener('message', (e) => {
+                    if (e.data && e.data.action === 'setVAID') {
+                        this.vaId = e.data.vaId;
+                        this.ladeDaten();
+                    }
+                    if (e.data && e.data.action === 'requery') {
+                        this.ladeDaten();
+                    }
+                });
+            },
+
+            async ladeDaten() {
+                if (!this.vaId) {
+                    this.renderTabelle([]);
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`http://localhost:5000/api/berechnungsliste?va_id=${this.vaId}`);
+                    if (response.ok) {
+                        this.daten = await response.json();
+                    } else {
+                        this.daten = [];
+                    }
+                } catch (e) {
+                    console.warn('API nicht erreichbar');
+                    this.daten = [];
+                }
+
+                this.renderTabelle(this.daten);
+            },
+
+            renderTabelle(daten) {
+                const tbody = document.getElementById('tbody_Berechnung');
+
+                if (!daten || daten.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#999;">Keine Berechnungsdaten</td></tr>';
+                    this.updateSummen(0, 0);
+                    document.getElementById('lblAnzahl').textContent = '0 Einträge';
+                    return;
+                }
+
+                let html = '';
+                let sumStunden = 0;
+                let sumBetrag = 0;
+
+                daten.forEach((zeile) => {
+                    const stunden = zeile.Stunden || 0;
+                    const stundensatz = zeile.Stundensatz || 0;
+                    const betrag = stunden * stundensatz;
+
+                    sumStunden += stunden;
+                    sumBetrag += betrag;
+
+                    // Datum formatieren
+                    const datum = zeile.Datum ? new Date(zeile.Datum).toLocaleDateString('de-DE') : '';
+
+                    html += `
+                        <tr>
+                            <td>${datum}</td>
+                            <td>${zeile.Von || ''}</td>
+                            <td>${zeile.Bis || ''}</td>
+                            <td class="text-right">${stunden.toLocaleString('de-DE', {minimumFractionDigits: 2})}</td>
+                            <td>${zeile.Mitarbeiter || ''}</td>
+                            <td>${zeile.Funktion || ''}</td>
+                            <td class="text-right">${stundensatz.toLocaleString('de-DE', {minimumFractionDigits: 2})}</td>
+                            <td class="text-right">${betrag.toLocaleString('de-DE', {minimumFractionDigits: 2})}</td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+                this.updateSummen(sumStunden, sumBetrag);
+                document.getElementById('lblAnzahl').textContent = `${daten.length} Eintr${daten.length !== 1 ? 'aege' : 'ag'}`;
+            },
+
+            updateSummen(stunden, betrag) {
+                document.getElementById('sumStunden').textContent = stunden.toLocaleString('de-DE', {minimumFractionDigits: 2});
+                document.getElementById('sumBetrag').textContent = betrag.toLocaleString('de-DE', {minimumFractionDigits: 2});
+            }
+        };
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => BerechnungsListe.init());
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+-- Query: qry_MA_VA_Doppelt1
+-- Type: 0
+SELECT tbl_MA_VA_Zuordnung.VA_ID, tbl_VA_Auftragstamm.Auftrag, tbl_VA_Auftragstamm.Objekt, tbl_VA_Auftragstamm.Ort, tbl_KD_Kundenstamm.kun_Firma, tbl_MA_VA_Zuordnung.VADatum, tbl_MA_VA_Zuordnung.MA_ID, tbl_MA_Mitarbeiterstamm.Nachname, tbl_MA_Mitarbeiterstamm.Vorname, tbl_MA_VA_Zuordnung.MA_Start, tbl_MA_VA_Zuordnung.MA_Ende, tbl_MA_VA_Zuordnung.MVA_Start, tbl_MA_VA_Zuordnung.MVA_Ende
+FROM (tbl_MA_Mitarbeiterstamm INNER JOIN (tbl_MA_VA_Zuordnung INNER JOIN tbl_VA_Auftragstamm ON tbl_MA_VA_Zuordnung.VA_ID = tbl_VA_Auftragstamm.ID) ON tbl_MA_Mitarbeiterstamm.ID = tbl_MA_VA_Zuordnung.MA_ID) LEFT JOIN tbl_KD_Kundenstamm ON tbl_VA_Auftragstamm.Veranstalter_ID = tbl_KD_Kundenstamm.kun_Id
+WHERE (((tbl_MA_VA_Zuordnung.MA_ID)>0) And (((((tbl_MA_Mitarbeiterstamm.IstSubunternehmer)=True)) Or (((tbl_MA_Mitarbeiterstamm.Anstellungsart_ID)=11)))=False));
+

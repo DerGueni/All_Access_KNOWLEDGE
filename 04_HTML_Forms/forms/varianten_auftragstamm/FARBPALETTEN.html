@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farbpaletten Übersicht</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .palette-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .palette {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .palette h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .color-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .color-box {
+            width: 80px;
+            height: 50px;
+            border: 1px solid #ddd;
+            margin-right: 15px;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .color-info {
+            flex: 1;
+        }
+
+        .color-label {
+            font-weight: bold;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .color-value {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .preview-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #999;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preview-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+            transform: translateY(-1px);
+        }
+
+        .original .preview-btn {
+            background: linear-gradient(to bottom, #8080c0, #6060a0);
+            color: white;
+        }
+
+        .dark-mode .preview-btn {
+            background: linear-gradient(to bottom, #BB86FC, #9B66DC);
+            color: white;
+        }
+
+        .enterprise .preview-btn {
+            background: linear-gradient(to bottom, #0288D1, #0277BD);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Auftragstamm Design-Varianten - Farbpaletten</h1>
+
+    <div class="palette-container">
+        <!-- ORIGINAL -->
+        <div class="palette original">
+            <h2>Original (Windows XP/Access Style)</h2>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #8080c0;"></div>
+                <div class="color-info">
+                    <div class="color-label">Haupt-Hintergrund</div>
+                    <div class="color-value">#8080c0</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: linear-gradient(to right, #000080, #1084d0);"></div>
+                <div class="color-info">
+                    <div class="color-label">Title Bar</div>
+                    <div class="color-value">#000080 → #1084d0</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #6060a0;"></div>
+                <div class="color-info">
+                    <div class="color-label">Left Menu</div>
+                    <div class="color-value">#6060a0</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);"></div>
+                <div class="color-info">
+                    <div class="color-label">Menu Buttons</div>
+                    <div class="color-value">#d0d0e0 → #a0a0c0</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #9090c0;"></div>
+                <div class="color-info">
+                    <div class="color-label">Content Area</div>
+                    <div class="color-value">#9090c0</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #000080; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px;">A</div>
+                <div class="color-info">
+                    <div class="color-label">Akzentfarbe</div>
+                    <div class="color-value">#000080 (Navy)</div>
+                </div>
+            </div>
+
+            <a href="../frm_va_Auftragstamm.html" class="preview-btn" target="_blank">Original öffnen →</a>
+        </div>
+
+        <!-- DARK MODE -->
+        <div class="palette dark-mode">
+            <h2>Variante 5: Elegant Dark Mode 🌙</h2>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #1E1E1E;"></div>
+                <div class="color-info">
+                    <div class="color-label">Haupt-Hintergrund</div>
+                    <div class="color-value">#1E1E1E (Dunkelgrau)</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: linear-gradient(to right, #2D2D2D, #3D3D3D);"></div>
+                <div class="color-info">
+                    <div class="color-label">Title Bar</div>
+                    <div class="color-value">#2D2D2D → #3D3D3D</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #2D2D2D;"></div>
+                <div class="color-info">
+                    <div class="color-label">Left Menu / Surface</div>
+                    <div class="color-value">#2D2D2D</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: linear-gradient(to bottom, #3C3C3C, #2D2D2D);"></div>
+                <div class="color-info">
+                    <div class="color-label">Buttons</div>
+                    <div class="color-value">#3C3C3C → #2D2D2D</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #E0E0E0; color: #1E1E1E; display: flex; align-items: center; justify-content: center; font-size: 20px;">A</div>
+                <div class="color-info">
+                    <div class="color-label">Text</div>
+                    <div class="color-value">#E0E0E0 (Hellgrau)</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #BB86FC; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px;">★</div>
+                <div class="color-info">
+                    <div class="color-label">Akzentfarbe</div>
+                    <div class="color-value">#BB86FC (Lila)</div>
+                </div>
+            </div>
+
+            <a href="variante_05_dark_mode.html" class="preview-btn" target="_blank">Dark Mode öffnen →</a>
+        </div>
+
+        <!-- ENTERPRISE -->
+        <div class="palette enterprise">
+            <h2>Variante 6: Corporate Enterprise 🏢</h2>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #ECEFF1;"></div>
+                <div class="color-info">
+                    <div class="color-label">Haupt-Hintergrund</div>
+                    <div class="color-value">#ECEFF1 (Hellgrau)</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: linear-gradient(to right, #37474F, #455A64);"></div>
+                <div class="color-info">
+                    <div class="color-label">Title Bar</div>
+                    <div class="color-value">#37474F → #455A64</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #37474F;"></div>
+                <div class="color-info">
+                    <div class="color-label">Left Menu (Blaugrau)</div>
+                    <div class="color-value">#37474F</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: linear-gradient(to bottom, #CFD8DC, #B0BEC5);"></div>
+                <div class="color-info">
+                    <div class="color-label">Buttons</div>
+                    <div class="color-value">#CFD8DC → #B0BEC5</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #263238; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px;">A</div>
+                <div class="color-info">
+                    <div class="color-label">Text</div>
+                    <div class="color-value">#263238 (Dunkel)</div>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <div class="color-box" style="background: #0288D1; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px;">★</div>
+                <div class="color-info">
+                    <div class="color-label">Akzentfarbe</div>
+                    <div class="color-value">#0288D1 (Blau)</div>
+                </div>
+            </div>
+
+            <a href="variante_06_enterprise.html" class="preview-btn" target="_blank">Enterprise öffnen →</a>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; padding: 20px; background: white; border-radius: 8px; max-width: 800px; margin-left: auto; margin-right: auto;">
+        <h3 style="margin-bottom: 15px;">Varianten erstellen</h3>
+        <p style="margin-bottom: 15px; color: #666;">
+            Die HTML-Dateien existieren noch nicht? Führen Sie eines der folgenden Scripts aus:
+        </p>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button onclick="alert('Öffnen Sie: VARIANTEN_ERSTELLEN.cmd')" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">
+                📁 VARIANTEN_ERSTELLEN.cmd
+            </button>
+            <button onclick="alert('Terminal: python create_variants.py')" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">
+                🐍 create_variants.py
+            </button>
+            <button onclick="alert('PowerShell: .\\create_variants.ps1')" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">
+                💻 create_variants.ps1
+            </button>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; color: #999; font-size: 12px;">
+        Erstellt: 2026-01-02 | Auftragstamm Design-Varianten
+    </div>
+</body>
+</html>

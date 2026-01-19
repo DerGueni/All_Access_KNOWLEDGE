@@ -1,0 +1,4 @@
+SELECT tbl_MA_VA_Zuordnung.VA_ID, tbl_MA_VA_Zuordnung.MA_ID, tbl_MA_VA_Zuordnung.VADatum_ID, tbl_MA_VA_Zuordnung.VADatum, tbl_VA_Auftragstamm.Auftrag, tbl_VA_Auftragstamm.Ort, tbl_VA_Auftragstamm.Objekt, ([MA_Start]) AS Beginn1, ([MA_Ende]) AS Ende1, ([MA_Brutto_Std2]) AS [Brutto Std], ([MA_Netto_Std2]) AS [Netto Std], ([PKW]) AS Fahrtkosten, tbl_MA_VA_Zuordnung.RL_34a, tbl_VA_Auftragstamm.ID AS Zuo_ID
+FROM tbl_VA_Auftragstamm INNER JOIN tbl_MA_VA_Zuordnung ON tbl_VA_Auftragstamm.ID = tbl_MA_VA_Zuordnung.VA_ID
+WHERE (((tbl_MA_VA_Zuordnung.VA_ID)>0) AND ((tbl_MA_VA_Zuordnung.MA_ID)>0) AND ((tbl_MA_VA_Zuordnung.VADatum_ID)>0));
+

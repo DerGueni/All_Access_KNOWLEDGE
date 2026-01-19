@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung - Rote Sidebar Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 12px;
+            background: #f0f0f0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ============================================
+           HAUPTLAYOUT
+           ============================================ */
+        .app-container {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+        }
+
+        /* ============================================
+           ROTE SIDEBAR
+           ============================================ */
+        .sidebar {
+            grid-row: 1 / -1;
+            background: linear-gradient(180deg, #8b2020 0%, #6b1515 50%, #4a0f0f 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            background: #2d0a0a;
+            padding: 15px 12px;
+            text-align: center;
+            border-bottom: 2px solid #ff6666;
+        }
+
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 10px 0;
+            overflow-y: auto;
+        }
+
+        .menu-section {
+            margin-bottom: 5px;
+        }
+
+        .menu-section-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #ffaaaa;
+            padding: 8px 15px 4px;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            color: white;
+            text-align: left;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #ff6666;
+        }
+
+        .menu-item.active {
+            background: rgba(255,255,255,0.15);
+            border-left-color: #ff6666;
+            font-weight: bold;
+        }
+
+        .sidebar-footer {
+            padding: 10px;
+            border-top: 1px solid #ff6666;
+            font-size: 10px;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* ============================================
+           GRAUER HEADER
+           ============================================ */
+        .header {
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+            color: white;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #404040;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 3px;
+        }
+
+        .nav-btn {
+            background: #505050;
+            border: 1px solid #707070;
+            color: white;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .nav-btn:hover {
+            background: #606060;
+        }
+
+        .header-center {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            background: linear-gradient(180deg, #707070 0%, #505050 100%);
+            border: 1px solid #808080;
+            color: white;
+            padding: 6px 14px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .header-btn:hover {
+            background: linear-gradient(180deg, #808080 0%, #606060 100%);
+        }
+
+        .header-btn.primary {
+            background: linear-gradient(180deg, #4a7c4a 0%, #3a5c3a 100%);
+            border-color: #5a9c5a;
+        }
+
+        .header-btn.danger {
+            background: linear-gradient(180deg, #9c4a4a 0%, #7c3a3a 100%);
+            border-color: #bc5a5a;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+        }
+
+        /* ============================================
+           HAUPTINHALT
+           ============================================ */
+        .main-content {
+            background: #e8e8e8;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: #d0d0d0;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #b0b0b0;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 24px;
+            background: #a0a0a0;
+            margin: 0 5px;
+        }
+
+        .toolbar-label {
+            font-size: 11px;
+            color: #404040;
+        }
+
+        .toolbar-input {
+            border: 1px solid #909090;
+            padding: 3px 6px;
+            font-size: 11px;
+            background: white;
+        }
+
+        .toolbar-select {
+            border: 1px solid #909090;
+            padding: 3px 6px;
+            font-size: 11px;
+            background: white;
+        }
+
+        .toolbar-btn {
+            background: linear-gradient(180deg, #f0f0f0 0%, #d0d0d0 100%);
+            border: 1px solid #a0a0a0;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .toolbar-btn:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        /* ============================================
+           TAB-BEREICH (HAUPTFEATURE!)
+           ============================================ */
+        .tab-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin: 8px;
+            background: white;
+            border: 1px solid #a0a0a0;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #c0c0c0;
+            border-bottom: 2px solid #808080;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: linear-gradient(180deg, #d8d8d8 0%, #b8b8b8 100%);
+            border: 1px solid #a0a0a0;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: -1px;
+            position: relative;
+            color: #404040;
+        }
+
+        .tab-btn:hover {
+            background: linear-gradient(180deg, #e8e8e8 0%, #c8c8c8 100%);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
+            border-bottom: 2px solid white;
+            margin-bottom: -2px;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .tab-page {
+            display: none;
+            height: 100%;
+            padding: 15px;
+            overflow: auto;
+        }
+
+        .tab-page.active {
+            display: block;
+        }
+
+        /* ============================================
+           TAB 1: STAMMDATEN
+           ============================================ */
+        .stammdaten-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group.wide {
+            grid-column: span 2;
+        }
+
+        .form-group.full {
+            grid-column: span 3;
+        }
+
+        .form-label {
+            font-size: 11px;
+            color: #505050;
+            font-weight: 500;
+        }
+
+        .form-input {
+            border: 1px solid #b0b0b0;
+            padding: 6px 8px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #8b2020;
+            box-shadow: 0 0 3px rgba(139,32,32,0.3);
+        }
+
+        .form-input.readonly {
+            background: #e8e8e8;
+        }
+
+        .form-select {
+            border: 1px solid #b0b0b0;
+            padding: 6px 8px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .form-textarea {
+            border: 1px solid #b0b0b0;
+            padding: 6px 8px;
+            font-size: 12px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #8b2020;
+            margin: 15px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #d0d0d0;
+            grid-column: span 3;
+        }
+
+        /* ============================================
+           TAB 2: SCHICHTEN
+           ============================================ */
+        .schichten-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .schichten-toolbar {
+            display: flex;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d0d0d0;
+        }
+
+        .schichten-grid {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #c0c0c0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .data-table th {
+            background: linear-gradient(180deg, #e0e0e0 0%, #c0c0c0 100%);
+            border: 1px solid #a0a0a0;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            border: 1px solid #d0d0d0;
+            padding: 6px 10px;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .data-table tr:hover {
+            background: #e8f0ff;
+        }
+
+        .data-table tr.selected {
+            background: #8b2020;
+            color: white;
+        }
+
+        .data-table input {
+            border: 1px solid #c0c0c0;
+            padding: 3px 5px;
+            font-size: 11px;
+            width: 100%;
+        }
+
+        .cell-green { background: #c8f0c8; }
+        .cell-yellow { background: #f0f0c0; }
+        .cell-red { background: #f0c8c8; }
+
+        /* ============================================
+           TAB 3: ZUGEWIESENE MITARBEITER
+           ============================================ */
+        .ma-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .ma-toolbar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d0d0d0;
+        }
+
+        .ma-stats {
+            margin-left: auto;
+            font-size: 11px;
+            color: #606060;
+        }
+
+        .ma-stats strong {
+            color: #8b2020;
+        }
+
+        .ma-grid {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #c0c0c0;
+        }
+
+        /* ============================================
+           TAB 4: PREISE / STUNDENSATZE
+           ============================================ */
+        .preise-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .preise-section {
+            background: #f8f8f8;
+            border: 1px solid #d0d0d0;
+            padding: 15px;
+        }
+
+        .preise-section-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #8b2020;
+            margin-bottom: 12px;
+        }
+
+        .preise-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .preis-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .preis-label {
+            font-size: 10px;
+            color: #606060;
+        }
+
+        .preis-input {
+            border: 1px solid #b0b0b0;
+            padding: 5px 8px;
+            font-size: 12px;
+            text-align: right;
+            background: white;
+        }
+
+        .preis-input.calculated {
+            background: #e8f0e8;
+            font-weight: bold;
+        }
+
+        .preise-summary {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #c0c0c0;
+            margin-top: 10px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            color: #606060;
+        }
+
+        .summary-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #8b2020;
+        }
+
+        /* ============================================
+           STATUSLEISTE
+           ============================================ */
+        .statusbar {
+            background: #d0d0d0;
+            padding: 4px 10px;
+            display: flex;
+            gap: 15px;
+            font-size: 10px;
+            border-top: 1px solid #b0b0b0;
+        }
+
+        .status-item {
+            display: flex;
+            gap: 5px;
+        }
+
+        .status-label {
+            color: #606060;
+        }
+
+        .status-value {
+            color: #000;
+        }
+
+        /* ============================================
+           HILFSELEMENTE
+           ============================================ */
+        .btn {
+            background: linear-gradient(180deg, #f0f0f0 0%, #d0d0d0 100%);
+            border: 1px solid #a0a0a0;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #8b2020 0%, #6b1515 100%);
+            border-color: #4a0f0f;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(180deg, #9b3030 0%, #7b2525 100%);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 50px;
+            right: 15px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 10px 18px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app-container">
+        <!-- ============================================
+             ROTE SIDEBAR
+             ============================================ -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">CONSYS</div>
+                <div class="sidebar-title">Planungssystem</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Planung</div>
+                    <button class="menu-item">Dienstplanubersicht</button>
+                    <button class="menu-item">Planungsubersicht</button>
+                    <button class="menu-item active">Auftragsverwaltung</button>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Stammdaten</div>
+                    <button class="menu-item">Mitarbeiterverwaltung</button>
+                    <button class="menu-item">Kundenverwaltung</button>
+                    <button class="menu-item">Objektverwaltung</button>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Personal</div>
+                    <button class="menu-item">Zeitkonten</button>
+                    <button class="menu-item">Abwesenheitsplanung</button>
+                    <button class="menu-item">Stundenabgleich</button>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">Abrechnung</div>
+                    <button class="menu-item">Verrechnungssatze</button>
+                    <button class="menu-item">Sub Rechnungen</button>
+                    <button class="menu-item">Lohnabrechnungen</button>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-section-title">System</div>
+                    <button class="menu-item">E-Mail</button>
+                    <button class="menu-item">System Info</button>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                Version 1.55 | 2025
+            </div>
+        </aside>
+
+        <!-- ============================================
+             GRAUER HEADER
+             ============================================ -->
+        <header class="header">
+            <div class="header-left">
+                <span class="header-title">Auftragsverwaltung</span>
+                <div class="header-nav">
+                    <button class="nav-btn">|&#9664;</button>
+                    <button class="nav-btn">&#9664;</button>
+                    <button class="nav-btn">&#9654;</button>
+                    <button class="nav-btn">&#9654;|</button>
+                </div>
+            </div>
+
+            <div class="header-center">
+                <button class="header-btn primary">Neuer Auftrag</button>
+                <button class="header-btn">Kopieren</button>
+                <button class="header-btn danger">Loschen</button>
+                <button class="header-btn">Aktualisieren</button>
+            </div>
+
+            <div class="header-right">
+                <span>Auftrag-ID:</span>
+                <input type="text" class="toolbar-input" id="ID" value="12345" style="width: 60px;" readonly>
+            </div>
+        </header>
+
+        <!-- ============================================
+             HAUPTINHALT
+             ============================================ -->
+        <main class="main-content">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <span class="toolbar-label">Datum:</span>
+                    <input type="date" class="toolbar-input" id="Dat_VA_Von" value="2025-01-18" style="width: 110px;">
+                    <span>-</span>
+                    <input type="date" class="toolbar-input" id="Dat_VA_Bis" value="2025-01-18" style="width: 110px;">
+                </div>
+
+                <div class="toolbar-separator"></div>
+
+                <div class="toolbar-group">
+                    <span class="toolbar-label">Auftrag:</span>
+                    <input type="text" class="toolbar-input" id="Auftrag" value="1.FC Nurnberg vs. Greuther Furth" style="width: 250px;" list="auftragListe" oninput="auftragGeaendert()">
+                    <datalist id="auftragListe">
+                        <option value="1.FC Nurnberg">
+                        <option value="Greuther Furth">
+                        <option value="HC Erlangen">
+                    </datalist>
+                </div>
+
+                <div class="toolbar-separator"></div>
+
+                <div class="toolbar-group">
+                    <span class="toolbar-label">Status:</span>
+                    <select class="toolbar-select" id="Status" style="width: 120px;">
+                        <option value="1">In Planung</option>
+                        <option value="2">Bestatigt</option>
+                        <option value="3">Abgeschlossen</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 TAB-BEREICH (STAMMDATEN / SCHICHTEN / ZUGEWIESENE MA / PREISE)
+                 ============================================ -->
+            <div class="tab-container">
+                <div class="tab-header">
+                    <button class="tab-btn active" data-tab="stammdaten" onclick="wechselTab('stammdaten')">Stammdaten</button>
+                    <button class="tab-btn" data-tab="schichten" onclick="wechselTab('schichten')">Schichten</button>
+                    <button class="tab-btn" data-tab="mitarbeiter" onclick="wechselTab('mitarbeiter')">Zugewiesene Mitarbeiter</button>
+                    <button class="tab-btn" data-tab="preise" onclick="wechselTab('preise')">Preise / Stundensatze</button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- ========== TAB: STAMMDATEN ========== -->
+                    <div class="tab-page active" id="tab-stammdaten">
+                        <div class="stammdaten-grid">
+                            <!-- Auftragsdetails -->
+                            <div class="section-title">Auftragsdetails</div>
+
+                            <div class="form-group wide">
+                                <label class="form-label">Veranstaltung / Auftrag</label>
+                                <input type="text" class="form-input" id="sdAuftrag" value="1.FC Nurnberg vs. Greuther Furth">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Auftrag-Nr.</label>
+                                <input type="text" class="form-input readonly" value="12345" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Objekt / Location</label>
+                                <input type="text" class="form-input" id="sdObjekt" value="Max-Morlock-Stadion">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Ort</label>
+                                <input type="text" class="form-input" id="sdOrt" value="Nurnberg">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">PLZ</label>
+                                <input type="text" class="form-input" id="sdPLZ" value="90480">
+                            </div>
+
+                            <div class="form-group wide">
+                                <label class="form-label">Strasse</label>
+                                <input type="text" class="form-input" id="sdStrasse" value="Valznerweiherstrasse 200">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Auftraggeber</label>
+                                <select class="form-select" id="sdVeranstalter">
+                                    <option value="20771" selected>1. FC Nurnberg e.V.</option>
+                                    <option value="20737">SpVgg Greuther Furth</option>
+                                    <option value="20761">HC Erlangen</option>
+                                </select>
+                            </div>
+
+                            <!-- Einsatzdetails -->
+                            <div class="section-title">Einsatzdetails</div>
+
+                            <div class="form-group">
+                                <label class="form-label">Treffzeit</label>
+                                <input type="time" class="form-input" id="sdTreffzeit" value="11:00">
+                            </div>
+                            <div class="form-group wide">
+                                <label class="form-label">Treffpunkt</label>
+                                <input type="text" class="form-input" id="sdTreffpunkt" value="15 min vor DB Eingang Nord West">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Anpfiff / Beginn</label>
+                                <input type="time" class="form-input" id="sdAnpfiff" value="13:00">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Dienstkleidung</label>
+                                <input type="text" class="form-input" id="sdKleidung" value="Schwarz neutral">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Ansprechpartner</label>
+                                <input type="text" class="form-input" id="sdAnsprechpartner" value="Herr Muller">
+                            </div>
+
+                            <!-- Fahrtkosten -->
+                            <div class="section-title">Fahrtkosten</div>
+
+                            <div class="form-group">
+                                <label class="form-label">PKW Anzahl</label>
+                                <input type="number" class="form-input" id="sdPKW" value="3" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Fahrtkosten pro PKW</label>
+                                <input type="text" class="form-input" id="sdFahrtkosten" value="25,00">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Fahrtkosten Gesamt</label>
+                                <input type="text" class="form-input readonly calculated" id="sdFahrtkostenGesamt" value="75,00" readonly>
+                            </div>
+
+                            <!-- Bemerkungen -->
+                            <div class="section-title">Bemerkungen</div>
+                            <div class="form-group full">
+                                <textarea class="form-textarea" id="sdBemerkungen" rows="4">Einlass ab 10:30 Uhr
+VIP-Bereich extra besetzt
+Kontakt vor Ort: Herr Muller, Tel: 0911/123456</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========== TAB: SCHICHTEN ========== -->
+                    <div class="tab-page" id="tab-schichten">
+                        <div class="schichten-container">
+                            <div class="schichten-toolbar">
+                                <button class="btn btn-primary">+ Schicht hinzufugen</button>
+                                <button class="btn">Schicht loschen</button>
+                                <button class="btn">Kopieren</button>
+                                <div class="toolbar-separator"></div>
+                                <span class="toolbar-label">Datum:</span>
+                                <select class="toolbar-select" id="schichtDatum" style="width: 120px;">
+                                    <option>18.01.2025</option>
+                                </select>
+                            </div>
+
+                            <div class="schichten-grid">
+                                <table class="data-table" id="tblSchichten">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">Nr.</th>
+                                            <th style="width: 80px;">Von</th>
+                                            <th style="width: 80px;">Bis</th>
+                                            <th style="width: 60px;">Stunden</th>
+                                            <th style="width: 80px;">Soll MA</th>
+                                            <th style="width: 80px;">Ist MA</th>
+                                            <th style="width: 80px;">Offen</th>
+                                            <th>Bemerkung</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr onclick="schichtAuswaehlen(this)">
+                                            <td>1</td>
+                                            <td><input type="time" value="11:00"></td>
+                                            <td><input type="time" value="16:00"></td>
+                                            <td>5,0</td>
+                                            <td><input type="number" value="5" style="width: 50px;"></td>
+                                            <td class="cell-green">5</td>
+                                            <td>0</td>
+                                            <td><input type="text" placeholder="Bemerkung..."></td>
+                                        </tr>
+                                        <tr onclick="schichtAuswaehlen(this)">
+                                            <td>2</td>
+                                            <td><input type="time" value="12:00"></td>
+                                            <td><input type="time" value="17:00"></td>
+                                            <td>5,0</td>
+                                            <td><input type="number" value="3" style="width: 50px;"></td>
+                                            <td class="cell-yellow">2</td>
+                                            <td class="cell-red">1</td>
+                                            <td><input type="text" value="VIP-Bereich"></td>
+                                        </tr>
+                                        <tr onclick="schichtAuswaehlen(this)">
+                                            <td>3</td>
+                                            <td><input type="time" value="10:00"></td>
+                                            <td><input type="time" value="14:00"></td>
+                                            <td>4,0</td>
+                                            <td><input type="number" value="2" style="width: 50px;"></td>
+                                            <td class="cell-green">2</td>
+                                            <td>0</td>
+                                            <td><input type="text" value="Einlasskontrolle"></td>
+                                        </tr>
+                                        <tr class="new-row">
+                                            <td>*</td>
+                                            <td><input type="time"></td>
+                                            <td><input type="time"></td>
+                                            <td></td>
+                                            <td><input type="number" style="width: 50px;"></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td><input type="text" placeholder="Neue Schicht..."></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========== TAB: ZUGEWIESENE MITARBEITER ========== -->
+                    <div class="tab-page" id="tab-mitarbeiter">
+                        <div class="ma-container">
+                            <div class="ma-toolbar">
+                                <button class="btn btn-primary">+ MA hinzufugen</button>
+                                <button class="btn">MA entfernen</button>
+                                <button class="btn">Schnellauswahl</button>
+                                <div class="toolbar-separator"></div>
+                                <button class="btn">Einsatzliste senden</button>
+                                <button class="btn">Einsatzliste drucken</button>
+
+                                <div class="ma-stats">
+                                    Gesamt: <strong>9</strong> MA | Zugesagt: <strong>7</strong> | Offen: <strong>2</strong>
+                                </div>
+                            </div>
+
+                            <div class="ma-grid">
+                                <table class="data-table" id="tblMitarbeiter">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40px;">Lfd</th>
+                                            <th style="width: 150px;">Mitarbeiter</th>
+                                            <th style="width: 80px;">Von</th>
+                                            <th style="width: 80px;">Bis</th>
+                                            <th style="width: 60px;">Std</th>
+                                            <th style="width: 80px;">Status</th>
+                                            <th style="width: 50px;">PKW</th>
+                                            <th style="width: 50px;">Info</th>
+                                            <th>Bemerkungen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Muller, Hans</td>
+                                            <td>11:00</td>
+                                            <td>16:00</td>
+                                            <td>5,0</td>
+                                            <td class="cell-green">Zugesagt</td>
+                                            <td>&#10003;</td>
+                                            <td>&#10003;</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Meyer, Anna</td>
+                                            <td>11:00</td>
+                                            <td>16:00</td>
+                                            <td>5,0</td>
+                                            <td class="cell-green">Zugesagt</td>
+                                            <td></td>
+                                            <td>&#10003;</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Bauer, Peter</td>
+                                            <td>12:00</td>
+                                            <td>17:00</td>
+                                            <td>5,0</td>
+                                            <td class="cell-yellow">Angefragt</td>
+                                            <td></td>
+                                            <td>&#10003;</td>
+                                            <td>VIP-Bereich</td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>Fischer, Lisa</td>
+                                            <td>11:00</td>
+                                            <td>16:00</td>
+                                            <td>5,0</td>
+                                            <td class="cell-green">Zugesagt</td>
+                                            <td>&#10003;</td>
+                                            <td>&#10003;</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>Weber, Max</td>
+                                            <td>12:00</td>
+                                            <td>17:00</td>
+                                            <td>5,0</td>
+                                            <td class="cell-green">Zugesagt</td>
+                                            <td></td>
+                                            <td>&#10003;</td>
+                                            <td>VIP-Bereich</td>
+                                        </tr>
+                                        <tr>
+                                            <td>6</td>
+                                            <td>Schneider, Tom</td>
+                                            <td>10:00</td>
+                                            <td>14:00</td>
+                                            <td>4,0</td>
+                                            <td class="cell-green">Zugesagt</td>
+                                            <td>&#10003;</td>
+                                            <td>&#10003;</td>
+                                            <td>Einlasskontrolle</td>
+                                        </tr>
+                                        <tr>
+                                            <td>7</td>
+                                            <td>Koch, Maria</td>
+                                            <td>10:00</td>
+                                            <td>14:00</td>
+                                            <td>4,0</td>
+                                            <td class="cell-green">Zugesagt</td>
+                                            <td></td>
+                                            <td>&#10003;</td>
+                                            <td>Einlasskontrolle</td>
+                                        </tr>
+                                        <tr>
+                                            <td>8</td>
+                                            <td>Wagner, Klaus</td>
+                                            <td>11:00</td>
+                                            <td>16:00</td>
+                                            <td>5,0</td>
+                                            <td class="cell-yellow">Angefragt</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>9</td>
+                                            <td>Hoffmann, Eva</td>
+                                            <td>12:00</td>
+                                            <td>17:00</td>
+                                            <td>5,0</td>
+                                            <td class="cell-green">Zugesagt</td>
+                                            <td></td>
+                                            <td>&#10003;</td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========== TAB: PREISE / STUNDENSATZE ========== -->
+                    <div class="tab-page" id="tab-preise">
+                        <div class="preise-container">
+                            <!-- Stundensatze -->
+                            <div class="preise-section">
+                                <div class="preise-section-title">Stundensatze</div>
+                                <div class="preise-grid">
+                                    <div class="preis-group">
+                                        <span class="preis-label">Standard-Stundensatz</span>
+                                        <input type="text" class="preis-input" value="25,00">
+                                    </div>
+                                    <div class="preis-group">
+                                        <span class="preis-label">VIP-Bereich</span>
+                                        <input type="text" class="preis-input" value="30,00">
+                                    </div>
+                                    <div class="preis-group">
+                                        <span class="preis-label">Objektleiter</span>
+                                        <input type="text" class="preis-input" value="35,00">
+                                    </div>
+                                    <div class="preis-group">
+                                        <span class="preis-label">Nacht-Zuschlag</span>
+                                        <input type="text" class="preis-input" value="5,00">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Berechnung -->
+                            <div class="preise-section">
+                                <div class="preise-section-title">Auftragskalkulation</div>
+                                <div class="preise-grid">
+                                    <div class="preis-group">
+                                        <span class="preis-label">Gesamt-Stunden</span>
+                                        <input type="text" class="preis-input calculated" value="43,0" readonly>
+                                    </div>
+                                    <div class="preis-group">
+                                        <span class="preis-label">Personalkosten</span>
+                                        <input type="text" class="preis-input calculated" value="1.075,00" readonly>
+                                    </div>
+                                    <div class="preis-group">
+                                        <span class="preis-label">Fahrtkosten</span>
+                                        <input type="text" class="preis-input calculated" value="75,00" readonly>
+                                    </div>
+                                    <div class="preis-group">
+                                        <span class="preis-label">Sonstige Kosten</span>
+                                        <input type="text" class="preis-input" value="0,00">
+                                    </div>
+                                </div>
+
+                                <div class="preise-summary">
+                                    <div class="summary-item">
+                                        <span class="summary-label">Gesamtsumme Netto:</span>
+                                        <span class="summary-value">1.150,00 EUR</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span class="summary-label">zzgl. 19% MwSt:</span>
+                                        <span class="summary-value">218,50 EUR</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span class="summary-label">Gesamtsumme Brutto:</span>
+                                        <span class="summary-value" style="font-size: 16px;">1.368,50 EUR</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kundenpreise -->
+                            <div class="preise-section">
+                                <div class="preise-section-title">Kundenspezifische Preise</div>
+                                <div class="preise-grid">
+                                    <div class="preis-group">
+                                        <span class="preis-label">Kunde</span>
+                                        <input type="text" class="preis-input" value="1. FC Nurnberg e.V." readonly>
+                                    </div>
+                                    <div class="preis-group">
+                                        <span class="preis-label">Vereinbarter Stundensatz</span>
+                                        <input type="text" class="preis-input" value="28,00">
+                                    </div>
+                                    <div class="preis-group">
+                                        <span class="preis-label">Rabatt %</span>
+                                        <input type="text" class="preis-input" value="0,00">
+                                    </div>
+                                    <div class="preis-group">
+                                        <span class="preis-label">Zahlungsziel (Tage)</span>
+                                        <input type="text" class="preis-input" value="30">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ============================================
+             STATUSLEISTE
+             ============================================ -->
+        <footer class="statusbar">
+            <div class="status-item">
+                <span class="status-label">Erstellt:</span>
+                <span class="status-value">guenther.siegert, 15.01.2025 09:00</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Geandert:</span>
+                <span class="status-value">guenther.siegert, 17.01.2025 14:30</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Datensatze:</span>
+                <span class="status-value">1 von 238</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Tab-Wechsel
+        function wechselTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-page').forEach(page => {
+                page.classList.toggle('active', page.id === 'tab-' + tabName);
+            });
+        }
+
+        // Schicht auswahlen
+        function schichtAuswaehlen(row) {
+            document.querySelectorAll('#tblSchichten tbody tr').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+        }
+
+        // Auftrag geandert - Template anwenden
+        function auftragGeaendert() {
+            const auftrag = document.getElementById('Auftrag').value.toLowerCase();
+
+            const templates = {
+                '1.fc nurnberg': { objekt: 'Max-Morlock-Stadion', ort: 'Nurnberg', plz: '90480', strasse: 'Valznerweiherstrasse 200', treffpunkt: '15 min vor DB Eingang Nord West' },
+                'greuther': { objekt: 'Sportpark am Ronhof', ort: 'Furth', plz: '90765', strasse: 'Laubenweg 60', treffpunkt: '15 min vor DB Tor F' },
+                'hc erlangen': { objekt: 'Arena Nurnberg', ort: 'Nurnberg', plz: '90471', strasse: 'Kurt-Leucht-Weg 11', treffpunkt: '15 min vor DB Arena Ecke Kurt-Leucht' }
+            };
+
+            for (const [key, tpl] of Object.entries(templates)) {
+                if (auftrag.includes(key)) {
+                    document.getElementById('sdObjekt').value = tpl.objekt;
+                    document.getElementById('sdOrt').value = tpl.ort;
+                    document.getElementById('sdPLZ').value = tpl.plz;
+                    document.getElementById('sdStrasse').value = tpl.strasse;
+                    document.getElementById('sdTreffpunkt').value = tpl.treffpunkt;
+                    zeigeMeldung('Stammdaten fur ' + key + ' geladen', 'success');
+                    break;
+                }
+            }
+        }
+
+        // Toast anzeigen
+        function zeigeMeldung(text, typ) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + typ;
+            toast.textContent = text;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // PKW * Fahrtkosten berechnen
+        document.getElementById('sdPKW').addEventListener('input', berechnefahrtkosten);
+        document.getElementById('sdFahrtkosten').addEventListener('input', berechnefahrtkosten);
+
+        function berechnefahrtkosten() {
+            const pkw = parseInt(document.getElementById('sdPKW').value) || 0;
+            const kosten = parseFloat(document.getElementById('sdFahrtkosten').value.replace(',', '.')) || 0;
+            document.getElementById('sdFahrtkostenGesamt').value = (pkw * kosten).toFixed(2).replace('.', ',');
+        }
+    </script>
+</body>
+</html>

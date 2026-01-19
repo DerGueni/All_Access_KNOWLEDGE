@@ -1,0 +1,212 @@
+================================================================================
+WHATSAPP BUSINESS API EINRICHTEN - SCHRITT-FÜR-SCHRITT ANLEITUNG
+================================================================================
+Erstellt: 2026-01-10
+Für: CONSEC WhatsApp-Integration
+================================================================================
+
+
+VORAUSSETZUNGEN
+---------------
+1. Facebook-Konto (persönlich)
+2. Meta Business Account (für die Firma CONSEC)
+3. Verifiziertes Unternehmen in Meta Business Manager
+4. WhatsApp-fähige Telefonnummer (+4991140997799)
+
+
+================================================================================
+SCHRITT 1: META DEVELOPER ACCOUNT ERSTELLEN
+================================================================================
+
+1. Gehe zu: https://developers.facebook.com/
+2. Klicke auf "Erste Schritte" / "Get Started"
+3. Melde dich mit deinem Facebook-Konto an
+4. Akzeptiere die Entwickler-Richtlinien
+
+
+================================================================================
+SCHRITT 2: APP ERSTELLEN
+================================================================================
+
+1. Im Developer Dashboard: "App erstellen" / "Create App"
+2. Wähle "Business" als App-Typ
+3. Gib einen Namen ein (z.B. "CONSEC WhatsApp")
+4. Wähle deinen Business Account aus
+5. App erstellen
+
+
+================================================================================
+SCHRITT 3: WHATSAPP-PRODUKT HINZUFÜGEN
+================================================================================
+
+1. In deiner App: Links "Produkte hinzufügen"
+2. Suche "WhatsApp" und klicke auf "Einrichten"
+3. Wähle deinen Meta Business Account aus
+
+
+================================================================================
+SCHRITT 4: TELEFONNUMMER HINZUFÜGEN
+================================================================================
+
+1. Gehe zu WhatsApp > API Setup im linken Menü
+2. Unter "From" siehst du eine Test-Nummer von Meta
+3. Klicke auf "Add phone number" um deine eigene Nummer hinzuzufügen
+   Nummer: +4991140997799
+4. Verifiziere die Nummer per SMS oder Anruf
+
+
+================================================================================
+SCHRITT 5: TEMPORÄREN ACCESS TOKEN HOLEN (ZUM TESTEN)
+================================================================================
+
+1. In WhatsApp > API Setup
+2. Klicke auf "Generate access token"
+3. Kopiere den Token
+
+ACHTUNG: Dieser Token läuft nach 24 STUNDEN ab!
+         Nur für Tests verwenden, nicht für Produktion!
+
+
+================================================================================
+SCHRITT 6: PERMANENTEN ACCESS TOKEN ERSTELLEN (FÜR PRODUKTION)
+================================================================================
+
+1. Gehe zu: https://business.facebook.com/settings/
+2. Wähle dein Unternehmen aus
+3. Links im Menü: Benutzer > Systembenutzer
+4. Klicke "Hinzufügen"
+5. Name eingeben: z.B. "CONSEC API User"
+6. Rolle: Admin
+7. Klicke "Systembenutzer erstellen"
+8. Klicke auf den neuen Benutzer > "Token generieren"
+9. Wähle deine WhatsApp-App aus dem Dropdown
+10. Aktiviere folgende Berechtigungen:
+    [x] whatsapp_business_management
+    [x] whatsapp_business_messaging
+11. Klicke "Token generieren"
+
+WICHTIG: Kopiere den Token SOFORT!
+         Er wird nur EINMAL angezeigt und kann danach nicht mehr abgerufen werden!
+         Speichere ihn sicher ab!
+
+
+================================================================================
+SCHRITT 7: PHONE NUMBER ID FINDEN
+================================================================================
+
+1. In WhatsApp > API Setup
+2. Unter "From" steht deine Nummer
+3. Die "Phone number ID" steht direkt darunter
+   Beispiel: 123456789012345
+
+Diese ID ist NICHT die Telefonnummer selbst, sondern eine interne Meta-ID!
+
+
+================================================================================
+SCHRITT 8: IN CONSEC EINTRAGEN
+================================================================================
+
+Öffne die Datei: set_whatsapp_env.bat
+(Im Ordner: 04_HTML_Forms/forms3/_whatsapp_feature/)
+
+Ersetze die Platzhalter:
+
+    set WA_PHONE_NUMBER_ID=123456789012345
+    set WA_ACCESS_TOKEN=EAAxxxxxxxxxxxxxxxxxxxxxx
+
+Dann starte den API-Server mit dieser Batch-Datei:
+
+    set_whatsapp_env.bat
+
+Der Server startet automatisch mit den gesetzten Credentials.
+
+
+================================================================================
+KOSTEN (STAND 2025)
+================================================================================
+
+Nachrichtentyp                  | Kosten pro Nachricht
+--------------------------------|----------------------
+Service (vom Kunden initiiert)  | 1.000 GRATIS pro Monat, dann ~0.005 EUR
+Utility (Benachrichtigungen)    | ~0.02-0.05 EUR
+Marketing                       | ~0.05-0.10 EUR
+
+Die Einsatz-Anfragen fallen unter "Utility" = ca. 2-5 Cent pro Nachricht.
+
+Bei 100 Anfragen pro Monat: ca. 2-5 EUR Kosten
+
+
+================================================================================
+TEST DER EINRICHTUNG
+================================================================================
+
+Nach der Einrichtung testen:
+
+1. API-Server starten (mit set_whatsapp_env.bat)
+
+2. Im Browser oder mit curl aufrufen:
+   http://localhost:5000/api/whatsapp/status
+
+3. Erwartete Antwort bei korrekter Konfiguration:
+   {
+     "configured": true,
+     "sender_number": "+4991140997799",
+     "webapp_url": "https://webapp.consec-security.selfhost.eu/...",
+     "hint": null
+   }
+
+4. Wenn "configured": false, dann sind die Umgebungsvariablen nicht gesetzt.
+
+
+================================================================================
+FEHLERBEHEBUNG
+================================================================================
+
+Problem: "configured": false
+Lösung:  Umgebungsvariablen prüfen. Server mit set_whatsapp_env.bat starten.
+
+Problem: "WhatsApp API nicht konfiguriert"
+Lösung:  WA_PHONE_NUMBER_ID und WA_ACCESS_TOKEN müssen beide gesetzt sein.
+
+Problem: Token abgelaufen
+Lösung:  Permanenten Token erstellen (Schritt 6), nicht temporären verwenden.
+
+Problem: Nachricht wird nicht zugestellt
+Lösung:
+  - Empfänger muss WhatsApp haben
+  - Telefonnummer muss mit Ländercode sein (49...)
+  - Nummer muss im richtigen Format sein (keine Leerzeichen, keine +)
+
+Problem: "Business not verified"
+Lösung:  Unternehmen muss in Meta Business Manager verifiziert sein.
+
+
+================================================================================
+NÜTZLICHE LINKS
+================================================================================
+
+Meta Developer Portal:
+https://developers.facebook.com/
+
+Meta Business Manager:
+https://business.facebook.com/
+
+WhatsApp Business API Dokumentation:
+https://developers.facebook.com/docs/whatsapp/cloud-api
+
+WhatsApp Nachrichtenvorlagen:
+https://developers.facebook.com/docs/whatsapp/message-templates
+
+
+================================================================================
+SUPPORT
+================================================================================
+
+Bei Fragen zur Meta/WhatsApp API:
+https://developers.facebook.com/support/
+
+Bei Fragen zur CONSEC-Integration:
+Siehe README.md im _whatsapp_feature Ordner
+
+
+================================================================================

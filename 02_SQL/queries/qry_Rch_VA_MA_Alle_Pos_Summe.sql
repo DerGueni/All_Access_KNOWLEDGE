@@ -1,0 +1,4 @@
+SELECT qry_Rch_VA_MA_Alle_Pos_MA_Einzel.VA_ID, qry_Rch_VA_MA_Alle_Pos_MA_Einzel.VADatum, Sum(qry_Rch_VA_MA_Alle_Pos_MA_Einzel.MA_Brutto_Std) AS Menge, qry_Rch_VA_MA_Alle_Pos_MA_Einzel.PreisArt_ID, qry_Rch_VA_MA_Alle_Pos_MA_Einzel.kun_ID, qry_Rch_VA_MA_Alle_Pos_MA_Einzel.Veranst_Status_ID
+FROM qry_Rch_VA_MA_Alle_Pos_MA_Einzel
+GROUP BY qry_Rch_VA_MA_Alle_Pos_MA_Einzel.VA_ID, qry_Rch_VA_MA_Alle_Pos_MA_Einzel.VADatum, qry_Rch_VA_MA_Alle_Pos_MA_Einzel.PreisArt_ID, qry_Rch_VA_MA_Alle_Pos_MA_Einzel.kun_ID, qry_Rch_VA_MA_Alle_Pos_MA_Einzel.Veranst_Status_ID;
+

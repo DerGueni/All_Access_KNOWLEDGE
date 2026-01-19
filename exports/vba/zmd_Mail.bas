@@ -1,0 +1,728 @@
+Attribute VB_Name = "zmd_Mail"
+Option Compare Database
+Option Explicit
+    
+    'Für Mailversand
+    Const cdoSendUsingMethod = "http://schemas.microsoft.com/cdo/configuration/sendusing"
+    Const cdoSMTPUseSSL = "http://schemas.microsoft.com/cdo/configuration/smtpusessl"
+    Const cdoSendUsingPort = 2
+    Const cdoSMTPServer = "http://schemas.microsoft.com/cdo/configuration/smtpserver"
+    Const cdoSMTPServerPort = "http://schemas.microsoft.com/cdo/configuration/smtpserverport"
+    Const cdoSMTPConnectionTimeout = "http://schemas.microsoft.com/cdo/configuration/smtpconnectiontimeout"
+    Const cdoSMTPAuthenticate = "http://schemas.microsoft.com/cdo/configuration/smtpauthenticate"
+    Const cdoBasic = 1
+    Const cdoSendUserName = "http://schemas.microsoft.com/cdo/configuration/sendusername"
+    Const cdoSendPassword = "http://schemas.microsoft.com/cdo/configuration/sendpassword"
+
+
+    Public MD5         As String
+    Public subRC       As String
+    Public VName       As String
+    Public NName       As String
+    Public Email       As String
+    Public va_text     As String
+    Public VA_Ort      As String
+    Public VA_Objekt   As String
+    Public VADatum     As String 'Besser wäre MVA_Datum, dieses wird gelesen!
+    Public VA_Uhrzeit  As String 'Besser wäre MVA_Uhrzeit, diese wird gelesen!
+    Public VA_Ende     As String
+    Public DC          As String
+    Public TP          As String
+    Public tpzeit      As String
+    Public Sender      As String
+    
+    
+'Mitarbeiter für Veranstaltung anfragen
+Function Anfragen(ByVal MA_ID As Integer, ByVal VA_ID As Long, _
+    ByVal VADatum_ID As Long, ByVal VAStart_ID As Long) As String
+    
+Dim check           As String
+Dim Status          As Integer
+Dim Criteria        As String
+Dim CRITERIAFORINFO As String
+Dim sql             As String
+    
+'    'Texte nachlesen
+'    subRC = Texte_lesen(MA_ID, VA_ID, VADatum_ID, VAStart_ID)
+    
+    'Prüfen, ob der Mitarbeiter eine Email-Adresse hat
+    If IsNull(TLookup("Email", MASTAMM, "ID = " & MA_ID)) Then
+        Anfragen = ">HAT KEINE EMAIL"
+            
+    Else
+        'MD5 Hash erzeugen
+        MD5 = FnsCalculateMD5(MA_ID & VA_ID & VADatum_ID & Email)
+        
+'        'Fehler beim Lesen der Texte - > Nicht mehr gebraucht
+'        If subRC <> "" Then
+'            Anfragen = "Fehler beim Lesen der Texte von MA_ID " & MA_ID & ": " & subRC
+'            Exit Function
+'        End If
+        
+        Criteria = "MA_ID = " & MA_ID & " AND VA_ID = " & VA_ID & _
+            " AND VADatum_ID = " & VADatum_ID & " AND VAStart_ID = " & VAStart_ID
+            
+        CRITERIAFORINFO = "VA_ID = " & VA_ID & _
+            " AND VADatum_ID = " & VADatum_ID & " AND VAStart_ID = " & VAStart_ID & " AND MA_ID = 0 AND IstFraglich = False"
+            
+        Status = TLookup("Status_ID", PLANUNG, Criteria)
+        'Status 1 bis 4:  1=Geplant, 2=Benachrichtigt, 3=Zusage, 4 =Absage
+        'Zusage 3 wird gelöscht kommt zu Zugeordnet -> Prüfung , ob MA bereits zugeordnet -> prüfen, ob das vorher schon passiert, sonst einkommentieren + anpassen!
+    '    If TLookup("ID", ZUORDNUNG, criteria) <> Null Then
+    '        Status = 3
+    '    endif.
+        
+        Select Case Status
+            Case 1
+                'Mitarbeiter anfragen
+                check = create_Mail(MA_ID, VA_ID, VADatum_ID, VAStart_ID, 1) & vbCrLf
+            
+                'Angefragt setzen, wenn Anfrage erfolgreich
+                If InStr(check, "OK") <> 0 Then Anfragen = setze_Angefragt(MA_ID, VA_ID, VADatum_ID, VAStart_ID)
+                
+                'Anfragezeitpunkt dokumentieren
+                TUpdate "Anfragezeitpunkt = " & DatumUhrzeitSQL(Now()), PLANUNG, Criteria
+'                SQL = "UPDATE " & PLANUNG & " SET Anfragezeitpunkt = " & DatumUhrzeitSQL(Now()) & " WHERE " & CRITERIA
+'                CurrentDb.Execute SQL
+                
+                'Infohaken setzen
+                setInfo (CRITERIAFORINFO)
+                
+            Case 2
+                
+                'Mitarbeiter anfragen
+                check = create_Mail(MA_ID, VA_ID, VADatum_ID, VAStart_ID, 1) & vbCrLf
+            
+                'Angefragt setzen, wenn Anfrage erfolgreich
+                If InStr(check, "OK") <> 0 Then Anfragen = setze_Angefragt(MA_ID, VA_ID, VADatum_ID, VAStart_ID)
+       
+                Anfragen = Anfragen & ">ERNEUT ANGEFRAGT!"
+                
+                'Infohaken setzen -> Darf nicht, da bereits bei der ersten Anfrage ein "Dummyhaken" gesetzt wurde!
+                'setInfo (CRITERIAFORINFO)
+                
+            Case 3
+                Anfragen = ">BEREITS ZUGESAGT!"
+                
+            Case 4
+                Anfragen = ">BEREITS ABGESAGT!"
+                
+            Case Else
+                Anfragen = ">UNBEKANNTER FEHLER!"
+            
+        End Select
+     
+        'Datei für Autmatische Antwort erzeugen
+        'create_PHP MD5, Email, VADatum, VA_Uhrzeit, VA_Ende, VA_Text, VA_Ort, VA_Objekt, MA_ID
+
+    End If
+    
+End Function
+
+
+'IstFraglich setzen
+Function setInfo(Criteria As String)
+
+Dim rs As Recordset
+    
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM " & ZUORDNUNG & " WHERE " & Criteria)
+    
+    If Not rs.EOF Then
+        rs.Edit
+        rs.fields("IstFraglich") = True
+        rs.update
+    End If
+    rs.Close
+    Set rs = Nothing
+
+End Function
+
+
+'Mitarbeiter als angefragt markieren Hier ANFRAGEZEITPUNKT SETZEN!
+Function setze_Angefragt(MA_ID As Integer, VA_ID As Long, VADatum_ID As Long, VAStart_ID As Long) As String
+
+Dim Criteria As String
+
+    Criteria = "MA_ID = " & MA_ID & " AND VA_ID = " & VA_ID & _
+        " AND VADatum_ID = " & VADatum_ID & " AND VAStart_ID = " & VAStart_ID
+
+    'Status 1 bis 4:  1=Geplant, 2=Benachrichtigt, 3=Zusage, 4 =Absage
+    '(Zusage 3 wird gelöscht kommt zu Zugeordnet)
+    
+    If TUpdate("Status_ID = 2", PLANUNG, Criteria) = "OK" Then
+      setze_Angefragt = ">OK"
+      
+    Else
+      setze_Angefragt = ">FEHLER!"
+    
+    End If
+      
+End Function
+    
+    
+'Texte zu IDs aus Stammdaten lesen
+Function Texte_lesen(ByVal MA_ID As String, ByVal VA_ID As String, ByVal VADatum_ID As String, ByVal VAStart_ID As String) As String
+    
+    Email = ""
+    VName = ""
+    NName = ""
+    va_text = ""
+    VA_Objekt = ""
+    VA_Ort = ""
+    VADatum = ""
+    VA_Uhrzeit = ""
+    VA_Ende = ""
+    DC = ""
+    TP = ""
+    tpzeit = ""
+    Sender = ""
+    
+On Error Resume Next
+
+    Email = TLookup("Email", "tbl_Ma_Mitarbeiterstamm", "ID=" & MA_ID)
+    
+    'eM@il Adresse muss gepflegt sein, da mit Grundlage für md5hash
+    If Err.Number <> 0 Then
+        Texte_lesen = "Mitarbeiter " & MA_ID & ": Emailadresse fehlt!"
+    End If
+    
+    'Rest ist rille für weitere Verarbeitung...
+    VName = TLookup("Vorname", MASTAMM, "ID = " & MA_ID)
+    NName = TLookup("Nachname", MASTAMM, "ID = " & MA_ID)
+    va_text = TLookup("Auftrag", AUFTRAGSTAMM, "ID = " & VA_ID)
+    VA_Objekt = TLookup("Objekt", AUFTRAGSTAMM, "ID = " & VA_ID)
+    VA_Ort = TLookup("Ort", AUFTRAGSTAMM, "ID = " & VA_ID)
+    VADatum = TLookup("VADatum", PLANUNG, "VADatum_ID = " & VADatum_ID & _
+        " AND MA_ID = " & MA_ID & " AND VAStart_ID = " & VAStart_ID)
+    VA_Uhrzeit = TLookup("MVA_Start", PLANUNG, "VADatum_ID = " & VADatum_ID & _
+        " AND MA_ID = " & MA_ID & " AND VAStart_ID = " & VAStart_ID)
+    DC = TLookup("Dienstkleidung", AUFTRAGSTAMM, "ID = " & VA_ID)
+    VA_Ende = TLookup("MVA_Ende", PLANUNG, "VADatum_ID = " & VADatum_ID & _
+        " AND MA_ID = " & MA_ID & " AND VAStart_ID = " & VAStart_ID)
+    TP = TLookup("Treffpunkt", AUFTRAGSTAMM, "ID = " & VA_ID)
+    tpzeit = TLookup("Treffp_Zeit", AUFTRAGSTAMM, "ID = " & VA_ID)
+    Sender = detect_sender
+
+    'Uhrzeit formatieren
+    VA_Uhrzeit = Format(VA_Uhrzeit, "HH:MM")
+    VA_Ende = Format(VA_Ende, "HH:MM")
+    tpzeit = Format(tpzeit, "HH:MM")
+    
+    'Autoende herausnehmen (bei 4,5h keine Endzeit)
+    If stunden(VA_Uhrzeit, VA_Ende) = "4,5" Then VA_Ende = ""
+   
+End Function
+
+
+'URL ERZEUGEN
+Function create_URL(MD5 As String, ByVal MA_ID As String, MAemail As String, ByVal VA_ID As String, _
+    ByVal VADatum_ID As String, ByVal VAStart_ID As String) As String
+
+    Dim url As String
+
+On Error GoTo err_URL
+    'Beispiel:
+    'http://noreply.consec-security.selfhost.eu/mail/index.php?MA_ID=0815&VA_ID=999&ZUSAGE=1&VADatum_ID=123123123
+    
+    url = "http://noreply.consec-security.selfhost.eu/mail/index.php?"
+    
+    'URL erzeugen
+    url = url & "md5hash=" & MD5 & "&MA_ID=" & MA_ID & "&VA_ID=" & VA_ID & _
+        "&VADatum_ID=" & VADatum_ID & "&VAStart_ID=" & VAStart_ID & "&dress=" & DC
+    
+    'Leerzeichen ersetzen
+    create_URL = Replace(url, " ", "_")
+
+
+end_URL:
+    Exit Function
+err_URL:
+    create_URL = Err.Number & Err.description
+    Resume end_URL
+End Function
+
+
+'Mail direkt erzeugen
+'Mailtype: 1=Anfrage, 2=Zusagebestätigung, 3=Absagebestätigung
+Function create_Mail(ByVal MA_ID As Integer, ByVal VA_ID As Long, ByVal VADatum_ID As Long, ByVal VAStart_ID As Long, Mailtype As Integer, Optional ByVal Attachment As String) As String
+
+    Dim Config  'As CDO.Configuration
+    Dim message 'As CDO.Message
+    Dim fields  'As ADODB.Fields
+
+    Dim url As String
+    Dim urlja As String
+    Dim urlnein As String
+    Dim Subject As String
+    Dim Body As String
+    Dim txtfile As String
+    Dim ZuAbsage As String
+    Dim Zusatztext As String
+    Dim farbe As String
+    
+    'Texte nachlesen
+    subRC = Texte_lesen(MA_ID, VA_ID, VADatum_ID, VAStart_ID)
+    
+    'URL erzeugen
+    Select Case Mailtype
+        Case 1 'Anfrage
+            url = create_URL(MD5, MA_ID, Email, VA_ID, VADatum_ID, VAStart_ID)
+        
+        
+            'Fehler beim Erzeugen der URL
+            If IsNumeric(Left(url, 1)) Then
+                create_Mail = "Fehler beim Erzeugen der URL: " & url
+                Exit Function
+            End If
+        
+            'URLs für Zusagen und Absage
+            urlja = url & "&ZUSAGE=1"
+            urlnein = url & "&ZUSAGE=0"
+            
+            'Betreffzeile aufbauen
+            Subject = "CONSEC Anfrage zu " & va_text & ", " & VADatum & " in " & VA_Ort
+        
+        Case Else ' Bestätigung
+            Subject = "Deine Rückmeldung ist angekommen " & va_text & ", " & VADatum & " in " & VA_Ort 'HIER noch unterscheiden-->ABSAGE /ZUSAGE
+        
+    End Select
+    
+    
+    Select Case Mailtype
+        Case 1
+            txtfile = TXTAnf
+        Case 2
+            txtfile = TXTConf
+            ZuAbsage = "Zusage"
+            farbe = "green"
+            Zusatztext = "Eine Übersicht über alle Deine zugesagten Aufträge findest Du als Dienstplan im Anhang." & vbCrLf & vbCrLf & "Viele Grüße"
+        Case 3
+            txtfile = TXTConf
+            ZuAbsage = "Absage"
+            farbe = "red"
+            Zusatztext = "Eine Übersicht über alle Deine zugesagten Aufträge findest Du als Dienstplan im Anhang." & vbCrLf & vbCrLf & "Viele Grüße"
+    End Select
+    
+    'Mailtext aufbauen
+    Body = create_HTML(txtfile)
+    
+    'Fehler beim Erzeugen des Bodys
+    If IsNumeric(Left(Body, 1)) Then
+        create_Mail = "Fehler beim Erzeugen des Bodys: " & Body
+        Exit Function
+    End If
+    
+    'Variablen ersetzen
+    Body = Replace(Body, "[A_URL_JA]", urlja)
+    Body = Replace(Body, "[A_URL_NEIN]", urlnein)
+    Body = Replace(Body, "[A_Auftr_Datum]", VADatum)
+    Body = Replace(Body, "[A_Auftrag]", va_text)
+    Body = Replace(Body, "[A_Ort]", VA_Ort)
+    Body = Replace(Body, "[A_Objekt]", VA_Objekt)
+    Body = Replace(Body, "[A_Start_Zeit]", VA_Uhrzeit & " Uhr")
+    If VA_Ende <> "" Then
+        'Body = Replace(Body, "[A_End_Zeit]", VA_Ende & " Uhr")
+        Body = Replace(Body, "[A_End_Zeit]", VA_Ende & " Uhr (Endzeit kann variieren)")
+    Else
+        Body = Replace(Body, "[A_End_Zeit]", VA_Ende)
+    End If
+    If tpzeit <> "" Then
+        Body = Replace(Body, "[A_Treffp_Zeit]", tpzeit & " Uhr")
+    Else
+        Body = Replace(Body, "[A_Treffp_Zeit]", tpzeit)
+    End If
+    Body = Replace(Body, "[A_Treffpunkt]", TP)
+    Body = Replace(Body, "[A_Dienstkleidung]", DC)
+    Body = Replace(Body, "[A_Sender]", Sender)
+    Body = Replace(Body, "[A_Wochentag]", Format(VADatum, "DDD"))
+
+    
+    'HIER noch unterscheiden
+    Body = Replace(Body, "[A_Color]", farbe)
+    Body = Replace(Body, "[A_ZUAB]", ZuAbsage)
+    Body = Replace(Body, "[A_Zusatztext]", Zusatztext)
+    
+    'Umlaute anpassen
+    Body = Text2HTML(Body)
+    
+    'Debug.Print Body
+
+    Set message = CreateObject("CDO.Message") 'server.CreateObject("CDO.Message")
+    Set Config = CreateObject("CDO.Configuration") 'server.CreateObject("CDO.Configuration")
+    Set fields = Config.fields
+    
+    Config.Load -1
+    With fields
+        .item(cdoSendUsingMethod) = cdoSendUsingPort
+        .item(cdoSMTPUseSSL).Value = False
+        .item(cdoSMTPServer).Value = "in-v3.mailjet.com"
+        .item(cdoSMTPServerPort).Value = 25
+        .item(cdoSMTPConnectionTimeout).Value = 10
+        .item(cdoSMTPAuthenticate).Value = cdoBasic
+        .item(cdoSendUserName).Value = SendUserName
+        .item(cdoSendPassword).Value = SendPassword
+        .update
+    End With
+     
+    With message
+    Set .Configuration = Config
+        .TO = Email
+        .FROM = """Consec Auftragsplanung"" <siegert@consec-nuernberg.de>"
+        .Subject = Subject
+        .HTMLBody = Body
+        If Attachment <> "" Then .addAttachment Attachment
+        .Send
+    End With
+     
+     
+    'is gut
+    create_Mail = VName & " " & NName & "  " & va_text & "  OK"
+    'Log
+    CurrentDb.Execute "INSERT INTO tbl_Log_eMail_Sent(SendDate,Absender,Betreff,MailText,BCC,VA_ID,IstHTML,Attachment)" & _
+        " VALUES (" & DatumUhrzeitSQL(Now) & ",'" & Environ("UserName") & " ','" & Subject & "','" & txtfile & "','" & Email & "'," & VA_ID & ",-1," & IIf(IsInitial(Attachment), 0, -1) & ")"
+    
+Ende:
+    Set fields = Nothing
+    Set message = Nothing
+    Set Config = Nothing
+    Exit Function
+Err:
+    create_Mail = Err.Number & " " & Err.description
+    Resume Ende
+End Function
+
+
+'HTML-Body aus Textdokument einlesen
+Function create_HTML(txtfile As String) As String
+
+Dim Buffer As String
+
+On Error GoTo Err_HTML
+
+    Open txtfile For Input As #1
+    Do
+      Line Input #1, Buffer
+      create_HTML = create_HTML & vbCrLf & Buffer
+    Loop While Not EOF(1)
+    
+    Close #1    ' Datei schließen
+
+    'Umlaute anpassen -> create_HTML -> wegen Variablen erst kurz vor Verssand!
+    'create_HTML = Text2HTML(create_HTML)
+    
+    
+End_HTML:
+    Exit Function
+Err_HTML:
+    create_HTML = Err.Number & " " & Err.description
+    Resume End_HTML
+End Function
+
+
+'Mail erzeugen und senden
+Function send_Mail(Email As String, Subject As String, Body As String, Optional Attachment As String) As String
+
+    Dim Config  'As CDO.Configuration
+    Dim message 'As CDO.Message
+    Dim fields  'As ADODB.Fields
+
+    Set message = CreateObject("CDO.Message") 'server.CreateObject("CDO.Message")
+    Set Config = CreateObject("CDO.Configuration") 'server.CreateObject("CDO.Configuration")
+    Set fields = Config.fields
+   
+On Error GoTo Err
+
+    Config.Load -1
+    With fields
+        .item(cdoSendUsingMethod) = cdoSendUsingPort
+        .item(cdoSMTPUseSSL).Value = False
+        .item(cdoSMTPServer).Value = SMTPServer
+        .item(cdoSMTPServerPort).Value = 25
+        .item(cdoSMTPConnectionTimeout).Value = 10
+        .item(cdoSMTPAuthenticate).Value = cdoBasic
+        .item(cdoSendUserName).Value = SendUserName
+        .item(cdoSendPassword).Value = SendPassword
+        .update
+    End With
+     
+    With message
+    Set .Configuration = Config
+        .TO = Email
+        .FROM = """Consec Auftragsplanung"" <siegert@consec-nuernberg.de>"
+        .Subject = Subject
+        .HTMLBody = Body
+        If Attachment <> "" Then .addAttachment Attachment
+        .Send
+    End With
+     
+     
+    'is gut
+    send_Mail = "Email wurde versendet"
+    
+    'Log
+    CurrentDb.Execute "INSERT INTO tbl_Log_eMail_Sent(SendDate,Absender,Betreff,MailText,BCC,IstHTML,Attachment)" & _
+        " VALUES (" & DatumUhrzeitSQL(Now) & ",'" & Environ("UserName") & " ','" & Subject & "','send_Mail','" & Email & "',-1," & IIf(IsInitial(Attachment), 0, -1) & ")"
+    
+    
+Ende:
+    Set fields = Nothing
+    Set message = Nothing
+    Set Config = Nothing
+    Exit Function
+Err:
+    send_Mail = Err.Number & " " & Err.description
+    Resume Ende
+End Function
+
+
+'Dienstplan senden
+Function Dienstplan_senden(MA_ID As Integer, von As Date, bis As Date) As String
+
+Dim Subject     As String
+Dim Body        As String
+Dim Attachment  As String
+Dim Report      As String
+Dim Sender      As String
+Dim Vorname     As String
+Dim Email       As String
+
+On Error GoTo Err
+    
+    'Email (bei Subs Telefonnummer, bei MA Email)
+    'If TLookup("IstSubunternehmer", MASTAMM, "ID=" & MA_ID) = False Then
+        Email = TLookup("Email", MASTAMM, "ID=" & MA_ID)
+    'Else
+        'Email = TLookup("Tel_Mobil", MASTAMM, "ID=" & MA_ID)
+        'Email = TLookup("Tel_Festnetz", MASTAMM, "ID=" & MA_ID)
+    'End If
+    
+    'Vorname
+    Vorname = TLookup("Vorname", MASTAMM, "ID= " & MA_ID)
+    
+    'Bericht
+    Report = "rpt_MA_Dienstplan"
+
+    'Anhang
+    Attachment = PfadTemp & "Dienstplan_" & von & "-" & bis & ".pdf"
+
+    'Prüfen, ob Bericht geöffnet
+    If fctIsReportOpen(Report) Then
+        MsgBox "Bitte zuerst den Bericht schließen!"
+        Exit Function
+    End If
+
+    'Betreff
+    Subject = "Dienstplan ab " & von
+
+    'Mailtext
+    Body = create_HTML(TXTDienstPl)
+    Body = Replace(Body, "[A_Vorname]", Vorname)
+    Body = Replace(Body, "[A_DatumAb]", von)
+
+    Sender = detect_sender
+
+    Body = Replace(Body, "[A_Sender]", Sender)
+    Body = Text2HTML(Body)
+    
+    'Alte Datei löschen falls noch vorhanden
+    If FileExists(Attachment) Then Kill Attachment
+
+    'Bericht im Temp-Verzeichnis als PDF sichern
+    DoCmd.OutputTo acOutputReport, Report, "PDF", Attachment
+
+    'Datum vermerken
+    TUpdate "Datum_DP = " & DatumSQL(Now), MASTAMM, "ID = " & MA_ID
+        
+    'Fire, Captain!
+    Dienstplan_senden = send_Mail(Email, Subject, Body, Attachment)
+        
+
+
+Ende:
+    'Datei löschen
+    If FileExists(Attachment) Then Kill Attachment
+    Exit Function
+Err:
+    Dienstplan_senden = Err.Number & " " & Err.description
+    Resume Ende
+End Function
+
+
+
+'Lohnabrechnung_ermitteln
+Function Lohnabrechnung_ermitteln(ByVal LexID As Long, Optional Jahr As Integer, Optional Monat As Integer) As String
+
+Dim PfadAbrech  As String
+Dim such        As String
+Dim MonatStr    As String
+Dim Datei       As String
+
+    If Jahr = 0 Then Jahr = Year(Now)
+    If Monat = 0 Then Monat = Month(Now) - 1
+    MonatStr = Monat_lang(Monat)
+
+    PfadAbrech = PfadPlanungAktuell & "A  - Lexware Datenträger\2 - Abr Lohn\CONSEC_Security_Veranstaltungsservice_&_" & Jahr & "_" & MonatStr & "\"
+    such = Jahr & "_" & MonatStr & "_" & LexID & "_"
+    Datei = Dir(PfadAbrech & "*" & such & "*.pdf")
+    
+    If Datei <> "" Then Lohnabrechnung_ermitteln = PfadAbrech & Datei
+    
+End Function
+
+
+'Lohnabrechnung senden
+Function Lohnabrechnung_senden(LexID As Long, Monat As String, Jahr As String, Datei As String) As String
+
+
+Dim Subject     As String
+Dim Body        As String
+Dim Attachment  As String
+Dim Sender      As String
+Dim Vorname     As String
+Dim Email       As String
+
+    
+    If Datei = "" Then
+        Lohnabrechnung_senden = "Keine Datei übergeben"
+        Exit Function
+    End If
+    
+   'Email
+    Email = TLookup("Email", MASTAMM, "LEXWare_ID=" & LexID)
+    
+    'Vorname
+    Vorname = TLookup("Vorname", MASTAMM, "LEXWare_ID= " & LexID & " AND IstAktiv = TRUE")
+
+    'Anhang
+    Attachment = Datei
+
+    'Betreff
+    Subject = "Consec Lohnabrechnung " & Monat
+
+    'Mailtext
+    Body = create_HTML(TXTAbrechnung)
+    Body = Replace(Body, "[A_Vorname]", Vorname)
+    Body = Replace(Body, "[A_Monat]", Monat)
+    Body = Replace(Body, "[A_Jahr]", Jahr)
+    
+    'Absender
+    Sender = detect_sender
+    
+    'Mailtext
+    Body = Replace(Body, "[A_Sender]", Sender)
+    Body = Text2HTML(Body)
+        
+    'Fire, Captain!
+    Lohnabrechnung_senden = send_Mail(Email, Subject, Body, Attachment)
+        
+Ende:
+    Exit Function
+Err:
+    Lohnabrechnung_senden = Err.Number & " " & Err.description
+    Resume Ende
+End Function
+
+
+'PDF Einsatzliste Subunternehmer
+Function pdf_erstellen_einsatzliste_sub(VA_ID As Long, MA_ID As Long) As String
+
+Dim PDF_Datei  As String
+
+    
+    PDF_Datei = Server & "Consys\Dokumente\Auftrag\Allgemein\" & Nz(TLookup("Auftrag", AUFTRAGSTAMM, "ID = " & VA_ID), "") & " " & _
+        Nz(TLookup("Objekt", AUFTRAGSTAMM, "ID = " & VA_ID), "") & " am " & TLookup("VADatum", anzTage, "VA_ID = " & VA_ID) & " " & _
+        Nz(TLookup("Nachname", MASTAMM, "ID = " & MA_ID), "") & " " & Nz(TLookup("Vorname", MASTAMM, "ID = " & MA_ID), "") & ".pdf"
+        
+    'Properties Query Bericht
+    Call Set_Priv_Property("prp_Report1_MA_ID", MA_ID)
+    Call Set_Priv_Property("prp_Report1_Auftrag_IstTage", 3)
+    Call Set_Priv_Property("prp_Report1_Auftrag_ID", VA_ID)
+    Call Set_Priv_Property("prp_Report1_Auftrag_VADatum_ID", TLookup("ID", anzTage, "VA_ID = " & VA_ID))
+    
+    DoCmd.OutputTo acOutputReport, "rpt_Auftrag_Zusage", acFormatPDF, PDF_Datei
+
+    pdf_erstellen_einsatzliste_sub = PDF_Datei
+    
+End Function
+
+
+Function ics_erstellen(ZUO_ID As Long) As String
+
+Dim VA_ID       As Long
+Dim Datum       As Date
+Dim Start       As Date
+Dim Ende        As Date
+Dim treffp      As String
+Dim tpzeit      As String
+Dim dienstkl    As String
+Dim pfad        As String
+Dim Datei       As String
+Dim Auftrag     As String
+Dim Objekt      As String
+Dim Ort         As String
+Dim va_text     As String
+Dim Body        As String
+Dim dtstamp     As String
+Dim dtStart     As String
+Dim dtEnde      As String
+Dim ics         As String
+Dim adodbStream As Object
+
+    pfad = "C:\Database\Temp\files\"
+    
+    VA_ID = TLookup("VA_ID", ZUORDNUNG, "ID = " & ZUO_ID)
+    Auftrag = TLookup("Auftrag", AUFTRAGSTAMM, "ID = " & VA_ID)
+    Objekt = TLookup("Objekt", AUFTRAGSTAMM, "ID = " & VA_ID)
+    Ort = TLookup("Ort", AUFTRAGSTAMM, "ID = " & VA_ID)
+    Datum = TLookup("VADatum", ZUORDNUNG, "ID = " & ZUO_ID)
+    Start = TLookup("MA_Start", ZUORDNUNG, "ID = " & ZUO_ID)
+    Ende = TLookup("MA_Ende", ZUORDNUNG, "ID = " & ZUO_ID)
+    TP = TLookup("Treffpunkt", AUFTRAGSTAMM, "ID = " & VA_ID)
+    tpzeit = Nz(TLookup("Treffp_Zeit", AUFTRAGSTAMM, "ID = " & VA_ID), "-")
+    dienstkl = TLookup("Dienstkleidung", AUFTRAGSTAMM, "ID = " & VA_ID)
+    
+    va_text = Auftrag & " " & Objekt & " " & Ort & " " & Datum
+    Body = "Treffpunkt: " & TP & "\nDienstkleidung: " & dienstkl '& ", Treffpunktzeit: " & tpzeit
+    dtstamp = Format(Now, "YYYYMMDD""T""hhmmss""Z""")
+    dtStart = Format(Datum, "YYYYMMDD") & "T" & Format(Start, "HHMMSS")
+    If Ende > Start Then
+        dtEnde = Format(Datum, "YYYYMMDD") & "T" & Format(Ende, "HHMMSS")
+    Else ' Ende nach Mitternacht
+        dtEnde = Format(Datum + 1, "YYYYMMDD") & "T" & Format(Ende, "HHMMSS")
+    End If
+    Datei = pfad & va_text & ".ics"
+
+    ics = "BEGIN:VCALENDAR" & vbCrLf & _
+            "VERSION:2.0" & vbCrLf & _
+            "PRODID:-//CONSEC//Veranstaltung//DE" & vbCrLf & _
+            "BEGIN:VEVENT" & vbCrLf & _
+            "DTSTAMP:" & dtstamp & vbCrLf & _
+            "DTSTART:" & dtStart & vbCrLf & _
+            "DTEND:" & dtEnde & vbCrLf & _
+            "SUMMARY:" & va_text & vbCrLf & _
+            "LOCATION:" & Ort & vbCrLf & _
+            "BEGIN:VALARM" & vbCrLf & _
+            "ACTION:DISPLAY" & vbCrLf & _
+            "TRIGGER:-PT180M" & vbCrLf & _
+            "DESCRIPTION:" & Body & vbCrLf & _
+            "END:VALARM" & vbCrLf & _
+            "END:VEVENT" & vbCrLf & _
+            "END:VCALENDAR"
+            '"X-ALT-DESC;FMTTYPE=text/html:" & body & vbCrLf & _
+
+
+    Set adodbStream = CreateObject("ADODB.Stream")
+    With adodbStream
+     .Type = 2 'Stream Typ
+     '.Charset = "utf-8" '-> geht nicht, da UTF8 BOM!
+     .Charset = "Windows-1252"
+     .Open
+     .WriteText ics 'Text schreiben
+     .SaveToFile Datei, 2 'binary Daten speichern
+    End With
+    Set adodbStream = Nothing
+    
+    ics_erstellen = Datei
+
+
+End Function

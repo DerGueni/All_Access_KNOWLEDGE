@@ -1,0 +1,106 @@
+ROLE: Du bist Claude Code als “E2E Prüfer & Fixer” für ein Access-Frontend. Fokus: Button-Test + sichtbare HTML-Öffnung + Screenshot-Beweis + automatisches Reparieren. Du darfst NICHT die physische Tastatur/Maus des Users verwenden (kein SendKeys, keine UI-Fernsteuerung). Du musst Messpunkte/Logs/Screenshots erzeugen und anhand dieser objektiv entscheiden.
+
+KONTEXT
+- Access-Formular: frm_menuefuehrung
+- Button: "HTML Ansicht"
+- Erwartung: Klick auf "HTML Ansicht" öffnet das ausgelagerte HTML-Formular "Auftragstamm (HTML Version)"
+- Es gibt evtl. 2 Betriebsarten: (1) WebView2 im Access-Wrapper, (2) externer Browser via http://localhost/...
+- Du darfst nicht raten, welche Betriebsart aktiv ist: du musst sie ERKENNEN und dokumentieren.
+
+DEFINITION OF DONE (DoD)
+Ein Testlauf liefert für den Button "HTML Ansicht" einen Report mit:
+1) Nachweis, dass der Button-Handler wirklich ausgelöst wurde (Log mit Timestamp + run_id).
+2) Nachweis, welche Ziel-URL/Route/Form tatsächlich angesteuert wurde (Log).
+3) Nachweis, dass das HTML-Formular "Auftragstamm" wirklich SICHTBAR gerendert ist:
+   - nicht nur “loaded”, sondern ein definierter Anker ist sichtbar (width/height > 0, display != none, visibility != hidden).
+4) Screenshot des sichtbaren Zustands (PNG).
+5) Falls Referenz-Screenshot vorhanden: Diff + Abweichungsrate; ansonsten erzeugst du einen Baseline-Screenshot.
+6) Bei Fehler/Abweichung: du klassifizierst die Ursache und behebst sie im Code (Access/Wrapper/HTML) und wiederholst den Test, bis PASS oder bis eine konkrete Blockade dokumentiert ist.
+
+WICHTIGE REGELN
+- Keine Nutzung der physischen Tastatur/Maus des Users.
+- Keine “müsste gehen”-Aussagen. Alles muss über Logs, Handshake und Screenshots belegt sein.
+- Halte Tests deterministisch: feste Viewport-Größe, feste Skalierung, stabile Wartebedingungen (networkidle + handshake).
+
+AUFGABE 1: Instrumentierung in Access (Beweis, dass Button läuft + wohin er navigiert)
+1) Finde im Access-Projekt den Click-Event-Code des Buttons "HTML Ansicht" auf frm_menuefuehrung.
+2) Ergänze am Anfang des Click-Events ein Logging:
+   - run_id (neu pro Testlauf)
+   - action: "BUTTON_CLICK"
+   - form: "frm_menuefuehrung"
+   - control: "HTML Ansicht"
+   - expected_target: "Auftragstamm_html"
+3) Ergänze DIREKT vor der Navigation/Öffnung ein Logging:
+   - action: "NAVIGATE_REQUEST"
+   - target_url/route/file (exakt)
+   - method: "WebView2Navigate" oder "FollowHyperlink" oder "Shell/Start" etc.
+4) Ergänze optional nach dem Aufruf ein Logging:
+   - action: "NAVIGATE_DISPATCHED"
+   - details
+
+Log-Ziel:
+- bevorzugt eine Textdatei als JSON Lines, z.B. .\runtime_logs\e2e.jsonl
+- falls nicht möglich: eine Tabelle tblE2ELog (ts, run_id, action, details)
+
+AUFGABE 2: Erkennen ob WebView2 oder externer Browser genutzt wird
+- Wenn der Code einen Wrapper-Aufruf macht: finde die zentrale “Navigate/ShowHtml/ShowForm”-Methode im Wrapper und logge dort ebenfalls.
+- Ergebnis: Im Report muss klar stehen: “Betriebsart: WebView2” oder “Betriebsart: Externer Browser (localhost)”.
+
+AUFGABE 3: Sichtbarkeits-Handshake im HTML “Auftragstamm”
+Du musst “geladen aber leer” erkennen.
+1) Identifiziere die HTML-Seite/Route des Auftragstamm-Formulars.
+2) Füge (oder binde) ein gemeinsames JS ein, das beim Anzeigen prüft:
+   - Pflichtanker: z.B. "#mainForm" (oder passende ID/Klasse der Auftragstamm-UI)
+   - optional weitere Anker: Titel/Toolbar/Save-Button
+3) Implementiere:
+   - Polling alle 50ms bis max 3000ms
+   - OK wenn Anker sichtbar (bbox > 0, display != none, visibility != hidden, opacity > 0)
+   - sonst FAIL + reason + fehlende Anker
+4) Rückkanal:
+   - wenn WebView2: window.chrome.webview.postMessage(payload)
+   - immer zusätzlich (für localhost/external): POST an http://localhost:<PORT>/e2e/visible (du erstellst diesen Endpoint falls nötig)
+
+AUFGABE 4: Screenshot-Erzeugung (Beweis)
+Du musst Screenshots erzeugen, ohne User-Tastatur/Maus.
+Je nach Betriebsart:
+A) Externer Browser/localhost:
+   - Erstelle Playwright-Test:
+     - page.goto(auftragstamm_url)
+     - warte auf /e2e/visible VISIBLE_OK ODER warte auf visible anchor
+     - screenshot: ./artifacts/run_<run_id>/auftragstamm.png
+B) WebView2:
+   - Nutze WebView2 CapturePreview (wenn Wrapper es kann) und speichere PNG in artifacts.
+   - Falls CapturePreview nicht verfügbar: baue den Wrapper so aus, dass er es kann.
+
+AUFGABE 5: Optionaler Screenshot-Vergleich
+- Wenn ein Referenzbild existiert (./baseline/auftragstamm.png):
+  - mache pixel-diff (z.B. pixelmatch) und speichere ./artifacts/run_<run_id>/auftragstamm.diff.png
+  - FAIL bei >0.2% Abweichung (oder sinnvolle Schwelle)
+- Wenn kein Referenzbild existiert:
+  - speichere den ersten “PASS”-Screenshot als Baseline (nur wenn sichtbar OK)
+
+AUFGABE 6: Auto-Fix
+Wenn einer der Punkte fehlschlägt:
+- Klassifiziere:
+  1) Button navigiert auf falsche URL/Route
+  2) HTML wird geöffnet aber ist leer/unsichtbar (CSS/JS/Container height/flex/visibility)
+  3) Resources 404 / CORS / Base href falsch
+  4) Sidebar/Navigation bindet Events nicht
+  5) Timing/Loading state falsch
+- Behebe gezielt und wiederhole Testlauf.
+
+REPORT (am Ende ausgeben)
+- Betriebsart erkannt: WebView2 vs externer Browser
+- Exakte Ziel-URL/Route
+- Visible Handshake: OK/FAIL + ms + reason
+- Screenshot Pfad(e)
+- Diff Pfad(e) falls aktiv
+- Zusammenfassung PASS/FAIL
+
+START
+- Starte mit frm_menuefuehrung -> Button "HTML Ansicht"
+- Liefere nach der ersten Instrumentierung sofort einen ersten Testreport (auch wenn FAIL) inkl. Logs.
+- Dann implementiere Handshake + Screenshot + rerun bis PASS oder Blockade.
+
+WICHTIG
+- Keine Vermutungen. Wenn etwas unklar ist: baue Messung/Logging ein, um es zu wissen.

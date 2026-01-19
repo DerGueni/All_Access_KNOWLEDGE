@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterauswahl - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_N_Mitarbeiterauswahl.css">
+</head>
+<body>
+    <div class="maw-container">
+        <!-- Linkes Menue -->
+
+        <!-- Hauptbereich -->
+        <main class="maw-main">
+            <!-- Header -->
+            <header class="maw-header">
+                <div class="header-left">
+                    <div class="maw-logo"></div>
+                    <h1 class="maw-title">Mitarbeiterauswahl</h1>
+                </div>
+                <div class="header-right">
+                    <button class="maw-btn primary" id="btnZurueckAuftrag">Zurueck zum Auftrag</button>
+                </div>
+            </header>
+
+            <!-- Auftrag Info -->
+            <div class="maw-auftrag-info">
+                <div class="info-left">
+                    <label>Auftrag:</label>
+                    <span id="lblAuftragDatum">12.12.2025</span>
+                    <span id="lblAuftragName">Spvgg Greuther Fuerth - Hertha Bsc</span>
+                    <span id="lblAuftragOrt">Sportpark am Ronhof</span>
+                    <select id="cboAuftrag" class="maw-select">
+                        <option value="1">Spvgg Greuther Fuerth - Hertha Bsc Sportpark am Ronhof</option>
+                    </select>
+                </div>
+                <div class="info-right">
+                    <label>Datum:</label>
+                    <select id="cboDatum" class="maw-select-small">
+                        <option value="2025-12-12" selected>Fr. 12.12.25</option>
+                    </select>
+                    <button class="maw-btn highlight" id="btnNurSelektierte">Nur Selektierte anfragen</button>
+                    <button class="maw-btn highlight" id="btnAlleMitarbeiter">Alle Mitarbeiter anfragen</button>
+                </div>
+            </div>
+
+            <!-- Hauptbereich -->
+            <div class="maw-content">
+                <!-- Linke Spalte: Dienstbeginn + MA Liste -->
+                <div class="maw-left-panel">
+                    <!-- Mitarbeiter Info -->
+                    <div class="maw-ma-info">
+                        <div class="ma-label">Mitarbeiter</div>
+                        <div class="ma-checkboxes">
+                            <label><input type="checkbox" id="chkGeplantVerfuegbar"> geplant = verfuegbar</label>
+                            <label><input type="checkbox" id="chkNurFreie" checked> Nur freie anzeigen</label>
+                            <label><input type="checkbox" id="chkNurAktive" checked> Nur aktive anzeigen</label>
+                        </div>
+                        <div class="ma-filters">
+                            <label>Anstellung:</label>
+                            <select id="cboAnstellung" class="maw-select-small">
+                                <option value="mini" selected>Minijobber</option>
+                                <option value="fest">Festangestellt</option>
+                                <option value="alle">Alle</option>
+                            </select>
+                            <label>Kategorie:</label>
+                            <select id="cboKategorie" class="maw-select-small">
+                                <option value="standard" selected>Standard</option>
+                            </select>
+                            <label><input type="checkbox" id="chkNur34a"> Nur 34a</label>
+                        </div>
+                        <div class="ma-gesamt">
+                            <label>Gesamt:</label>
+                            <span id="lblGesamt">0 / 42</span>
+                        </div>
+                    </div>
+
+                    <!-- Dienstbeginn auswaehlen -->
+                    <div class="maw-dienstbeginn">
+                        <div class="section-title">Dienstbeginn auswaehlen:</div>
+                        <div class="dienstbeginn-table-container">
+                            <table class="dienstbeginn-table" id="tblDienstbeginn">
+                                <thead>
+                                    <tr>
+                                        <th>Ist</th>
+                                        <th>Soll</th>
+                                        <th>Beginn</th>
+                                        <th>Ende</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="selected">
+                                        <td>0</td>
+                                        <td>2</td>
+                                        <td>15:00</td>
+                                        <td>21:00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>0</td>
+                                        <td>40</td>
+                                        <td>16:00</td>
+                                        <td>21:00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="endzeit-row">
+                            <label>Endzeit: (geplant)</label>
+                            <input type="text" id="txtEndzeit" class="maw-input-time" value="21:00">
+                        </div>
+                    </div>
+
+                    <!-- Parallele Einsaetze -->
+                    <div class="maw-parallele">
+                        <div class="section-title">Parallele Einsaetze:</div>
+                        <div class="parallele-list" id="lstParallele">
+                            <div class="parallele-item">Spvgg Greuther Fuerth - Hertha</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mitte: MA durch Doppelklick -->
+                <div class="maw-center-panel">
+                    <div class="section-title">Mitarbeiterauswahl durch Doppelklick</div>
+                    <div class="ma-list-container">
+                        <table class="ma-list-table" id="tblMAListe">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Std</th>
+                                    <th>Beginn</th>
+                                    <th>Ende</th>
+                                    <th>Grund</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Strobel Bernd</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Sunar Tan</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Truckenbrodt Melanie</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Tsakmak Moustafa</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Tuerkseven Ismail</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Ulhan Caner</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Vermez Meryem</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Viehbeck Armin</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Wagner Corinna</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Wanko Stefan</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Weber Ines</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Weigl Thomas</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Wilson Jason</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Winter Elke</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Winter Jasmin</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Zeka Brima</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Aldaba Wesam</td><td></td><td></td><td></td><td></td></tr>
+                                <tr><td>Aliyev Khayyam</td><td></td><td></td><td></td><td></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Buttons Mitte -->
+                <div class="maw-action-buttons">
+                    <div class="action-group">
+                        <label>Standard</label>
+                        <label>Entfernung</label>
+                    </div>
+                    <button class="maw-btn-arrow" id="btnAuswaehlen" title="Auswaehlen">&#9654;<br>Auswaehlen</button>
+                    <button class="maw-btn-arrow" id="btnEntfernen" title="Entfernen">&#9664;<br>Entfernen</button>
+                </div>
+
+                <!-- Rechts: Geplante MA -->
+                <div class="maw-right-panel">
+                    <div class="section-title">Mitarbeiter geplant:</div>
+                    <div class="geplant-table-container">
+                        <table class="geplant-table" id="tblGeplant">
+                            <thead>
+                                <tr>
+                                    <th>Lfd</th>
+                                    <th>Nachname</th>
+                                    <th>Vorname</th>
+                                    <th>Beginn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td></td><td></td><td></td></tr>
+                                <tr><td>2</td><td></td><td></td><td></td></tr>
+                                <tr><td>3</td><td></td><td></td><td></td></tr>
+                                <tr><td>4</td><td></td><td></td><td></td></tr>
+                                <tr><td>5</td><td></td><td></td><td></td></tr>
+                                <tr><td>6</td><td></td><td></td><td></td></tr>
+                                <tr><td>7</td><td></td><td></td><td></td></tr>
+                                <tr><td>8</td><td></td><td></td><td></td></tr>
+                                <tr><td>9</td><td></td><td></td><td></td></tr>
+                                <tr><td>10</td><td></td><td></td><td></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Ganz rechts: Mita Liste -->
+                <div class="maw-far-right">
+                    <div class="section-title">Mita</div>
+                    <div class="mita-list">
+                        <div>Lfd</div>
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                        <div>5</div>
+                        <div>6</div>
+                        <div>7</div>
+                        <div>8</div>
+                        <div>9</div>
+                        <div>10</div>
+                        <div>11</div>
+                        <div>12</div>
+                        <div>13</div>
+                        <div>14</div>
+                        <div>15</div>
+                        <div>16</div>
+                        <div>17</div>
+                        <div>18</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="maw-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblAnzahl">42 Mitarbeiter verfuegbar</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Dienstbeginn Zeile Klick
+        document.querySelectorAll('.dienstbeginn-table tbody tr').forEach(row => {
+            row.addEventListener('click', function() {
+                document.querySelectorAll('.dienstbeginn-table tbody tr').forEach(r => r.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // MA-Liste Doppelklick
+        document.querySelectorAll('.ma-list-table tbody tr').forEach(row => {
+            row.addEventListener('dblclick', function() {
+                // MA zur geplanten Liste hinzufuegen
+                console.log('MA ausgewaehlt:', this.cells[0].textContent);
+            });
+        });
+    </script>
+</body>
+</html>

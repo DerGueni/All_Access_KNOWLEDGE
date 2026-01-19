@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS - Hauptmenü</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .dashboard-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            padding: 12px 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .card-header.blue { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
+        .card-header.green { background: linear-gradient(135deg, #5cb85c 0%, #449d44 100%); }
+        .card-header.orange { background: linear-gradient(135deg, #f0ad4e 0%, #ec971f 100%); }
+        .card-header.red { background: linear-gradient(135deg, #d9534f 0%, #c9302c 100%); }
+        .card-header.purple { background: linear-gradient(135deg, #4316B2 0%, #3558c0 100%); }
+        .card-header.cyan { background: linear-gradient(135deg, #5bc0de 0%, #46b8da 100%); }
+
+        .card-body {
+            padding: 16px;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .card-stat {
+            text-align: center;
+        }
+
+        .card-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .card-stat-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            padding: 16px 16px 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quick-stats {
+            display: flex;
+            gap: 24px;
+            padding: 16px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .quick-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .quick-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .quick-stat-value.green { color: #5cb85c; }
+        .quick-stat-value.orange { color: #f0ad4e; }
+        .quick-stat-value.red { color: #d9534f; }
+
+        .quick-stat-label {
+            font-size: 11px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">CONSYS</span>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Stammdaten</div>
+                    <a class="menu-item" href="frm_MA_Mitarbeiterstamm.html">Mitarbeiter</a>
+                    <a class="menu-item" href="frm_KD_Kundenstamm.html">Kunden</a>
+                    <a class="menu-item" href="frm_va_Auftragstamm.html">Aufträge</a>
+                </div>
+                <div class="menu-divider"></div>
+                <div class="menu-section">
+                    <div class="menu-section-title">Planung</div>
+                    <a class="menu-item" href="frm_N_Dienstplanübersicht.html">Dienstplan</a>
+                    <a class="menu-item" href="frm_VA_Planungsübersicht.html">Planungsübersicht</a>
+                    <a class="menu-item" href="frm_Einsatzübersicht.html">Einsatzübersicht</a>
+                </div>
+                <div class="menu-divider"></div>
+                <div class="menu-section">
+                    <div class="menu-section-title">Personal</div>
+                    <a class="menu-item" href="frm_MA_Abwesenheit.html">Abwesenheit</a>
+                    <a class="menu-item" href="frm_MA_Zeitkonten.html">Zeitkonten</a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="menu-item" id="btn-refresh">🔄 Aktualisieren</button>
+            </div>
+        </aside>
+
+        <!-- Main Area -->
+        <main class="app-main">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <span class="header-date" id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats" id="quickStats">
+                <div class="quick-stat">
+                    <span class="quick-stat-value" id="statHeuteEinsaetze">-</span>
+                    <span class="quick-stat-label">Einsätze heute</span>
+                </div>
+                <div class="quick-stat">
+                    <span class="quick-stat-value green" id="statBesetzt">-</span>
+                    <span class="quick-stat-label">Besetzt</span>
+                </div>
+                <div class="quick-stat">
+                    <span class="quick-stat-value orange" id="statPlanung">-</span>
+                    <span class="quick-stat-label">In Planung</span>
+                </div>
+                <div class="quick-stat">
+                    <span class="quick-stat-value red" id="statOffen">-</span>
+                    <span class="quick-stat-label">Offen</span>
+                </div>
+                <div class="quick-stat">
+                    <span class="quick-stat-value" id="statMitarbeiter">-</span>
+                    <span class="quick-stat-label">Mitarbeiter aktiv</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="app-content" style="overflow-y: auto; padding: 0;">
+                <div class="section-title">Stammdaten</div>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" onclick="location.href='frm_MA_Mitarbeiterstamm.html'">
+                        <div class="card-header blue">Mitarbeiterstamm</div>
+                        <div class="card-body">
+                            <div class="card-desc">Mitarbeiterdaten, Qualifikationen, Nichtverfügbarkeiten</div>
+                            <div class="card-stats">
+                                <div class="card-stat">
+                                    <div class="card-stat-value" id="cardMaAktiv">-</div>
+                                    <div class="card-stat-label">Aktiv</div>
+                                </div>
+                                <div class="card-stat">
+                                    <div class="card-stat-value" id="cardMaGesamt">-</div>
+                                    <div class="card-stat-label">Gesamt</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" onclick="location.href='frm_KD_Kundenstamm.html'">
+                        <div class="card-header green">Kundenstamm</div>
+                        <div class="card-body">
+                            <div class="card-desc">Kundendaten, Adressen, Ansprechpartner</div>
+                            <div class="card-stats">
+                                <div class="card-stat">
+                                    <div class="card-stat-value" id="cardKdAktiv">-</div>
+                                    <div class="card-stat-label">Aktiv</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" onclick="location.href='frm_va_Auftragstamm.html'">
+                        <div class="card-header red">Auftragsverwaltung</div>
+                        <div class="card-body">
+                            <div class="card-desc">Aufträge, Schichten, MA-Zuordnung</div>
+                            <div class="card-stats">
+                                <div class="card-stat">
+                                    <div class="card-stat-value" id="cardVaOffen">-</div>
+                                    <div class="card-stat-label">Offen</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">Planung</div>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" onclick="location.href='frm_N_Dienstplanübersicht.html'">
+                        <div class="card-header purple">Dienstplanübersicht</div>
+                        <div class="card-body">
+                            <div class="card-desc">Wochenansicht aller Einsätze im Kalender</div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" onclick="location.href='frm_VA_Planungsübersicht.html'">
+                        <div class="card-header red">Planungsübersicht</div>
+                        <div class="card-body">
+                            <div class="card-desc">Status aller Einsätze, Filter, Export</div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" onclick="location.href='frm_Einsatzübersicht.html'">
+                        <div class="card-header blue">Einsatzübersicht</div>
+                        <div class="card-body">
+                            <div class="card-desc">Tagesansicht mit MA-Zuordnung</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">Personal</div>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" onclick="location.href='frm_MA_Abwesenheit.html'">
+                        <div class="card-header orange">Abwesenheitsplanung</div>
+                        <div class="card-body">
+                            <div class="card-desc">Urlaub, Krankheit, Nichtverfügbarkeiten</div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" onclick="location.href='frm_MA_Zeitkonten.html'">
+                        <div class="card-header cyan">Zeitkonten</div>
+                        <div class="card-body">
+                            <div class="card-desc">Soll/Ist-Vergleich, Überstunden</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <div class="footer-left">
+                    <span class="footer-status" id="footer-status">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span>API: localhost:5000</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module">
+        import { Bridge } from '../api/bridgeClient.js';
+
+        // Datum anzeigen
+        function updateDate() {
+            const now = new Date();
+            document.getElementById('header-date').textContent = now.toLocaleDateString('de-DE', {
+                weekday: 'long',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+        updateDate();
+
+        // Dashboard-Daten laden
+        async function loadDashboard() {
+            document.getElementById('footer-status').textContent = 'Lade Daten...';
+
+            try {
+                // Dashboard-Kennzahlen
+                const result = await Bridge.dashboard.get();
+                const data = result.data || {};
+
+                document.getElementById('statHeuteEinsaetze').textContent = data.heute_einsaetze || data.total || 0;
+                document.getElementById('statBesetzt').textContent = data.besetzt || 0;
+                document.getElementById('statPlanung').textContent = data.in_planung || 0;
+                document.getElementById('statOffen').textContent = data.offen || 0;
+
+                // Mitarbeiter
+                const maResult = await Bridge.mitarbeiter.list({ aktiv: true });
+                const maAktiv = (maResult.data || []).length;
+                document.getElementById('statMitarbeiter').textContent = maAktiv;
+                document.getElementById('cardMaAktiv').textContent = maAktiv;
+
+                const maAllResult = await Bridge.mitarbeiter.list();
+                document.getElementById('cardMaGesamt').textContent = (maAllResult.data || []).length;
+
+                // Kunden
+                const kdResult = await Bridge.kunden.list();
+                document.getElementById('cardKdAktiv').textContent = (kdResult.data || []).length;
+
+                // Offene Aufträge
+                document.getElementById('cardVaOffen').textContent = data.offen || 0;
+
+                document.getElementById('footer-status').textContent = 'Bereit';
+
+            } catch (error) {
+                console.error('Dashboard-Fehler:', error);
+                document.getElementById('footer-status').textContent = 'API nicht erreichbar - Starten Sie api_server.py';
+            }
+        }
+
+        loadDashboard();
+
+        // Refresh Button
+        document.getElementById('btn-refresh').addEventListener('click', loadDashboard);
+    </script>
+</body>
+</html>

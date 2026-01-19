@@ -1,0 +1,4 @@
+SELECT qry_Ins_MA_JahrMon2.MA_ID, qry_Ins_MA_JahrMon2.AktJahr, qry_Ins_MA_JahrMon2.AktMon, Sum(qry_Ins_MA_JahrMon2.[34a_RZ]) AS 34a_RZ, Sum(qry_Ins_MA_JahrMon2.Abschlag) AS Abschlag, Sum(qry_Ins_MA_JahrMon2.Nicht_Erscheinen) AS Nicht_Erscheinen, Sum(qry_Ins_MA_JahrMon2.Kaution) AS Kaution, Sum(qry_Ins_MA_JahrMon2.Sonst_Abzuege) AS Sonst_Abzuege, Sum(qry_Ins_MA_JahrMon2.Monatslohn) AS Monatslohn, Avg(qry_Ins_MA_JahrMon2.UeberwVon) AS UeberwVon
+FROM qry_Ins_MA_JahrMon2
+GROUP BY qry_Ins_MA_JahrMon2.MA_ID, qry_Ins_MA_JahrMon2.AktJahr, qry_Ins_MA_JahrMon2.AktMon;
+

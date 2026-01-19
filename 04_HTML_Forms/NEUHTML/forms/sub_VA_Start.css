@@ -1,0 +1,149 @@
+/* sub_VA_Start.css - Schichten Subform */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 11px;
+    background: #f0f0f0;
+}
+
+.subform-container {
+    background: #ffffff;
+    border: 1px solid #999;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.subform-header {
+    background: #4316B2;
+    color: white;
+    padding: 4px 8px;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.subform-title {
+    text-transform: uppercase;
+}
+
+/* Datenblatt */
+.datasheet-container {
+    flex: 1;
+    overflow: auto;
+}
+
+.datasheet {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.datasheet thead {
+    background: #e8e8e8;
+    position: sticky;
+    top: 0;
+}
+
+.datasheet th {
+    padding: 4px 6px;
+    text-align: left;
+    border: 1px solid #cccccc;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.datasheet td {
+    padding: 3px 6px;
+    border: 1px solid #d0d0d0;
+    background: #fff;
+}
+
+.datasheet tr:nth-child(even) td {
+    background: #f8f9fa;
+}
+
+.datasheet tr:hover td {
+    background: #f0f0f0;
+}
+
+.datasheet tr.selected td {
+    background: #e8e8e8;
+}
+
+/* Eingabefelder in Tabelle */
+.datasheet input[type="text"] {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 2px;
+    font-size: 11px;
+}
+
+.datasheet input[type="text"]:focus {
+    outline: 2px solid #4316B2;
+    background: #fff;
+}
+
+/* Neue Zeile Bereich */
+.new-row-area {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: #f5f5f5;
+    border-top: 1px solid #ccc;
+}
+
+.txt-input {
+    flex: 1;
+    padding: 4px;
+    border: 1px solid #ccc;
+    font-size: 11px;
+}
+
+.txt-input.txt-small {
+    max-width: 60px;
+}
+
+.btn-add {
+    padding: 4px 12px;
+    background: #4316B2;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-add:hover {
+    background: #3558c0;
+}
+
+/* Readonly-Zellen */
+.cell-readonly {
+    background: #f0f0f0 !important;
+    color: #666;
+}
+
+/* Zahlen rechtsbündig */
+.cell-number {
+    text-align: right;
+}
+
+/* Status-Farben - ALLE GRAU */
+.status-ok {
+    color: #333333;
+}
+
+.status-warning {
+    color: #666666;
+}
+
+.status-error {
+    color: #333333;
+}

@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung - Slide-in Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Farbpalette - Modern Purple/Blue */
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-color: #ff4081;
+            --accent-hover: #e91e63;
+            --bg-dark: #1a1a2e;
+            --bg-medium: #16213e;
+            --bg-light: #0f3460;
+            --text-light: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
+            --card-bg: #ffffff;
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+
+            /* Layout */
+            --sidebar-width: 280px;
+            --header-height: 64px;
+            --fab-size: 56px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           OVERLAY - Dunkler Hintergrund bei Sidebar
+           ============================================ */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed) ease;
+            z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ============================================
+           SLIDE-IN SIDEBAR
+           ============================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: calc(-1 * var(--sidebar-width));
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--primary-gradient);
+            transition: left var(--transition-speed) ease;
+            z-index: 1000;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sidebar-logo-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-light);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: var(--text-light);
+            border-left-color: var(--text-light);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           HAMBURGER MENU BUTTON
+           ============================================ */
+        .hamburger {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            width: 48px;
+            height: 48px;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .hamburger-line {
+            width: 22px;
+            height: 2px;
+            background: #333;
+            border-radius: 2px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            height: var(--header-height);
+            background: var(--card-bg);
+            padding: 0 24px 0 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn-outline {
+            background: transparent;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+
+        .header-btn-outline:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .header-btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .header-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .main-content {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Statistik-Karten */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .stat-icon.blue { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+        .stat-icon.green { background: rgba(76, 175, 80, 0.1); color: #4caf50; }
+        .stat-icon.orange { background: rgba(255, 152, 0, 0.1); color: #ff9800; }
+        .stat-icon.red { background: rgba(244, 67, 54, 0.1); color: #f44336; }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #888;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .form-card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-card-body {
+            padding: 24px;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            padding: 12px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input:read-only {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        /* Section Divider */
+        .section-divider {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+        }
+
+        .section-divider-line {
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .section-divider-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            margin-top: 24px;
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid #eee;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            padding: 24px 0;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table tr:hover td {
+            background: #f8f9ff;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.confirmed { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.pending { background: #fff3e0; color: #ef6c00; }
+        .status-badge.cancelled { background: #ffebee; color: #c62828; }
+
+        /* ============================================
+           FLOATING ACTION BUTTON (FAB) + SPEED DIAL
+           ============================================ */
+        .fab-container {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 1000;
+        }
+
+        .fab {
+            width: var(--fab-size);
+            height: var(--fab-size);
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 64, 129, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-speed) ease;
+            color: white;
+            font-size: 24px;
+        }
+
+        .fab:hover {
+            background: var(--accent-hover);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 64, 129, 0.5);
+        }
+
+        .fab.active {
+            transform: rotate(45deg);
+        }
+
+        .fab-icon {
+            transition: transform var(--transition-speed) ease;
+        }
+
+        /* Speed Dial Actions */
+        .speed-dial {
+            position: absolute;
+            bottom: calc(var(--fab-size) + 16px);
+            right: 4px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .speed-dial.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .speed-dial-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .speed-dial-label {
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .speed-dial-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .speed-dial-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .speed-dial-btn.save { background: #4caf50; }
+        .speed-dial-btn.print { background: #2196f3; }
+        .speed-dial-btn.email { background: #ff9800; }
+        .speed-dial-btn.delete { background: #f44336; }
+        .speed-dial-btn.copy { background: #9c27b0; }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .header {
+                padding-left: 70px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger" id="hamburger" aria-label="Menü öffnen">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Slide-in Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">C</div>
+                <span class="sidebar-logo-text">CONSEC</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Stammdaten</div>
+                <a class="nav-item" href="variante1_mitarbeiter_slidein.html">
+                    <span class="nav-icon">👤</span>
+                    <span>Mitarbeiter</span>
+                </a>
+                <a class="nav-item" href="variante1_kunde_slidein.html">
+                    <span class="nav-icon">🏢</span>
+                    <span>Kunden</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📍</span>
+                    <span>Objekte</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Planung</div>
+                <a class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span>Aufträge</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    <span>Dienstplan</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Einsatzübersicht</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Personal</div>
+                <a class="nav-item">
+                    <span class="nav-icon">⏰</span>
+                    <span>Zeitkonten</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📧</span>
+                    <span>Anfragen</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">GS</div>
+                <div class="user-details">
+                    <div class="user-name">Günther Siegert</div>
+                    <div class="user-role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Header -->
+    <header class="header">
+        <div>
+            <h1 class="header-title">Auftragsverwaltung</h1>
+            <p class="header-subtitle">Veranstaltung: Messe München 2026</p>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn header-btn-outline">Zurück</button>
+            <button class="header-btn header-btn-primary">Speichern</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Statistik-Karten -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue">📅</div>
+                <div class="stat-value">5</div>
+                <div class="stat-label">Einsatztage</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">👥</div>
+                <div class="stat-value">24</div>
+                <div class="stat-label">Mitarbeiter eingeplant</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">⏳</div>
+                <div class="stat-value">8</div>
+                <div class="stat-label">Anfragen offen</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">❌</div>
+                <div class="stat-value">2</div>
+                <div class="stat-label">Absagen</div>
+            </div>
+        </div>
+
+        <!-- Hauptformular -->
+        <div class="form-card">
+            <div class="form-card-header">
+                <span class="form-card-title">Auftragsdaten</span>
+            </div>
+            <div class="form-card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Auftragsnummer</label>
+                        <input type="text" class="form-input" id="VA_Auftrag" value="2026-0142" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-input" id="VA_Status">
+                            <option value="1">Angefragt</option>
+                            <option value="2" selected>Bestätigt</option>
+                            <option value="3">Storniert</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kunde</label>
+                        <input type="text" class="form-input" id="Veranstalter_ID" value="Messe München GmbH">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Objekt</label>
+                        <input type="text" class="form-input" id="Objekt" value="Messegelände München">
+                    </div>
+
+                    <div class="section-divider">
+                        <span class="section-divider-line"></span>
+                        <span class="section-divider-text">Zeitraum</span>
+                        <span class="section-divider-line"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Von Datum</label>
+                        <input type="date" class="form-input" id="VA_Von" value="2026-03-15">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bis Datum</label>
+                        <input type="date" class="form-input" id="VA_Bis" value="2026-03-19">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Uhrzeit Von</label>
+                        <input type="time" class="form-input" id="VA_Start" value="08:00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Uhrzeit Bis</label>
+                        <input type="time" class="form-input" id="VA_Ende" value="18:00">
+                    </div>
+
+                    <div class="section-divider">
+                        <span class="section-divider-line"></span>
+                        <span class="section-divider-text">Personal</span>
+                        <span class="section-divider-line"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">MA Soll</label>
+                        <input type="number" class="form-input" id="MA_Anzahl" value="30">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">MA Ist</label>
+                        <input type="number" class="form-input" id="MA_Anzahl_Ist" value="24" readonly>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Bemerkung</label>
+                        <textarea class="form-input" id="Bemerkung" rows="3" style="resize: vertical;">Einlass- und Sicherheitspersonal für Messe. VIP-Bereich separat besetzen.</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs für Unterformulare -->
+        <div class="tabs-container form-card" style="margin-top: 24px;">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="schichten">Schichten</button>
+                <button class="tab-btn" data-tab="mitarbeiter">Mitarbeiter</button>
+                <button class="tab-btn" data-tab="anfragen">Anfragen</button>
+                <button class="tab-btn" data-tab="kosten">Kosten</button>
+            </div>
+            <div class="tab-content">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Schicht</th>
+                            <th>Von</th>
+                            <th>Bis</th>
+                            <th>MA Soll</th>
+                            <th>MA Ist</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>15.03.2026</td>
+                            <td>Frühschicht</td>
+                            <td>08:00</td>
+                            <td>14:00</td>
+                            <td>15</td>
+                            <td>14</td>
+                            <td><span class="status-badge pending">Offen</span></td>
+                        </tr>
+                        <tr>
+                            <td>15.03.2026</td>
+                            <td>Spätschicht</td>
+                            <td>14:00</td>
+                            <td>20:00</td>
+                            <td>15</td>
+                            <td>15</td>
+                            <td><span class="status-badge confirmed">Besetzt</span></td>
+                        </tr>
+                        <tr>
+                            <td>16.03.2026</td>
+                            <td>Frühschicht</td>
+                            <td>08:00</td>
+                            <td>14:00</td>
+                            <td>15</td>
+                            <td>12</td>
+                            <td><span class="status-badge pending">Offen</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Action Button mit Speed Dial -->
+    <div class="fab-container">
+        <div class="speed-dial" id="speedDial">
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Auftrag kopieren</span>
+                <button class="speed-dial-btn copy" title="Kopieren">📋</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Auftrag löschen</span>
+                <button class="speed-dial-btn delete" title="Löschen">🗑️</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">E-Mail senden</span>
+                <button class="speed-dial-btn email" title="E-Mail">✉️</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Drucken</span>
+                <button class="speed-dial-btn print" title="Drucken">🖨️</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Speichern</span>
+                <button class="speed-dial-btn save" title="Speichern">💾</button>
+            </div>
+        </div>
+        <button class="fab" id="fab" aria-label="Aktionen">
+            <span class="fab-icon">+</span>
+        </button>
+    </div>
+
+    <script>
+        // === Sidebar Toggle ===
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function toggleSidebar() {
+            hamburger.classList.toggle('active');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        hamburger.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // ESC schließt Sidebar
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        });
+
+        // === FAB Speed Dial ===
+        const fab = document.getElementById('fab');
+        const speedDial = document.getElementById('speedDial');
+
+        fab.addEventListener('click', () => {
+            fab.classList.toggle('active');
+            speedDial.classList.toggle('active');
+        });
+
+        // Klick außerhalb schließt Speed Dial
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.fab-container') && speedDial.classList.contains('active')) {
+                fab.classList.remove('active');
+                speedDial.classList.remove('active');
+            }
+        });
+
+        // Speed Dial Button Actions
+        document.querySelectorAll('.speed-dial-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const action = btn.classList[1]; // save, print, email, etc.
+                console.log('Action:', action);
+
+                // Feedback
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => btn.style.transform = '', 150);
+
+                // Demo-Alerts
+                switch(action) {
+                    case 'save': alert('Auftrag gespeichert!'); break;
+                    case 'print': alert('Druckvorschau wird geöffnet...'); break;
+                    case 'email': alert('E-Mail-Dialog wird geöffnet...'); break;
+                    case 'delete': if(confirm('Auftrag wirklich löschen?')) alert('Gelöscht!'); break;
+                    case 'copy': alert('Auftrag wurde kopiert!'); break;
+                }
+            });
+        });
+
+        // === Tabs ===
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // Hier würde Tab-Inhalt gewechselt werden
+            });
+        });
+    </script>
+</body>
+</html>

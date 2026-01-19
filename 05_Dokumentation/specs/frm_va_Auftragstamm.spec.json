@@ -1,0 +1,2908 @@
+{
+  "form_name": "frm_va_Auftragstamm",
+  "record_source": "qry_Auftrag_Sort",
+  "record_source_type": "query",
+  "caption": "Auftragsverwaltung",
+  "default_view": 0,
+  "order_by": "[qry_Auftrag_Sort].[Dienstkleidung]",
+  "filter": null,
+  "form_events": {
+    "before_del_confirm": "[Event Procedure]",
+    "on_current": "[Event Procedure]",
+    "before_update": "[Event Procedure]",
+    "on_open": "[Event Procedure]"
+  },
+  "controls": [
+    {
+      "name": "Rechteck620",
+      "type": "rectangle",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 5215,
+        "top": 208,
+        "width": 1595,
+        "height": 428
+      }
+    },
+    {
+      "name": "Auto_Kopfzeile0",
+      "type": "label",
+      "caption": "Auftragsverwaltung",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 1814,
+        "top": 396,
+        "width": 2928,
+        "height": 375
+      }
+    },
+    {
+      "name": "lbl_Datum",
+      "type": "label",
+      "caption": "03.12.2025",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 26430,
+        "top": 390,
+        "width": 1365,
+        "height": 270
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld344",
+      "type": "label",
+      "caption": "Auftragsstatus:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 22560,
+        "top": 285,
+        "width": 1605,
+        "height": 285
+      }
+    },
+    {
+      "name": "btnSchnellPlan",
+      "type": "commandbutton",
+      "caption": "Mitarbeiterauswahl",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 1,
+      "position": {
+        "left": 7995,
+        "top": 450,
+        "width": 1935,
+        "height": 465
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnMailEins",
+      "type": "commandbutton",
+      "caption": "Einsatzliste senden MA",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 2,
+      "position": {
+        "left": 15195,
+        "top": 165,
+        "width": 2295,
+        "height": 360
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnAuftrBerech",
+      "type": "commandbutton",
+      "caption": "Auftrag berechnen",
+      "control_source": null,
+      "visible": false,
+      "enabled": false,
+      "locked": false,
+      "tab_index": 3,
+      "position": {
+        "left": 2664,
+        "top": 56,
+        "width": 180,
+        "height": 270
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnDruckZusage",
+      "type": "commandbutton",
+      "caption": "Einsatzliste drucken",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 4,
+      "position": {
+        "left": 15195,
+        "top": 735,
+        "width": 2295,
+        "height": 360
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btn_letzer_Datensatz",
+      "type": "commandbutton",
+      "caption": "btn_letzter_Datensatz",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 5,
+      "position": {
+        "left": 6172,
+        "top": 291,
+        "width": 246,
+        "height": 276
+      }
+    },
+    {
+      "name": "Befehl40",
+      "type": "commandbutton",
+      "caption": "btn_Datensatz_vor",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 6,
+      "position": {
+        "left": 5881,
+        "top": 291,
+        "width": 246,
+        "height": 276
+      }
+    },
+    {
+      "name": "Befehl41",
+      "type": "commandbutton",
+      "caption": "btn_Datensatz_zurueck",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 7,
+      "position": {
+        "left": 5590,
+        "top": 291,
+        "width": 246,
+        "height": 276
+      }
+    },
+    {
+      "name": "Befehl43",
+      "type": "commandbutton",
+      "caption": "btn_erster_Datensatz",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 8,
+      "position": {
+        "left": 5299,
+        "top": 291,
+        "width": 246,
+        "height": 276
+      }
+    },
+    {
+      "name": "mcobtnDelete",
+      "type": "commandbutton",
+      "caption": "Auftrag löschen",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 9,
+      "position": {
+        "left": 12870,
+        "top": 165,
+        "width": 1995,
+        "height": 360
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Befehl38",
+      "type": "commandbutton",
+      "caption": "btn_Formular_schliessen",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 10,
+      "position": {
+        "left": 28006,
+        "top": 113,
+        "width": 306,
+        "height": 336
+      }
+    },
+    {
+      "name": "btnRibbonAus",
+      "type": "commandbutton",
+      "caption": "Befehl179",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 11,
+      "position": {
+        "left": 738,
+        "top": 328,
+        "width": 283,
+        "height": 238
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnRibbonEin",
+      "type": "commandbutton",
+      "caption": "Befehl179",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 12,
+      "position": {
+        "left": 738,
+        "top": 673,
+        "width": 283,
+        "height": 223
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnDaBaEin",
+      "type": "commandbutton",
+      "caption": "Befehl179",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 13,
+      "position": {
+        "left": 1023,
+        "top": 508,
+        "width": 283,
+        "height": 223
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnDaBaAus",
+      "type": "commandbutton",
+      "caption": "Befehl179",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 14,
+      "position": {
+        "left": 453,
+        "top": 508,
+        "width": 283,
+        "height": 223
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnReq",
+      "type": "commandbutton",
+      "caption": "Aktualisieren",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 15,
+      "position": {
+        "left": 5325,
+        "top": 795,
+        "width": 1236,
+        "height": 276
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "lbl_Version",
+      "type": "label",
+      "caption": "GPT | TEST",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 26362,
+        "top": 113,
+        "width": 1533,
+        "height": 315
+      }
+    },
+    {
+      "name": "btnneuveranst",
+      "type": "commandbutton",
+      "caption": "Neuer Auftrag",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 16,
+      "position": {
+        "left": 10545,
+        "top": 729,
+        "width": 1995,
+        "height": 345
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btn_aenderungsprotokoll",
+      "type": "commandbutton",
+      "caption": "Änderungsprotokoll",
+      "control_source": null,
+      "visible": false,
+      "enabled": false,
+      "locked": false,
+      "tab_index": 17,
+      "position": {
+        "left": 2948,
+        "top": 56,
+        "width": 270,
+        "height": 270
+      }
+    },
+    {
+      "name": "Befehl640",
+      "type": "commandbutton",
+      "caption": "Auftrag kopieren",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 19,
+      "position": {
+        "left": 10545,
+        "top": 165,
+        "width": 1995,
+        "height": 345
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnmailpos",
+      "type": "commandbutton",
+      "caption": "Positionsliste senden",
+      "control_source": null,
+      "visible": true,
+      "enabled": false,
+      "locked": false,
+      "tab_index": 20,
+      "position": {
+        "left": 3628,
+        "top": 56,
+        "width": 255,
+        "height": 270
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btn_Posliste_oeffnen",
+      "type": "commandbutton",
+      "caption": "Positionen",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 21,
+      "position": {
+        "left": 8160,
+        "top": 960,
+        "width": 1500,
+        "height": 340
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btn_rueck",
+      "type": "commandbutton",
+      "caption": "Befehl649",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 22,
+      "position": {
+        "left": 6463,
+        "top": 283,
+        "width": 246,
+        "height": 276
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnCheck",
+      "type": "commandbutton",
+      "caption": "Aufträge prüfen",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 23,
+      "position": {
+        "left": 4320,
+        "top": 60,
+        "width": 300,
+        "height": 270
+      }
+    },
+    {
+      "name": "btnDruckZusage1",
+      "type": "commandbutton",
+      "caption": "Mehrtagesliste drucken",
+      "control_source": null,
+      "visible": false,
+      "enabled": false,
+      "locked": false,
+      "tab_index": 25,
+      "position": {
+        "left": 2324,
+        "top": 56,
+        "width": 285,
+        "height": 330
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btn_Rueckmeld",
+      "type": "commandbutton",
+      "caption": "Rückmelde-Statistik",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 26,
+      "position": {
+        "left": 1814,
+        "top": 850,
+        "width": 1425,
+        "height": 225
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Rech_NR",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Rech_NR",
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 27,
+      "position": {
+        "left": 24318,
+        "top": 682,
+        "width": null,
+        "height": 270
+      }
+    },
+    {
+      "name": "lbl_rechnungsnr",
+      "type": "label",
+      "caption": "Rechnung Nr.:",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 22560,
+        "top": 682,
+        "width": 1545,
+        "height": 285
+      }
+    },
+    {
+      "name": "btnSyncErr",
+      "type": "commandbutton",
+      "caption": "Syncfehler checken",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 28,
+      "position": {
+        "left": 3458,
+        "top": 850,
+        "width": 1035,
+        "height": 225
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btn_ListeStd",
+      "type": "commandbutton",
+      "caption": "Namensliste ESS",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 29,
+      "position": {
+        "left": 12903,
+        "top": 735,
+        "width": 1995,
+        "height": 360
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btn_Autosend_BOS",
+      "type": "commandbutton",
+      "caption": "Einsatzliste senden BOS",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 30,
+      "position": {
+        "left": 17745,
+        "top": 165,
+        "width": 2610,
+        "height": 360
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "cbAutosendEL",
+      "type": "checkbox",
+      "caption": null,
+      "control_source": "Autosend_EL",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 31,
+      "position": {
+        "left": 18990,
+        "top": 855,
+        "width": null,
+        "height": null
+      }
+    },
+    {
+      "name": "lbl_EL_Autosend",
+      "type": "label",
+      "caption": "EL Autosend",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 17744,
+        "top": 798,
+        "width": 1095,
+        "height": 270
+      }
+    },
+    {
+      "name": "Befehl709",
+      "type": "commandbutton",
+      "caption": "EL gesendet",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 32,
+      "position": {
+        "left": 19275,
+        "top": 795,
+        "width": 1065,
+        "height": 270
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnMailSub",
+      "type": "commandbutton",
+      "caption": "Einsatzliste senden SUB",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 33,
+      "position": {
+        "left": 20475,
+        "top": 165,
+        "width": 1920,
+        "height": 510
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btn_N_HTMLAnsicht",
+      "type": "commandbutton",
+      "caption": "HTML Ansicht",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 34,
+      "position": {
+        "left": 8500,
+        "top": 50,
+        "width": 1400,
+        "height": 340
+      },
+      "events": {
+        "on_click": "=HTMLAnsichtOeffnen()"
+      }
+    },
+    {
+      "name": "ID",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "ID",
+      "visible": true,
+      "enabled": false,
+      "locked": true,
+      "tab_index": 11,
+      "position": {
+        "left": 7117,
+        "top": 119,
+        "width": 615,
+        "height": 329
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld466",
+      "type": "label",
+      "caption": "Nr.",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 6690,
+        "top": 113,
+        "width": 420,
+        "height": 335
+      }
+    },
+    {
+      "name": "Dat_VA_Von",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Dat_VA_Von",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3727,
+        "top": 113,
+        "width": 1305,
+        "height": 335
+      },
+      "events": {
+        "on_dbl_click": "[Event Procedure]",
+        "on_exit": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld272",
+      "type": "label",
+      "caption": "Datum:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2797,
+        "top": 113,
+        "width": 855,
+        "height": 335
+      }
+    },
+    {
+      "name": "Dat_VA_Bis",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Dat_VA_Bis",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 1,
+      "position": {
+        "left": 5260,
+        "top": 113,
+        "width": 1305,
+        "height": 335
+      },
+      "events": {
+        "on_dbl_click": "[Event Procedure]",
+        "after_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "PLZ",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "PLZ",
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 13,
+      "position": {
+        "left": 8392,
+        "top": 135,
+        "width": 240,
+        "height": 346
+      }
+    },
+    {
+      "name": "Treffpunkt",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Treffpunkt",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 6,
+      "position": {
+        "left": 14485,
+        "top": 119,
+        "width": 3060,
+        "height": 329
+      },
+      "events": {
+        "on_got_focus": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld327",
+      "type": "label",
+      "caption": "Treffpunkt:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 11735,
+        "top": 113,
+        "width": 1740,
+        "height": 335
+      }
+    },
+    {
+      "name": "Treffp_Zeit",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Treffp_Zeit",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 5,
+      "position": {
+        "left": 13575,
+        "top": 119,
+        "width": 870,
+        "height": 329
+      },
+      "events": {
+        "before_update": "[Event Procedure]",
+        "on_got_focus": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Ansprechpartner",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Ansprechpartner",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 8,
+      "position": {
+        "left": 13575,
+        "top": 892,
+        "width": 3953,
+        "height": 329
+      },
+      "events": {
+        "on_got_focus": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld333",
+      "type": "label",
+      "caption": "Ansprechpartner:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 11735,
+        "top": 875,
+        "width": 1740,
+        "height": 346
+      }
+    },
+    {
+      "name": "btnDatumLeft",
+      "type": "commandbutton",
+      "caption": "btn_Datensatz_zurueck",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 17,
+      "position": {
+        "left": 8317,
+        "top": 1260,
+        "width": 291,
+        "height": 346
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnDatumRight",
+      "type": "commandbutton",
+      "caption": "btn_Datensatz_vor",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 19,
+      "position": {
+        "left": 10869,
+        "top": 1260,
+        "width": 291,
+        "height": 346
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld243",
+      "type": "label",
+      "caption": "Objekt:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2782,
+        "top": 1271,
+        "width": 855,
+        "height": 335
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld467",
+      "type": "label",
+      "caption": "Ort:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2797,
+        "top": 886,
+        "width": 855,
+        "height": 335
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld330",
+      "type": "label",
+      "caption": "Dienstkleidung:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 11735,
+        "top": 477,
+        "width": 1740,
+        "height": 346
+      }
+    },
+    {
+      "name": "frm_Menuefuehrung",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 10,
+      "position": {
+        "left": 15,
+        "top": null,
+        "width": 2603,
+        "height": 11887
+      },
+      "source_object": "Form.frm_Menuefuehrung"
+    },
+    {
+      "name": "PKW_Anzahl",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Dummy",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 14,
+      "position": {
+        "left": 10033,
+        "top": 345,
+        "width": 1035,
+        "height": 346
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld339",
+      "type": "label",
+      "caption": "PKW Anzahl:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 8117,
+        "top": 345,
+        "width": 1873,
+        "height": 346
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld592",
+      "type": "label",
+      "caption": "Auftraggeber:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 11735,
+        "top": 1277,
+        "width": 1740,
+        "height": 329
+      }
+    },
+    {
+      "name": "pgMA_Zusage",
+      "type": "page",
+      "caption": "Einsatzliste",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2850,
+        "top": 2205,
+        "width": 16140,
+        "height": 9870
+      }
+    },
+    {
+      "name": "MA_Selektion",
+      "type": "optiongroup",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 10211,
+        "top": 2704,
+        "width": 7362,
+        "height": 1276
+      },
+      "events": {
+        "after_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Option264",
+      "type": "optionbutton",
+      "caption": null,
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 14865,
+        "top": 3875,
+        "width": 215,
+        "height": 105
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld265",
+      "type": "label",
+      "caption": "Alle",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 14921,
+        "top": 3649,
+        "width": 210,
+        "height": 120
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld517",
+      "type": "label",
+      "caption": "Anstellungsart:",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 13798,
+        "top": 2821,
+        "width": 1320,
+        "height": 285
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld263",
+      "type": "label",
+      "caption": "Filter:",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 12948,
+        "top": 2707,
+        "width": 630,
+        "height": 285
+      }
+    },
+    {
+      "name": "btnPlan_Kopie",
+      "type": "commandbutton",
+      "caption": "Daten in Folgetag kopieren",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 2,
+      "position": {
+        "left": 3900,
+        "top": 2385,
+        "width": 2730,
+        "height": 300
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Befehl543",
+      "type": "commandbutton",
+      "caption": "btn_Datensatz_vor",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 3,
+      "position": {
+        "left": 3348,
+        "top": 2774,
+        "width": 171,
+        "height": 150
+      }
+    },
+    {
+      "name": "btnVAPlanCrea",
+      "type": "commandbutton",
+      "caption": "Liste aktualisieren",
+      "control_source": null,
+      "visible": false,
+      "enabled": false,
+      "locked": false,
+      "tab_index": 4,
+      "position": {
+        "left": 2883,
+        "top": 3251,
+        "width": 195,
+        "height": 360
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "VerrSatz",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Dummy",
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 5,
+      "position": {
+        "left": 6120,
+        "top": 5715,
+        "width": 255,
+        "height": null
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld269",
+      "type": "label",
+      "caption": "Kategorie:",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3677,
+        "top": 2769,
+        "width": 30,
+        "height": 285
+      }
+    },
+    {
+      "name": "IstVerfuegbar",
+      "type": "checkbox",
+      "caption": null,
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 7,
+      "position": {
+        "left": 15602,
+        "top": 3706,
+        "width": 155,
+        "height": 195
+      },
+      "events": {
+        "after_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "lbl_NurFreie",
+      "type": "label",
+      "caption": "Nur freie anzeigen",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 15829,
+        "top": 3649,
+        "width": 1635,
+        "height": 285
+      }
+    },
+    {
+      "name": "lbl_KeineEingabe",
+      "type": "label",
+      "caption": "Auftrag bereits berechnet",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 11670,
+        "top": 2325,
+        "width": 2490,
+        "height": 285
+      }
+    },
+    {
+      "name": "sub_MA_VA_Zuordnung",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 8,
+      "position": {
+        "left": 6825,
+        "top": 2805,
+        "width": 12159,
+        "height": 9251
+      },
+      "source_object": "Form.sub_MA_VA_Zuordnung",
+      "link_master_fields": "ID;cboVADatum",
+      "link_child_fields": "VA_ID;VADatum_ID",
+      "events": {
+        "on_enter": "[Event Procedure]",
+        "on_exit": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "sub_VA_Start",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 9,
+      "position": {
+        "left": 2955,
+        "top": 2805,
+        "width": 3765,
+        "height": 2790
+      },
+      "source_object": "Form.sub_VA_Start",
+      "link_master_fields": "ID;cboVADatum",
+      "link_child_fields": "VA_ID;VADatum_ID",
+      "events": {
+        "on_enter": "[Event Procedure]",
+        "on_exit": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld255",
+      "type": "label",
+      "caption": "Anzahl     ",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3184,
+        "top": 3236,
+        "width": 915,
+        "height": 315
+      }
+    },
+    {
+      "name": "btn_VA_Abwesenheiten",
+      "type": "commandbutton",
+      "caption": "Abwesenheiten",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 10,
+      "position": {
+        "left": 5615,
+        "top": 5435,
+        "width": 795,
+        "height": 150
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "sub_MA_VA_Planung_Absage",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 11,
+      "position": {
+        "left": 2895,
+        "top": 6203,
+        "width": 3810,
+        "height": 5851
+      },
+      "source_object": "Form.sub_MA_VA_Planung_Absage",
+      "link_master_fields": "ID;cboVADatum",
+      "link_child_fields": "VA_ID;VADatum_ID"
+    },
+    {
+      "name": "Bezeichnungsfeld526",
+      "type": "label",
+      "caption": "Absagen:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2955,
+        "top": 5880,
+        "width": 960,
+        "height": 285
+      }
+    },
+    {
+      "name": "btn_sortieren",
+      "type": "commandbutton",
+      "caption": "sortieren",
+      "control_source": null,
+      "visible": false,
+      "enabled": false,
+      "locked": false,
+      "tab_index": 12,
+      "position": {
+        "left": 14119,
+        "top": 2490,
+        "width": 1084,
+        "height": 227
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "cmd_Messezettel_NameEintragen",
+      "type": "commandbutton",
+      "caption": "BWN Namen",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 13,
+      "position": {
+        "left": 6855,
+        "top": 2325,
+        "width": 1401,
+        "height": null
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "cmd_BWN_send",
+      "type": "commandbutton",
+      "caption": "BWN senden",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 14,
+      "position": {
+        "left": 10140,
+        "top": 2325,
+        "width": 1416,
+        "height": null
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btn_BWN_Druck",
+      "type": "commandbutton",
+      "caption": "BWN drucken",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 15,
+      "position": {
+        "left": 8370,
+        "top": 2325,
+        "width": 1656,
+        "height": null
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "pgMA_Plan",
+      "type": "page",
+      "caption": "Antworten ausstehend",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2850,
+        "top": 2205,
+        "width": 16140,
+        "height": 9870
+      }
+    },
+    {
+      "name": "sub_MA_VA_Zuordnung_Status",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3185,
+        "top": 2537,
+        "width": 13794,
+        "height": 9086
+      },
+      "source_object": "Form.sub_MA_VA_Planung_Status",
+      "link_master_fields": "ID;cboVADatum",
+      "link_child_fields": "VA_ID;VADatum_ID"
+    },
+    {
+      "name": "Bezeichnungsfeld386",
+      "type": "label",
+      "caption": "Mitarbeiter geplant:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3120,
+        "top": 2430,
+        "width": 1950,
+        "height": 315
+      }
+    },
+    {
+      "name": "pgAttach",
+      "type": "page",
+      "caption": "Zusatzdateien",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2850,
+        "top": 2205,
+        "width": 16140,
+        "height": 9870
+      }
+    },
+    {
+      "name": "sub_ZusatzDateien",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3225,
+        "top": 3556,
+        "width": 13500,
+        "height": 8411
+      },
+      "source_object": "Form.sub_ZusatzDateien",
+      "link_master_fields": "Objekt_ID;TabellenNr",
+      "link_child_fields": "Ueberordnung;TabellenID"
+    },
+    {
+      "name": "btnNeuAttach",
+      "type": "commandbutton",
+      "caption": "Neuen Attach hinzufügen",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 1,
+      "position": {
+        "left": 12790,
+        "top": 3000,
+        "width": 3175,
+        "height": 628
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld355",
+      "type": "label",
+      "caption": "Doppelklick auf Dateinamen zeigt Inhalt an bzw. öffnet Office-Pgm ",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3379,
+        "top": 3060,
+        "width": 8674,
+        "height": 625
+      }
+    },
+    {
+      "name": "TabellenNr",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "=42",
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 2,
+      "position": {
+        "left": 12312,
+        "top": 3057,
+        "width": 343,
+        "height": 315
+      }
+    },
+    {
+      "name": "pgRechnung",
+      "type": "page",
+      "caption": "Rechnung",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2850,
+        "top": 2205,
+        "width": 16140,
+        "height": 9870
+      }
+    },
+    {
+      "name": "sub_rch_Pos",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3366,
+        "top": 3511,
+        "width": 14242,
+        "height": 1748
+      },
+      "source_object": "Query.zqry_Rch_Pos",
+      "link_master_fields": "ID",
+      "link_child_fields": "VA_ID"
+    },
+    {
+      "name": "Bezeichnungsfeld470",
+      "type": "label",
+      "caption": "Rechnungspositionen:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3360,
+        "top": 3141,
+        "width": 1995,
+        "height": 315
+      }
+    },
+    {
+      "name": "sub_Berechnungsliste",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 1,
+      "position": {
+        "left": 3388,
+        "top": 5790,
+        "width": 14272,
+        "height": 6124
+      },
+      "source_object": "Form.zsub_rch_Berechnungsliste",
+      "link_master_fields": "ID",
+      "link_child_fields": "VA_ID"
+    },
+    {
+      "name": "Bezeichnungsfeld472",
+      "type": "label",
+      "caption": "Berechnungsliste:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3360,
+        "top": 5430,
+        "width": 2145,
+        "height": 315
+      }
+    },
+    {
+      "name": "btnPDFKopf",
+      "type": "commandbutton",
+      "caption": "Rechnung PDF",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 2,
+      "position": {
+        "left": 5514,
+        "top": 3045,
+        "width": 1984,
+        "height": 392
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnPDFPos",
+      "type": "commandbutton",
+      "caption": "Berechnungsliste PDF",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 3,
+      "position": {
+        "left": 7736,
+        "top": 3045,
+        "width": 2659,
+        "height": 392
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "PosGesamtsumme",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "=tsum(\\\"summe\\\",\\\"ztbl_Rch_Berechnungsliste\\\",\\\"VA_ID=\\\" & [ID])",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 4,
+      "position": {
+        "left": 15249,
+        "top": 5313,
+        "width": 2317,
+        "height": 315
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld439",
+      "type": "label",
+      "caption": "Gesamtsumme Netto:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 12930,
+        "top": 5310,
+        "width": 2145,
+        "height": 315
+      }
+    },
+    {
+      "name": "btnLoad",
+      "type": "commandbutton",
+      "caption": "Daten laden",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 5,
+      "position": {
+        "left": 10801,
+        "top": 3060,
+        "width": null,
+        "height": 403
+      }
+    },
+    {
+      "name": "btnRchLex",
+      "type": "commandbutton",
+      "caption": "Rechnung in Lexware erstellen",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 6,
+      "position": {
+        "left": 16800,
+        "top": 2880,
+        "width": 1986,
+        "height": 568
+      }
+    },
+    {
+      "name": "pgBemerk",
+      "type": "page",
+      "caption": "Bemerkungen",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2850,
+        "top": 2205,
+        "width": 16140,
+        "height": 9870
+      }
+    },
+    {
+      "name": "Bemerkungen",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Bemerkungen",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 3203,
+        "top": 3503,
+        "width": 12743,
+        "height": 8291
+      }
+    },
+    {
+      "name": "sub_VA_Anzeige",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 12,
+      "position": {
+        "left": 19117,
+        "top": 170,
+        "width": 9425,
+        "height": 1232
+      },
+      "source_object": "Form.sub_VA_Anzeige"
+    },
+    {
+      "name": "Auftraege_ab",
+      "type": "textbox",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 20,
+      "position": {
+        "left": 20349,
+        "top": 1596,
+        "width": 1074,
+        "height": 286
+      },
+      "events": {
+        "on_dbl_click": "[Event Procedure]",
+        "on_exit": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld482",
+      "type": "label",
+      "caption": "Aufträge ab: ",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 19215,
+        "top": 1606,
+        "width": 1065,
+        "height": 286
+      }
+    },
+    {
+      "name": "btn_AbWann",
+      "type": "commandbutton",
+      "caption": "Go",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 21,
+      "position": {
+        "left": 21480,
+        "top": 1590,
+        "width": 416,
+        "height": 286
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnHeute",
+      "type": "commandbutton",
+      "caption": "Ab Heute",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 24,
+      "position": {
+        "left": 23045,
+        "top": 1596,
+        "width": 1055,
+        "height": 286
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnTgBack",
+      "type": "commandbutton",
+      "caption": "<<",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 22,
+      "position": {
+        "left": 22025,
+        "top": 1596,
+        "width": 440,
+        "height": 286
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "btnTgVor",
+      "type": "commandbutton",
+      "caption": ">>",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 23,
+      "position": {
+        "left": 22478,
+        "top": 1596,
+        "width": 410,
+        "height": 286
+      },
+      "events": {
+        "on_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "lblSearch",
+      "type": "label",
+      "caption": "Suchen",
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 25514,
+        "top": 1590,
+        "width": 855,
+        "height": 286
+      }
+    },
+    {
+      "name": "btn_Tag_loeschen",
+      "type": "commandbutton",
+      "caption": "Tag löschen",
+      "control_source": null,
+      "visible": false,
+      "enabled": false,
+      "locked": false,
+      "tab_index": 26,
+      "position": {
+        "left": 27786,
+        "top": 1757,
+        "width": 510,
+        "height": 135
+      }
+    },
+    {
+      "name": "Rechteck619",
+      "type": "rectangle",
+      "caption": null,
+      "control_source": null,
+      "visible": false,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 27403,
+        "top": 1650,
+        "width": 235,
+        "height": 12
+      }
+    },
+    {
+      "name": "Fahrtkosten",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Fahrtkosten",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 15,
+      "position": {
+        "left": 10042,
+        "top": 737,
+        "width": 1021,
+        "height": 300
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld655",
+      "type": "label",
+      "caption": "Fahrtkosten pro PKW:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 8115,
+        "top": 735,
+        "width": 2205,
+        "height": 315
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld657",
+      "type": "label",
+      "caption": "Auftrag:",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 2778,
+        "top": 488,
+        "width": 855,
+        "height": 335
+      }
+    },
+    {
+      "name": "zsub_lstAuftrag",
+      "type": "subform",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 28,
+      "position": {
+        "left": 19170,
+        "top": 1995,
+        "width": 9546,
+        "height": 9936
+      },
+      "source_object": "Form.frm_lst_row_auftrag"
+    },
+    {
+      "name": "Text416",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Erst_von",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 1077,
+        "top": 56,
+        "width": 1871,
+        "height": 225
+      },
+      "events": {
+        "before_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld417",
+      "type": "label",
+      "caption": "Erstellt",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": null,
+        "top": 56,
+        "width": 795,
+        "height": 225
+      }
+    },
+    {
+      "name": "Text418",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Erst_am",
+      "visible": true,
+      "enabled": false,
+      "locked": true,
+      "tab_index": 1,
+      "position": {
+        "left": 3174,
+        "top": 56,
+        "width": 1871,
+        "height": 225
+      },
+      "events": {
+        "before_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Text419",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Aend_von",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 2,
+      "position": {
+        "left": 7378,
+        "top": 56,
+        "width": 1871,
+        "height": 225
+      },
+      "events": {
+        "before_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Bezeichnungsfeld421",
+      "type": "label",
+      "caption": "Geändert",
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 6301,
+        "top": 56,
+        "width": 795,
+        "height": 225
+      }
+    },
+    {
+      "name": "Text422",
+      "type": "textbox",
+      "caption": null,
+      "control_source": "Aend_am",
+      "visible": true,
+      "enabled": false,
+      "locked": true,
+      "tab_index": 3,
+      "position": {
+        "left": 9475,
+        "top": 56,
+        "width": 1871,
+        "height": 225
+      },
+      "events": {
+        "before_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Veranst_Status_ID",
+      "type": "combobox",
+      "caption": null,
+      "control_source": "Veranst_Status_ID",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": null,
+      "position": {
+        "left": 24318,
+        "top": 285,
+        "width": 1710,
+        "height": 330
+      },
+      "row_source": "SELECT tbl_VA_Status.ID, tbl_VA_Status.Fortschritt FROM tbl_VA_Status ORDER BY t",
+      "row_source_type": "Table/Query",
+      "events": {
+        "on_dbl_click": "[Event Procedure]",
+        "after_update": "[Event Procedure]",
+        "before_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "IstStatus",
+      "type": "combobox",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 18,
+      "position": {
+        "left": 3288,
+        "top": 56,
+        "width": 311,
+        "height": 270
+      },
+      "row_source": "SELECT -5 as ID, \\",
+      "row_source_type": "Table/Query",
+      "events": {
+        "after_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "cboEinsatzliste",
+      "type": "combobox",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 24,
+      "position": {
+        "left": 1530,
+        "top": 56,
+        "width": 750,
+        "height": 330
+      },
+      "row_source": "0;\\",
+      "row_source_type": "Value List",
+      "events": {
+        "after_update": "[Event Procedure]",
+        "before_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Objekt_ID",
+      "type": "combobox",
+      "caption": null,
+      "control_source": "Objekt_ID",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 16,
+      "position": {
+        "left": 7295,
+        "top": 1260,
+        "width": 452,
+        "height": 346
+      },
+      "row_source": "SELECT [tbl_OB_Objekt].ID, [tbl_OB_Objekt].Objekt, [tbl_OB_Objekt].Strasse, [tbl",
+      "row_source_type": "Table/Query",
+      "events": {
+        "on_dbl_click": "[Event Procedure]",
+        "after_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "cboVADatum",
+      "type": "combobox",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 18,
+      "position": {
+        "left": 8657,
+        "top": 1260,
+        "width": 2178,
+        "height": 346
+      },
+      "row_source": "SELECT tbl_VA_AnzTage.ID, tbl_VA_AnzTage.VADatum FROM tbl_VA_AnzTage WHERE (((tb",
+      "row_source_type": "Table/Query",
+      "events": {
+        "on_dbl_click": "[Event Procedure]",
+        "after_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Objekt",
+      "type": "combobox",
+      "caption": null,
+      "control_source": "Objekt",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 4,
+      "position": {
+        "left": 3727,
+        "top": 1260,
+        "width": 3717,
+        "height": 346
+      },
+      "row_source": "SELECT DISTINCT tbl_VA_Auftragstamm.Objekt FROM tbl_VA_Auftragstamm WHERE (((Len",
+      "row_source_type": "Table/Query",
+      "events": {
+        "on_dbl_click": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Ort",
+      "type": "combobox",
+      "caption": null,
+      "control_source": "Ort",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 3,
+      "position": {
+        "left": 3727,
+        "top": 875,
+        "width": 4020,
+        "height": 346
+      },
+      "row_source": "SELECT DISTINCT tbl_VA_Auftragstamm.Ort FROM tbl_VA_Auftragstamm WHERE (((Len(Tr",
+      "row_source_type": "Table/Query"
+    },
+    {
+      "name": "Dienstkleidung",
+      "type": "combobox",
+      "caption": null,
+      "control_source": "Dienstkleidung",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 7,
+      "position": {
+        "left": 13575,
+        "top": 494,
+        "width": 3953,
+        "height": 329
+      },
+      "row_source": "SELECT DISTINCT tbl_VA_Auftragstamm.Dienstkleidung FROM tbl_VA_Auftragstamm WHER",
+      "row_source_type": "Table/Query"
+    },
+    {
+      "name": "veranstalter_id",
+      "type": "combobox",
+      "caption": null,
+      "control_source": "Veranstalter_ID",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 9,
+      "position": {
+        "left": 13575,
+        "top": 1277,
+        "width": 3953,
+        "height": 329
+      },
+      "row_source": "SELECT tbl_KD_Kundenstamm.kun_Id, tbl_KD_Kundenstamm.kun_Firma FROM tbl_KD_Kunde",
+      "row_source_type": "Table/Query",
+      "events": {
+        "on_dbl_click": "[Event Procedure]",
+        "after_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "cboAnstArt",
+      "type": "combobox",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 1,
+      "position": {
+        "left": 15216,
+        "top": 2821,
+        "width": 2252,
+        "height": 285
+      },
+      "row_source": "SELECT tbl_hlp_MA_Anstellungsart.ID, tbl_hlp_MA_Anstellungsart.Anstellungsart, t",
+      "row_source_type": "Table/Query",
+      "events": {
+        "on_dbl_click": "[Event Procedure]",
+        "after_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "cboQuali",
+      "type": "combobox",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 6,
+      "position": {
+        "left": 3742,
+        "top": 2736,
+        "width": 167,
+        "height": 285
+      },
+      "row_source": "SELECT [tbl_MA_Einsatzart].ID, [tbl_MA_Einsatzart].QualiName FROM tbl_MA_Einsatz",
+      "row_source_type": "Table/Query"
+    },
+    {
+      "name": "cboID",
+      "type": "combobox",
+      "caption": null,
+      "control_source": null,
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 25,
+      "position": {
+        "left": 26366,
+        "top": 1596,
+        "width": 1505,
+        "height": 286
+      },
+      "row_source": "SELECT tbl_VA_Auftragstamm.ID, tbl_VA_Auftragstamm.Auftrag, tbl_VA_Auftragstamm.",
+      "row_source_type": "Table/Query",
+      "events": {
+        "after_update": "[Event Procedure]"
+      }
+    },
+    {
+      "name": "Kombinationsfeld656",
+      "type": "combobox",
+      "caption": null,
+      "control_source": "Auftrag",
+      "visible": true,
+      "enabled": true,
+      "locked": false,
+      "tab_index": 2,
+      "position": {
+        "left": 3727,
+        "top": 477,
+        "width": 4020,
+        "height": 346
+      },
+      "row_source": "SELECT DISTINCT tbl_VA_Auftragstamm.Auftrag FROM tbl_VA_Auftragstamm WHERE (((Le",
+      "row_source_type": "Table/Query"
+    }
+  ],
+  "subforms": [
+    {
+      "name": "frm_Menuefuehrung",
+      "source_object": "Form.frm_Menuefuehrung",
+      "link_master_fields": null,
+      "link_child_fields": null,
+      "vba_control": {
+        "type": "static",
+        "description": "Keine VBA-Steuerung gefunden - Menuleiste wird statisch geladen",
+        "notes": "SourceObject ist fest auf Form.frm_Menuefuehrung gesetzt"
+      }
+    },
+    {
+      "name": "sub_MA_VA_Zuordnung",
+      "source_object": "Form.sub_MA_VA_Zuordnung",
+      "link_master_fields": "ID;cboVADatum",
+      "link_child_fields": "VA_ID;VADatum_ID"
+    },
+    {
+      "name": "sub_VA_Start",
+      "source_object": "Form.sub_VA_Start",
+      "link_master_fields": "ID;cboVADatum",
+      "link_child_fields": "VA_ID;VADatum_ID"
+    },
+    {
+      "name": "sub_MA_VA_Planung_Absage",
+      "source_object": "Form.sub_MA_VA_Planung_Absage",
+      "link_master_fields": "ID;cboVADatum",
+      "link_child_fields": "VA_ID;VADatum_ID"
+    },
+    {
+      "name": "sub_MA_VA_Zuordnung_Status",
+      "source_object": "Form.sub_MA_VA_Planung_Status",
+      "link_master_fields": "ID;cboVADatum",
+      "link_child_fields": "VA_ID;VADatum_ID"
+    },
+    {
+      "name": "sub_ZusatzDateien",
+      "source_object": "Form.sub_ZusatzDateien",
+      "link_master_fields": "Objekt_ID;TabellenNr",
+      "link_child_fields": "Ueberordnung;TabellenID"
+    },
+    {
+      "name": "sub_rch_Pos",
+      "source_object": "Query.zqry_Rch_Pos",
+      "link_master_fields": "ID",
+      "link_child_fields": "VA_ID"
+    },
+    {
+      "name": "sub_Berechnungsliste",
+      "source_object": "Form.zsub_rch_Berechnungsliste",
+      "link_master_fields": "ID",
+      "link_child_fields": "VA_ID"
+    },
+    {
+      "name": "sub_VA_Anzeige",
+      "source_object": "Form.sub_VA_Anzeige",
+      "link_master_fields": null,
+      "link_child_fields": null,
+      "vba_control": {
+        "type": "external_function_call",
+        "description": "Aktualisierung ueber externe Funktion Form_sub_VA_Anzeige.f_UpdStatus",
+        "triggers": [
+          {
+            "event": "req_rq",
+            "action": "Form_sub_VA_Anzeige.f_UpdStatus"
+          },
+          {
+            "event": "btnAuftrBerech_Click",
+            "action": "Form_sub_VA_Anzeige.f_UpdStatus"
+          }
+        ],
+        "notes": "Funktion f_UpdStatus befindet sich im Klassenmodul von sub_VA_Anzeige"
+      }
+    },
+    {
+      "name": "zsub_lstAuftrag",
+      "source_object": "Form.frm_lst_row_auftrag",
+      "link_master_fields": null,
+      "link_child_fields": null,
+      "vba_control": {
+        "type": "dynamic_recordsource_and_requery",
+        "description": "Dynamische Steuerung ueber recordSource-Aenderung und Requery/Recalc",
+        "default_recordsource": "qry_lst_Row_Auftrag",
+        "triggers": [
+          {
+            "event": "Befehl640_Click",
+            "action": "Requery",
+            "context": "Nach Auftrag kopieren"
+          },
+          {
+            "event": "mcobtnDelete_Click",
+            "action": "Requery + AbsolutePosition",
+            "context": "Nach Auftrag loeschen"
+          },
+          {
+            "event": "req_rq",
+            "action": "Recalc",
+            "context": "Allgemeine Aktualisierung"
+          },
+          {
+            "event": "VAOpen",
+            "action": "FindFirst/Bookmark",
+            "context": "Navigation zum Datensatz"
+          },
+          {
+            "event": "btn_AbWann_Click",
+            "action": "recordSource setzen",
+            "context": "Filter nach Datum/Status"
+          },
+          {
+            "event": "Dat_VA_Bis_AfterUpdate",
+            "action": "Requery",
+            "context": "Nach Datums-Aenderung"
+          },
+          {
+            "event": "btnVAPlanCrea_Click",
+            "action": "Recalc",
+            "context": "Nach Planung erstellen"
+          },
+          {
+            "event": "sub_MA_VA_Zuordnung_Exit",
+            "action": "Recalc",
+            "context": "Nach Verlassen Zuordnung"
+          },
+          {
+            "event": "sub_MA_VA_Zuordnung_Enter",
+            "action": "Recalc",
+            "context": "Beim Betreten Zuordnung"
+          },
+          {
+            "event": "sub_VA_Start_Exit",
+            "action": "Recalc",
+            "context": "Nach Verlassen Start"
+          },
+          {
+            "event": "Veranst_Status_ID_AfterUpdate",
+            "action": "Recalc",
+            "context": "Nach Status-Aenderung"
+          }
+        ],
+        "filter_mechanism": {
+          "function": "btn_AbWann_Click",
+          "filter_fields": [
+            "tbl_VA_AnzTage.VADatum >= Auftraege_ab",
+            "tbl_VA_Auftragstamm.Veranst_Status_ID = IstStatus"
+          ],
+          "creates_query": "CreateQuery(strSQL, qry_lst_Row_Auftrag)"
+        }
+      }
+    }
+  ],
+  "vba_code": {
+    "has_code": true,
+    "total_procedures": 111,
+    "form_events": [
+      {
+        "event": "BeforeDelConfirm",
+        "parameters": "Cancel As Integer, response As Integer"
+      },
+      {
+        "event": "Load",
+        "parameters": ""
+      },
+      {
+        "event": "Open",
+        "parameters": "Cancel As Integer"
+      },
+      {
+        "event": "BeforeUpdate",
+        "parameters": "Cancel As Integer"
+      },
+      {
+        "event": "Current",
+        "parameters": ""
+      }
+    ],
+    "control_events_by_control": {
+      "btnXLEinsLst": [
+        "Click"
+      ],
+      "Befehl658": [
+        "Click"
+      ],
+      "Befehl640": [
+        "Click"
+      ],
+      "btn": [
+        "Neuer_Auftrag2_Click",
+        "Autosend_BOS_Click",
+        "BWN_Druck_Click",
+        "ListeStd_Click",
+        "Posliste_oeffnen_Click",
+        "rueck_Click",
+        "rueckgaengig_Click",
+        "Rueckmeld_Click",
+        "std_check_Click",
+        "std_check_LostFocus",
+        "sortieren_Click",
+        "VA_Abwesenheiten_Click",
+        "VA_Neu_Aus_Vorlage_Click",
+        "AbWann_Click"
+      ],
+      "Befehl709": [
+        "Click"
+      ],
+      "f": [
+        "abwesenheiten",
+        "AbWann",
+        "lst_Auft_Cl",
+        "lstZeiten_upd"
+      ],
+      "btnDatumRight": [
+        "Click"
+      ],
+      "fSort": [
+        "MA"
+      ],
+      "btnSyncErr": [
+        "Click"
+      ],
+      "cboEinsatzliste": [
+        "BeforeUpdate",
+        "AfterUpdate"
+      ],
+      "Ansprechpartner": [
+        "GotFocus"
+      ],
+      "cmd": [
+        "BWN_send_Click",
+        "Messezettel_NameEintragen_Click"
+      ],
+      "Dienstkleidung": [
+        "GotFocus"
+      ],
+      "mcobtnDelete": [
+        "Click"
+      ],
+      "Objekt": [
+        "GotFocus",
+        "DblClick",
+        "Exit",
+        "ID_AfterUpdate",
+        "ID_DblClick"
+      ],
+      "Ort": [
+        "GotFocus"
+      ],
+      "Treffp": [
+        "Zeit_GotFocus",
+        "Zeit_BeforeUpdate",
+        "Zeit_KeyDown"
+      ],
+      "Treffpunkt": [
+        "GotFocus"
+      ],
+      "veranstalter": [
+        "id_GotFocus",
+        "id_AfterUpdate"
+      ],
+      "cboAnstArt": [
+        "DblClick",
+        "AfterUpdate"
+      ],
+      "cboID": [
+        "AfterUpdate"
+      ],
+      "Auftraege": [
+        "ab_DblClick",
+        "ab_Exit"
+      ],
+      "btnreq": [
+        "Click"
+      ],
+      "VAOpen": [
+        "LastDS",
+        "New"
+      ],
+      "req": [
+        "rq"
+      ],
+      "btnMAErz": [
+        "Click"
+      ],
+      "btnAuftrBerech": [
+        "Click"
+      ],
+      "btnDatumLeft": [
+        "Click"
+      ],
+      "btnDruck": [
+        "Click"
+      ],
+      "btnStdBerech": [
+        "Click"
+      ],
+      "btnDruckZusage": [
+        "Click"
+      ],
+      "btnDruckZusage1": [
+        "Click"
+      ],
+      "btnMailEins": [
+        "Click"
+      ],
+      "btnMailPos": [
+        "Click"
+      ],
+      "btnMailSub": [
+        "Click"
+      ],
+      "btnNeuAttach": [
+        "Click"
+      ],
+      "btnNeuVeranst": [
+        "Click"
+      ],
+      "btnPDFKopf": [
+        "Click"
+      ],
+      "btnPDFPos": [
+        "Click"
+      ],
+      "btnSchnellPlan": [
+        "Click"
+      ],
+      "PosNr": [
+        "Einfaerben_FormatCondition_Loesch",
+        "Einfaerben_FormatCondition"
+      ],
+      "btnVAPlanAendern": [
+        "Click"
+      ],
+      "btnVAPlanCrea": [
+        "Click"
+      ],
+      "btnPlan": [
+        "Kopie_Click"
+      ],
+      "cboAuftrSuche": [
+        "AfterUpdate"
+      ],
+      "cboVADatum": [
+        "AfterUpdate",
+        "DblClick"
+      ],
+      "Dat": [
+        "VA_Bis_DblClick",
+        "VA_Von_DblClick",
+        "VA_Von_Exit",
+        "VA_Bis_AfterUpdate"
+      ],
+      "btnTgVor": [
+        "Click"
+      ],
+      "btnTgBack": [
+        "Click"
+      ],
+      "btnHeute": [
+        "Click"
+      ],
+      "IstStatus": [
+        "AfterUpdate"
+      ],
+      "fMA": [
+        "Selektion_AfterUpdate"
+      ],
+      "IstVerfuegbar": [
+        "AfterUpdate"
+      ],
+      "MA": [
+        "Selektion_AfterUpdate"
+      ],
+      "sub": [
+        "VA_Start_Enter",
+        "MA_VA_Zuordnung_Exit",
+        "MA_VA_Zuordnung_Enter",
+        "VA_Start_Exit"
+      ],
+      "Veranst": [
+        "Status_ID_AfterUpdate",
+        "Status_ID_BeforeUpdate",
+        "Status_ID_DblClick"
+      ],
+      "Veranstalter": [
+        "ID_DblClick",
+        "ID_KeyDown"
+      ],
+      "btnDaBaAus": [
+        "Click"
+      ],
+      "btnDaBaEin": [
+        "Click"
+      ],
+      "btnRibbonAus": [
+        "Click"
+      ],
+      "btnRibbonEin": [
+        "Click"
+      ],
+      "tbl": [
+        "ma_mitarbeiterstamm"
+      ],
+      "lstRowAuftrag": [
+        "Click"
+      ],
+      "check": [
+        "Ersteller"
+      ]
+    },
+    "standalone_functions": [
+      {
+        "name": "VADateSet",
+        "type": "function",
+        "parameters": "iVADatum_ID"
+      },
+      {
+        "name": "VAOpen",
+        "type": "function",
+        "parameters": "iVA_ID As Long, iVADatum_ID As Long"
+      },
+      {
+        "name": "OutlookRch",
+        "type": "function",
+        "parameters": "IstHTML As Variant, Bodytext As String, Betreff As String, SendTo As String, sendAs As String"
+      }
+    ]
+  },
+  "statistics": {
+    "total_controls": 137,
+    "by_type": {
+      "rectangle": 2,
+      "label": 34,
+      "commandbutton": 50,
+      "textbox": 19,
+      "checkbox": 2,
+      "subform": 10,
+      "page": 5,
+      "optiongroup": 1,
+      "optionbutton": 1,
+      "combobox": 13
+    },
+    "subforms_count": 10,
+    "buttons_with_click": 39,
+    "vba_procedures": 111
+  },
+  "missing_information": [
+    "frm_Menuefuehrung: Keine VBA-Steuerung gefunden - vermutlich statisches Menu. Pruefen: Hat frm_Menuefuehrung eigene RecordSource?",
+    "sub_VA_Anzeige: f_UpdStatus Funktion im Klassenmodul von sub_VA_Anzeige (nicht in diesem Export enthalten)"
+  ]
+}

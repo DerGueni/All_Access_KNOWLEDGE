@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stunden Lexware Export - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        .app-header { background: #4316B2; min-height: 94px; }
+
+        .export-panel {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin: 12px;
+            overflow: hidden;
+        }
+
+        .export-header {
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .export-title {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .export-content {
+            padding: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group-label {
+            font-weight: 600;
+            font-size: 11px;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .option-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+        }
+
+        .preview-box {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Consolas', monospace;
+            font-size: 10px;
+            max-height: 200px;
+            overflow: auto;
+        }
+
+        .preview-row {
+            display: flex;
+            gap: 20px;
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .preview-row:last-child { border-bottom: none; }
+
+        .progress-box {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4316B2;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body data-active-menu="lohn">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Stundenexport für Lexware</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Abrechnungsmonat:</label>
+                    <select id="cboMonat" class="form-control" style="width:100px;">
+                        <option value="12" selected>Dezember</option>
+                        <option value="11">November</option>
+                        <option value="10">Oktober</option>
+                    </select>
+                    <select id="cboJahr" class="form-control" style="width:80px;">
+                        <option value="2024" selected>2024</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn" id="btnVorschau">Vorschau</button>
+                    <button class="btn btn-primary" id="btnExport">Export starten</button>
+                </div>
+            </div>
+
+            <div class="app-content" style="overflow:auto;padding:0;">
+                <div class="export-panel">
+                    <div class="export-header">
+                        <span class="export-title">Export-Einstellungen</span>
+                    </div>
+                    <div class="export-content">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-group-label">Mitarbeiter-Auswahl:</label>
+                                    <div class="option-list">
+                                        <label class="option-item"><input type="radio" name="maAuswahl" value="alle" checked> Alle Mitarbeiter</label>
+                                        <label class="option-item"><input type="radio" name="maAuswahl" value="aktiv"> Nur aktive MA</label>
+                                        <label class="option-item"><input type="radio" name="maAuswahl" value="auswahl"> Manuelle Auswahl</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-group-label">Export-Format:</label>
+                                    <div class="option-list">
+                                        <label class="option-item"><input type="radio" name="format" value="csv" checked> CSV (Semikolon-getrennt)</label>
+                                        <label class="option-item"><input type="radio" name="format" value="txt"> TXT (Tab-getrennt)</label>
+                                        <label class="option-item"><input type="radio" name="format" value="xml"> XML</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-group-label">Zu exportierende Felder:</label>
+                                    <div class="option-list">
+                                        <label class="option-item"><input type="checkbox" checked> Personal-Nr</label>
+                                        <label class="option-item"><input type="checkbox" checked> Name</label>
+                                        <label class="option-item"><input type="checkbox" checked> Arbeitsstunden</label>
+                                        <label class="option-item"><input type="checkbox" checked> Überstunden</label>
+                                        <label class="option-item"><input type="checkbox" checked> Nachtschicht</label>
+                                        <label class="option-item"><input type="checkbox" checked> Feiertag</label>
+                                        <label class="option-item"><input type="checkbox"> Urlaubstage</label>
+                                        <label class="option-item"><input type="checkbox"> Krankheitstage</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-group-label">Speicherort:</label>
+                            <div style="display:flex;gap:8px;">
+                                <input type="text" class="form-control" id="txtPfad" value="C:\Export\Lexware\" style="flex:1;">
+                                <button class="btn" id="btnPfad">Durchsuchen...</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-group-label">Vorschau (erste 5 Zeilen):</label>
+                            <div class="preview-box" id="previewBox">
+                                <div class="preview-row"><span>PersNr</span><span>Name</span><span>Stunden</span><span>Ueberst</span><span>Nacht</span></div>
+                                <div class="preview-row"><span>1001</span><span>Mustermann, Max</span><span>172,50</span><span>12,50</span><span>24,00</span></div>
+                                <div class="preview-row"><span>1002</span><span>Schmidt, Peter</span><span>168,00</span><span>8,00</span><span>16,00</span></div>
+                                <div class="preview-row"><span>1003</span><span>Müller, Klaus</span><span>160,00</span><span>0,00</span><span>32,00</span></div>
+                                <div class="preview-row"><span>1004</span><span>Weber, Thomas</span><span>155,50</span><span>0,00</span><span>8,00</span></div>
+                                <div class="preview-row"><span>1005</span><span>Fischer, Anna</span><span>164,25</span><span>4,25</span><span>0,00</span></div>
+                            </div>
+                        </div>
+
+                        <div class="progress-box" id="progressBox">
+                            <div style="font-size:11px;">Export laeuft... <span id="progressText">0 von 125 MA</span></div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblInfo">125 MA | Dezember 2024</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+
+        document.getElementById('btnExport').addEventListener('click', () => {
+            const progressBox = document.getElementById('progressBox');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            progressBox.style.display = 'block';
+            let progress = 0;
+            const total = 125;
+
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 10) + 5;
+                if (progress >= total) {
+                    progress = total;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        alert('Export abgeschlossen!\nDatei: Stunden_Dez2024.csv');
+                        progressBox.style.display = 'none';
+                    }, 500);
+                }
+                progressFill.style.width = (progress / total * 100) + '%';
+                progressText.textContent = progress + ' von ' + total + ' MA';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

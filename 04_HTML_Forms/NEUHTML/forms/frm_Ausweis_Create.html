@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ausweisdruck - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_Ausweis_Create.css">
+    <style>
+        /* Zusaetzliche Styles fuer Zwei-Listen-Layout */
+        .dual-list-container {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
+        }
+        .list-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border: 1px solid #ccc;
+            min-width: 200px;
+        }
+        .list-panel-header {
+            padding: 6px 8px;
+            background: #4316B2;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .list-panel-content {
+            flex: 1;
+            overflow: auto;
+        }
+        .list-panel-content select {
+            width: 100%;
+            height: 100%;
+            border: none;
+            font-size: 11px;
+        }
+        .list-panel-content select option {
+            padding: 4px 8px;
+        }
+        .transfer-buttons {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        .transfer-btn {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            background: #e8e8e8;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        .transfer-btn:hover { background: #d5d5d5; }
+
+        /* Ausweistyp-Buttons */
+        .ausweistyp-section {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 12px;
+            margin-top: 8px;
+        }
+        .ausweistyp-header {
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .ausweistyp-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .ausweistyp-btn {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            background: #e8e8e8;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 10px;
+            min-width: 140px;
+        }
+        .ausweistyp-btn:hover { background: #d5d5d5; }
+        .ausweistyp-btn.primary {
+            background: #4316B2;
+            color: white;
+            border-color: #3a12a0;
+        }
+
+        /* Kartendrucker */
+        .kartendruck-section {
+            background: #f5f5f5;
+            border: 1px solid #ccc;
+            padding: 12px;
+            margin-top: 8px;
+        }
+        .kartendruck-header {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .kartendruck-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .kartendruck-label {
+            font-size: 10px;
+            min-width: 100px;
+        }
+        .kartendruck-value {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Gueltig-bis */
+        .gueltig-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="aw-container">
+        <!-- Linkes Menue -->
+        <aside class="aw-menu">
+            <div class="menu-header">HAUPTMENUE</div>
+            <nav class="menu-buttons">
+                <a href="frm_N_Dienstplanuebersicht.html" class="menu-btn">Dienstplanuebersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="menu-btn">Planungsuebersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="menu-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="menu-btn">Mitarbeiterverwaltung</a>
+                <a href="#" class="menu-btn">Offene Mail Anfragen</a>
+                <a href="#" class="menu-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="menu-btn">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="menu-btn">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="menu-btn active">Dienstausweis erstellen</a>
+                <a href="#" class="menu-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="menu-btn">Kundenverwaltung</a>
+                <a href="#" class="menu-btn">Verrechnungssaetze</a>
+                <a href="#" class="menu-btn">Sub Rechnungen</a>
+                <a href="#" class="menu-btn">E-Mail</a>
+                <a href="#" class="menu-btn secondary">Menue 2</a>
+                <a href="#" class="menu-btn secondary">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Hauptbereich -->
+        <main class="aw-main">
+            <!-- Header -->
+            <header class="aw-header">
+                <div class="header-left">
+                    <div class="aw-logo"></div>
+                    <h1 class="aw-title">Ausweisdruck</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Toolbar -->
+            <div class="aw-toolbar">
+                <div class="toolbar-group">
+                    <button class="aw-btn" id="btnObjektliste">Objektliste drucken</button>
+                    <button class="aw-btn" id="btnHilfe">Hilfe</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="aw-content">
+                <!-- Linker Bereich: Zwei Listen -->
+                <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+                    <div class="dual-list-container">
+                        <!-- Mitarbeiter alle -->
+                        <div class="list-panel">
+                            <div class="list-panel-header">Mitarbeiter alle:</div>
+                            <div class="list-panel-content">
+                                <select id="lstMA_Alle" multiple size="15">
+                                    <option value="1">Alali Ahmad</option>
+                                    <option value="2">Alayoubi Salim</option>
+                                    <option value="3">Glatz Michaela</option>
+                                    <option value="4">Goeschelbauer Thomas</option>
+                                    <option value="5">Prost Guido</option>
+                                    <option value="6">Mueller Klaus</option>
+                                    <option value="7">Schmidt Peter</option>
+                                    <option value="8">Weber Anna</option>
+                                    <option value="9">Fischer Maria</option>
+                                    <option value="10">Bauer Hans</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Transfer Buttons -->
+                        <div class="transfer-buttons">
+                            <button class="transfer-btn" id="btnAddSelected" title="Auswaehlen">&gt;</button>
+                            <button class="transfer-btn" id="btnDelSelected" title="Entfernen">&lt;</button>
+                        </div>
+
+                        <!-- Mitarbeiter Ausweis -->
+                        <div class="list-panel">
+                            <div class="list-panel-header">Mitarbeiter Ausweis:</div>
+                            <div class="list-panel-content">
+                                <select id="lstMA_Ausweis" multiple size="15">
+                                    <!-- Ausgewaehlte Mitarbeiter -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gueltig bis -->
+                    <div class="gueltig-section">
+                        <label style="font-size:11px;">Gueltig bis:</label>
+                        <input type="date" id="datGueltigBis" class="aw-input" style="width:140px;">
+                    </div>
+
+                    <!-- Ausweistyp-Buttons -->
+                    <div class="ausweistyp-section">
+                        <div class="ausweistyp-header">Ausweistyp waehlen:</div>
+                        <div class="ausweistyp-buttons">
+                            <button class="ausweistyp-btn primary" id="btnAusweis1">1. Ausweis mit Namen</button>
+                            <button class="ausweistyp-btn" id="btnAusweis2">2. Einsatzleitung</button>
+                            <button class="ausweistyp-btn" id="btnAusweis3">3. Bereichsleiter</button>
+                            <button class="ausweistyp-btn" id="btnAusweis4">4. Sicherheitspersonal</button>
+                            <button class="ausweistyp-btn" id="btnAusweis5">5. Servicepersonal</button>
+                            <button class="ausweistyp-btn" id="btnAusweis6">6. Garderobenpersonal</button>
+                            <button class="ausweistyp-btn" id="btnAusweis7">7. Verwaltung</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rechter Bereich: Kartendruck -->
+                <div style="width:280px;display:flex;flex-direction:column;">
+                    <div class="kartendruck-section">
+                        <div class="kartendruck-header">KARTENDRUCK</div>
+                        <div class="kartendruck-row">
+                            <span class="kartendruck-label">Kartendrucker:</span>
+                            <span class="kartendruck-value" id="lblKartendrucker">Badgy200</span>
+                        </div>
+                        <div class="kartendruck-row">
+                            <span class="kartendruck-label">Kartendrucker aendern:</span>
+                            <select id="cbo_Kartendrucker" class="aw-select" style="flex:1;">
+                                <option value="">-- waehlen --</option>
+                                <option value="1">Guacamole Printer</option>
+                                <option value="2">Samsung M267x 287x Series</option>
+                                <option value="3">OneNote (Desktop)</option>
+                                <option value="4" selected>Badgy200</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Ausweis Vorschau -->
+                    <fieldset class="fieldset" style="margin-top:8px;">
+                        <legend>Vorschau</legend>
+                        <div class="ausweis-preview">
+                            <div class="ausweis-foto"></div>
+                            <div class="ausweis-name" id="previewName">Max Mustermann</div>
+                            <div class="ausweis-funktion" id="previewFunktion">Sicherheitsmitarbeiter</div>
+                            <div class="ausweis-firma">CONSYS Security GmbH</div>
+                            <div class="ausweis-nr" id="previewNr">Nr: 00001</div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Ausweis erstellen Button -->
+                    <div style="padding:8px;text-align:center;">
+                        <button class="aw-btn primary" id="btnAusweisErstellen" style="width:100%;padding:12px;">Ausweis erstellen</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="aw-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 ausgewaehlt</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+    <script type="module" src="frm_Ausweis_Create.logic.js"></script>
+</body>
+</html>

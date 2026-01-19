@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abwesenheitsübersicht - CONSYS</title>
+    <style>
+        /* CSS Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+        }
+
+        /* Window Frame Container */
+        .window-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #8080c0;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 3px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .title-bar-text {
+            color: white;
+        }
+
+        .title-bar-close {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 14px;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            background-color: #8080c0;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 180px;
+            background-color: #6060a0;
+            border-right: 2px solid #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            border-bottom: 1px solid #ffffff;
+        }
+
+        .menu-item {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 4px 8px;
+            margin: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            text-align: left;
+        }
+
+        .menu-item:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #8080c0;
+            padding: 4px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background-color: #b8b8d8;
+            padding: 4px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            height: 22px;
+        }
+
+        .btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .btn:hover {
+            filter: brightness(1.05);
+        }
+
+        /* Form Section */
+        .form-section {
+            background-color: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px;
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 10px;
+        }
+
+        .data-grid th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 3px 6px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        .data-grid td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 6px;
+            background: white;
+        }
+
+        .data-grid tr:hover {
+            background: #e0e0ff;
+        }
+
+        .data-grid tbody tr.selected {
+            background: #000080;
+            color: white;
+        }
+
+        /* Input & Select Styles */
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+            height: 20px;
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            width: 320px;
+            background-color: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px;
+            margin-left: 4px;
+            overflow-y: auto;
+        }
+
+        .detail-header {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 10px;
+            margin-bottom: 8px;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 4px;
+        }
+
+        .field-row label {
+            width: 90px;
+            font-size: 10px;
+        }
+
+        .field-row input[type="text"],
+        .field-row input[type="date"],
+        .field-row select {
+            flex: 1;
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+            height: 20px;
+        }
+
+        .field-row input[readonly] {
+            background: #f0f0f0;
+        }
+
+        .field-row textarea {
+            flex: 1;
+            border: 1px solid #808080;
+            padding: 2px 4px;
+            font-size: 10px;
+            background: white;
+            resize: vertical;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            height: 23px;
+            margin-top: 4px;
+        }
+
+        /* Scroll container */
+        .scroll-container {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .toolbar-separator {
+            width: 2px;
+            height: 18px;
+            background: linear-gradient(to right, #808080, #ffffff);
+            margin: 0 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <span class="title-bar-text">Abwesenheitsübersicht - CONSYS</span>
+            <button class="title-bar-close" onclick="window.close()">×</button>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+            <div class="left-menu">
+                <div class="menu-header">CONSYS</div>
+                <button class="menu-item">Mitarbeiterstamm</button>
+                <button class="menu-item">Kundenstamm</button>
+                <button class="menu-item">Auftragsverwaltung</button>
+                <button class="menu-item">Dienstplan</button>
+                <button class="menu-item">Abwesenheit</button>
+                <button class="menu-item">Zeitkonten</button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <button class="btn" id="btnErster">|◄</button>
+                    <button class="btn" id="btnVorheriger">◄</button>
+                    <button class="btn" id="btnNächster">►</button>
+                    <button class="btn" id="btnLetzter">►|</button>
+
+                    <div class="toolbar-separator"></div>
+
+                    <button class="btn" id="btnNeu">+ Neu</button>
+                    <button class="btn" id="btnSpeichern">Speichern</button>
+                    <button class="btn" id="btnLöschen">Löschen</button>
+
+                    <div class="toolbar-separator"></div>
+
+                    <label style="font-size: 10px;">Mitarbeiter:</label>
+                    <select id="cboMitarbeiter" class="form-select" style="width:180px;">
+                        <option value="">Alle Mitarbeiter</option>
+                    </select>
+
+                    <label style="font-size: 10px;">Zeitraum:</label>
+                    <input type="date" id="datVon" class="form-input" style="width:110px;">
+                    <span style="margin:0 4px; font-size: 10px;">bis</span>
+                    <input type="date" id="datBis" class="form-input" style="width:110px;">
+                </div>
+
+                <!-- Form Section -->
+                <div class="form-section">
+                    <div class="scroll-container">
+                        <table class="data-grid">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px;">ID</th>
+                                    <th style="width:150px;">Mitarbeiter</th>
+                                    <th style="width:100px;">Von</th>
+                                    <th style="width:100px;">Bis</th>
+                                    <th style="width:100px;">Grund</th>
+                                    <th style="width:80px;">Ganztägig</th>
+                                    <th>Bemerkung</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody_Liste">
+                                <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Lade Daten...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Detail Panel -->
+                    <div class="detail-panel">
+                        <div class="detail-header">Abwesenheit bearbeiten</div>
+
+                        <div class="field-row">
+                            <label>ID:</label>
+                            <input type="text" id="NV_ID" readonly>
+                        </div>
+                        <div class="field-row">
+                            <label>Mitarbeiter:</label>
+                            <select id="NV_MA_ID"></select>
+                        </div>
+                        <div class="field-row">
+                            <label>Von:</label>
+                            <input type="date" id="NV_VonDat">
+                        </div>
+                        <div class="field-row">
+                            <label>Bis:</label>
+                            <input type="date" id="NV_BisDat">
+                        </div>
+                        <div class="field-row">
+                            <label>Grund:</label>
+                            <select id="NV_Grund">
+                                <option value="Urlaub">Urlaub</option>
+                                <option value="Krank">Krankheit</option>
+                                <option value="Privat">Privat</option>
+                                <option value="Fortbildung">Fortbildung</option>
+                                <option value="Sonstiges">Sonstiges</option>
+                            </select>
+                        </div>
+                        <div class="field-row">
+                            <label>Ganztägig:</label>
+                            <input type="checkbox" id="NV_Ganztaegig" checked>
+                        </div>
+                        <div class="field-row" style="flex-direction:column;align-items:stretch;">
+                            <label>Bemerkung:</label>
+                            <textarea id="NV_Bemerkung" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span id="lblStatus">Bereit</span>
+                    <span id="lblAnzahl">0 Einträge</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('header-date') && (document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE'));
+    </script>
+    <script type="module" src="logic/frm_Abwesenheiten.logic.js"></script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+</body>
+</html>

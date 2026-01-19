@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <script>
+    // Auto-Load in Shell (Sidebar-Integration)
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isInShell = urlParams.has('shell') || window.SHELL_PARAMS;
+        const isInIframe = window.self !== window.top;
+        if (!isInShell && !isInIframe) {
+            const formName = window.location.pathname.split('/').pop();
+            const recordId = urlParams.get('id') || urlParams.get('ma_id');
+            let shellUrl = 'shell.html?form=' + formName;
+            if (recordId) shellUrl += '&id=' + recordId;
+            for (const [key, value] of urlParams.entries()) {
+                if (!['shell', 'id', 'ma_id', '_t'].includes(key)) {
+                    shellUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                }
+            }
+            console.log('[Auto-Redirect] Lade mit Sidebar:', shellUrl);
+            window.location.replace(shellUrl);
+        }
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stundenauswertung - CONSYS</title>
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
+    <style>
+        /* CONSYS Standard: Body-Hintergrund */
+        body {
+            background-color: #8080c0;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Container Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+        }
+
+        .menu-btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .menu-btn:active { background: linear-gradient(to bottom, #b0b0d0, #9090b0); }
+        .menu-btn.active { background: linear-gradient(to bottom, #a0a0d0, #8080b0); }
+
+        /* Main Content */
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* Toolbar */
+        .app-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 8px;
+            background-color: #9090c0;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toolbar-label { font-size: 11px; color: #000; }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 20px;
+            background-color: #606090;
+            margin: 0 5px;
+        }
+
+        /* Form Controls */
+        .form-control {
+            padding: 3px 6px;
+            border: 1px solid #7070a0;
+            background-color: white;
+            font-size: 11px;
+        }
+
+        select.form-control { min-width: 120px; }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: none;
+            padding: 4px 12px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-primary, .btn-blue {
+            background: linear-gradient(to bottom, #9090c0, #6060a0);
+        }
+
+        .btn-primary:hover, .btn-blue:hover { background: linear-gradient(to bottom, #a0a0d0, #7070b0); }
+
+        .btn-success, .btn-green {
+            background: linear-gradient(to bottom, #90c090, #60a060);
+            color: white;
+        }
+
+        .btn-danger, .btn-red {
+            background: linear-gradient(to bottom, #c09090, #a06060);
+        }
+
+        /* Content Area */
+        .app-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 0.5rem;
+            padding: 8px;
+            background-color: #b8b8d8;
+            min-height: 0;
+        }
+
+        .content-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        /* Summary Bar */
+        .summary-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 8px;
+            background-color: #c0c0d8;
+            border: 1px solid #7070a0;
+            margin-bottom: 8px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .summary-label { font-size: 10px; color: #404040; }
+        .summary-value { font-size: 12px; font-weight: bold; color: #000; }
+        .summary-value.positive { color: #008000; }
+        .summary-value.negative { color: #c00000; }
+
+        /* Datasheet */
+        .datasheet {
+            width: 100%;
+            background-color: white;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .datasheet thead {
+            position: sticky;
+            top: 0;
+            z-index: 11;
+        }
+
+        .datasheet th {
+            background-color: #000080;
+            color: white;
+            padding: 6px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: left;
+            border: 1px solid #606090;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .datasheet th:hover {
+            background-color: #0000a0;
+        }
+
+        .datasheet th .sort-arrow {
+            margin-left: 4px;
+            font-size: 9px;
+        }
+
+        .datasheet td {
+            padding: 4px 8px;
+            font-size: 11px;
+            border: 1px solid #d0d0d0;
+        }
+
+        .datasheet tbody tr:nth-child(even) { background-color: #f5f5f5; }
+        .datasheet tbody tr:hover { background-color: #e0e0f0; cursor: pointer; }
+        .datasheet tbody tr.selected { background-color: #c0d0f0; }
+        .datasheet .sum-row { background-color: #ffffcc; font-weight: bold; }
+
+        /* Zellen-Formatierung */
+        .datasheet td.number { text-align: right; font-family: 'Consolas', monospace; }
+        .datasheet td.positive { color: #008000; }
+        .datasheet td.negative { color: #c00000; background-color: #fff0f0; }
+        .datasheet td.warning { background-color: #ffffcc; }
+
+        /* Status Bar */
+        .app-footer {
+            background-color: #9090c0;
+            color: #000;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            border-top: 1px solid #7070a0;
+        }
+
+        /* Fullscreen Button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: none;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .fullscreen-btn:active { background: linear-gradient(to bottom, #b0b0d0, #9090b0); }
+
+        .loading-cell { text-align: center; padding: 40px; color: #999; }
+
+        /* Side Panel */
+        .side-panel {
+            width: clamp(250px, 18vw, 320px);
+            flex-shrink: 0;
+            overflow: auto;
+            background-color: #c0c0d8;
+            padding: 8px;
+            border: 1px solid #7070a0;
+        }
+
+        .panel-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .panel-content { background-color: white; padding: 8px; }
+
+        .stat-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 11px; border-bottom: 1px solid #e0e0e0; }
+        .stat-label { color: #404040; }
+        .stat-value { font-weight: bold; }
+
+        @media (max-width: 1366px) {
+            .side-panel { width: 250px; }
+        }
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-active-menu="stundenauswertung" data-form="frm_N_Stundenauswertung">
+    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">&#x26F6;</button>
+
+    <div class="app-container">
+        <!-- Left Menu -->
+        <nav class="left-menu">
+            <div class="menu-header">CONSYS Menu</div>
+            <button class="menu-btn" data-form="frm_Menuefuehrung1">Dashboard</button>
+            <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiter</button>
+            <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kunden</button>
+            <button class="menu-btn" data-form="frm_va_Auftragstamm">Auftraege</button>
+            <button class="menu-btn" data-form="frm_OB_Objekt">Objekte</button>
+            <button class="menu-btn" data-form="frm_N_Dienstplanuebersicht">Dienstplan</button>
+            <button class="menu-btn" data-form="frm_MA_Zeitkonten">Zeitkonten</button>
+            <button class="menu-btn active" data-form="frm_N_Stundenauswertung">Stundenauswertung</button>
+            <button class="menu-btn" data-form="frm_MA_Abwesenheit">Abwesenheit</button>
+            <button class="menu-btn" data-form="frm_N_Lohnabrechnungen">Lohnabrechnung</button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Unified Header -->
+            <div class="header-row-wrapper">
+                <div class="header-row combined-buttons">
+                    <div class="logo-box">C</div>
+                    <span class="title-text" style="font-size: 15px; font-weight: bold; color: #000000;">Stundenauswertung</span>
+                    <div class="buttons-grid">
+                        <button class="btn unified-btn" id="btnAktualisieren" onclick="btnAktualisieren_Click()" title="Daten neu laden">Aktualisieren</button>
+                        <button class="btn unified-btn btn-green" id="btnExportExcel" onclick="btnExportExcel_Click()" title="Nach Excel exportieren">Export Excel</button>
+                        <button class="btn unified-btn" id="btnDrucken" onclick="btnDrucken_Click()" title="Auswertung drucken">Drucken</button>
+                        <button class="btn unified-btn" id="btnVergleich" onclick="btnVergleich_Click()" title="Monatsvergleich anzeigen">Monatsvergleich</button>
+                    </div>
+                </div>
+                <div class="gpt-box">CONSYS<span>Web</span></div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Jahr:</label>
+                    <select id="cboJahr" class="form-control">
+                        <!-- Wird dynamisch gefuellt -->
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Monat:</label>
+                    <select id="cboMonat" class="form-control">
+                        <option value="1">Januar</option>
+                        <option value="2">Februar</option>
+                        <option value="3">Maerz</option>
+                        <option value="4">April</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Dezember</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Mitarbeiter:</label>
+                    <select id="cboMitarbeiter" class="form-control input-lg" style="min-width: 200px;">
+                        <option value="">-- Alle Mitarbeiter --</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Anstellungsart:</label>
+                    <select id="cboAnstArt" class="form-control">
+                        <option value="">Alle</option>
+                        <option value="3">Festangestellt</option>
+                        <option value="5">Minijobber</option>
+                        <option value="13">Fest + Mini</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">
+                        <input type="checkbox" id="chkNurDifferenzen"> Nur Differenzen
+                    </label>
+                </div>
+            </div>
+
+            <!-- Summary Bar -->
+            <div class="summary-bar">
+                <div class="summary-item">
+                    <span class="summary-label">Mitarbeiter gesamt</span>
+                    <span class="summary-value" id="summAnzahlMA">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Soll-Stunden gesamt</span>
+                    <span class="summary-value" id="summSollGesamt">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Ist-Stunden gesamt</span>
+                    <span class="summary-value" id="summIstGesamt">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Differenz gesamt</span>
+                    <span class="summary-value" id="summDifferenzGesamt">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Ueberstunden</span>
+                    <span class="summary-value positive" id="summUeberstunden">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Fehlstunden</span>
+                    <span class="summary-value negative" id="summFehlstunden">0:00</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="app-content">
+                <div class="content-main">
+                    <table class="datasheet" id="tblAuswertung">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;" onclick="sortTable(0)">MA-Nr <span class="sort-arrow"></span></th>
+                                <th style="width:180px;" onclick="sortTable(1)">Name <span class="sort-arrow">&#x25BC;</span></th>
+                                <th style="width:100px;" onclick="sortTable(2)">Anstellungsart <span class="sort-arrow"></span></th>
+                                <th style="width:80px;" onclick="sortTable(3)">Soll-Std <span class="sort-arrow"></span></th>
+                                <th style="width:80px;" onclick="sortTable(4)">Ist-Std <span class="sort-arrow"></span></th>
+                                <th style="width:80px;" onclick="sortTable(5)">Differenz <span class="sort-arrow"></span></th>
+                                <th style="width:60px;" onclick="sortTable(6)">Urlaub <span class="sort-arrow"></span></th>
+                                <th style="width:60px;" onclick="sortTable(7)">Krank <span class="sort-arrow"></span></th>
+                                <th style="width:80px;" onclick="sortTable(8)">Ueberhang <span class="sort-arrow"></span></th>
+                                <th>Bemerkung</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_Auswertung">
+                            <tr><td colspan="10" class="loading-cell">Lade Daten...</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="sum-row">
+                                <td colspan="3" style="text-align:right;"><strong>Summe:</strong></td>
+                                <td class="number" id="sumSoll">0:00</td>
+                                <td class="number" id="sumIst">0:00</td>
+                                <td class="number" id="sumDiff">0:00</td>
+                                <td class="number" id="sumUrlaub">0</td>
+                                <td class="number" id="sumKrank">0</td>
+                                <td class="number" id="sumUeberhang">0:00</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Side Panel: Statistik -->
+                <aside class="side-panel">
+                    <div class="panel-header">Monatsstatistik</div>
+                    <div class="panel-content">
+                        <div class="stat-row">
+                            <span class="stat-label">Arbeitstage:</span>
+                            <span class="stat-value" id="statArbeitstage">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Feiertage:</span>
+                            <span class="stat-value" id="statFeiertage">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Durchschn. Std/Tag:</span>
+                            <span class="stat-value" id="statDurchschnitt">0:00</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">MA mit Ueberstunden:</span>
+                            <span class="stat-value" id="statMAUeberstunden">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">MA mit Fehlstunden:</span>
+                            <span class="stat-value" id="statMAFehlstunden">0</span>
+                        </div>
+                        <div class="stat-row" style="margin-top: 12px; padding-top: 12px; border-top: 2px solid #7070a0;">
+                            <span class="stat-label">Periode:</span>
+                            <span class="stat-value" id="statPeriode">-</span>
+                        </div>
+                    </div>
+
+                    <div class="panel-header" style="margin-top: 12px;">Top 5 Ueberstunden</div>
+                    <div class="panel-content">
+                        <div id="topUeberstunden">
+                            <div class="stat-row"><span class="stat-label">-</span><span class="stat-value">-</span></div>
+                        </div>
+                    </div>
+
+                    <div class="panel-header" style="margin-top: 12px;">Top 5 Fehlstunden</div>
+                    <div class="panel-content">
+                        <div id="topFehlstunden">
+                            <div class="stat-row"><span class="stat-label">-</span><span class="stat-value">-</span></div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <span id="lblStatus">Bereit</span>
+                <span id="lblAnzahl">0 Mitarbeiter</span>
+                <span id="lblPeriode">-</span>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Logic-Datei -->
+    <script type="module" src="./logic/frm_N_Stundenauswertung.logic.js"></script>
+
+    <!-- Shell-Detector fuer iframe-Integration -->
+    <script src="js/shell-detector.js"></script>
+    <!-- WebView2 Bridge fuer Access-Integration -->
+    <script src="js/webview2-bridge.js"></script>
+    <!-- API-Server Lifecycle -->
+    <script src="js/api-lifecycle.js"></script>
+    <!-- Server Watchdog -->
+    <script src="js/server-watchdog.js"></script>
+</body>
+</html>

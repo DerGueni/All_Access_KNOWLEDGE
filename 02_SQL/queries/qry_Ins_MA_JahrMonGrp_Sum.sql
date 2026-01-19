@@ -1,0 +1,3 @@
+SELECT qry_Ins_MA_JahrMon2_Sum.MA_ID, qry_Ins_MA_JahrMon2_Sum.AktJahr, qry_Ins_MA_JahrMon2_Sum.AktMon, fctRound([Netto_Std1]) AS Netto_Std, qry_Ins_MA_JahrMon1_Sum.Brutto_Std, qry_Ins_MA_JahrMon1_Sum.Fahrtko, ([rl34a]) AS RL_34a, qry_Ins_MA_JahrMon2_Sum.[34a_RZ], qry_Ins_MA_JahrMon2_Sum.Abschlag, qry_Ins_MA_JahrMon2_Sum.Nicht_Erscheinen, qry_Ins_MA_JahrMon2_Sum.Sonst_Abzuege, qry_Ins_MA_JahrMon2_Sum.Monatslohn, qry_Ins_MA_JahrMon2_Sum.UeberwVon
+FROM tbltmp_MA_VA_Zuordnung, tbl_MA_VA_Zuordnung, qry_Ins_MA_JahrMon2_Sum INNER JOIN qry_Ins_MA_JahrMon1_Sum ON (qry_Ins_MA_JahrMon2_Sum.MA_ID = qry_Ins_MA_JahrMon1_Sum.MA_ID) AND (qry_Ins_MA_JahrMon2_Sum.AktJahr = qry_Ins_MA_JahrMon1_Sum.AktJahr) AND (qry_Ins_MA_JahrMon2_Sum.AktMon = qry_Ins_MA_JahrMon1_Sum.AktMon);
+

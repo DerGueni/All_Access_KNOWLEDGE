@@ -1,0 +1,352 @@
+═══════════════════════════════════════════════════════════════════════════════
+  EMBEDDED-SIDEBAR-VARIANTE - ARCHITEKTUR-DIAGRAMM
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      BROWSER WINDOW (Formular-Seite)                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  frm_va_Auftragstamm_embedded.html                                          │
+│  ┌────────────────────┬───────────────────────────────────────────────────┐│
+│  │                    │                                                   ││
+│  │   SIDEBAR (iframe) │          MAIN CONTENT AREA                        ││
+│  │                    │                                                   ││
+│  │ ┌────────────────┐ │   ┌────────────────────────────────────────────┐ ││
+│  │ │sub_sidebar.html│ │   │ Header: "Auftragstamm"                     │ ││
+│  │ │                │ │   ├────────────────────────────────────────────┤ ││
+│  │ │ ┌─────────────┐│ │   │ Form Section:                              │ ││
+│  │ │ │ Personal    ││ │   │  ┌──────────────┬──────────────┐           │ ││
+│  │ │ └─────────────┘│ │   │  │ Auftrag:     │ Veranstalter:│           │ ││
+│  │ │ • Mitarbeiter  │ │   │  ├──────────────┼──────────────┤           │ ││
+│  │ │ • Abwesenheit  │ │   │  │ Von Datum:   │ Bis Datum:   │           │ ││
+│  │ │                │ │   │  └──────────────┴──────────────┘           │ ││
+│  │ │ ┌─────────────┐│ │   │                                            │ ││
+│  │ │ │ Planung     ││ │   │  [Speichern] [Neu] [Löschen]              │ ││
+│  │ │ └─────────────┘│ │   ├────────────────────────────────────────────┤ ││
+│  │ │ • Auftrag   ◄──┼─┼───┼─ AKTUELL AKTIV                             │ ││
+│  │ │ • Dienstplan   │ │   │                                            │ ││
+│  │ │                │ │   │  Subform: Einsatztage (iframe)             │ ││
+│  │ │ ┌─────────────┐│ │   │  ┌──────────────────────────────────────┐ │ ││
+│  │ │ │ Stammdaten  ││ │   │  │ Datum      | Status   | MA Anzahl    │ │ ││
+│  │ │ └─────────────┘│ │   │  │ 15.01.2025 | Geplant  | 5            │ │ ││
+│  │ │ • Kunden       │ │   │  └──────────────────────────────────────┘ │ ││
+│  │ │ • Objekte      │ │   │                                            │ ││
+│  │ │                │ │   │  Subform: Schichten (iframe)               │ ││
+│  │ │                │ │   │  ┌──────────────────────────────────────┐ │ ││
+│  │ │                │ │   │  │ Zeit       | MA Bedarf | MA Ist      │ │ ││
+│  │ │                │ │   │  │ 08:00-16:00| 3         | 2           │ │ ││
+│  │ │                │ │   │  └──────────────────────────────────────┘ │ ││
+│  │ └────────────────┘ │   └────────────────────────────────────────────┘ ││
+│  │                    │                                                   ││
+│  └────────────────────┴───────────────────────────────────────────────────┘│
+│         ▲  │                                                                │
+│         │  │                                                                │
+│         │  ▼                                                                │
+│    ┌────────────┐                                                           │
+│    │ postMessage│  Kommunikation zwischen Sidebar-iframe und Parent        │
+│    └────────────┘                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  POSTMESSAGE-KOMMUNIKATIONSFLUSS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. USER KLICKT AUF MENÜPUNKT "Mitarbeiter"
+   ──────────────────────────────────────
+
+┌──────────────────┐                          ┌───────────────────────────┐
+│ sub_sidebar.html │                          │ frm_va_Auftragstamm_...   │
+│    (iframe)      │                          │      (parent)             │
+├──────────────────┤                          ├───────────────────────────┤
+│                  │                          │                           │
+│ User klickt:     │                          │                           │
+│ • Mitarbeiter    │                          │                           │
+│                  │                          │                           │
+│ Event-Handler:   │  ─── postMessage ───>    │                           │
+│ {                │  NAVIGATE                │ window.addEventListener   │
+│   type: "NAV",   │  {type: "NAVIGATE",      │                           │
+│   form: "ma"     │   form: "mitarbeiter",   │ if (type === "NAVIGATE")  │
+│ }                │   file: "frm_MA_..."     │   window.location.href =  │
+│                  │  }                       │     e.data.file           │
+└──────────────────┘                          └───────────────────────────┘
+                                                          │
+                                                          ▼
+                                              ┌───────────────────────────┐
+                                              │ Browser navigiert zu:     │
+                                              │ frm_MA_Mitarbeiter_...    │
+                                              └───────────────────────────┘
+
+
+2. NEUES FORMULAR LÄDT UND INITIALISIERT SIDEBAR
+   ──────────────────────────────────────────────
+
+┌──────────────────┐                          ┌───────────────────────────┐
+│ sub_sidebar.html │                          │ frm_MA_Mitarbeiter_...    │
+│    (iframe)      │                          │      (parent)             │
+├──────────────────┤                          ├───────────────────────────┤
+│                  │                          │                           │
+│ DOMContentLoaded │  <─── SIDEBAR_READY ──   │ Formular geladen          │
+│                  │                          │                           │
+│ Signalisiert:    │  {type: "SIDEBAR_READY"} │ Wartet auf READY          │
+│ "Ich bin fertig" │                          │                           │
+│                  │                          │                           │
+│                  │  <─── SET_ACTIVE ─────   │ Sendet aktives Menü       │
+│                  │  {type: "SET_ACTIVE",    │                           │
+│ Empfängt:        │   form: "mitarbeiter"}   │ <body data-active-menu=   │
+│ Setzt Highlight  │                          │       "mitarbeiter">      │
+│ auf "Mitarbeiter"│                          │                           │
+└──────────────────┘                          └───────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  DATEIEN-ABHÄNGIGKEITEN
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           PROJEKTSTRUKTUR                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+variante_embedded/
+│
+├── sub_sidebar.html ◄──────────────────┐ ZENTRALE SIDEBAR
+│   ├── Enthält: Menüstruktur           │ (wird in JEDES Formular eingebettet)
+│   ├── Enthält: FORM_MAP               │
+│   ├── Enthält: postMessage-Logik      │
+│   └── Style: Inline CSS                │
+│                                        │
+├── frm_va_Auftragstamm_embedded.html ──┤ FORMULAR 1
+│   ├── Bettet ein: sub_sidebar.html    │ (enthält iframe zu sub_sidebar)
+│   ├── data-active-menu="auftrag"      │
+│   ├── Empfängt: NAVIGATE               │
+│   └── Sendet: SET_ACTIVE               │
+│                                        │
+├── frm_MA_Mitarbeiterstamm_embedded.html─┤ FORMULAR 2
+│   ├── Bettet ein: sub_sidebar.html    │ (enthält iframe zu sub_sidebar)
+│   ├── data-active-menu="mitarbeiter"  │
+│   ├── Empfängt: NAVIGATE               │
+│   └── Sendet: SET_ACTIVE               │
+│                                        │
+└── ... (weitere Formulare)              │
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  ÄNDERUNG PROPAGIEREN: BEISPIEL
+═══════════════════════════════════════════════════════════════════════════════
+
+AUFGABE: Neues Menüelement "Berichte" hinzufügen
+────────────────────────────────────────────────
+
+SCHRITT 1: sub_sidebar.html bearbeiten (EINZIGE DATEI!)
+──────────────────────────────────────────────────────
+
+<div class="menu-section">Berichte</div>   ◄── Neu
+<a href="#" data-form="berichte">Berichte</a>   ◄── Neu
+
+const FORM_MAP = {
+    ...
+    'berichte': 'frm_Berichte_embedded.html'   ◄── Neu
+};
+
+
+SCHRITT 2: Neues Formular erstellen
+────────────────────────────────────
+
+frm_Berichte_embedded.html
+<body data-active-menu="berichte">   ◄── Wichtig!
+    <aside class="app-sidebar">
+        <iframe src="sub_sidebar.html"></iframe>
+    </aside>
+    ...
+</body>
+
+
+SCHRITT 3: Fertig! Alle Formulare haben jetzt "Berichte" im Menü
+──────────────────────────────────────────────────────────────────
+
+frm_va_Auftragstamm_embedded.html  ✓ Zeigt "Berichte"
+frm_MA_Mitarbeiterstamm_embedded.html  ✓ Zeigt "Berichte"
+frm_KD_Kundenstamm_embedded.html  ✓ Zeigt "Berichte"
+... (alle anderen Formulare)  ✓ Zeigt "Berichte"
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  MEMORY-LAYOUT (BROWSER)
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              BROWSER PROCESS                                 │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  MAIN WINDOW                                                                 │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ frm_va_Auftragstamm_embedded.html                                      │ │
+│  │                                                                        │ │
+│  │  JAVASCRIPT CONTEXT 1 (Parent)                                         │ │
+│  │  ─────────────────────────────────────────────────────────────────     │ │
+│  │  - window.addEventListener('message', ...)                             │ │
+│  │  - sidebarFrame.contentWindow.postMessage(...)                         │ │
+│  │  - Form-Logik (loadAuftrag, btnSave, etc.)                             │ │
+│  │                                                                        │ │
+│  │  ┌──────────────────────────────────────────────────────────────────┐ │ │
+│  │  │ IFRAME: sub_sidebar.html                                         │ │ │
+│  │  │                                                                  │ │ │
+│  │  │  JAVASCRIPT CONTEXT 2 (Sidebar)                                  │ │ │
+│  │  │  ──────────────────────────────────────────────────────────      │ │ │
+│  │  │  - window.parent.postMessage(...)                                │ │ │
+│  │  │  - Event Delegation (ein Listener für alle Menüpunkte)           │ │ │
+│  │  │  - setActiveMenuItem(...)                                        │ │ │
+│  │  │                                                                  │ │ │
+│  │  │  DOM:                                                            │ │ │
+│  │  │  <nav class="sidebar-menu">                                      │ │ │
+│  │  │    <a data-form="mitarbeiter">Mitarbeiterstamm</a>               │ │ │
+│  │  │    <a data-form="auftrag" class="active">Auftragstamm</a>        │ │ │
+│  │  │    ...                                                           │ │ │
+│  │  │  </nav>                                                          │ │ │
+│  │  └──────────────────────────────────────────────────────────────────┘ │ │
+│  │                                                                        │ │
+│  │  ┌──────────────────────────────────────────────────────────────────┐ │ │
+│  │  │ IFRAME: sub_VA_AnzTage.html (Subform 1)                          │ │ │
+│  │  │  JAVASCRIPT CONTEXT 3                                            │ │ │
+│  │  └──────────────────────────────────────────────────────────────────┘ │ │
+│  │                                                                        │ │
+│  │  ┌──────────────────────────────────────────────────────────────────┐ │ │
+│  │  │ IFRAME: sub_VA_Start.html (Subform 2)                            │ │ │
+│  │  │  JAVASCRIPT CONTEXT 4                                            │ │ │
+│  │  └──────────────────────────────────────────────────────────────────┘ │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│  TOTAL: 4 isolierte JavaScript-Kontexte                                     │
+│  TOTAL MEMORY: ~50-80 MB (abhängig von Formular-Komplexität)                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  PERFORMANCE-TIMELINE (Formular-Wechsel)
+═══════════════════════════════════════════════════════════════════════════════
+
+USER KLICKT AUF "Mitarbeiter"
+│
+├─ 0ms    Event-Handler in sidebar.html
+│
+├─ 1ms    postMessage NAVIGATE
+│
+├─ 2ms    Parent empfängt Event
+│
+├─ 3ms    window.location.href = "frm_MA_..."
+│
+├─ 4ms    Browser beginnt Navigation
+│          └─ Unload frm_va_Auftragstamm_embedded.html
+│          └─ Request für frm_MA_Mitarbeiterstamm_embedded.html
+│
+├─ 35ms   HTML geladen (10-20 KB)
+│
+├─ 40ms   HTML geparst, DOM aufgebaut
+│
+├─ 42ms   iframe #sidebarFrame erstellt
+│          └─ Request für sub_sidebar.html
+│
+├─ 60ms   sub_sidebar.html geladen (6 KB, meist CACHED!)
+│
+├─ 65ms   sub_sidebar.html geparst
+│
+├─ 68ms   DOMContentLoaded in sub_sidebar.html
+│          └─ postMessage SIDEBAR_READY
+│
+├─ 69ms   Parent empfängt SIDEBAR_READY
+│          └─ postMessage SET_ACTIVE {form: "mitarbeiter"}
+│
+├─ 70ms   sub_sidebar.html setzt aktives Menü
+│
+├─ 75ms   CSS-Transition für Highlight (200ms duration)
+│
+├─ 80ms   Formular beginnt Daten zu laden (fetch API)
+│
+└─ 150ms  FERTIG - Formular voll interaktiv
+
+TOTAL: ~150ms (mit Cache) / ~200ms (ohne Cache)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  VERGLEICH: INLINE vs. EMBEDDED vs. SHELL (VISUAL)
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ INLINE-VARIANTE (Original)                                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  frm_va_Auftragstamm.html                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ <aside>                                                                │ │
+│  │   <nav class="sidebar-menu">   ◄── SIDEBAR DIREKT IM HTML             │ │
+│  │     <a href="frm_MA_...">Mitarbeiter</a>                               │ │
+│  │     <a href="frm_va_...">Auftrag</a>                                   │ │
+│  │   </nav>                                                               │ │
+│  │ </aside>                                                               │ │
+│  │ <main>...</main>                                                       │ │
+│  │ <script src="sidebar.js">   ◄── EXTERNES JS                            │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  PROBLEM: Sidebar-Änderungen erfordern Anpassung ALLER Formulare           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ EMBEDDED-VARIANTE (Diese Implementierung)                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  frm_va_Auftragstamm_embedded.html                                          │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ <aside>                                                                │ │
+│  │   <iframe src="sub_sidebar.html">   ◄── SIDEBAR ALS IFRAME             │ │
+│  │     (Lädt sub_sidebar.html)                                            │ │
+│  │   </iframe>                                                            │ │
+│  │ </aside>                                                               │ │
+│  │ <main>...</main>                                                       │ │
+│  │ <script>postMessage-Logik...</script>                                  │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  VORTEIL: Sidebar-Änderungen nur in sub_sidebar.html                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SHELL-VARIANTE (Alternative)                                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  shell.html                                                                 │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ <aside>                                                                │ │
+│  │   <nav class="sidebar-menu">   ◄── SIDEBAR IM SHELL                    │ │
+│  │     <a href="#mitarbeiter">Mitarbeiter</a>                             │ │
+│  │     <a href="#auftrag">Auftrag</a>                                     │ │
+│  │   </nav>                                                               │ │
+│  │ </aside>                                                               │ │
+│  │ <main>                                                                 │ │
+│  │   <iframe id="content" src="frm_va_Auftragstamm_content.html">         │ │
+│  │     ◄── CONTENT ALS IFRAME                                             │ │
+│  │   </iframe>                                                            │ │
+│  │ </main>                                                                │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│  VORTEIL: Sidebar lädt nur EINMAL (kein Reload bei Navigation)             │
+│  NACHTEIL: Deep-Links kompliziert (hash-basiert)                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+  FAZIT
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ EMBEDDED-VARIANTE ist ideal für:
+   - Mittlere bis große Anwendungen (10-30 Formulare)
+   - Häufige Sidebar-Änderungen
+   - Anforderung an Deep-Links
+   - Akzeptable Performance-Einbußen (~50ms mehr als Inline)
+
+⚠️  Nicht geeignet für:
+   - Sehr große Anwendungen (> 50 Formulare) → Shell-Variante
+   - Performance-kritische Anwendungen → Inline-Variante
+   - Cross-Domain-Szenarien → Inline-Variante
+
+═══════════════════════════════════════════════════════════════════════════════

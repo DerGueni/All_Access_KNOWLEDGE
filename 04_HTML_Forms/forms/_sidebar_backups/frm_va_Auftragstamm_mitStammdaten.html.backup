@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung - Mit Stammdaten</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .window-frame {
+            background-color: #8080c0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 2px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .title-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .title-bar-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 21px;
+            height: 21px;
+            background: #ece9d8;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-btn.close {
+            background: #c75050;
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            background-color: #8080c0;
+            padding: 3px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Header Row */
+        .header-row {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4040a0, #8080c0);
+            border: 2px solid #404080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .title-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-green {
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+        }
+
+        .btn-yellow {
+            background: linear-gradient(to bottom, #e0e080, #c0c040);
+        }
+
+        .btn-red {
+            background: linear-gradient(to bottom, #e06060, #c04040);
+            color: white;
+        }
+
+        /* Button Row */
+        .button-row {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            padding: 3px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+        }
+
+        .status-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: auto;
+        }
+
+        .form-label {
+            font-size: 10px;
+        }
+
+        .form-select, .form-input {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #000080;
+            box-shadow: 0 0 2px #000080;
+        }
+
+        .form-input.readonly {
+            background: #e0e0e0;
+        }
+
+        /* NEUES STAMMDATEN-PANEL */
+        .stammdaten-panel {
+            background: linear-gradient(to bottom, #d8d8f0, #c0c0e0);
+            border: 2px solid;
+            border-color: #ffffff #606090 #606090 #ffffff;
+            padding: 8px 12px;
+            flex-shrink: 0;
+            display: none; /* Initial versteckt */
+        }
+
+        .stammdaten-panel.visible {
+            display: block;
+        }
+
+        .stammdaten-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #8080a0;
+        }
+
+        .stammdaten-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #000080;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stammdaten-title .icon {
+            font-size: 18px;
+        }
+
+        .stammdaten-auftrag-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #800000;
+            background: #ffffe0;
+            padding: 2px 8px;
+            border: 1px solid #c0c000;
+        }
+
+        .stammdaten-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px 20px;
+        }
+
+        .stammdaten-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stammdaten-item.full-width {
+            grid-column: span 2;
+        }
+
+        .stammdaten-label {
+            font-size: 9px;
+            color: #404080;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .stammdaten-value {
+            font-size: 12px;
+            color: #000;
+            background: white;
+            padding: 3px 6px;
+            border: 1px solid #a0a0c0;
+            min-height: 20px;
+        }
+
+        .stammdaten-value.highlight {
+            background: #ffffc0;
+            border-color: #c0c000;
+            font-weight: bold;
+        }
+
+        .stammdaten-value.time {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .stammdaten-close {
+            background: #c0c0c0;
+            border: 1px solid #808080;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .stammdaten-close:hover {
+            background: #d0d0d0;
+        }
+
+        /* Form Section - kompakter wenn Stammdaten sichtbar */
+        .form-section {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 8px 12px;
+            display: flex;
+            gap: 30px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .form-section.compact {
+            padding: 4px 12px;
+            gap: 20px;
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-section.compact .form-column {
+            gap: 2px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-column.left .form-label {
+            min-width: 45px;
+            text-align: right;
+        }
+
+        .form-column.middle .form-label {
+            min-width: 110px;
+            text-align: right;
+        }
+
+        .form-column.right .form-label {
+            min-width: 90px;
+            text-align: right;
+        }
+
+        .input-narrow { width: 80px; }
+        .input-medium { width: 200px; }
+        .input-wide { width: 250px; }
+
+        /* Work Area */
+        .work-area {
+            display: flex;
+            flex: 1;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        /* Left Work Panel */
+        .left-work-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Tab Container */
+        .tab-container {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #8080b0;
+            border-bottom: 1px solid #606090;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            padding: 4px 12px;
+            background: #a0a0c0;
+            border: 1px solid #808080;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 10px;
+            margin-right: -1px;
+        }
+
+        .tab-btn.active {
+            background: #9090c0;
+            border-bottom: 1px solid #9090c0;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-content {
+            padding: 5px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-page {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-page.active {
+            display: flex;
+        }
+
+        .bwn-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
+
+        .status-red {
+            color: #c00000;
+            font-weight: bold;
+        }
+
+        /* Grid Area */
+        .grid-area {
+            display: flex;
+            gap: 3px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Subform */
+        .subform-left {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .subform-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .grid-wrapper {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #808080;
+            background: white;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .data-grid th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 4px 6px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .data-grid th:hover {
+            background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+        }
+
+        .data-grid td {
+            border: 1px solid #c0c0c0;
+            padding: 3px 5px;
+            height: 22px;
+        }
+
+        .data-grid tr:hover {
+            background: #e0e0ff;
+        }
+
+        .data-grid tr.selected {
+            background: #000080;
+            color: white;
+        }
+
+        .cell-blue { background-color: #add8e6; }
+        .cell-green { background-color: #90ee90; }
+        .cell-yellow { background-color: #ffff90; }
+        .cell-red { background-color: #ffb0b0; }
+
+        /* Absagen Section */
+        .absagen-section {
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+        .absagen-label {
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+
+        .absagen-grid-wrapper {
+            height: 120px;
+            overflow: auto;
+            border: 1px solid #808080;
+            background: white;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 420px;
+            background: #9090c0;
+            border: 1px solid #606090;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .right-header {
+            padding: 5px;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+        }
+
+        .status-table {
+            width: 100%;
+            font-size: 10px;
+            border-collapse: collapse;
+        }
+
+        .status-table td {
+            padding: 2px 4px;
+        }
+
+        .status-table .count {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .anzeigen-btn {
+            background: #e0e0e0;
+            border: 1px solid #808080;
+            padding: 1px 6px;
+            font-size: 9px;
+            cursor: pointer;
+        }
+
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 6px;
+            background: #a0a0c0;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+            font-size: 10px;
+        }
+
+        .date-input {
+            width: 75px;
+            border: 1px solid #808080;
+            padding: 2px 4px;
+            font-size: 10px;
+        }
+
+        .nav-btn {
+            background: #d0d0d0;
+            border: 1px solid #808080;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .nav-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .auftraege-wrapper {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .auftraege-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+
+        .auftraege-table th {
+            background: linear-gradient(to bottom, #c0c0d0, #a0a0b0);
+            border: 1px solid #808080;
+            padding: 3px 5px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-weight: bold;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .auftraege-table td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 4px;
+            white-space: nowrap;
+            background: white;
+            height: 20px;
+        }
+
+        .auftraege-table tr:nth-child(even) td {
+            background: #f0f0ff;
+        }
+
+        .auftraege-table tr:hover td {
+            background: #d0d0ff;
+        }
+
+        .auftraege-table tr.selected td {
+            background: #000080;
+            color: white;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 2px 5px;
+            display: flex;
+            gap: 10px;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .status-section {
+            border: 1px inset #808080;
+            padding: 1px 8px;
+            background: #e0e0e0;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 30px;
+            right: 10px;
+            z-index: 1002;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+        .toast.warning { background: #f57f17; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+
+        /* GPT Box */
+        .gpt-box {
+            background: #ffe0e0;
+            border: 1px solid #a00000;
+            padding: 2px 6px;
+            font-size: 9px;
+            text-align: center;
+            line-height: 1.2;
+            position: absolute;
+            right: 10px;
+            top: 28px;
+        }
+
+        .header-row-wrapper {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <span>&#128203;</span>
+                <span>Auftragsverwaltung - Mit Stammdaten-Anzeige</span>
+            </div>
+            <div class="title-bar-buttons">
+                <button class="title-btn" onclick="window.close()">&#10005;</button>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+            <div class="left-menu">
+                <div>
+                    <div class="menu-header">HAUPTMENU</div>
+                </div>
+                <div class="menu-buttons">
+                    <button class="menu-btn">Dienstplanubersicht</button>
+                    <button class="menu-btn">Planungsubersicht</button>
+                    <button class="menu-btn active">Auftragsverwaltung</button>
+                    <button class="menu-btn">Mitarbeiterverwaltung</button>
+                    <button class="menu-btn">Offene Mail Anfragen</button>
+                    <button class="menu-btn">Excel Zeitkonten</button>
+                    <button class="menu-btn">Zeitkonten</button>
+                    <button class="menu-btn">Abwesenheitsplanung</button>
+                    <button class="menu-btn">Dienstausweis erstellen</button>
+                    <button class="menu-btn">Stundenabgleich</button>
+                    <button class="menu-btn">Kundenverwaltung</button>
+                    <button class="menu-btn">Verrechnungssatze</button>
+                    <button class="menu-btn">Sub Rechnungen</button>
+                    <button class="menu-btn">E-Mail</button>
+                    <button class="menu-btn">Menu 2</button>
+                    <button class="menu-btn">System Info</button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Header Row 1 -->
+                <div class="header-row-wrapper">
+                    <div class="header-row">
+                        <div class="logo-box">C</div>
+                        <span class="title-text">Auftragsverwaltung</span>
+                        <button class="btn" id="btnAktualisieren" onclick="refreshData()">Aktualisieren</button>
+                        <button class="btn" id="btnToggleStammdaten" onclick="toggleStammdaten()">Stammdaten ein/aus</button>
+                        <button class="btn" id="btnSchnellPlan">Mitarbeiterauswahl</button>
+                        <button class="btn" id="btnPositionen">Positionen</button>
+                        <button class="btn btn-green" id="btnMailBOS">Einsatzliste senden BOS</button>
+                        <button class="btn btn-yellow" id="btnMailSub">Einsatzliste senden SUB</button>
+                    </div>
+                    <div class="gpt-box">STAMMDATEN<br>VERSION</div>
+                </div>
+
+                <!-- Header Row 2 -->
+                <div class="button-row">
+                    <button class="btn" id="btnNeuAuftrag">Neuer Auftrag</button>
+                    <button class="btn" id="btnListeStd">Namensliste ESS</button>
+                    <button class="btn" id="btnDruckZusage">Einsatzliste drucken</button>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="cbAutosendEL" name="Autosend_EL">
+                        <label for="cbAutosendEL">EL Autosend</label>
+                    </div>
+                    <div class="status-group">
+                        <span class="form-label">Auftragsstatus:</span>
+                        <select class="form-select" id="Veranst_Status_ID" style="width: 120px;">
+                            <option value="1">In Planung</option>
+                            <option value="2">Bestatigt</option>
+                            <option value="3">Abgeschlossen</option>
+                            <option value="4">Abgerechnet</option>
+                            <option value="5">Storniert</option>
+                        </select>
+                        <span class="form-label" style="margin-left: 15px;">Rechnung Nr.:</span>
+                        <input type="text" class="form-input readonly" id="Rech_NR" style="width: 100px;" readonly>
+                    </div>
+                </div>
+
+                <!-- NEUES STAMMDATEN-PANEL -->
+                <div class="stammdaten-panel" id="stammdatenPanel">
+                    <div class="stammdaten-header">
+                        <div class="stammdaten-title">
+                            <span class="icon">&#127941;</span>
+                            <span>AUFTRAG-STAMMDATEN</span>
+                            <span class="stammdaten-auftrag-name" id="stammdatenAuftragName">1.FC Nurnberg</span>
+                        </div>
+                        <button class="stammdaten-close" onclick="toggleStammdaten()">X Schliessen</button>
+                    </div>
+                    <div class="stammdaten-grid">
+                        <!-- Zeile 1 -->
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Veranstaltung / Auftrag</span>
+                            <div class="stammdaten-value highlight" id="sdAuftrag">1.FC Nurnberg vs. Greuther Furth</div>
+                        </div>
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Objekt / Stadion</span>
+                            <div class="stammdaten-value" id="sdObjekt">Max-Morlock-Stadion</div>
+                        </div>
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Datum</span>
+                            <div class="stammdaten-value highlight" id="sdDatum">Sa 18.01.2025</div>
+                        </div>
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Anpfiff / Spielbeginn</span>
+                            <div class="stammdaten-value time" id="sdAnpfiff">13:00 Uhr</div>
+                        </div>
+
+                        <!-- Zeile 2 -->
+                        <div class="stammdaten-item full-width">
+                            <span class="stammdaten-label">Adresse</span>
+                            <div class="stammdaten-value" id="sdAdresse">Valznerweiherstrasse 200, 90480 Nurnberg</div>
+                        </div>
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Ort</span>
+                            <div class="stammdaten-value" id="sdOrt">Nurnberg</div>
+                        </div>
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">PLZ</span>
+                            <div class="stammdaten-value" id="sdPLZ">90480</div>
+                        </div>
+
+                        <!-- Zeile 3 -->
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Treffzeit</span>
+                            <div class="stammdaten-value time" id="sdTreffzeit">11:00 Uhr</div>
+                        </div>
+                        <div class="stammdaten-item full-width">
+                            <span class="stammdaten-label">Treffpunkt</span>
+                            <div class="stammdaten-value highlight" id="sdTreffpunkt">15 min vor DB Eingang Nord West</div>
+                        </div>
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Dienstkleidung</span>
+                            <div class="stammdaten-value" id="sdDienstkleidung">Schwarz neutral</div>
+                        </div>
+
+                        <!-- Zeile 4 -->
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Ansprechpartner</span>
+                            <div class="stammdaten-value" id="sdAnsprechpartner">Herr Muller</div>
+                        </div>
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Auftraggeber</span>
+                            <div class="stammdaten-value" id="sdAuftraggeber">1. FC Nurnberg e.V.</div>
+                        </div>
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">PKW Anzahl</span>
+                            <div class="stammdaten-value" id="sdPKW">3</div>
+                        </div>
+                        <div class="stammdaten-item">
+                            <span class="stammdaten-label">Fahrtkosten/PKW</span>
+                            <div class="stammdaten-value" id="sdFahrtkosten">25,00 EUR</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Section - wird kompakter wenn Stammdaten sichtbar -->
+                <div class="form-section" id="formSection">
+                    <!-- Left Column -->
+                    <div class="form-column left">
+                        <div class="form-row">
+                            <span class="form-label">Datum:</span>
+                            <input type="date" class="form-input input-narrow" id="Dat_VA_Von">
+                            <span>-</span>
+                            <input type="date" class="form-input input-narrow" id="Dat_VA_Bis">
+                            <span style="margin-left: 15px;">Nr.</span>
+                            <input type="text" class="form-input readonly" id="ID" style="width: 60px;" readonly>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Auftrag:</span>
+                            <input type="text" class="form-input input-medium" id="Auftrag" list="auftragListe" onchange="auftragChanged()" oninput="auftragInput()">
+                            <datalist id="auftragListe">
+                                <option value="1.FC Nurnberg">
+                                <option value="1.FCN vs Greuther">
+                                <option value="Greuther Furth">
+                                <option value="HC Erlangen">
+                                <option value="Kaufland Event">
+                                <option value="Arena Konzert">
+                            </datalist>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Ort:</span>
+                            <input type="text" class="form-input input-medium" id="Ort" list="ortListe">
+                            <datalist id="ortListe">
+                                <option value="Nurnberg">
+                                <option value="Furth">
+                                <option value="Erlangen">
+                            </datalist>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Objekt:</span>
+                            <input type="text" class="form-input" id="Objekt" list="objektListe" style="width: 150px;">
+                            <datalist id="objektListe">
+                                <option value="Max-Morlock-Stadion">
+                                <option value="Sportpark am Ronhof">
+                                <option value="Arena Nurnberg">
+                                <option value="Hirsch">
+                            </datalist>
+                            <select class="form-select" id="Objekt_ID" style="width: 50px;"></select>
+                            <button class="nav-btn" id="btnDatumLeft" style="padding: 1px 4px;">&#9664;</button>
+                            <select class="form-select" id="cboVADatum" style="width: 100px;"></select>
+                            <button class="nav-btn" id="btnDatumRight" style="padding: 1px 4px;">&#9654;</button>
+                        </div>
+                    </div>
+
+                    <!-- Middle Column -->
+                    <div class="form-column middle">
+                        <div class="form-row">
+                            <span class="form-label">PKW Anzahl:</span>
+                            <input type="number" class="form-input input-narrow" id="PKW_Anzahl" value="0" min="0">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Fahrtkosten pro PKW:</span>
+                            <input type="text" class="form-input input-narrow" id="Fahrtkosten" value="0,00">
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="form-column right">
+                        <div class="form-row">
+                            <span class="form-label">Treffzeit:</span>
+                            <input type="time" class="form-input" id="Treffp_Zeit" style="width: 70px;">
+                            <span class="form-label">Treffpunkt:</span>
+                            <input type="text" class="form-input input-wide" id="Treffpunkt">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Dienstkleidung:</span>
+                            <input type="text" class="form-input input-wide" id="Dienstkleidung" list="kleidungListe">
+                            <datalist id="kleidungListe">
+                                <option value="Schwarz neutral">
+                                <option value="Consec">
+                                <option value="Business">
+                            </datalist>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Ansprechpartner:</span>
+                            <input type="text" class="form-input input-wide" id="Ansprechpartner">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Auftraggeber:</span>
+                            <select class="form-select input-wide" id="Veranstalter_ID">
+                                <option value="">-- Wahlen --</option>
+                                <option value="20771">1. FC Nurnberg e.V.</option>
+                                <option value="20737">SpVgg Greuther Furth</option>
+                                <option value="20761">HC Erlangen</option>
+                                <option value="20770">Kaufland</option>
+                                <option value="10233">Hirsch Konzerte</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Work Area -->
+                <div class="work-area">
+                    <!-- Left Work Panel -->
+                    <div class="left-work-panel">
+                        <div class="tab-container">
+                            <div class="tab-header">
+                                <button class="tab-btn active" data-tab="einsatzliste">Einsatzliste</button>
+                                <button class="tab-btn" data-tab="antworten">Antworten ausstehend</button>
+                                <button class="tab-btn" data-tab="bemerkungen">Bemerkungen</button>
+                            </div>
+                            <div class="tab-content">
+                                <!-- Tab 1: Einsatzliste -->
+                                <div class="tab-page active" id="tab-einsatzliste">
+                                    <div class="bwn-row">
+                                        <button class="btn">BWN drucken</button>
+                                        <span class="status-red" id="lblKeineEingabe" style="display: none;">Auftrag bereits berechnet</span>
+                                    </div>
+
+                                    <div class="grid-area">
+                                        <!-- Left Subform: Schichten -->
+                                        <div class="subform-left">
+                                            <div class="grid-wrapper">
+                                                <table class="data-grid" id="gridSchichten">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 30px;">Anz</th>
+                                                            <th style="width: 60px;">von</th>
+                                                            <th style="width: 60px;">bis</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="schichtenBody">
+                                                        <tr><td>5</td><td>11:00</td><td class="cell-blue">16:00</td></tr>
+                                                        <tr><td>3</td><td>12:00</td><td class="cell-blue">17:00</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- Absagen -->
+                                            <div class="absagen-section">
+                                                <div class="absagen-label">Absagen:</div>
+                                                <div class="absagen-grid-wrapper">
+                                                    <table class="data-grid" id="gridAbsagen">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20px;"></th>
+                                                                <th>Mitarbeiter</th>
+                                                                <th>Bemerkung</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="absagenBody">
+                                                            <tr><td></td><td>Schmidt, Thomas</td><td>Krank</td></tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Subform: MA-Zuordnungen -->
+                                        <div class="subform-right">
+                                            <div class="grid-wrapper">
+                                                <table class="data-grid" id="gridZuordnungen">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 35px;">Lfd</th>
+                                                            <th style="width: 140px;">Mitarbeiter</th>
+                                                            <th style="width: 55px;">von</th>
+                                                            <th style="width: 55px;">bis</th>
+                                                            <th style="width: 45px;">Std</th>
+                                                            <th>Bemerkungen</th>
+                                                            <th style="width: 25px;">I</th>
+                                                            <th style="width: 45px;">PKW</th>
+                                                            <th style="width: 25px;">E</th>
+                                                            <th style="width: 25px;">R</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="zuordnungenBody">
+                                                        <tr><td>1</td><td>Muller, Hans</td><td>11:00</td><td>16:00</td><td>5.0</td><td></td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td class="cell-green">&#10003;</td></tr>
+                                                        <tr><td>2</td><td>Meyer, Anna</td><td>11:00</td><td>16:00</td><td>5.0</td><td></td><td>&#10003;</td><td></td><td>&#10003;</td><td class="cell-green">&#10003;</td></tr>
+                                                        <tr><td>3</td><td>Bauer, Peter</td><td>12:00</td><td>17:00</td><td>5.0</td><td>Eingang Ost</td><td>&#10003;</td><td></td><td>&#10003;</td><td></td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 2: Antworten ausstehend -->
+                                <div class="tab-page" id="tab-antworten">
+                                    <div class="bwn-row">
+                                        <span class="form-label">Mitarbeiter geplant: 8 | Ausstehend: 2</span>
+                                    </div>
+                                    <div class="grid-wrapper" style="flex: 1;">
+                                        <table class="data-grid" id="gridStatus">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mitarbeiter</th>
+                                                    <th>Status</th>
+                                                    <th>Angefragt am</th>
+                                                    <th>Antwort</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="statusBody">
+                                                <tr><td>Muller, Hans</td><td class="cell-green">Zugesagt</td><td>15.01.2025 10:30</td><td>Bin dabei</td></tr>
+                                                <tr><td>Meyer, Anna</td><td class="cell-yellow">Angefragt</td><td>15.01.2025 10:30</td><td></td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 3: Bemerkungen -->
+                                <div class="tab-page" id="tab-bemerkungen">
+                                    <textarea id="Bemerkungen" style="width: 100%; height: 100%; resize: none; font-size: 11px;">Wichtige Hinweise zum Auftrag...</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Auftragsliste -->
+                    <div class="right-panel">
+                        <div class="right-header">
+                            <table class="status-table" id="statusOverview">
+                                <tr>
+                                    <td><strong>Auftragsstatus</strong></td>
+                                    <td class="count"><strong>Anzahl</strong></td>
+                                    <td><strong>Aktion</strong></td>
+                                </tr>
+                                <tr data-status="1">
+                                    <td>In Planung</td>
+                                    <td class="count" id="countPlanung">5</td>
+                                    <td><button class="anzeigen-btn">Anzeigen</button></td>
+                                </tr>
+                                <tr data-status="3">
+                                    <td>Auftrag beendet, Zeiten noch in Bearbeitung</td>
+                                    <td class="count" id="countBeendet">2</td>
+                                    <td><button class="anzeigen-btn">Anzeigen</button></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="date-nav">
+                            <span>Auftrage ab:</span>
+                            <input type="date" class="date-input" id="Auftraege_ab">
+                            <button class="nav-btn">Go</button>
+                            <button class="nav-btn">&#60;&#60;</button>
+                            <button class="nav-btn">&#62;&#62;</button>
+                            <button class="nav-btn">Ab Heute</button>
+                        </div>
+
+                        <div class="auftraege-wrapper">
+                            <table class="auftraege-table" id="auftraegeTable">
+                                <thead>
+                                    <tr>
+                                        <th>Datum</th>
+                                        <th>Auftrag</th>
+                                        <th>Objekt</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auftraegeBody">
+                                    <tr class="selected" onclick="selectAuftrag(this, 1)"><td>18.01.25</td><td>1.FC Nurnberg</td><td>Max-Morlock-Stadion</td></tr>
+                                    <tr onclick="selectAuftrag(this, 2)"><td>19.01.25</td><td>Greuther Furth</td><td>Sportpark Ronhof</td></tr>
+                                    <tr onclick="selectAuftrag(this, 3)"><td>25.01.25</td><td>HC Erlangen</td><td>Arena Nurnberg</td></tr>
+                                    <tr onclick="selectAuftrag(this, 4)"><td>26.01.25</td><td>1.FCN vs Schalke</td><td>Max-Morlock-Stadion</td></tr>
+                                    <tr onclick="selectAuftrag(this, 5)"><td>01.02.25</td><td>Kaufland Event</td><td>Messegelande</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-section">Erstellt</span>
+            <span class="status-section" id="Erst_von">Admin</span>
+            <span class="status-section" id="Erst_am">15.01.2025 09:00</span>
+            <span class="status-section">Geandert</span>
+            <span class="status-section" id="Aend_von">Admin</span>
+            <span class="status-section" id="Aend_am">17.01.2025 14:30</span>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        // ============================================
+        // STAMMDATEN-TEMPLATES
+        // ============================================
+        const AUFTRAG_TEMPLATES = {
+            '1.fc nurnberg': {
+                auftrag: '1.FC Nurnberg',
+                objekt: 'Max-Morlock-Stadion',
+                ort: 'Nurnberg',
+                plz: '90480',
+                strasse: 'Valznerweiherstrasse 200',
+                treffpunkt: '15 min vor DB Eingang Nord West',
+                dienstkleidung: 'Schwarz neutral',
+                auftraggeber: '1. FC Nurnberg e.V.',
+                veranstalter_id: 20771
+            },
+            '1.fcn': {
+                auftrag: '1.FC Nurnberg',
+                objekt: 'Max-Morlock-Stadion',
+                ort: 'Nurnberg',
+                plz: '90480',
+                strasse: 'Valznerweiherstrasse 200',
+                treffpunkt: '15 min vor DB Eingang Nord West',
+                dienstkleidung: 'Schwarz neutral',
+                auftraggeber: '1. FC Nurnberg e.V.',
+                veranstalter_id: 20771
+            },
+            'greuther': {
+                auftrag: 'Greuther Furth',
+                objekt: 'Sportpark am Ronhof',
+                ort: 'Furth',
+                plz: '90765',
+                strasse: 'Laubenweg 60',
+                treffpunkt: '15 min vor DB Tor F',
+                dienstkleidung: 'Schwarz neutral',
+                auftraggeber: 'SpVgg Greuther Furth',
+                veranstalter_id: 20737
+            },
+            'hc erlangen': {
+                auftrag: 'HC Erlangen',
+                objekt: 'Arena Nurnberg',
+                ort: 'Nurnberg',
+                plz: '90471',
+                strasse: 'Kurt-Leucht-Weg 11',
+                treffpunkt: '15 min vor DB Arena Ecke Kurt-Leucht',
+                dienstkleidung: 'Schwarz neutral',
+                auftraggeber: 'HC Erlangen',
+                veranstalter_id: 20761
+            },
+            'kaufland': {
+                auftrag: 'Kaufland Event',
+                objekt: 'Messegelande',
+                ort: 'Nurnberg',
+                plz: '90471',
+                strasse: 'Messezentrum 1',
+                treffpunkt: '15 min vor Ort',
+                dienstkleidung: 'Schwarz neutral',
+                auftraggeber: 'Kaufland',
+                veranstalter_id: 20770
+            }
+        };
+
+        // State
+        let stammdatenVisible = false;
+        let currentAuftrag = null;
+
+        // ============================================
+        // INITIALISIERUNG
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab-Wechsel
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Initial: Stammdaten einblenden wenn Auftrag vorhanden
+            const auftragInput = document.getElementById('Auftrag');
+            if (auftragInput.value) {
+                auftragChanged();
+            }
+
+            // Datum setzen
+            document.getElementById('Auftraege_ab').value = new Date().toISOString().split('T')[0];
+
+            // Demo: Ersten Auftrag laden
+            loadDemoAuftrag();
+        });
+
+        // ============================================
+        // STAMMDATEN-FUNKTIONEN
+        // ============================================
+        function toggleStammdaten() {
+            const panel = document.getElementById('stammdatenPanel');
+            const formSection = document.getElementById('formSection');
+            stammdatenVisible = !stammdatenVisible;
+
+            if (stammdatenVisible) {
+                panel.classList.add('visible');
+                formSection.classList.add('compact');
+            } else {
+                panel.classList.remove('visible');
+                formSection.classList.remove('compact');
+            }
+        }
+
+        function updateStammdatenPanel(data) {
+            if (!data) return;
+
+            // Auftragname im Header
+            document.getElementById('stammdatenAuftragName').textContent = data.auftrag || '-';
+
+            // Alle Felder updaten
+            document.getElementById('sdAuftrag').textContent = data.auftrag || '-';
+            document.getElementById('sdObjekt').textContent = data.objekt || '-';
+            document.getElementById('sdDatum').textContent = formatDatumDisplay(document.getElementById('Dat_VA_Von').value);
+            document.getElementById('sdAnpfiff').textContent = data.anpfiff || calculateAnpfiff(document.getElementById('Treffp_Zeit').value);
+            document.getElementById('sdAdresse').textContent = (data.strasse || '') + ', ' + (data.plz || '') + ' ' + (data.ort || '');
+            document.getElementById('sdOrt').textContent = data.ort || '-';
+            document.getElementById('sdPLZ').textContent = data.plz || '-';
+            document.getElementById('sdTreffzeit').textContent = formatTime(document.getElementById('Treffp_Zeit').value);
+            document.getElementById('sdTreffpunkt').textContent = data.treffpunkt || document.getElementById('Treffpunkt').value || '-';
+            document.getElementById('sdDienstkleidung').textContent = data.dienstkleidung || document.getElementById('Dienstkleidung').value || '-';
+            document.getElementById('sdAnsprechpartner').textContent = document.getElementById('Ansprechpartner').value || '-';
+            document.getElementById('sdAuftraggeber').textContent = data.auftraggeber || '-';
+            document.getElementById('sdPKW').textContent = document.getElementById('PKW_Anzahl').value || '0';
+            document.getElementById('sdFahrtkosten').textContent = document.getElementById('Fahrtkosten').value + ' EUR';
+        }
+
+        function auftragInput() {
+            // Live-Suche wahrend der Eingabe
+            const auftragValue = document.getElementById('Auftrag').value.toLowerCase().trim();
+
+            for (const [key, template] of Object.entries(AUFTRAG_TEMPLATES)) {
+                if (auftragValue.includes(key)) {
+                    // Match gefunden - Panel automatisch einblenden
+                    if (!stammdatenVisible) {
+                        toggleStammdaten();
+                    }
+                    currentAuftrag = template;
+                    updateStammdatenPanel(template);
+
+                    // Formularfelder vorausfullen (nur wenn leer)
+                    fillFormIfEmpty('Ort', template.ort);
+                    fillFormIfEmpty('Objekt', template.objekt);
+                    fillFormIfEmpty('Treffpunkt', template.treffpunkt);
+                    fillFormIfEmpty('Dienstkleidung', template.dienstkleidung);
+                    if (template.veranstalter_id) {
+                        document.getElementById('Veranstalter_ID').value = template.veranstalter_id;
+                    }
+                    break;
+                }
+            }
+        }
+
+        function auftragChanged() {
+            auftragInput();
+        }
+
+        function fillFormIfEmpty(fieldId, value) {
+            const field = document.getElementById(fieldId);
+            if (field && !field.value && value) {
+                field.value = value;
+            }
+        }
+
+        // ============================================
+        // DEMO-DATEN
+        // ============================================
+        function loadDemoAuftrag() {
+            // Demo: 1.FC Nurnberg laden
+            document.getElementById('ID').value = '12345';
+            document.getElementById('Auftrag').value = '1.FC Nurnberg vs. Greuther Furth';
+            document.getElementById('Ort').value = 'Nurnberg';
+            document.getElementById('Objekt').value = 'Max-Morlock-Stadion';
+            document.getElementById('Dat_VA_Von').value = '2025-01-18';
+            document.getElementById('Dat_VA_Bis').value = '2025-01-18';
+            document.getElementById('Treffp_Zeit').value = '11:00';
+            document.getElementById('Treffpunkt').value = '15 min vor DB Eingang Nord West';
+            document.getElementById('Dienstkleidung').value = 'Schwarz neutral';
+            document.getElementById('Ansprechpartner').value = 'Herr Muller';
+            document.getElementById('Veranstalter_ID').value = '20771';
+            document.getElementById('PKW_Anzahl').value = '3';
+            document.getElementById('Fahrtkosten').value = '25,00';
+
+            // Stammdaten einblenden
+            currentAuftrag = {
+                ...AUFTRAG_TEMPLATES['1.fc nurnberg'],
+                anpfiff: '13:00 Uhr'
+            };
+            toggleStammdaten();
+            updateStammdatenPanel(currentAuftrag);
+        }
+
+        function selectAuftrag(row, id) {
+            // Alle Zeilen deselektieren
+            document.querySelectorAll('#auftraegeBody tr').forEach(tr => {
+                tr.classList.remove('selected');
+            });
+            row.classList.add('selected');
+
+            // Demo-Daten je nach Auftrag laden
+            const demos = {
+                1: { name: '1.FC Nurnberg vs. Greuther Furth', template: '1.fc nurnberg', anpfiff: '13:00 Uhr', datum: '2025-01-18' },
+                2: { name: 'Greuther Furth vs. HSV', template: 'greuther', anpfiff: '15:30 Uhr', datum: '2025-01-19' },
+                3: { name: 'HC Erlangen vs. THW Kiel', template: 'hc erlangen', anpfiff: '17:00 Uhr', datum: '2025-01-25' },
+                4: { name: '1.FCN vs. Schalke 04', template: '1.fcn', anpfiff: '13:30 Uhr', datum: '2025-01-26' },
+                5: { name: 'Kaufland Fruhjahrs-Event', template: 'kaufland', anpfiff: '10:00 Uhr', datum: '2025-02-01' }
+            };
+
+            const demo = demos[id];
+            if (demo) {
+                document.getElementById('Auftrag').value = demo.name;
+                document.getElementById('Dat_VA_Von').value = demo.datum;
+                document.getElementById('Dat_VA_Bis').value = demo.datum;
+
+                const template = AUFTRAG_TEMPLATES[demo.template];
+                if (template) {
+                    document.getElementById('Ort').value = template.ort;
+                    document.getElementById('Objekt').value = template.objekt;
+                    document.getElementById('Treffpunkt').value = template.treffpunkt;
+                    document.getElementById('Dienstkleidung').value = template.dienstkleidung;
+                    document.getElementById('Veranstalter_ID').value = template.veranstalter_id;
+
+                    currentAuftrag = { ...template, anpfiff: demo.anpfiff };
+
+                    if (!stammdatenVisible) {
+                        toggleStammdaten();
+                    }
+                    updateStammdatenPanel(currentAuftrag);
+                }
+            }
+        }
+
+        // ============================================
+        // HILFSFUNKTIONEN
+        // ============================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-page').forEach(page => {
+                page.classList.toggle('active', page.id === 'tab-' + tabName);
+            });
+        }
+
+        function formatDatumDisplay(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+            return days[d.getDay()] + ' ' + d.toLocaleDateString('de-DE');
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '-';
+            return timeStr + ' Uhr';
+        }
+
+        function calculateAnpfiff(treffzeit) {
+            // Anpfiff ist typischerweise 2 Stunden nach Treffzeit
+            if (!treffzeit) return '-';
+            const [h, m] = treffzeit.split(':').map(Number);
+            const anpfiffH = h + 2;
+            return String(anpfiffH).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ' Uhr';
+        }
+
+        function refreshData() {
+            showToast('Daten werden aktualisiert...', 'success');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

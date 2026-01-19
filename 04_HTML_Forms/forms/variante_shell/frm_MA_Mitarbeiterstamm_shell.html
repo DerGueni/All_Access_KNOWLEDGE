@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstammblatt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background-color: #8080c0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 2px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .title-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .title-bar-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 21px;
+            height: 21px;
+            background: #ece9d8;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-btn.close {
+            background: #c75050;
+            color: white;
+        }
+
+        /* Content Area - no sidebar, full width */
+        .content-area {
+            flex: 1;
+            background-color: #8080c0;
+            padding: 3px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Header Row */
+        .header-row {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4040a0, #8080c0);
+            border: 2px solid #404080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .title-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-blue {
+            background: linear-gradient(to bottom, #6080d0, #4060a0);
+            color: white;
+        }
+
+        .btn-green {
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+        }
+
+        .btn-red {
+            background: linear-gradient(to bottom, #e06060, #c04040);
+            color: white;
+        }
+
+        .gpt-box {
+            background: #ffe0e0;
+            border: 1px solid #a00000;
+            padding: 2px 6px;
+            font-size: 9px;
+            text-align: center;
+            line-height: 1.2;
+            position: absolute;
+            right: 10px;
+            top: 28px;
+        }
+
+        .header-row-wrapper {
+            position: relative;
+        }
+
+        .header-ma-nr {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        .header-ma-nr input {
+            width: 60px;
+            height: 18px;
+            border: 1px solid #808080;
+            text-align: center;
+            font-size: 10px;
+            background: #e0e0e0;
+        }
+
+        /* Employee Info Row */
+        .employee-info {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 6px 12px;
+            flex-shrink: 0;
+        }
+
+        .employee-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        /* Work Area */
+        .work-area {
+            display: flex;
+            flex: 1;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        /* Left Work Panel */
+        .left-work-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Tab Container */
+        .tab-container {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #8080b0;
+            border-bottom: 1px solid #606090;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 4px 10px;
+            background: #a0a0c0;
+            border: 1px solid #808080;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 9px;
+            margin-right: -1px;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: #9090c0;
+            border-bottom: 1px solid #9090c0;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-content {
+            padding: 8px;
+            flex: 1;
+            overflow: auto;
+            background: #9090c0;
+        }
+
+        .tab-page {
+            display: none;
+        }
+
+        .tab-page.active {
+            display: block;
+        }
+
+        /* Form Layout */
+        .form-columns {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-column {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-label {
+            min-width: 100px;
+            text-align: right;
+            font-size: 10px;
+        }
+
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+            height: 18px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #000080;
+            box-shadow: 0 0 2px #000080;
+        }
+
+        .form-input.readonly {
+            background: #e0e0e0;
+        }
+
+        .form-input.small { width: 60px; }
+        .form-input.medium { width: 120px; }
+        .form-input.wide { flex: 1; min-width: 150px; }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 105px;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: 13px;
+            height: 13px;
+        }
+
+        .checkbox-row label {
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Right Panel: Employee List */
+        .right-panel {
+            width: 300px;
+            background: #9090c0;
+            border: 1px solid #606090;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .right-header {
+            padding: 5px;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .search-box label {
+            font-size: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            height: 18px;
+            border: 1px solid #808080;
+            padding: 1px 4px;
+            font-size: 10px;
+        }
+
+        .filter-box {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .filter-box label {
+            font-size: 10px;
+        }
+
+        .filter-box select {
+            flex: 1;
+            height: 18px;
+            border: 1px solid #808080;
+            font-size: 10px;
+        }
+
+        .list-wrapper {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .data-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+
+        .data-grid th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 3px 5px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+
+        .data-grid td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 4px;
+            background: white;
+        }
+
+        .data-grid tr:hover td {
+            background: #e0e0ff;
+        }
+
+        .data-grid tr.selected td {
+            background: #000080;
+            color: white;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 2px 5px;
+            display: flex;
+            gap: 10px;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .status-section {
+            border: 1px inset #808080;
+            padding: 1px 8px;
+            background: #e0e0e0;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="form-container">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <span>👤</span>
+                <span>Mitarbeiterstammblatt</span>
+            </div>
+            <div class="title-bar-buttons">
+                <button class="title-btn" onclick="minimizeForm()">_</button>
+                <button class="title-btn">☐</button>
+                <button class="title-btn close" onclick="closeForm()">✕</button>
+            </div>
+        </div>
+
+        <!-- Content Area (no sidebar!) -->
+        <div class="content-area">
+            <!-- Header Row -->
+            <div class="header-row-wrapper">
+                <div class="header-row">
+                    <div class="logo-box">M</div>
+                    <span class="title-text">Mitarbeiterstammblatt</span>
+
+                    <!-- Navigation Buttons -->
+                    <button class="btn" onclick="navFirst()">|&lt;</button>
+                    <button class="btn" onclick="navPrev()">&lt;</button>
+                    <button class="btn" onclick="navNext()">&gt;</button>
+                    <button class="btn" onclick="navLast()">&gt;|</button>
+
+                    <button class="btn btn-blue" onclick="openMAAdressen()">MA Adressen</button>
+                    <button class="btn" onclick="refreshData()">Aktualisieren</button>
+                    <button class="btn" onclick="openZeitkonto()">Zeitkonto</button>
+                    <button class="btn" onclick="neuerMitarbeiter()">Neuer Mitarbeiter</button>
+                    <button class="btn btn-red" onclick="mitarbeiterLoeschen()">Mitarbeiter löschen</button>
+                    <button class="btn btn-blue" onclick="openDienstplan()">Dienstplan</button>
+                    <button class="btn btn-blue" onclick="openEinsatzuebersicht()">Einsatzübersicht</button>
+                    <button class="btn btn-green" onclick="openMaps()">Karte öffnen</button>
+
+                    <div class="header-ma-nr">
+                        <span>MA-ID:</span>
+                        <input type="text" id="maNr" readonly>
+                    </div>
+
+                    <button class="btn" onclick="speichern()">Speichern</button>
+                </div>
+                <div class="gpt-box">GPT | SHELL TEST<br><span id="lblDatum"></span></div>
+            </div>
+
+            <!-- Employee Info -->
+            <div class="employee-info">
+                <span class="employee-name"><span id="displayNachname">-</span>, <span id="displayVorname">-</span></span>
+            </div>
+
+            <!-- Work Area -->
+            <div class="work-area">
+                <!-- Left Work Panel -->
+                <div class="left-work-panel">
+                    <div class="tab-container">
+                        <div class="tab-header">
+                            <button class="tab-btn active" data-tab="stammdaten">Stammdaten</button>
+                            <button class="tab-btn" data-tab="einsatzuebersicht">Einsatzübersicht</button>
+                            <button class="tab-btn" data-tab="dienstplan">Dienstplan</button>
+                            <button class="tab-btn" data-tab="nichtverfuegbar">Nicht Verfügbar</button>
+                            <button class="tab-btn" data-tab="zeitkonto">Zeitkonto</button>
+                        </div>
+                        <div class="tab-content">
+                            <!-- Tab: Stammdaten -->
+                            <div class="tab-page active" id="tab-stammdaten">
+                                <div class="form-columns">
+                                    <!-- Column 1 -->
+                                    <div class="form-column">
+                                        <div class="form-row">
+                                            <span class="form-label">PersNr:</span>
+                                            <input type="text" class="form-input small readonly" id="ID" data-field="ID" readonly>
+                                        </div>
+                                        <div class="checkbox-row">
+                                            <input type="checkbox" id="IstAktiv" data-field="IstAktiv">
+                                            <label for="IstAktiv">Aktiv</label>
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Nachname:</span>
+                                            <input type="text" class="form-input wide" id="Nachname" data-field="Nachname">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Vorname:</span>
+                                            <input type="text" class="form-input wide" id="Vorname" data-field="Vorname">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Straße:</span>
+                                            <input type="text" class="form-input wide" id="Strasse" data-field="Strasse">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">PLZ:</span>
+                                            <input type="text" class="form-input medium" id="PLZ" data-field="PLZ">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Ort:</span>
+                                            <input type="text" class="form-input wide" id="Ort" data-field="Ort">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Tel. Mobil:</span>
+                                            <input type="text" class="form-input wide" id="Tel_Mobil" data-field="Tel_Mobil">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Email:</span>
+                                            <input type="text" class="form-input wide" id="Email" data-field="Email">
+                                        </div>
+                                    </div>
+
+                                    <!-- Column 2 -->
+                                    <div class="form-column">
+                                        <div class="form-row">
+                                            <span class="form-label">Eintrittsdatum:</span>
+                                            <input type="date" class="form-input medium" id="Eintrittsdatum" data-field="Eintrittsdatum">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Austrittsdatum:</span>
+                                            <input type="date" class="form-input medium" id="Austrittsdatum" data-field="Austrittsdatum">
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Anstellungsart:</span>
+                                            <select class="form-select" id="Anstellungsart_ID" data-field="Anstellungsart_ID" style="width: 150px;">
+                                                <option value=""></option>
+                                                <option value="3">Festangestellt</option>
+                                                <option value="4">Freiberufler</option>
+                                                <option value="5">Subunternehmer</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-row">
+                                            <span class="form-label">Kleidergroße:</span>
+                                            <select class="form-select" id="Kleidergroe" data-field="Kleidergroe" style="width: 100px;">
+                                                <option></option>
+                                                <option>XS</option>
+                                                <option>S</option>
+                                                <option>M</option>
+                                                <option>L</option>
+                                                <option>XL</option>
+                                                <option>XXL</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Einsatzübersicht -->
+                            <div class="tab-page" id="tab-einsatzuebersicht">
+                                <p>Einsatzübersicht wird hier angezeigt...</p>
+                            </div>
+
+                            <!-- Tab: Dienstplan -->
+                            <div class="tab-page" id="tab-dienstplan">
+                                <iframe src="../sub_MA_Dienstplan.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                            </div>
+
+                            <!-- Tab: Nicht Verfügbar -->
+                            <div class="tab-page" id="tab-nichtverfuegbar">
+                                <p>Nicht verfügbar Zeiten werden hier angezeigt...</p>
+                            </div>
+
+                            <!-- Tab: Zeitkonto -->
+                            <div class="tab-page" id="tab-zeitkonto">
+                                <iframe src="../sub_MA_Zeitkonto.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Employee List -->
+                <div class="right-panel">
+                    <div class="right-header">
+                        <div class="search-box">
+                            <label>Suche:</label>
+                            <input type="text" id="searchInput" placeholder="Name eingeben...">
+                        </div>
+                        <div class="filter-box">
+                            <label>Filter:</label>
+                            <select id="filterSelect">
+                                <option value="aktiv">Alle Aktiven</option>
+                                <option value="alle">Alle</option>
+                                <option value="inaktiv">Inaktive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="list-wrapper">
+                        <table class="data-grid">
+                            <thead>
+                                <tr>
+                                    <th>Nachname</th>
+                                    <th>Vorname</th>
+                                    <th>Ort</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maListBody">
+                                <!-- Wird dynamisch gefüllt -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-section">Erstellt</span>
+            <span class="status-section" id="erstelltVon">-</span>
+            <span class="status-section" id="erstelltAm">-</span>
+            <span class="status-section">Geändert</span>
+            <span class="status-section" id="geaendertVon">-</span>
+            <span class="status-section" id="geaendertAm">-</span>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        const API_BASE = 'http://localhost:5000/api';
+
+        // State
+        const state = {
+            mitarbeiterList: [],
+            currentIndex: 0,
+            currentRecord: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            document.getElementById('lblDatum').textContent = formatDate(new Date());
+
+            // Tab-Wechsel
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Search & Filter
+            document.getElementById('searchInput').addEventListener('input', renderMitarbeiterList);
+            document.getElementById('filterSelect').addEventListener('change', loadMitarbeiter);
+
+            // Daten laden
+            await loadMitarbeiter();
+            hideLoading();
+        });
+
+        // Navigation
+        function navFirst() { showRecord(0); }
+        function navPrev() { showRecord(Math.max(0, state.currentIndex - 1)); }
+        function navNext() { showRecord(Math.min(state.mitarbeiterList.length - 1, state.currentIndex + 1)); }
+        function navLast() { showRecord(state.mitarbeiterList.length - 1); }
+
+        async function loadMitarbeiter() {
+            showLoading();
+            try {
+                const filter = document.getElementById('filterSelect').value;
+                let url = `${API_BASE}/mitarbeiter`;
+                if (filter === 'aktiv') url += '?aktiv=true';
+                else if (filter === 'inaktiv') url += '?aktiv=false';
+
+                const response = await fetch(url);
+                const result = await response.json();
+                state.mitarbeiterList = result.data || [];
+
+                renderMitarbeiterList();
+
+                if (state.mitarbeiterList.length > 0) {
+                    await showRecord(0);
+                }
+            } catch (e) {
+                console.error('Mitarbeiter laden fehlgeschlagen:', e);
+            }
+            hideLoading();
+        }
+
+        function renderMitarbeiterList() {
+            const tbody = document.getElementById('maListBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            state.mitarbeiterList.forEach((ma, index) => {
+                const name = (ma.Nachname || '') + ' ' + (ma.Vorname || '');
+                if (search && !name.toLowerCase().includes(search)) return;
+
+                const tr = document.createElement('tr');
+                tr.dataset.index = index;
+                if (index === state.currentIndex) {
+                    tr.classList.add('selected');
+                }
+                tr.innerHTML = `
+                    <td>${escapeHtml(ma.Nachname || '')}</td>
+                    <td>${escapeHtml(ma.Vorname || '')}</td>
+                    <td>${escapeHtml(ma.Ort || '')}</td>
+                `;
+                tr.addEventListener('click', () => showRecord(index));
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function showRecord(index) {
+            if (index < 0 || index >= state.mitarbeiterList.length) return;
+            state.currentIndex = index;
+            state.currentRecord = state.mitarbeiterList[index];
+
+            // Formular befüllen
+            document.getElementById('displayNachname').textContent = state.currentRecord.Nachname || '-';
+            document.getElementById('displayVorname').textContent = state.currentRecord.Vorname || '-';
+            document.getElementById('maNr').value = state.currentRecord.ID || '';
+
+            // Alle Felder mit data-field befüllen
+            document.querySelectorAll('[data-field]').forEach(el => {
+                const field = el.dataset.field;
+                let value = state.currentRecord[field] || '';
+
+                if (el.type === 'checkbox') {
+                    el.checked = !!value;
+                } else if (el.type === 'date' && value) {
+                    el.value = value.substring(0, 10);
+                } else {
+                    el.value = value;
+                }
+            });
+
+            // Liste aktualisieren
+            renderMitarbeiterList();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-page').forEach(page => {
+                page.classList.toggle('active', page.id === 'tab-' + tabName);
+            });
+        }
+
+        function neuerMitarbeiter() {
+            alert('Neuer Mitarbeiter erstellen...');
+        }
+
+        function mitarbeiterLoeschen() {
+            if (confirm('Mitarbeiter wirklich löschen?')) {
+                alert('Löschen...');
+            }
+        }
+
+        function speichern() {
+            alert('Speichern...');
+        }
+
+        function refreshData() {
+            loadMitarbeiter();
+        }
+
+        function openMAAdressen() {
+            notifyParent('NAVIGATE', 'frm_MA_Adressen_shell');
+        }
+
+        function openZeitkonto() {
+            notifyParent('NAVIGATE', 'frm_MA_Zeitkonten');
+        }
+
+        function openDienstplan() {
+            notifyParent('NAVIGATE', 'frm_DP_Dienstplan_MA');
+        }
+
+        function openEinsatzuebersicht() {
+            notifyParent('NAVIGATE', 'frm_Einsatzuebersicht');
+        }
+
+        function openMaps() {
+            const koord = state.currentRecord?.Koordinaten;
+            if (koord) {
+                window.open(`https://www.google.com/maps?q=${koord}`, '_blank');
+            }
+        }
+
+        function minimizeForm() {
+            notifyParent('MINIMIZE');
+        }
+
+        function closeForm() {
+            notifyParent('CLOSE');
+        }
+
+        // Communicate with parent shell
+        function notifyParent(type, data) {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: type,
+                    formName: typeof data === 'string' ? data : undefined,
+                    data: typeof data === 'object' ? data : undefined
+                }, '*');
+            }
+        }
+
+        // Listen to messages from parent
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+
+            if (data.type === 'LOAD_DATA') {
+                if (data.ma_id) {
+                    loadMitarbeiterById(data.ma_id);
+                }
+            }
+        });
+
+        async function loadMitarbeiterById(id) {
+            try {
+                const response = await fetch(`${API_BASE}/mitarbeiter/${id}`);
+                const result = await response.json();
+                state.currentRecord = result.data?.mitarbeiter || result.data;
+                // Formular befüllen...
+            } catch (e) {
+                console.error('Mitarbeiter laden:', e);
+            }
+        }
+
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            return d.toLocaleDateString('de-DE');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        console.log('[Mitarbeiterstamm Shell] Form loaded');
+    </script>
+    <!-- API-Server Lifecycle (fuer Standalone-Test) -->
+    <script src="../../js/api-lifecycle.js"></script>
+</body>
+</html>

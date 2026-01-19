@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abwesenheitsübersicht</title>
+        <link rel="stylesheet" href="css/fonts_override.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            height: 100vh;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            font-size: 12px;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            color: #000;
+            font-weight: 500;
+            border: none;
+            margin: 1px 0;
+        }
+
+        .menu-btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .menu-btn.active { background: linear-gradient(to bottom, #4040a0, #6060c0); color: white; }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .header-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 8px 15px;
+            font-size: 22px; /* Formulartitel +8px (war 14px) gemaess Anforderung */
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            background: #d0d0e0;
+            padding: 8px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+        }
+
+        .filter-bar label { font-weight: bold; }
+        .filter-bar input, .filter-bar select { padding: 3px 5px; border: 1px solid #808080; }
+        .filter-bar button {
+            padding: 4px 12px;
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            cursor: pointer;
+        }
+
+        .calendar-container {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .ma-list {
+            width: 200px;
+            background: white;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            overflow-y: auto;
+        }
+
+        .ma-item {
+            padding: 5px 8px;
+            border-bottom: 1px solid #d0d0d0;
+            cursor: pointer;
+        }
+        .ma-item:hover { background: #e0e0ff; }
+        .ma-item.selected { background: #4080c0; color: white; }
+
+        .calendar-grid {
+            flex: 1;
+            background: white;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            overflow: auto;
+        }
+
+        .calendar-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .calendar-table th {
+            background: #000080;
+            color: white;
+            padding: 4px;
+            text-align: center;
+            min-width: 25px;
+        }
+
+        .calendar-table td {
+            padding: 2px;
+            text-align: center;
+            border: 1px solid #d0d0d0;
+            min-width: 25px;
+        }
+
+        .calendar-table .day-header { font-size: 10px; }
+        .calendar-table .weekend { background: #f0f0f0; }
+
+        .absence-urlaub { background: #90EE90 !important; }
+        .absence-krank { background: #FFB6C1 !important; }
+        .absence-frei { background: #ADD8E6 !important; }
+        .absence-sonstig { background: #FFFFE0 !important; }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            background: #d0d0e0;
+            padding: 8px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #808080;
+        }
+
+        .footer-bar {
+            background: #d0d0e0;
+            padding: 5px 10px;
+            margin-top: 10px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+    <script src="js/webview2-bridge.js"></script>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-active-menu="abwesenheitsübersicht">
+    <div class="left-menu">
+        <div class="menu-header">PERSONAL</div>
+        <button class="menu-btn" onclick="Bridge.navigate('mitarbeiterstamm')">Mitarbeiterstamm</button>
+        <button class="menu-btn active">Abwesenheitsübersicht</button>
+        <button class="menu-btn" onclick="Bridge.navigate('abwesenheitsplanung')">Abwesenheitsplanung</button>
+        <button class="menu-btn" onclick="Bridge.navigate('zeitkonten')">Zeitkonten</button>
+        <button class="menu-btn" onclick="Bridge.navigate('dashboard')">Zurück zum Menü</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header-bar">Abwesenheitsübersicht</div>
+
+        <div class="filter-bar">
+            <label>Monat:</label>
+            <select id="cboMonat"></select>
+            <label>Jahr:</label>
+            <input type="number" id="txtJahr" style="width:60px">
+            <label>Abteilung:</label>
+            <select id="cboAbteilung">
+                <option value="">Alle</option>
+            </select>
+            <button onclick="loadData()">Aktualisieren</button>
+        </div>
+
+        <div class="calendar-container">
+            <div class="ma-list" id="maList">
+                <div class="ma-item">Lade Mitarbeiter...</div>
+            </div>
+            <div class="calendar-grid">
+                <table class="calendar-table" id="calendarTable">
+                    <thead id="calendarHead"></thead>
+                    <tbody id="calendarBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color absence-urlaub"></div> Urlaub</div>
+            <div class="legend-item"><div class="legend-color absence-krank"></div> Krank</div>
+            <div class="legend-item"><div class="legend-color absence-frei"></div> Frei</div>
+            <div class="legend-item"><div class="legend-color absence-sonstig"></div> Sonstige</div>
+        </div>
+
+        <div class="footer-bar">
+            <span id="lblStatus">Bereit</span>
+            <span id="lblRecordInfo">0 Mitarbeiter</span>
+        </div>
+    </div>
+
+    <script>
+        let mitarbeiter = [];
+        let abwesenheiten = [];
+        let currentMonth, currentYear;
+
+        Bridge.on('onDataReceived', function(data) {
+            if (data.type === 'mitarbeiter') {
+                mitarbeiter = data.records || data.data || [];
+                renderMitarbeiterList();
+            }
+            if (data.type === 'abwesenheiten') {
+                abwesenheiten = data.records || data.data || [];
+                renderCalendar();
+            }
+        });
+
+        function initMonthSelect() {
+            const select = document.getElementById('cboMonat');
+            const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+            select.innerHTML = months.map((m, i) => `<option value="${i+1}">${m}</option>`).join('');
+
+            const today = new Date();
+            currentMonth = today.getMonth() + 1;
+            currentYear = today.getFullYear();
+            select.value = currentMonth;
+            document.getElementById('txtJahr').value = currentYear;
+        }
+
+        function renderMitarbeiterList() {
+            const list = document.getElementById('maList');
+            if (!mitarbeiter.length) {
+                list.innerHTML = '<div class="ma-item">Keine Mitarbeiter</div>';
+                return;
+            }
+            list.innerHTML = mitarbeiter.map(m =>
+                `<div class="ma-item" data-id="${m.ID}">${m.Nachname}, ${m.Vorname}</div>`
+            ).join('');
+            document.getElementById('lblRecordInfo').textContent = mitarbeiter.length + ' Mitarbeiter';
+        }
+
+        function renderCalendar() {
+            const month = parseInt(document.getElementById('cboMonat').value);
+            const year = parseInt(document.getElementById('txtJahr').value);
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            // Header
+            let headerHtml = '<tr><th>Mitarbeiter</th>';
+            for (let d = 1; d <= daysInMonth; d++) {
+                const date = new Date(year, month - 1, d);
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                const dayName = ['So','Mo','Di','Mi','Do','Fr','Sa'][date.getDay()];
+                headerHtml += `<th class="${isWeekend ? 'weekend' : ''}"><div class="day-header">${dayName}</div>${d}</th>`;
+            }
+            headerHtml += '</tr>';
+            document.getElementById('calendarHead').innerHTML = headerHtml;
+
+            // Body
+            let bodyHtml = '';
+            mitarbeiter.forEach(ma => {
+                bodyHtml += `<tr><td style="text-align:left;white-space:nowrap">${ma.Nachname}, ${ma.Vorname}</td>`;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    const date = new Date(year, month - 1, d);
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                    const absence = findAbsence(ma.ID, dateStr);
+                    const absClass = absence ? getAbsenceClass(absence.Grund) : '';
+                    const weekendClass = isWeekend ? 'weekend' : '';
+                    const title = absence ? absence.Grund : '';
+                    bodyHtml += `<td class="${weekendClass} ${absClass}" title="${title}"></td>`;
+                }
+                bodyHtml += '</tr>';
+            });
+            document.getElementById('calendarBody').innerHTML = bodyHtml || '<tr><td colspan="32">Keine Daten</td></tr>';
+        }
+
+        function findAbsence(maId, dateStr) {
+            return abwesenheiten.find(a =>
+                a.MA_ID == maId &&
+                dateStr >= a.vonDat?.split('T')[0] &&
+                dateStr <= a.bisDat?.split('T')[0]
+            );
+        }
+
+        function getAbsenceClass(grund) {
+            if (!grund) return '';
+            const g = grund.toLowerCase();
+            if (g.includes('urlaub')) return 'absence-urlaub';
+            if (g.includes('krank')) return 'absence-krank';
+            if (g.includes('frei')) return 'absence-frei';
+            return 'absence-sonstig';
+        }
+
+        function loadData() {
+            const month = document.getElementById('cboMonat').value;
+            const year = document.getElementById('txtJahr').value;
+            document.getElementById('lblStatus').textContent = 'Lade Daten...';
+
+            Bridge.loadData('mitarbeiter', null, { aktiv: true });
+            Bridge.loadData('abwesenheiten', null, { monat: month, jahr: year });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initMonthSelect();
+            loadData();
+        });
+    </script>
+</body>
+</html>
+

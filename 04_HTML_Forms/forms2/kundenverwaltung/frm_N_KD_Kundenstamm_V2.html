@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenstammblatt - CONSEC</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 12px; background: #d4d0c8; overflow: hidden; }
+        .app-container { display: flex; height: 100vh; width: 100%; }
+        .sidebar { width: 130px; background: linear-gradient(180deg, #8B0000 0%, #660000 100%); display: flex; flex-direction: column; }
+        .sidebar-logo { padding: 6px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .sidebar-logo-icon { width: 36px; height: 36px; margin: 0 auto; background: #1a3a6a; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+        .sidebar-title { color: white; font-size: 11px; font-weight: bold; text-align: center; padding: 6px; background: rgba(0,0,0,0.2); }
+        .sidebar-menu { flex: 1; padding: 4px; overflow-y: auto; }
+        .menu-btn { display: block; width: 100%; padding: 5px; margin: 2px 0; background: #5577aa; color: white; border: 1px solid #3355aa; border-radius: 3px; cursor: pointer; font-size: 9px; }
+        .menu-btn:hover { background: #6688bb; }
+        .menu-btn.active { background: #3355aa; }
+        .main-area { flex: 1; display: flex; flex-direction: column; }
+        .header-row1 { background: #5577aa; padding: 4px 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .header-logo { width: 36px; height: 36px; background: #1a3a6a; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; }
+        .header-title { color: white; font-size: 15px; font-weight: bold; }
+        .nav-btns { display: flex; gap: 1px; }
+        .nav-btn { width: 24px; height: 24px; background: #f0f0f0; border: 1px solid #888; cursor: pointer; font-size: 11px; }
+        .header-btn { padding: 4px 10px; font-size: 11px; border: 1px solid #666; background: #f4f4f4; cursor: pointer; border-radius: 2px; }
+        .header-btn.cyan { background: #00aaaa; color: white; }
+        .header-btn.red { background: #cc4444; color: white; }
+        .header-btn.blue { background: #4488cc; color: white; }
+        .header-spacer { flex: 1; }
+        .name-display { background: white; padding: 6px 16px; font-size: 16px; font-weight: bold; min-width: 250px; border: 1px solid #888; }
+        .name-sub { font-size: 11px; font-weight: normal; color: #666; }
+        .id-box { background: #0066cc; color: white; padding: 4px 8px; font-weight: bold; border-radius: 3px; }
+        .content-wrapper { flex: 1; display: flex; padding: 4px; gap: 4px; overflow: hidden; }
+        .content-left { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .content-right { width: 260px; display: flex; flex-direction: column; gap: 4px; }
+        .tab-box { background: white; border: 1px solid #888; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .tab-header { display: flex; flex-wrap: wrap; background: #f0f0f0; border-bottom: 1px solid #888; padding: 2px; gap: 1px; }
+        .tab-btn { padding: 4px 8px; border: 1px solid #888; border-bottom: none; background: #e0e0e0; cursor: pointer; font-size: 10px; border-radius: 3px 3px 0 0; }
+        .tab-btn.active { background: white; font-weight: bold; }
+        .tab-body { display: none; flex: 1; overflow: auto; padding: 8px; }
+        .tab-body.active { display: block; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-col { display: flex; flex-direction: column; gap: 4px; }
+        .form-row { display: flex; align-items: center; gap: 4px; }
+        .form-row label { width: 100px; font-size: 11px; text-align: right; }
+        .form-row input, .form-row select { flex: 1; padding: 2px 4px; border: 1px solid #888; font-size: 11px; }
+        .section-title { font-weight: bold; font-size: 11px; padding: 4px 0; border-bottom: 1px solid #ccc; margin-bottom: 4px; }
+        .subform-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .subform-table th { background: #4466aa; color: white; padding: 4px; text-align: left; }
+        .subform-table td { padding: 3px 4px; border: 1px solid #ddd; }
+        .subform-table tr:nth-child(even) { background: #f8f8f8; }
+        .subform-table tr:hover { background: #e8f4ff; }
+        .filter-section { background: white; border: 1px solid #888; padding: 4px; }
+        .filter-row { display: flex; align-items: center; gap: 4px; margin: 2px 0; }
+        .filter-row label { font-size: 10px; width: 50px; }
+        .filter-row input, .filter-row select { flex: 1; font-size: 10px; padding: 2px; border: 1px solid #888; }
+        .kd-list { background: white; border: 1px solid #888; flex: 1; overflow: auto; }
+        .kd-list-header { display: grid; grid-template-columns: 50px 1fr 80px; background: #4466aa; color: white; font-size: 10px; }
+        .kd-list-header div { padding: 3px; }
+        .kd-list-row { display: grid; grid-template-columns: 50px 1fr 80px; font-size: 10px; border-bottom: 1px solid #ddd; cursor: pointer; }
+        .kd-list-row:hover { background: #e8f4ff; }
+        .kd-list-row.selected { background: #0066cc; color: white; }
+        .kd-list-row div { padding: 2px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-row { display: flex; gap: 4px; margin-bottom: 8px; }
+        .btn-small { padding: 3px 8px; font-size: 10px; border: 1px solid #666; background: #f0f0f0; cursor: pointer; }
+        .btn-small.blue { background: #4488cc; color: white; }
+        .btn-small.green { background: #44aa44; color: white; }
+        .footer { background: #4466aa; color: white; padding: 2px 8px; font-size: 10px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-logo"><div class="sidebar-logo-icon">◆</div></div>
+            <div class="sidebar-title">HAUPTMENÜ</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn" onclick="openMenu('dienstplan')">Dienstplanübersicht</button>
+                <button class="menu-btn" onclick="openMenu('planung')">Planungsübersicht</button>
+                <button class="menu-btn" onclick="openMenu('auftrag')">Auftragsverwaltung</button>
+                <button class="menu-btn" onclick="openMenu('mitarbeiter')">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" onclick="openMenu('mail')">Offene Mail Anfragen</button>
+                <button class="menu-btn" onclick="openMenu('excel')">Excel Zeitkonten</button>
+                <button class="menu-btn" onclick="openMenu('zeitkonten')">Zeitkonten</button>
+                <button class="menu-btn" onclick="openMenu('abwesenheit')">Abwesenheitsplanung</button>
+                <button class="menu-btn" onclick="openMenu('ausweis')">Dienstausweis erstellen</button>
+                <button class="menu-btn" onclick="openMenu('stunden')">Stundenabgleich</button>
+                <button class="menu-btn active">Kundenverwaltung</button>
+            </div>
+        </div>
+        <div class="main-area">
+            <div class="header-row1">
+                <div class="header-logo">◄►</div>
+                <span class="header-title">Kundenstammblatt</span>
+                <div class="nav-btns">
+                    <button class="nav-btn" onclick="navFirst()">|◄</button>
+                    <button class="nav-btn" onclick="navPrev()">◄</button>
+                    <button class="nav-btn" onclick="navNext()">►</button>
+                    <button class="nav-btn" onclick="navLast()">►|</button>
+                </div>
+                <div class="header-spacer"></div>
+                <div class="name-display">
+                    <div id="kdFirma">1 Agency</div>
+                    <div class="name-sub" id="kdAnsprech">Holger Rothe</div>
+                </div>
+                <span style="color:white;margin-left:8px;">Kunden-Nr.:</span>
+                <div class="id-box" id="kdIdBox">27</div>
+                <button class="header-btn cyan" onclick="showVerrechnungssaetze()">Verrechnungssätze</button>
+                <button class="header-btn cyan" onclick="showUmsatzauswertung()">Umsatzauswertung</button>
+                <button class="header-btn red" onclick="deleteKunde()">Kunden löschen</button>
+                <button class="header-btn blue" onclick="newKunde()">Neuer Kunde</button>
+            </div>
+            <div class="content-wrapper">
+                <div class="content-left">
+                    <div class="tab-box">
+                        <div class="tab-header">
+                            <button class="tab-btn active" onclick="showTab('stammdaten',this)">Stammdaten</button>
+                            <button class="tab-btn" onclick="showTab('konditionen',this)">Konditionen</button>
+                            <button class="tab-btn" onclick="showTab('auftragueb',this)">Auftragsübersicht</button>
+                            <button class="tab-btn" onclick="showTab('rechnungen',this)">Rechnungen</button>
+                            <button class="tab-btn" onclick="showTab('angebote',this)">Angebote</button>
+                            <button class="tab-btn" onclick="showTab('zusatzdateien',this)">Zusatzdateien</button>
+                            <button class="tab-btn" onclick="showTab('ansprechpartner',this)">Ansprechpartner</button>
+                            <button class="tab-btn" onclick="showTab('bemerkungen',this)">Bemerkungen</button>
+                        </div>
+                        <div class="tab-body active" id="tab-stammdaten">
+                            <div style="margin-bottom:8px;"><input type="checkbox" id="IstAktiv" checked><label for="IstAktiv"> Ist aktiv</label></div>
+                            <div class="form-grid">
+                                <div class="form-col">
+                                    <div class="section-title">Adressdaten</div>
+                                    <div class="form-row"><label>Kunden-Kürzel:</label><input type="text" id="KundenKuerzel"></div>
+                                    <div class="form-row"><label>Straße:</label><input type="text" id="Strasse"></div>
+                                    <div class="form-row"><label>PLZ Ort:</label><input type="text" id="PLZ" style="width:60px"><input type="text" id="Ort"></div>
+                                    <div class="form-row"><label>Land:</label><select id="Land"><option value="DE">DE</option><option value="AT">AT</option><option value="CH">CH</option></select></div>
+                                    <div class="form-row"><label>Telefon:</label><input type="text" id="Telefon"></div>
+                                    <div class="form-row"><label>Mobil:</label><input type="text" id="Mobil"></div>
+                                    <div class="form-row"><label>Mobil 2:</label><input type="text" id="Mobil2"></div>
+                                    <div class="form-row"><label>E-Mail:</label><input type="email" id="Email"></div>
+                                    <div class="form-row"><label>Homepage:</label><input type="url" id="Homepage"></div>
+                                    <div class="form-row"><label>Anspr.Partner:</label><select id="AnsprechPartner"><option value="">-- wählen --</option></select></div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="section-title">Bankdaten</div>
+                                    <div class="form-row"><label>Kreditinstitut:</label><input type="text" id="Kreditinstitut"></div>
+                                    <div class="form-row"><label>IBAN:</label><input type="text" id="IBAN"></div>
+                                    <div class="form-row"><label>BIC:</label><input type="text" id="BIC"></div>
+                                    <div class="form-row"><label>UStIDNr.:</label><input type="text" id="UStIDNr"></div>
+                                    <div class="form-row"><label>Zahlungsbed.:</label><select id="Zahlungsbedingung"><option value="Netto 7">Netto 7</option><option value="Netto 14">Netto 14</option><option value="Netto 30">Netto 30</option></select></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-body" id="tab-konditionen">
+                            <div class="section-title">Verrechnungssätze</div>
+                            <table class="subform-table"><thead><tr><th>Pos</th><th>Bezeichnung</th><th>Stundensatz</th><th>Gültig ab</th></tr></thead>
+                            <tbody id="konditionenBody"><tr><td colspan="4" style="text-align:center;padding:20px;">Konditionen werden geladen...</td></tr></tbody></table>
+                        </div>
+                        <div class="tab-body" id="tab-auftragueb">
+                            <div class="btn-row"><label>Zeitraum:</label><select id="kdZeitraum" style="width:150px"><option value="aktuell">Aktuelles Jahr</option><option value="alle">Alle</option></select>
+                            <button class="btn-small blue" onclick="loadKdAuftraege()">Laden</button></div>
+                            <table class="subform-table"><thead><tr><th>Datum</th><th>Auftrag</th><th>Location</th><th>Ort</th><th>Betrag</th><th>Status</th></tr></thead>
+                            <tbody id="kdAuftraegeBody"><tr><td colspan="6" style="text-align:center;padding:20px;">Aufträge werden geladen...</td></tr></tbody></table>
+                        </div>
+                        <div class="tab-body" id="tab-rechnungen">
+                            <div class="btn-row"><button class="btn-small blue" onclick="exportRchPDF()">Auftrags-Rch PDF</button><button class="btn-small" onclick="exportRchPosPDF()">Position PDF</button><button class="btn-small" onclick="exportEinsPDF()">Einsatz PDF</button></div>
+                            <table class="subform-table"><thead><tr><th>RechNr</th><th>Datum</th><th>Betrag</th><th>Bezahlt</th><th>Status</th></tr></thead>
+                            <tbody id="rechnungenBody"><tr><td colspan="5" style="text-align:center;padding:20px;">Rechnungen werden geladen...</td></tr></tbody></table>
+                        </div>
+                        <div class="tab-body" id="tab-angebote">
+                            <div class="btn-row"><button class="btn-small blue" onclick="newAngebot()">Neues Angebot</button></div>
+                            <table class="subform-table"><thead><tr><th>AngNr</th><th>Datum</th><th>Betreff</th><th>Betrag</th><th>Status</th></tr></thead>
+                            <tbody id="angeboteBody"><tr><td colspan="5" style="text-align:center;padding:20px;">Angebote werden geladen...</td></tr></tbody></table>
+                        </div>
+                        <div class="tab-body" id="tab-zusatzdateien">
+                            <div class="btn-row"><button class="btn-small blue" onclick="addAttachment()">+ Anhang hinzufügen</button></div>
+                            <table class="subform-table"><thead><tr><th>Datei</th><th>Typ</th><th>Größe</th><th>Datum</th></tr></thead>
+                            <tbody id="zusatzdateienBody"><tr><td colspan="4" style="text-align:center;padding:20px;">Keine Dateien vorhanden</td></tr></tbody></table>
+                        </div>
+                        <div class="tab-body" id="tab-ansprechpartner">
+                            <div class="btn-row"><button class="btn-small blue" onclick="addAnsprechpartner()">+ Ansprechpartner</button></div>
+                            <table class="subform-table"><thead><tr><th>Name</th><th>Position</th><th>Telefon</th><th>E-Mail</th></tr></thead>
+                            <tbody id="ansprechpartnerBody"><tr><td colspan="4" style="text-align:center;padding:20px;">Keine Ansprechpartner</td></tr></tbody></table>
+                        </div>
+                        <div class="tab-body" id="tab-bemerkungen">
+                            <textarea id="bemerkungen" style="width:100%;height:200px;font-size:11px;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-right">
+                    <div class="filter-section">
+                        <div style="margin-bottom:4px;"><input type="checkbox" id="nurAktiveKD" checked onchange="filterKunden()"><label for="nurAktiveKD" style="font-size:10px;"> Nur Aktive anzeigen</label></div>
+                        <div class="filter-row"><label>Suche:</label><input type="text" id="kdSearch" placeholder="Suchen..." oninput="filterKunden()"></div>
+                        <div class="filter-row"><label>Filter:</label><select id="kdFilter" onchange="filterKunden()"><option value="alle">Alle</option></select></div>
+                    </div>
+                    <div class="kd-list">
+                        <div class="kd-list-header"><div>kun_Id</div><div>Firma</div><div>adr.</div></div>
+                        <div id="kdListBody"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <span>Erstellt am: <span id="erstelltAm">Mo 30.01.2023</span> von <span id="erstelltVon">guenther.siegert</span></span>
+                <span>Geändert am: <span id="geaendertAm">Mi 10.12.2025</span> von <span id="geaendertVon">guenther.siegert</span></span>
+            </div>
+        </div>
+    </div>
+    <script>
+        let allKunden = [];
+        let filteredKunden = [];
+        let currentIndex = 0;
+        let currentKD = null;
+        
+        document.addEventListener('DOMContentLoaded', loadAllData);
+        
+        async function loadAllData() {
+            try {
+                const script = document.createElement('script');
+                script.src = '../data/kunden_data.js';
+                script.onload = function() {
+                    if (typeof kundenData !== 'undefined') {
+                        allKunden = kundenData;
+                        filterKunden();
+                        if (allKunden.length > 0) selectKunde(0);
+                    }
+                };
+                script.onerror = loadDemoData;
+                document.head.appendChild(script);
+            } catch (e) { loadDemoData(); }
+        }
+        
+        function loadDemoData() {
+            allKunden = [
+                { kun_Id: 27, Firma: '1 Agency', Ansprechpartner: 'Holger Rothe', Ort: 'Nürnberg', PLZ: '90419', Strasse: 'Steinstraße 21', Telefon: '0911 27 43 74 70', Email: 'hr@1agency.de', Homepage: 'http://www.1agency.de', IstAktiv: true },
+                { kun_Id: 11155, Firma: 'A&R', Ansprechpartner: 'Sec', Ort: 'Oberasbach', PLZ: '', Strasse: '', Telefon: '', Email: '', IstAktiv: true }
+            ];
+            filterKunden();
+            selectKunde(0);
+        }
+        
+        function filterKunden() {
+            const search = document.getElementById('kdSearch').value.toLowerCase();
+            const nurAktive = document.getElementById('nurAktiveKD').checked;
+            filteredKunden = allKunden.filter(kd => {
+                const matchSearch = !search || (kd.Firma && kd.Firma.toLowerCase().includes(search));
+                const matchAktiv = !nurAktive || kd.IstAktiv;
+                return matchSearch && matchAktiv;
+            });
+            renderKDListe();
+        }
+        
+        function renderKDListe() {
+            const container = document.getElementById('kdListBody');
+            container.innerHTML = '';
+            filteredKunden.forEach((kd, idx) => {
+                const row = document.createElement('div');
+                row.className = 'kd-list-row' + (idx === currentIndex ? ' selected' : '');
+                row.innerHTML = `<div>${kd.kun_Id || ''}</div><div>${kd.Firma || ''}</div><div>${kd.Ort || ''}</div>`;
+                row.onclick = () => selectKunde(idx);
+                container.appendChild(row);
+            });
+        }
+        
+        function selectKunde(index) {
+            if (index < 0 || index >= filteredKunden.length) return;
+            currentIndex = index;
+            currentKD = filteredKunden[index];
+            document.getElementById('kdFirma').textContent = currentKD.Firma || '';
+            document.getElementById('kdAnsprech').textContent = currentKD.Ansprechpartner || '';
+            document.getElementById('kdIdBox').textContent = currentKD.kun_Id || '?';
+            fillFormFields(currentKD);
+            renderKDListe();
+        }
+        
+        function fillFormFields(kd) {
+            const fields = ['KundenKuerzel', 'Strasse', 'PLZ', 'Ort', 'Land', 'Telefon', 'Mobil', 'Mobil2', 'Email', 'Homepage', 'Kreditinstitut', 'IBAN', 'BIC', 'UStIDNr'];
+            fields.forEach(f => { const el = document.getElementById(f); if (el) el.value = kd[f] || ''; });
+            document.getElementById('IstAktiv').checked = kd.IstAktiv !== false;
+        }
+        
+        function navFirst() { selectKunde(0); }
+        function navPrev() { selectKunde(Math.max(0, currentIndex - 1)); }
+        function navNext() { selectKunde(Math.min(filteredKunden.length - 1, currentIndex + 1)); }
+        function navLast() { selectKunde(filteredKunden.length - 1); }
+        
+        function showTab(tabId, btn) {
+            document.querySelectorAll('.tab-body').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+        
+        function showVerrechnungssaetze() { alert('Verrechnungssätze - WebView2 Bridge'); }
+        function showUmsatzauswertung() { alert('Umsatzauswertung - WebView2 Bridge'); }
+        function deleteKunde() { if(confirm('Kunde wirklich löschen?')) alert('Löschen - WebView2 Bridge'); }
+        function newKunde() { alert('Neuer Kunde - WebView2 Bridge'); }
+        function loadKdAuftraege() { alert('Aufträge laden - WebView2 Bridge'); }
+        function exportRchPDF() { alert('Rechnung PDF - WebView2 Bridge'); }
+        function exportRchPosPDF() { alert('Position PDF - WebView2 Bridge'); }
+        function exportEinsPDF() { alert('Einsatz PDF - WebView2 Bridge'); }
+        function newAngebot() { alert('Neues Angebot - WebView2 Bridge'); }
+        function addAttachment() { alert('Anhang hinzufügen - WebView2 Bridge'); }
+        function addAnsprechpartner() { alert('Ansprechpartner hinzufügen - WebView2 Bridge'); }
+        
+        function openMenu(target) {
+            const urls = { 'dienstplan': '../frm_DP_Dienstplan_MA.html', 'planung': '../frm_VA_Planungsuebersicht.html',
+                'auftrag': '../auftragsverwaltung/frm_N_VA_Auftragstamm.html', 'mitarbeiter': '../mitarbeiterverwaltung/frm_N_MA_Mitarbeiterstamm.html' };
+            if (urls[target]) window.location.href = urls[target];
+        }
+    </script>
+</body>
+</html>

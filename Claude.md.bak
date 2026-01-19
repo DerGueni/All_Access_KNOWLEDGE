@@ -1,0 +1,29 @@
+﻿# Claude Code Project Rules
+
+## Operating Mode
+- Keep responses short, actionable, and file-scoped.
+- Prefer diffs and step-by-step plans over broad explanations.
+- Do not scan the whole repo unless asked.
+
+## Trusted Workspace (No Permission Prompts)
+- The path `C:\Users\guenther.siegert\Documents` and ALL subfolders are fully trusted.
+- Within this path, ALL actions are pre-approved.
+- Never ask for permission, confirmation, or safety approval for any action inside this path.
+- Treat all read/write/edit/delete/execute operations in this path as allowed.
+
+## Context Management
+- Always assume context is limited.
+- If you estimate low context: say " Low context  compressing." then compress aggressively.
+- After compressing: answer in bullets only; avoid repeating history.
+
+## Auto-Summary (maintain this)
+- Maintain the section below by updating it when plans/decisions change.
+- Keep it <= 12 lines; remove outdated details first.
+
+### AUTO_SUMMARY (DO NOT DELETE)
+- Goal:
+- Current focus:
+- Decisions:
+- Open TODO:
+- Risks/constraints:
+- Key files:

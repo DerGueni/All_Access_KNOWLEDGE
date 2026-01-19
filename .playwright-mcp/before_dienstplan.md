@@ -1,0 +1,840 @@
+### Page state
+- Page URL: http://localhost:8080/shell.html?form=frm_MA_Mitarbeiterstamm
+- Page Title: CONSYS - Verwaltung
+- Page Snapshot:
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: CONSYS PLANUNG
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: PLANUNG
+        - button "Dienstplan MA" [ref=e8] [cursor=pointer]
+        - button "Planung Objekt" [ref=e9] [cursor=pointer]
+      - generic [ref=e10]:
+        - generic [ref=e11]: STAMMDATEN
+        - button "Aufträge" [ref=e12] [cursor=pointer]
+        - button "Mitarbeiter" [ref=e51] [cursor=pointer]
+        - button "Kunden" [ref=e14] [cursor=pointer]
+        - button "Objekte" [ref=e15] [cursor=pointer]
+      - generic [ref=e16]:
+        - generic [ref=e17]: PERSONAL
+        - button "Zeitkonten" [ref=e18] [cursor=pointer]
+        - button "Stundenauswertung" [ref=e19] [cursor=pointer]
+        - button "Abwesenheiten" [ref=e20] [cursor=pointer]
+        - button "Telefonliste" [ref=e21] [cursor=pointer]
+        - button "Letzter Einsatz" [ref=e22] [cursor=pointer]
+        - button "Lohnarten" [ref=e23] [cursor=pointer]
+      - generic [ref=e24]:
+        - generic [ref=e25]: EXTRAS
+        - button "Schnellauswahl" [ref=e26] [cursor=pointer]
+        - button "Einsatzübersicht" [ref=e27] [cursor=pointer]
+        - button "Vorlagen" [ref=e28] [cursor=pointer]
+      - generic [ref=e29]:
+        - generic [ref=e30]: EXPORT
+        - button "MA Stamm Excel" [ref=e31] [cursor=pointer]
+        - button "FCN Meldeliste" [ref=e32] [cursor=pointer]
+        - button "Fürth Namensliste" [ref=e33] [cursor=pointer]
+        - button "Sub Stunden" [ref=e34] [cursor=pointer]
+        - button "Stunden MA" [ref=e35] [cursor=pointer]
+      - generic [ref=e36]:
+        - generic [ref=e37]: SYSTEM
+        - button "Lex Aktiv" [ref=e38] [cursor=pointer]
+        - button "Löwensaal Sync" [ref=e39] [cursor=pointer]
+  - generic [ref=e40]:
+    - generic [ref=e41]:
+      - generic "Aufträge" [ref=e43] [cursor=pointer]
+      - generic [ref=e47] [cursor=pointer]:
+        - generic "Mitarbeiter" [ref=e48]
+        - button "Ã—" [ref=e49]
+    - iframe [active] [ref=e50]:
+      - generic [ref=f4e1]:
+        - button "â›¶" [ref=f4e2] [cursor=pointer]
+        - generic [ref=f4e3]:
+          - generic [ref=f4e4]:
+            - generic [ref=f4e5]:
+              - generic [ref=f4e6]: 👤
+              - generic [ref=f4e7]: Mitarbeiterstammblatt
+            - generic [ref=f4e8]:
+              - button "_" [ref=f4e9] [cursor=pointer]
+              - button "□" [ref=f4e10] [cursor=pointer]
+              - button "✕" [ref=f4e11] [cursor=pointer]
+          - generic [ref=f4e13]:
+            - generic [ref=f4e14]:
+              - generic [ref=f4e15]:
+                - generic [ref=f4e16]: M
+                - generic [ref=f4e17]: Mitarbeiterstammblatt
+                - button "Aktualisieren" [active] [ref=f4e18] [cursor=pointer]
+                - generic [ref=f4e19]:
+                  - button "MA Adressen" [ref=f4e20] [cursor=pointer]
+                  - button "Zeitkonto" [ref=f4e21] [cursor=pointer]
+                  - button "Neuer Mitarbeiter" [ref=f4e22] [cursor=pointer]
+                  - button "Mitarbeiter löschen" [ref=f4e23] [cursor=pointer]
+                  - button "Einsätze FA" [ref=f4e24] [cursor=pointer]
+                  - button "Einsätze MJ" [ref=f4e25] [cursor=pointer]
+                  - button "Einsatzübersicht" [ref=f4e26] [cursor=pointer]
+                  - button "ZK Fest" [ref=f4e27] [cursor=pointer]
+                  - button "ZK Mini" [ref=f4e28] [cursor=pointer]
+                  - button "ZK Einzel" [ref=f4e29] [cursor=pointer]
+                  - combobox [ref=f4e30]:
+                    - option "Dieser Monat" [selected]
+                    - option "Letzter Monat"
+                    - option "Dieses Jahr"
+                    - option "Letztes Jahr"
+                    - option "Naechste 30 Tage"
+                    - option "Naechste 10 Tage"
+                    - option "Naechste 14 Tage"
+                    - option "Ab Heute"
+                  - button "Speichern" [ref=f4e31] [cursor=pointer]
+                - generic [ref=f4e32]:
+                  - generic [ref=f4e33]: "MA-ID:"
+                  - textbox [ref=f4e34]
+                - button "Dienstplan" [ref=f4e35] [cursor=pointer]
+                - button "Excel Export ▼" [ref=f4e37] [cursor=pointer]
+              - generic [ref=f4e38]:
+                - text: GPT | TEST
+                - generic [ref=f4e39]: 17.1.2026
+            - generic [ref=f4e41]: Akcay Ediz
+            - generic [ref=f4e42]:
+              - generic [ref=f4e44]:
+                - generic [ref=f4e45]:
+                  - button "Stammdaten" [ref=f4e46] [cursor=pointer]
+                  - button "Einsatzübersicht" [ref=f4e47] [cursor=pointer]
+                  - button "Dienstplan" [ref=f4e48] [cursor=pointer]
+                  - button "Nicht Verfügbar" [ref=f4e49] [cursor=pointer]
+                  - button "Bestand Dienstkleidung" [ref=f4e50] [cursor=pointer]
+                  - button "Zeitkonto" [ref=f4e51] [cursor=pointer]
+                  - button "Uberhang Std." [ref=f4e52] [cursor=pointer]
+                - generic [ref=f4e54]:
+                  - generic [ref=f4e55]:
+                    - generic [ref=f4e56]:
+                      - generic [ref=f4e57]:
+                        - generic [ref=f4e58]: "PersNr:"
+                        - textbox [ref=f4e59]: "852"
+                      - generic [ref=f4e60]:
+                        - generic [ref=f4e61]: "LexNr:"
+                        - textbox [ref=f4e62]: "326"
+                      - generic [ref=f4e63]:
+                        - checkbox "Aktiv" [checked] [ref=f4e64]
+                        - generic [ref=f4e65] [cursor=pointer]: Aktiv
+                      - generic [ref=f4e66]:
+                        - checkbox "Lex_Aktiv" [checked] [ref=f4e67]
+                        - generic [ref=f4e68] [cursor=pointer]: Lex_Aktiv
+                      - generic [ref=f4e69]:
+                        - generic [ref=f4e70]: "Nachname: *"
+                        - textbox [ref=f4e71]: Akcay
+                      - generic [ref=f4e72]:
+                        - generic [ref=f4e73]: "Vorname: *"
+                        - textbox [ref=f4e74]: Ediz
+                      - generic [ref=f4e75]:
+                        - generic [ref=f4e76]: "Strase:"
+                        - textbox [ref=f4e77]: Weiltingerstraße
+                      - generic [ref=f4e78]:
+                        - generic [ref=f4e79]: "Nr:"
+                        - textbox [ref=f4e80]: "24"
+                      - generic [ref=f4e81]:
+                        - generic [ref=f4e82]: "PLZ:"
+                        - textbox "5-stellige PLZ eingeben" [ref=f4e83]: "90449"
+                      - generic [ref=f4e84]:
+                        - generic [ref=f4e85]: "Ort:"
+                        - textbox [ref=f4e86]: Nürnberg
+                      - generic [ref=f4e87]:
+                        - generic [ref=f4e88]: "Land:"
+                        - combobox [ref=f4e89]:
+                          - option "Deutschland" [selected]
+                          - option "Osterreich"
+                          - option "Schweiz"
+                      - generic [ref=f4e90]:
+                        - generic [ref=f4e91]: "Bundesland:"
+                        - textbox [ref=f4e92]: Bayern
+                      - generic [ref=f4e93]:
+                        - generic [ref=f4e94]: "Tel. Mobil:"
+                        - textbox "Telefonnummer eingeben" [ref=f4e95]: 0176 – 805 94 877
+                      - generic [ref=f4e96]:
+                        - generic [ref=f4e97]: "Tel. Festnetz:"
+                        - textbox "Telefonnummer eingeben" [ref=f4e98]: "+491712057404"
+                      - generic [ref=f4e99]:
+                        - generic [ref=f4e100]: "Email:"
+                        - textbox "Gueltige E-Mail-Adresse eingeben" [ref=f4e101]: siegert@consec-nuernberg.de
+                      - generic [ref=f4e102]:
+                        - generic [ref=f4e103]: "Geschlecht:"
+                        - combobox [ref=f4e104]:
+                          - option [selected]
+                          - option "mannlich"
+                          - option "weiblich"
+                      - generic [ref=f4e105]:
+                        - generic [ref=f4e106]: "Staatsang.:"
+                        - textbox [ref=f4e107]: deutsch
+                      - generic [ref=f4e108]:
+                        - generic [ref=f4e109]: "Geb. Datum:"
+                        - textbox [ref=f4e110]: 1996-10-25
+                      - generic [ref=f4e111]:
+                        - generic [ref=f4e112]: "Geb. Ort:"
+                        - textbox [ref=f4e113]: Nürnberg
+                      - generic [ref=f4e114]:
+                        - generic [ref=f4e115]: "Geb. Name:"
+                        - textbox [ref=f4e116]
+                    - generic [ref=f4e117]:
+                      - generic [ref=f4e118]:
+                        - generic [ref=f4e119]: "Eintrittsdatum:"
+                        - textbox [ref=f4e120]: 2025-09-13
+                      - generic [ref=f4e121]:
+                        - generic [ref=f4e122]: "Austrittsdatum:"
+                        - textbox [ref=f4e123]
+                      - generic [ref=f4e124]:
+                        - generic [ref=f4e125]: "Anstellungsart:"
+                        - combobox [ref=f4e126]:
+                          - option [selected]
+                          - option "Festangestellt"
+                          - option "Freiberufler"
+                          - option "Subunternehmer"
+                      - generic [ref=f4e127]:
+                        - checkbox "Subunternehmer" [ref=f4e128]
+                        - generic [ref=f4e129] [cursor=pointer]: Subunternehmer
+                      - generic [ref=f4e130]:
+                        - generic [ref=f4e131]: "Kleidergrose:"
+                        - combobox [ref=f4e132]:
+                          - option
+                          - option "XS"
+                          - option "S"
+                          - option "M"
+                          - option "L" [selected]
+                          - option "XL"
+                          - option "XXL"
+                      - generic [ref=f4e133]:
+                        - checkbox "Fahrerausweis" [ref=f4e134]
+                        - generic [ref=f4e135] [cursor=pointer]: Fahrerausweis
+                      - generic [ref=f4e136]:
+                        - checkbox "Eigener PKW" [checked] [ref=f4e137]
+                        - generic [ref=f4e138] [cursor=pointer]: Eigener PKW
+                      - generic [ref=f4e139]:
+                        - generic [ref=f4e140]: "Dienstausweis:"
+                        - textbox [ref=f4e141]: "852"
+                      - generic [ref=f4e142]:
+                        - generic [ref=f4e143]: "Ausweis Ende:"
+                        - textbox [ref=f4e144]: 2025-12-30
+                      - generic [ref=f4e145]:
+                        - generic [ref=f4e146]: "Ausweis Funktion:"
+                        - textbox [ref=f4e147]: LG6N86KRF
+                      - generic [ref=f4e148]:
+                        - generic [ref=f4e149]: "Letzte Uberpr. OA:"
+                        - textbox [ref=f4e150]: 2025-10-06
+                      - generic [ref=f4e151]:
+                        - generic [ref=f4e152]: "Personalausweis-Nr:"
+                        - textbox [ref=f4e153]: "3967644"
+                      - generic [ref=f4e154]:
+                        - generic [ref=f4e155]: "DFB Epin:"
+                        - textbox [ref=f4e156]
+                      - generic [ref=f4e157]:
+                        - checkbox "DFB Modul 1" [ref=f4e158]
+                        - generic [ref=f4e159] [cursor=pointer]: DFB Modul 1
+                      - generic [ref=f4e160]:
+                        - generic [ref=f4e161]: "Bewacher ID:"
+                        - textbox [ref=f4e162]: "3967644"
+                      - generic [ref=f4e163]:
+                        - generic [ref=f4e164]: "Zust. Behorde:"
+                        - textbox [ref=f4e165]
+                    - generic [ref=f4e166]:
+                      - generic [ref=f4e167]:
+                        - generic [ref=f4e168]: "Kontoinhaber:"
+                        - textbox [ref=f4e169]: Akcay Ediz
+                      - generic [ref=f4e170]:
+                        - generic [ref=f4e171]: "Bankname:"
+                        - textbox [ref=f4e172]
+                      - generic [ref=f4e173]:
+                        - generic [ref=f4e174]: "IBAN:"
+                        - 'textbox "IBAN Format: DE12345678901234567890" [ref=f4e175]': DE37 5001 0517 5429 4041 00
+                      - generic [ref=f4e176]:
+                        - generic [ref=f4e177]: "BIC:"
+                        - 'textbox "BIC Format: ABCDEFGH oder ABCDEFGHIJK" [ref=f4e178]'
+                      - generic [ref=f4e179]:
+                        - generic [ref=f4e180]: "Lohngruppe:"
+                        - combobox [ref=f4e181]:
+                          - option [selected]
+                          - option "BY Lohn 2a/b Okl. 1"
+                      - generic [ref=f4e182]:
+                        - generic [ref=f4e183]: "Kostenstelle:"
+                        - textbox [ref=f4e184]
+                      - generic [ref=f4e185]:
+                        - generic [ref=f4e186]: "Bezuge gezahlt als:"
+                        - textbox [ref=f4e187]
+                      - generic [ref=f4e188]:
+                        - generic [ref=f4e189]: "Koordinaten:"
+                        - textbox [ref=f4e190]
+                      - generic [ref=f4e191]:
+                        - generic [ref=f4e192]: "Steuer-ID:"
+                        - textbox [ref=f4e193]: 50 691 274 390
+                      - generic [ref=f4e194]:
+                        - generic [ref=f4e195]: "Tatigkeit Bez.:"
+                        - combobox [ref=f4e196]:
+                          - option [selected]
+                          - option "Sicherheitspersonal"
+                      - generic [ref=f4e197]:
+                        - generic [ref=f4e198]: "Krankenkasse:"
+                        - textbox [ref=f4e199]: Bosch BKK
+                      - generic [ref=f4e200]:
+                        - generic [ref=f4e201]: "Steuerklasse:"
+                        - textbox [ref=f4e202]
+                      - generic [ref=f4e203]:
+                        - generic [ref=f4e204]: "Sozialvers.Nr:"
+                        - textbox [ref=f4e205]
+                      - generic [ref=f4e206]:
+                        - generic [ref=f4e207]: "Arbeitsstd./Tag:"
+                        - spinbutton [ref=f4e208]
+                      - generic [ref=f4e209]:
+                        - generic [ref=f4e210]: "Arbeitstage/Woche:"
+                        - spinbutton [ref=f4e211]
+                      - generic [ref=f4e212]:
+                        - generic [ref=f4e213]: "Resturlaub Vorj.:"
+                        - spinbutton [ref=f4e214]
+                      - generic [ref=f4e215]:
+                        - generic [ref=f4e216]: "Urlaub pro Jahr:"
+                        - spinbutton [ref=f4e217]
+                      - generic [ref=f4e218]:
+                        - generic [ref=f4e219]: "Std. Monat max.:"
+                        - spinbutton [ref=f4e220]
+                      - generic [ref=f4e221]:
+                        - checkbox "RV Befreiung beantragt" [ref=f4e222]
+                        - generic [ref=f4e223] [cursor=pointer]: RV Befreiung beantragt
+                      - generic [ref=f4e224]:
+                        - checkbox "Brutto-Std" [ref=f4e225]
+                        - generic [ref=f4e226] [cursor=pointer]: Brutto-Std
+                      - generic [ref=f4e227]:
+                        - checkbox "Abrechnung per eMail" [checked] [ref=f4e228]
+                        - generic [ref=f4e229] [cursor=pointer]: Abrechnung per eMail
+                      - generic [ref=f4e230]:
+                        - checkbox "Keine 34a" [ref=f4e231]
+                        - generic [ref=f4e232] [cursor=pointer]: Keine 34a
+                      - generic [ref=f4e233]:
+                        - checkbox "Unterweisungs Â§ 34a" [ref=f4e234]
+                        - generic [ref=f4e235] [cursor=pointer]: Unterweisungs Â§ 34a
+                      - generic [ref=f4e236]:
+                        - checkbox "Sachkunde Â§ 34a" [ref=f4e237]
+                        - generic [ref=f4e238] [cursor=pointer]: Sachkunde Â§ 34a
+                      - generic [ref=f4e239]:
+                        - generic [ref=f4e240]: "Bemerkungen:"
+                        - textbox [ref=f4e241]: Test-Eintrag Claude 17.01.2026
+                  - generic [ref=f4e242]:
+                    - img "Foto" [ref=f4e244]
+                    - button "Foto hochladen" [ref=f4e245] [cursor=pointer]
+              - generic [ref=f4e246]:
+                - generic [ref=f4e247]:
+                  - generic [ref=f4e248]:
+                    - generic [ref=f4e249]: "Name:"
+                    - textbox "Name eingeben..." [ref=f4e250]
+                  - generic [ref=f4e251]:
+                    - generic [ref=f4e252]: "Filter:"
+                    - combobox [ref=f4e253]:
+                      - option "Alle MA"
+                      - option "Nur Aktive"
+                      - option "Nur Festangestellte"
+                      - option "Nur Minijobber"
+                      - option "Festangestellte + Minijobber" [selected]
+                      - option "Nur Subunternehmer"
+                - table [ref=f4e255]:
+                  - rowgroup [ref=f4e256]:
+                    - row "Nachname Vorname Ort" [ref=f4e257]:
+                      - columnheader "Nachname" [ref=f4e258]
+                      - columnheader "Vorname" [ref=f4e259]
+                      - columnheader "Ort" [ref=f4e260]
+                  - rowgroup [ref=f4e261]:
+                    - row "Akcay Ediz Nürnberg" [ref=f4e761]:
+                      - cell "Akcay" [ref=f4e762]
+                      - cell "Ediz" [ref=f4e763]
+                      - cell "Nürnberg" [ref=f4e764]
+                    - row "Alali Ahmad Nürnberg" [ref=f4e765]:
+                      - cell "Alali" [ref=f4e766]
+                      - cell "Ahmad" [ref=f4e767]
+                      - cell "Nürnberg" [ref=f4e768]
+                    - row "Alayoubi Salim Nürnberg" [ref=f4e769]:
+                      - cell "Alayoubi" [ref=f4e770]
+                      - cell "Salim" [ref=f4e771]
+                      - cell "Nürnberg" [ref=f4e772]
+                    - row "Aldaba Wesam Fürth" [ref=f4e773]:
+                      - cell "Aldaba" [ref=f4e774]
+                      - cell "Wesam" [ref=f4e775]
+                      - cell "Fürth" [ref=f4e776]
+                    - row "Alhajjaj Mohammad Wendelstein" [ref=f4e777]:
+                      - cell "Alhajjaj" [ref=f4e778]
+                      - cell "Mohammad" [ref=f4e779]
+                      - cell "Wendelstein" [ref=f4e780]
+                    - row "Ameri Targhi Mohammad Nürnberg" [ref=f4e781]:
+                      - cell "Ameri Targhi" [ref=f4e782]
+                      - cell "Mohammad" [ref=f4e783]
+                      - cell "Nürnberg" [ref=f4e784]
+                    - row "Antakia Khalaf Abd Alhaleem Feucht" [ref=f4e785]:
+                      - cell "Antakia Khalaf" [ref=f4e786]
+                      - cell "Abd Alhaleem" [ref=f4e787]
+                      - cell "Feucht" [ref=f4e788]
+                    - row "Argentino Luigi Nürnberg" [ref=f4e789]:
+                      - cell "Argentino" [ref=f4e790]
+                      - cell "Luigi" [ref=f4e791]
+                      - cell "Nürnberg" [ref=f4e792]
+                    - row "Aykan Metin Nürnberg" [ref=f4e793]:
+                      - cell "Aykan" [ref=f4e794]
+                      - cell "Metin" [ref=f4e795]
+                      - cell "Nürnberg" [ref=f4e796]
+                    - row "Badran Ammar Nürnberg" [ref=f4e797]:
+                      - cell "Badran" [ref=f4e798]
+                      - cell "Ammar" [ref=f4e799]
+                      - cell "Nürnberg" [ref=f4e800]
+                    - row "Badran Majd Nürnberg" [ref=f4e801]:
+                      - cell "Badran" [ref=f4e802]
+                      - cell "Majd" [ref=f4e803]
+                      - cell "Nürnberg" [ref=f4e804]
+                    - row "Ballichar Emily Sydney Nürnberg" [ref=f4e805]:
+                      - cell "Ballichar" [ref=f4e806]
+                      - cell "Emily Sydney" [ref=f4e807]
+                      - cell "Nürnberg" [ref=f4e808]
+                    - row "Banut Ioan Nürnberg" [ref=f4e809]:
+                      - cell "Banut" [ref=f4e810]
+                      - cell "Ioan" [ref=f4e811]
+                      - cell "Nürnberg" [ref=f4e812]
+                    - row "Banut Sabin-Ioan Nürnberg" [ref=f4e813]:
+                      - cell "Banut" [ref=f4e814]
+                      - cell "Sabin-Ioan" [ref=f4e815]
+                      - cell "Nürnberg" [ref=f4e816]
+                    - row "Bauersachs Benjamin Nürnberg" [ref=f4e817]:
+                      - cell "Bauersachs" [ref=f4e818]
+                      - cell "Benjamin" [ref=f4e819]
+                      - cell "Nürnberg" [ref=f4e820]
+                    - row "Baumann Margit Neumarkt" [ref=f4e821]:
+                      - cell "Baumann" [ref=f4e822]
+                      - cell "Margit" [ref=f4e823]
+                      - cell "Neumarkt" [ref=f4e824]
+                    - row "Baumann Willibald Neumarkt" [ref=f4e825]:
+                      - cell "Baumann" [ref=f4e826]
+                      - cell "Willibald" [ref=f4e827]
+                      - cell "Neumarkt" [ref=f4e828]
+                    - row "Bekdash Abdulellah Nürnberg" [ref=f4e829]:
+                      - cell "Bekdash" [ref=f4e830]
+                      - cell "Abdulellah" [ref=f4e831]
+                      - cell "Nürnberg" [ref=f4e832]
+                    - row "Bruns Nicole Nürnberg" [ref=f4e833]:
+                      - cell "Bruns" [ref=f4e834]
+                      - cell "Nicole" [ref=f4e835]
+                      - cell "Nürnberg" [ref=f4e836]
+                    - row "Bruns Sandra Nürnberg" [ref=f4e837]:
+                      - cell "Bruns" [ref=f4e838]
+                      - cell "Sandra" [ref=f4e839]
+                      - cell "Nürnberg" [ref=f4e840]
+                    - row "Cengiz Mert Nürnberg" [ref=f4e841]:
+                      - cell "Cengiz" [ref=f4e842]
+                      - cell "Mert" [ref=f4e843]
+                      - cell "Nürnberg" [ref=f4e844]
+                    - row "Dambrosio Maria Spalt" [ref=f4e845]:
+                      - cell "Dambrosio" [ref=f4e846]
+                      - cell "Maria" [ref=f4e847]
+                      - cell "Spalt" [ref=f4e848]
+                    - row "Degner-Seemann Kristin Erlangen" [ref=f4e849]:
+                      - cell "Degner-Seemann" [ref=f4e850]
+                      - cell "Kristin" [ref=f4e851]
+                      - cell "Erlangen" [ref=f4e852]
+                    - row "Dehm Christian Bechhofen" [ref=f4e853]:
+                      - cell "Dehm" [ref=f4e854]
+                      - cell "Christian" [ref=f4e855]
+                      - cell "Bechhofen" [ref=f4e856]
+                    - row "Dehm Heike Bechhofen" [ref=f4e857]:
+                      - cell "Dehm" [ref=f4e858]
+                      - cell "Heike" [ref=f4e859]
+                      - cell "Bechhofen" [ref=f4e860]
+                    - row "Dementiev Artem Igensdorf" [ref=f4e861]:
+                      - cell "Dementiev" [ref=f4e862]
+                      - cell "Artem" [ref=f4e863]
+                      - cell "Igensdorf" [ref=f4e864]
+                    - row "Demir Hakan Erlangen" [ref=f4e865]:
+                      - cell "Demir" [ref=f4e866]
+                      - cell "Hakan" [ref=f4e867]
+                      - cell "Erlangen" [ref=f4e868]
+                    - row "Dogan Berkan Nürnberg" [ref=f4e869]:
+                      - cell "Dogan" [ref=f4e870]
+                      - cell "Berkan" [ref=f4e871]
+                      - cell "Nürnberg" [ref=f4e872]
+                    - row "Eberl Julian Nürnberg" [ref=f4e873]:
+                      - cell "Eberl" [ref=f4e874]
+                      - cell "Julian" [ref=f4e875]
+                      - cell "Nürnberg" [ref=f4e876]
+                    - row "Engelhardt Thomas Pleinfeld" [ref=f4e877]:
+                      - cell "Engelhardt" [ref=f4e878]
+                      - cell "Thomas" [ref=f4e879]
+                      - cell "Pleinfeld" [ref=f4e880]
+                    - row "Esposito Gennaro Roth" [ref=f4e881]:
+                      - cell "Esposito" [ref=f4e882]
+                      - cell "Gennaro" [ref=f4e883]
+                      - cell "Roth" [ref=f4e884]
+                    - row "Esposito Ivan Nürnberg" [ref=f4e885]:
+                      - cell "Esposito" [ref=f4e886]
+                      - cell "Ivan" [ref=f4e887]
+                      - cell "Nürnberg" [ref=f4e888]
+                    - row "Evrydoglou Christodoulos Schwabach" [ref=f4e889]:
+                      - cell "Evrydoglou" [ref=f4e890]
+                      - cell "Christodoulos" [ref=f4e891]
+                      - cell "Schwabach" [ref=f4e892]
+                    - row "Fatah Al Souk Mouaed Roth" [ref=f4e893]:
+                      - cell "Fatah Al Souk" [ref=f4e894]
+                      - cell "Mouaed" [ref=f4e895]
+                      - cell "Roth" [ref=f4e896]
+                    - row "Frömmel Christian Berg" [ref=f4e897]:
+                      - cell "Frömmel" [ref=f4e898]
+                      - cell "Christian" [ref=f4e899]
+                      - cell "Berg" [ref=f4e900]
+                    - row "Früchtl Kevin Fürth" [ref=f4e901]:
+                      - cell "Früchtl" [ref=f4e902]
+                      - cell "Kevin" [ref=f4e903]
+                      - cell "Fürth" [ref=f4e904]
+                    - row "Fuchs Iris Nürnberg" [ref=f4e905]:
+                      - cell "Fuchs" [ref=f4e906]
+                      - cell "Iris" [ref=f4e907]
+                      - cell "Nürnberg" [ref=f4e908]
+                    - row "Glatz Michaela Nürnberg" [ref=f4e909]:
+                      - cell "Glatz" [ref=f4e910]
+                      - cell "Michaela" [ref=f4e911]
+                      - cell "Nürnberg" [ref=f4e912]
+                    - row "Göschelbauer Thomas Nürnberg" [ref=f4e913]:
+                      - cell "Göschelbauer" [ref=f4e914]
+                      - cell "Thomas" [ref=f4e915]
+                      - cell "Nürnberg" [ref=f4e916]
+                    - row "Grgan Beate Sengenthal" [ref=f4e917]:
+                      - cell "Grgan" [ref=f4e918]
+                      - cell "Beate" [ref=f4e919]
+                      - cell "Sengenthal" [ref=f4e920]
+                    - row "Gürsoy Akin Nürnberg" [ref=f4e921]:
+                      - cell "Gürsoy" [ref=f4e922]
+                      - cell "Akin" [ref=f4e923]
+                      - cell "Nürnberg" [ref=f4e924]
+                    - row "Haider Johannes Wendelstein" [ref=f4e925]:
+                      - cell "Haider" [ref=f4e926]
+                      - cell "Johannes" [ref=f4e927]
+                      - cell "Wendelstein" [ref=f4e928]
+                    - row "Hamberger Bernd Nürnberg" [ref=f4e929]:
+                      - cell "Hamberger" [ref=f4e930]
+                      - cell "Bernd" [ref=f4e931]
+                      - cell "Nürnberg" [ref=f4e932]
+                    - row "Hassas Arman Nürnberg" [ref=f4e933]:
+                      - cell "Hassas" [ref=f4e934]
+                      - cell "Arman" [ref=f4e935]
+                      - cell "Nürnberg" [ref=f4e936]
+                    - row "Hassas Gabriele Nürnberg" [ref=f4e937]:
+                      - cell "Hassas" [ref=f4e938]
+                      - cell "Gabriele" [ref=f4e939]
+                      - cell "Nürnberg" [ref=f4e940]
+                    - row "Haßler Leon Nürnberg" [ref=f4e941]:
+                      - cell "Haßler" [ref=f4e942]
+                      - cell "Leon" [ref=f4e943]
+                      - cell "Nürnberg" [ref=f4e944]
+                    - row "Heberle Leo Nürnberg" [ref=f4e945]:
+                      - cell "Heberle" [ref=f4e946]
+                      - cell "Leo" [ref=f4e947]
+                      - cell "Nürnberg" [ref=f4e948]
+                    - row "Hezer Tufan Nürnberg" [ref=f4e949]:
+                      - cell "Hezer" [ref=f4e950]
+                      - cell "Tufan" [ref=f4e951]
+                      - cell "Nürnberg" [ref=f4e952]
+                    - row "Hofmann Thomas Fürth" [ref=f4e953]:
+                      - cell "Hofmann" [ref=f4e954]
+                      - cell "Thomas" [ref=f4e955]
+                      - cell "Fürth" [ref=f4e956]
+                    - row "Holfeld-Wörner Erika Veitsbronn" [ref=f4e957]:
+                      - cell "Holfeld-Wörner" [ref=f4e958]
+                      - cell "Erika" [ref=f4e959]
+                      - cell "Veitsbronn" [ref=f4e960]
+                    - row "Holstein Sergej Nürnberg" [ref=f4e961]:
+                      - cell "Holstein" [ref=f4e962]
+                      - cell "Sergej" [ref=f4e963]
+                      - cell "Nürnberg" [ref=f4e964]
+                    - row "Huynh Tony Nürnberg" [ref=f4e965]:
+                      - cell "Huynh" [ref=f4e966]
+                      - cell "Tony" [ref=f4e967]
+                      - cell "Nürnberg" [ref=f4e968]
+                    - row "Jones Petra Nürnberg" [ref=f4e969]:
+                      - cell "Jones" [ref=f4e970]
+                      - cell "Petra" [ref=f4e971]
+                      - cell "Nürnberg" [ref=f4e972]
+                    - row "Kallweit Marco Haundorf" [ref=f4e973]:
+                      - cell "Kallweit" [ref=f4e974]
+                      - cell "Marco" [ref=f4e975]
+                      - cell "Haundorf" [ref=f4e976]
+                    - row "Käppner Benjamin Nürnberg" [ref=f4e977]:
+                      - cell "Käppner" [ref=f4e978]
+                      - cell "Benjamin" [ref=f4e979]
+                      - cell "Nürnberg" [ref=f4e980]
+                    - row "Kawtherry Mahmoud Stein" [ref=f4e981]:
+                      - cell "Kawtherry" [ref=f4e982]
+                      - cell "Mahmoud" [ref=f4e983]
+                      - cell "Stein" [ref=f4e984]
+                    - row "Kiki Yazan Röthenbach" [ref=f4e985]:
+                      - cell "Kiki" [ref=f4e986]
+                      - cell "Yazan" [ref=f4e987]
+                      - cell "Röthenbach" [ref=f4e988]
+                    - row "Kilbauch Artur Nürnberg" [ref=f4e989]:
+                      - cell "Kilbauch" [ref=f4e990]
+                      - cell "Artur" [ref=f4e991]
+                      - cell "Nürnberg" [ref=f4e992]
+                    - row "Kocak Gökalp Nürnberg" [ref=f4e993]:
+                      - cell "Kocak" [ref=f4e994]
+                      - cell "Gökalp" [ref=f4e995]
+                      - cell "Nürnberg" [ref=f4e996]
+                    - row "Koge Aria Nürnberg" [ref=f4e997]:
+                      - cell "Koge" [ref=f4e998]
+                      - cell "Aria" [ref=f4e999]
+                      - cell "Nürnberg" [ref=f4e1000]
+                    - row "Koge Juanita Nürnberg" [ref=f4e1001]:
+                      - cell "Koge" [ref=f4e1002]
+                      - cell "Juanita" [ref=f4e1003]
+                      - cell "Nürnberg" [ref=f4e1004]
+                    - row "Konrad Eduard Roth" [ref=f4e1005]:
+                      - cell "Konrad" [ref=f4e1006]
+                      - cell "Eduard" [ref=f4e1007]
+                      - cell "Roth" [ref=f4e1008]
+                    - row "Kupfer Sabina Röthenbach/Pegnitz" [ref=f4e1009]:
+                      - cell "Kupfer" [ref=f4e1010]
+                      - cell "Sabina" [ref=f4e1011]
+                      - cell "Röthenbach/Pegnitz" [ref=f4e1012]
+                    - row "Kuypers Johannes Ansbach" [ref=f4e1013]:
+                      - cell "Kuypers" [ref=f4e1014]
+                      - cell "Johannes" [ref=f4e1015]
+                      - cell "Ansbach" [ref=f4e1016]
+                    - row "Lazovic Anke Neumarkt" [ref=f4e1017]:
+                      - cell "Lazovic" [ref=f4e1018]
+                      - cell "Anke" [ref=f4e1019]
+                      - cell "Neumarkt" [ref=f4e1020]
+                    - row "Linnert Markus Roßtal" [ref=f4e1021]:
+                      - cell "Linnert" [ref=f4e1022]
+                      - cell "Markus" [ref=f4e1023]
+                      - cell "Roßtal" [ref=f4e1024]
+                    - row "Lombardo Giuseppe Nürnberg" [ref=f4e1025]:
+                      - cell "Lombardo" [ref=f4e1026]
+                      - cell "Giuseppe" [ref=f4e1027]
+                      - cell "Nürnberg" [ref=f4e1028]
+                    - row "Mahdi Thomas Nürnberg" [ref=f4e1029]:
+                      - cell "Mahdi" [ref=f4e1030]
+                      - cell "Thomas" [ref=f4e1031]
+                      - cell "Nürnberg" [ref=f4e1032]
+                    - row "Marinelli Vincenzo Nürnberg" [ref=f4e1033]:
+                      - cell "Marinelli" [ref=f4e1034]
+                      - cell "Vincenzo" [ref=f4e1035]
+                      - cell "Nürnberg" [ref=f4e1036]
+                    - row "Melzer Dina Nürnberg" [ref=f4e1037]:
+                      - cell "Melzer" [ref=f4e1038]
+                      - cell "Dina" [ref=f4e1039]
+                      - cell "Nürnberg" [ref=f4e1040]
+                    - row "Merideno Annette Nürnberg" [ref=f4e1041]:
+                      - cell "Merideno" [ref=f4e1042]
+                      - cell "Annette" [ref=f4e1043]
+                      - cell "Nürnberg" [ref=f4e1044]
+                    - row "Merideno Francisco Nürnberg" [ref=f4e1045]:
+                      - cell "Merideno" [ref=f4e1046]
+                      - cell "Francisco" [ref=f4e1047]
+                      - cell "Nürnberg" [ref=f4e1048]
+                    - row "Merideno Pedro Nürnberg" [ref=f4e1049]:
+                      - cell "Merideno" [ref=f4e1050]
+                      - cell "Pedro" [ref=f4e1051]
+                      - cell "Nürnberg" [ref=f4e1052]
+                    - row "Moriconi Vincenzo Nürnberg" [ref=f4e1053]:
+                      - cell "Moriconi" [ref=f4e1054]
+                      - cell "Vincenzo" [ref=f4e1055]
+                      - cell "Nürnberg" [ref=f4e1056]
+                    - row "Müller Wolfram Ansbach" [ref=f4e1057]:
+                      - cell "Müller" [ref=f4e1058]
+                      - cell "Wolfram" [ref=f4e1059]
+                      - cell "Ansbach" [ref=f4e1060]
+                    - row "Nikolova Monika Fürth" [ref=f4e1061]:
+                      - cell "Nikolova" [ref=f4e1062]
+                      - cell "Monika" [ref=f4e1063]
+                      - cell "Fürth" [ref=f4e1064]
+                    - row "Oberndorfer Melanie Nürnberg" [ref=f4e1065]:
+                      - cell "Oberndorfer" [ref=f4e1066]
+                      - cell "Melanie" [ref=f4e1067]
+                      - cell "Nürnberg" [ref=f4e1068]
+                    - row "Olimpio Fabrizio Nürnberg" [ref=f4e1069]:
+                      - cell "Olimpio" [ref=f4e1070]
+                      - cell "Fabrizio" [ref=f4e1071]
+                      - cell "Nürnberg" [ref=f4e1072]
+                    - row "Olmo-Olmo Emilio Nürnberg" [ref=f4e1073]:
+                      - cell "Olmo-Olmo" [ref=f4e1074]
+                      - cell "Emilio" [ref=f4e1075]
+                      - cell "Nürnberg" [ref=f4e1076]
+                    - row "Osseili Hassan Eckental / Eschenau" [ref=f4e1077]:
+                      - cell "Osseili" [ref=f4e1078]
+                      - cell "Hassan" [ref=f4e1079]
+                      - cell "Eckental / Eschenau" [ref=f4e1080]
+                    - row "Peter Jürgen Fürth" [ref=f4e1081]:
+                      - cell "Peter" [ref=f4e1082]
+                      - cell "Jürgen" [ref=f4e1083]
+                      - cell "Fürth" [ref=f4e1084]
+                    - row "Prastalo Nenad Nürnberg" [ref=f4e1085]:
+                      - cell "Prastalo" [ref=f4e1086]
+                      - cell "Nenad" [ref=f4e1087]
+                      - cell "Nürnberg" [ref=f4e1088]
+                    - row "Prost Guido Nürnberg" [ref=f4e1089]:
+                      - cell "Prost" [ref=f4e1090]
+                      - cell "Guido" [ref=f4e1091]
+                      - cell "Nürnberg" [ref=f4e1092]
+                    - row "Rachiu Cristian Nürnberg" [ref=f4e1093]:
+                      - cell "Rachiu" [ref=f4e1094]
+                      - cell "Cristian" [ref=f4e1095]
+                      - cell "Nürnberg" [ref=f4e1096]
+                    - row "Ranke Maik Nürnberg" [ref=f4e1097]:
+                      - cell "Ranke" [ref=f4e1098]
+                      - cell "Maik" [ref=f4e1099]
+                      - cell "Nürnberg" [ref=f4e1100]
+                    - row "Reinl Harald Nürnberg" [ref=f4e1101]:
+                      - cell "Reinl" [ref=f4e1102]
+                      - cell "Harald" [ref=f4e1103]
+                      - cell "Nürnberg" [ref=f4e1104]
+                    - row "Rieß Johann Nürnberg" [ref=f4e1105]:
+                      - cell "Rieß" [ref=f4e1106]
+                      - cell "Johann" [ref=f4e1107]
+                      - cell "Nürnberg" [ref=f4e1108]
+                    - row "Ritter Liam Nürnberg" [ref=f4e1109]:
+                      - cell "Ritter" [ref=f4e1110]
+                      - cell "Liam" [ref=f4e1111]
+                      - cell "Nürnberg" [ref=f4e1112]
+                    - row "Rosa Chris Nürnberg" [ref=f4e1113]:
+                      - cell "Rosa" [ref=f4e1114]
+                      - cell "Chris" [ref=f4e1115]
+                      - cell "Nürnberg" [ref=f4e1116]
+                    - row "Sachs Günter Nürnberg" [ref=f4e1117]:
+                      - cell "Sachs" [ref=f4e1118]
+                      - cell "Günter" [ref=f4e1119]
+                      - cell "Nürnberg" [ref=f4e1120]
+                    - row "Schelkopf Nina Nürnberg" [ref=f4e1121]:
+                      - cell "Schelkopf" [ref=f4e1122]
+                      - cell "Nina" [ref=f4e1123]
+                      - cell "Nürnberg" [ref=f4e1124]
+                    - row "Schnabel Alexandru Nürnberg" [ref=f4e1125]:
+                      - cell "Schnabel" [ref=f4e1126]
+                      - cell "Alexandru" [ref=f4e1127]
+                      - cell "Nürnberg" [ref=f4e1128]
+                    - row "Schnabel Katalin Nürnberg" [ref=f4e1129]:
+                      - cell "Schnabel" [ref=f4e1130]
+                      - cell "Katalin" [ref=f4e1131]
+                      - cell "Nürnberg" [ref=f4e1132]
+                    - row "Schott Stefan Fürth" [ref=f4e1133]:
+                      - cell "Schott" [ref=f4e1134]
+                      - cell "Stefan" [ref=f4e1135]
+                      - cell "Fürth" [ref=f4e1136]
+                    - row "Schuckert Michael Neumarkt" [ref=f4e1137]:
+                      - cell "Schuckert" [ref=f4e1138]
+                      - cell "Michael" [ref=f4e1139]
+                      - cell "Neumarkt" [ref=f4e1140]
+                    - row "Seiler Marion Ansbach" [ref=f4e1141]:
+                      - cell "Seiler" [ref=f4e1142]
+                      - cell "Marion" [ref=f4e1143]
+                      - cell "Ansbach" [ref=f4e1144]
+                    - row "Seiler Stefan Ansbach" [ref=f4e1145]:
+                      - cell "Seiler" [ref=f4e1146]
+                      - cell "Stefan" [ref=f4e1147]
+                      - cell "Ansbach" [ref=f4e1148]
+                    - row "Shaaban Mohammad Schwabach" [ref=f4e1149]:
+                      - cell "Shaaban" [ref=f4e1150]
+                      - cell "Mohammad" [ref=f4e1151]
+                      - cell "Schwabach" [ref=f4e1152]
+                    - row "Siegert Günther Postbauer-Heng" [ref=f4e1153]:
+                      - cell "Siegert" [ref=f4e1154]
+                      - cell "Günther" [ref=f4e1155]
+                      - cell "Postbauer-Heng" [ref=f4e1156]
+                    - row "Sierocki Laura Schwabach" [ref=f4e1157]:
+                      - cell "Sierocki" [ref=f4e1158]
+                      - cell "Laura" [ref=f4e1159]
+                      - cell "Schwabach" [ref=f4e1160]
+                    - row "Sobchuk Andrij Fürth" [ref=f4e1161]:
+                      - cell "Sobchuk" [ref=f4e1162]
+                      - cell "Andrij" [ref=f4e1163]
+                      - cell "Fürth" [ref=f4e1164]
+                    - row "Soukup Jürgen Ellingen" [ref=f4e1165]:
+                      - cell "Soukup" [ref=f4e1166]
+                      - cell "Jürgen" [ref=f4e1167]
+                      - cell "Ellingen" [ref=f4e1168]
+                    - row "Spencer Gilbert Nürnberg" [ref=f4e1169]:
+                      - cell "Spencer" [ref=f4e1170]
+                      - cell "Gilbert" [ref=f4e1171]
+                      - cell "Nürnberg" [ref=f4e1172]
+                    - row "Steininger Daniel Eckental" [ref=f4e1173]:
+                      - cell "Steininger" [ref=f4e1174]
+                      - cell "Daniel" [ref=f4e1175]
+                      - cell "Eckental" [ref=f4e1176]
+                    - row "Strobel Bernd Parsberg" [ref=f4e1177]:
+                      - cell "Strobel" [ref=f4e1178]
+                      - cell "Bernd" [ref=f4e1179]
+                      - cell "Parsberg" [ref=f4e1180]
+                    - row "Sunar Tan Nürnberg" [ref=f4e1181]:
+                      - cell "Sunar" [ref=f4e1182]
+                      - cell "Tan" [ref=f4e1183]
+                      - cell "Nürnberg" [ref=f4e1184]
+                    - row "Truckenbrodt Melanie Erlangen" [ref=f4e1185]:
+                      - cell "Truckenbrodt" [ref=f4e1186]
+                      - cell "Melanie" [ref=f4e1187]
+                      - cell "Erlangen" [ref=f4e1188]
+                    - row "Tsakmak Moustafa Nürnberg" [ref=f4e1189]:
+                      - cell "Tsakmak" [ref=f4e1190]
+                      - cell "Moustafa" [ref=f4e1191]
+                      - cell "Nürnberg" [ref=f4e1192]
+                    - row "Türkseven Ismail Nürnberg" [ref=f4e1193]:
+                      - cell "Türkseven" [ref=f4e1194]
+                      - cell "Ismail" [ref=f4e1195]
+                      - cell "Nürnberg" [ref=f4e1196]
+                    - row "Tusjak Julia Nürnberg" [ref=f4e1197]:
+                      - cell "Tusjak" [ref=f4e1198]
+                      - cell "Julia" [ref=f4e1199]
+                      - cell "Nürnberg" [ref=f4e1200]
+                    - row "Ulhan Caner Fürth" [ref=f4e1201]:
+                      - cell "Ulhan" [ref=f4e1202]
+                      - cell "Caner" [ref=f4e1203]
+                      - cell "Fürth" [ref=f4e1204]
+                    - row "Vermez Meryem Fürth" [ref=f4e1205]:
+                      - cell "Vermez" [ref=f4e1206]
+                      - cell "Meryem" [ref=f4e1207]
+                      - cell "Fürth" [ref=f4e1208]
+                    - row "Viehbeck Armin Schwabach" [ref=f4e1209]:
+                      - cell "Viehbeck" [ref=f4e1210]
+                      - cell "Armin" [ref=f4e1211]
+                      - cell "Schwabach" [ref=f4e1212]
+                    - row "Wagner Corinna Nürnberg" [ref=f4e1213]:
+                      - cell "Wagner" [ref=f4e1214]
+                      - cell "Corinna" [ref=f4e1215]
+                      - cell "Nürnberg" [ref=f4e1216]
+                    - row "Wanko Stefan Oberasbach" [ref=f4e1217]:
+                      - cell "Wanko" [ref=f4e1218]
+                      - cell "Stefan" [ref=f4e1219]
+                      - cell "Oberasbach" [ref=f4e1220]
+                    - row "Weber Ines Fürth" [ref=f4e1221]:
+                      - cell "Weber" [ref=f4e1222]
+                      - cell "Ines" [ref=f4e1223]
+                      - cell "Fürth" [ref=f4e1224]
+                    - row "Weigl Thomas Nürnberg" [ref=f4e1225]:
+                      - cell "Weigl" [ref=f4e1226]
+                      - cell "Thomas" [ref=f4e1227]
+                      - cell "Nürnberg" [ref=f4e1228]
+                    - row "Wießner Marco Nürnberg" [ref=f4e1229]:
+                      - cell "Wießner" [ref=f4e1230]
+                      - cell "Marco" [ref=f4e1231]
+                      - cell "Nürnberg" [ref=f4e1232]
+                    - row "Wilson Jason Ansbach" [ref=f4e1233]:
+                      - cell "Wilson" [ref=f4e1234]
+                      - cell "Jason" [ref=f4e1235]
+                      - cell "Ansbach" [ref=f4e1236]
+                    - row "Xakidis Konstantinos Fürth" [ref=f4e1237]:
+                      - cell "Xakidis" [ref=f4e1238]
+                      - cell "Konstantinos" [ref=f4e1239]
+                      - cell "Fürth" [ref=f4e1240]
+                    - row "Zeka Brima Nürnberg" [ref=f4e1241]:
+                      - cell "Zeka" [ref=f4e1242]
+                      - cell "Brima" [ref=f4e1243]
+                      - cell "Nürnberg" [ref=f4e1244]
+                    - row "Zilling Thomas Hilpoltstein" [ref=f4e1245]:
+                      - cell "Zilling" [ref=f4e1246]
+                      - cell "Thomas" [ref=f4e1247]
+                      - cell "Hilpoltstein" [ref=f4e1248]
+                    - row "Zournatzidis Viktor Nürnberg" [ref=f4e1249]:
+                      - cell "Zournatzidis" [ref=f4e1250]
+                      - cell "Viktor" [ref=f4e1251]
+                      - cell "Nürnberg" [ref=f4e1252]
+          - generic [ref=f4e754]:
+            - generic [ref=f4e755]: Erstellt
+            - generic [ref=f4e756]: "-"
+            - generic [ref=f4e757]: "-"
+            - generic [ref=f4e758]: Geandert
+            - generic [ref=f4e759]: "-"
+            - generic [ref=f4e760]: "-"
+```

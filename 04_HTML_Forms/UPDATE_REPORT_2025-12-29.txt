@@ -1,0 +1,130 @@
+﻿╔══════════════════════════════════════════════════════════════════════════════╗
+║          CONSEC HTML FORMULARE - AKTUALISIERUNGSREPORT                       ║
+║                    Stand: 29.12.2025 18:53                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+================================================================================
+NEUE V2 VERSIONEN ERSTELLT
+================================================================================
+
+1. MITARBEITERSTAMMBLATT V2
+   Pfad: forms\mitarbeiterverwaltung\frm_N_MA_Mitarbeiterstamm_V2.html
+   Größe: 61.945 Bytes
+   
+   HINZUGEFÜGTE TABS (8 neue):
+   ✅ Einsatz Monat (pgMonat)
+   ✅ Einsatz Jahr (pgJahr)
+   ✅ Auftragsübersicht (pgAuftrUeb)
+   ✅ Stundenübersicht (pgStundenuebersicht)
+   ✅ Vordrucke (pgVordr)
+   ✅ Brief (pgBrief)
+   ✅ Überhangstunden (pgStdUeberlaufstd)
+   ✅ Maps (pgMaps)
+   ✅ Sub Rechnungen (pgSubRech)
+   
+   HINZUGEFÜGTE FELDER:
+   ✅ Nr (Hausnummer)
+   ✅ Geschlecht (Dropdown)
+   ✅ Lohngruppe (Dropdown)
+   ✅ Bezüge gezahlt als (Dropdown)
+   ✅ Brutto-Std (Checkbox)
+   ✅ Lichtbild (mit Auswahl-Button)
+   ✅ Koordinaten (Button)
+   
+   HINZUGEFÜGTE BUTTONS:
+   ✅ ZK Fest, ZK Mini
+   ✅ Maps öffnen
+   ✅ Excel Export (Einsatz, Jahr, NVerfügbar, Vordrucke, Überhang)
+   ✅ Dienstplan drucken/senden
+   ✅ Brief erstellen, Word öffnen
+   ✅ Route berechnen, Geocodieren
+   
+   TABS JETZT: 13/13 (100%)
+
+--------------------------------------------------------------------------------
+
+2. KUNDENSTAMMBLATT V2
+   Pfad: forms\kundenverwaltung\frm_N_KD_Kundenstamm_V2.html
+   Größe: 23.351 Bytes
+   
+   HINZUGEFÜGTE TABS (3 neue):
+   ✅ Rechnungen (pg_Rch_Kopf)
+   ✅ Angebote (pg_Ang)
+   ✅ Ansprechpartner (pgAnsprech)
+   
+   HINZUGEFÜGTE FELDER:
+   ✅ Mobil 2 (zweites Mobilfeld)
+   
+   HINZUGEFÜGTE BUTTONS:
+   ✅ Auftrags-Rch PDF, Position PDF, Einsatz PDF
+   ✅ Neues Angebot
+   ✅ Ansprechpartner hinzufügen
+   ✅ Anhang hinzufügen
+   
+   TABS JETZT: 8/8 (100%)
+
+--------------------------------------------------------------------------------
+
+3. AUFTRAGSVERWALTUNG V2
+   Pfad: forms\auftragsverwaltung\frm_N_VA_Auftragstamm_V2.html
+   Größe: 29.557 Bytes
+   
+   HINZUGEFÜGTE TABS (2 neue):
+   ✅ Zusatzdateien (pgAttach)
+   ✅ Bemerkungen (pgBemerk)
+   
+   HINZUGEFÜGTE SUBFORMULARE:
+   ✅ Schichten (sub_VA_Start) - mit Tabelle Ai/von/bis
+   ✅ MA-Zuordnung (sub_MA_VA_Zuordnung) - mit Lfd/MA/von/bis/Std/Bemerkungen
+   ✅ Absagen (sub_MA_VA_Planung_Absage) - mit MA/Bemerkung
+   
+   HINZUGEFÜGTE ELEMENTE (rechte Seite):
+   ✅ Auftragsstatus-Box (sub_VA_Anzeige)
+   ✅ Aufträge ab: Datumsfilter
+   ✅ Go/<</>>/Navigation Buttons
+   ✅ Sortierung nach Datum/ID
+   
+   HINZUGEFÜGTE BUTTONS:
+   ✅ BWN drucken
+   ✅ PDF Kopf, Positionen
+   ✅ Anhang hinzufügen
+   
+   TABS JETZT: 5/5 (100%)
+
+================================================================================
+ZUSAMMENFASSUNG
+================================================================================
+
+                        VORHER          NACHHER         VERBESSERUNG
+FORMULAR                TABS    %       TABS    %       
+─────────────────────────────────────────────────────────────────────
+Mitarbeiterstamm        5/13    38%     13/13   100%    +8 Tabs
+Kundenstamm             5/8     62%     8/8     100%    +3 Tabs
+Auftragsverwaltung      3/5     60%     5/5     100%    +2 Tabs + Subformulare
+
+GESAMTFORTSCHRITT:
+- Alle fehlenden Tabs implementiert
+- Alle fehlenden Felder hinzugefügt
+- Subformulare für Auftragsverwaltung erstellt
+- Button-Stubs für WebView2 Bridge vorbereitet
+
+================================================================================
+VERWENDUNG
+================================================================================
+
+Die neuen V2-Versionen können wie folgt getestet werden:
+
+1. Im Browser öffnen:
+   file:///S:/CONSEC/.../forms/mitarbeiterverwaltung/frm_N_MA_Mitarbeiterstamm_V2.html
+   file:///S:/CONSEC/.../forms/kundenverwaltung/frm_N_KD_Kundenstamm_V2.html
+   file:///S:/CONSEC/.../forms/auftragsverwaltung/frm_N_VA_Auftragstamm_V2.html
+
+2. Nach erfolgreichem Test:
+   - Alte Version sichern (mit _OLD Suffix)
+   - V2 Version umbenennen (ohne _V2)
+
+3. WebView2 Bridge Integration:
+   - Button-Funktionen rufen aktuell alert() auf
+   - Müssen mit echten Bridge-Calls ersetzt werden
+
+================================================================================

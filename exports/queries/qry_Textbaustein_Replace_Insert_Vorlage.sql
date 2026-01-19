@@ -1,0 +1,5 @@
+-- Query: qry_Textbaustein_Replace_Insert_Vorlage
+-- Type: 0
+SELECT [_tblEigeneFirma_TB_Dok_Feldnamen].DokNr, tbl_Textbaustein_Namen.TB_Name_Kl, tbl_Textbaustein_Namen.Feldname, tbl_Textbaustein_Herkunft.Herkunftsname, tbl_Textbaustein_Herkunft.P1, tbl_Textbaustein_Herkunft.P1Typ
+FROM _tblEigeneFirma_TB_Dok_Feldnamen INNER JOIN (tbl_Textbaustein_Herkunft INNER JOIN tbl_Textbaustein_Namen ON tbl_Textbaustein_Herkunft.ID = tbl_Textbaustein_Namen.Herkunft_ID) ON [_tblEigeneFirma_TB_Dok_Feldnamen].Feldname = tbl_Textbaustein_Namen.TB_Name_Kl;
+

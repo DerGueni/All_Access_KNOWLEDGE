@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstamm - Card Design</title>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --accent: #f59e0b;
+            --surface: #ffffff;
+            --surface-hover: #faf5ff;
+            --background: #f5f3ff;
+            --text: #1e1b4b;
+            --text-muted: #6b7280;
+            --border: #e9d5ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow-sm: 0 2px 4px rgba(139, 92, 246, 0.08);
+            --shadow: 0 4px 16px rgba(139, 92, 246, 0.15);
+            --shadow-lg: 0 12px 40px rgba(139, 92, 246, 0.25);
+            --radius: 20px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ========== VERTICAL TABS (Glassmorphism) ========== */
+        .vertical-tabs {
+            width: 260px;
+            background: rgba(139, 92, 246, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vertical-tabs::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .tabs-header {
+            padding: 32px 24px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tabs-header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .tabs-header .subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Employee Profile Preview */
+        .employee-preview {
+            padding: 24px;
+            margin: 0 16px 16px;
+            background: rgba(255,255,255,0.15);
+            border-radius: var(--radius);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .employee-photo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent) 0%, #fbbf24 100%);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            font-weight: 700;
+            border: 4px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .employee-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .employee-id {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .employee-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #a7f3d0;
+        }
+
+        .employee-status .dot {
+            width: 8px;
+            height: 8px;
+            background: #34d399;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .tab-list {
+            flex: 1;
+            padding: 8px 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            margin: 6px 0;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+            font-weight: 500;
+        }
+
+        .tab-item:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .tab-item.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            transform: translateX(8px);
+        }
+
+        .tab-item .icon {
+            font-size: 20px;
+            width: 28px;
+            text-align: center;
+        }
+
+        .tab-item .badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+        }
+
+        .tab-item.active .badge {
+            background: var(--primary-light);
+        }
+
+        /* Tab Footer */
+        .tab-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .quick-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-action:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        /* Top Header Bar */
+        .header-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .record-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--background);
+            padding: 6px;
+            border-radius: var(--radius-sm);
+        }
+
+        .record-nav button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .record-nav button:hover {
+            background: var(--surface);
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .record-nav .current {
+            padding: 0 20px;
+            font-size: 14px;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-light);
+            background: var(--surface-hover);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent) 0%, #fbbf24 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            justify-content: center;
+        }
+
+        /* ========== CONTENT AREA ========== */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        /* Tab Panels */
+        .tab-panel {
+            display: none;
+            animation: fadeScale 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeScale {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* ========== CARD STYLES ========== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 24px;
+        }
+
+        .card-grid-2col {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            background: linear-gradient(135deg, var(--surface-hover) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-title .icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-action {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--surface);
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-action:hover {
+            background: var(--primary);
+            color: white;
+            transform: rotate(5deg);
+        }
+
+        .card-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Form Elements */
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .form-group.w-half { flex: 0 0 calc(50% - 8px); }
+        .form-group.w-third { flex: 0 0 calc(33.33% - 11px); }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            background: var(--surface);
+            color: var(--text);
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 5px rgba(139, 92, 246, 0.1);
+        }
+
+        .form-control:disabled {
+            background: var(--background);
+            color: var(--text-muted);
+        }
+
+        /* Checkbox as Toggle */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+        }
+
+        .toggle-group input {
+            display: none;
+        }
+
+        .toggle-switch {
+            width: 52px;
+            height: 28px;
+            background: #d1d5db;
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .toggle-group input:checked + .toggle-switch {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        }
+
+        .toggle-group input:checked + .toggle-switch::after {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* ========== ACCORDION ========== */
+        .accordion {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .accordion-header:hover {
+            background: var(--surface-hover);
+        }
+
+        .accordion-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .accordion-header .icon {
+            font-size: 18px;
+        }
+
+        .accordion-arrow {
+            width: 28px;
+            height: 28px;
+            background: var(--background);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: var(--text-muted);
+        }
+
+        .accordion-item.open .accordion-arrow {
+            transform: rotate(180deg);
+            background: var(--primary);
+            color: white;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 800px;
+        }
+
+        .accordion-body {
+            padding: 24px;
+            background: var(--background);
+        }
+
+        /* ========== PROFILE CARD (Special) ========== */
+        .profile-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius);
+            padding: 32px;
+            color: white;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 32px;
+            align-items: center;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .profile-photo-large {
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 700;
+            border: 4px solid rgba(255,255,255,0.3);
+        }
+
+        .profile-info h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .profile-info .meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .profile-info .meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-tags {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .profile-tag {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ========== DATA TABLE ========== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, var(--background) 0%, rgba(139, 92, 246, 0.05) 100%);
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.8px;
+        }
+
+        .data-table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: var(--surface-hover);
+        }
+
+        /* ========== FULL WIDTH CARD ========== */
+        .card-full {
+            grid-column: 1 / -1;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1200px) {
+            .card-grid-2col {
+                grid-template-columns: 1fr;
+            }
+            .profile-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .profile-photo-large {
+                margin: 0 auto;
+            }
+            .profile-info .meta {
+                justify-content: center;
+            }
+            .profile-tags {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .vertical-tabs {
+                width: 80px;
+            }
+            .tabs-header h1, .tabs-header .subtitle,
+            .employee-name, .employee-id, .employee-status,
+            .tab-item span:not(.icon) {
+                display: none;
+            }
+            .employee-preview {
+                padding: 12px;
+            }
+            .employee-photo {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+            .tab-item {
+                justify-content: center;
+                padding: 14px;
+            }
+            .tab-item:hover, .tab-item.active {
+                transform: none;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- VERTICAL TABS -->
+    <nav class="vertical-tabs">
+        <div class="tabs-header">
+            <h1>Mitarbeiterstamm</h1>
+            <div class="subtitle">Personal & HR</div>
+        </div>
+
+        <div class="employee-preview">
+            <div class="employee-photo">HA</div>
+            <div class="employee-name">Hans Alali</div>
+            <div class="employee-id">MA-ID: 707 | Lex: 4521</div>
+            <div class="employee-status">
+                <span class="dot"></span>
+                Aktiv
+            </div>
+        </div>
+
+        <div class="tab-list">
+            <div class="tab-item active" data-tab="stammdaten">
+                <span class="icon">👤</span>
+                <span>Stammdaten</span>
+            </div>
+            <div class="tab-item" data-tab="finanzen">
+                <span class="icon">💳</span>
+                <span>Bank & Finanzen</span>
+            </div>
+            <div class="tab-item" data-tab="arbeitszeit">
+                <span class="icon">⏰</span>
+                <span>Arbeitszeit</span>
+            </div>
+            <div class="tab-item" data-tab="qualifikationen">
+                <span class="icon">🎓</span>
+                <span>Qualifikationen</span>
+            </div>
+            <div class="tab-item" data-tab="einsaetze">
+                <span class="icon">📅</span>
+                <span>Einsätze</span>
+                <span class="badge">24</span>
+            </div>
+            <div class="tab-item" data-tab="dokumente">
+                <span class="icon">📎</span>
+                <span>Dokumente</span>
+            </div>
+        </div>
+
+        <div class="tab-footer">
+            <div class="quick-action">
+                <span>⚡</span>
+                Zeitkonto öffnen
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- Header Bar -->
+        <header class="header-bar">
+            <div class="header-left">
+                <span class="page-title">Mitarbeiterstammblatt</span>
+                <div class="record-nav">
+                    <button>⏮</button>
+                    <button>◀</button>
+                    <span class="current">707 / 1.250</span>
+                    <button>▶</button>
+                    <button>⏭</button>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary btn-icon" title="Mitarbeitertabelle">📋</button>
+                <button class="btn btn-secondary btn-icon" title="Listen drucken">🖨️</button>
+                <button class="btn btn-accent">⚡ Einsätze übertragen</button>
+                <button class="btn btn-primary">➕ Neuer Mitarbeiter</button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Tab Panel: Stammdaten -->
+            <div class="tab-panel active" id="panel-stammdaten">
+                <!-- Profile Header Card -->
+                <div class="profile-card">
+                    <div class="profile-photo-large">HA</div>
+                    <div class="profile-info">
+                        <h2>Hans Alali</h2>
+                        <div class="meta">
+                            <span>📍 München</span>
+                            <span>📧 h.alali@email.de</span>
+                            <span>📱 +49 171 1234567</span>
+                        </div>
+                        <div class="profile-tags">
+                            <span class="profile-tag">Festangestellt</span>
+                            <span class="profile-tag">34a-Schein</span>
+                            <span class="profile-tag">Eigener PKW</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cards Grid -->
+                <div class="card-grid card-grid-2col">
+                    <!-- Persönliche Daten -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">
+                                <span class="icon">👤</span>
+                                Persönliche Daten
+                            </span>
+                            <div class="card-actions">
+                                <button class="card-action" title="Bearbeiten">✏️</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nachname</label>
+                                    <input type="text" class="form-control" value="Alali">
+                                </div>
+                                <div class="form-group">
+                                    <label>Vorname</label>
+                                    <input type="text" class="form-control" value="Hans">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Geburtsdatum</label>
+                                    <input type="date" class="form-control" value="1985-03-15">
+                                </div>
+                                <div class="form-group">
+                                    <label>Geburtsort</label>
+                                    <input type="text" class="form-control" value="München">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Geschlecht</label>
+                                    <select class="form-control">
+                                        <option selected>Männlich</option>
+                                        <option>Weiblich</option>
+                                        <option>Divers</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Staatsangehörigkeit</label>
+                                    <input type="text" class="form-control" value="Deutsch">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Adresse -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">
+                                <span class="icon">📍</span>
+                                Adresse
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 2;">
+                                    <label>Straße</label>
+                                    <input type="text" class="form-control" value="Musterstraße">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Nr.</label>
+                                    <input type="text" class="form-control" value="42">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group w-third">
+                                    <label>PLZ</label>
+                                    <input type="text" class="form-control" value="80331">
+                                </div>
+                                <div class="form-group">
+                                    <label>Ort</label>
+                                    <input type="text" class="form-control" value="München">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Land</label>
+                                    <input type="text" class="form-control" value="Deutschland">
+                                </div>
+                                <div class="form-group">
+                                    <label>Bundesland</label>
+                                    <input type="text" class="form-control" value="Bayern">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kontakt -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">
+                                <span class="icon">📞</span>
+                                Kontakt
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Mobiltelefon</label>
+                                <input type="tel" class="form-control" value="+49 171 1234567">
+                            </div>
+                            <div class="form-group">
+                                <label>Festnetz</label>
+                                <input type="tel" class="form-control" value="+49 89 9876543">
+                            </div>
+                            <div class="form-group">
+                                <label>E-Mail</label>
+                                <input type="email" class="form-control" value="h.alali@email.de">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anstellungsverhältnis -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">
+                                <span class="icon">💼</span>
+                                Anstellungsverhältnis
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <label class="toggle-group">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-switch"></span>
+                                    <span class="toggle-label">Aktiv</span>
+                                </label>
+                                <label class="toggle-group">
+                                    <input type="checkbox">
+                                    <span class="toggle-switch"></span>
+                                    <span class="toggle-label">Subunternehmer</span>
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Eintrittsdatum</label>
+                                    <input type="date" class="form-control" value="2020-01-15">
+                                </div>
+                                <div class="form-group">
+                                    <label>Austrittsdatum</label>
+                                    <input type="date" class="form-control" value="">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Anstellungsart</label>
+                                <select class="form-control">
+                                    <option selected>Festangestellt</option>
+                                    <option>Minijob</option>
+                                    <option>Aushilfe</option>
+                                </select>
+                            </div>
+                            <label class="toggle-group">
+                                <input type="checkbox" checked>
+                                <span class="toggle-switch"></span>
+                                <span class="toggle-label">Eigener PKW</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: Additional Info -->
+                <div class="accordion">
+                    <div class="accordion-item open">
+                        <div class="accordion-header">
+                            <h3><span class="icon">🎫</span> Dienstausweis</h3>
+                            <span class="accordion-arrow">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Ausweis-Nr.</label>
+                                        <input type="text" class="form-control" value="DA-2024-0707">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Gültig bis</label>
+                                        <input type="date" class="form-control" value="2027-12-31">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Funktion</label>
+                                        <input type="text" class="form-control" value="Sicherheitsmitarbeiter">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3><span class="icon">📝</span> Bemerkungen</h3>
+                            <span class="accordion-arrow">▼</span>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <textarea class="form-control" rows="4" placeholder="Interne Notizen...">Sehr zuverlässiger Mitarbeiter. Bevorzugt Einsätze in München und Umgebung.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Bank & Finanzen -->
+            <div class="tab-panel" id="panel-finanzen">
+                <div class="card-grid card-grid-2col">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><span class="icon">🏦</span> Bankverbindung</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Kontoinhaber</label>
+                                <input type="text" class="form-control" value="Hans Alali">
+                            </div>
+                            <div class="form-group">
+                                <label>IBAN</label>
+                                <input type="text" class="form-control" value="DE89 3704 0044 0532 0130 00">
+                            </div>
+                            <div class="form-group">
+                                <label>BIC</label>
+                                <input type="text" class="form-control" value="COBADEFFXXX">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><span class="icon">📑</span> Steuerdaten</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Steuer-ID</label>
+                                <input type="text" class="form-control" value="12 345 678 901">
+                            </div>
+                            <div class="form-group">
+                                <label>Sozialversicherungs-Nr.</label>
+                                <input type="text" class="form-control" value="12 150385 A 001">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Steuerklasse</label>
+                                    <select class="form-control">
+                                        <option selected>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                        <option>6</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Krankenkasse</label>
+                                    <input type="text" class="form-control" value="AOK Bayern">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Arbeitszeit -->
+            <div class="tab-panel" id="panel-arbeitszeit">
+                <div class="card-grid card-grid-2col">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><span class="icon">⏰</span> Arbeitszeiten</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Stunden pro Tag</label>
+                                    <input type="number" class="form-control" value="8">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tage pro Woche</label>
+                                    <input type="number" class="form-control" value="5">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Max. Stunden/Monat</label>
+                                <input type="number" class="form-control" value="173">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><span class="icon">🏖️</span> Urlaub</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Urlaub pro Jahr</label>
+                                    <input type="number" class="form-control" value="30">
+                                </div>
+                                <div class="form-group">
+                                    <label>Resturlaub Vorjahr</label>
+                                    <input type="number" class="form-control" value="5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Qualifikationen -->
+            <div class="tab-panel" id="panel-qualifikationen">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><span class="icon">🎓</span> Qualifikationen & Zertifikate</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <label class="toggle-group">
+                                <input type="checkbox" checked>
+                                <span class="toggle-switch"></span>
+                                <span class="toggle-label">34a-Schein vorhanden</span>
+                            </label>
+                            <label class="toggle-group">
+                                <input type="checkbox" checked>
+                                <span class="toggle-switch"></span>
+                                <span class="toggle-label">Sachkundeprüfung</span>
+                            </label>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>EPIN DFB</label>
+                                <input type="text" class="form-control" value="DFB-2024-12345">
+                            </div>
+                            <div class="form-group">
+                                <label>Bewacher-ID</label>
+                                <input type="text" class="form-control" value="BY-SEC-0707">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Einsätze -->
+            <div class="tab-panel" id="panel-einsaetze">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><span class="icon">📅</span> Letzte Einsätze</span>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Datum</th>
+                                    <th>Auftrag</th>
+                                    <th>Objekt</th>
+                                    <th>Von</th>
+                                    <th>Bis</th>
+                                    <th>Stunden</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>15.01.2026</td>
+                                    <td>Messe München - VIP</td>
+                                    <td>Messegelände</td>
+                                    <td>08:00</td>
+                                    <td>18:00</td>
+                                    <td>10</td>
+                                </tr>
+                                <tr>
+                                    <td>12.01.2026</td>
+                                    <td>Arena Event</td>
+                                    <td>Olympiahalle</td>
+                                    <td>18:00</td>
+                                    <td>02:00</td>
+                                    <td>8</td>
+                                </tr>
+                                <tr>
+                                    <td>08.01.2026</td>
+                                    <td>Firmenfeier</td>
+                                    <td>BMW Welt</td>
+                                    <td>17:00</td>
+                                    <td>23:00</td>
+                                    <td>6</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Dokumente -->
+            <div class="tab-panel" id="panel-dokumente">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><span class="icon">📎</span> Dokumente</span>
+                        <button class="btn btn-primary">📤 Hochladen</button>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: var(--text-muted);">Keine Dokumente vorhanden.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab Switching with Animation
+        const tabs = document.querySelectorAll('.tab-item');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const panelId = 'panel-' + tab.dataset.tab;
+                panels.forEach(p => p.classList.remove('active'));
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+
+        // Accordion
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('open');
+            });
+        });
+
+        // Card Actions
+        document.querySelectorAll('.card-action').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Add edit functionality here
+            });
+        });
+    </script>
+</body>
+</html>

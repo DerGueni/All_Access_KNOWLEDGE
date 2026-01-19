@@ -1,0 +1,4 @@
+SELECT qry_MA_Monat_VA_Zuordnung.VADatum
+FROM qry_MA_Monat_VA_Zuordnung
+GROUP BY qry_MA_Monat_VA_Zuordnung.VADatum;
+

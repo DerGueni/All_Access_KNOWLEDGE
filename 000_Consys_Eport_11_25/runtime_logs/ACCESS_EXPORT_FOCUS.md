@@ -1,0 +1,1009 @@
+# ACCESS_EXPORT_FOCUS
+
+## Targets
+- frm_va_auftragstamm
+- frm_ma_mitarbeiterstamm
+- frm_kd_kundenstamm
+- frm_ma_va_schnellauswahl
+
+## Candidates (dienstplan/planung)
+- frm_dp_dienstplan_objekt
+- frm_dp_dienstplan_objekt1
+- frm_dp_dienstplan_ma
+- frm_auftragsuebersicht_neu
+
+## frm_va_auftragstamm
+- file: `0006_All_Access_KNOWLEDGE/000_Consys_Eport_11_25/30_forms/FRM_frm_VA_Auftragstamm.json`
+- form_name: `frm_va_auftragstamm`
+- record_source: `{'type': 'query', 'ref': 'qry_Auftrag_Sort', 'ref_id': 'QRY_qry_Auftrag_Sort'}`
+
+### Form events
+- OnOpen: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnLoad: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnClose: {'kind': 'Macro', 'macro': ''}
+- OnCurrent: {'kind': 'Procedure', 'handler': '(auto)'}
+- BeforeUpdate: {'kind': 'Procedure', 'handler': '(auto)'}
+- AfterUpdate: {'kind': 'Macro', 'macro': ''}
+- OnError: {'kind': 'Macro', 'macro': ''}
+- OnTimer: {'kind': 'Macro', 'macro': ''}
+- OnApplyFilter: {'kind': 'Macro', 'macro': ''}
+- OnFilter: {'kind': 'Macro', 'macro': ''}
+- OnUnload: {'kind': 'Macro', 'macro': ''}
+
+### Controls (name | type | control_source | row_source | subform)
+- Rechteck620 | Rectangle | None | None | None
+- Auto_Kopfzeile0 | Label | None | None | None
+- lbl_Datum | Label | None | None | None
+- Veranst_Status_ID | ComboBox | Veranst_Status_ID | {'type': 'sql_or_table', 'ref': 'SELECT tbl_VA_Status.ID, tbl_VA_Status.Fortschritt FROM tbl_VA_Status ORDER BY tbl_VA_Status.ID; '} | None
+- Bezeichnungsfeld344 | Label | None | None | None
+- btnSchnellPlan | CommandButton | None | None | None
+- btnMailEins | CommandButton | None | None | None
+- btnAuftrBerech | CommandButton | None | None | None
+- btnDruckZusage | CommandButton | None | None | None
+- btn_letzer_Datensatz | CommandButton | None | None | None
+- Befehl40 | CommandButton | None | None | None
+- Befehl41 | CommandButton | None | None | None
+- Befehl43 | CommandButton | None | None | None
+- mcobtnDelete | CommandButton | None | None | None
+- Befehl38 | CommandButton | None | None | None
+- btnRibbonAus | CommandButton | None | None | None
+- btnRibbonEin | CommandButton | None | None | None
+- btnDaBaEin | CommandButton | None | None | None
+- btnDaBaAus | CommandButton | None | None | None
+- btnReq | CommandButton | None | None | None
+- lbl_Version | Label | None | None | None
+- btnneuveranst | CommandButton | None | None | None
+- btn_aenderungsprotokoll | CommandButton | None | None | None
+- IstStatus | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT -5 as ID, "(Alle)" AS Fortschritt FROM _tblInternalSystemFE UNION SELECT tbl_VA_Status.ID, tbl_VA_Status.Fortschritt FROM tbl_VA_Status ORDER BY ID;'} | None
+- Befehl640 | CommandButton | None | None | None
+- btnmailpos | CommandButton | None | None | None
+- btn_Posliste_oeffnen | CommandButton | None | None | None
+- btn_rueck | CommandButton | None | None | None
+- btnCheck | CommandButton | None | None | None
+- cboEinsatzliste | ComboBox | None | {'type': 'sql_or_table', 'ref': '0;"Druck Einsatzliste: Tag";-1;"Druck Einsatzliste: komplett";1;"Druck Einsatzliste: ab Heute"'} | None
+- btnDruckZusage1 | CommandButton | None | None | None
+- btn_Rueckmeld | CommandButton | None | None | None
+- Rech_NR | TextBox | Rech_NR | None | None
+- lbl_rechnungsnr | Label | None | None | None
+- btnSyncErr | CommandButton | None | None | None
+- btn_ListeStd | CommandButton | None | None | None
+- btn_Autosend_BOS | CommandButton | None | None | None
+- cbAutosendEL | CheckBox | Autosend_EL | None | None
+- lbl_EL_Autosend | Label | None | None | None
+- Befehl709 | CommandButton | None | None | None
+- btnMailSub | CommandButton | None | None | None
+- ID | TextBox | ID | None | None
+- Bezeichnungsfeld466 | Label | None | None | None
+- Dat_VA_Von | TextBox | Dat_VA_Von | None | None
+- Bezeichnungsfeld272 | Label | None | None | None
+- Dat_VA_Bis | TextBox | Dat_VA_Bis | None | None
+- PLZ | TextBox | PLZ | None | None
+- Treffpunkt | TextBox | Treffpunkt | None | None
+- Bezeichnungsfeld327 | Label | None | None | None
+- Treffp_Zeit | TextBox | Treffp_Zeit | None | None
+- Ansprechpartner | TextBox | Ansprechpartner | None | None
+- Bezeichnungsfeld333 | Label | None | None | None
+- Objekt_ID | ComboBox | Objekt_ID | {'type': 'sql_or_table', 'ref': 'SELECT [tbl_OB_Objekt].ID, [tbl_OB_Objekt].Objekt, [tbl_OB_Objekt].Strasse, [tbl_OB_Objekt].PLZ, [tbl_OB_Objekt].Ort, [tbl_OB_Objekt].Bemerkung, [tbl_OB_Objekt].Treffpunkt, [tbl_OB_Objekt].Treffp_Zeit, [tbl_OB_Objekt].Dienstkleidung, [tbl_OB_Objekt].Ansprechpartner, [tbl_OB_Objekt].Treffpunkt2 FROM tbl_OB_Objekt; '} | None
+- cboVADatum | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_VA_AnzTage.ID, tbl_VA_AnzTage.VADatum FROM tbl_VA_AnzTage WHERE (((tbl_VA_AnzTage.VA_ID)= 9009));'} | None
+- btnDatumLeft | CommandButton | None | None | None
+- btnDatumRight | CommandButton | None | None | None
+- Objekt | ComboBox | Objekt | {'type': 'sql_or_table', 'ref': 'SELECT DISTINCT tbl_VA_Auftragstamm.Objekt FROM tbl_VA_Auftragstamm WHERE (((Len(Trim(Nz([Objekt]))))>0)) ORDER BY tbl_VA_Auftragstamm.Objekt; '} | None
+- Bezeichnungsfeld243 | Label | None | None | None
+- Ort | ComboBox | Ort | {'type': 'sql_or_table', 'ref': 'SELECT DISTINCT tbl_VA_Auftragstamm.Ort FROM tbl_VA_Auftragstamm WHERE (((Len(Trim(Nz([ort]))))>0)) ORDER BY tbl_VA_Auftragstamm.Ort; '} | None
+- Bezeichnungsfeld467 | Label | None | None | None
+- Dienstkleidung | ComboBox | Dienstkleidung | {'type': 'sql_or_table', 'ref': 'SELECT DISTINCT tbl_VA_Auftragstamm.Dienstkleidung FROM tbl_VA_Auftragstamm WHERE (((Len(Trim(Nz([Dienstkleidung]))))>0)) ORDER BY tbl_VA_Auftragstamm.Dienstkleidung; '} | None
+- Bezeichnungsfeld330 | Label | None | None | None
+- frm_Menuefuehrung | SubForm | None | None | {'source_object': 'frm_Menuefuehrung', 'link_master_fields': [], 'link_child_fields': []}
+- PKW_Anzahl | TextBox | None | None | None
+- Bezeichnungsfeld339 | Label | None | None | None
+- veranstalter_id | ComboBox | Veranstalter_ID | {'type': 'sql_or_table', 'ref': 'SELECT tbl_KD_Kundenstamm.kun_Id, tbl_KD_Kundenstamm.kun_Firma FROM tbl_KD_Kundenstamm WHERE (((tbl_KD_Kundenstamm.kun_AdressArt)=1) AND ((tbl_KD_Kundenstamm.kun_IstAktiv)=True)) ORDER BY tbl_KD_Kundenstamm.kun_Firma; '} | None
+- Bezeichnungsfeld592 | Label | None | None | None
+- Reg_VA | TabControl | None | None | None
+- pgMA_Zusage | Page | None | None | None
+- MA_Selektion | OptionGroup | None | None | None
+- Option264 | OptionButton | None | None | None
+- Bezeichnungsfeld265 | Label | None | None | None
+- Bezeichnungsfeld517 | Label | None | None | None
+- cboAnstArt | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_hlp_MA_Anstellungsart.ID, tbl_hlp_MA_Anstellungsart.Anstellungsart, tbl_hlp_MA_Anstellungsart.Sortierung FROM tbl_hlp_MA_Anstellungsart WHERE (((tbl_hlp_MA_Anstellungsart.ID)=3 Or (tbl_hlp_MA_Anstellungsart.ID)=5 Or (tbl_hlp_MA_Anstellungsart.ID)=9 Or (tbl_hlp_MA_Anstellungsart.ID)=11)) ORDER BY tbl_hlp_MA_Anstellungsart.Sortierung; '} | None
+- Bezeichnungsfeld263 | Label | None | None | None
+- btnPlan_Kopie | CommandButton | None | None | None
+- Befehl543 | CommandButton | None | None | None
+- btnVAPlanCrea | CommandButton | None | None | None
+- VerrSatz | TextBox | Dummy | None | None
+- cboQuali | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT [tbl_MA_Einsatzart].ID, [tbl_MA_Einsatzart].QualiName FROM tbl_MA_Einsatzart; '} | None
+- Bezeichnungsfeld269 | Label | None | None | None
+- IstVerfuegbar | CheckBox | None | None | None
+- lbl_NurFreie | Label | None | None | None
+- lbl_KeineEingabe | Label | None | None | None
+- sub_MA_VA_Zuordnung | SubForm | None | None | {'source_object': 'sub_MA_VA_Zuordnung', 'link_master_fields': ['ID', 'cboVADatum'], 'link_child_fields': ['VA_ID', 'VADatum_ID']}
+- sub_VA_Start | SubForm | None | None | {'source_object': 'sub_VA_Start', 'link_master_fields': ['ID', 'cboVADatum'], 'link_child_fields': ['VA_ID', 'VADatum_ID']}
+- Bezeichnungsfeld255 | Label | None | None | None
+- btn_VA_Abwesenheiten | CommandButton | None | None | None
+- sub_MA_VA_Planung_Absage | SubForm | None | None | {'source_object': 'sub_MA_VA_Planung_Absage', 'link_master_fields': ['ID', 'cboVADatum'], 'link_child_fields': ['VA_ID', 'VADatum_ID']}
+- Bezeichnungsfeld526 | Label | None | None | None
+- cmd_BWN_send | CommandButton | None | None | None
+- pgMA_Plan | Page | None | None | None
+- sub_MA_VA_Zuordnung_Status | SubForm | None | None | {'source_object': 'sub_MA_VA_Planung_Status', 'link_master_fields': ['ID', 'cboVADatum'], 'link_child_fields': ['VA_ID', 'VADatum_ID']}
+- Bezeichnungsfeld386 | Label | None | None | None
+- pgAttach | Page | None | None | None
+- sub_ZusatzDateien | SubForm | None | None | {'source_object': 'sub_ZusatzDateien', 'link_master_fields': ['Objekt_ID', 'TabellenNr'], 'link_child_fields': ['Ueberordnung', 'TabellenID']}
+- btnNeuAttach | CommandButton | None | None | None
+- Bezeichnungsfeld355 | Label | None | None | None
+- TabellenNr | TextBox | =42 | None | None
+- pgRechnung | Page | None | None | None
+- sub_tbl_Rch_Kopf | SubForm | None | None | {'source_object': 'sub_tbl_Rch_Kopf', 'link_master_fields': ['ID'], 'link_child_fields': ['VA_ID']}
+- Bezeichnungsfeld470 | Label | None | None | None
+- sub_tbl_Rch_Pos_Auftrag | SubForm | None | None | {'source_object': 'sub_tbl_Rch_Pos_Auftrag', 'link_master_fields': ['ID'], 'link_child_fields': ['VA_ID']}
+- Bezeichnungsfeld472 | Label | None | None | None
+- btnPDFKopf | CommandButton | None | None | None
+- btnPDFPos | CommandButton | None | None | None
+- PosGesamtsumme | TextBox | None | None | None
+- Bezeichnungsfeld439 | Label | None | None | None
+- pgBemerk | Page | None | None | None
+- Bemerkungen | TextBox | Bemerkungen | None | None
+- sub_VA_Anzeige | SubForm | None | None | {'source_object': 'sub_VA_Anzeige', 'link_master_fields': [], 'link_child_fields': []}
+- Auftraege_ab | TextBox | None | None | None
+- Bezeichnungsfeld482 | Label | None | None | None
+- btn_AbWann | CommandButton | None | None | None
+- btnHeute | CommandButton | None | None | None
+- btnTgBack | CommandButton | None | None | None
+- btnTgVor | CommandButton | None | None | None
+- cboID | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_VA_Auftragstamm.ID, tbl_VA_Auftragstamm.Auftrag, tbl_VA_Auftragstamm.Dat_VA_Von, tbl_VA_Auftragstamm.Objekt, tbl_VA_Auftragstamm.Ort, tbl_KD_Kundenstamm.kun_Firma FROM tbl_KD_Kundenstamm RIGHT JOIN tbl_VA_Auftragstamm ON tbl_KD_Kundenstamm.kun_Id = tbl_VA_Auftragstamm.Veranstalter_ID ORDER BY tbl_VA_Auftragstamm.Auftrag; '} | None
+- lblSearch | Label | None | None | None
+- btn_Tag_loeschen | CommandButton | None | None | None
+- Rechteck619 | Rectangle | None | None | None
+- lb_Fahrtkosten | TextBox | None | None | None
+- Bezeichnungsfeld655 | Label | None | None | None
+- Kombinationsfeld656 | ComboBox | Auftrag | {'type': 'sql_or_table', 'ref': 'SELECT DISTINCT tbl_VA_Auftragstamm.Auftrag FROM tbl_VA_Auftragstamm WHERE (((Len(Trim(Nz([ort]))))>0)) ORDER BY tbl_VA_Auftragstamm.Auftrag; '} | None
+- Bezeichnungsfeld657 | Label | None | None | None
+- EmptyCell689 | EmptyCell | None | None | None
+- EmptyCell691 | EmptyCell | None | None | None
+- EmptyCell693 | EmptyCell | None | None | None
+- zsub_lstAuftrag | SubForm | None | None | {'source_object': 'frm_lst_row_auftrag', 'link_master_fields': [], 'link_child_fields': []}
+- cmd_Messezettel_NameEintragen | CommandButton | None | None | None
+- Text416 | TextBox | Erst_von | None | None
+- Bezeichnungsfeld417 | Label | None | None | None
+- Text418 | TextBox | Erst_am | None | None
+- Text419 | TextBox | Aend_von | None | None
+- Bezeichnungsfeld421 | Label | None | None | None
+- Text422 | TextBox | Aend_am | None | None
+
+### Subcontrols links
+- frm_Menuefuehrung -> frm_Menuefuehrung (master: [], child: [])
+- sub_MA_VA_Zuordnung -> sub_MA_VA_Zuordnung (master: ['ID', 'cboVADatum'], child: ['VA_ID', 'VADatum_ID'])
+- sub_VA_Start -> sub_VA_Start (master: ['ID', 'cboVADatum'], child: ['VA_ID', 'VADatum_ID'])
+- sub_MA_VA_Planung_Absage -> sub_MA_VA_Planung_Absage (master: ['ID', 'cboVADatum'], child: ['VA_ID', 'VADatum_ID'])
+- sub_MA_VA_Zuordnung_Status -> sub_MA_VA_Planung_Status (master: ['ID', 'cboVADatum'], child: ['VA_ID', 'VADatum_ID'])
+- sub_ZusatzDateien -> sub_ZusatzDateien (master: ['Objekt_ID', 'TabellenNr'], child: ['Ueberordnung', 'TabellenID'])
+- sub_tbl_Rch_Kopf -> sub_tbl_Rch_Kopf (master: ['ID'], child: ['VA_ID'])
+- sub_tbl_Rch_Pos_Auftrag -> sub_tbl_Rch_Pos_Auftrag (master: ['ID'], child: ['VA_ID'])
+- sub_VA_Anzeige -> sub_VA_Anzeige (master: [], child: [])
+- zsub_lstAuftrag -> frm_lst_row_auftrag (master: [], child: [])
+
+## frm_ma_mitarbeiterstamm
+- file: `0006_All_Access_KNOWLEDGE/000_Consys_Eport_11_25/30_forms/FRM_frm_MA_Mitarbeiterstamm.json`
+- form_name: `frm_MA_Mitarbeiterstamm`
+- record_source: `{'type': 'table', 'ref': 'tbl_MA_Mitarbeiterstamm', 'ref_id': 'TAB_tbl_MA_Mitarbeiterstamm'}`
+
+### Form events
+- OnOpen: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnLoad: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnClose: {'kind': 'Macro', 'macro': ''}
+- OnCurrent: {'kind': 'Procedure', 'handler': '(auto)'}
+- BeforeUpdate: {'kind': 'Procedure', 'handler': '(auto)'}
+- AfterUpdate: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnError: {'kind': 'Macro', 'macro': ''}
+- OnTimer: {'kind': 'Macro', 'macro': ''}
+- OnApplyFilter: {'kind': 'Macro', 'macro': ''}
+- OnFilter: {'kind': 'Macro', 'macro': ''}
+- OnUnload: {'kind': 'Macro', 'macro': ''}
+
+### Controls (name | type | control_source | row_source | subform)
+- Auto_Kopfzeile0 | Label | None | None | None
+- lbl_Datum | Label | None | None | None
+- Rechteck37 | Rectangle | None | None | None
+- Befehl39 | CommandButton | None | None | None
+- Befehl40 | CommandButton | None | None | None
+- Befehl41 | CommandButton | None | None | None
+- Befehl43 | CommandButton | None | None | None
+- Befehl46 | CommandButton | None | None | None
+- mcobtnDelete | CommandButton | None | None | None
+- lbl_Vorname | Label | None | None | None
+- lbl_Nachname | Label | None | None | None
+- lbl_PersNr | Label | None | None | None
+- btnLstDruck | CommandButton | None | None | None
+- lbl_Version | Label | None | None | None
+- DiDatumAb | TextBox | None | None | None
+- btnMADienstpl | CommandButton | None | None | None
+- btnRibbonAus | CommandButton | None | None | None
+- btnRibbonEin | CommandButton | None | None | None
+- btnDaBaEin | CommandButton | None | None | None
+- btnDaBaAus | CommandButton | None | None | None
+- lbl_ab | TextBox | None | None | None
+- lbl_Mitarbeitertabelle | CommandButton | None | None | None
+- Bezeichnungsfeld575 | Label | None | None | None
+- btnZeitkonto | CommandButton | None | None | None
+- Bezeichnungsfeld604 | Label | None | None | None
+- btnZKFest | CommandButton | None | None | None
+- btnZKMini | CommandButton | None | None | None
+- lst_MA | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT ID, Nachname, Vorname, Ort FROM tbl_MA_Mitarbeiterstamm Where Anstellungsart_ID = 3 or Anstellungsart_ID = 5 ORDER BY Nachname, Vorname;'} | None
+- Menü | SubForm | None | None | {'source_object': 'frm_Menuefuehrung', 'link_master_fields': [], 'link_child_fields': []}
+- Bezeichnungsfeld449 | Label | None | None | None
+- Bezeichnungsfeld473 | Label | None | None | None
+- reg_MA | TabControl | None | None | None
+- pgAdresse | Page | None | None | None
+- PersNr | TextBox | ID | None | None
+- Bezeichnungsfeld325 | Label | None | None | None
+- LEXWare_ID | TextBox | LEXWare_ID | None | None
+- Bezeichnungsfeld349 | Label | None | None | None
+- IstAktiv | CheckBox | IstAktiv | None | None
+- Bezeichnungsfeld351 | Label | None | None | None
+- IstSubunternehmer | CheckBox | IstSubunternehmer | None | None
+- Bezeichnungsfeld353 | Label | None | None | None
+- Nachname | TextBox | Nachname | None | None
+- Bezeichnungsfeld291 | Label | None | None | None
+- Vorname | TextBox | Vorname | None | None
+- Bezeichnungsfeld293 | Label | None | None | None
+- Strasse | TextBox | Strasse | None | None
+- Bezeichnungsfeld295 | Label | None | None | None
+- Nr | TextBox | Nr | None | None
+- Bezeichnungsfeld12 | Label | None | None | None
+- PLZ | TextBox | PLZ | None | None
+- Bezeichnungsfeld297 | Label | None | None | None
+- Ort | TextBox | Ort | None | None
+- Bezeichnungsfeld299 | Label | None | None | None
+- Land | TextBox | Land | None | None
+- Bezeichnungsfeld300 | Label | None | None | None
+- Bundesland | TextBox | Bundesland | None | None
+- Bezeichnungsfeld301 | Label | None | None | None
+- Tel_Mobil | TextBox | Tel_Mobil | None | None
+- Bezeichnungsfeld302 | Label | None | None | None
+- Tel_Festnetz | TextBox | Tel_Festnetz | None | None
+- Bezeichnungsfeld303 | Label | None | None | None
+- Email | TextBox | Email | None | None
+- Bezeichnungsfeld305 | Label | None | None | None
+- Geschlecht | ComboBox | Geschlecht | {'type': 'sql_or_table', 'ref': 'SELECT tbl_Hlp_MA_Geschlecht.ID, tbl_Hlp_MA_Geschlecht.Geschlecht FROM tbl_Hlp_MA_Geschlecht; '} | None
+- Bezeichnungsfeld306 | Label | None | None | None
+- Staatsang | TextBox | Staatsang | None | None
+- Bezeichnungsfeld307 | Label | None | None | None
+- Geb_Dat | TextBox | Geb_Dat | None | None
+- Bezeichnungsfeld308 | Label | None | None | None
+- Geb_Ort | TextBox | Geb_Ort | None | None
+- Bezeichnungsfeld309 | Label | None | None | None
+- Geb_Name | TextBox | Geb_Name | None | None
+- Bezeichnungsfeld392 | Label | None | None | None
+- Eintrittsdatum | TextBox | Eintrittsdatum | None | None
+- Bezeichnungsfeld48 | Label | None | None | None
+- Austrittsdatum | TextBox | Austrittsdatum | None | None
+- Bezeichnungsfeld51 | Label | None | None | None
+- Anstellungsart | ComboBox | Anstellungsart_ID | {'type': 'sql_or_table', 'ref': 'SELECT tbl_hlp_MA_Anstellungsart.ID, tbl_hlp_MA_Anstellungsart.Anstellungsart FROM tbl_hlp_MA_Anstellungsart; '} | None
+- Bezeichnungsfeld54 | Label | None | None | None
+- Kostenstelle | TextBox | Kostenstelle | None | None
+- Bezeichnungsfeld57 | Label | None | None | None
+- Eigener_PKW | CheckBox | Eigener_PKW | None | None
+- DienstausweisNr | TextBox | DienstausweisNr | None | None
+- Ausweis_Endedatum | TextBox | Ausweis_Endedatum | None | None
+- Ausweis_Funktion | TextBox | Ausweis_Funktion | None | None
+- Epin_DFB | TextBox | Epin_DFB | None | None
+- Bewacher_ID | TextBox | Bewacher_ID | None | None
+- MA_Bild | Image | None | None | None
+- sub_MA_ErsatzEmail | SubForm | None | None | {'source_object': 'sub_MA_ErsatzEmail', 'link_master_fields': ['ID'], 'link_child_fields': ['MA_ID']}
+- Auszahlungsart | TextBox | Auszahlungsart | None | None
+- Bezeichnungsfeld60 | Label | None | None | None
+- Bankname | TextBox | Bankname | None | None
+- Bezeichnungsfeld63 | Label | None | None | None
+- Bankleitzahl | TextBox | Bankleitzahl | None | None
+- Bezeichnungsfeld66 | Label | None | None | None
+- Kontonummer | TextBox | Kontonummer | None | None
+- Bezeichnungsfeld69 | Label | None | None | None
+- BIC | TextBox | BIC | None | None
+- Bezeichnungsfeld72 | Label | None | None | None
+- IBAN | TextBox | IBAN | None | None
+- Kontoinhaber | TextBox | Kontoinhaber | None | None
+- Bezuege_gezahlt_als | TextBox | Bezuege_gezahlt_als | None | None
+- Sozialvers_Nr | TextBox | Sozialvers_Nr | None | None
+- SteuerNr | TextBox | SteuerNr | None | None
+- KV_Kasse | TextBox | KV_Kasse | None | None
+- Ist_RV_Befrantrag | CheckBox | Ist_RV_Befrantrag | None | None
+- Steuerklasse | TextBox | Steuerklasse | None | None
+- Arbst_pro_Arbeitstag | TextBox | Arbst_pro_Arbeitstag | None | None
+- Arbeitstage_pro_Woche | TextBox | Arbeitstage_pro_Woche | None | None
+- Resturl_Vorjahr | TextBox | Resturl_Vorjahr | None | None
+- Urlaubsanspr_pro_Jahr | TextBox | Urlaubsanspr_pro_Jahr | None | None
+- StundenZahlMax | TextBox | StundenZahlMax | None | None
+- Kosten_pro_MAStunde | TextBox | Kosten_pro_MAStunde | None | None
+- Bezeichnungsfeld443 | Label | None | None | None
+- IstNSB | CheckBox | IstNSB | None | None
+- Bezeichnungsfeld434 | Label | None | None | None
+- Datum_34a | TextBox | Datum_34a | None | None
+- Bezeichnungsfeld439 | Label | None | None | None
+- Hat_keine_34a | CheckBox | Hat_keine_34a | None | None
+- HatSachkunde | CheckBox | HatSachkunde | None | None
+- btnDateisuch | CommandButton | None | None | None
+- tblBilddatei | TextBox | tblBilddatei | None | None
+- Bemerkungen | TextBox | Bemerkungen | None | None
+- sub_MA_Einsatz_Zuo | SubForm | None | None | {'source_object': 'sub_MA_Einsatz_Zuo', 'link_master_fields': ['ID'], 'link_child_fields': ['MA_ID']}
+- Bezeichnungsfeld396 | Label | None | None | None
+- btnDateisuch2 | CommandButton | None | None | None
+- tblSignaturdatei | TextBox | tblSignaturdatei | None | None
+- MA_Signatur | Image | None | None | None
+- Bezeichnungsfeld75 | Label | None | None | None
+- Bezeichnungsfeld78 | Label | None | None | None
+- Bezeichnungsfeld81 | Label | None | None | None
+- Bezeichnungsfeld84 | Label | None | None | None
+- Bezeichnungsfeld87 | Label | None | None | None
+- Bezeichnungsfeld90 | Label | None | None | None
+- Bezeichnungsfeld324 | Label | None | None | None
+- Bezeichnungsfeld99 | Label | None | None | None
+- Bezeichnungsfeld102 | Label | None | None | None
+- Bezeichnungsfeld105 | Label | None | None | None
+- Bezeichnungsfeld428 | Label | None | None | None
+- Bezeichnungsfeld108 | Label | None | None | None
+- Bezeichnungsfeld111 | Label | None | None | None
+- Bezeichnungsfeld114 | Label | None | None | None
+- Bezeichnungsfeld117 | Label | None | None | None
+- Bezeichnungsfeld120 | Label | None | None | None
+- Bezeichnungsfeld132 | Label | None | None | None
+- Bezeichnungsfeld135 | Label | None | None | None
+- Bezeichnungsfeld394 | Label | None | None | None
+- Bezeichnungsfeld123 | Label | None | None | None
+- Bezeichnungsfeld138 | Label | None | None | None
+- Bezeichnungsfeld144 | Label | None | None | None
+- Bezeichnungsfeld141 | Label | None | None | None
+- Bezeichnungsfeld432 | Label | None | None | None
+- Bezeichnungsfeld527 | Label | None | None | None
+- Bezeichnungsfeld538 | Label | None | None | None
+- Bezeichnungsfeld549 | Label | None | None | None
+- Bezeichnungsfeld548 | Label | None | None | None
+- btnMaps | CommandButton | None | None | None
+- Stundenlohn_brutto | ComboBox | Stundenlohn_brutto | {'type': 'sql_or_table', 'ref': 'SELECT zqry_ZK_Lohnarten_Zuschlag.ID, zqry_ZK_Lohnarten_Zuschlag.Bezeichnung, zqry_ZK_Lohnarten_Zuschlag.Satz FROM zqry_ZK_Lohnarten_Zuschlag WHERE (((zqry_ZK_Lohnarten_Zuschlag.Anzeige_MAStamm)=True)) ORDER BY zqry_ZK_Lohnarten_Zuschlag.Bezeichnung; '} | None
+- Fahrerlaubnis | ComboBox | Fahrerlaubnis | {'type': 'sql_or_table', 'ref': '"ja";"nein"'} | None
+- Taetigkeit_Bezeichnung | ComboBox | Taetigkeit_Bezeichnung | {'type': 'sql_or_table', 'ref': '"Sicherheitspersonal";"Servicepersonal"'} | None
+- btnZuAb | CommandButton | None | None | None
+- Amt_Pruefung | TextBox | Amt_Pruefung | None | None
+- Bezeichnungsfeld605 | Label | None | None | None
+- Datum_Pruefung | TextBox | Datum_Pruefung | None | None
+- Bezeichnungsfeld606 | Label | None | None | None
+- Lex_Aktiv | CheckBox | Lex_Aktiv | None | None
+- Bezeichnungsfeld682 | Label | None | None | None
+- cbMailAbrech | CheckBox | eMail_Abrechnung | None | None
+- lblMailAbrech | Label | None | None | None
+- Kleidergroesse | ComboBox | Kleidergroesse | {'type': 'sql_or_table', 'ref': '"XS";"S";"M";"L";"XL";"XXL";"XXXL"'} | None
+- Modul1_DFB | CheckBox | Modul1_DFB | None | None
+- Bezeichnungsfeld695 | Label | None | None | None
+- pgMonat | Page | None | None | None
+- Bezeichnungsfeld163 | Label | None | None | None
+- lblDatum | Label | None | None | None
+- Mon_aktdat | TextBox | None | None | None
+- btnXLZeitkto | CommandButton | None | None | None
+- btnLesen | CommandButton | None | None | None
+- btnUpdJahr | CommandButton | None | None | None
+- EinsProMon | TextBox | None | None | None
+- Bezeichnungsfeld202 | Label | None | None | None
+- TagProMon | TextBox | None | None | None
+- Bezeichnungsfeld204 | Label | None | None | None
+- cboMonat | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT [_tblAlleMonate].MonNr, [_tblAlleMonate].MonKurz FROM _tblAlleMonate ORDER BY [_tblAlleMonate].MonNr; '} | None
+- cboJahr | ComboBox | None | {'type': 'sql_or_table', 'ref': '_tblAlleJahre'} | None
+- sub_tbl_MA_Zeitkonto_Aktmon2 | SubForm | None | None | {'source_object': 'sub_tbl_MA_Zeitkonto_Aktmon2', 'link_master_fields': [], 'link_child_fields': []}
+- lst_Tl1M | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT * FROM qry_JB_MA_Jahr_tl1A_Ue WHERE AktJahr = 2022 AND AktMon = 10 AND MA_ID = 792 ORDER BY MA_ID, AktJahr, AktMon'} | None
+- Bezeichnungsfeld338 | Label | None | None | None
+- lst_Tl2M | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT * FROM qry_JB_MA_Jahr_tl2A_Ue WHERE AktJahr = 2022 AND AktMon = 10 AND MA_ID = 792 ORDER BY MA_ID, AktJahr, AktMon'} | None
+- sub_tbl_MA_Zeitkonto_Aktmon1 | SubForm | None | None | {'source_object': 'sub_tbl_MA_Zeitkonto_Aktmon1', 'link_master_fields': [], 'link_child_fields': []}
+- pgJahr | Page | None | None | None
+- lst_Tl1 | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT * FROM qry_JB_MA_Jahr_tl1A_Ue WHERE AktJahr = 2025 AND MA_ID = 792 ORDER BY MA_ID, AktJahr, AktMon'} | None
+- Bezeichnungsfeld334 | Label | None | None | None
+- lst_Tl2 | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT * FROM qry_JB_MA_Jahr_tl2A_Ue WHERE AktJahr = 2025 AND MA_ID = 792 ORDER BY MA_ID, AktJahr, AktMon'} | None
+- Bezeichnungsfeld336 | Label | None | None | None
+- cboJahrJa | ComboBox | None | {'type': 'sql_or_table', 'ref': '_tblAlleJahre'} | None
+- btnXLJahr | CommandButton | None | None | None
+- pgAuftrUeb | Page | None | None | None
+- btnXLEinsUeber | CommandButton | None | None | None
+- btnZKeinzel | CommandButton | None | None | None
+- Bezeichnungsfeld364 | Label | None | None | None
+- Bericht_drucken | CommandButton | None | None | None
+- btnAU_Lesen | CommandButton | None | None | None
+- cboFilterAuftrag | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT DISTINCT VA_ID,Auftrag FROM qry_MA_VA_Plan_All_AufUeber2_Zuo WHERE VADatum Between #2023-01-01# AND #2023-12-31# And MA_ID = 9295'} | None
+- Bezeichnungsfeld617 | Label | None | None | None
+- lbSummeStunden | Label | None | None | None
+- lst_Zuo | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT * FROM qry_MA_VA_Plan_All_AufUeber2_Zuo WHERE VADatum Between #2025-02-01# AND #2025-02-28# And MA_ID = 792 ORDER BY VADatum, Beginn'} | None
+- txRechSub | TextBox | None | None | None
+- lbRechSub | Label | None | None | None
+- btnRch | CommandButton | None | None | None
+- btnCalc | CommandButton | None | None | None
+- txRechCheck | TextBox | None | None | None
+- lbRechCheck | Label | None | None | None
+- txRechBezahlt | TextBox | None | None | None
+- lbRechBez | Label | None | None | None
+- pgStundenuebersicht | Page | None | None | None
+- btnXLUeberhangStd | CommandButton | None | None | None
+- btnau_lesen2 | CommandButton | None | None | None
+- frmStundenübersicht | SubForm | None | None | {'source_object': 'frm_Stundenübersicht2', 'link_master_fields': ['ID'], 'link_child_fields': ['MA_ID']}
+- pgPlan | Page | None | None | None
+- Bezeichnungsfeld550 | Label | None | None | None
+- txDatumDP | TextBox | Datum_DP | None | None
+- btnAUPl_Lesen | CommandButton | None | None | None
+- btn_Diensplan_prnt | CommandButton | None | None | None
+- btn_Dienstplan_send | CommandButton | None | None | None
+- btnXLDiePl | CommandButton | None | None | None
+- lstPl_Zuo | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT * FROM qry_Dienstplan WHERE VADatum Between #2025-02-11# AND #2025-02-21# And MA_ID = 792 ORDER BY VADatum, Beginn'} | None
+- pgnVerfueg | Page | None | None | None
+- btnMehrfachtermine | CommandButton | None | None | None
+- TermineAbHeute | CheckBox | None | None | None
+- Bezeichnungsfeld403 | Label | None | None | None
+- sub_MA_tbl_MA_NVerfuegZeiten | SubForm | None | None | {'source_object': 'sub_MA_tbl_MA_NVerfuegZeiten', 'link_master_fields': [], 'link_child_fields': []}
+- Bezeichnungsfeld457 | Label | None | None | None
+- btnXLNverfueg | CommandButton | None | None | None
+- pgDienstKl | Page | None | None | None
+- btnReport_Dienstkleidung | CommandButton | None | None | None
+- sub_MA_Dienstkleidung | SubForm | None | None | {'source_object': 'sub_MA_Dienstkleidung', 'link_master_fields': ['ID'], 'link_child_fields': ['MA_ID']}
+- pgVordr | Page | None | None | None
+- sub_tbltmp_MA_Ausgef_Vorlagen | SubForm | None | None | {'source_object': 'sub_tbltmp_MA_Ausgef_Vorlagen', 'link_master_fields': [], 'link_child_fields': []}
+- btn_MA_EinlesVorlageDatei | CommandButton | None | None | None
+- btnXLVordrucke | CommandButton | None | None | None
+- pgBrief | Page | None | None | None
+- Briefkopf | TextBox | Briefkopf | None | None
+- Bezeichnungsfeld408 | Label | None | None | None
+- IstBrfAuto | CheckBox | IstBrfAuto | None | None
+- Bezeichnungsfeld410 | Label | None | None | None
+- Anr | TextBox | Anr | None | None
+- Bezeichnungsfeld412 | Label | None | None | None
+- Anr_Brief | TextBox | Anr_Brief | None | None
+- Bezeichnungsfeld414 | Label | None | None | None
+- Anr_eMail | TextBox | Anr_eMail | None | None
+- Bezeichnungsfeld417 | Label | None | None | None
+- pgStdUeberlaufstd | Page | None | None | None
+- Untergeordnet360 | SubForm | None | None | {'source_object': 'sub_tbl_MA_StundenFolgemonat', 'link_master_fields': ['ID', 'pgJahrStdVorMon'], 'link_child_fields': ['MA_ID', 'AktJahr']}
+- Bezeichnungsfeld361 | Label | None | None | None
+- pgJahrStdVorMon | ComboBox | None | {'type': 'sql_or_table', 'ref': '_tblAlleJahre'} | None
+- pgMaps | Page | None | None | None
+- ufrm_Maps | SubForm | None | None | {'source_object': 'sub_Browser', 'link_master_fields': [], 'link_child_fields': []}
+- Bezeichnungsfeld582 | Label | None | None | None
+- pgSubRech | Page | None | None | None
+- subAuftragRech | SubForm | None | None | {'source_object': 'sub_Auftrag_Rechnung_Gueni', 'link_master_fields': ['ID'], 'link_child_fields': ['MA_ID']}
+- subZuoStunden | SubForm | None | None | {'source_object': 'zfrm_ZUO_Stunden_Sub_lb', 'link_master_fields': [], 'link_child_fields': []}
+- Bezeichnungsfeld681 | Label | None | None | None
+- EmptyCell683 | EmptyCell | None | None | None
+- Bezeichnungsfeld332 | Label | None | None | None
+- cboAuswahl | ComboBox | None | {'type': 'sql_or_table', 'ref': '0;"";1;"Telefon";2;"§ 34a";3;"E-Mail Adresse";4;"Anstellungsart";5;"aktiv";6;"Geburtsdatum";7;"Arbeitsstunden pro Arbeitstag";8;"Arbeitstage pro Woche";9;"Resturlaub Vorjahr";10;"Urlaubsanspruch pro Jahr";11;"Arbeitsstunden akt. Monat";12;"Arbeitsstunden lfd. Jahr";13;"Kosten pro Mitarbeiter pro Std.";14;"DFB e-pin";15;"Sachkunde"'} | None
+- NurAktiveMA | ComboBox | None | {'type': 'sql_or_table', 'ref': '0;"Alle";1;"Alle Aktiven";2;"Festangestellte";3;"Minijobber";4;"Unternehmer";5;"Inaktive ";6;"Vorrübergehend nicht Tätige"'} | None
+- MANameEingabe | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_MA_Mitarbeiterstamm.ID, [Nachname] & " " & [Vorname] AS GesName FROM tbl_MA_Mitarbeiterstamm ORDER BY tbl_MA_Mitarbeiterstamm.Nachname, tbl_MA_Mitarbeiterstamm.Vorname; '} | None
+- Bezeichnungsfeld451 | Label | None | None | None
+- cboIDSuche | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_MA_Mitarbeiterstamm.ID, ([Nachname] & " " & [Vorname]) AS Name FROM tbl_MA_Mitarbeiterstamm ORDER BY ([Nachname] & " " & [Vorname]); '} | None
+- Bezeichnungsfeld471 | Label | None | None | None
+- Bezeichnungsfeld474 | Label | None | None | None
+- Kombinationsfeld674 | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT [_tblZeitraumAngaben].ID, [_tblZeitraumAngaben].Bemerkung FROM _tblZeitraumAngaben WHERE ((([_tblZeitraumAngaben].Anzeige)=True)) ORDER BY [_tblZeitraumAngaben].iSort; '} | None
+- Bezeichnungsfeld675 | Label | None | None | None
+- Text676 | TextBox | None | None | None
+- Bezeichnungsfeld677 | Label | None | None | None
+- Text678 | TextBox | None | None | None
+- Bezeichnungsfeld679 | Label | None | None | None
+- cboZeitraum | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT [_tblZeitraumAngaben].ID, [_tblZeitraumAngaben].Bemerkung FROM _tblZeitraumAngaben WHERE ((([_tblZeitraumAngaben].Anzeige)=True)) ORDER BY [_tblZeitraumAngaben].iSort; '} | None
+- Bezeichnungsfeld366 | Label | None | None | None
+- AU_von | TextBox | None | None | None
+- Bezeichnungsfeld368 | Label | None | None | None
+- AU_bis | TextBox | None | None | None
+- Bezeichnungsfeld370 | Label | None | None | None
+- Erst_von | TextBox | Erst_von | None | None
+- Bezeichnungsfeld416 | Label | None | None | None
+- Erst_am | TextBox | Erst_am | None | None
+- Aend_von | TextBox | Aend_von | None | None
+- Bezeichnungsfeld420 | Label | None | None | None
+- Aend_am | TextBox | Aend_am | None | None
+
+### Subcontrols links
+- Menü -> frm_Menuefuehrung (master: [], child: [])
+- sub_MA_ErsatzEmail -> sub_MA_ErsatzEmail (master: ['ID'], child: ['MA_ID'])
+- sub_MA_Einsatz_Zuo -> sub_MA_Einsatz_Zuo (master: ['ID'], child: ['MA_ID'])
+- sub_tbl_MA_Zeitkonto_Aktmon2 -> sub_tbl_MA_Zeitkonto_Aktmon2 (master: [], child: [])
+- sub_tbl_MA_Zeitkonto_Aktmon1 -> sub_tbl_MA_Zeitkonto_Aktmon1 (master: [], child: [])
+- frmStundenübersicht -> frm_Stundenübersicht2 (master: ['ID'], child: ['MA_ID'])
+- sub_MA_tbl_MA_NVerfuegZeiten -> sub_MA_tbl_MA_NVerfuegZeiten (master: [], child: [])
+- sub_MA_Dienstkleidung -> sub_MA_Dienstkleidung (master: ['ID'], child: ['MA_ID'])
+- sub_tbltmp_MA_Ausgef_Vorlagen -> sub_tbltmp_MA_Ausgef_Vorlagen (master: [], child: [])
+- Untergeordnet360 -> sub_tbl_MA_StundenFolgemonat (master: ['ID', 'pgJahrStdVorMon'], child: ['MA_ID', 'AktJahr'])
+- ufrm_Maps -> sub_Browser (master: [], child: [])
+- subAuftragRech -> sub_Auftrag_Rechnung_Gueni (master: ['ID'], child: ['MA_ID'])
+- subZuoStunden -> zfrm_ZUO_Stunden_Sub_lb (master: [], child: [])
+
+## frm_kd_kundenstamm
+- file: `0006_All_Access_KNOWLEDGE/000_Consys_Eport_11_25/30_forms/FRM_frm_KD_Kundenstamm.json`
+- form_name: `frm_KD_Kundenstamm`
+- record_source: `{'type': 'table', 'ref': 'SELECT tbl_KD_Kundenstamm.* FROM tbl_KD_Kundenstamm ORDER BY tbl_KD_Kundenstamm.kun_Firma; ', 'ref_id': 'TAB_SELECTtbl_KD_Kundenstamm_*FROMtbl_KD_KundenstammORDERBYtbl_KD_Kundenstamm_kun_Firma;'}`
+
+### Form events
+- OnOpen: {'kind': 'Macro', 'macro': ''}
+- OnLoad: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnClose: {'kind': 'Macro', 'macro': ''}
+- OnCurrent: {'kind': 'Procedure', 'handler': '(auto)'}
+- BeforeUpdate: {'kind': 'Procedure', 'handler': '(auto)'}
+- AfterUpdate: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnError: {'kind': 'Macro', 'macro': ''}
+- OnTimer: {'kind': 'Macro', 'macro': ''}
+- OnApplyFilter: {'kind': 'Macro', 'macro': ''}
+- OnFilter: {'kind': 'Macro', 'macro': ''}
+- OnUnload: {'kind': 'Macro', 'macro': ''}
+
+### Controls (name | type | control_source | row_source | subform)
+- Auto_Kopfzeile0 | Label | None | None | None
+- lbl_Datum | Label | None | None | None
+- cboSuchPLZ | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT "_ALLE" AS kun_plz, "Alle" AS kun_ort FROM tbl_KD_Kundenstamm WHERE kun_ID = 11100\nUNION \nSELECT * From qryHlp_KunPlz ORDER BY kun_plz;'} | None
+- Bezeichnungsfeld294 | Label | None | None | None
+- cboSuchOrt | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT "_ALLE" AS kun_Ort, "Alle" AS kun_plz FROM tbl_KD_Kundenstamm WHERE kun_ID = 11100 UNION SELECT * From qryHlp_KunOrt ORDER BY kun_ort;'} | None
+- Bezeichnungsfeld330 | Label | None | None | None
+- btnAlle | CommandButton | None | None | None
+- Rechteck37 | Rectangle | None | None | None
+- Befehl39 | CommandButton | None | None | None
+- Befehl40 | CommandButton | None | None | None
+- Befehl41 | CommandButton | None | None | None
+- Befehl43 | CommandButton | None | None | None
+- Befehl46 | CommandButton | None | None | None
+- mcobtnDelete | CommandButton | None | None | None
+- cboKDNrSuche | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_KD_Kundenstamm.kun_Id FROM tbl_KD_Kundenstamm; '} | None
+- Bezeichnungsfeld456 | Label | None | None | None
+- lbl_Version | Label | None | None | None
+- btnUmsAuswert | CommandButton | None | None | None
+- btnRibbonAus | CommandButton | None | None | None
+- btnRibbonEin | CommandButton | None | None | None
+- btnDaBaEin | CommandButton | None | None | None
+- btnDaBaAus | CommandButton | None | None | None
+- btnAuswertung | CommandButton | None | None | None
+- RegStammKunde | TabControl | None | None | None
+- pgMain | Page | None | None | None
+- kun_IstAktiv | CheckBox | kun_IstAktiv | None | None
+- Bezeichnungsfeld418 | Label | None | None | None
+- Bezeichnungsfeld42 | Label | None | None | None
+- kun_kreditinstitut | TextBox | kun_kreditinstitut | None | None
+- kun_Matchcode | TextBox | kun_Matchcode | None | None
+- Bezeichnungsfeld237 | Label | None | None | None
+- Bezeichnungsfeld45 | Label | None | None | None
+- kun_blz | TextBox | kun_blz | None | None
+- Bezeichnungsfeld48 | Label | None | None | None
+- kun_kontonummer | TextBox | kun_kontonummer | None | None
+- kun_strasse | TextBox | kun_strasse | None | None
+- Bezeichnungsfeld12 | Label | None | None | None
+- Bezeichnungsfeld51 | Label | None | None | None
+- kun_iban | TextBox | kun_iban | None | None
+- kun_plz | TextBox | kun_plz | None | None
+- kun_ort | TextBox | kun_ort | None | None
+- Bezeichnungsfeld18 | Label | None | None | None
+- Bezeichnungsfeld54 | Label | None | None | None
+- kun_bic | TextBox | kun_bic | None | None
+- kun_LKZ | ComboBox | kun_LKZ | {'type': 'sql_or_table', 'ref': 'SELECT [_tblLKZ].ISO_2 AS LKZ, [_tblLKZ].Landesname_deu AS Staat, [_tblLKZ].Euro, [_tblLKZ].TelVorwahl AS Landesvorwahl, "Postfach" AS Postfachtxt FROM _tblLKZ; '} | None
+- Bezeichnungsfeld21 | Label | None | None | None
+- Bezeichnungsfeld57 | Label | None | None | None
+- kun_ustidnr | TextBox | kun_ustidnr | None | None
+- kun_Zahlbed | ComboBox | kun_Zahlbed | {'type': 'sql_or_table', 'ref': 'SELECT [_tblEigeneFirma_Zahlungsbedingungen].[ID], [_tblEigeneFirma_Zahlungsbedingungen].Zahlungsbedingung FROM _tblEigeneFirma_Zahlungsbedingungen; '} | None
+- Bezeichnungsfeld370 | Label | None | None | None
+- kun_telefon | TextBox | kun_telefon | None | None
+- Bezeichnungsfeld27 | Label | None | None | None
+- kun_telefax | TextBox | kun_telefax | None | None
+- Bezeichnungsfeld30 | Label | None | None | None
+- kun_IstSammelRechnung | CheckBox | kun_IstSammelRechnung | None | None
+- Bezeichnungsfeld372 | Label | None | None | None
+- kun_mobil | TextBox | kun_mobil | None | None
+- Bezeichnungsfeld33 | Label | None | None | None
+- kun_email | TextBox | kun_email | None | None
+- Bezeichnungsfeld36 | Label | None | None | None
+- kun_BriefKopf | TextBox | kun_BriefKopf | None | None
+- Bezeichnungsfeld24 | Label | None | None | None
+- kun_URL | TextBox | kun_URL | None | None
+- Bezeichnungsfeld214 | Label | None | None | None
+- kun_ans_manuell | CheckBox | kun_ans_manuell | None | None
+- Bezeichnungsfeld223 | Label | None | None | None
+- adr_mobil | TextBox | kun_mobil | None | None
+- Bezeichnungsfeld218 | Label | None | None | None
+- adr_eMail | TextBox | None | None | None
+- Bezeichnungsfeld356 | Label | None | None | None
+- Anschreiben | TextBox | kun_Anschreiben | None | None
+- Bezeichnungsfeld267 | Label | None | None | None
+- adr_telefon | TextBox | None | None | None
+- Bezeichnungsfeld216 | Label | None | None | None
+- kun_land_vorwahl | TextBox | kun_land_vorwahl | None | None
+- Bezeichnungsfeld246 | Label | None | None | None
+- Bezeichnungsfeld63 | Label | None | None | None
+- kun_geloescht | TextBox | kun_geloescht | None | None
+- kun_IDF_PersonID | ComboBox | kun_IDF_PersonID | {'type': 'query', 'ref': 'qryAdrKundZuo2'} | None
+- Bezeichnungsfeld212 | Label | None | None | None
+- pgPreise | Page | None | None | None
+- sub_KD_Standardpreise | SubForm | None | None | {'source_object': 'sub_KD_Standardpreise', 'link_master_fields': ['kun_ID'], 'link_child_fields': ['kun_ID']}
+- Auftragsübersicht | Page | None | None | None
+- sub_KD_Auftragskopf | SubForm | None | None | {'source_object': 'sub_KD_Auftragskopf', 'link_master_fields': ['kun_ID'], 'link_child_fields': ['kun_ID']}
+- Bezeichnungsfeld424 | Label | None | None | None
+- sub_KD_Rch_Auftragspos | SubForm | None | None | {'source_object': 'sub_KD_Rch_Auftragspos', 'link_master_fields': [], 'link_child_fields': []}
+- Bezeichnungsfeld426 | Label | None | None | None
+- KD_Ges | TextBox | None | None | None
+- Bezeichnungsfeld428 | Label | None | None | None
+- KD_VJ | TextBox | None | None | None
+- Bezeichnungsfeld430 | Label | None | None | None
+- KD_LJ | TextBox | None | None | None
+- Bezeichnungsfeld432 | Label | None | None | None
+- KD_LM | TextBox | None | None | None
+- Bezeichnungsfeld434 | Label | None | None | None
+- btnAufRchPDF | CommandButton | None | None | None
+- btnAufRchPosPDF | CommandButton | None | None | None
+- btnAufEinsPDF | CommandButton | None | None | None
+- PosGesamtsumme | TextBox | None | None | None
+- Bezeichnungsfeld439 | Label | None | None | None
+- pg_Rch_Kopf | Page | None | None | None
+- Rechteck414 | Rectangle | None | None | None
+- Bezeichnungsfeld415 | Label | None | None | None
+- Bezeichnungsfeld413 | Label | None | None | None
+- Rechteck412 | Rectangle | None | None | None
+- Bezeichnungsfeld105 | Label | None | None | None
+- Bezeichnungsfeld106 | Label | None | None | None
+- Bezeichnungsfeld107 | Label | None | None | None
+- Bezeichnungsfeld411 | Label | None | None | None
+- Bezeichnungsfeld92 | Label | None | None | None
+- Bezeichnungsfeld95 | Label | None | None | None
+- Bezeichnungsfeld98 | Label | None | None | None
+- UmsNGes1 | TextBox | None | None | None
+- Bezeichnungsfeld384 | Label | None | None | None
+- PersGes1 | TextBox | None | None | None
+- StdGes1 | TextBox | None | None | None
+- UmsGes1 | TextBox | None | None | None
+- Std51 | TextBox | None | None | None
+- Pers51 | TextBox | None | None | None
+- Std61 | TextBox | None | None | None
+- Pers61 | TextBox | None | None | None
+- Std71 | TextBox | None | None | None
+- Pers71 | TextBox | None | None | None
+- AufAnz1 | TextBox | None | None | None
+- Bezeichnungsfeld392 | Label | None | None | None
+- UmsNGes2 | TextBox | None | None | None
+- Bezeichnungsfeld388 | Label | None | None | None
+- AufAnz2 | TextBox | None | None | None
+- Bezeichnungsfeld394 | Label | None | None | None
+- PersGes2 | TextBox | None | None | None
+- StdGes2 | TextBox | None | None | None
+- UmsGes2 | TextBox | None | None | None
+- Std52 | TextBox | None | None | None
+- Pers52 | TextBox | None | None | None
+- Std62 | TextBox | None | None | None
+- Pers62 | TextBox | None | None | None
+- Std72 | TextBox | None | None | None
+- Pers72 | TextBox | None | None | None
+- UmsNGes3 | TextBox | None | None | None
+- Bezeichnungsfeld390 | Label | None | None | None
+- AufAnz3 | TextBox | None | None | None
+- Bezeichnungsfeld396 | Label | None | None | None
+- PersGes3 | TextBox | None | None | None
+- StdGes3 | TextBox | None | None | None
+- UmsGes3 | TextBox | None | None | None
+- Std53 | TextBox | None | None | None
+- Pers53 | TextBox | None | None | None
+- Std63 | TextBox | None | None | None
+- Pers63 | TextBox | None | None | None
+- Std73 | TextBox | None | None | None
+- Pers73 | TextBox | None | None | None
+- pg_Ang | Page | None | None | None
+- sub_Rch_Kopf_Ang | SubForm | None | None | {'source_object': 'sub_Rch_Kopf_Ang', 'link_master_fields': ['kun_ID'], 'link_child_fields': ['kun_ID']}
+- pgAttach | Page | None | None | None
+- sub_ZusatzDateien | SubForm | None | None | {'source_object': 'sub_ZusatzDateien', 'link_master_fields': ['kun_ID', 'TabellenNr'], 'link_child_fields': ['Ueberordnung', 'TabellenID']}
+- btnNeuAttach | CommandButton | None | None | None
+- Bezeichnungsfeld355 | Label | None | None | None
+- pgAnsprech | Page | None | None | None
+- sub_Ansprechpartner | SubForm | None | None | {'source_object': 'sub_Ansprechpartner', 'link_master_fields': ['kun_Id'], 'link_child_fields': ['kun_Id']}
+- pgBemerk | Page | None | None | None
+- kun_memo | TextBox | kun_memo | None | None
+- Bezeichnungsfeld253 | Label | None | None | None
+- kun_ID | TextBox | kun_ID | None | None
+- Bezeichnungsfeld236 | Label | None | None | None
+- kun_bezeichnung | TextBox | kun_bezeichnung | None | None
+- kun_firma | TextBox | kun_firma | None | None
+- kun_AdressArt | ComboBox | kun_AdressArt | {'type': 'sql_or_table', 'ref': 'SELECT [tbl_KD_Adressart].ID, [tbl_KD_Adressart].kun_AdressArt FROM tbl_KD_Adressart; '} | None
+- Bezeichnungsfeld348 | Label | None | None | None
+- TabellenNr | TextBox | =2 | None | None
+- lst_KD | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_KD_Kundenstamm.kun_Id, tbl_KD_Kundenstamm.kun_Firma, tbl_KD_Ansprechpartner.adr_Nachname, tbl_KD_Ansprechpartner.adr_Vorname, tbl_KD_Ansprechpartner.adr_Handy FROM tbl_KD_Kundenstamm LEFT JOIN tbl_KD_Ansprechpartner ON tbl_KD_Kundenstamm.kun_IDF_PersonID = tbl_KD_Ansprechpartner.adr_ID WHERE kun_IstAktiv = TRUE ORDER BY kun_firma; '} | None
+- Menü | SubForm | None | None | {'source_object': 'frm_Menuefuehrung', 'link_master_fields': [], 'link_child_fields': []}
+- Bezeichnungsfeld422 | Label | None | None | None
+- Textschnell | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_KD_Kundenstamm.kun_Id, tbl_KD_Kundenstamm.kun_Firma FROM tbl_KD_Kundenstamm ORDER BY tbl_KD_Kundenstamm.kun_Firma; '} | None
+- Bezeichnungsfeld333 | Label | None | None | None
+- NurAktiveKD | CheckBox | None | None | None
+- lbl_nur_aktive_anzeigen | Label | None | None | None
+- cbo_Auswahl | ComboBox | None | {'type': 'sql_or_table', 'ref': '0;"";1;"Telefon";2;"eMail";3;"Umsatz";4;""'} | None
+- Zusatzanzeige:_Bezeichnungsfeld | Label | None | None | None
+- Text473 | TextBox | None | None | None
+- Erst_am | TextBox | Erst_am | None | None
+- Bezeichnungsfeld188 | Label | None | None | None
+- Erst_von | TextBox | Erst_von | None | None
+- Bezeichnungsfeld194 | Label | None | None | None
+- Aend_am | TextBox | Aend_am | None | None
+- Bezeichnungsfeld196 | Label | None | None | None
+- Aend_von | TextBox | Aend_von | None | None
+- Bezeichnungsfeld198 | Label | None | None | None
+
+### Subcontrols links
+- sub_KD_Standardpreise -> sub_KD_Standardpreise (master: ['kun_ID'], child: ['kun_ID'])
+- sub_KD_Auftragskopf -> sub_KD_Auftragskopf (master: ['kun_ID'], child: ['kun_ID'])
+- sub_KD_Rch_Auftragspos -> sub_KD_Rch_Auftragspos (master: [], child: [])
+- sub_Rch_Kopf_Ang -> sub_Rch_Kopf_Ang (master: ['kun_ID'], child: ['kun_ID'])
+- sub_ZusatzDateien -> sub_ZusatzDateien (master: ['kun_ID', 'TabellenNr'], child: ['Ueberordnung', 'TabellenID'])
+- sub_Ansprechpartner -> sub_Ansprechpartner (master: ['kun_Id'], child: ['kun_Id'])
+- Menü -> frm_Menuefuehrung (master: [], child: [])
+
+## frm_ma_va_schnellauswahl
+- file: `0006_All_Access_KNOWLEDGE/000_Consys_Eport_11_25/30_forms/FRM_frm_MA_VA_Schnellauswahl.json`
+- form_name: `frm_MA_VA_Schnellauswahl`
+- record_source: `{'type': 'none', 'ref': '', 'ref_id': ''}`
+
+### Form events
+- OnOpen: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnLoad: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnClose: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnCurrent: {'kind': 'Macro', 'macro': ''}
+- BeforeUpdate: {'kind': 'Macro', 'macro': ''}
+- AfterUpdate: {'kind': 'Macro', 'macro': ''}
+- OnError: {'kind': 'Macro', 'macro': ''}
+- OnTimer: {'kind': 'Macro', 'macro': ''}
+- OnApplyFilter: {'kind': 'Macro', 'macro': ''}
+- OnFilter: {'kind': 'Macro', 'macro': ''}
+- OnUnload: {'kind': 'Macro', 'macro': ''}
+
+### Controls (name | type | control_source | row_source | subform)
+- Auto_Kopfzeile0 | Label | None | None | None
+- Befehl38 | CommandButton | None | None | None
+- btnZuAbsage | CommandButton | None | None | None
+- lbl_Datum | Label | None | None | None
+- btnAuftrag | CommandButton | None | None | None
+- btnHilfe | CommandButton | None | None | None
+- btnPosListe | CommandButton | None | None | None
+- btnRibbonAus | CommandButton | None | None | None
+- btnRibbonEin | CommandButton | None | None | None
+- btnDaBaEin | CommandButton | None | None | None
+- btnDaBaAus | CommandButton | None | None | None
+- lbAuftrag | Label | None | None | None
+- iGes_MA | TextBox | None | None | None
+- Bezeichnungsfeld9 | Label | None | None | None
+- lstZeiten | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT VAStart_ID, VADatum, MVA_Start, MVA_Ende, MA_Ist as Ist, MA_Soll as Soll, left(VA_Start,5) As Beginn, left(VA_Ende,5) as Ende FROM qry_Anz_MA_Start WHERE VA_ID = 8470 AND VADatum_ID = 649066 ORDER BY VA_Start, VA_Ende'} | None
+- Bezeichnungsfeld7 | Label | None | None | None
+- lstMA_Plan | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT * FROM qry_Mitarbeiter_Geplant WHERE VA_ID = 8470 AND VADatum_ID = 649066'} | None
+- Bezeichnungsfeld24 | Label | None | None | None
+- VA_ID | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_VA_Auftragstamm.ID, tbl_VA_AnzTage.ID AS VADatum_ID, [tbl_VA_AnzTage].[VADatum] & "   " & [Auftrag] & "   " & [Objekt] & "   " & [Ort] AS Auftragsname FROM tbl_VA_Auftragstamm INNER JOIN (tbl_VA_AnzTage INNER JOIN qry_tbl_Start_proTag ON (tbl_VA_AnzTage.VA_ID = qry_tbl_Start_proTag.VA_ID) AND (tbl_VA_AnzTage.ID = qry_tbl_Start_proTag.VADatum_ID)) ON tbl_VA_Auftragstamm.ID = qry_tbl_Start_proTag.VA_ID WHERE (((tbl_VA_AnzTage.VADatum)>=Format(Now(),"dd/mm/yyyy"))) ORDER BY tbl_VA_AnzTage.VADatum; '} | None
+- Bezeichnungsfeld1 | Label | None | None | None
+- btnAddSelected | CommandButton | None | None | None
+- btnDelAll | CommandButton | None | None | None
+- btnDelSelected | CommandButton | None | None | None
+- cboVADatum | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_VA_AnzTage.ID, tbl_VA_AnzTage.VADatum FROM tbl_VA_AnzTage WHERE (((tbl_VA_AnzTage.VA_ID)= 8470)) ORDER BY ID;'} | None
+- Bezeichnungsfeld26 | Label | None | None | None
+- List_MA | ListBox | None | {'type': 'sql_or_table', 'ref': 'ztbl_MA_Schnellauswahl'} | None
+- Bezeichnungsfeld5 | Label | None | None | None
+- lstMA_Zusage | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT * FROM qry_Mitarbeiter_Zusage WHERE VA_ID = 8470 AND VADatum_ID = 649066'} | None
+- Bezeichnungsfeld32 | Label | None | None | None
+- cboAuftrStatus | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_VA_Status.ID, tbl_VA_Status.Fortschritt FROM tbl_VA_Status; '} | None
+- Bezeichnungsfeld35 | Label | None | None | None
+- strSchnellSuche | TextBox | None | None | None
+- btnSchnellGo | CommandButton | None | None | None
+- Lst_Parallel_Einsatz | ListBox | None | {'type': 'sql_or_table', 'ref': 'SELECT * FROM qry_VA_Einsatz WHERE VADatum = #2024-08-24#'} | None
+- Bezeichnungsfeld37 | Label | None | None | None
+- cboAnstArt | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT tbl_hlp_MA_Anstellungsart.ID, tbl_hlp_MA_Anstellungsart.Anstellungsart, tbl_hlp_MA_Anstellungsart.Sortierung FROM tbl_hlp_MA_Anstellungsart WHERE (((tbl_hlp_MA_Anstellungsart.ID)=3 Or (tbl_hlp_MA_Anstellungsart.ID)=5 Or (tbl_hlp_MA_Anstellungsart.ID)=11 Or (tbl_hlp_MA_Anstellungsart.ID)=9 Or (tbl_hlp_MA_Anstellungsart.ID)=13)) ORDER BY tbl_hlp_MA_Anstellungsart.Sortierung; '} | None
+- IstVerfuegbar | CheckBox | None | None | None
+- lbl_NurFreie | Label | None | None | None
+- cboQuali | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT [tbl_MA_Einsatzart].ID, [tbl_MA_Einsatzart].QualiName FROM tbl_MA_Einsatzart; '} | None
+- Bezeichnungsfeld269 | Label | None | None | None
+- Bezeichnungsfeld263 | Label | None | None | None
+- Bezeichnungsfeld517 | Label | None | None | None
+- DienstEnde | TextBox | None | None | None
+- Bezeichnungsfeld48 | Label | None | None | None
+- frm_Menuefuehrung | SubForm | None | None | {'source_object': 'frm_Menuefuehrung', 'link_master_fields': [], 'link_child_fields': []}
+- btnAddZusage | CommandButton | None | None | None
+- btnMoveZusage | CommandButton | None | None | None
+- btnDelZusage | CommandButton | None | None | None
+- btnSortZugeord | CommandButton | None | None | None
+- btnSortPLan | CommandButton | None | None | None
+- IstAktiv | CheckBox | None | None | None
+- lbl_IstAktiv | Label | None | None | None
+- btnMail | CommandButton | None | None | None
+- Bezeichnungsfeld62 | Label | None | None | None
+- Bezeichnungsfeld63 | Label | None | None | None
+- btnMailSelected | CommandButton | None | None | None
+- cbVerplantVerfuegbar | CheckBox | None | None | None
+- lbl_VerplantVerfuegbar | Label | None | None | None
+- cbNur34a | CheckBox | None | None | None
+- lbl_Nur34a | Label | None | None | None
+
+### Subcontrols links
+- frm_Menuefuehrung -> frm_Menuefuehrung (master: [], child: [])
+
+## frm_dp_dienstplan_objekt
+- file: `0006_All_Access_KNOWLEDGE/000_Consys_Eport_11_25/30_forms/FRM_frm_DP_Dienstplan_Objekt.json`
+- form_name: `frm_DP_Dienstplan_Objekt`
+- record_source: `{'type': 'none', 'ref': '', 'ref_id': ''}`
+
+### Form events
+- OnOpen: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnLoad: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnClose: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnCurrent: {'kind': 'Macro', 'macro': ''}
+- BeforeUpdate: {'kind': 'Macro', 'macro': ''}
+- AfterUpdate: {'kind': 'Macro', 'macro': ''}
+- OnError: {'kind': 'Macro', 'macro': ''}
+- OnTimer: {'kind': 'Macro', 'macro': ''}
+- OnApplyFilter: {'kind': 'Macro', 'macro': ''}
+- OnFilter: {'kind': 'Macro', 'macro': ''}
+- OnUnload: {'kind': 'Macro', 'macro': ''}
+
+### Controls (name | type | control_source | row_source | subform)
+- lbl_Datum | Label | None | None | None
+- Bezeichnungsfeld96 | Label | None | None | None
+- Rechteck108 | Rectangle | None | None | None
+- dtStartdatum | TextBox | None | None | None
+- btnStartdatum | CommandButton | None | None | None
+- btnVor | CommandButton | None | None | None
+- btnrueck | CommandButton | None | None | None
+- tmpFokus | TextBox | None | None | None
+- btn_Heute | CommandButton | None | None | None
+- NurIstNichtZugeordnet | CheckBox | None | None | None
+- Bezeichnungsfeld15 | Label | None | None | None
+- PosAusblendAb | TextBox | None | None | None
+- Bezeichnungsfeld17 | Label | None | None | None
+- Bezeichnungsfeld20 | Label | None | None | None
+- IstAuftrAusblend | CheckBox | None | None | None
+- btnOutpExcelSend | CommandButton | None | None | None
+- btnOutpExcel | CommandButton | None | None | None
+- Befehl37 | CommandButton | None | None | None
+- btnRibbonAus | CommandButton | None | None | None
+- btnRibbonEin | CommandButton | None | None | None
+- btnDaBaEin | CommandButton | None | None | None
+- btnDaBaAus | CommandButton | None | None | None
+- lbl_Version | Label | None | None | None
+- sub_DP_Grund | SubForm | None | None | {'source_object': 'sub_DP_Grund', 'link_master_fields': [], 'link_child_fields': []}
+- lbl_Auftrag | Label | None | None | None
+- lbl_Tag_1 | TextBox | None | None | None
+- lbl_Tag_2 | TextBox | None | None | None
+- lbl_Tag_3 | TextBox | None | None | None
+- lbl_Tag_4 | TextBox | None | None | None
+- lbl_Tag_5 | TextBox | None | None | None
+- lbl_Tag_6 | TextBox | None | None | None
+- lbl_Tag_7 | TextBox | None | None | None
+- frm_Menuefuehrung | SubForm | None | None | {'source_object': 'frm_Menuefuehrung', 'link_master_fields': [], 'link_child_fields': []}
+
+### Subcontrols links
+- sub_DP_Grund -> sub_DP_Grund (master: [], child: [])
+- frm_Menuefuehrung -> frm_Menuefuehrung (master: [], child: [])
+
+## frm_dp_dienstplan_objekt1
+- file: `0006_All_Access_KNOWLEDGE/000_Consys_Eport_11_25/30_forms/FRM_frm_DP_Dienstplan_Objekt1.json`
+- form_name: `frm_DP_Dienstplan_Objekt1`
+- record_source: `{'type': 'none', 'ref': '', 'ref_id': ''}`
+
+### Form events
+- OnOpen: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnLoad: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnClose: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnCurrent: {'kind': 'Macro', 'macro': ''}
+- BeforeUpdate: {'kind': 'Macro', 'macro': ''}
+- AfterUpdate: {'kind': 'Macro', 'macro': ''}
+- OnError: {'kind': 'Macro', 'macro': ''}
+- OnTimer: {'kind': 'Macro', 'macro': ''}
+- OnApplyFilter: {'kind': 'Macro', 'macro': ''}
+- OnFilter: {'kind': 'Macro', 'macro': ''}
+- OnUnload: {'kind': 'Macro', 'macro': ''}
+
+### Controls (name | type | control_source | row_source | subform)
+- lbl_Datum | Label | None | None | None
+- btnDruck | CommandButton | None | None | None
+- Bezeichnungsfeld96 | Label | None | None | None
+- btn_MenueFuehrung | CommandButton | None | None | None
+- btnHilfe | CommandButton | None | None | None
+- Rechteck108 | Rectangle | None | None | None
+- dtStartdatum | TextBox | None | None | None
+- btnStartdatum | CommandButton | None | None | None
+- btnVor | CommandButton | None | None | None
+- btnrueck | CommandButton | None | None | None
+- tmpFokus | TextBox | None | None | None
+- btn_Heute | CommandButton | None | None | None
+- NurIstNichtZugeordnet | CheckBox | None | None | None
+- Bezeichnungsfeld15 | Label | None | None | None
+- PosAusblendAb | TextBox | None | None | None
+- Bezeichnungsfeld17 | Label | None | None | None
+- Bezeichnungsfeld20 | Label | None | None | None
+- IstAuftrAusblend | CheckBox | None | None | None
+- btnOutpExcelSend | CommandButton | None | None | None
+- btnOutpExcel | CommandButton | None | None | None
+- Befehl37 | CommandButton | None | None | None
+- btnRibbonAus | CommandButton | None | None | None
+- btnRibbonEin | CommandButton | None | None | None
+- btnDaBaEin | CommandButton | None | None | None
+- btnDaBaAus | CommandButton | None | None | None
+- btnReq | CommandButton | None | None | None
+- lbl_Version | Label | None | None | None
+- sub_DP_Grund | SubForm | None | None | {'source_object': 'sub_DP_Grund', 'link_master_fields': [], 'link_child_fields': []}
+- lbl_Auftrag | Label | None | None | None
+- lbl_Tag_1 | TextBox | None | None | None
+- lbl_Tag_2 | TextBox | None | None | None
+- lbl_Tag_3 | TextBox | None | None | None
+- lbl_Tag_4 | TextBox | None | None | None
+- lbl_Tag_5 | TextBox | None | None | None
+- lbl_Tag_6 | TextBox | None | None | None
+- lbl_Tag_7 | TextBox | None | None | None
+- frm_Menuefuehrung | SubForm | None | None | {'source_object': 'frm_Menuefuehrung', 'link_master_fields': [], 'link_child_fields': []}
+
+### Subcontrols links
+- sub_DP_Grund -> sub_DP_Grund (master: [], child: [])
+- frm_Menuefuehrung -> frm_Menuefuehrung (master: [], child: [])
+
+## frm_dp_dienstplan_ma
+- file: `0006_All_Access_KNOWLEDGE/000_Consys_Eport_11_25/30_forms/FRM_frm_DP_Dienstplan_MA.json`
+- form_name: `frm_DP_Dienstplan_MA`
+- record_source: `{'type': 'none', 'ref': '', 'ref_id': ''}`
+
+### Form events
+- OnOpen: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnLoad: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnClose: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnCurrent: {'kind': 'Macro', 'macro': ''}
+- BeforeUpdate: {'kind': 'Macro', 'macro': ''}
+- AfterUpdate: {'kind': 'Macro', 'macro': ''}
+- OnError: {'kind': 'Macro', 'macro': ''}
+- OnTimer: {'kind': 'Macro', 'macro': ''}
+- OnApplyFilter: {'kind': 'Macro', 'macro': ''}
+- OnFilter: {'kind': 'Macro', 'macro': ''}
+- OnUnload: {'kind': 'Macro', 'macro': ''}
+
+### Controls (name | type | control_source | row_source | subform)
+- lbl_Datum | Label | None | None | None
+- Bezeichnungsfeld96 | Label | None | None | None
+- Rechteck108 | Rectangle | None | None | None
+- dtStartdatum | TextBox | None | None | None
+- btnStartdatum | CommandButton | None | None | None
+- btnVor | CommandButton | None | None | None
+- btnrueck | CommandButton | None | None | None
+- tmpFokus | TextBox | None | None | None
+- btn_Heute | CommandButton | None | None | None
+- NurAktiveMA | ComboBox | None | {'type': 'sql_or_table', 'ref': '0;"Alle anzeigen";1;"Alle aktiven";2;"Festangestellte";3;"Minijobber";4;Sub"'} | None
+- btnOutpExcelSend | CommandButton | None | None | None
+- btnOutpExcel | CommandButton | None | None | None
+- Befehl37 | CommandButton | None | None | None
+- btnRibbonAus | CommandButton | None | None | None
+- btnRibbonEin | CommandButton | None | None | None
+- btnDaBaEin | CommandButton | None | None | None
+- btnDaBaAus | CommandButton | None | None | None
+- lbl_Version | Label | None | None | None
+- btnMADienstpl | CommandButton | None | None | None
+- Befehl20 | CommandButton | None | None | None
+- btnDPSenden | CommandButton | None | None | None
+- dtEnddatum | TextBox | None | None | None
+- lbl_Tag_7 | TextBox | None | None | None
+- lbl_Tag_6 | TextBox | None | None | None
+- lbl_Tag_5 | TextBox | None | None | None
+- lbl_Tag_4 | TextBox | None | None | None
+- lbl_Tag_3 | TextBox | None | None | None
+- lbl_Tag_2 | TextBox | None | None | None
+- lbl_Tag_1 | TextBox | None | None | None
+- lbl_Auftrag | Label | None | None | None
+- sub_DP_Grund | SubForm | None | None | {'source_object': 'sub_DP_Grund_MA', 'link_master_fields': [], 'link_child_fields': []}
+- frm_Menuefuehrung | SubForm | None | None | {'source_object': 'frm_Menuefuehrung', 'link_master_fields': [], 'link_child_fields': []}
+
+### Subcontrols links
+- sub_DP_Grund -> sub_DP_Grund_MA (master: [], child: [])
+- frm_Menuefuehrung -> frm_Menuefuehrung (master: [], child: [])
+
+## frm_auftragsuebersicht_neu
+- file: `0006_All_Access_KNOWLEDGE/000_Consys_Eport_11_25/30_forms/FRM_frm_Auftragsuebersicht_neu.json`
+- form_name: `frm_Auftragsuebersicht_neu`
+- record_source: `{'type': 'none', 'ref': '', 'ref_id': ''}`
+
+### Form events
+- OnOpen: {'kind': 'Macro', 'macro': ''}
+- OnLoad: {'kind': 'Procedure', 'handler': '(auto)'}
+- OnClose: {'kind': 'Macro', 'macro': ''}
+- OnCurrent: {'kind': 'Macro', 'macro': ''}
+- BeforeUpdate: {'kind': 'Macro', 'macro': ''}
+- AfterUpdate: {'kind': 'Macro', 'macro': ''}
+- OnError: {'kind': 'Macro', 'macro': ''}
+- OnTimer: {'kind': 'Macro', 'macro': ''}
+- OnApplyFilter: {'kind': 'Macro', 'macro': ''}
+- OnFilter: {'kind': 'Macro', 'macro': ''}
+- OnUnload: {'kind': 'Macro', 'macro': ''}
+
+### Controls (name | type | control_source | row_source | subform)
+- Bezeichnungsfeld30 | Label | None | None | None
+- Kombinationsfeld47 | ComboBox | None | {'type': 'sql_or_table', 'ref': 'SELECT [_FindReplace].[Suchlauf] FROM _FindReplace; '} | None
+- Suchlauf_Bezeichnungsfeld | Label | None | None | None
+- btn_uedruck | CommandButton | None | None | None
+- Menü | SubForm | None | None | {'source_object': 'frm_Menuefuehrung', 'link_master_fields': [], 'link_child_fields': []}
+- Einsatzübersicht kpl. | SubForm | None | None | {'source_object': 'frm_Einsatzuebersicht_kpl', 'link_master_fields': [], 'link_child_fields': []}
+
+### Subcontrols links
+- Menü -> frm_Menuefuehrung (master: [], child: [])
+- Einsatzübersicht kpl. -> frm_Einsatzuebersicht_kpl (master: [], child: [])

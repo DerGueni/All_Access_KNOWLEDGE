@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planungsübersicht - CONSYS</title>
+    <style>
+        /* CSS Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8B0000;
+            overflow: hidden;
+        }
+
+        /* Window Frame Container */
+        .window-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #8B0000;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 3px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .title-bar-text {
+            color: white;
+        }
+
+        .title-bar-close {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 14px;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            background-color: #8B0000;
+        }
+
+        /* Left Menu - Dunkelrot */
+        .left-menu {
+            width: 180px;
+            background-color: #5c0000;
+            border-right: 2px solid #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            border-bottom: 1px solid #ffffff;
+        }
+
+        .menu-item {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 4px 8px;
+            margin: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            text-align: left;
+        }
+
+        .menu-item:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #8B0000;
+            padding: 4px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background-color: #b8b8d8;
+            padding: 4px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            height: 22px;
+        }
+
+        .btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .btn:hover {
+            filter: brightness(1.05);
+        }
+
+        /* Form Section */
+        .form-section {
+            background-color: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Calendar Header Row */
+        .calendar-header-row {
+            display: flex;
+            gap: 1px;
+            margin-bottom: 4px;
+        }
+
+        .calendar-header-cell {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 10px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .calendar-header-cell.weekend {
+            background: #c0c0c0;
+        }
+
+        .calendar-header-cell.auftrag {
+            width: 250px;
+            flex: none;
+            text-align: left;
+        }
+
+        /* Calendar Grid */
+        .calendar-body {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .calendar-row {
+            display: flex;
+            border-bottom: 1px solid #c0c0c0;
+            min-height: 60px;
+        }
+
+        .calendar-row:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .col-auftrag {
+            width: 250px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            background-color: #ffffcc;
+            border-right: 1px solid #808080;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .auftrag-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .auftrag-details {
+            font-weight: normal;
+            font-size: 9px;
+            color: #666;
+        }
+
+        .day-column {
+            flex: 1;
+            min-width: 100px;
+            border-right: 1px solid #c0c0c0;
+            padding: 2px;
+            font-size: 9px;
+            background: white;
+        }
+
+        .day-column.weekend {
+            background-color: #f8f8f8;
+        }
+
+        .ma-entry {
+            display: flex;
+            padding: 1px 2px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .ma-entry:hover {
+            background-color: #e0e0ff;
+        }
+
+        .ma-name {
+            flex: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .ma-von {
+            width: 35px;
+            text-align: center;
+            color: #009900;
+            font-weight: bold;
+        }
+
+        .ma-bis {
+            width: 35px;
+            text-align: center;
+        }
+
+        .ma-entry.storno .ma-name {
+            color: #cc0000;
+            font-weight: bold;
+        }
+
+        /* Input & Select Styles */
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+            height: 20px;
+        }
+
+        input[type="checkbox"] {
+            width: 13px;
+            height: 13px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            height: 23px;
+            margin-top: 4px;
+        }
+
+        .toolbar-separator {
+            width: 2px;
+            height: 18px;
+            background: linear-gradient(to right, #808080, #ffffff);
+            margin: 0 4px;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top-color: #8B0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <span class="title-bar-text">Planungsübersicht - CONSYS</span>
+            <button class="title-bar-close" onclick="window.close()">×</button>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+            <div class="left-menu">
+                <div class="menu-header">CONSYS</div>
+                <button class="menu-item">Dienstplanübersicht</button>
+                <button class="menu-item">Planungsübersicht</button>
+                <button class="menu-item">Auftragsverwaltung</button>
+                <button class="menu-item">Mitarbeiterverwaltung</button>
+                <button class="menu-item">Zeitkonten</button>
+                <button class="menu-item">Abwesenheitsplanung</button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <label style="font-size: 10px;">Startdatum:</label>
+                    <input type="date" id="dtStartdatum" class="form-input" style="width:110px;">
+                    <button class="btn" id="btnVor">►</button>
+                    <button class="btn" id="btnrueck">◄</button>
+                    <button class="btn" id="btn_Heute">Ab Heute</button>
+
+                    <div class="toolbar-separator"></div>
+
+                    <input type="checkbox" id="NurIstNichtZugeordnet">
+                    <label style="font-size: 10px;">Nur freie Schichten</label>
+
+                    <div class="toolbar-separator"></div>
+
+                    <input type="checkbox" id="IstAuftrAusblend">
+                    <label style="font-size: 10px;">Nur Aufträge mit weniger als</label>
+                    <input type="text" id="PosAusblendAb" value="25" class="form-input" style="width:40px; text-align:center;">
+                    <label style="font-size: 10px;">Positionen</label>
+
+                    <div class="toolbar-separator"></div>
+
+                    <button class="btn" id="btnOutpExcel">Übersicht drucken</button>
+                </div>
+
+                <!-- Form Section -->
+                <div class="form-section">
+                    <!-- Calendar Header -->
+                    <div class="calendar-header-row">
+                        <div class="calendar-header-cell auftrag">Auftrag / Veranstaltung</div>
+                        <div class="calendar-header-cell" id="day_1">Mo. 28.07.25</div>
+                        <div class="calendar-header-cell" id="day_2">Di. 29.07.25</div>
+                        <div class="calendar-header-cell" id="day_3">Mi. 30.07.25</div>
+                        <div class="calendar-header-cell" id="day_4">Do. 31.07.25</div>
+                        <div class="calendar-header-cell" id="day_5">Fr. 01.08.25</div>
+                        <div class="calendar-header-cell weekend" id="day_6">Sa. 02.08.25</div>
+                        <div class="calendar-header-cell weekend" id="day_7">So. 03.08.25</div>
+                    </div>
+
+                    <!-- Calendar Body -->
+                    <div class="calendar-body" id="calendarBody">
+                        <div class="loading">Lade Planungsübersicht...</div>
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span id="lblStatus">Bereit</span>
+                    <span id="timestamp"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        const state = {
+            startDate: new Date(),
+            auftraege: [],
+            zuordnungen: {},
+            nurFreieSchichten: false,
+            posAusblendAb: 25,
+            istAuftrAusblend: false
+        };
+
+        const WOCHENTAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            state.startDate = new Date(today.setDate(today.getDate() + diff));
+
+            updateDateInputs();
+            setupEventListeners();
+            await loadData();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('btnVor').addEventListener('click', () => navigateWeek(1));
+            document.getElementById('btnrueck').addEventListener('click', () => navigateWeek(-1));
+            document.getElementById('btn_Heute').addEventListener('click', goToToday);
+            document.getElementById('btnStartdatum') && document.getElementById('btnStartdatum').addEventListener('click', () => {
+                const newDate = document.getElementById('dtStartdatum').value;
+                if (newDate) {
+                    state.startDate = new Date(newDate);
+                    const dayOfWeek = state.startDate.getDay();
+                    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                    state.startDate.setDate(state.startDate.getDate() + diff);
+                    updateDateInputs();
+                    loadData();
+                }
+            });
+
+            document.getElementById('NurIstNichtZugeordnet').addEventListener('change', (e) => {
+                state.nurFreieSchichten = e.target.checked;
+                renderCalendar();
+            });
+
+            document.getElementById('IstAuftrAusblend').addEventListener('change', (e) => {
+                state.istAuftrAusblend = e.target.checked;
+                renderCalendar();
+            });
+
+            document.getElementById('PosAusblendAb').addEventListener('change', (e) => {
+                state.posAusblendAb = parseInt(e.target.value) || 25;
+                renderCalendar();
+            });
+
+            document.getElementById('btnOutpExcel') && document.getElementById('btnOutpExcel').addEventListener('click', () => alert('Übersicht drucken'));
+        }
+
+        function navigateWeek(direction) {
+            state.startDate.setDate(state.startDate.getDate() + (direction * 7));
+            updateDateInputs();
+            loadData();
+        }
+
+        function goToToday() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            state.startDate = new Date(today.setDate(today.getDate() + diff));
+            updateDateInputs();
+            loadData();
+        }
+
+        function updateDateInputs() {
+            document.getElementById('dtStartdatum').value = formatDateForInput(state.startDate);
+            updateHeaderLabels();
+        }
+
+        function updateHeaderLabels() {
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(state.startDate);
+                date.setDate(date.getDate() + i);
+                const dayName = WOCHENTAGE[date.getDay()];
+                const dateStr = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear().toString().slice(-2)}`;
+                const dayHeader = document.querySelector(`#day_${i + 1}`);
+                if (dayHeader) {
+                    dayHeader.textContent = `${dayName}. ${dateStr}`;
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                    dayHeader.classList.toggle('weekend', isWeekend);
+                }
+            }
+        }
+
+        async function loadData() {
+            const container = document.getElementById('calendarBody');
+            container.innerHTML = '<div class="loading">Lade Planungsübersicht...</div>';
+
+            try {
+                const startStr = formatDateForInput(state.startDate);
+                const endDate = new Date(state.startDate);
+                endDate.setDate(endDate.getDate() + 6);
+                const endStr = formatDateForInput(endDate);
+
+                const auftragResponse = await fetch(`${API_BASE}/auftraege?von=${startStr}&bis=${endStr}`);
+                const auftragResult = await auftragResponse.json();
+                state.auftraege = auftragResult.data || [];
+
+                state.zuordnungen = {};
+                try {
+                    const zuordResponse = await fetch(`${API_BASE}/zuordnungen?von=${startStr}&bis=${endStr}`);
+                    if (zuordResponse.ok) {
+                        const zuordResult = await zuordResponse.json();
+                        for (const z of (zuordResult.data || [])) {
+                            const key = `${z.VA_ID}_${formatDateForInput(new Date(z.VADatum))}`;
+                            if (!state.zuordnungen[key]) {
+                                state.zuordnungen[key] = [];
+                            }
+                            state.zuordnungen[key].push(z);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Zuordnungen laden fehlgeschlagen:', e);
+                }
+
+                renderCalendar();
+            } catch (error) {
+                console.error('Fehler beim Laden:', error);
+                container.innerHTML = '<div style="padding: 20px; color: red;">Fehler beim Laden der Daten</div>';
+            }
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendarBody');
+
+            let auftraege = state.auftraege;
+
+            if (auftraege.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Keine Aufträge im gewählten Zeitraum</div>';
+                return;
+            }
+
+            let html = '';
+
+            for (const auftrag of auftraege.slice(0, 50)) {
+                const auftragName = auftrag.Auftrag || auftrag.VA_Bezeichnung || 'Unbekannt';
+                const objekt = auftrag.Objekt || '';
+                const ort = auftrag.Ort || '';
+
+                html += '<div class="calendar-row">';
+                html += `<div class="col-auftrag">
+                    <span class="auftrag-name">${escapeHtml(auftragName)}, ${escapeHtml(ort)}</span>
+                    <span class="auftrag-details">Auftrag Objekt Ort</span>
+                </div>`;
+
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(state.startDate);
+                    date.setDate(date.getDate() + i);
+                    const dateKey = formatDateForInput(date);
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+                    const key = `${auftrag.ID}_${dateKey}`;
+                    const zuordnungen = state.zuordnungen[key] || [];
+
+                    html += `<div class="day-column ${isWeekend ? 'weekend' : ''}">`;
+
+                    for (const z of zuordnungen) {
+                        const maName = z.MAName || z.Nachname || 'MA';
+                        const von = formatTime(z.VA_Start);
+                        const bis = formatTime(z.VA_Ende);
+                        const isStorno = (z.Status || '').toLowerCase().includes('storno');
+
+                        html += `<div class="ma-entry ${isStorno ? 'storno' : ''}">
+                            <span class="ma-name">${escapeHtml(maName)}</span>
+                            <span class="ma-von">${von}</span>
+                            <span class="ma-bis">${bis}</span>
+                        </div>`;
+                    }
+
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function formatDateForInput(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const day = d.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatTime(t) {
+            if (!t) return '';
+            if (typeof t === 'number' && t < 1) {
+                const h = Math.floor(t * 24), m = Math.round((t * 24 - h) * 60);
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            }
+            return typeof t === 'string' && t.includes(':') ? t.substring(0, 5) : t;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            const elem = document.getElementById('timestamp');
+            if (elem) {
+                elem.textContent = now.toLocaleString('de-DE');
+            }
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+    </script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+
+    <!-- Logic-Modul (muss nach WebView2 Bridge geladen werden) -->
+    <script type="module" src="logic/frm_DP_Dienstplan_Objekt.logic.js"></script>
+</body>
+</html>

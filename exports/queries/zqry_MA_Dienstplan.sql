@@ -1,0 +1,6 @@
+-- Query: zqry_MA_Dienstplan
+-- Type: 0
+SELECT *
+FROM qry_MA_VA_Plan_All_AufUeber2_Zuo
+ORDER BY qry_MA_VA_Plan_All_AufUeber2_Zuo.VADatum, qry_MA_VA_Plan_All_AufUeber2_Zuo.MA_ID;
+

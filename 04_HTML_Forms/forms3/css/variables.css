@@ -1,0 +1,326 @@
+/* ==========================================================
+   CONSYS Design System - CSS Custom Properties (Variables)
+   ==========================================================
+   Erstellt: 2026-01-06
+   Zweck: Einheitliche Design-Tokens fuer alle HTML-Formulare
+
+   Verwendung:
+   1. Diese Datei in <head> einbinden:
+      <link rel="stylesheet" href="../css/variables.css">
+
+   2. CSS-Variablen nutzen:
+      color: var(--color-text-primary);
+      font-size: var(--font-size-base);
+   ========================================================== */
+
+:root {
+    /* ========================================================
+       FARBEN - Primaerpalette (CONSYS Standard)
+       ======================================================== */
+
+    /* Primaerfarben - Blau/Violett-Toene */
+    --color-primary-900: #000080;     /* Title-Bar Start, Sidebar-Header */
+    --color-primary-800: #1084d0;     /* Title-Bar End (Gradient) */
+    --color-primary-700: #4040a0;     /* Gradient-Akzent */
+    --color-primary-600: #6060a0;     /* Sidebar-Hintergrund */
+    --color-primary-500: #8080c0;     /* Body/Window-Hintergrund */
+    --color-primary-400: #9090c0;     /* Header-Row, Toolbar */
+    --color-primary-300: #a0a0c0;     /* Button-Gradient End */
+    --color-primary-200: #b8b8d8;     /* Content-Area Hell */
+    --color-primary-100: #c0c0d8;     /* Summary-Bar, Input-Section */
+    --color-primary-50:  #d0d0e0;     /* Button-Gradient Start */
+
+    /* Akzentfarben - Gruen */
+    --color-success-600: #60a060;
+    --color-success-500: #90c090;
+    --color-success-400: #a0d0a0;
+
+    /* Akzentfarben - Rot */
+    --color-danger-600: #a06060;
+    --color-danger-500: #c09090;
+    --color-danger-400: #d0a0a0;
+
+    /* Akzentfarben - Gelb */
+    --color-warning-600: #c0c040;
+    --color-warning-500: #e0e080;
+    --color-warning-400: #f0f0a0;
+
+    /* Akzentfarben - Blau (Buttons) */
+    --color-info-600: #6060a0;
+    --color-info-500: #9090c0;
+    --color-info-400: #a0a0d0;
+
+    /* Neutralfarben */
+    --color-white: #ffffff;
+    --color-gray-50: #f0f0f0;
+    --color-gray-100: #e8e8e8;
+    --color-gray-200: #e0e0e0;
+    --color-gray-300: #d0d0d0;
+    --color-gray-400: #c0c0c0;
+    --color-gray-500: #a0a0a0;
+    --color-gray-600: #808080;
+    --color-gray-700: #606060;
+    --color-gray-800: #404040;
+    --color-gray-900: #333333;
+    --color-black: #000000;
+
+    /* ========================================================
+       FARBEN - Semantische Zuordnung
+       ======================================================== */
+
+    /* Hintergruende */
+    --bg-body: var(--color-primary-500);           /* #8080c0 */
+    --bg-sidebar: var(--color-primary-600);        /* #6060a0 */
+    --bg-sidebar-header: var(--color-primary-900); /* #000080 */
+    --bg-content: var(--color-primary-500);        /* #8080c0 */
+    --bg-content-light: var(--color-primary-200);  /* #b8b8d8 */
+    --bg-header-row: var(--color-primary-400);     /* #9090c0 */
+    --bg-toolbar: var(--color-primary-400);        /* #9090c0 */
+    --bg-input: var(--color-white);
+    --bg-input-disabled: var(--color-gray-200);
+
+    /* Texte */
+    --color-text-primary: var(--color-black);
+    --color-text-secondary: var(--color-gray-800);
+    --color-text-muted: var(--color-gray-700);
+    --color-text-inverse: var(--color-white);
+    --color-text-title: var(--color-primary-900);
+    --color-text-link: var(--color-primary-900);
+
+    /* Borders */
+    --border-color-light: var(--color-white);
+    --border-color-medium: var(--color-gray-600);
+    --border-color-dark: #606090;
+    --border-color-input: #7070a0;
+    --border-color-section: #606090;
+
+    /* Status-Farben */
+    --color-positive: #008000;
+    --color-negative: #c00000;
+    --color-highlight: #ffff80;
+
+    /* ========================================================
+       TYPOGRAFIE
+       ======================================================== */
+
+    /* Font-Familie */
+    --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-family-mono: 'Consolas', 'Courier New', monospace;
+
+    /* Font-Groessen - Skala */
+    --font-size-xs: 9px;      /* Badges, Notizen, GPT-Box */
+    --font-size-sm: 10px;     /* Status-Bar, Header-Links */
+    --font-size-base: 11px;   /* Standard fuer alle Elemente */
+    --font-size-md: 12px;     /* Labels, Menu-Buttons, Sidebar-Buttons */
+    --font-size-lg: 14px;     /* Section-Titel, Subform-Header */
+    --font-size-xl: 16px;     /* Haupt-Titel */
+    --font-size-2xl: 18px;    /* Grosse Formular-Titel */
+    --font-size-3xl: 24px;    /* Hauptformular-Titel (2x Sidebar-Buttons) */
+
+    /* Font-Gewichte */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Zeilenhoehen */
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.4;
+    --line-height-relaxed: 1.6;
+
+    /* ========================================================
+       SPACING (Abstaende)
+       ======================================================== */
+
+    --spacing-0: 0;
+    --spacing-1: 1px;
+    --spacing-2: 2px;
+    --spacing-3: 3px;
+    --spacing-4: 4px;
+    --spacing-5: 5px;
+    --spacing-6: 6px;
+    --spacing-8: 8px;
+    --spacing-10: 10px;
+    --spacing-12: 12px;
+    --spacing-16: 16px;
+    --spacing-20: 20px;
+    --spacing-24: 24px;
+
+    /* ========================================================
+       LAYOUT
+       ======================================================== */
+
+    /* Sidebar */
+    --sidebar-width: 185px;
+    --sidebar-padding: var(--spacing-5);
+    --sidebar-gap: var(--spacing-2);
+
+    /* Content */
+    --content-padding: var(--spacing-4);
+    --content-gap: var(--spacing-2);
+
+    /* Title-Bar */
+    --titlebar-height: 22px;
+
+    /* Status-Bar */
+    --statusbar-height: 20px;
+
+    /* ========================================================
+       BORDERS
+       ======================================================== */
+
+    --border-width-thin: 1px;
+    --border-width-medium: 2px;
+    --border-width-thick: 3px;
+
+    --border-radius-none: 0;
+    --border-radius-sm: 2px;
+    --border-radius-md: 3px;
+    --border-radius-lg: 4px;
+
+    /* ========================================================
+       SHADOWS
+       ======================================================== */
+
+    --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 4px 0 16px rgba(0, 0, 0, 0.4);
+
+    /* ========================================================
+       BUTTONS - Gemeinsame Properties
+       ======================================================== */
+
+    /* Standard Button */
+    --btn-padding-y: var(--spacing-4);
+    --btn-padding-x: var(--spacing-12);
+    --btn-font-size: var(--font-size-base);
+    --btn-font-weight: var(--font-weight-normal);
+
+    /* Button Gradients */
+    --btn-bg-start: var(--color-primary-50);       /* #d0d0e0 */
+    --btn-bg-end: var(--color-primary-300);        /* #a0a0c0 */
+    --btn-bg-hover-start: #e0e0f0;
+    --btn-bg-hover-end: #b0b0d0;
+    --btn-bg-active-start: #b0b0d0;
+    --btn-bg-active-end: #9090b0;
+
+    /* Button Borders (3D-Effekt) */
+    --btn-border-light: var(--color-white);
+    --btn-border-dark: var(--color-gray-600);
+
+    /* Disabled State */
+    --btn-disabled-opacity: 0.6;
+
+    /* Green Button */
+    --btn-green-start: var(--color-success-500);   /* #90c090 */
+    --btn-green-end: var(--color-success-600);     /* #60a060 */
+
+    /* Red Button */
+    --btn-red-start: var(--color-danger-500);      /* #c09090 */
+    --btn-red-end: var(--color-danger-600);        /* #a06060 */
+
+    /* Blue Button */
+    --btn-blue-start: var(--color-info-500);       /* #9090c0 */
+    --btn-blue-end: var(--color-info-600);         /* #6060a0 */
+
+    /* Yellow Button */
+    --btn-yellow-start: var(--color-warning-500);  /* #e0e080 */
+    --btn-yellow-end: var(--color-warning-600);    /* #c0c040 */
+
+    /* ========================================================
+       MENU BUTTONS (Sidebar)
+       ======================================================== */
+
+    --menu-btn-padding-y: var(--spacing-8);
+    --menu-btn-padding-x: var(--spacing-10);
+    --menu-btn-font-size: var(--font-size-base);
+    --menu-btn-font-weight: var(--font-weight-medium);
+    --menu-btn-bg-start: var(--color-primary-50);  /* #d0d0e0 */
+    --menu-btn-bg-end: var(--color-primary-300);   /* #a0a0c0 */
+    --menu-btn-edge-light: var(--color-white);
+    --menu-btn-edge-dark: #404070;
+    --menu-btn-active-start: #a0a0d0;
+    --menu-btn-active-end: #8080b0;
+    --menu-btn-active-edge-light: #505080;
+    --menu-btn-active-edge-dark: #c0c0d8;
+
+    /* ========================================================
+       INPUTS & FORM CONTROLS
+       ======================================================== */
+
+    --input-padding-y: var(--spacing-3);
+    --input-padding-x: var(--spacing-6);
+    --input-font-size: var(--font-size-base);
+    --input-border-color: var(--border-color-input);
+    --input-border-radius: var(--border-radius-none);
+    --input-bg: var(--bg-input);
+    --input-bg-disabled: var(--bg-input-disabled);
+
+    /* Select */
+    --select-min-width: 120px;
+
+    /* ========================================================
+       TABLES
+       ======================================================== */
+
+    --table-header-bg: #4466aa;
+    --table-header-color: var(--color-white);
+    --table-row-bg: var(--color-white);
+    --table-row-bg-alt: #f8f8f8;
+    --table-row-bg-hover: #e8e8f0;
+    --table-row-bg-selected: #d0d0e8;
+    --table-border-color: #ddd;
+
+    /* ========================================================
+       TABS
+       ======================================================== */
+
+    --tab-padding-y: var(--spacing-4);
+    --tab-padding-x: var(--spacing-10);
+    --tab-font-size: var(--font-size-base);
+    --tab-bg: #e0e0e0;
+    --tab-bg-active: var(--color-white);
+    --tab-border-color: var(--color-gray-600);
+
+    /* ========================================================
+       TRANSITIONS
+       ======================================================== */
+
+    --transition-fast: 0.1s ease;
+    --transition-normal: 0.2s ease;
+    --transition-slow: 0.3s ease;
+
+    /* ========================================================
+       Z-INDEX SCALE
+       ======================================================== */
+
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-overlay: 1000;
+    --z-modal: 2000;
+    --z-tooltip: 3000;
+}
+
+/* ==========================================================
+   UTILITY KLASSEN (Optional)
+   ========================================================== */
+
+/* Visually Hidden (Accessibility) */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus Ring */
+:focus-visible {
+    outline: 2px solid var(--color-primary-900);
+    outline-offset: 2px;
+}

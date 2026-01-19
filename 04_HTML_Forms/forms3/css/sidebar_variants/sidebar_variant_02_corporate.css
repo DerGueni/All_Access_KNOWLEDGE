@@ -1,0 +1,487 @@
+/**
+ * CONSEC Sidebar - Variante 2: Corporate Blue
+ *
+ * Design-Konzept:
+ * - Klassisches Business-Design mit Professionalitaet
+ * - Blaue Farbpalette (#0D47A1 bis #1976D2)
+ * - Klare Trennlinien zwischen Gruppen
+ * - Subtile Schatten fuer Tiefe
+ * - Premium-Look mit Farbverlaeufen
+ *
+ * Verwendung:
+ * <link rel="stylesheet" href="css/sidebar_variants/sidebar_variant_02_corporate.css">
+ */
+
+/* ============================================
+   CSS VARIABLES - CORPORATE DESIGN TOKENS
+   ============================================ */
+:root {
+    /* Sidebar Dimensionen */
+    --sidebar-width: 220px;
+    --sidebar-transition: 0.3s ease;
+
+    /* Corporate Blue Palette */
+    --corp-blue-900: #0D47A1;
+    --corp-blue-800: #1565C0;
+    --corp-blue-700: #1976D2;
+    --corp-blue-600: #1E88E5;
+    --corp-blue-500: #2196F3;
+    --corp-blue-400: #42A5F5;
+    --corp-blue-100: #BBDEFB;
+    --corp-blue-50: #E3F2FD;
+
+    /* Neutrals */
+    --corp-white: #FFFFFF;
+    --corp-gray-50: #FAFAFA;
+    --corp-gray-100: #F5F5F5;
+    --corp-gray-200: #EEEEEE;
+    --corp-gray-300: #E0E0E0;
+    --corp-gray-600: #757575;
+    --corp-gray-800: #424242;
+    --corp-gray-900: #212121;
+
+    /* Accent Colors */
+    --corp-accent: #FF6F00;
+    --corp-accent-light: #FFA726;
+    --corp-success: #43A047;
+    --corp-warning: #FFA000;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.14);
+    --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.10);
+    --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+
+    /* Button Sizing */
+    --btn-min-height: 46px;
+    --btn-border-radius: 4px;
+    --btn-padding-h: 16px;
+    --btn-padding-v: 12px;
+
+    /* Category */
+    --category-height: 32px;
+}
+
+/* ============================================
+   SIDEBAR CONTAINER
+   ============================================ */
+.sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, var(--corp-blue-900) 0%, var(--corp-blue-800) 100%);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border-right: none;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    z-index: 100;
+    overflow: hidden;
+}
+
+/* Decorative Stripe */
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        var(--corp-accent) 0%,
+        var(--corp-accent-light) 50%,
+        var(--corp-accent) 100%
+    );
+}
+
+/* ============================================
+   SIDEBAR HEADER
+   ============================================ */
+.sidebar-header {
+    background: linear-gradient(135deg, var(--corp-blue-900) 0%, #0a3d91 100%);
+    color: var(--corp-white);
+    padding: 20px 16px;
+    font-weight: 700;
+    font-size: 16px;
+    text-align: left;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    position: relative;
+    padding-left: 20px; /* Space for decorative stripe */
+}
+
+/* Company Logo Placeholder */
+.sidebar-header::before {
+    content: '';
+    width: 28px;
+    height: 28px;
+    background: var(--corp-white);
+    border-radius: 4px;
+    margin-right: 12px;
+    flex-shrink: 0;
+
+    /* Logo Icon - Placeholder */
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E");
+    mask-size: 18px;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E");
+    -webkit-mask-size: 18px;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+}
+
+/* ============================================
+   MENU CATEGORIES CONTAINER
+   ============================================ */
+.menu-categories {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 0;
+
+    /* Premium Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.menu-categories::-webkit-scrollbar {
+    width: 6px;
+}
+
+.menu-categories::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.menu-categories::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.menu-categories::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================
+   CATEGORY BLOCK
+   ============================================ */
+.category-block {
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 8px;
+}
+
+.category-block:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* ============================================
+   CATEGORY HEADER
+   ============================================ */
+.category-header {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+    color: var(--corp-blue-100);
+    padding: 10px 16px 10px 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    border: none;
+    height: var(--category-height);
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Category Icon Indicator */
+.category-header::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    background: var(--corp-accent);
+    border-radius: 2px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   MENU BUTTONS
+   ============================================ */
+.menu-btn {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    padding: var(--btn-padding-v) var(--btn-padding-h);
+    padding-left: 20px;
+    min-height: var(--btn-min-height);
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    border: none;
+    border-left: 3px solid transparent;
+    width: 100%;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+/* Button Text */
+.menu-btn span {
+    flex: 1;
+}
+
+/* Hover State */
+.menu-btn:hover {
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.06) 50%,
+        transparent 100%
+    );
+    color: var(--corp-white);
+    border-left-color: var(--corp-blue-400);
+}
+
+/* Active/Click State */
+.menu-btn:active {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(2px);
+}
+
+/* Selected/Current State */
+.menu-btn.active {
+    background: linear-gradient(90deg,
+        var(--corp-blue-600) 0%,
+        var(--corp-blue-700) 100%
+    );
+    color: var(--corp-white);
+    border-left-color: var(--corp-accent);
+    font-weight: 600;
+    box-shadow: var(--shadow-inset), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.menu-btn.active::after {
+    content: '';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: var(--corp-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--corp-accent);
+}
+
+/* ============================================
+   BUTTON ICONS (Optional - via data-icon)
+   ============================================ */
+.menu-btn::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    margin-right: 12px;
+    background: currentColor;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+
+    /* Default Icon */
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+}
+
+.menu-btn:hover::before {
+    opacity: 1;
+}
+
+.menu-btn.active::before {
+    opacity: 1;
+}
+
+/* Specific Icons */
+.menu-btn[data-form*="Dienstplan"]::before,
+.menu-btn[data-form*="Planung"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Auftrag"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Mitarbeiter"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Kunden"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M3 21h18'/%3E%3Cpath d='M9 8h1'/%3E%3Cpath d='M9 12h1'/%3E%3Cpath d='M9 16h1'/%3E%3Cpath d='M14 8h1'/%3E%3Cpath d='M14 12h1'/%3E%3Cpath d='M14 16h1'/%3E%3Cpath d='M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M3 21h18'/%3E%3Cpath d='M9 8h1'/%3E%3Cpath d='M9 12h1'/%3E%3Cpath d='M9 16h1'/%3E%3Cpath d='M14 8h1'/%3E%3Cpath d='M14 12h1'/%3E%3Cpath d='M14 16h1'/%3E%3Cpath d='M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Objekt"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Zeitkont"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Abwesenheit"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2'/%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Ccircle cx='12' cy='10' r='2'/%3E%3Cline x1='8' y1='2' x2='8' y2='4'/%3E%3Cline x1='16' y1='2' x2='16' y2='4'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2'/%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Ccircle cx='12' cy='10' r='2'/%3E%3Cline x1='8' y1='2' x2='8' y2='4'/%3E%3Cline x1='16' y1='2' x2='16' y2='4'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-action*="Excel"]::before,
+.menu-btn[data-action*="liste"]::before,
+.menu-btn[data-action*="Stunden"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-action*="sync"]::before,
+.menu-btn[data-action*="Anlegen"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolyline points='23 4 23 10 17 10'/%3E%3Cpolyline points='1 20 1 14 7 14'/%3E%3Cpath d='M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolyline points='23 4 23 10 17 10'/%3E%3Cpolyline points='1 20 1 14 7 14'/%3E%3Cpath d='M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Lohnart"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cline x1='12' y1='1' x2='12' y2='23'/%3E%3Cpath d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cline x1='12' y1='1' x2='12' y2='23'/%3E%3Cpath d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Vorlagen"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Cline x1='3' y1='9' x2='21' y2='9'/%3E%3Cline x1='9' y1='21' x2='9' y2='9'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Cline x1='3' y1='9' x2='21' y2='9'/%3E%3Cline x1='9' y1='21' x2='9' y2='9'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Lex"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-action*="Einsatz"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   TOOLTIP STYLING
+   ============================================ */
+.menu-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--corp-gray-900);
+    color: var(--corp-white);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: var(--shadow-md);
+    animation: tooltipSlide 0.2s ease;
+}
+
+.menu-btn[title]:hover::before {
+    /* Keep the icon, tooltip arrow via separate element if needed */
+}
+
+@keyframes tooltipSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+/* ============================================
+   RESPONSIVE - TOUCH FRIENDLY
+   ============================================ */
+@media (max-height: 800px) {
+    .menu-btn {
+        min-height: 44px;
+        padding: 10px var(--btn-padding-h);
+    }
+
+    .category-header {
+        padding: 8px 16px 8px 20px;
+        height: 28px;
+    }
+}
+
+/* Fuer sehr hohe Bildschirme: Buttons verteilen */
+@media (min-height: 900px) {
+    .menu-categories {
+        justify-content: space-around;
+    }
+
+    .category-block {
+        margin-bottom: 0;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .menu-btn {
+        min-height: 52px;
+    }
+}
+
+/* ============================================
+   LOADING OVERLAY ANPASSUNG
+   ============================================ */
+.loading-overlay {
+    left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+}
+
+/* ============================================
+   FOOTER (Optional)
+   ============================================ */
+.sidebar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.sidebar-footer-text {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+    .sidebar {
+        display: none;
+    }
+}

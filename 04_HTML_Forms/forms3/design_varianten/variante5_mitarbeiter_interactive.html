@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variante 5 - Mitarbeiterstamm Interactive</title>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-dark: #6d28d9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --bg-main: #faf5ff;
+            --bg-card: #ffffff;
+            --text-primary: #1e1b4b;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.1), 0 2px 4px -1px rgba(124, 58, 237, 0.06);
+            --shadow-lg: 0 10px 25px -5px rgba(124, 58, 237, 0.15);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-main);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-white:hover {
+            background: #f5f3ff;
+            transform: translateY(-1px);
+        }
+
+        .btn-glass {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-glass:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 24px;
+            padding: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Card */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* MA List */
+        .ma-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ma-card {
+            background: #faf5ff;
+            border: 2px solid transparent;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: grab;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .ma-card:hover {
+            background: #f3e8ff;
+            border-color: var(--primary-light);
+            transform: translateX(4px);
+        }
+
+        .ma-card.dragging {
+            opacity: 0.5;
+            transform: scale(1.02) rotate(2deg);
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+        }
+
+        .ma-card.selected {
+            border-color: var(--primary);
+            background: #ede9fe;
+        }
+
+        .ma-card.drag-over {
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+
+        .drag-handle {
+            width: 24px;
+            height: 24px;
+            opacity: 0.3;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .ma-card:hover .drag-handle {
+            opacity: 0.6;
+        }
+
+        .ma-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .ma-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 14px;
+            object-fit: cover;
+        }
+
+        .ma-status-dot {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: var(--success);
+        }
+
+        .ma-status-dot.busy { background: var(--warning); }
+        .ma-status-dot.offline { background: var(--border); }
+
+        .ma-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ma-name {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        .ma-role {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .ma-meta {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .ma-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .ma-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .ma-card:hover .ma-actions {
+            opacity: 1;
+        }
+
+        .ma-action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .ma-action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Team Drop Zones */
+        .team-zones {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .team-zone {
+            background: white;
+            border: 2px dashed var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.25s;
+            min-height: 100px;
+        }
+
+        .team-zone.active {
+            border-color: var(--primary-light);
+            background: #faf5ff;
+        }
+
+        .team-zone.hover {
+            border-color: var(--primary);
+            background: #ede9fe;
+            transform: scale(1.02);
+        }
+
+        .team-zone-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .zone-service .team-zone-icon { background: #dbeafe; }
+        .zone-security .team-zone-icon { background: #fef3c7; }
+        .zone-team .team-zone-icon { background: #dcfce7; }
+        .zone-pool .team-zone-icon { background: #f3e8ff; }
+
+        .team-zone-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .team-zone-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Schicht Sidebar */
+        .schicht-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .schicht-item {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border-radius: 12px;
+            padding: 16px;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .schicht-item:hover {
+            border-color: var(--primary-light);
+        }
+
+        .schicht-item.drop-active {
+            border-color: var(--success);
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        }
+
+        .schicht-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .schicht-time {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--primary);
+        }
+
+        .schicht-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-offen { background: #fee2e2; color: #991b1b; }
+        .badge-teil { background: #fef3c7; color: #92400e; }
+        .badge-voll { background: #dcfce7; color: #166534; }
+
+        .schicht-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .schicht-ma-slots {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ma-slot {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 2px dashed var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .ma-slot.filled {
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .ma-slot.drop-target {
+            border-color: var(--primary);
+            background: #f3e8ff;
+            transform: scale(1.1);
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(124, 58, 237, 0.2), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            min-width: 240px;
+            padding: 8px;
+            z-index: 9999;
+            opacity: 0;
+            transform: scale(0.95) translateY(-8px);
+            transform-origin: top left;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .context-menu.show {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .context-menu-header {
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        .context-menu-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .context-menu-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .context-menu-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .context-menu-item {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.15s;
+        }
+
+        .context-menu-item:hover {
+            background: #f5f3ff;
+        }
+
+        .context-menu-item.danger:hover {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .context-menu-item .icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .context-menu-item .shortcut {
+            margin-left: auto;
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: #f3f4f6;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 0;
+        }
+
+        .context-menu-submenu {
+            position: relative;
+        }
+
+        .context-menu-submenu > .context-menu-item::after {
+            content: '›';
+            margin-left: auto;
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .context-menu-submenu .submenu {
+            position: absolute;
+            left: 100%;
+            top: 0;
+            margin-left: 6px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(124, 58, 237, 0.2);
+            min-width: 180px;
+            padding: 8px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.2s;
+            pointer-events: none;
+        }
+
+        .context-menu-submenu:hover .submenu {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10000;
+        }
+
+        .toast {
+            background: var(--text-primary);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: toastSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.success { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+        .toast.warning { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
+        .toast.error { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }
+
+        @keyframes toastSlide {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Quick Actions Floating */
+        .quick-actions {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .quick-action-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.25s;
+        }
+
+        .quick-action-btn.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        .quick-action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Reorder indicator */
+        .reorder-indicator {
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            margin: -2px 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .reorder-indicator.show {
+            opacity: 1;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            padding: 16px 24px;
+            background: white;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-icon.green { background: #dcfce7; }
+        .stat-icon.yellow { background: #fef3c7; }
+        .stat-icon.blue { background: #dbeafe; }
+        .stat-icon.purple { background: #f3e8ff; }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="header-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <div>
+                <h1>Mitarbeiterstamm</h1>
+                <div class="header-subtitle">Drag & Drop Teamzuordnung</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-glass">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Import
+            </button>
+            <button class="btn btn-white">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Neuer Mitarbeiter
+            </button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-icon green">👥</div>
+                    <div>
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">Gesamt</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon blue">✓</div>
+                    <div>
+                        <div class="stat-value">124</div>
+                        <div class="stat-label">Aktiv</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon yellow">📅</div>
+                    <div>
+                        <div class="stat-value">18</div>
+                        <div class="stat-label">Im Einsatz</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon purple">🆕</div>
+                    <div>
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Neu</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                        </svg>
+                        Mitarbeiter Pool
+                    </span>
+                    <span style="font-size: 13px; color: var(--text-secondary);">Ziehen zum Zuordnen</span>
+                </div>
+                <div class="card-body">
+                    <div class="team-zones">
+                        <div class="team-zone zone-service" data-team="service">
+                            <div class="team-zone-icon">🍽️</div>
+                            <div class="team-zone-title">Service Team</div>
+                            <div class="team-zone-count">32 Mitarbeiter</div>
+                        </div>
+                        <div class="team-zone zone-security" data-team="security">
+                            <div class="team-zone-icon">🛡️</div>
+                            <div class="team-zone-title">Security</div>
+                            <div class="team-zone-count">24 Mitarbeiter</div>
+                        </div>
+                        <div class="team-zone zone-team" data-team="teamleiter">
+                            <div class="team-zone-icon">👔</div>
+                            <div class="team-zone-title">Teamleiter</div>
+                            <div class="team-zone-count">8 Mitarbeiter</div>
+                        </div>
+                        <div class="team-zone zone-pool" data-team="pool">
+                            <div class="team-zone-icon">📋</div>
+                            <div class="team-zone-title">Pool</div>
+                            <div class="team-zone-count">60 Mitarbeiter</div>
+                        </div>
+                    </div>
+
+                    <div class="ma-list" id="maList">
+                        <div class="ma-card" draggable="true" data-id="MA001">
+                            <div class="drag-handle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="6" r="2"></circle>
+                                    <circle cx="8" cy="12" r="2"></circle><circle cx="16" cy="12" r="2"></circle>
+                                    <circle cx="8" cy="18" r="2"></circle><circle cx="16" cy="18" r="2"></circle>
+                                </svg>
+                            </div>
+                            <div class="ma-avatar">
+                                MS
+                                <div class="ma-status-dot"></div>
+                            </div>
+                            <div class="ma-info">
+                                <div class="ma-name">Max Schmidt</div>
+                                <div class="ma-role">Servicekraft</div>
+                                <div class="ma-meta">
+                                    <span class="ma-meta-item">📞 0176-1234567</span>
+                                    <span class="ma-meta-item">⭐ 4.8</span>
+                                </div>
+                            </div>
+                            <div class="ma-actions">
+                                <button class="ma-action-btn" title="Anrufen">📞</button>
+                                <button class="ma-action-btn" title="Nachricht">💬</button>
+                                <button class="ma-action-btn" title="Kalender">📅</button>
+                            </div>
+                        </div>
+
+                        <div class="ma-card" draggable="true" data-id="MA002">
+                            <div class="drag-handle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="6" r="2"></circle>
+                                    <circle cx="8" cy="12" r="2"></circle><circle cx="16" cy="12" r="2"></circle>
+                                    <circle cx="8" cy="18" r="2"></circle><circle cx="16" cy="18" r="2"></circle>
+                                </svg>
+                            </div>
+                            <div class="ma-avatar" style="background: linear-gradient(135deg, #059669 0%, #34d399 100%);">
+                                TK
+                                <div class="ma-status-dot"></div>
+                            </div>
+                            <div class="ma-info">
+                                <div class="ma-name">Thomas Krueger</div>
+                                <div class="ma-role">Teamleiter</div>
+                                <div class="ma-meta">
+                                    <span class="ma-meta-item">📞 0176-2345678</span>
+                                    <span class="ma-meta-item">⭐ 4.9</span>
+                                </div>
+                            </div>
+                            <div class="ma-actions">
+                                <button class="ma-action-btn" title="Anrufen">📞</button>
+                                <button class="ma-action-btn" title="Nachricht">💬</button>
+                                <button class="ma-action-btn" title="Kalender">📅</button>
+                            </div>
+                        </div>
+
+                        <div class="ma-card" draggable="true" data-id="MA003">
+                            <div class="drag-handle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="6" r="2"></circle>
+                                    <circle cx="8" cy="12" r="2"></circle><circle cx="16" cy="12" r="2"></circle>
+                                    <circle cx="8" cy="18" r="2"></circle><circle cx="16" cy="18" r="2"></circle>
+                                </svg>
+                            </div>
+                            <div class="ma-avatar" style="background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);">
+                                AB
+                                <div class="ma-status-dot busy"></div>
+                            </div>
+                            <div class="ma-info">
+                                <div class="ma-name">Anna Berger</div>
+                                <div class="ma-role">Servicekraft</div>
+                                <div class="ma-meta">
+                                    <span class="ma-meta-item">📞 0176-3456789</span>
+                                    <span class="ma-meta-item">⭐ 4.7</span>
+                                </div>
+                            </div>
+                            <div class="ma-actions">
+                                <button class="ma-action-btn" title="Anrufen">📞</button>
+                                <button class="ma-action-btn" title="Nachricht">💬</button>
+                                <button class="ma-action-btn" title="Kalender">📅</button>
+                            </div>
+                        </div>
+
+                        <div class="ma-card" draggable="true" data-id="MA004">
+                            <div class="drag-handle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="6" r="2"></circle>
+                                    <circle cx="8" cy="12" r="2"></circle><circle cx="16" cy="12" r="2"></circle>
+                                    <circle cx="8" cy="18" r="2"></circle><circle cx="16" cy="18" r="2"></circle>
+                                </svg>
+                            </div>
+                            <div class="ma-avatar" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
+                                PW
+                                <div class="ma-status-dot"></div>
+                            </div>
+                            <div class="ma-info">
+                                <div class="ma-name">Peter Wagner</div>
+                                <div class="ma-role">Security</div>
+                                <div class="ma-meta">
+                                    <span class="ma-meta-item">📞 0176-4567890</span>
+                                    <span class="ma-meta-item">⭐ 4.6</span>
+                                </div>
+                            </div>
+                            <div class="ma-actions">
+                                <button class="ma-action-btn" title="Anrufen">📞</button>
+                                <button class="ma-action-btn" title="Nachricht">💬</button>
+                                <button class="ma-action-btn" title="Kalender">📅</button>
+                            </div>
+                        </div>
+
+                        <div class="ma-card" draggable="true" data-id="MA005">
+                            <div class="drag-handle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="6" r="2"></circle>
+                                    <circle cx="8" cy="12" r="2"></circle><circle cx="16" cy="12" r="2"></circle>
+                                    <circle cx="8" cy="18" r="2"></circle><circle cx="16" cy="18" r="2"></circle>
+                                </svg>
+                            </div>
+                            <div class="ma-avatar" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);">
+                                LH
+                                <div class="ma-status-dot offline"></div>
+                            </div>
+                            <div class="ma-info">
+                                <div class="ma-name">Lisa Hoffmann</div>
+                                <div class="ma-role">Servicekraft</div>
+                                <div class="ma-meta">
+                                    <span class="ma-meta-item">📞 0176-5678901</span>
+                                    <span class="ma-meta-item">⭐ 4.5</span>
+                                </div>
+                            </div>
+                            <div class="ma-actions">
+                                <button class="ma-action-btn" title="Anrufen">📞</button>
+                                <button class="ma-action-btn" title="Nachricht">💬</button>
+                                <button class="ma-action-btn" title="Kalender">📅</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Schichten - 17.01.2026
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="schicht-list" id="schichtList">
+                    <div class="schicht-item" data-schicht="S1">
+                        <div class="schicht-header">
+                            <span class="schicht-time">08:00 - 14:00</span>
+                            <span class="schicht-badge badge-teil">3/5 MA</span>
+                        </div>
+                        <div class="schicht-info">Messe Nuernberg - Halle 3</div>
+                        <div class="schicht-ma-slots">
+                            <div class="ma-slot filled">MS</div>
+                            <div class="ma-slot filled">TK</div>
+                            <div class="ma-slot filled">AB</div>
+                            <div class="ma-slot" data-slot="4">+</div>
+                            <div class="ma-slot" data-slot="5">+</div>
+                        </div>
+                    </div>
+
+                    <div class="schicht-item" data-schicht="S2">
+                        <div class="schicht-header">
+                            <span class="schicht-time">14:00 - 22:00</span>
+                            <span class="schicht-badge badge-offen">1/4 MA</span>
+                        </div>
+                        <div class="schicht-info">Sparkasse - Event</div>
+                        <div class="schicht-ma-slots">
+                            <div class="ma-slot filled">PW</div>
+                            <div class="ma-slot" data-slot="2">+</div>
+                            <div class="ma-slot" data-slot="3">+</div>
+                            <div class="ma-slot" data-slot="4">+</div>
+                        </div>
+                    </div>
+
+                    <div class="schicht-item" data-schicht="S3">
+                        <div class="schicht-header">
+                            <span class="schicht-time">18:00 - 02:00</span>
+                            <span class="schicht-badge badge-voll">6/6 MA</span>
+                        </div>
+                        <div class="schicht-info">BMW - Gala Dinner</div>
+                        <div class="schicht-ma-slots">
+                            <div class="ma-slot filled">MS</div>
+                            <div class="ma-slot filled">TK</div>
+                            <div class="ma-slot filled">AB</div>
+                            <div class="ma-slot filled">PW</div>
+                            <div class="ma-slot filled">LH</div>
+                            <div class="ma-slot filled">JM</div>
+                        </div>
+                    </div>
+
+                    <div class="schicht-item" data-schicht="S4">
+                        <div class="schicht-header">
+                            <span class="schicht-time">10:00 - 18:00</span>
+                            <span class="schicht-badge badge-offen">0/3 MA</span>
+                        </div>
+                        <div class="schicht-info">ADAC - Konferenz</div>
+                        <div class="schicht-ma-slots">
+                            <div class="ma-slot" data-slot="1">+</div>
+                            <div class="ma-slot" data-slot="2">+</div>
+                            <div class="ma-slot" data-slot="3">+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-header" id="contextMenuHeader">
+            <div class="context-menu-avatar">MS</div>
+            <div>
+                <div class="context-menu-name">Max Schmidt</div>
+                <div class="context-menu-role">Servicekraft</div>
+            </div>
+        </div>
+        <div class="context-menu-item" data-action="edit">
+            <span class="icon">✏️</span>
+            <span>Bearbeiten</span>
+            <span class="shortcut">E</span>
+        </div>
+        <div class="context-menu-item" data-action="view">
+            <span class="icon">👁️</span>
+            <span>Profil anzeigen</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="call">
+            <span class="icon">📞</span>
+            <span>Anrufen</span>
+        </div>
+        <div class="context-menu-item" data-action="message">
+            <span class="icon">💬</span>
+            <span>WhatsApp senden</span>
+        </div>
+        <div class="context-menu-item" data-action="email">
+            <span class="icon">📧</span>
+            <span>E-Mail senden</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-submenu">
+            <div class="context-menu-item">
+                <span class="icon">👥</span>
+                <span>Team zuordnen</span>
+            </div>
+            <div class="submenu">
+                <div class="context-menu-item" data-action="team-service">
+                    <span class="icon">🍽️</span>
+                    <span>Service</span>
+                </div>
+                <div class="context-menu-item" data-action="team-security">
+                    <span class="icon">🛡️</span>
+                    <span>Security</span>
+                </div>
+                <div class="context-menu-item" data-action="team-leader">
+                    <span class="icon">👔</span>
+                    <span>Teamleiter</span>
+                </div>
+                <div class="context-menu-item" data-action="team-pool">
+                    <span class="icon">📋</span>
+                    <span>Pool</span>
+                </div>
+            </div>
+        </div>
+        <div class="context-menu-item" data-action="calendar">
+            <span class="icon">📅</span>
+            <span>Verfuegbarkeit</span>
+        </div>
+        <div class="context-menu-item" data-action="documents">
+            <span class="icon">📄</span>
+            <span>Dokumente</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item danger" data-action="deactivate">
+            <span class="icon">🚫</span>
+            <span>Deaktivieren</span>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <button class="quick-action-btn primary" title="Neuer Mitarbeiter">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        // State
+        const state = {
+            draggedMA: null,
+            selectedMA: null
+        };
+
+        // Context Menu
+        const contextMenu = document.getElementById('contextMenu');
+        let currentTarget = null;
+
+        document.addEventListener('contextmenu', (e) => {
+            const maCard = e.target.closest('.ma-card');
+            if (maCard) {
+                e.preventDefault();
+                currentTarget = maCard;
+
+                // Update context menu header
+                const name = maCard.querySelector('.ma-name').textContent;
+                const role = maCard.querySelector('.ma-role').textContent;
+                const initials = maCard.querySelector('.ma-avatar').textContent.trim();
+                const avatarStyle = maCard.querySelector('.ma-avatar').getAttribute('style') || '';
+
+                const header = document.getElementById('contextMenuHeader');
+                header.querySelector('.context-menu-name').textContent = name;
+                header.querySelector('.context-menu-role').textContent = role;
+                header.querySelector('.context-menu-avatar').textContent = initials;
+                if (avatarStyle) {
+                    header.querySelector('.context-menu-avatar').setAttribute('style', avatarStyle);
+                }
+
+                // Position
+                let x = e.clientX;
+                let y = e.clientY;
+                const menuWidth = 260;
+                const menuHeight = 420;
+                if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth - 10;
+                if (y + menuHeight > window.innerHeight) y = window.innerHeight - menuHeight - 10;
+
+                contextMenu.style.left = x + 'px';
+                contextMenu.style.top = y + 'px';
+                contextMenu.classList.add('show');
+
+                // Select card
+                document.querySelectorAll('.ma-card').forEach(c => c.classList.remove('selected'));
+                maCard.classList.add('selected');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.context-menu')) {
+                contextMenu.classList.remove('show');
+            }
+        });
+
+        // Context Menu Actions
+        contextMenu.addEventListener('click', (e) => {
+            const item = e.target.closest('.context-menu-item');
+            if (item && currentTarget) {
+                const action = item.dataset.action;
+                handleAction(action, currentTarget);
+                contextMenu.classList.remove('show');
+            }
+        });
+
+        function handleAction(action, target) {
+            const name = target.querySelector('.ma-name').textContent;
+            switch(action) {
+                case 'edit':
+                    showToast('Bearbeite: ' + name);
+                    break;
+                case 'view':
+                    showToast('Oeffne Profil: ' + name);
+                    break;
+                case 'call':
+                    showToast('Rufe an: ' + name);
+                    break;
+                case 'message':
+                    showToast('WhatsApp an ' + name);
+                    break;
+                case 'email':
+                    showToast('E-Mail an ' + name);
+                    break;
+                case 'calendar':
+                    showToast('Kalender von ' + name);
+                    break;
+                case 'documents':
+                    showToast('Dokumente von ' + name);
+                    break;
+                case 'deactivate':
+                    target.style.opacity = '0.5';
+                    showToast(name + ' deaktiviert', 'warning');
+                    break;
+                case 'team-service':
+                case 'team-security':
+                case 'team-leader':
+                case 'team-pool':
+                    const team = action.replace('team-', '');
+                    showToast(name + ' zu ' + team + ' zugeordnet', 'success');
+                    break;
+            }
+        }
+
+        // Drag & Drop for MA Cards
+        document.querySelectorAll('.ma-card').forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                state.draggedMA = card;
+                card.classList.add('dragging');
+                e.dataTransfer.setData('ma-id', card.dataset.id);
+                e.dataTransfer.effectAllowed = 'move';
+
+                // Activate all drop zones
+                document.querySelectorAll('.team-zone').forEach(z => z.classList.add('active'));
+                document.querySelectorAll('.ma-slot:not(.filled)').forEach(s => s.classList.add('drop-target'));
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                state.draggedMA = null;
+                document.querySelectorAll('.team-zone').forEach(z => z.classList.remove('active', 'hover'));
+                document.querySelectorAll('.ma-slot').forEach(s => s.classList.remove('drop-target'));
+            });
+
+            // Reorder within list
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (state.draggedMA && state.draggedMA !== card) {
+                    const rect = card.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    if (e.clientY < midY) {
+                        card.parentNode.insertBefore(state.draggedMA, card);
+                    } else {
+                        card.parentNode.insertBefore(state.draggedMA, card.nextSibling);
+                    }
+                }
+            });
+        });
+
+        // Team Zone Drop
+        document.querySelectorAll('.team-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('hover');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('hover');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('hover');
+                if (state.draggedMA) {
+                    const name = state.draggedMA.querySelector('.ma-name').textContent;
+                    const team = zone.querySelector('.team-zone-title').textContent;
+                    showToast(name + ' zu ' + team + ' zugeordnet', 'success');
+                }
+            });
+        });
+
+        // Schicht Slot Drop
+        document.querySelectorAll('.ma-slot:not(.filled)').forEach(slot => {
+            slot.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                slot.classList.add('drop-target');
+            });
+
+            slot.addEventListener('dragleave', () => {
+                slot.classList.remove('drop-target');
+            });
+
+            slot.addEventListener('drop', (e) => {
+                e.preventDefault();
+                slot.classList.remove('drop-target');
+                if (state.draggedMA) {
+                    const initials = state.draggedMA.querySelector('.ma-avatar').textContent.trim();
+                    const name = state.draggedMA.querySelector('.ma-name').textContent;
+                    const schicht = slot.closest('.schicht-item');
+                    const zeit = schicht.querySelector('.schicht-time').textContent;
+
+                    slot.classList.add('filled');
+                    slot.textContent = initials;
+
+                    // Update badge
+                    updateSchichtBadge(schicht);
+
+                    showToast(name + ' zur Schicht ' + zeit + ' zugeordnet', 'success');
+                }
+            });
+        });
+
+        function updateSchichtBadge(schicht) {
+            const slots = schicht.querySelectorAll('.ma-slot');
+            const filled = schicht.querySelectorAll('.ma-slot.filled').length;
+            const total = slots.length;
+            const badge = schicht.querySelector('.schicht-badge');
+
+            badge.textContent = filled + '/' + total + ' MA';
+
+            if (filled === 0) {
+                badge.className = 'schicht-badge badge-offen';
+            } else if (filled < total) {
+                badge.className = 'schicht-badge badge-teil';
+            } else {
+                badge.className = 'schicht-badge badge-voll';
+            }
+        }
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            const selected = document.querySelector('.ma-card.selected');
+            if (!selected) return;
+
+            if (e.key === 'e' || e.key === 'E') {
+                handleAction('edit', selected);
+            } else if (e.key === 'Escape') {
+                selected.classList.remove('selected');
+                contextMenu.classList.remove('show');
+            }
+        });
+
+        // Long Press for Touch
+        let longPressTimer;
+        document.querySelectorAll('.ma-card').forEach(card => {
+            card.addEventListener('touchstart', (e) => {
+                longPressTimer = setTimeout(() => {
+                    currentTarget = card;
+                    const touch = e.touches[0];
+
+                    // Update header
+                    const name = card.querySelector('.ma-name').textContent;
+                    const role = card.querySelector('.ma-role').textContent;
+                    document.querySelector('.context-menu-name').textContent = name;
+                    document.querySelector('.context-menu-role').textContent = role;
+
+                    contextMenu.style.left = touch.clientX + 'px';
+                    contextMenu.style.top = touch.clientY + 'px';
+                    contextMenu.classList.add('show');
+                    card.classList.add('selected');
+                }, 500);
+            });
+
+            card.addEventListener('touchend', () => clearTimeout(longPressTimer));
+            card.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+        });
+
+        // Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✓' : type === 'warning' ? '⚠' : '✕'}</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'toastSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1) reverse forwards';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        // Quick Actions Button
+        document.querySelector('.quick-action-btn').addEventListener('click', () => {
+            showToast('Formular fuer neuen Mitarbeiter oeffnet...');
+        });
+
+        // MA Card Click Selection
+        document.querySelectorAll('.ma-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.ma-action-btn')) {
+                    document.querySelectorAll('.ma-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                }
+            });
+        });
+
+        // Action Buttons
+        document.querySelectorAll('.ma-action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const card = btn.closest('.ma-card');
+                const name = card.querySelector('.ma-name').textContent;
+                const action = btn.title;
+                showToast(action + ': ' + name);
+            });
+        });
+    </script>
+</body>
+</html>

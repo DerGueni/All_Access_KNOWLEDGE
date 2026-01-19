@@ -1,0 +1,1 @@
+"""Badge printing service package."""

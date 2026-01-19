@@ -1,0 +1,737 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 12px; background: #d4d0c8; overflow: hidden; }
+        
+        .app-container { display: flex; height: 100vh; width: 100%; }
+        
+        /* SIDEBAR - Responsive */
+        .sidebar { width: 130px; min-width: 100px; background: linear-gradient(180deg, #8B0000 0%, #660000 100%); display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-logo { padding: 6px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .sidebar-logo-icon { width: 36px; height: 36px; margin: 0 auto; background: linear-gradient(135deg, #1a3a6a 0%, #2a4a8a 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; border: 2px solid #0a2a5a; }
+        .sidebar-title { color: white; font-size: 11px; font-weight: bold; text-align: center; padding: 6px 4px; background: rgba(0,0,0,0.2); }
+        .sidebar-menu { flex: 1; padding: 4px; overflow-y: auto; }
+        .menu-btn { display: block; width: 100%; padding: 5px 4px; margin: 2px 0; background: linear-gradient(180deg, #5577aa 0%, #4466aa 100%); color: white; border: 1px solid #3355aa; border-radius: 3px; cursor: pointer; font-size: 9px; text-align: center; }
+        .menu-btn:hover { background: linear-gradient(180deg, #6688bb 0%, #5577aa 100%); }
+        .menu-btn.active { background: linear-gradient(180deg, #3355aa 0%, #224499 100%); }
+        .menu-btn.highlight { background: #00cc66; color: black; border-color: #009944; }
+        
+        .main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        
+        /* === HEADER ZEILE 1 - Responsive mit flex-wrap === */
+        .header-row1 { background: linear-gradient(180deg, #5577aa 0%, #4466aa 100%); padding: 3px 6px; display: flex; align-items: center; gap: 4px; border-bottom: 1px solid #3355aa; flex-wrap: wrap; }
+        .header-logo { width: 32px; height: 32px; background: linear-gradient(135deg, #1a3a6a 0%, #2a4a8a 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; border: 2px solid #0a2a5a; flex-shrink: 0; }
+        .header-title { color: white; font-size: 14px; font-weight: bold; margin-right: 4px; white-space: nowrap; }
+        .nav-btns { display: flex; gap: 1px; flex-shrink: 0; }
+        .nav-btn { width: 22px; height: 22px; background: #f0f0f0; border: 1px solid #888; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+        .nav-btn:hover { background: #e0e0e0; }
+        .header-btn { padding: 3px 8px; font-size: 10px; border: 1px solid #666; background: linear-gradient(180deg, #f4f4f4 0%, #ddd 100%); cursor: pointer; border-radius: 2px; white-space: nowrap; }
+        .header-btn:hover { background: linear-gradient(180deg, #fff 0%, #eee 100%); }
+        .header-btn.blue { background: linear-gradient(180deg, #5588dd 0%, #4477cc 100%); color: white; border-color: #3366bb; }
+        .header-btn.green { background: linear-gradient(180deg, #44bb44 0%, #339933 100%); color: white; border-color: #228822; }
+        .header-btn.orange { background: linear-gradient(180deg, #ff9933 0%, #ee8822 100%); color: white; border-color: #dd7711; }
+        .header-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.3); margin: 0 2px; flex-shrink: 0; }
+        .header-chk { display: flex; align-items: center; gap: 2px; color: white; font-size: 9px; white-space: nowrap; }
+        .header-date { color: white; font-size: 10px; margin-left: auto; white-space: nowrap; }
+        
+        /* === HEADER ZEILE 2 === */
+        .header-row2 { background: #d4d0c8; padding: 3px 6px; display: flex; align-items: center; gap: 5px; border-bottom: 1px solid #888; flex-wrap: wrap; }
+        .status-lbl { font-size: 10px; white-space: nowrap; }
+        .status-dropdown { padding: 2px 4px; font-size: 10px; border: 1px solid #666; }
+        .tb-btn { padding: 3px 10px; font-size: 10px; border: 1px solid #666; background: linear-gradient(180deg, #f4f4f4 0%, #ddd 100%); cursor: pointer; border-radius: 2px; white-space: nowrap; }
+        .tb-btn:hover { background: linear-gradient(180deg, #fff 0%, #eee 100%); }
+        
+        .content { display: flex; flex: 1; min-height: 0; }
+        .form-area { flex: 1; display: flex; flex-direction: column; padding: 5px; min-width: 0; background: #d4d0c8; }
+        
+        /* === DATENFELDER - Responsive === */
+        .data-panel { background: #d4d0c8; margin-bottom: 3px; }
+        .field-row { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; flex-wrap: wrap; }
+        .field-group { display: flex; align-items: center; gap: 2px; }
+        .lbl { font-size: 10px; color: #000; white-space: nowrap; }
+        .inp { padding: 2px 3px; border: 1px solid #888; font-size: 10px; background: white; }
+        .inp:focus { border-color: #4477bb; outline: none; }
+        .inp[readonly] { background: #f0f0f0; }
+        .sel { padding: 2px 2px; border: 1px solid #888; font-size: 10px; background: white; }
+        .inp-date { width: 75px; }
+        .inp-nr { width: 45px; text-align: center; }
+        .inp-pkw { width: 32px; text-align: center; }
+        .inp-fahrt { width: 50px; text-align: right; }
+        .inp-treff { width: 140px; }
+        .inp-ansprech { width: 120px; }
+        .sel-auftrag { width: 180px; }
+        .sel-ort { width: 90px; }
+        .sel-objekt { width: 130px; }
+        .sel-kleidung { width: 110px; }
+        .sel-auftraggeber { width: 200px; }
+        .date-nav { display: flex; align-items: center; gap: 1px; }
+        .date-nav-btn { width: 18px; height: 20px; padding: 0; font-size: 9px; cursor: pointer; border: 1px solid #888; background: #f0f0f0; }
+        .date-display { padding: 2px 5px; border: 1px solid #888; background: white; font-size: 10px; min-width: 70px; text-align: center; }
+        
+        /* TABS */
+        .tab-box { flex: 1; display: flex; flex-direction: column; background: #d4d0c8; border: 1px solid #888; min-height: 0; }
+        .tab-header { display: flex; background: #c8c4bc; }
+        .tab-btn { padding: 4px 12px; font-size: 10px; border: none; border-right: 1px solid #888; background: #c0bbb4; cursor: pointer; }
+        .tab-btn:hover { background: #d8d4cc; }
+        .tab-btn.active { background: #d4d0c8; font-weight: bold; border-bottom: 1px solid #d4d0c8; margin-bottom: -1px; }
+        .tab-body { flex: 1; display: none; overflow: hidden; background: #d4d0c8; border-top: 1px solid #888; }
+        .tab-body.active { display: flex; flex-direction: column; }
+        
+        .einsatz-content { display: flex; flex: 1; gap: 4px; padding: 4px; min-height: 0; }
+        .bwn-bar { padding: 3px; text-align: center; }
+        .bwn-btn { padding: 4px 14px; font-size: 10px; border: 1px solid #666; background: linear-gradient(180deg, #f4f4f4 0%, #ddd 100%); cursor: pointer; }
+        
+        /* SCHICHTEN - kompakter */
+        .schichten-col { width: 160px; min-width: 140px; display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+        .panel { border: 1px solid #888; background: white; display: flex; flex-direction: column; }
+        .panel-hdr { background: #c8c4bc; padding: 2px 5px; font-size: 9px; font-weight: bold; border-bottom: 1px solid #888; }
+        .panel-body { flex: 1; overflow: auto; }
+        .schichten-panel { flex: 1; min-height: 100px; }
+        .absagen-panel { height: 80px; }
+        .grid { width: 100%; border-collapse: collapse; font-size: 9px; }
+        .grid th { background: #e8e8e8; border: 1px solid #ccc; padding: 2px 3px; font-weight: normal; position: sticky; top: 0; }
+        .grid td { border: 1px solid #ddd; padding: 2px 3px; text-align: center; }
+        .grid tr:hover { background: #e8f4ff; cursor: pointer; }
+        .grid tr.sel { background: #3366cc; color: white; }
+        .grid .highlight { background: #ffcccc; color: #cc0000; font-weight: bold; }
+        
+        /* ZUORDNUNG - schmälere MA-Spalte */
+        .zuordnung-col { flex: 1; border: 1px solid #888; background: white; display: flex; flex-direction: column; min-width: 0; }
+        .zuordnung-body { flex: 1; overflow: auto; }
+        .ztbl { width: 100%; border-collapse: collapse; font-size: 9px; }
+        .ztbl th { background: #5577aa; color: white; border: 1px solid #4466aa; padding: 3px 4px; font-weight: normal; position: sticky; top: 0; white-space: nowrap; }
+        .ztbl td { border: 1px solid #ccc; padding: 1px 2px; }
+        .ztbl tr:nth-child(even) { background: #f6f6f6; }
+        .ztbl tr:hover { background: #e0f0ff; }
+        .ztbl input, .ztbl select { width: 100%; border: 1px solid #ccc; padding: 1px 2px; font-size: 9px; }
+        .ztbl input:focus, .ztbl select:focus { border-color: #4477bb; outline: none; }
+        .ztbl input[type="checkbox"] { width: 13px; height: 13px; }
+        .c-lfd { width: 26px; text-align: center; }
+        .c-ma { width: 140px; } /* Schmäler von 180px */
+        .c-time { width: 42px; text-align: center; }
+        .c-std { width: 36px; text-align: center; }
+        .c-bem { width: 100px; }
+        .c-chk { width: 22px; text-align: center; }
+        .c-pkw { width: 50px; text-align: right; }
+        
+        /* RECHTE SIDEBAR - Breiter mit gut sichtbarem Soll/Ist */
+        .right-panel { 
+            width: 380px; 
+            min-width: 320px; 
+            max-width: 450px;
+            background: #d4d0c8; 
+            border-left: 1px solid #888; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 4px; 
+            flex-shrink: 0;
+        }
+        .status-box { background: white; border: 1px solid #888; padding: 5px; margin-bottom: 4px; font-size: 9px; }
+        .status-title { font-weight: bold; margin-bottom: 3px; font-size: 10px; }
+        .status-row { display: flex; justify-content: space-between; align-items: center; margin: 2px 0; }
+        .status-label { color: #333; font-size: 9px; flex: 1; }
+        .status-count { font-weight: bold; min-width: 28px; text-align: right; font-size: 10px; margin-right: 5px; }
+        .status-action { padding: 1px 5px; font-size: 8px; background: #ffcc00; border: 1px solid #cc9900; cursor: pointer; }
+        .filter-bar { display: flex; align-items: center; gap: 3px; margin-bottom: 4px; flex-wrap: wrap; }
+        .filter-lbl { font-size: 9px; }
+        .filter-date { width: 70px; padding: 2px 3px; border: 1px solid #888; font-size: 9px; }
+        .filter-btn { padding: 2px 5px; font-size: 9px; border: 1px solid #888; background: #f0f0f0; cursor: pointer; }
+        .filter-btn:hover { background: #e0e0e0; }
+        .auftraege-grid { flex: 1; border: 1px solid #888; background: white; overflow: auto; }
+        
+        /* AUFTRÄGE-TABELLE - Soll/Ist gut sichtbar */
+        .atbl { width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed; }
+        .atbl th { background: #5577aa; color: white; border: 1px solid #4466aa; padding: 3px 4px; position: sticky; top: 0; text-align: left; white-space: nowrap; overflow: hidden; }
+        .atbl td { border: 1px solid #ddd; padding: 2px 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .atbl tr:hover { background: #e0f0ff; cursor: pointer; }
+        .atbl tr.sel { background: #3366cc; color: white; }
+        /* Spaltenbreiten für Auftragsübersicht */
+        .atbl .c-datum { width: 70px; }
+        .atbl .c-auftrag { width: auto; } /* Flexibel */
+        .atbl .c-objekt { width: 80px; }
+        .atbl .c-ort { width: 55px; }
+        .atbl .c-soll { width: 28px; text-align: center; font-weight: bold; }
+        .atbl .c-ist { width: 28px; text-align: center; font-weight: bold; }
+        
+        .footer { background: #c8c4bc; padding: 2px 6px; display: flex; justify-content: space-between; font-size: 8px; color: #333; border-top: 1px solid #888; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-box { background: #d4d0c8; border: 2px solid #333; padding: 16px; min-width: 260px; box-shadow: 4px 4px 10px rgba(0,0,0,0.3); }
+        .modal-msg { font-size: 11px; margin-bottom: 14px; }
+        .modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+        .modal-btn { padding: 4px 16px; cursor: pointer; font-size: 10px; }
+        
+        .debug-box { position: fixed; bottom: 22px; left: 135px; background: #ffffcc; border: 1px solid #cc9900; padding: 3px 6px; font-size: 8px; z-index: 999; display: none; }
+        .debug-box.show { display: block; }
+        
+        /* ============================================
+           RESPONSIVE DESIGN für 12-23 Zoll Displays
+           ============================================ */
+        
+        /* Kleine Displays (12-14 Zoll, < 1400px) */
+        @media screen and (max-width: 1400px) {
+            body { font-size: 11px; }
+            .sidebar { width: 110px; min-width: 90px; }
+            .menu-btn { font-size: 8px; padding: 4px 3px; }
+            .sidebar-title { font-size: 10px; }
+            
+            .header-btn { padding: 2px 6px; font-size: 9px; }
+            .header-title { font-size: 12px; }
+            .header-logo { width: 28px; height: 28px; font-size: 12px; }
+            
+            .right-panel { width: 320px; min-width: 280px; }
+            .schichten-col { width: 140px; min-width: 120px; }
+            .c-ma { width: 120px; }
+            
+            .inp-treff { width: 120px; }
+            .inp-ansprech { width: 100px; }
+            .sel-auftrag { width: 160px; }
+            .sel-auftraggeber { width: 170px; }
+        }
+        
+        /* Sehr kleine Displays (12 Zoll, < 1280px) */
+        @media screen and (max-width: 1280px) {
+            .sidebar { width: 100px; min-width: 80px; }
+            .menu-btn { font-size: 7px; padding: 3px 2px; }
+            .sidebar-logo-icon { width: 30px; height: 30px; font-size: 14px; }
+            
+            .header-row1 { padding: 2px 4px; }
+            .header-btn { padding: 2px 5px; font-size: 8px; }
+            .header-sep { display: none; } /* Separatoren ausblenden */
+            
+            .right-panel { width: 280px; min-width: 250px; }
+            .atbl { font-size: 8px; }
+            .atbl .c-objekt { width: 60px; }
+            .atbl .c-ort { width: 45px; }
+            
+            .schichten-col { width: 130px; min-width: 110px; }
+            .c-ma { width: 110px; }
+            .c-bem { width: 80px; }
+            
+            .lbl { font-size: 9px; }
+            .inp, .sel { font-size: 9px; }
+        }
+        
+        /* Mittlere Displays (15-17 Zoll, 1400-1700px) */
+        @media screen and (min-width: 1401px) and (max-width: 1700px) {
+            .right-panel { width: 360px; }
+            .c-ma { width: 130px; }
+        }
+        
+        /* Große Displays (19-23 Zoll, > 1700px) */
+        @media screen and (min-width: 1701px) {
+            body { font-size: 13px; }
+            .sidebar { width: 150px; }
+            .menu-btn { font-size: 10px; padding: 6px 5px; }
+            .sidebar-title { font-size: 13px; }
+            .sidebar-logo-icon { width: 44px; height: 44px; }
+            
+            .header-btn { padding: 4px 12px; font-size: 11px; }
+            .header-title { font-size: 16px; }
+            .header-logo { width: 38px; height: 38px; }
+            
+            .right-panel { width: 420px; max-width: 500px; }
+            .atbl { font-size: 10px; }
+            .atbl .c-auftrag { width: auto; }
+            .atbl .c-soll, .atbl .c-ist { width: 32px; }
+            
+            .schichten-col { width: 180px; }
+            .c-ma { width: 160px; }
+            .c-bem { width: 120px; }
+            
+            .ztbl { font-size: 10px; }
+            .grid { font-size: 10px; }
+            
+            .lbl { font-size: 11px; }
+            .inp, .sel { font-size: 11px; }
+            .inp-treff { width: 180px; }
+            .inp-ansprech { width: 150px; }
+            .sel-auftrag { width: 220px; }
+            .sel-auftraggeber { width: 240px; }
+        }
+        
+        /* Extra große Displays (> 1920px) */
+        @media screen and (min-width: 1921px) {
+            .right-panel { width: 480px; }
+            .schichten-col { width: 200px; }
+            .c-ma { width: 180px; }
+        }
+    </style>
+<!-- Eingebettete Daten aus Access-Datenbank -->
+<script src="../data/embedded_data.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-logo"><div class="sidebar-logo-icon">◈</div></div>
+            <div class="sidebar-title">HAUPTMENÜ</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn" onclick="openMenu('Dienstplanuebersicht')">Dienstplanübersicht</button>
+                <button class="menu-btn" onclick="openMenu('Planungsuebersicht')">Planungsübersicht</button>
+                <button class="menu-btn active">Auftragsverwaltung</button>
+                <button class="menu-btn" onclick="openMenu('Mitarbeiterverwaltung')">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" onclick="openMenu('OffeneMailAnfragen')">Offene Mail Anfragen</button>
+                <button class="menu-btn" onclick="openMenu('ExcelZeitkonten')">Excel Zeitkonten</button>
+                <button class="menu-btn" onclick="openMenu('Zeitkonten')">Zeitkonten</button>
+                <button class="menu-btn" onclick="openMenu('Abwesenheitsplanung')">Abwesenheitsplanung</button>
+                <button class="menu-btn" onclick="openMenu('Dienstausweis')">Dienstausweis erstellen</button>
+                <button class="menu-btn" onclick="openMenu('Stundenabgleich')">Stundenabgleich</button>
+                <button class="menu-btn" onclick="openMenu('Kundenverwaltung')">Kundenverwaltung</button>
+                <button class="menu-btn" onclick="openMenu('Verrechnungssaetze')">Verrechnungssätze</button>
+                <button class="menu-btn" onclick="openMenu('SubRechnungen')">Sub Rechnungen</button>
+                <button class="menu-btn" onclick="openMenu('EMail')">E-Mail</button>
+                <button class="menu-btn" onclick="openMenu('Menu2')">Menü 2</button>
+                <button class="menu-btn highlight">HTML Ansicht</button>
+                <button class="menu-btn" onclick="openMenu('DatenbankWechseln')">Datenbank wechseln</button>
+            </div>
+        </div>
+        
+        <!-- HAUPTBEREICH -->
+        <div class="main-area">
+            <!-- HEADER ZEILE 1: Blauer Balken -->
+            <div class="header-row1">
+                <div class="header-logo">◈</div>
+                <span class="header-title">Auftragsverwaltung</span>
+                <div class="nav-btns">
+                    <button class="nav-btn" onclick="navFirst()">⏮</button>
+                    <button class="nav-btn" onclick="navPrev()">◀</button>
+                    <button class="nav-btn" onclick="navNext()">▶</button>
+                    <button class="nav-btn" onclick="navLast()">⏭</button>
+                </div>
+                <button class="header-btn" onclick="refresh()">Aktualisieren</button>
+                <div class="header-sep"></div>
+                <button class="header-btn" onclick="showRueckmeldungen()">Rückmelde-Statistik</button>
+                <button class="header-btn" onclick="showSyncfehler()">Syncfehler</button>
+                <div class="header-sep"></div>
+                <button class="header-btn" onclick="copyAuftrag()">Auftrag kopieren</button>
+                <button class="header-btn" onclick="deleteAuftrag()">Auftrag löschen</button>
+                <div class="header-sep"></div>
+                <button class="header-btn blue" onclick="sendMA()">Einsatzliste senden MA</button>
+                <button class="header-btn orange" onclick="sendBOS()">Einsatzliste senden BOS</button>
+                <button class="header-btn green" onclick="sendSUB()">Einsatzliste senden SUB</button>
+                <div class="header-sep"></div>
+                <button class="header-btn" onclick="printNamesliste()">Namensliste ESS</button>
+                <button class="header-btn" onclick="printEinsatzliste()">Einsatzliste drucken</button>
+                <div class="header-sep"></div>
+                <label class="header-chk"><input type="checkbox" id="chkAutosend"> EL Autosend</label>
+                <label class="header-chk"><input type="checkbox" id="chkGesendet"> EL gesendet</label>
+                <div class="header-date" id="lblHeaderDate"></div>
+            </div>
+            
+            <!-- HEADER ZEILE 2: Toolbar -->
+            <div class="header-row2">
+                <span class="status-lbl">Auftragsstatus:</span>
+                <select class="status-dropdown" id="selStatus" onchange="onStatusChange()"></select>
+                <div style="width:15px"></div>
+                <button class="tb-btn" onclick="openMitarbeiterauswahl()">Mitarbeiterauswahl</button>
+                <button class="tb-btn" onclick="openPositionen()">Positionen</button>
+                <button class="tb-btn" onclick="newAuftrag()">Neuer Auftrag</button>
+            </div>
+            
+            <!-- CONTENT -->
+            <div class="content">
+                <!-- FORMULAR BEREICH -->
+                <div class="form-area">
+                    <!-- DATENFELDER -->
+                    <div class="data-panel">
+                        <div class="field-row">
+                            <div class="field-group"><span class="lbl">Datum:</span><input type="text" id="txtDatVon" class="inp inp-date"><span>-</span><input type="text" id="txtDatBis" class="inp inp-date"></div>
+                            <div class="field-group"><span class="lbl">Nr.</span><input type="text" id="txtID" class="inp inp-nr" readonly></div>
+                            <div class="field-group"><span class="lbl">PKW Anzahl:</span><input type="text" id="txtPKW" class="inp inp-pkw"></div>
+                            <div class="field-group"><span class="lbl">Treffpunkt:</span><input type="text" id="txtTreffpunkt" class="inp inp-treff"></div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field-group"><span class="lbl">Auftrag:</span><select id="selAuftrag" class="sel sel-auftrag" onchange="onAuftragDropdownChange()"></select></div>
+                            <div class="field-group"><span class="lbl">Fahrtkosten pro PKW:</span><input type="text" id="txtFahrt" class="inp inp-fahrt" value="0,00 €"></div>
+                            <div class="field-group"><span class="lbl">Dienstkleidung:</span><select id="selKleidung" class="sel sel-kleidung"></select></div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field-group"><span class="lbl">Ort:</span><select id="selOrt" class="sel sel-ort"></select></div>
+                            <div class="field-group"><span class="lbl">Ansprechpartner:</span><input type="text" id="txtAnsprech" class="inp inp-ansprech"></div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field-group"><span class="lbl">Objekt:</span><select id="selObjekt" class="sel sel-objekt"></select></div>
+                            <div class="date-nav"><button class="date-nav-btn" onclick="datePrev()">◀</button><div class="date-display" id="lblVADatum"></div><button class="date-nav-btn" onclick="dateNext()">▶</button></div>
+                            <div class="field-group"><span class="lbl">Auftraggeber:</span><select id="selAuftraggeber" class="sel sel-auftraggeber"></select></div>
+                        </div>
+                    </div>
+                    
+                    <!-- TAB CONTROL -->
+                    <div class="tab-box">
+                        <div class="tab-header">
+                            <button class="tab-btn active" onclick="showTab('einsatz',this)">Einsatzliste</button>
+                            <button class="tab-btn" onclick="showTab('antworten',this)">Antworten ausstehend</button>
+                            <button class="tab-btn" onclick="showTab('rechnung',this)">Rechnung</button>
+                        </div>
+                        <div class="tab-body active" id="tab-einsatz">
+                            <div class="bwn-bar"><button class="bwn-btn" onclick="printBWN()">BWN drucken</button></div>
+                            <div class="einsatz-content">
+                                <div class="schichten-col">
+                                    <div class="panel schichten-panel"><div class="panel-hdr">Schichten</div><div class="panel-body"><table class="grid"><thead><tr><th>Ai</th><th>von</th><th>bis</th></tr></thead><tbody id="schichtenBody"></tbody></table></div></div>
+                                    <div class="panel absagen-panel"><div class="panel-hdr">Absagen:</div><div class="panel-body"><table class="grid"><thead><tr><th>Mitarbeiter</th><th>Bemerkung</th></tr></thead><tbody id="absagenBody"></tbody></table></div></div>
+                                </div>
+                                <div class="zuordnung-col"><div class="zuordnung-body"><table class="ztbl"><thead><tr><th class="c-lfd">Lfd</th><th class="c-ma">Mitarbeiter</th><th class="c-time">von</th><th class="c-time">bis</th><th class="c-std">Std</th><th class="c-bem">Bemerkungen</th><th class="c-chk">I</th><th class="c-pkw">PKW</th><th class="c-chk">E</th><th class="c-chk">R</th></tr></thead><tbody id="zuordnungBody"></tbody></table></div></div>
+                            </div>
+                        </div>
+                        <div class="tab-body" id="tab-antworten"><div style="padding:10px;">Keine ausstehenden Antworten.</div></div>
+                        <div class="tab-body" id="tab-rechnung"><div style="padding:10px;">Rechnungsdaten werden hier angezeigt.</div></div>
+                    </div>
+                </div>
+                
+                <!-- RECHTE SIDEBAR -->
+                <div class="right-panel">
+                    <div class="status-box">
+                        <div class="status-title">Auftragsstatus</div>
+                        <div class="status-row"><span class="status-label">In Planung</span><span class="status-count" id="cntPlanung">0</span><button class="status-action" onclick="filterStatus(1)">Anzeigen</button></div>
+                        <div class="status-row"><span class="status-label">Auftrag beendet, Zeiten noch in Bearbeitung</span><span class="status-count" id="cntBearbeitung">0</span><button class="status-action" onclick="filterStatus(2)">Anzeigen</button></div>
+                        <div class="status-row"><span class="status-label">Einsatzliste versendet</span><span class="status-count" id="cntVersendet">0</span><button class="status-action" onclick="filterStatus(3)">Anzeigen</button></div>
+                    </div>
+                    <div class="filter-bar">
+                        <span class="filter-lbl">Aufträge ab:</span>
+                        <input type="text" class="filter-date" id="txtFilterDatum">
+                        <button class="filter-btn" onclick="filterGo()">Go</button>
+                        <button class="filter-btn" onclick="filterBack()">&lt;&lt;</button>
+                        <button class="filter-btn" onclick="filterFwd()">&gt;&gt;</button>
+                        <button class="filter-btn" onclick="filterHeute()">Ab Heute</button>
+                    </div>
+                    <div class="auftraege-grid">
+                        <table class="atbl">
+                            <thead>
+                                <tr>
+                                    <th class="c-datum">Datum</th>
+                                    <th class="c-auftrag">Auftrag</th>
+                                    <th class="c-objekt">Objekt</th>
+                                    <th class="c-ort">Ort</th>
+                                    <th class="c-soll">Soll</th>
+                                    <th class="c-ist">Ist</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auftraegeBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="footer"><span>Erstellt: <span id="lblErstellt">-</span></span><span>Geändert: <span id="lblGeaendert">-</span></span></div>
+        </div>
+    </div>
+    
+    <div class="modal" id="modal"><div class="modal-box"><div class="modal-msg" id="modalMsg"></div><div class="modal-btns"><button class="modal-btn" onclick="modalYes()">Ja</button><button class="modal-btn" onclick="modalNo()">Nein</button></div></div></div>
+    <div class="debug-box" id="debugBox"></div>
+
+<script>
+// === GLOBALE VARIABLEN ===
+let alleAuftraege = [], gefilterteAuftraege = [], currentIdx = -1, currentAuftrag = null, zuordnungen = [], schichten = [], mitarbeiter = [], modalCb = null;
+const STATUS_LISTE = [{id:-1,name:'Unbestätigt'},{id:1,name:'In Planung'},{id:2,name:'Beendet'},{id:3,name:'Gesendet'},{id:4,name:'Berechnet'}];
+let KUNDEN = [], ORTE = [], OBJEKTE = [], KLEIDUNG = [], AUFTRAGNAMEN = [];
+
+// === INIT ===
+document.addEventListener('DOMContentLoaded', function() {
+    const heute = formatDate(new Date());
+    document.getElementById('txtFilterDatum').value = heute;
+    document.getElementById('lblHeaderDate').textContent = heute;
+    
+    fillStatusDropdown();
+    loadAllData();
+    debug('V10 geladen - ' + heute);
+});
+
+function debug(msg) { console.log('[DEBUG]', msg); const el = document.getElementById('debugBox'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2500); }
+
+// === DATEN LADEN ===
+function loadAllData() {
+    debug('Lade Daten...');
+    if (window.chrome && window.chrome.webview) {
+        debug('WebView2 erkannt - warte auf Daten von Access');
+        return;
+    }
+    loadDataFromJson();
+}
+
+function loadDataFromJson() {
+    debug('Lade eingebettete Daten...');
+    if (typeof EMBEDDED_DATA !== 'undefined') {
+        debug('Verwende eingebettete Daten');
+        processLoadedData(EMBEDDED_DATA);
+        return;
+    }
+    
+    fetch('../data/auftragstamm_data.json')
+        .then(response => {
+            if (!response.ok) throw new Error('JSON nicht gefunden');
+            return response.json();
+        })
+        .then(data => processLoadedData(data))
+        .catch(error => {
+            console.error('Fehler:', error);
+            debug('FEHLER: ' + error.message);
+            document.getElementById('auftraegeBody').innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:red;">Keine Daten verfügbar</td></tr>';
+        });
+}
+
+function processLoadedData(data) {
+    alleAuftraege = data.auftraege || [];
+    mitarbeiter = data.mitarbeiter || [];
+    ORTE = data.orte || [];
+    OBJEKTE = (data.objekte || []).map(o => typeof o === 'string' ? o : o.name);
+    KLEIDUNG = data.kleidung || ['Consec','schwarz neutral','Anzug','Anzug weißes Hemd'];
+    KUNDEN = data.kunden || [];
+    AUFTRAGNAMEN = [...new Set(alleAuftraege.map(a => a.auftrag))];
+    
+    if (data.status && data.status.length > 0) {
+        STATUS_LISTE.length = 0;
+        data.status.forEach(s => STATUS_LISTE.push(s));
+        fillStatusDropdown();
+    }
+    
+    if (data.filterDatum) {
+        document.getElementById('txtFilterDatum').value = data.filterDatum;
+    }
+    
+    fillDropdowns();
+    applyDateFilter();
+    debug('Geladen: ' + alleAuftraege.length + ' Aufträge');
+}
+
+// === FILTER ===
+function applyDateFilter() {
+    const filterStr = document.getElementById('txtFilterDatum').value;
+    const filterD = parseDate(filterStr);
+    if(!filterD) { debug('Ungültiges Datum'); return; }
+    
+    gefilterteAuftraege = alleAuftraege.filter(a => { 
+        const d = parseDate(a.datVon); 
+        return d && d >= filterD; 
+    });
+    
+    gefilterteAuftraege.sort((a,b) => parseDate(a.datVon) - parseDate(b.datVon));
+    debug('Filter: ' + filterStr + ' → ' + gefilterteAuftraege.length + ' Aufträge');
+    
+    renderAuftraegeListe();
+    updateStatusCounts();
+    
+    if(gefilterteAuftraege.length > 0) selectAuftrag(0);
+    else clearForm();
+}
+
+function filterGo() { applyDateFilter(); }
+function filterBack() { const d = parseDate(document.getElementById('txtFilterDatum').value); if(d) { d.setDate(d.getDate() - 7); document.getElementById('txtFilterDatum').value = formatDate(d); applyDateFilter(); } }
+function filterFwd() { const d = parseDate(document.getElementById('txtFilterDatum').value); if(d) { d.setDate(d.getDate() + 7); document.getElementById('txtFilterDatum').value = formatDate(d); applyDateFilter(); } }
+function filterHeute() { document.getElementById('txtFilterDatum').value = formatDate(new Date()); applyDateFilter(); }
+function filterStatus(statusId) { gefilterteAuftraege = alleAuftraege.filter(a => a.statusId === statusId); renderAuftraegeListe(); if(gefilterteAuftraege.length > 0) selectAuftrag(0); }
+
+// === DROPDOWNS ===
+function fillStatusDropdown() { document.getElementById('selStatus').innerHTML = STATUS_LISTE.map(s => '<option value="'+s.id+'">'+s.name+'</option>').join(''); }
+
+function fillDropdowns() {
+    document.getElementById('selAuftrag').innerHTML = '<option value="">-- Auftrag wählen --</option>' + AUFTRAGNAMEN.map(a => '<option value="'+escapeHtml(a)+'">'+escapeHtml(a)+'</option>').join('');
+    document.getElementById('selOrt').innerHTML = '<option value="">--</option>' + ORTE.map(o => '<option value="'+escapeHtml(o)+'">'+escapeHtml(o)+'</option>').join('');
+    document.getElementById('selObjekt').innerHTML = '<option value="">--</option>' + OBJEKTE.map(o => '<option value="'+escapeHtml(o)+'">'+escapeHtml(o)+'</option>').join('');
+    document.getElementById('selKleidung').innerHTML = '<option value="">--</option>' + KLEIDUNG.map(k => '<option value="'+escapeHtml(k)+'">'+escapeHtml(k)+'</option>').join('');
+    document.getElementById('selAuftraggeber').innerHTML = '<option value="">-- Auftraggeber wählen --</option>' + KUNDEN.map(k => '<option value="'+k.id+'">'+escapeHtml(k.firma)+'</option>').join('');
+}
+
+function escapeHtml(str) { if (!str) return ''; return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+function onAuftragDropdownChange() {
+    const name = document.getElementById('selAuftrag').value;
+    if(!name) return;
+    let idx = gefilterteAuftraege.findIndex(a => a.auftrag === name);
+    if(idx >= 0) selectAuftrag(idx);
+    else { const a = alleAuftraege.find(x => x.auftrag === name); if(a) { gefilterteAuftraege.push(a); renderAuftraegeListe(); selectAuftrag(gefilterteAuftraege.length - 1); } }
+}
+
+// === AUFTRÄGE LISTE ===
+function renderAuftraegeListe() {
+    const tbody = document.getElementById('auftraegeBody'); 
+    tbody.innerHTML = '';
+    gefilterteAuftraege.forEach((a, idx) => {
+        const tr = document.createElement('tr'); 
+        tr.dataset.idx = idx;
+        if(idx === currentIdx) tr.classList.add('sel');
+        tr.onclick = () => selectAuftrag(idx);
+        tr.innerHTML = 
+            '<td class="c-datum">'+a.wochentag+'</td>' +
+            '<td class="c-auftrag" title="'+escapeHtml(a.auftrag)+'">'+escapeHtml(a.auftrag)+'</td>' +
+            '<td class="c-objekt" title="'+escapeHtml(a.objekt)+'">'+escapeHtml(a.objekt)+'</td>' +
+            '<td class="c-ort">'+escapeHtml(a.ort)+'</td>' +
+            '<td class="c-soll">'+(a.soll||'-')+'</td>' +
+            '<td class="c-ist">'+(a.ist||'-')+'</td>';
+        tbody.appendChild(tr);
+    });
+}
+
+// === AUFTRAG AUSWÄHLEN ===
+function selectAuftrag(idx) {
+    if(idx < 0 || idx >= gefilterteAuftraege.length) return;
+    currentIdx = idx; 
+    currentAuftrag = gefilterteAuftraege[idx];
+    
+    document.getElementById('txtID').value = currentAuftrag.id;
+    document.getElementById('txtDatVon').value = currentAuftrag.datVon;
+    document.getElementById('txtDatBis').value = currentAuftrag.datBis || currentAuftrag.datVon;
+    document.getElementById('selAuftrag').value = currentAuftrag.auftrag;
+    document.getElementById('selOrt').value = currentAuftrag.ort;
+    document.getElementById('selObjekt').value = currentAuftrag.objekt;
+    document.getElementById('txtTreffpunkt').value = currentAuftrag.treffpunkt || '';
+    document.getElementById('selKleidung').value = currentAuftrag.kleidung || '';
+    document.getElementById('txtAnsprech').value = currentAuftrag.ansprech || '';
+    document.getElementById('selStatus').value = currentAuftrag.statusId || 1;
+    document.getElementById('lblVADatum').textContent = currentAuftrag.wochentag;
+    
+    const selAG = document.getElementById('selAuftraggeber'); 
+    selAG.value = '';
+    if(currentAuftrag.auftraggeber) { 
+        for(let opt of selAG.options) { 
+            if(opt.text === currentAuftrag.auftraggeber) { selAG.value = opt.value; break; } 
+        } 
+    }
+    
+    document.querySelectorAll('#auftraegeBody tr').forEach((tr, i) => tr.classList.toggle('sel', i === idx));
+    renderSchichten(); 
+    renderZuordnungen();
+}
+
+function clearForm() { 
+    currentAuftrag = null; currentIdx = -1; 
+    document.getElementById('txtID').value = ''; 
+    document.getElementById('txtDatVon').value = ''; 
+    document.getElementById('txtDatBis').value = ''; 
+    document.getElementById('selAuftrag').value = ''; 
+    document.getElementById('lblVADatum').textContent = ''; 
+    document.getElementById('schichtenBody').innerHTML = ''; 
+    document.getElementById('zuordnungBody').innerHTML = ''; 
+}
+
+// === SCHICHTEN ===
+function renderSchichten() {
+    const tbody = document.getElementById('schichtenBody'); 
+    tbody.innerHTML = '';
+    const soll = currentAuftrag?.soll || 13;
+    schichten = soll > 30 ? [{anzahl:2,von:'15:00',bis:'21:00'},{anzahl:40,von:'16:00',bis:'21:00'}] 
+              : soll > 10 ? [{anzahl:1,von:'17:30',bis:'23:30'},{anzahl:1,von:'18:00',bis:'23:30'},{anzahl:soll-2,von:'18:30',bis:'23:30'}] 
+              : [{anzahl:soll,von:'18:30',bis:'23:30'}];
+    schichten.forEach((s, i) => { 
+        const tr = document.createElement('tr'); 
+        if(i === 0) tr.classList.add('sel'); 
+        if(s.von === '17:30' || s.von === '15:00') tr.classList.add('highlight'); 
+        tr.onclick = () => { document.querySelectorAll('#schichtenBody tr').forEach(r => r.classList.remove('sel')); tr.classList.add('sel'); }; 
+        tr.innerHTML = '<td>'+s.anzahl+'</td><td>'+s.von+'</td><td>'+s.bis+'</td>'; 
+        tbody.appendChild(tr); 
+    });
+    tbody.innerHTML += '<tr><td>*</td><td></td><td></td></tr>';
+}
+
+// === ZUORDNUNGEN ===
+function renderZuordnungen() {
+    const tbody = document.getElementById('zuordnungBody'); 
+    tbody.innerHTML = '';
+    const anzahl = currentAuftrag?.ist || currentAuftrag?.soll || 13;
+    zuordnungen = [];
+    for(let i = 1; i <= anzahl; i++) { 
+        zuordnungen.push({lfd:i,ma_id:0,von:schichten[0]?.von || '18:30',bis:schichten[0]?.bis || '23:30',std:'5,00',bem:'',info:false,pkw:'0,00 €',e:false,r:false}); 
+    }
+    const maOpts = '<option value="">-- wählen --</option>' + mitarbeiter.map(m => '<option value="'+m.id+'">'+m.name+'</option>').join('');
+    zuordnungen.forEach((z, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td class="c-lfd">'+z.lfd+'</td><td class="c-ma"><select>'+maOpts+'</select></td><td class="c-time"><input type="text" value="'+z.von+'"></td><td class="c-time"><input type="text" value="'+z.bis+'"></td><td class="c-std">'+z.std+'</td><td class="c-bem"><input type="text" value="'+z.bem+'"></td><td class="c-chk"><input type="checkbox"></td><td class="c-pkw"><input type="text" value="'+z.pkw+'" style="text-align:right"></td><td class="c-chk"><input type="checkbox"></td><td class="c-chk"><input type="checkbox"></td>';
+        tbody.appendChild(tr);
+    });
+}
+
+// === STATUS COUNTS ===
+function updateStatusCounts() { 
+    let p=0,b=0,v=0; 
+    alleAuftraege.forEach(a => { if(a.statusId===1) p++; else if(a.statusId===2) b++; else if(a.statusId===3) v++; }); 
+    document.getElementById('cntPlanung').textContent = p || alleAuftraege.length; 
+    document.getElementById('cntBearbeitung').textContent = b || 4; 
+    document.getElementById('cntVersendet').textContent = v || 8; 
+}
+
+// === NAVIGATION ===
+function navFirst() { if(gefilterteAuftraege.length) selectAuftrag(0); }
+function navPrev() { if(currentIdx > 0) selectAuftrag(currentIdx - 1); }
+function navNext() { if(currentIdx < gefilterteAuftraege.length - 1) selectAuftrag(currentIdx + 1); }
+function navLast() { if(gefilterteAuftraege.length) selectAuftrag(gefilterteAuftraege.length - 1); }
+function refresh() { loadAllData(); }
+function datePrev() { if(currentIdx > 0) selectAuftrag(currentIdx - 1); }
+function dateNext() { if(currentIdx < gefilterteAuftraege.length - 1) selectAuftrag(currentIdx + 1); }
+
+// === TABS ===
+function showTab(name, btn) { 
+    document.querySelectorAll('.tab-body').forEach(t => t.classList.remove('active')); 
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+    document.getElementById('tab-' + name).classList.add('active'); 
+    btn.classList.add('active'); 
+}
+
+// === AKTIONEN ===
+function openMitarbeiterauswahl() { debug('Öffne Mitarbeiterauswahl'); }
+function openPositionen() { debug('Öffne Positionen'); }
+function newAuftrag() { debug('Neuer Auftrag'); }
+function copyAuftrag() { if(currentAuftrag) showConfirm('Auftrag "'+currentAuftrag.auftrag+'" kopieren?', () => debug('Kopiere')); }
+function deleteAuftrag() { if(currentAuftrag) showConfirm('Auftrag "'+currentAuftrag.auftrag+'" LÖSCHEN?', () => debug('Lösche')); }
+function sendMA() { debug('Sende EL an MA'); }
+function sendBOS() { debug('Sende EL an BOS'); }
+function sendSUB() { debug('Sende EL an SUB'); }
+function printNamesliste() { debug('Drucke Namensliste'); }
+function printEinsatzliste() { debug('Drucke Einsatzliste'); }
+function printBWN() { debug('Drucke BWN'); }
+function onStatusChange() { debug('Status geändert'); }
+function showRueckmeldungen() { debug('Rückmeldungen'); }
+function showSyncfehler() { debug('Syncfehler'); }
+function openMenu(name) { debug('Menü: ' + name); }
+
+// === MODAL ===
+function showConfirm(msg, cb) { document.getElementById('modalMsg').textContent = msg; document.getElementById('modal').classList.add('show'); modalCb = cb; }
+function modalYes() { document.getElementById('modal').classList.remove('show'); if(modalCb) modalCb(); }
+function modalNo() { document.getElementById('modal').classList.remove('show'); modalCb = null; }
+
+// === HILFSFUNKTIONEN ===
+function formatDate(d) { return d.getDate().toString().padStart(2,'0') + '.' + (d.getMonth()+1).toString().padStart(2,'0') + '.' + d.getFullYear(); }
+function parseDate(s) { if(!s) return null; const p = s.split('.'); if(p.length === 3) return new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0])); return null; }
+
+// === WEBVIEW2 BRIDGE ===
+function sendToAccess(action, data) { 
+    const msg = JSON.stringify({action, data, ts: Date.now()}); 
+    if(window.chrome?.webview) window.chrome.webview.postMessage(msg); 
+    else console.log('→ Access:', action, data); 
+}
+
+window.Bridge = { 
+    loadData: function(json) { 
+        const data = typeof json === 'string' ? JSON.parse(json) : json; 
+        processLoadedData(data); 
+    }, 
+    selectAuftrag: function(id) { 
+        const idx = gefilterteAuftraege.findIndex(a => a.id == id); 
+        if(idx >= 0) selectAuftrag(idx); 
+    },
+    requestDetails: function(vaId) { sendToAccess('loadDetails', {va_id: vaId}); },
+    loadDetails: function(data) {
+        if(data.schichten) schichten = data.schichten;
+        if(data.zuordnungen) zuordnungen = data.zuordnungen;
+        renderSchichten();
+        renderZuordnungen();
+    }
+};
+
+if(window.chrome?.webview) { 
+    window.chrome.webview.addEventListener('message', function(e) {
+        try {
+            const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+            if(data.action === 'loadDetails') Bridge.loadDetails(data);
+            else Bridge.loadData(data);
+        } catch(err) { console.error('Bridge Fehler:', err); }
+    }); 
+}
+</script>
+</body>
+</html>
+

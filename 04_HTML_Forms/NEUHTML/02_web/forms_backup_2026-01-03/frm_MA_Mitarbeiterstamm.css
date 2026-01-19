@@ -1,0 +1,614 @@
+/* Mitarbeiterstammblatt - Styles nach Access Screenshot */
+
+/* Container */
+.ma-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    background: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 11px;
+}
+
+/* Linkes Menue - HELLGRAU mit BLAUEM Header */
+.ma-menu {
+    width: 140px;
+    min-width: 140px;
+    background: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #cccccc;
+}
+
+.menu-header {
+    background: #4316B2;
+    color: white;
+    padding: 12px 8px;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+.menu-btn {
+    display: block;
+    padding: 8px 6px;
+    background: #f0f0f0;
+    border: 1px solid #999;
+    color: #333;
+    text-decoration: none;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.menu-btn:hover {
+    background: #e0e0e0;
+}
+
+.menu-btn.active {
+    background: #4316B2;
+    color: white;
+    border-color: #3558c0;
+}
+
+.menu-btn.secondary {
+    background: #d0d0d0;
+    color: #666;
+}
+
+/* Hauptbereich */
+.ma-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header - BLAU 2,5cm */
+.ma-header {
+    background: #4316B2;
+    color: white;
+    padding: 6px 12px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    min-height: 94px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #3558c0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ma-logo {
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 4px;
+}
+
+.ma-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.ma-btn {
+    padding: 4px 10px;
+    font-size: 10px;
+    border: 1px solid #999;
+    background: #f0f0f0;
+    color: #333;
+    cursor: pointer;
+}
+
+.ma-btn:hover {
+    background: #e0e0e0;
+}
+
+.ma-btn.special {
+    background: #4316B2;
+    color: white;
+    border-color: #3558c0;
+}
+
+.ma-btn.primary {
+    background: #4316B2;
+    color: white;
+    border-color: #3558c0;
+}
+
+.ma-btn.danger {
+    background: #e8e8e8;
+    color: #333333;
+}
+
+.ma-btn-small {
+    padding: 2px 6px;
+    font-size: 10px;
+    border: 1px solid #999;
+    background: #f0f0f0;
+    cursor: pointer;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.ma-btn-nav {
+    width: 24px;
+    height: 22px;
+    border: 1px solid #999;
+    background: #f0f0f0;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+.ma-btn-nav:hover {
+    background: #e0e0e0;
+}
+
+.header-center {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    justify-content: center;
+}
+
+.ma-kuerzel {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.ma-name {
+    font-size: 18px;
+}
+
+.ma-id {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.header-buttons-row {
+    display: flex;
+    gap: 4px;
+}
+
+.version-info {
+    font-size: 9px;
+    opacity: 0.8;
+    text-align: right;
+}
+
+.version-info span {
+    display: block;
+}
+
+/* Content */
+.ma-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Tabs Bereich */
+.ma-tabs-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tab-nav {
+    display: flex;
+    background: #e0e0e0;
+    border-bottom: 1px solid #999;
+}
+
+.tab-btn {
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    font-size: 11px;
+    cursor: pointer;
+    border-right: 1px solid #ccc;
+}
+
+.tab-btn:hover {
+    background: #d0d0d0;
+}
+
+.tab-btn.active {
+    background: white;
+    border-bottom: 2px solid #4316B2;
+    font-weight: 600;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: auto;
+    background: white;
+}
+
+.tab-pane {
+    display: none;
+    padding: 8px;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* Stammdaten Tab */
+.stammdaten-header {
+    padding: 8px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+}
+
+.stammdaten-ids {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.stammdaten-ids label {
+    font-size: 11px;
+}
+
+.checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 12px;
+}
+
+.checkbox-inline input {
+    margin: 0;
+}
+
+.stammdaten-content {
+    display: flex;
+    gap: 16px;
+    padding: 8px;
+}
+
+.stammdaten-left,
+.stammdaten-right {
+    flex: 1;
+    min-width: 280px;
+}
+
+.stammdaten-foto {
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.foto-container {
+    width: 150px;
+    height: 180px;
+    border: 1px solid #999;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.foto-placeholder {
+    color: #999;
+    font-size: 14px;
+}
+
+.arbeitsstd-info {
+    width: 100%;
+    font-size: 10px;
+}
+
+.arbeitsstd-info .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+}
+
+.field-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.field-row label {
+    min-width: 120px;
+    font-size: 11px;
+}
+
+.input-small {
+    width: 60px;
+    padding: 3px 6px;
+    font-size: 11px;
+    border: 1px solid #999;
+}
+
+.input-medium {
+    width: 150px;
+    padding: 3px 6px;
+    font-size: 11px;
+    border: 1px solid #999;
+}
+
+.input-date {
+    width: 120px;
+    padding: 3px 6px;
+    font-size: 11px;
+    border: 1px solid #999;
+}
+
+.input-betrag {
+    width: 100px;
+    padding: 3px 6px;
+    font-size: 11px;
+    border: 1px solid #999;
+    text-align: right;
+}
+
+.input-betrag.highlight {
+    background: #e8e8e8;
+    border: 2px solid #333333;
+    font-weight: bold;
+}
+
+/* Sub Rechnungen Tab */
+.sub-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
+}
+
+.sub-header label {
+    font-size: 11px;
+}
+
+.sub-auftraege,
+.sub-details {
+    margin: 8px;
+}
+
+.sub-auftraege-header,
+.sub-details-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    flex-wrap: wrap;
+}
+
+.section-title {
+    font-weight: bold;
+    font-size: 12px;
+    color: #4316B2;
+}
+
+.hint-text {
+    font-size: 10px;
+    color: #666;
+}
+
+.auftrag-info {
+    font-weight: bold;
+    color: #333;
+}
+
+.table-container {
+    max-height: 180px;
+    overflow: auto;
+    border: 1px solid #999;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.data-table thead {
+    background: #e0e0e0;
+    position: sticky;
+    top: 0;
+}
+
+.data-table th {
+    padding: 4px 6px;
+    text-align: left;
+    border-bottom: 1px solid #999;
+    font-weight: normal;
+}
+
+.data-table td {
+    padding: 3px 6px;
+    border-bottom: 1px solid #ddd;
+}
+
+.data-table tbody tr:hover {
+    background: #f5f5f5;
+}
+
+.data-table tbody tr.selected {
+    background: #4316B2;
+    color: white;
+}
+
+.sub-summen {
+    padding: 8px;
+    background: #f5f5f5;
+    margin-top: 8px;
+}
+
+.summen-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+
+.summen-row label {
+    font-size: 10px;
+    min-width: 40px;
+}
+
+/* Einsatz Header */
+.einsatz-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+}
+
+/* MA Liste rechts */
+.ma-list-section {
+    width: 280px;
+    min-width: 280px;
+    border-left: 1px solid #999;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+.ma-list-header {
+    padding: 8px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+}
+
+.list-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+
+.list-filter-row label {
+    font-size: 11px;
+    min-width: 40px;
+}
+
+.ma-list-table-container {
+    flex: 1;
+    overflow: auto;
+}
+
+.ma-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.ma-list-table thead {
+    background: #e0e0e0;
+    position: sticky;
+    top: 0;
+}
+
+.ma-list-table th {
+    padding: 4px 6px;
+    text-align: left;
+    border-bottom: 1px solid #999;
+    font-weight: normal;
+}
+
+.ma-list-table td {
+    padding: 3px 6px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.ma-list-table tbody tr:hover {
+    background: #f5f5f5;
+}
+
+.ma-list-table tbody tr.selected {
+    background: #4316B2;
+    color: white;
+}
+
+/* Footer */
+.ma-footer {
+    background: #4316B2;
+    color: white;
+    padding: 4px 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+}
+
+.footer-left,
+.footer-center,
+.footer-right {
+    display: flex;
+    gap: 8px;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+    .stammdaten-content {
+        flex-wrap: wrap;
+    }
+    .stammdaten-foto {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 1200px) {
+    .ma-list-section {
+        width: 220px;
+        min-width: 220px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .ma-menu {
+        display: none;
+    }
+    .ma-content {
+        flex-direction: column;
+    }
+    .ma-list-section {
+        width: 100%;
+        height: 200px;
+        border-left: none;
+        border-top: 1px solid #999;
+    }
+}

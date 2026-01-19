@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auswahl Master - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        .app-header { background: #4316B2; min-height: 94px; }
+
+        /* Selection Panel */
+        .selection-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .list-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 300px;
+            border-right: 1px solid #ccc;
+        }
+
+        .list-header {
+            padding: 10px 12px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .list-title {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .list-count {
+            font-size: 10px;
+            color: #666;
+            background: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .list-search {
+            padding: 8px 12px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .list-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .list-item:hover { background: #f0f0f0; }
+        .list-item.selected { background: #e8e8e8; }
+
+        .list-item-checkbox {
+            margin-right: 10px;
+        }
+
+        .list-item-content {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .list-item-subtitle {
+            font-size: 10px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        /* Transfer Buttons */
+        .transfer-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+            gap: 8px;
+            background: #f8f8f8;
+        }
+
+        .transfer-btn {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .transfer-btn:hover { background: #e8e8e8; }
+
+        /* Filter Options */
+        .filter-panel {
+            padding: 12px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .filter-row:last-child { margin-bottom: 0; }
+
+        .filter-label {
+            min-width: 80px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Buttons Panel */
+        .action-panel {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body data-active-menu="auswahl">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Auswahl Master</h1>
+                </div>
+                <div class="header-right">
+                    <span id="lblModus">Modus: -</span>
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Auswahl-Typ:</label>
+                    <select id="cboTyp" class="form-control" style="width:180px;">
+                        <option value="">-- Typ wählen --</option>
+                        <option value="mitarbeiter">Mitarbeiter</option>
+                        <option value="kunden">Kunden</option>
+                        <option value="objekte">Objekte</option>
+                        <option value="aufträge">Aufträge</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn" id="btnAktualisieren">Aktualisieren</button>
+                    <button class="btn" id="btnAlleWählen">Alle wählen</button>
+                    <button class="btn" id="btnAlleAbwählen">Alle abwählen</button>
+                </div>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-panel">
+                <div class="filter-row">
+                    <span class="filter-label">Status:</span>
+                    <label><input type="checkbox" id="chkAktiv" checked> Nur aktive</label>
+                    <label><input type="checkbox" id="chkInaktiv"> Inaktive einschließen</label>
+                </div>
+                <div class="filter-row">
+                    <span class="filter-label">Sortierung:</span>
+                    <select id="cboSortierung" class="form-control form-control-sm">
+                        <option value="name">Name</option>
+                        <option value="nummer">Nummer</option>
+                        <option value="datum">Datum</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="app-content" style="padding:0;">
+                <div class="selection-container">
+                    <!-- Verfügbare Liste -->
+                    <div class="list-panel">
+                        <div class="list-header">
+                            <span class="list-title">Verfügbar</span>
+                            <span class="list-count" id="countVerfügbar">0</span>
+                        </div>
+                        <div class="list-search">
+                            <input type="text" class="form-control" id="txtSucheVerfügbar" placeholder="Suchen..." style="width:100%;">
+                        </div>
+                        <div class="list-content" id="listVerfügbar">
+                            <div class="list-item">
+                                <input type="checkbox" class="list-item-checkbox">
+                                <div class="list-item-content">
+                                    <div class="list-item-title">Mustermann, Max</div>
+                                    <div class="list-item-subtitle">ID: 1001 | Aktiv</div>
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <input type="checkbox" class="list-item-checkbox">
+                                <div class="list-item-content">
+                                    <div class="list-item-title">Meier, Hans</div>
+                                    <div class="list-item-subtitle">ID: 1002 | Aktiv</div>
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <input type="checkbox" class="list-item-checkbox">
+                                <div class="list-item-content">
+                                    <div class="list-item-title">Schmidt, Peter</div>
+                                    <div class="list-item-subtitle">ID: 1003 | Aktiv</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transfer Buttons -->
+                    <div class="transfer-panel">
+                        <button class="transfer-btn" id="btnHinzufügen" title="Ausgewählte hinzufügen">&#8250;&#8250;</button>
+                        <button class="transfer-btn" id="btnHinzufügenAlle" title="Alle hinzufügen">&#8250;&#8250;|</button>
+                        <button class="transfer-btn" id="btnEntfernen" title="Ausgewählte entfernen">&#8249;&#8249;</button>
+                        <button class="transfer-btn" id="btnEntfernenAlle" title="Alle entfernen">|&#8249;&#8249;</button>
+                    </div>
+
+                    <!-- Ausgewählte Liste -->
+                    <div class="list-panel" style="border-right:none;">
+                        <div class="list-header">
+                            <span class="list-title">Ausgewählt</span>
+                            <span class="list-count" id="countAusgewählt">0</span>
+                        </div>
+                        <div class="list-search">
+                            <input type="text" class="form-control" id="txtSucheAusgewählt" placeholder="Suchen..." style="width:100%;">
+                        </div>
+                        <div class="list-content" id="listAusgewählt">
+                            <div style="padding:40px;text-align:center;color:#999;font-size:11px;">
+                                Keine Elemente ausgewählt
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-panel">
+                <button class="btn" id="btnAbbrechen">Abbrechen</button>
+                <button class="btn btn-primary" id="btnÜbernehmen">Übernehmen</button>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 verfügbar | 0 ausgewählt</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+
+        // List Item Click Handler
+        document.querySelectorAll('.list-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const cb = item.querySelector('.list-item-checkbox');
+                if (cb) cb.checked = !cb.checked;
+                item.classList.toggle('selected', cb.checked);
+            });
+        });
+    </script>
+</body>
+</html>

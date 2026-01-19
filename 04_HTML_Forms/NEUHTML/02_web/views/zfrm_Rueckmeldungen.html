@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rückmeldungen - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        .app-header { background: #4316B2; min-height: 94px; }
+        .detail-header { background: #4316B2; }
+
+        /* Rückmeldungs-Karten */
+        .rückmeldung-card {
+            display: flex;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .rückmeldung-card:hover { background: #f5f5f5; }
+        .rückmeldung-card.selected { background: #e8e8e8; border-left: 3px solid #4316B2; }
+        .rückmeldung-card.ungelesen { background: #f0f0f0; }
+
+        .rückmeldung-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4316B2;
+            margin-right: 10px;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+        .rückmeldung-indicator.gelesen { background: transparent; }
+
+        .rückmeldung-content { flex: 1; }
+        .rückmeldung-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .rückmeldung-absender { font-weight: 600; font-size: 11px; }
+        .rückmeldung-zeit { font-size: 10px; color: #666; }
+        .rückmeldung-betreff { font-size: 11px; margin-bottom: 4px; }
+        .rückmeldung-preview { font-size: 10px; color: #666; }
+
+        .rückmeldung-typ {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 8px;
+        }
+        .typ-info { background: #e8e8e8; color: #333333; }
+        .typ-anfrage { background: #e8e8e8; color: #333333; }
+        .typ-bestätigung { background: #e8e8e8; color: #333333; }
+        .typ-absage { background: #e8e8e8; color: #333333; }
+        .typ-problem { background: #e8e8e8; color: #333333; }
+
+        /* Nachrichten-Ansicht */
+        .nachricht-container {
+            padding: 16px;
+        }
+        .nachricht-header {
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 16px;
+        }
+        .nachricht-betreff {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .nachricht-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 11px;
+            color: #666;
+        }
+        .nachricht-body {
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .nachricht-actions {
+            margin-top: 20px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body data-active-menu="rückmeldung">
+    <div class="app-container">
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Rückmeldungen</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Filter:</label>
+                    <select id="cboFilter" class="form-control" style="width:130px;">
+                        <option value="">Alle</option>
+                        <option value="ungelesen">Ungelesen</option>
+                        <option value="anfrage">Anfragen</option>
+                        <option value="bestätigung">Bestätigungen</option>
+                        <option value="absage">Absagen</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <input type="text" id="txtSuche" class="form-control" placeholder="Suchen..." style="width:180px;">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn" id="btnAlleGelesen">Alle als gelesen</button>
+                    <button class="btn" id="btnAktualisieren">Aktualisieren</button>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item"><span class="stat-value" id="statGesamt">48</span><span class="stat-label">Gesamt</span></div>
+                <div class="stat-item stat-info"><span class="stat-value" id="statUngelesen">5</span><span class="stat-label">Ungelesen</span></div>
+                <div class="stat-item stat-ok"><span class="stat-value" id="statBestätigt">32</span><span class="stat-label">Bestätigt</span></div>
+                <div class="stat-item stat-err"><span class="stat-value" id="statAbsagen">8</span><span class="stat-label">Absagen</span></div>
+            </div>
+
+            <div class="app-content">
+                <div class="content-main" style="overflow:auto;max-width:400px;">
+                    <div class="rückmeldung-card ungelesen selected">
+                        <div class="rückmeldung-indicator"></div>
+                        <div class="rückmeldung-content">
+                            <div class="rückmeldung-header">
+                                <span class="rückmeldung-absender">Mustermann, Max</span>
+                                <span class="rückmeldung-zeit">vor 15 Min</span>
+                            </div>
+                            <div class="rückmeldung-betreff">
+                                Zusage: Messe Frankfurt 20.12.
+                                <span class="rückmeldung-typ typ-bestätigung">Zusage</span>
+                            </div>
+                            <div class="rückmeldung-preview">Ich bestätigt hiermit meine Teilnahme am...</div>
+                        </div>
+                    </div>
+
+                    <div class="rückmeldung-card ungelesen">
+                        <div class="rückmeldung-indicator"></div>
+                        <div class="rückmeldung-content">
+                            <div class="rückmeldung-header">
+                                <span class="rückmeldung-absender">Schmidt, Peter</span>
+                                <span class="rückmeldung-zeit">vor 2 Std</span>
+                            </div>
+                            <div class="rückmeldung-betreff">
+                                Absage: Commerzbank Arena 21.12.
+                                <span class="rückmeldung-typ typ-absage">Absage</span>
+                            </div>
+                            <div class="rückmeldung-preview">Leider muss ich absagen wegen...</div>
+                        </div>
+                    </div>
+
+                    <div class="rückmeldung-card">
+                        <div class="rückmeldung-indicator gelesen"></div>
+                        <div class="rückmeldung-content">
+                            <div class="rückmeldung-header">
+                                <span class="rückmeldung-absender">Müller, Klaus</span>
+                                <span class="rückmeldung-zeit">gestern</span>
+                            </div>
+                            <div class="rückmeldung-betreff">
+                                Anfrage: Urlaub 23.-27.12.
+                                <span class="rückmeldung-typ typ-anfrage">Anfrage</span>
+                            </div>
+                            <div class="rückmeldung-preview">Ich moechte Urlaub beantragen...</div>
+                        </div>
+                    </div>
+
+                    <div class="rückmeldung-card">
+                        <div class="rückmeldung-indicator gelesen"></div>
+                        <div class="rückmeldung-content">
+                            <div class="rückmeldung-header">
+                                <span class="rückmeldung-absender">Weber, Thomas</span>
+                                <span class="rückmeldung-zeit">17.12.2024</span>
+                            </div>
+                            <div class="rückmeldung-betreff">
+                                Problem: Stundenerfassung
+                                <span class="rückmeldung-typ typ-problem">Problem</span>
+                            </div>
+                            <div class="rückmeldung-preview">Bei meiner letzten Schicht fehlen...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-sidebar" style="flex:1;max-width:none;">
+                    <div class="detail-header">
+                        <span class="detail-title">Nachricht</span>
+                    </div>
+                    <div class="detail-content">
+                        <div class="nachricht-container">
+                            <div class="nachricht-header">
+                                <div class="nachricht-betreff">Zusage: Messe Frankfurt 20.12.</div>
+                                <div class="nachricht-meta">
+                                    <span><strong>Von:</strong> Mustermann, Max</span>
+                                    <span><strong>Datum:</strong> 18.12.2024 10:45</span>
+                                    <span><strong>Typ:</strong> <span class="rückmeldung-typ typ-bestätigung">Zusage</span></span>
+                                </div>
+                            </div>
+                            <div class="nachricht-body">
+                                <p>Hallo,</p>
+                                <p>ich bestätige hiermit meine Teilnahme am Einsatz:</p>
+                                <ul>
+                                    <li><strong>Objekt:</strong> Messe Frankfurt - Halle 1</li>
+                                    <li><strong>Datum:</strong> 20.12.2024</li>
+                                    <li><strong>Zeit:</strong> 08:00 - 16:00 Uhr</li>
+                                    <li><strong>Position:</strong> Einlasskontrolle</li>
+                                </ul>
+                                <p>Ich werde pünktlich vor Ort sein.</p>
+                                <p>Mit freundlichen Grüßen<br>Max Mustermann</p>
+                            </div>
+                            <div class="nachricht-actions">
+                                <button class="btn btn-primary">Antworten</button>
+                                <button class="btn">Weiterleiten</button>
+                                <button class="btn">Archivieren</button>
+                                <button class="btn btn-danger">Löschen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">48 Rückmeldungen</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="zfrm_Rueckmeldungen.logic.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+</body>
+</html>

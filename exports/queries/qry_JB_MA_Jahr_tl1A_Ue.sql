@@ -1,0 +1,5 @@
+-- Query: qry_JB_MA_Jahr_tl1A_Ue
+-- Type: 0
+SELECT qry_JB_MA_Jahr_tl1A.MA_ID, qry_JB_MA_Jahr_tl1A.AktJahr, [_tblAlleMonate].MonKurz AS Monat, qry_JB_MA_Jahr_tl1A.[Ist] AS Std, FA_Runden([RestAusVormonat]) AS [Rest aus Vormonat], qry_JB_MA_Jahr_tl1A.IstGes AS [Std gesamt], FA_Runden([UeberlaufAktMonat]) AS [Überlauf Std], qry_JB_MA_Jahr_tl1A.HabVerr AS verrechnet, qry_JB_MA_Jahr_tl1A.InfBrutto AS [Info Brutto], qry_JB_MA_Jahr_tl1A.Lst AS Lohnsteuer, qry_JB_MA_Jahr_tl1A.InfNetto AS [Info Netto], qry_JB_MA_Jahr_tl1A.InfGesamt AS [Info netto ges], qry_JB_MA_Jahr_tl1A.Lohn AS [MA Auszahlung], qry_JB_MA_Jahr_tl1A.LohnVon AS [Auszahlung von], FA_Runden([RestGut]) AS Restguthaben, qry_JB_MA_Jahr_tl1A.AktMon
+FROM _tblAlleMonate INNER JOIN qry_JB_MA_Jahr_tl1A ON [_tblAlleMonate].MonNr = qry_JB_MA_Jahr_tl1A.AktMon;
+

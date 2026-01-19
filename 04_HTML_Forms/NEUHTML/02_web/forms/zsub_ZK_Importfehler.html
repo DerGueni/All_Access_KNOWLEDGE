@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZK Importfehler - Subform</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: white;
+        }
+        .subform-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .subform-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: linear-gradient(180deg, #f8d7da 0%, #f5c6cb 100%);
+            border-bottom: 1px solid #f5c6cb;
+            font-size: 11px;
+        }
+        .subform-title { font-weight: 600; color: #721c24; }
+        .subform-toolbar {
+            padding: 4px 8px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 6px;
+        }
+        .subform-content { flex: 1; overflow: auto; }
+
+        .fehler-item {
+            display: flex;
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .fehler-item:hover { background: #fff5f5; }
+        .fehler-item.selected { background: #ffebee; border-left: 3px solid #dc3545; }
+
+        .fehler-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #f8d7da;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #721c24;
+            font-size: 14px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .fehler-content { flex: 1; }
+        .fehler-zeile { font-weight: 500; font-size: 11px; }
+        .fehler-text { font-size: 10px; color: #666; margin-top: 2px; }
+        .fehler-detail { font-size: 9px; color: #999; margin-top: 4px; }
+
+        .fehler-typ {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .fehler-typ.warnung { background: #fff3cd; color: #856404; }
+
+        .btn-sm {
+            padding: 3px 8px;
+            font-size: 9px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .btn-sm:hover { background: #f0f0f0; }
+        .btn-sm.fix { background: #28a745; color: white; border-color: #28a745; }
+        .btn-sm.ignore { background: #6c757d; color: white; border-color: #6c757d; }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #28a745;
+            text-align: center;
+        }
+        .empty-icon { font-size: 32px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">
+            <span class="subform-title">&#9888; Zeitkonto-Importfehler</span>
+            <span id="lblAnzahl">5 Fehler</span>
+        </div>
+
+        <div class="subform-toolbar">
+            <button class="btn-sm fix" id="btnAlleFixieren">Alle korrigieren</button>
+            <button class="btn-sm ignore" id="btnAlleIgnorieren">Alle ignorieren</button>
+            <span style="flex:1;"></span>
+            <button class="btn-sm" id="btnExportieren">Exportieren</button>
+        </div>
+
+        <div class="subform-content" id="fehlerListe">
+            <div class="fehler-item selected">
+                <div class="fehler-icon">&#9888;</div>
+                <div class="fehler-content">
+                    <div class="fehler-zeile">Zeile 15: Mustermann, Max</div>
+                    <div class="fehler-text">Ungültige Zeitangabe: 25:30</div>
+                    <div class="fehler-detail">Erwartet: HH:MM Format (00:00-23:59)</div>
+                </div>
+                <span class="fehler-typ">Fehler</span>
+            </div>
+
+            <div class="fehler-item">
+                <div class="fehler-icon">&#9888;</div>
+                <div class="fehler-content">
+                    <div class="fehler-zeile">Zeile 23: Schmidt, Peter</div>
+                    <div class="fehler-text">MA nicht gefunden: ID 9999</div>
+                    <div class="fehler-detail">Personal-Nr existiert nicht im System</div>
+                </div>
+                <span class="fehler-typ">Fehler</span>
+            </div>
+
+            <div class="fehler-item">
+                <div class="fehler-icon" style="background:#fff3cd;color:#856404;">&#33;</div>
+                <div class="fehler-content">
+                    <div class="fehler-zeile">Zeile 45: Müller, Klaus</div>
+                    <div class="fehler-text">Ueberlappende Zeiten erkannt</div>
+                    <div class="fehler-detail">08:00-16:00 überlappt mit bestehendem Eintrag</div>
+                </div>
+                <span class="fehler-typ warnung">Warnung</span>
+            </div>
+
+            <div class="fehler-item">
+                <div class="fehler-icon">&#9888;</div>
+                <div class="fehler-content">
+                    <div class="fehler-zeile">Zeile 67: Weber, Thomas</div>
+                    <div class="fehler-text">Auftrag nicht gefunden: VA-2024-999</div>
+                    <div class="fehler-detail">Auftrags-ID existiert nicht</div>
+                </div>
+                <span class="fehler-typ">Fehler</span>
+            </div>
+
+            <div class="fehler-item">
+                <div class="fehler-icon" style="background:#fff3cd;color:#856404;">&#33;</div>
+                <div class="fehler-content">
+                    <div class="fehler-zeile">Zeile 89: Fischer, Anna</div>
+                    <div class="fehler-text">Negative Stunden: -2,50</div>
+                    <div class="fehler-detail">Stundenanzahl kann nicht negativ sein</div>
+                </div>
+                <span class="fehler-typ warnung">Warnung</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Subform: zsub_ZK_Importfehler
+        // Zeigt Fehler beim Import von Zeitkonto-Daten
+        const ZsubZKImportfehler = {
+            importId: null,
+
+            init() {
+                const params = new URLSearchParams(window.location.search);
+                this.importId = params.get('Import_ID') || params.get('import_id');
+
+                // Item Click Handler
+                document.querySelectorAll('.fehler-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.fehler-item').forEach(i => i.classList.remove('selected'));
+                        item.classList.add('selected');
+                    });
+                });
+
+                // Button Handlers
+                document.getElementById('btnAlleFixieren').addEventListener('click', () => {
+                    if (confirm('Alle Fehler automatisch korrigieren wo möglich?')) {
+                        // API-Aufruf
+                        alert('Korrektur wird durchgeführt...');
+                    }
+                });
+
+                document.getElementById('btnAlleIgnorieren').addEventListener('click', () => {
+                    if (confirm('Alle Fehler ignorieren und Import fortsetzen?')) {
+                        document.getElementById('fehlerListe').innerHTML =
+                            '<div class="empty-state"><div class="empty-icon">&#10003;</div><div>Keine Fehler vorhanden</div></div>';
+                        document.getElementById('lblAnzahl').textContent = '0 Fehler';
+                    }
+                });
+
+                window.addEventListener('message', (e) => {
+                    if (e.data && e.data.action === 'setImportID') {
+                        this.importId = e.data.importId;
+                        this.ladeDaten();
+                    }
+                    if (e.data && e.data.action === 'requery') {
+                        this.ladeDaten();
+                    }
+                });
+            },
+
+            async ladeDaten() {
+                // API-Aufruf hier
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => ZsubZKImportfehler.init());
+    </script>
+</body>
+</html>

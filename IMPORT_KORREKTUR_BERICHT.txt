@@ -1,0 +1,84 @@
+================================================================================
+                    IMPORT-KORREKTUR ABSCHLUSSBERICHT
+================================================================================
+
+HAUPTFORMULARE
+--------------------------------------------------------------------------------
+Datei                                                | Status
+--------------------------------------------------------------------------------
+frm_MA_Mitarbeiterstamm.logic.js                    | Korrigiert
+frm_KD_Kundenstamm.logic.js                         | Korrigiert
+frm_va_Auftragstamm.logic.js                        | Bereits korrekt
+frm_OB_Objekt.logic.js                              | Bereits korrekt
+frm_N_Dienstplanuebersicht.logic.js                 | Korrigiert
+frm_DP_Dienstplan_MA.html (inline)                  | Bereits korrekt
+frm_DP_Dienstplan_Objekt.html                       | Kein Bridge-Import noetig
+frm_MA_Abwesenheit.logic.js                         | Korrigiert
+frm_MA_Zeitkonten.logic.js                          | Korrigiert
+frm_Kundenpreise.logic.js                           | Bereits korrekt
+frm_Subrechnungen.logic.js                          | Bereits korrekt
+frm_MA_Offene_Anfragen.html (inline)                | Bereits korrekt
+frm_Einsatzuebersicht.logic.js                      | Korrigiert
+frm_VA_Planungsuebersicht.logic.js                  | Korrigiert
+frm_N_MA_Bewerber_Verarbeitung.logic.js             | Korrigiert
+frm_N_Lohnabrechnungen.logic.js                     | Korrigiert
+frm_N_Stundenauswertung.logic.js                    | Korrigiert
+frm_MA_VA_Schnellauswahl.logic.js                   | Korrigiert
+index.html (inline)                                 | Korrigiert
+
+SUBFORMULARE
+--------------------------------------------------------------------------------
+Datei                                                | Status
+--------------------------------------------------------------------------------
+sub_DP_Grund.logic.js                               | Korrigiert
+sub_DP_Grund_MA.logic.js                            | Korrigiert
+sub_MA_Offene_Anfragen.logic.js                     | Korrigiert
+sub_MA_VA_Planung_Absage.logic.js                   | Korrigiert
+sub_MA_VA_Planung_Status.logic.js                   | Korrigiert
+sub_MA_VA_Zuordnung.logic.js                        | Korrigiert
+sub_OB_Objekt_Positionen.logic.js                   | Korrigiert
+sub_rch_Pos.logic.js                                | Korrigiert
+sub_VA_Anzeige.logic.js                             | Korrigiert
+sub_VA_Start.logic.js                               | Korrigiert
+sub_ZusatzDateien.logic.js                          | Korrigiert
+
+SONSTIGE DATEIEN
+--------------------------------------------------------------------------------
+Datei                                                | Status
+--------------------------------------------------------------------------------
+frm_Ausweis_Create.logic.js                         | Bereits korrekt
+frm_lst_row_auftrag.logic.js                        | Korrigiert
+zfrm_Lohnabrechnungen.logic.js                      | Korrigiert
+zfrm_Rueckmeldungen.logic.js                        | Korrigiert
+
+BACKUP-DATEIEN (nicht korrigiert)
+--------------------------------------------------------------------------------
+frm_va_Auftragstamm.logicALT.js                     | ALT-Datei (Backup)
+
+================================================================================
+ZUSAMMENFASSUNG
+================================================================================
+
+Gesamtanzahl gepruefter Dateien:    35
+Korrigiert (bridgeClient -> webview2-bridge):  26
+Bereits korrekt:                     8
+Kein Import noetig:                  1
+Backup-Dateien (nicht korrigiert):   1
+
+ALLE KORREKTUREN
+================================================================================
+Import-Statement vorher:  import { Bridge } from '../api/bridgeClient.js';
+Import-Statement nachher: import { Bridge } from '../js/webview2-bridge.js';
+
+HINWEIS
+================================================================================
+- Alle aktiven HTML-Formulare und .logic.js Dateien verwenden jetzt den
+  korrekten Import von webview2-bridge.js
+- Die Datei frm_va_Auftragstamm.logicALT.js ist eine Backup-Datei und wurde
+  nicht korrigiert (wird nicht aktiv verwendet)
+- frm_DP_Dienstplan_Objekt.html benoetigt keinen Bridge-Import, da sie nur
+  statisches HTML ohne Datenanbindung enthaelt
+
+STATUS
+================================================================================
+[ERFOLG] Alle aktiven Dateien korrekt konfiguriert!

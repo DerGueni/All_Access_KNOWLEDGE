@@ -1,0 +1,5 @@
+-- Query: qry_MA_VA_Zuo_All_AufUeber_Maintain
+-- Type: 0
+SELECT qry_MA_VA_Zuo_All_AufUeber1.VA_ID, qry_MA_VA_Zuo_All_AufUeber1.MA_ID, qry_MA_VA_Zuo_All_AufUeber1.Zuo_ID, qry_MA_VA_Zuo_All_AufUeber1.VADatum_ID, qry_MA_VA_Zuo_All_AufUeber1.VADatum, qry_MA_VA_Zuo_All_AufUeber1.Auftrag, qry_MA_VA_Zuo_All_AufUeber1.Ort, qry_MA_VA_Zuo_All_AufUeber1.Objekt, qry_MA_VA_Zuo_All_AufUeber1.Beginn1, qry_MA_VA_Zuo_All_AufUeber1.Ende1, ([ma_brutto_std2]) AS [Brutto Std], ([ma_netto_std2]) AS [Netto Std], qry_MA_VA_Zuo_All_AufUeber1.Fahrtkosten, qry_MA_VA_Zuo_All_AufUeber1.RL_34a
+FROM qry_MA_VA_Zuo_All_AufUeber1 INNER JOIN tbl_MA_VA_Zuordnung ON qry_MA_VA_Zuo_All_AufUeber1.VA_ID = tbl_MA_VA_Zuordnung.VA_ID;
+

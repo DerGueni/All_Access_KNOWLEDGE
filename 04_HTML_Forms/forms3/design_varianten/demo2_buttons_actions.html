@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo 2 - Buttons und Action-Elemente</title>
+    <style>
+        /* ========================================
+           CSS VARIABLEN
+        ======================================== */
+        :root {
+            /* Primärfarben */
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-active: #1e40af;
+            --primary-light: #dbeafe;
+            --primary-rgb: 37, 99, 235;
+
+            /* Sekundärfarben */
+            --secondary: #64748b;
+            --secondary-hover: #475569;
+            --secondary-active: #334155;
+            --secondary-light: #f1f5f9;
+
+            /* Status-Farben */
+            --success: #10b981;
+            --success-hover: #059669;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-hover: #d97706;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --danger-light: #fee2e2;
+            --info: #06b6d4;
+            --info-hover: #0891b2;
+            --info-light: #cffafe;
+
+            /* Neutrale Farben */
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+
+            /* Schatten */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+
+            /* Animationen */
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+            --transition-slow: 350ms ease;
+        }
+
+        /* ========================================
+           RESET & BASE
+        ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ========================================
+           LAYOUT
+        ======================================== */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+            color: white;
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header h2::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .section-content {
+            padding: 24px;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .button-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 24px 0;
+        }
+
+        /* ========================================
+           RIPPLE EFFEKT (Material Design)
+        ======================================== */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.5s;
+        }
+
+        .ripple:active::after {
+            transform: scale(0, 0);
+            opacity: 1;
+            transition: 0s;
+        }
+
+        /* ========================================
+           BASIS BUTTON STYLES
+        ======================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            text-decoration: none;
+            white-space: nowrap;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Größen */
+        .btn-xs {
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 13px;
+            border-radius: 6px;
+        }
+
+        .btn-lg {
+            padding: 14px 28px;
+            font-size: 16px;
+            border-radius: 10px;
+        }
+
+        .btn-xl {
+            padding: 18px 36px;
+            font-size: 18px;
+            border-radius: 12px;
+        }
+
+        /* ========================================
+           PRIMARY BUTTON
+        ======================================== */
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm), 0 1px 2px rgba(var(--primary-rgb), 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md), 0 4px 12px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .btn-primary:active {
+            background: var(--primary-active);
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ========================================
+           SECONDARY BUTTON
+        ======================================== */
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary:active {
+            background: var(--secondary-active);
+            transform: translateY(0);
+        }
+
+        /* ========================================
+           TERTIARY / OUTLINE BUTTON
+        ======================================== */
+        .btn-tertiary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-tertiary:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-tertiary:active {
+            background: rgba(var(--primary-rgb), 0.15);
+        }
+
+        /* ========================================
+           GHOST BUTTON
+        ======================================== */
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-ghost:hover {
+            background: var(--secondary-light);
+        }
+
+        .btn-ghost:active {
+            background: var(--border);
+        }
+
+        /* ========================================
+           LINK BUTTON
+        ======================================== */
+        .btn-link {
+            background: transparent;
+            color: var(--primary);
+            padding: 10px 8px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .btn-link:hover {
+            color: var(--primary-hover);
+            text-decoration-thickness: 2px;
+        }
+
+        .btn-link:focus {
+            box-shadow: none;
+        }
+
+        /* ========================================
+           STATUS BUTTONS
+        ======================================== */
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: var(--success-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md), 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: var(--warning-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md), 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md), 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: var(--info-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md), 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+
+        /* ========================================
+           ICON BUTTONS
+        ======================================== */
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 18px;
+        }
+
+        .btn-icon.btn-sm {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+        }
+
+        .btn-icon.btn-lg {
+            width: 48px;
+            height: 48px;
+            font-size: 20px;
+        }
+
+        .btn-icon.btn-xl {
+            width: 56px;
+            height: 56px;
+            font-size: 24px;
+        }
+
+        /* Square Icon Buttons */
+        .btn-icon-square {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        /* ========================================
+           LOADING BUTTON
+        ======================================== */
+        .btn-loading {
+            position: relative;
+            color: transparent !important;
+            pointer-events: none;
+        }
+
+        .btn-loading::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .btn-loading.btn-tertiary::before,
+        .btn-loading.btn-ghost::before {
+            border-color: rgba(var(--primary-rgb), 0.3);
+            border-top-color: var(--primary);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========================================
+           TOGGLE / SWITCH BUTTON
+        ======================================== */
+        .toggle-btn {
+            position: relative;
+            width: 56px;
+            height: 28px;
+            background: var(--border);
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+
+        .toggle-btn::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: var(--shadow);
+            transition: all var(--transition-normal);
+        }
+
+        .toggle-btn.active {
+            background: var(--primary);
+        }
+
+        .toggle-btn.active::after {
+            left: 32px;
+        }
+
+        .toggle-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3);
+        }
+
+        /* Toggle mit Label */
+        .toggle-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        /* ========================================
+           BUTTON GRUPPEN
+        ======================================== */
+        .btn-group {
+            display: inline-flex;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-group .btn {
+            border-radius: 0;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-group .btn:last-child {
+            border-right: none;
+        }
+
+        .btn-group .btn:hover {
+            transform: none;
+            z-index: 1;
+        }
+
+        /* Vertikale Button-Gruppe */
+        .btn-group-vertical {
+            display: inline-flex;
+            flex-direction: column;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-group-vertical .btn {
+            border-radius: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-group-vertical .btn:last-child {
+            border-bottom: none;
+        }
+
+        /* ========================================
+           SPLIT BUTTON
+        ======================================== */
+        .split-btn {
+            display: inline-flex;
+            position: relative;
+        }
+
+        .split-btn .btn-main {
+            border-radius: 8px 0 0 8px;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .split-btn .btn-dropdown {
+            border-radius: 0 8px 8px 0;
+            padding: 10px 12px;
+            min-width: auto;
+        }
+
+        .split-btn .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            min-width: 180px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all var(--transition-normal);
+            z-index: 100;
+        }
+
+        .split-btn.open .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .dropdown-item:hover {
+            background: var(--secondary-light);
+        }
+
+        .dropdown-item .icon {
+            width: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* ========================================
+           FLOATING ACTION BUTTON (FAB)
+        ======================================== */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg), 0 6px 20px rgba(var(--primary-rgb), 0.4);
+            transition: all var(--transition-normal);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-xl), 0 8px 25px rgba(var(--primary-rgb), 0.5);
+        }
+
+        .fab:active {
+            transform: scale(1);
+        }
+
+        /* FAB Mini */
+        .fab-mini {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        /* ========================================
+           SPEED DIAL (FAB mit Optionen)
+        ======================================== */
+        .speed-dial {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+        }
+
+        .speed-dial-actions {
+            position: absolute;
+            bottom: 64px;
+            right: 8px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
+        }
+
+        .speed-dial.open .speed-dial-actions {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .speed-dial-action {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(20px) scale(0.8);
+            transition: all var(--transition-normal);
+        }
+
+        .speed-dial.open .speed-dial-action {
+            transform: translateY(0) scale(1);
+        }
+
+        .speed-dial.open .speed-dial-action:nth-child(1) { transition-delay: 50ms; }
+        .speed-dial.open .speed-dial-action:nth-child(2) { transition-delay: 100ms; }
+        .speed-dial.open .speed-dial-action:nth-child(3) { transition-delay: 150ms; }
+        .speed-dial.open .speed-dial-action:nth-child(4) { transition-delay: 200ms; }
+
+        .speed-dial-action .label {
+            background: var(--text-primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: var(--shadow);
+        }
+
+        .speed-dial-action .fab-mini {
+            position: relative;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .speed-dial-action .fab-mini:hover {
+            background: var(--secondary-light);
+        }
+
+        .speed-dial .fab-main {
+            position: relative;
+        }
+
+        .speed-dial .fab-main .icon-open,
+        .speed-dial .fab-main .icon-close {
+            position: absolute;
+            transition: all var(--transition-normal);
+        }
+
+        .speed-dial .fab-main .icon-close {
+            opacity: 0;
+            transform: rotate(-90deg);
+        }
+
+        .speed-dial.open .fab-main .icon-open {
+            opacity: 0;
+            transform: rotate(90deg);
+        }
+
+        .speed-dial.open .fab-main .icon-close {
+            opacity: 1;
+            transform: rotate(0);
+        }
+
+        /* ========================================
+           PROGRESS BUTTON
+        ======================================== */
+        .btn-progress {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-progress .progress-bar {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.4);
+            width: 0%;
+            transition: width var(--transition-normal);
+        }
+
+        .btn-progress.in-progress {
+            pointer-events: none;
+        }
+
+        .btn-progress .btn-text {
+            transition: opacity var(--transition-fast);
+        }
+
+        .btn-progress.in-progress .btn-text {
+            opacity: 0.7;
+        }
+
+        /* Progress Button mit Ring */
+        .btn-progress-ring {
+            position: relative;
+        }
+
+        .progress-ring {
+            position: absolute;
+            left: -4px;
+            top: -4px;
+            width: calc(100% + 8px);
+            height: calc(100% + 8px);
+            pointer-events: none;
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .progress-ring .bg {
+            stroke: rgba(var(--primary-rgb), 0.2);
+        }
+
+        .progress-ring .progress {
+            stroke: var(--primary);
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 0.3s ease;
+        }
+
+        /* ========================================
+           CONFIRM BUTTON (Doppelklick)
+        ======================================== */
+        .btn-confirm {
+            position: relative;
+            transition: all var(--transition-normal);
+        }
+
+        .btn-confirm .confirm-overlay {
+            position: absolute;
+            inset: 0;
+            background: var(--danger);
+            border-radius: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all var(--transition-normal);
+            pointer-events: none;
+        }
+
+        .btn-confirm.confirming .confirm-overlay {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .btn-confirm.confirming {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        /* ========================================
+           COPY TO CLIPBOARD BUTTON
+        ======================================== */
+        .btn-copy {
+            position: relative;
+        }
+
+        .btn-copy .tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: var(--text-primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-copy .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--text-primary);
+        }
+
+        .btn-copy.copied .tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .btn-copy .icon-copy,
+        .btn-copy .icon-check {
+            transition: all var(--transition-fast);
+        }
+
+        .btn-copy.copied .icon-copy {
+            display: none;
+        }
+
+        .btn-copy:not(.copied) .icon-check {
+            display: none;
+        }
+
+        .btn-copy.copied {
+            background: var(--success);
+        }
+
+        /* ========================================
+           STATE SHOWCASE
+        ======================================== */
+        .state-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .state-item {
+            text-align: center;
+        }
+
+        .state-item .btn {
+            margin-bottom: 8px;
+        }
+
+        .state-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Force States für Demo */
+        .demo-hover {
+            background: var(--primary-hover) !important;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md), 0 4px 12px rgba(var(--primary-rgb), 0.3) !important;
+        }
+
+        .demo-active {
+            background: var(--primary-active) !important;
+            transform: translateY(0);
+        }
+
+        .demo-focus {
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3) !important;
+        }
+
+        /* ========================================
+           BADGE auf Button
+        ======================================== */
+        .btn-badge {
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            background: var(--danger);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+        }
+
+        .badge.pulse {
+            animation: badge-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* ========================================
+           DARK BUTTONS
+        ======================================== */
+        .btn-dark {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-dark:hover {
+            background: #0f172a;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ========================================
+           GRADIENT BUTTONS
+        ======================================== */
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg), 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-gradient-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .btn-gradient-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        /* ========================================
+           SOFT / LIGHT BUTTONS
+        ======================================== */
+        .btn-soft-primary {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .btn-soft-primary:hover {
+            background: rgba(var(--primary-rgb), 0.2);
+        }
+
+        .btn-soft-success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .btn-soft-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .btn-soft-warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        /* ========================================
+           PULSE ANIMATION
+        ======================================== */
+        .btn-pulse {
+            animation: btn-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes btn-pulse {
+            0%, 100% { box-shadow: var(--shadow), 0 0 0 0 rgba(var(--primary-rgb), 0.4); }
+            50% { box-shadow: var(--shadow), 0 0 0 8px rgba(var(--primary-rgb), 0); }
+        }
+
+        /* ========================================
+           SKELETON LOADING
+        ======================================== */
+        .btn-skeleton {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton 1.5s ease-in-out infinite;
+            color: transparent;
+            pointer-events: none;
+        }
+
+        @keyframes skeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ========================================
+           RESPONSIVE
+        ======================================== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .section-content {
+                padding: 16px;
+            }
+
+            .button-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .label {
+                margin-bottom: 8px;
+            }
+
+            .state-showcase {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ========================================
+           PRINT STYLES
+        ======================================== */
+        @media print {
+            .fab, .speed-dial {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Header -->
+    <header class="page-header">
+        <h1>Buttons und Action-Elemente</h1>
+        <p>Umfassende Demo aller Button-Varianten mit States, Animationen und Interaktionen</p>
+    </header>
+
+    <div class="container">
+        <!-- 1. Basis Button-Varianten -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Basis Button-Varianten</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <span class="label">Primary:</span>
+                    <button class="btn btn-primary ripple">Primary Button</button>
+                    <button class="btn btn-primary ripple">Mit Icon</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Secondary:</span>
+                    <button class="btn btn-secondary ripple">Secondary Button</button>
+                    <button class="btn btn-secondary ripple">Mit Icon</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Tertiary/Outline:</span>
+                    <button class="btn btn-tertiary">Tertiary Button</button>
+                    <button class="btn btn-tertiary">Mit Icon</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Ghost:</span>
+                    <button class="btn btn-ghost">Ghost Button</button>
+                    <button class="btn btn-ghost">Mit Icon</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Link:</span>
+                    <button class="btn btn-link">Link Button</button>
+                    <button class="btn btn-link">Mehr erfahren</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Status Buttons -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Status Buttons</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <button class="btn btn-success ripple">Erfolgreich</button>
+                    <button class="btn btn-warning ripple">Warnung</button>
+                    <button class="btn btn-danger ripple">Gefahr</button>
+                    <button class="btn btn-info ripple">Information</button>
+                    <button class="btn btn-dark ripple">Dunkel</button>
+                </div>
+                <div class="divider"></div>
+                <div class="button-row">
+                    <span class="label">Soft / Light:</span>
+                    <button class="btn btn-soft-primary">Primary Soft</button>
+                    <button class="btn btn-soft-success">Success Soft</button>
+                    <button class="btn btn-soft-warning">Warning Soft</button>
+                    <button class="btn btn-soft-danger">Danger Soft</button>
+                </div>
+                <div class="divider"></div>
+                <div class="button-row">
+                    <span class="label">Gradient:</span>
+                    <button class="btn btn-gradient ripple">Gradient</button>
+                    <button class="btn btn-gradient btn-gradient-success ripple">Success</button>
+                    <button class="btn btn-gradient btn-gradient-danger ripple">Danger</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Größen -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Button-Größen</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row" style="align-items: flex-end;">
+                    <button class="btn btn-primary btn-xs ripple">Extra Klein</button>
+                    <button class="btn btn-primary btn-sm ripple">Klein</button>
+                    <button class="btn btn-primary ripple">Normal</button>
+                    <button class="btn btn-primary btn-lg ripple">Groß</button>
+                    <button class="btn btn-primary btn-xl ripple">Extra Groß</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Button States -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Button States (mit Ripple-Effekt)</h2>
+            </div>
+            <div class="section-content">
+                <div class="state-showcase">
+                    <div class="state-item">
+                        <button class="btn btn-primary ripple">Normal</button>
+                        <div class="state-label">Normal</div>
+                    </div>
+                    <div class="state-item">
+                        <button class="btn btn-primary demo-hover">Hover</button>
+                        <div class="state-label">Hover</div>
+                    </div>
+                    <div class="state-item">
+                        <button class="btn btn-primary demo-active">Active</button>
+                        <div class="state-label">Active</div>
+                    </div>
+                    <div class="state-item">
+                        <button class="btn btn-primary demo-focus">Focus</button>
+                        <div class="state-label">Focus</div>
+                    </div>
+                    <div class="state-item">
+                        <button class="btn btn-primary" disabled>Disabled</button>
+                        <div class="state-label">Disabled</div>
+                    </div>
+                    <div class="state-item">
+                        <button class="btn btn-primary btn-loading">Loading</button>
+                        <div class="state-label">Loading</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Icon Buttons -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Icon Buttons</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <span class="label">Rund:</span>
+                    <button class="btn btn-primary btn-icon btn-sm ripple">+</button>
+                    <button class="btn btn-primary btn-icon ripple">+</button>
+                    <button class="btn btn-primary btn-icon btn-lg ripple">+</button>
+                    <button class="btn btn-primary btn-icon btn-xl ripple">+</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Mit Emoji/Unicode:</span>
+                    <button class="btn btn-secondary btn-icon ripple">📧</button>
+                    <button class="btn btn-success btn-icon ripple">✓</button>
+                    <button class="btn btn-danger btn-icon ripple">✕</button>
+                    <button class="btn btn-warning btn-icon ripple">⚠</button>
+                    <button class="btn btn-info btn-icon ripple">ℹ</button>
+                    <button class="btn btn-ghost btn-icon ripple">⋮</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Eckig:</span>
+                    <button class="btn btn-primary btn-icon-square ripple">🔍</button>
+                    <button class="btn btn-secondary btn-icon-square ripple">⚙</button>
+                    <button class="btn btn-ghost btn-icon-square ripple">📋</button>
+                    <button class="btn btn-tertiary btn-icon-square">🔔</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Mit Badge:</span>
+                    <button class="btn btn-ghost btn-icon btn-badge ripple">
+                        🔔
+                        <span class="badge pulse">3</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon btn-badge ripple">
+                        📧
+                        <span class="badge">12</span>
+                    </button>
+                    <button class="btn btn-secondary btn-badge ripple">
+                        Nachrichten
+                        <span class="badge">5</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Loading Buttons -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Loading Buttons</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <button class="btn btn-primary btn-loading">Laden...</button>
+                    <button class="btn btn-secondary btn-loading">Laden...</button>
+                    <button class="btn btn-tertiary btn-loading">Laden...</button>
+                    <button class="btn btn-ghost btn-loading">Laden...</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Klicken zum Testen:</span>
+                    <button class="btn btn-primary ripple" onclick="simulateLoading(this)">Speichern</button>
+                    <button class="btn btn-success ripple" onclick="simulateLoading(this)">Senden</button>
+                    <button class="btn btn-info ripple" onclick="simulateLoading(this)">Hochladen</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Toggle Buttons -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Toggle / Switch Buttons</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <div class="toggle-wrapper">
+                        <button class="toggle-btn" onclick="this.classList.toggle('active')"></button>
+                        <span class="toggle-label">Benachrichtigungen</span>
+                    </div>
+                    <div class="toggle-wrapper">
+                        <button class="toggle-btn active" onclick="this.classList.toggle('active')"></button>
+                        <span class="toggle-label">Dark Mode</span>
+                    </div>
+                    <div class="toggle-wrapper">
+                        <button class="toggle-btn" onclick="this.classList.toggle('active')"></button>
+                        <span class="toggle-label">Auto-Save</span>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="button-row">
+                    <span class="label">Segmented Control:</span>
+                    <div class="btn-group">
+                        <button class="btn btn-primary ripple">Tag</button>
+                        <button class="btn btn-secondary ripple">Woche</button>
+                        <button class="btn btn-secondary ripple">Monat</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Button Gruppen -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Button-Gruppen</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <span class="label">Horizontal:</span>
+                    <div class="btn-group">
+                        <button class="btn btn-primary ripple">Links</button>
+                        <button class="btn btn-primary ripple">Mitte</button>
+                        <button class="btn btn-primary ripple">Rechts</button>
+                    </div>
+                </div>
+                <div class="button-row">
+                    <span class="label">Mit Icons:</span>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary ripple">⬅</button>
+                        <button class="btn btn-secondary ripple">⏸</button>
+                        <button class="btn btn-secondary ripple">➡</button>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-ghost ripple">📄</button>
+                        <button class="btn btn-ghost ripple">📋</button>
+                        <button class="btn btn-ghost ripple">📁</button>
+                    </div>
+                </div>
+                <div class="button-row">
+                    <span class="label">Vertikal:</span>
+                    <div class="btn-group-vertical">
+                        <button class="btn btn-primary ripple">Option 1</button>
+                        <button class="btn btn-primary ripple">Option 2</button>
+                        <button class="btn btn-primary ripple">Option 3</button>
+                    </div>
+                    <div class="btn-group-vertical">
+                        <button class="btn btn-ghost ripple">🔼</button>
+                        <button class="btn btn-ghost ripple">⏺</button>
+                        <button class="btn btn-ghost ripple">🔽</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. Split Buttons -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Split Buttons mit Dropdown</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <div class="split-btn" id="splitBtn1">
+                        <button class="btn btn-primary btn-main ripple">Speichern</button>
+                        <button class="btn btn-primary btn-dropdown" onclick="toggleSplitBtn('splitBtn1')">▼</button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item" onclick="alert('Speichern als...')">
+                                <span class="icon">💾</span>
+                                <span>Speichern als...</span>
+                            </div>
+                            <div class="dropdown-item" onclick="alert('Als Vorlage speichern')">
+                                <span class="icon">📄</span>
+                                <span>Als Vorlage speichern</span>
+                            </div>
+                            <div class="dropdown-item" onclick="alert('Exportieren')">
+                                <span class="icon">📤</span>
+                                <span>Exportieren</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="split-btn" id="splitBtn2">
+                        <button class="btn btn-success btn-main ripple">Senden</button>
+                        <button class="btn btn-success btn-dropdown" onclick="toggleSplitBtn('splitBtn2')">▼</button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item">
+                                <span class="icon">📧</span>
+                                <span>Per E-Mail senden</span>
+                            </div>
+                            <div class="dropdown-item">
+                                <span class="icon">💬</span>
+                                <span>Per SMS senden</span>
+                            </div>
+                            <div class="dropdown-item">
+                                <span class="icon">🖨</span>
+                                <span>Drucken</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. Progress Buttons -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Progress Buttons</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <span class="label">Mit Fortschrittsbalken:</span>
+                    <button class="btn btn-primary btn-progress ripple" onclick="simulateProgress(this)">
+                        <span class="btn-text">Hochladen</span>
+                        <div class="progress-bar"></div>
+                    </button>
+                    <button class="btn btn-success btn-progress ripple" onclick="simulateProgress(this)">
+                        <span class="btn-text">Verarbeiten</span>
+                        <div class="progress-bar"></div>
+                    </button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Pulsierend:</span>
+                    <button class="btn btn-primary btn-pulse ripple">Achtung!</button>
+                    <button class="btn btn-danger btn-pulse ripple">Dringend</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Skeleton:</span>
+                    <button class="btn btn-skeleton" style="width: 120px;">Laden...</button>
+                    <button class="btn btn-skeleton" style="width: 180px;">Laden...</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. Confirm Buttons -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Confirm Buttons (Doppelklick-Bestätigung)</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <button class="btn btn-danger btn-confirm ripple" onclick="handleConfirm(this, 'Datensatz gelöscht!')">
+                        <span>🗑 Löschen</span>
+                        <div class="confirm-overlay">Nochmal klicken!</div>
+                    </button>
+                    <button class="btn btn-warning btn-confirm ripple" onclick="handleConfirm(this, 'Zurückgesetzt!')">
+                        <span>↺ Zurücksetzen</span>
+                        <div class="confirm-overlay">Sicher?</div>
+                    </button>
+                    <button class="btn btn-secondary btn-confirm ripple" onclick="handleConfirm(this, 'Abgebrochen!')">
+                        <span>✕ Abbrechen</span>
+                        <div class="confirm-overlay">Bestätigen!</div>
+                    </button>
+                </div>
+                <p style="margin-top: 12px; font-size: 13px; color: var(--text-secondary);">
+                    Hinweis: Erster Klick zeigt Bestätigung, zweiter Klick führt Aktion aus. Nach 3 Sekunden wird zurückgesetzt.
+                </p>
+            </div>
+        </section>
+
+        <!-- 12. Copy to Clipboard -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Copy to Clipboard Button</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <button class="btn btn-tertiary btn-copy ripple" onclick="copyToClipboard(this, 'Hallo Welt!')">
+                        <span class="icon-copy">📋 Text kopieren</span>
+                        <span class="icon-check">✓ Kopiert!</span>
+                        <span class="tooltip">In Zwischenablage kopiert!</span>
+                    </button>
+                    <button class="btn btn-primary btn-copy ripple" onclick="copyToClipboard(this, 'https://example.com/link')">
+                        <span class="icon-copy">🔗 Link kopieren</span>
+                        <span class="icon-check">✓ Kopiert!</span>
+                        <span class="tooltip">Link kopiert!</span>
+                    </button>
+                    <button class="btn btn-ghost btn-icon btn-copy ripple" onclick="copyToClipboard(this, 'API-KEY-12345')">
+                        <span class="icon-copy">📋</span>
+                        <span class="icon-check">✓</span>
+                        <span class="tooltip">API Key kopiert!</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 13. Spezial-Buttons -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Spezial-Buttons</h2>
+            </div>
+            <div class="section-content">
+                <div class="button-row">
+                    <span class="label">Mit Text + Icon:</span>
+                    <button class="btn btn-primary ripple">📧 E-Mail senden</button>
+                    <button class="btn btn-success ripple">✓ Bestätigen</button>
+                    <button class="btn btn-danger ripple">🗑 Löschen</button>
+                    <button class="btn btn-secondary ripple">⬇ Download</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Icon rechts:</span>
+                    <button class="btn btn-primary ripple">Weiter ➡</button>
+                    <button class="btn btn-tertiary">Mehr anzeigen ▼</button>
+                    <button class="btn btn-ghost">Öffnen ↗</button>
+                </div>
+                <div class="button-row">
+                    <span class="label">Full Width:</span>
+                </div>
+                <button class="btn btn-primary ripple" style="width: 100%; justify-content: center;">Vollbreite Button</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab ripple" onclick="alert('FAB geklickt!')" title="Hinzufügen">+</button>
+
+    <!-- Speed Dial -->
+    <div class="speed-dial" id="speedDial" style="right: 100px;">
+        <div class="speed-dial-actions">
+            <div class="speed-dial-action">
+                <span class="label">Neuer Mitarbeiter</span>
+                <button class="fab fab-mini ripple" onclick="alert('Neuer Mitarbeiter')">👤</button>
+            </div>
+            <div class="speed-dial-action">
+                <span class="label">Neuer Auftrag</span>
+                <button class="fab fab-mini ripple" onclick="alert('Neuer Auftrag')">📋</button>
+            </div>
+            <div class="speed-dial-action">
+                <span class="label">Neue Nachricht</span>
+                <button class="fab fab-mini ripple" onclick="alert('Neue Nachricht')">✉</button>
+            </div>
+            <div class="speed-dial-action">
+                <span class="label">Schnellsuche</span>
+                <button class="fab fab-mini ripple" onclick="alert('Schnellsuche')">🔍</button>
+            </div>
+        </div>
+        <button class="fab fab-main ripple" onclick="toggleSpeedDial()">
+            <span class="icon-open">☰</span>
+            <span class="icon-close">✕</span>
+        </button>
+    </div>
+
+    <script>
+        // ========================================
+        // LOADING BUTTON SIMULATION
+        // ========================================
+        function simulateLoading(btn) {
+            const originalText = btn.innerHTML;
+            btn.classList.add('btn-loading');
+            btn.innerHTML = 'Laden...';
+
+            setTimeout(() => {
+                btn.classList.remove('btn-loading');
+                btn.innerHTML = '✓ Fertig!';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-primary', 'btn-info');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-primary');
+                }, 1500);
+            }, 2000);
+        }
+
+        // ========================================
+        // PROGRESS BUTTON SIMULATION
+        // ========================================
+        function simulateProgress(btn) {
+            if (btn.classList.contains('in-progress')) return;
+
+            btn.classList.add('in-progress');
+            const progressBar = btn.querySelector('.progress-bar');
+            const btnText = btn.querySelector('.btn-text');
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+
+                progressBar.style.width = progress + '%';
+                btnText.textContent = Math.round(progress) + '%';
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        btnText.textContent = '✓ Fertig!';
+                        setTimeout(() => {
+                            btn.classList.remove('in-progress');
+                            progressBar.style.width = '0%';
+                            btnText.textContent = btn.classList.contains('btn-success') ? 'Verarbeiten' : 'Hochladen';
+                        }, 1500);
+                    }, 300);
+                }
+            }, 200);
+        }
+
+        // ========================================
+        // SPLIT BUTTON DROPDOWN
+        // ========================================
+        function toggleSplitBtn(id) {
+            const splitBtn = document.getElementById(id);
+
+            // Schließe alle anderen
+            document.querySelectorAll('.split-btn.open').forEach(el => {
+                if (el.id !== id) el.classList.remove('open');
+            });
+
+            splitBtn.classList.toggle('open');
+        }
+
+        // Schließe Dropdown bei Klick außerhalb
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.split-btn')) {
+                document.querySelectorAll('.split-btn.open').forEach(el => {
+                    el.classList.remove('open');
+                });
+            }
+        });
+
+        // ========================================
+        // CONFIRM BUTTON
+        // ========================================
+        const confirmTimers = new Map();
+
+        function handleConfirm(btn, successMessage) {
+            if (btn.classList.contains('confirming')) {
+                // Zweiter Klick - Aktion ausführen
+                clearTimeout(confirmTimers.get(btn));
+                confirmTimers.delete(btn);
+                btn.classList.remove('confirming');
+
+                // Erfolgs-Feedback
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<span>✓ ' + successMessage + '</span>';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-danger', 'btn-warning', 'btn-secondary');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('btn-success');
+                    // Ursprüngliche Klasse wiederherstellen
+                    if (originalHTML.includes('Löschen')) btn.classList.add('btn-danger');
+                    else if (originalHTML.includes('Zurücksetzen')) btn.classList.add('btn-warning');
+                    else btn.classList.add('btn-secondary');
+                }, 2000);
+            } else {
+                // Erster Klick - Bestätigung anzeigen
+                btn.classList.add('confirming');
+
+                // Auto-Reset nach 3 Sekunden
+                const timer = setTimeout(() => {
+                    btn.classList.remove('confirming');
+                    confirmTimers.delete(btn);
+                }, 3000);
+
+                confirmTimers.set(btn, timer);
+            }
+        }
+
+        // ========================================
+        // COPY TO CLIPBOARD
+        // ========================================
+        async function copyToClipboard(btn, text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                btn.classList.add('copied');
+
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Kopieren fehlgeschlagen:', err);
+                alert('Kopieren fehlgeschlagen!');
+            }
+        }
+
+        // ========================================
+        // SPEED DIAL
+        // ========================================
+        function toggleSpeedDial() {
+            document.getElementById('speedDial').classList.toggle('open');
+        }
+
+        // Schließe Speed Dial bei Klick außerhalb
+        document.addEventListener('click', (e) => {
+            const speedDial = document.getElementById('speedDial');
+            if (!e.target.closest('.speed-dial') && speedDial.classList.contains('open')) {
+                speedDial.classList.remove('open');
+            }
+        });
+
+        // ========================================
+        // TOGGLE BUTTON KEYBOARD SUPPORT
+        // ========================================
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    btn.classList.toggle('active');
+                }
+            });
+        });
+
+        // ========================================
+        // SEGMENTED CONTROL
+        // ========================================
+        document.querySelectorAll('.btn-group').forEach(group => {
+            group.addEventListener('click', (e) => {
+                const btn = e.target.closest('.btn');
+                if (!btn) return;
+
+                // Nur wenn es ein Segmented Control ist (alle Buttons in der Gruppe)
+                const buttons = group.querySelectorAll('.btn');
+                const hasSecondary = Array.from(buttons).some(b => b.classList.contains('btn-secondary'));
+
+                if (hasSecondary) {
+                    buttons.forEach(b => {
+                        b.classList.remove('btn-primary');
+                        b.classList.add('btn-secondary');
+                    });
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('btn-primary');
+                }
+            });
+        });
+
+        // ========================================
+        // RIPPLE EFFECT ENHANCEMENT
+        // ========================================
+        document.querySelectorAll('.ripple').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const ripple = document.createElement('span');
+                ripple.style.cssText = `
+                    position: absolute;
+                    background: rgba(255,255,255,0.4);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    width: 0;
+                    height: 0;
+                    left: ${x}px;
+                    top: ${y}px;
+                    transform: translate(-50%, -50%);
+                    animation: rippleEffect 0.6s ease-out forwards;
+                `;
+
+                this.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Ripple Animation hinzufügen
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes rippleEffect {
+                to {
+                    width: 200px;
+                    height: 200px;
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ========================================
+        // CONSOLE INFO
+        // ========================================
+        console.log('%c Button Demo geladen!', 'color: #2563eb; font-size: 16px; font-weight: bold;');
+        console.log('Interaktive Elemente:');
+        console.log('- Loading Buttons: Klicken zum Testen');
+        console.log('- Progress Buttons: Klicken für Fortschrittsanzeige');
+        console.log('- Confirm Buttons: Doppelklick zum Bestätigen');
+        console.log('- Copy Buttons: Kopiert Text in Zwischenablage');
+        console.log('- FAB (rechts unten): Floating Action Button');
+        console.log('- Speed Dial (Mitte unten): Ausklappbare Optionen');
+    </script>
+</body>
+</html>

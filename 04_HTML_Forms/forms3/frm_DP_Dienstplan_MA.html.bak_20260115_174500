@@ -1,0 +1,932 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplanübersicht</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 12px;
+            background-color: #8080c0;
+            overflow: hidden;
+        }
+
+        /* Shell-Modus: Sidebar ausblenden */
+        body.shell-mode .left-menu,
+        body.shell-mode .app-sidebar {
+            display: none !important;
+        }
+
+        body.shell-mode .content-wrapper,
+        body.shell-mode .app-main {
+            width: 100% !important;
+            margin-left: 0 !important;
+        }
+
+        body.shell-mode .app-wrapper {
+            display: block !important;
+        }
+
+        /* Hauptcontainer - exakt 1904px breit (28559 twips / 15) */
+        .form-container {
+            width: 100%;
+            height: 100%;
+            background-color: #8080c0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section - 88px hoch (1314 twips), Dunkelrot */
+        .form-header {
+            position: relative;
+            height: 88px;
+            background-color: #d3d3d3;
+            border-bottom: 1px solid #6060a0;
+        }
+
+        /* Detail Section - 412px hoch (6182 twips), gleiche Hintergrundfarbe */
+        .form-detail {
+            position: relative;
+            height: calc(100% - 88px);
+            background-color: #8080c0;
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* ============================================ */
+        /* HEADER CONTROLS - Absolute Positionierung   */
+        /* ============================================ */
+
+        /* Schliessen Button */
+        #Befehl37 {
+            position: absolute;
+            left: 1871px;
+            top: 8px;
+            width: 20px;
+            height: 22px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Titel: Dienstplanübersicht */
+        #Bezeichnungsfeld96 {
+            position: absolute;
+            left: 125px;
+            top: 30px;
+            width: 193px;
+            height: 27px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Ribbon Buttons (klein, versteckt) */
+        #btnRibbonAus { position: absolute; left: 49px; top: 23px; width: 20px; height: 14px; font-size: 8px; display: none; }
+        #btnDaBaAus { position: absolute; left: 30px; top: 34px; width: 20px; height: 14px; font-size: 8px; display: none; }
+        #btnDaBaEin { position: absolute; left: 68px; top: 34px; width: 20px; height: 14px; font-size: 8px; display: none; }
+        #btnRibbonEin { position: absolute; left: 49px; top: 45px; width: 20px; height: 14px; font-size: 8px; display: none; }
+
+        /* Startdatum Bereich */
+        #Rechteck108 {
+            position: absolute;
+            left: 488px;
+            top: 22px;
+            width: 167px;
+            height: 45px;
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid #6060a0;
+            border-radius: 3px;
+        }
+
+        /* KW-Dropdown neben Datum */
+        #cboKW {
+            position: absolute;
+            left: 595px;
+            top: 26px;
+            width: 55px;
+            height: 17px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        #lblKW {
+            position: absolute;
+            left: 597px;
+            top: 10px;
+            font-size: 9px;
+            color: #fff;
+        }
+
+        #dtStartdatum {
+            position: absolute;
+            left: 491px;
+            top: 26px;
+            width: 102px;
+            height: 17px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            padding: 1px 4px;
+            background-color: #fff;
+        }
+
+        #btnVor {
+            position: absolute;
+            left: 653px;
+            top: 28px;
+            width: 38px;
+            height: 15px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        #btnStartdatum {
+            position: absolute;
+            left: 492px;
+            top: 45px;
+            width: 103px;
+            height: 19px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 9px;
+            cursor: pointer;
+        }
+
+        #btnrueck {
+            position: absolute;
+            left: 653px;
+            top: 47px;
+            width: 38px;
+            height: 15px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        #btn_Heute {
+            position: absolute;
+            left: 709px;
+            top: 34px;
+            width: 77px;
+            height: 18px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* MA Filter ComboBox */
+        #NurAktiveMA {
+            position: absolute;
+            left: 869px;
+            top: 30px;
+            width: 158px;
+            height: 23px;
+            font-size: 10px;
+            border: 1px solid #ccc;
+        }
+
+        /* Dienstpläne senden Button */
+        #btnDPSenden {
+            position: absolute;
+            left: 1119px;
+            top: 15px;
+            width: 146px;
+            height: 31px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Einzeldienstpläne Button */
+        #btnMADienstpl {
+            position: absolute;
+            left: 1274px;
+            top: 15px;
+            width: 146px;
+            height: 22px;
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Enddatum */
+        #dtEnddatum {
+            position: absolute;
+            left: 1142px;
+            top: 57px;
+            width: 102px;
+            height: 17px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            padding: 1px 4px;
+            background-color: #fff;
+        }
+
+        /* Übersicht drucken Button */
+        #btnOutpExcel {
+            position: absolute;
+            left: 1274px;
+            top: 53px;
+            width: 146px;
+            height: 22px;
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Senden Button */
+        #Befehl20 {
+            position: absolute;
+            left: 1644px;
+            top: 15px;
+            width: 100px;
+            height: 21px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Übersicht senden Button */
+        #btnOutpExcelSend {
+            position: absolute;
+            left: 1625px;
+            top: 49px;
+            width: 118px;
+            height: 22px;
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Version Label */
+        #lbl_Version {
+            position: absolute;
+            left: 1765px;
+            top: 15px;
+            width: 139px;
+            height: 18px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Datum Label rechts */
+        #lbl_Datum {
+            position: absolute;
+            left: 1769px;
+            top: 38px;
+            width: 96px;
+            height: 19px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ============================================ */
+        /* DETAIL CONTROLS - Absolute Positionierung   */
+        /* ============================================ */
+
+        /* Mitarbeiter Label */
+        #lbl_Auftrag {
+            position: absolute;
+            left: 181px;
+            top: 0px;
+            width: 175px;
+            height: 28px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            background-color: #6060a0;
+            padding-left: 8px;
+        }
+
+        /* 7 Tages-Spalten Header - CYAN wie im Screenshot */
+        .day-header {
+            position: absolute;
+            top: 1px;
+            height: 28px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #000000;
+            background-color: #00CED1;
+            border: 1px solid #008B8B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lbl_Tag_1 {
+            left: 350px;
+            width: 226px;
+        }
+
+        #lbl_Tag_2 {
+            left: 574px;
+            width: 231px;
+        }
+
+        #lbl_Tag_3 {
+            left: 803px;
+            width: 225px;
+        }
+
+        #lbl_Tag_4 {
+            left: 1025px;
+            width: 212px;
+        }
+
+        #lbl_Tag_5 {
+            left: 1232px;
+            width: 225px;
+        }
+
+        /* Wochenende - ROT */
+        #lbl_Tag_6 {
+            left: 1445px;
+            width: 223px;
+            background-color: #8080c0;
+            color: #ffffff;
+            border-color: #6060a0;
+        }
+
+        #lbl_Tag_7 {
+            left: 1645px;
+            width: 227px;
+            background-color: #8080c0;
+            color: #ffffff;
+            border-color: #6060a0;
+        }
+
+        /* Subform DP_Grund (Kalender Grid) */
+        #sub_DP_Grund {
+            position: absolute;
+            left: 172px;
+            top: 26px;
+            width: 1732px;
+            height: 383px;
+            border: none;
+            background-color: #ffffff;
+        }
+
+        /* ============================================ */
+        /* KALENDER GRID STYLES                        */
+        /* ============================================ */
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 175px repeat(7, 1fr);
+            gap: 1px;
+            background-color: #ccc;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .calendar-header {
+            background-color: #00CED1;
+            color: #000;
+            font-weight: bold;
+            font-size: 11px;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .calendar-header.weekend {
+            background-color: #00CED1;
+            color: #000;
+        }
+
+        .calendar-header.feiertag {
+            background-color: #c04040;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-row {
+            display: contents;
+        }
+
+        .calendar-cell-name {
+            background-color: #f5f5f5;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+        }
+
+        .calendar-cell {
+            background-color: #ffffff;
+            padding: 2px;
+            font-size: 9px;
+            border-bottom: 1px solid #eee;
+            min-height: 28px;
+            position: relative;
+        }
+
+        .calendar-cell.weekend {
+            background-color: #00CED1;
+        }
+
+        .calendar-cell.feiertag {
+            background-color: #ffe6e6;
+        }
+
+        .calendar-cell.today {
+            background-color: #ffffd0;
+        }
+
+        /* Einsatz-Eintrag im Kalender */
+        .einsatz-entry {
+            background-color: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 2px;
+            padding: 1px 3px;
+            margin: 1px 0;
+            font-size: 9px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .einsatz-entry.abwesend {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .einsatz-entry.krank {
+            background-color: #ffc107;
+            border-color: #d39e00;
+        }
+
+        .einsatz-entry.urlaub {
+            background-color: #17a2b8;
+            border-color: #117a8b;
+            color: white;
+        }
+
+        .einsatz-entry.privat {
+            background-color: #6c757d;
+            border-color: #545b62;
+            color: white;
+        }
+
+        /* MA Zeile alternierend */
+        .calendar-row:nth-child(even) .calendar-cell-name {
+            background-color: #eaeaea;
+        }
+
+        .calendar-row:hover .calendar-cell-name,
+        .calendar-row:hover .calendar-cell {
+            background-color: #e8f4fc;
+        }
+
+        /* ============================================ */
+        /* ALLGEMEINE STYLES                           */
+        /* ============================================ */
+
+        button {
+            font-family: inherit;
+        }
+
+        button:hover {
+            filter: brightness(0.95);
+        }
+
+        input[type="date"],
+        input[type="text"] {
+            font-family: inherit;
+        }
+
+        select {
+            font-family: inherit;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top-color: #8080c0;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================ */
+        /* SIDEBAR NAVIGATION                          */
+        /* ============================================ */
+
+        .app-wrapper {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: 1px solid;
+            border-color: #e0e0f0 #606090 #606090 #e0e0f0;
+            padding: 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #000;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .content-wrapper {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Main Container OHNE Offset */
+        .app-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #loadingOverlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6060a0;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Toast Container */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: #333;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            min-width: 250px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.success {
+            background-color: #28a745;
+        }
+
+        .toast.error {
+            background-color: #dc3545;
+        }
+
+        .toast.warning {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .toast.info {
+            background-color: #17a2b8;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Vollbild-Button oben rechts */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #606060 #606060 #ffffff;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .fullscreen-btn:active {
+            border-color: #606060 #ffffff #ffffff #606060;
+        }
+
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-form="frm_DP_Dienstplan_MA">
+    <script>
+        // Shell-Modus erkennen (URL-Parameter oder SHELL_PARAMS)
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isShell = urlParams.get('shell') === '1' || (window.SHELL_PARAMS && window.SHELL_PARAMS.shell === '1');
+            if (isShell) {
+                document.body.classList.add('shell-mode');
+            }
+        })();
+    </script>
+    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">⛶</button>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- APP WRAPPER mit Sidebar -->
+    <div class="app-wrapper">
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="left-menu">
+            <div class="menu-header">HAUPTMENU</div>
+            <div class="menu-buttons">
+                <button class="menu-btn active" data-form="frm_DP_Dienstplan_MA">Dienstplanübersicht</button>
+                <button class="menu-btn" data-form="frm_DP_Dienstplan_Objekt">Planungsübersicht</button>
+                <button class="menu-btn" data-form="frm_va_Auftragstamm">Auftragsverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_VA_Schnellauswahl">Offene Mail Anfragen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Excel Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_Abwesenheiten">Abwesenheitsplanung</button>
+                <button class="menu-btn">Dienstausweis erstellen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Stundenabgleich</button>
+                <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kundenverwaltung</button>
+                <button class="menu-btn">Verrechnungssätze</button>
+                <button class="menu-btn">Sub Rechnungen</button>
+                <button class="menu-btn" data-form="frmOff_Outlook_aufrufen">E-Mail</button>
+                <button class="menu-btn" data-form="frm_Menuefuehrung1">Menu 2</button>
+                <button class="menu-btn" onclick="openHtmlAnsicht()">HTML Ansicht</button>
+                <button class="menu-btn">System Info</button>
+            </div>
+        </aside>
+
+        <!-- CONTENT WRAPPER -->
+        <main class="content-wrapper">
+    <div class="app-container">
+
+        <!-- Main Content -->
+        <main class="app-main">
+    <div class="form-container">
+        <!-- HEADER SECTION -->
+        <div class="form-header">
+            <!-- Titel -->
+            <span id="Bezeichnungsfeld96">Dienstplanübersicht</span>
+
+            <!-- Schliessen Button -->
+            <button id="Befehl37" title="Schließen">&times;</button>
+
+            <!-- Version -->
+            <span id="lbl_Version">1 | V1.55</span>
+
+            <!-- Datum rechts -->
+            <span id="lbl_Datum"></span>
+
+            <!-- Startdatum Bereich -->
+            <div id="Rechteck108"></div>
+            <input type="date" id="dtStartdatum">
+            <label id="lblKW">KW:</label>
+            <select id="cboKW"></select>
+            <button id="btnVor">&gt;</button>
+            <button id="btnStartdatum">Startdatum ändern</button>
+            <button id="btnrueck">&lt;</button>
+            <button id="btn_Heute">Ab Heute</button>
+
+            <!-- MA Filter -->
+            <select id="NurAktiveMA">
+                <option value="0">Alle anzeigen</option>
+                <option value="1" selected>Alle aktiven</option>
+                <option value="2">Festangestellte</option>
+                <option value="3">Minijobber</option>
+                <option value="4">Sub</option>
+            </select>
+
+            <!-- Senden Buttons -->
+            <button id="btnDPSenden">Dienstpläne senden bis</button>
+            <input type="date" id="dtEnddatum">
+
+            <button id="btnMADienstpl">Einzeldienstpläne</button>
+            <button id="btnOutpExcel">Übersicht drucken</button>
+
+            <button id="Befehl20">Senden</button>
+            <button id="btnOutpExcelSend">Übersicht senden</button>
+
+            <!-- Ribbon Buttons (versteckt) -->
+            <button id="btnRibbonAus">-</button>
+            <button id="btnDaBaAus">-</button>
+            <button id="btnDaBaEin">+</button>
+            <button id="btnRibbonEin">+</button>
+        </div>
+
+        <!-- DETAIL SECTION -->
+        <div class="form-detail">
+            <!-- KEIN Menu-Iframe - Dienstplanübersicht benötigt keine Navigation -->
+
+            <!-- Mitarbeiter Spalte Header -->
+            <div id="lbl_Auftrag">Mitarbeiter</div>
+
+            <!-- 7 Tages-Spalten Header - CYAN für Wochentage, ROT für Wochenende -->
+            <div id="lbl_Tag_1" class="day-header"></div>
+            <div id="lbl_Tag_2" class="day-header"></div>
+            <div id="lbl_Tag_3" class="day-header"></div>
+            <div id="lbl_Tag_4" class="day-header"></div>
+            <div id="lbl_Tag_5" class="day-header"></div>
+            <div id="lbl_Tag_6" class="day-header"></div>
+            <div id="lbl_Tag_7" class="day-header"></div>
+
+            <!-- Kalender Grid (Subform) -->
+            <div id="sub_DP_Grund">
+                <div class="loading">Lade Dienstpläne...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-left">Ready</div>
+        <div class="status-right">
+            <span id="timestamp"></span>
+        </div>
+    </div>
+        </main>
+    </div>
+        </main> <!-- Ende content-wrapper -->
+    </div> <!-- Ende app-wrapper -->
+
+    <!-- WebView2 Bridge für Access-Integration (MUSS ZUERST GELADEN WERDEN) -->
+    <script src="js/webview2-bridge.js"></script>
+    <script src="js/global-handlers.js"></script>
+
+    <script type="module" src="logic/frm_DP_Dienstplan_MA.logic.js"></script>
+
+    <script>
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = now.toLocaleString('de-DE');
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+
+        // SIDEBAR NAVIGATION
+        document.querySelectorAll('.menu-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const formName = this.dataset.form;
+
+                // Active-Status aktualisieren
+                document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Navigation zu anderem Formular
+                if (formName !== 'frm_DP_Dienstplan_MA') {
+                    const formPath = `${formName}.html`;
+                    window.location.href = formPath;
+                }
+            });
+        });
+
+        // Vollbild-Toggle Funktion (Browser Fullscreen API)
+        function toggleFullscreen() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.title = 'Vollbild beenden';
+                }).catch(err => console.error('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen().then(() => {
+                    btn.title = 'Vollbild';
+                }).catch(err => console.error('Exit fullscreen error:', err));
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+    </script>
+    <!-- API-Server Lifecycle (Auto-Start/Stop) -->
+    <script src="js/api-lifecycle.js"></script>
+</body>
+</html>
+
+
+

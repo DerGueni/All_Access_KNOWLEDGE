@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenstammblatt - CONSEC</title>
+    <style>
+        /* CSS Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+        }
+
+        /* Window Frame Container */
+        .window-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #8080c0;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 3px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .title-bar-text {
+            color: white;
+        }
+
+        .title-bar-close {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 14px;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            background-color: #8080c0;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 180px;
+            background-color: #6060a0;
+            border-right: 2px solid #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            border-bottom: 1px solid #ffffff;
+        }
+
+        .menu-item {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 4px 8px;
+            margin: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            text-align: left;
+        }
+
+        .menu-item:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #8080c0;
+            padding: 4px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background-color: #b8b8d8;
+            padding: 4px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            height: 22px;
+        }
+
+        .btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .btn:hover {
+            filter: brightness(1.05);
+        }
+
+        /* Form Section */
+        .form-section {
+            background-color: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px;
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Tab Container */
+        .tab-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Tab Headers */
+        .tab-headers {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 4px;
+        }
+
+        .tab-header {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 3px 12px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .tab-header.active {
+            background: #b8b8d8;
+            border-bottom-color: #b8b8d8;
+            font-weight: bold;
+        }
+
+        /* Tab Content */
+        .tab-content-area {
+            flex: 1;
+            background: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px;
+            overflow-y: auto;
+        }
+
+        .tab-page {
+            display: none;
+        }
+
+        .tab-page.active {
+            display: block;
+        }
+
+        /* Form Rows */
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 4px;
+        }
+
+        .form-label {
+            width: 120px;
+            font-size: 10px;
+        }
+
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+            height: 20px;
+            flex: 1;
+        }
+
+        .form-input.wide {
+            flex: 1;
+            max-width: none;
+        }
+
+        .form-input.small {
+            width: 80px;
+            flex: none;
+        }
+
+        .form-checkbox {
+            width: 13px;
+            height: 13px;
+        }
+
+        textarea.form-input {
+            height: auto;
+            resize: vertical;
+            padding: 2px 4px;
+        }
+
+        /* Two Column Layout */
+        .two-columns {
+            display: flex;
+            gap: 20px;
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            padding: 6px;
+            background: #d0d0d8;
+            border: 1px solid #808080;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 10px;
+        }
+
+        .data-grid th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 3px 6px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        .data-grid td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 6px;
+            background: white;
+        }
+
+        .data-grid tr:hover {
+            background: #e0e0ff;
+        }
+
+        .data-grid tbody tr.selected {
+            background: #000080;
+            color: white;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 300px;
+            background-color: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            margin-left: 4px;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            height: 23px;
+            margin-top: 4px;
+        }
+
+        .toolbar-separator {
+            width: 2px;
+            height: 18px;
+            background: linear-gradient(to right, #808080, #ffffff);
+            margin: 0 4px;
+        }
+
+        /* Scroll container */
+        .scroll-container {
+            flex: 1;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <span class="title-bar-text">Kundenstammblatt - CONSEC</span>
+            <button class="title-bar-close" onclick="window.close()">×</button>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+            <div class="left-menu">
+                <div class="menu-header">CONSYS</div>
+                <button class="menu-item">Mitarbeiterstamm</button>
+                <button class="menu-item">Kundenstamm</button>
+                <button class="menu-item">Auftragsverwaltung</button>
+                <button class="menu-item">Objektverwaltung</button>
+                <button class="menu-item">Dienstplan</button>
+                <button class="menu-item">Zeitkonten</button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <button class="btn" id="btnErster">|◄</button>
+                    <button class="btn" id="btnVorheriger">◄</button>
+                    <button class="btn" id="btnNaechster">►</button>
+                    <button class="btn" id="btnLetzter">►|</button>
+
+                    <div class="toolbar-separator"></div>
+
+                    <button class="btn" id="btnNeuerKunde">+ Neuer Kunde</button>
+                    <button class="btn" id="btnSpeichern">Speichern</button>
+                    <button class="btn" id="btnLoeschen">Löschen</button>
+
+                    <div class="toolbar-separator"></div>
+
+                    <label style="font-size: 10px;">Kunden-Nr:</label>
+                    <input type="text" id="KD_ID" class="form-input" style="width: 60px; text-align: center;">
+
+                    <div class="toolbar-separator"></div>
+
+                    <button class="btn" id="btnVerrechnungssaetze">Verrechnungssätze</button>
+                    <button class="btn" id="btnUmsatzauswertung">Umsatzauswertung</button>
+                </div>
+
+                <!-- Form Section -->
+                <div class="form-section">
+                    <div class="tab-container">
+                        <!-- Tab Headers -->
+                        <div class="tab-headers">
+                            <div class="tab-header active" data-tab="pgMain">Stammdaten</div>
+                            <div class="tab-header" data-tab="pgPreise">Konditionen</div>
+                            <div class="tab-header" data-tab="pgAuftrUeb">Auftragsübersicht</div>
+                            <div class="tab-header" data-tab="pgAnsprech">Ansprechpartner</div>
+                            <div class="tab-header" data-tab="pgAttach">Zusatzdateien</div>
+                            <div class="tab-header" data-tab="pgBemerk">Bemerkungen</div>
+                        </div>
+
+                        <!-- Tab Content -->
+                        <div class="tab-content-area">
+                            <!-- Tab: Stammdaten -->
+                            <div class="tab-page active" id="tab-pgMain">
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" class="form-checkbox" id="KD_IstAktiv" checked>
+                                        <label>Ist aktiv</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" class="form-checkbox" id="kun_IstSammelRechnung">
+                                        <label>Sammelrechnung</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" class="form-checkbox" id="kun_ans_manuell">
+                                        <label>Anschrift manuell</label>
+                                    </div>
+                                </div>
+
+                                <div class="two-columns">
+                                    <div class="column">
+                                        <div class="form-row"><label class="form-label">Firma</label><input type="text" class="form-input wide" id="KD_Name1"></div>
+                                        <div class="form-row"><label class="form-label">Bezeichnung</label><input type="text" class="form-input wide" id="KD_Name2"></div>
+                                        <div class="form-row"><label class="form-label">Kunden-Kürzel</label><input type="text" class="form-input wide" id="KD_Kuerzel"></div>
+                                        <div class="form-row"><label class="form-label">Straße</label><input type="text" class="form-input wide" id="KD_Strasse"></div>
+                                        <div class="form-row"><label class="form-label">PLZ</label><input type="text" class="form-input wide" id="KD_PLZ"></div>
+                                        <div class="form-row"><label class="form-label">Ort</label><input type="text" class="form-input wide" id="KD_Ort"></div>
+                                        <div class="form-row"><label class="form-label">Land</label><select class="form-select" id="KD_Land"><option value="DE">DE</option><option value="AT">AT</option><option value="CH">CH</option></select></div>
+                                        <div class="form-row"><label class="form-label">Telefon</label><input type="text" class="form-input wide" id="KD_Telefon"></div>
+                                        <div class="form-row"><label class="form-label">Mobil</label><input type="text" class="form-input wide" id="kun_mobil"></div>
+                                        <div class="form-row"><label class="form-label">Telefax</label><input type="text" class="form-input wide" id="KD_Fax"></div>
+                                        <div class="form-row"><label class="form-label">E-Mail</label><input type="text" class="form-input wide" id="KD_Email"></div>
+                                        <div class="form-row"><label class="form-label">Homepage</label><input type="text" class="form-input wide" id="KD_Web"></div>
+                                    </div>
+
+                                    <div class="column">
+                                        <div class="form-row"><label class="form-label">Kreditinstitut</label><input type="text" class="form-input wide" id="kun_kreditinstitut"></div>
+                                        <div class="form-row"><label class="form-label">BLZ</label><input type="text" class="form-input wide" id="kun_blz"></div>
+                                        <div class="form-row"><label class="form-label">Kontonummer</label><input type="text" class="form-input wide" id="kun_kontonummer"></div>
+                                        <div class="form-row"><label class="form-label">IBAN</label><input type="text" class="form-input wide" id="kun_iban"></div>
+                                        <div class="form-row"><label class="form-label">BIC</label><input type="text" class="form-input wide" id="kun_bic"></div>
+                                        <div class="form-row"><label class="form-label">UStIDNr.</label><input type="text" class="form-input wide" id="KD_UStIDNr"></div>
+                                        <div class="form-row"><label class="form-label">Zahlungsbed.</label><select class="form-select" id="KD_Zahlungsbedingung"><option value="6">Netto 6 Tage</option><option value="7">Netto 7 Tage</option><option value="14">Netto 14 Tage</option><option value="30">Netto 30 Tage</option></select></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Konditionen -->
+                            <div class="tab-page" id="tab-pgPreise">
+                                <div class="form-row"><label class="form-label">Rabatt %</label><input type="number" class="form-input small" id="KD_Rabatt" step="0.01"></div>
+                                <div class="form-row"><label class="form-label">Skonto %</label><input type="number" class="form-input small" id="KD_Skonto" step="0.01"></div>
+                                <div class="form-row"><label class="form-label">Skonto Tage</label><input type="number" class="form-input small" id="KD_SkontoTage"></div>
+                            </div>
+
+                            <!-- Tab: Auftragsübersicht -->
+                            <div class="tab-page" id="tab-pgAuftrUeb">
+                                <div class="form-row" style="margin-bottom: 8px;">
+                                    <label class="form-label">Aufträge von</label>
+                                    <input type="date" class="form-input small" id="datAuftraegeVon">
+                                    <label class="form-label" style="width:auto;">bis</label>
+                                    <input type="date" class="form-input small" id="datAuftraegeBis">
+                                    <button class="btn" id="btnAuftraegeFiltern">Filtern</button>
+                                </div>
+                                <div class="scroll-container">
+                                    <table class="data-grid">
+                                        <thead>
+                                            <tr>
+                                                <th>Nr</th>
+                                                <th>Bezeichnung</th>
+                                                <th>Datum</th>
+                                                <th>Objekt</th>
+                                                <th>Status</th>
+                                                <th>Betrag</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody_Auftraege">
+                                            <tr><td colspan="6" style="text-align:center;padding:20px;">Keine Aufträge</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Ansprechpartner -->
+                            <div class="tab-page" id="tab-pgAnsprech">
+                                <div class="form-row"><label class="form-label">Ansprechpartner</label><input type="text" class="form-input wide" id="KD_AP_Name"></div>
+                                <div class="form-row"><label class="form-label">Position</label><input type="text" class="form-input wide" id="KD_AP_Position"></div>
+                                <div class="form-row"><label class="form-label">Telefon</label><input type="text" class="form-input wide" id="KD_AP_Telefon"></div>
+                                <div class="form-row"><label class="form-label">E-Mail</label><input type="text" class="form-input wide" id="KD_AP_Email"></div>
+                            </div>
+
+                            <!-- Tab: Zusatzdateien -->
+                            <div class="tab-page" id="tab-pgAttach">
+                                <div style="margin-bottom: 8px;">
+                                    <button class="btn" id="btnDateiHinzufuegen">Datei hinzufügen</button>
+                                </div>
+                                <div class="scroll-container">
+                                    <table class="data-grid">
+                                        <thead>
+                                            <tr>
+                                                <th>Dateiname</th>
+                                                <th>Datum</th>
+                                                <th>Größe</th>
+                                                <th>Typ</th>
+                                                <th>Beschreibung</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody_Dateien">
+                                            <tr><td colspan="5" style="text-align:center;padding:20px;">Keine Dateien</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Bemerkungen -->
+                            <div class="tab-page" id="tab-pgBemerk">
+                                <div class="form-row" style="flex-direction:column;align-items:stretch;">
+                                    <label class="form-label">Anschreiben</label>
+                                    <textarea class="form-input wide" id="kun_Anschreiben" rows="3" style="width:100%;"></textarea>
+                                </div>
+                                <div class="form-row" style="flex-direction:column;align-items:stretch;">
+                                    <label class="form-label">Briefkopf</label>
+                                    <textarea class="form-input wide" id="kun_BriefKopf" rows="4" style="width:100%;"></textarea>
+                                </div>
+                                <div class="form-row" style="flex-direction:column;align-items:stretch;">
+                                    <label class="form-label">Memo</label>
+                                    <textarea class="form-input wide" id="KD_Bemerkungen" rows="8" style="width:100%;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Kundenliste -->
+                    <div class="right-panel">
+                        <div class="panel-header">Kundenliste</div>
+                        <div style="padding: 4px;">
+                            <div class="checkbox-item" style="margin-bottom: 4px;">
+                                <input type="checkbox" id="chkNurAktive" checked>
+                                <label>Nur Aktive</label>
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <label style="font-size: 10px;">Suche:</label>
+                                <input type="text" id="txtSuche" class="form-input" style="width: 100%; margin-top: 2px;">
+                            </div>
+                        </div>
+                        <div class="panel-content">
+                            <table class="data-grid">
+                                <thead>
+                                    <tr>
+                                        <th>Nr</th>
+                                        <th>Firma</th>
+                                        <th>Ort</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody_Liste">
+                                    <tr><td colspan="3" style="text-align:center;padding:20px;">Lade...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span id="lblStatus">Bereit</span>
+                    <span id="lblRecordInfo">Datensatz: - / -</span>
+                    <span id="lblAnzahl">0 Kunden</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab-Wechsel
+        document.querySelectorAll('.tab-header').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+
+                // Alle Tabs deaktivieren
+                document.querySelectorAll('.tab-header').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+
+                // Aktiven Tab aktivieren
+                this.classList.add('active');
+                document.getElementById('tab-' + tabId).classList.add('active');
+            });
+        });
+    </script>
+
+    <script type="module" src="../logic/frm_KD_Kundenstamm.logic.js"></script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+</body>
+</html>

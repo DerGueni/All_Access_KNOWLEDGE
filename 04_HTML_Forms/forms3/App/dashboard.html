@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1976D2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Consec Planung - Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="app-title">Consec Planung</h1>
+            <button id="menuBtn" class="menu-btn" aria-label="Menü öffnen">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <div class="header-sub">
+            <span class="page-title">Dashboard</span>
+            <div class="user-dropdown">
+                <button id="userBtn" class="user-btn">
+                    <span id="userName">Laden...</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 10l5 5 5-5z"/>
+                    </svg>
+                </button>
+                <div id="userMenu" class="dropdown-menu hidden">
+                    <a href="#" id="profileLink">Mein Profil</a>
+                    <a href="#" id="settingsLink">Einstellungen</a>
+                    <hr>
+                    <a href="#" id="logoutLink" class="logout">Abmelden</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Menu -->
+    <div id="sidebar" class="sidebar hidden">
+        <div class="sidebar-header">
+            <span>Menü</span>
+            <button id="closeSidebar" class="close-btn">&times;</button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Dashboard
+            </a>
+            <a href="#" class="nav-item" data-page="dienstplan">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                </svg>
+                Mein Dienstplan
+            </a>
+            <a href="#" class="nav-item" data-page="anfragen">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                Offene Anfragen
+                <span id="anfragenBadge" class="badge hidden">0</span>
+            </a>
+            <a href="#" class="nav-item" data-page="abwesenheit">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                Abwesenheit melden
+            </a>
+        </nav>
+    </div>
+    <div id="overlay" class="overlay hidden"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Sync Status & Actions -->
+        <section class="card sync-section">
+            <div class="sync-row">
+                <button id="qrCodeBtn" class="btn btn-outline">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13 2h-2v4h2v-4zm-4-2h2v2h-2v-2zm2 4h2v2h-2v-2zm4-4h2v6h-6v-2h4v-4z"/>
+                    </svg>
+                    Mein QR-Code
+                </button>
+                <button id="refreshBtn" class="btn btn-outline">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    </svg>
+                    Aktualisieren
+                </button>
+            </div>
+            <div id="syncStatus" class="sync-status">
+                <span class="status-dot"></span>
+                <span class="status-text">Verbinde...</span>
+            </div>
+        </section>
+
+        <!-- Zugeordnete Veranstaltungen -->
+        <section class="card">
+            <h2 class="section-title">Meine Einsätze</h2>
+            <div id="einsaetzeList" class="einsaetze-list">
+                <div class="loading-placeholder">
+                    <div class="spinner"></div>
+                    <p>Lade Einsätze...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Offene Anfragen -->
+        <section class="card">
+            <h2 class="section-title">Offene Anfragen</h2>
+            <div id="anfragenList" class="anfragen-list">
+                <div class="loading-placeholder">
+                    <div class="spinner"></div>
+                    <p>Lade Anfragen...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Einsatz Details</h3>
+                <button id="closeModal" class="close-btn">&times;</button>
+            </div>
+            <div id="modalBody" class="modal-body">
+                <!-- Dynamischer Inhalt -->
+            </div>
+            <div id="modalFooter" class="modal-footer">
+                <!-- Dynamische Buttons -->
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="modal hidden">
+        <div class="modal-content qr-modal">
+            <div class="modal-header">
+                <h3>Mein QR-Code</h3>
+                <button id="closeQrModal" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body qr-body">
+                <div id="qrCode" class="qr-code-container"></div>
+                <p class="qr-hint">Diesen Code beim Check-In scannen lassen</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

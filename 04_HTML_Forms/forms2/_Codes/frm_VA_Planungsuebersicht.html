@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planungsübersicht - CONSYS</title>
+    <link rel="stylesheet" href="../../css/app-layout.css">
+    <link rel="stylesheet" href="../../theme/consys_theme.css">
+    <link rel="stylesheet" href="styles/frm_VA_Planungsuebersicht.css">
+</head>
+<body data-active-menu="planungsuebersicht" data-menu-style="access">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+        <main class="app-main">
+            <div class="dp-container">
+                <div class="dp-main">
+            <!-- Header -->
+            <header class="dp-header">
+                <div class="header-left">
+                    <div class="dp-nav-control" aria-hidden="true">
+                        <span>◄</span><span>►</span>
+                        <span>▲</span><span>▼</span>
+                    </div>
+                    <div class="dp-logo"></div>
+                    <h1 class="dp-title">Planungsübersicht</h1>
+                </div>
+                <div class="header-center">
+                    <input type="date" id="datStartdatum" class="dp-date-input" value="">
+                    <button class="dp-btn" id="btnStartdatumAendern">Startdatum Ändern</button>
+                    <button class="dp-btn-nav" id="btnVorwoche">&#9664;</button>
+                    <button class="dp-btn-nav" id="btnNachwoche">&#9654;</button>
+                    <button class="dp-btn" id="btnAbHeute">Ab Heute</button>
+                    <button class="dp-btn" id="Befehl38" style="display:none;">Schließen</button>
+                </div>
+                <div class="header-right">
+                    <div class="filter-options">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="chkNurFreieSchichten">
+                            Nur freie Schichten anzeigen
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="chkWenigerAls">
+                            Nur Aufträge mit weniger als
+                            <input type="number" id="txtPositionen" class="dp-input-small" value="25" min="1" max="100">
+                            Positionen anzeigen
+                        </label>
+                    </div>
+                    <button class="dp-btn" id="btnUebersichtDrucken">Übersicht drucken</button>
+                    <button class="dp-btn" id="btnUebers" style="display:none;">Übersicht</button>
+                    <button class="dp-btn" id="btnHilfe" style="display:none;">Hilfe</button>
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V2.0</span>
+                        <span id="lblDatum"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Planungs Tabelle -->
+            <div class="dp-table-container">
+                <table class="dp-table" id="tblPlanung">
+                    <thead>
+                        <tr class="dp-header-row">
+                            <th class="col-auftrag" rowspan="2">
+                                <div class="th-content cyan">Auftrag / Veranstaltung</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag1">
+                                <div class="th-content">Do. 18.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag2">
+                                <div class="th-content">Fr. 19.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag3">
+                                <div class="th-content">Sa. 20.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag4">
+                                <div class="th-content">So. 21.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag5">
+                                <div class="th-content">Mo. 22.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag6">
+                                <div class="th-content">Di. 23.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag7">
+                                <div class="th-content">Mi. 24.12.25</div>
+                            </th>
+                        </tr>
+                        <tr class="dp-subheader-row">
+                            <th class="sub-col auftrag-sub">Auftrag Objekt Ort</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Name</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody_Planung">
+                        <tr>
+                            <td colspan="22" style="text-align:center;padding:40px;color:#666;">
+                                Lade Planungsdaten...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <footer class="dp-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblAnzAuftraege">8 Aufträge</span>
+                </div>
+            </footer>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../js/api-autostart.js"></script>
+    <script src="../../js/sidebar.js"></script>
+    <script>
+        if (typeof initSidebar === 'function') {
+            initSidebar('planungsuebersicht');
+        }
+    </script>
+    <script type="module" src="logic/frm_VA_Planungsuebersicht.logic.js"></script>
+
+    <!-- Access-ID Platzhalter (unsichtbar) -->
+    <div style="display:none;">
+        <input type="date" id="AU_von">
+        <input type="date" id="AU_bis">
+        <input type="checkbox" id="NichtNurAktive">
+        <select id="cboZeitraum"></select>
+        <select id="cbo_MA_Vgl"></select>
+    </div>
+<div id="__access_missing_controls" style="display:none">
+  <input type="text" id="lbl_Datum" data-access-id="lbl_Datum" />
+  <input type="text" id="Bezeichnungsfeld96" data-access-id="Bezeichnungsfeld96" />
+  <input type="text" id="Rechteck108" data-access-id="Rechteck108" />
+  <input type="text" id="dtStartdatum" data-access-id="dtStartdatum" />
+  <input type="text" id="btnStartdatum" data-access-id="btnStartdatum" />
+  <input type="text" id="btnVor" data-access-id="btnVor" />
+  <input type="text" id="btnrueck" data-access-id="btnrueck" />
+  <input type="text" id="tmpFokus" data-access-id="tmpFokus" />
+  <input type="text" id="btn_Heute" data-access-id="btn_Heute" />
+  <input type="text" id="NurIstNichtZugeordnet" data-access-id="NurIstNichtZugeordnet" />
+  <input type="text" id="Bezeichnungsfeld15" data-access-id="Bezeichnungsfeld15" />
+  <input type="text" id="PosAusblendAb" data-access-id="PosAusblendAb" />
+  <input type="text" id="Bezeichnungsfeld17" data-access-id="Bezeichnungsfeld17" />
+  <input type="text" id="Bezeichnungsfeld20" data-access-id="Bezeichnungsfeld20" />
+  <input type="text" id="IstAuftrAusblend" data-access-id="IstAuftrAusblend" />
+  <input type="text" id="btnOutpExcelSend" data-access-id="btnOutpExcelSend" />
+  <input type="text" id="btnOutpExcel" data-access-id="btnOutpExcel" />
+  <input type="text" id="Befehl37" data-access-id="Befehl37" />
+  <input type="text" id="btnRibbonAus" data-access-id="btnRibbonAus" />
+  <input type="text" id="btnRibbonEin" data-access-id="btnRibbonEin" />
+  <input type="text" id="btnDaBaEin" data-access-id="btnDaBaEin" />
+  <input type="text" id="btnDaBaAus" data-access-id="btnDaBaAus" />
+  <input type="text" id="lbl_Version" data-access-id="lbl_Version" />
+  <input type="text" id="sub_DP_Grund" data-access-id="sub_DP_Grund" />
+  <input type="text" id="lbl_Auftrag" data-access-id="lbl_Auftrag" />
+  <input type="text" id="lbl_Tag_1" data-access-id="lbl_Tag_1" />
+  <input type="text" id="lbl_Tag_2" data-access-id="lbl_Tag_2" />
+  <input type="text" id="lbl_Tag_3" data-access-id="lbl_Tag_3" />
+  <input type="text" id="lbl_Tag_4" data-access-id="lbl_Tag_4" />
+  <input type="text" id="lbl_Tag_5" data-access-id="lbl_Tag_5" />
+  <input type="text" id="lbl_Tag_6" data-access-id="lbl_Tag_6" />
+  <input type="text" id="lbl_Tag_7" data-access-id="lbl_Tag_7" />
+  <input type="text" id="frm_Menuefuehrung" data-access-id="frm_Menuefuehrung" />
+</div>
+</body>
+</html>
+

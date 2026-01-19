@@ -1,0 +1,4 @@
+SELECT qry_RchAng_VA_Alle_Zeitraum_Akt_KD.*, qry_Rch_StandardArtikel.Mengenheit, qry_Rch_StandardArtikel.Beschreibung
+FROM qry_Rch_StandardArtikel INNER JOIN qry_RchAng_VA_Alle_Zeitraum_Akt_KD ON qry_Rch_StandardArtikel.ID = qry_RchAng_VA_Alle_Zeitraum_Akt_KD.PreisArt_ID
+ORDER BY qry_RchAng_VA_Alle_Zeitraum_Akt_KD.kun_ID, qry_RchAng_VA_Alle_Zeitraum_Akt_KD.VADatum, qry_RchAng_VA_Alle_Zeitraum_Akt_KD.MA_Start, qry_RchAng_VA_Alle_Zeitraum_Akt_KD.MA_Ende, qry_RchAng_VA_Alle_Zeitraum_Akt_KD.PreisArt_ID;
+

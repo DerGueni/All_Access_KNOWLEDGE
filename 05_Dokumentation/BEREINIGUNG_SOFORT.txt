@@ -1,0 +1,81 @@
+============================================================================
+SOFORTIGE BEREINIGUNG - MODULE ZUM LOESCHEN
+============================================================================
+Erstellt: 02.12.2025
+
+Diese Liste enthaelt die Module, die SOFORT geloescht werden koennen.
+Bitte in Access: VBA-Editor oeffnen -> Modul rechtsklick -> Entfernen
+
+============================================================================
+SICHER ZU LOESCHEN (100% Duplikate, keine einzigartigen Funktionen):
+============================================================================
+
+1. mod_WorkflowDetector1.bas
+   Grund: Exakte Kopie von mod_WorkflowDetector.bas
+
+2. modProtokoll.bas
+   Grund: Exakte Kopie von mdl_modProtokoll.bas
+
+3. mdl_Exl_Import2.bas
+   Grund: Alle Funktionen sind in mdl_CONSEC_Excel.bas vorhanden
+
+4. mdl_ObjektPositionen.bas
+   Grund: Die kompaktere Version. mdl_OB_Position_Sort.bas ist vollstaendiger
+          und enthaelt zusaetzlich RenumberPositions()
+   ODER alternativ: mdl_OB_Position_Sort.bas loeschen und
+   RenumberPositions in mdl_ObjektPositionen.bas einfuegen
+
+============================================================================
+EMPFEHLUNG FUER OBJEKT-POSITIONEN:
+============================================================================
+
+BEHALTEN: mdl_OB_Position_Sort.bas (enthaelt RenumberPositions)
+LOESCHEN: mdl_ObjektPositionen.bas
+
+ALTERNATIV (besserer Code-Stil):
+BEHALTEN: mdl_ObjektPositionen.bas + RenumberPositions hinzufuegen
+LOESCHEN: mdl_OB_Position_Sort.bas
+
+Der Code in mdl_ObjektPositionen.bas ist eleganter (eine MovePosition-Funktion
+mit Direction-Parameter statt zwei separate Funktionen), aber
+mdl_OB_Position_Sort.bas hat ausfuehrlichere Kommentare.
+
+============================================================================
+WEITERE PRUEFUNG ERFORDERLICH:
+============================================================================
+
+Diese Module haben teilweise doppelte Funktionen, aber auch einzigartige:
+
+1. mdlSonstiges4.bas
+   Doppelte Funktionen entfernen:
+   - ArrFill_DAO (ist in mdlKalenderfill.bas)
+   - ArrFill_DAO_Acc (ist in mdl_DbAuswerten_Ver_2.bas)
+   - ChgSaSoCondition (ist in mdlDatasheetSizeChange.bas)
+   - CreateQuery (ist in mdl_DbAuswerten_Ver_2.bas)
+
+2. mdlTstTabField.bas
+   Doppelte Funktionen entfernen:
+   - AccessEigenschaftEinstellen (ist in mdl_DbAuswerten_Ver_2.bas)
+   - fieldType (ist in mdl_DbAuswerten_Ver_2.bas)
+
+3. mdlFileDialogBeispiel.bas
+   Doppelte Funktionen entfernen:
+   - XLSSuch (ist in clsExcel.bas)
+   - XLSSuchNeu (ist in clsExcel.bas)
+
+4. mdl_Setup_Monatsuebersicht.bas
+   Doppelte Funktionen entfernen:
+   - DaBa_Fenster_aus (ist in mdl_Ribbon_DaBaFenster_EinAus.bas)
+   - DaBa_Fenster_ein (ist in mdl_Ribbon_DaBaFenster_EinAus.bas)
+   - Ribbon_aus (ist in mdl_Ribbon_DaBaFenster_EinAus.bas)
+   - Ribbon_ein (ist in mdl_Ribbon_DaBaFenster_EinAus.bas)
+
+============================================================================
+NACH DEM LOESCHEN:
+============================================================================
+
+1. Im VBA-Editor: Debug -> Kompilieren
+2. Bei Fehlern: Die fehlende Funktion ist im falschen Modul geloescht worden
+3. Alle Formulare testen die Objektpositionen verwenden
+
+============================================================================

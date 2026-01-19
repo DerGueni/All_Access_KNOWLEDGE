@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstamm - Dark Mode</title>
+    <style>
+        /* ===== DESIGN VARIANTE 4: DARK MODE - MITARBEITERSTAMM ===== */
+        /* Cyberpunk-inspired Dark Theme with Neon Accents */
+
+        :root {
+            /* Cyberpunk Dark Theme */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --bg-card: rgba(26, 26, 37, 0.9);
+            --bg-input: rgba(255, 255, 255, 0.03);
+            --bg-hover: rgba(255, 255, 255, 0.06);
+
+            --neon-cyan: #00fff5;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+            --neon-green: #00ff88;
+            --neon-orange: #ff8800;
+
+            --accent-primary: var(--neon-cyan);
+            --accent-secondary: var(--neon-pink);
+            --accent-success: var(--neon-green);
+            --accent-warning: var(--neon-orange);
+
+            --text-primary: #e0e0e0;
+            --text-secondary: #888899;
+            --text-muted: #555566;
+
+            --border-color: rgba(0, 255, 245, 0.15);
+            --border-glow: var(--neon-cyan);
+
+            --glow-cyan: 0 0 20px rgba(0, 255, 245, 0.5);
+            --glow-pink: 0 0 20px rgba(255, 0, 255, 0.5);
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+
+            --transition-fast: 0.15s ease;
+            --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e9ecef;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-input: rgba(0, 0, 0, 0.03);
+            --bg-hover: rgba(0, 0, 0, 0.05);
+
+            --accent-primary: #0066cc;
+            --accent-secondary: #9933cc;
+            --accent-success: #00994d;
+            --accent-warning: #cc6600;
+
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a5a;
+            --text-muted: #8a8a9a;
+
+            --border-color: rgba(0, 0, 0, 0.1);
+            --border-glow: var(--accent-primary);
+
+            --glow-cyan: 0 4px 15px rgba(0, 102, 204, 0.2);
+            --glow-pink: 0 4px 15px rgba(153, 51, 204, 0.2);
+            --glow-green: 0 4px 15px rgba(0, 153, 77, 0.2);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background var(--transition-medium), color var(--transition-medium);
+        }
+
+        /* ===== ANIMATED GRID BACKGROUND ===== */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--border-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== NEON GLOW CARDS ===== */
+        .neon-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            position: relative;
+            transition: all var(--transition-medium);
+            z-index: 1;
+        }
+
+        .neon-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            opacity: 0;
+            z-index: -1;
+            transition: opacity var(--transition-medium);
+        }
+
+        .neon-card:hover::before {
+            opacity: 0.3;
+            filter: blur(8px);
+        }
+
+        .neon-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            z-index: 100;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            animation: header-line 3s linear infinite;
+        }
+
+        @keyframes header-line {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            position: relative;
+            animation: icon-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes icon-glow {
+            0%, 100% { box-shadow: var(--glow-cyan); }
+            50% { box-shadow: var(--glow-pink); }
+        }
+
+        .brand-text h1 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-text span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ===== THEME TOGGLE ANIMATED ===== */
+        .theme-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toggle-container {
+            position: relative;
+            width: 70px;
+            height: 34px;
+            cursor: pointer;
+        }
+
+        .toggle-track {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-input);
+            border-radius: 17px;
+            border: 2px solid var(--border-color);
+            position: relative;
+            transition: all var(--transition-medium);
+            overflow: hidden;
+        }
+
+        .toggle-track::before {
+            content: '&#127769;';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+
+        .toggle-track::after {
+            content: '&#9728;';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+            transition: all var(--transition-medium);
+            box-shadow: var(--glow-cyan);
+        }
+
+        [data-theme="light"] .toggle-thumb {
+            left: calc(100% - 30px);
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            box-shadow: 0 0 15px rgba(243, 156, 18, 0.5);
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-wrapper {
+            display: flex;
+            min-height: calc(100vh - 70px);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        /* ===== EMPLOYEE LIST ===== */
+        .employee-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        .employee-card {
+            padding: 14px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all var(--transition-fast);
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .employee-card:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-color);
+        }
+
+        .employee-card.active {
+            background: rgba(0, 255, 245, 0.08);
+            border-color: var(--accent-primary);
+        }
+
+        .employee-card.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            background: var(--accent-primary);
+            border-radius: 0 2px 2px 0;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .employee-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-success), var(--accent-primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--bg-primary);
+            position: relative;
+        }
+
+        .employee-avatar.online::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-success);
+            border-radius: 50%;
+            border: 2px solid var(--bg-secondary);
+            animation: online-pulse 2s infinite;
+        }
+
+        @keyframes online-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(0, 255, 136, 0); }
+        }
+
+        .employee-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .employee-details span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .employee-status {
+            margin-left: auto;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .employee-status.active {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--accent-success);
+        }
+
+        .employee-status.inactive {
+            background: rgba(255, 0, 255, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+        }
+
+        /* ===== PROFILE HEADER ===== */
+        .profile-header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--bg-primary);
+            position: relative;
+        }
+
+        .profile-avatar::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(10px);
+            animation: avatar-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes avatar-glow {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-info h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-info .role {
+            font-size: 14px;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+        }
+
+        .profile-info .meta {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .profile-info .meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* ===== NEON BUTTONS ===== */
+        .btn-neon {
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-neon.primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-neon.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 255, 245, 0.6);
+        }
+
+        .btn-neon.secondary {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-neon.secondary:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .btn-neon.success {
+            background: linear-gradient(135deg, var(--accent-success), #00cc6a);
+            color: var(--bg-primary);
+            box-shadow: var(--glow-green);
+        }
+
+        /* Button Ripple Effect */
+        .btn-neon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-neon:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* ===== STATS ROW ===== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .stat-box {
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: var(--accent-primary);
+            border-radius: 2px;
+            opacity: 0;
+            transition: all var(--transition-fast);
+        }
+
+        .stat-box:hover::before {
+            opacity: 1;
+            width: 60px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== FORM SECTIONS ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-card {
+            padding: 24px;
+        }
+
+        .form-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        .form-card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 2px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: var(--glow-cyan);
+        }
+
+        /* ===== LOADING STATES ===== */
+        .skeleton-loader {
+            background: linear-gradient(90deg,
+                var(--bg-input) 0%,
+                var(--bg-hover) 50%,
+                var(--bg-input) 100%);
+            background-size: 200% 100%;
+            animation: skeleton-shine 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        @keyframes skeleton-shine {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ===== SKILL PROGRESS BARS ===== */
+        .skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .skill-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .skill-header span:first-child {
+            color: var(--text-primary);
+        }
+
+        .skill-header span:last-child {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .skill-bar {
+            height: 8px;
+            background: var(--bg-input);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 4px;
+            transition: width 1s ease-out;
+            box-shadow: var(--glow-cyan);
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .toast {
+            padding: 16px 20px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toast-in 0.3s ease-out;
+            min-width: 280px;
+        }
+
+        @keyframes toast-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.success { border-left: 4px solid var(--accent-success); }
+        .toast.error { border-left: 4px solid var(--accent-secondary); }
+        .toast.info { border-left: 4px solid var(--accent-primary); }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-content h5 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .toast-content p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Grid Background -->
+    <div class="grid-bg"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">
+            <div class="brand-icon">&#128100;</div>
+            <div class="brand-text">
+                <h1>Mitarbeiterstamm</h1>
+                <span>Personalverwaltung</span>
+            </div>
+        </div>
+
+        <div class="theme-toggle-wrapper">
+            <div class="toggle-container" onclick="toggleTheme()">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="search-container">
+                <span class="search-icon">&#128269;</span>
+                <input type="text" class="search-input" placeholder="Mitarbeiter suchen...">
+            </div>
+
+            <div class="employee-list">
+                <div class="employee-card active">
+                    <div class="employee-avatar online">MS</div>
+                    <div class="employee-details">
+                        <h4>Max Schneider</h4>
+                        <span>Teamleiter</span>
+                    </div>
+                    <span class="employee-status active">Aktiv</span>
+                </div>
+
+                <div class="employee-card">
+                    <div class="employee-avatar online" style="background: linear-gradient(135deg, var(--neon-pink), var(--neon-orange));">AB</div>
+                    <div class="employee-details">
+                        <h4>Anna Becker</h4>
+                        <span>Sicherheitskraft</span>
+                    </div>
+                    <span class="employee-status active">Aktiv</span>
+                </div>
+
+                <div class="employee-card">
+                    <div class="employee-avatar" style="background: linear-gradient(135deg, var(--neon-yellow), var(--neon-green));">TM</div>
+                    <div class="employee-details">
+                        <h4>Thomas Müller</h4>
+                        <span>Objektleiter</span>
+                    </div>
+                    <span class="employee-status active">Aktiv</span>
+                </div>
+
+                <div class="employee-card">
+                    <div class="employee-avatar" style="background: linear-gradient(135deg, var(--neon-orange), var(--neon-pink));">SK</div>
+                    <div class="employee-details">
+                        <h4>Sarah Koch</h4>
+                        <span>Empfang</span>
+                    </div>
+                    <span class="employee-status inactive">Urlaub</span>
+                </div>
+
+                <div class="employee-card">
+                    <div class="employee-avatar online" style="background: linear-gradient(135deg, var(--neon-cyan), var(--neon-yellow));">MW</div>
+                    <div class="employee-details">
+                        <h4>Michael Weber</h4>
+                        <span>Security</span>
+                    </div>
+                    <span class="employee-status active">Aktiv</span>
+                </div>
+
+                <div class="employee-card">
+                    <div class="employee-avatar" style="background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));">LF</div>
+                    <div class="employee-details">
+                        <h4>Lisa Fischer</h4>
+                        <span>Verwaltung</span>
+                    </div>
+                    <span class="employee-status active">Aktiv</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Profile Header -->
+            <div class="neon-card profile-header">
+                <div class="profile-avatar">MS</div>
+                <div class="profile-info">
+                    <h1>Max Schneider</h1>
+                    <div class="role">Teamleiter Security</div>
+                    <div class="meta">
+                        <span>&#128205; München</span>
+                        <span>&#128197; Seit 15.03.2022</span>
+                        <span>&#128231; max.schneider@consec.de</span>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn-neon secondary">&#128221; Bearbeiten</button>
+                    <button class="btn-neon success" onclick="showToast('success', 'Gespeichert', 'Änderungen wurden übernommen')">&#128190; Speichern</button>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="neon-card stat-box">
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">Einsätze</div>
+                </div>
+                <div class="neon-card stat-box">
+                    <div class="stat-value">1.248</div>
+                    <div class="stat-label">Stunden</div>
+                </div>
+                <div class="neon-card stat-box">
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">Quote</div>
+                </div>
+                <div class="neon-card stat-box">
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-label">Bewertung</div>
+                </div>
+            </div>
+
+            <!-- Form Grid -->
+            <div class="form-grid">
+                <div class="neon-card form-card">
+                    <h3 class="form-card-title">Persönliche Daten</h3>
+                    <div class="form-row">
+                        <label class="form-label">Personalnummer</label>
+                        <input type="text" class="form-input" value="MA-2022-0042" readonly style="background: var(--bg-tertiary);">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Vorname</label>
+                        <input type="text" class="form-input" value="Max">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Nachname</label>
+                        <input type="text" class="form-input" value="Schneider">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Geburtsdatum</label>
+                        <input type="date" class="form-input" value="1988-05-12">
+                    </div>
+                </div>
+
+                <div class="neon-card form-card">
+                    <h3 class="form-card-title">Kontaktdaten</h3>
+                    <div class="form-row">
+                        <label class="form-label">Telefon</label>
+                        <input type="tel" class="form-input" value="+49 151 12345678">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">E-Mail</label>
+                        <input type="email" class="form-input" value="max.schneider@consec.de">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Adresse</label>
+                        <input type="text" class="form-input" value="Musterstraße 42, 80331 München">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Notfallkontakt</label>
+                        <input type="text" class="form-input" value="Anna Schneider (+49 170 9876543)">
+                    </div>
+                </div>
+
+                <div class="neon-card form-card">
+                    <h3 class="form-card-title">Beschäftigung</h3>
+                    <div class="form-row">
+                        <label class="form-label">Position</label>
+                        <select class="form-input">
+                            <option selected>Teamleiter</option>
+                            <option>Objektleiter</option>
+                            <option>Sicherheitskraft</option>
+                            <option>Empfang</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Abteilung</label>
+                        <select class="form-input">
+                            <option selected>Security</option>
+                            <option>Empfang</option>
+                            <option>Verwaltung</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Stundensatz</label>
+                        <input type="text" class="form-input" value="18,50 €">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Vertragsart</label>
+                        <select class="form-input">
+                            <option selected>Festanstellung</option>
+                            <option>Minijob</option>
+                            <option>Freelancer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="neon-card form-card">
+                    <h3 class="form-card-title">Qualifikationen</h3>
+                    <div class="skill-list">
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span>Sachkundeprüfung §34a</span>
+                                <span>100%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span>Erste Hilfe</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 95%;"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span>Brandschutz</span>
+                                <span>88%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 88%;"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span>Englisch</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            showToast('info', 'Theme gewechselt', `${newTheme === 'dark' ? 'Dark' : 'Light'} Mode aktiviert`);
+        }
+
+        // Load saved theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            // Employee selection
+            document.querySelectorAll('.employee-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.employee-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                });
+            });
+
+            // Animate skill bars on load
+            setTimeout(() => {
+                document.querySelectorAll('.skill-progress').forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0';
+                    setTimeout(() => bar.style.width = width, 100);
+                });
+            }, 500);
+        });
+
+        // Toast Notifications
+        function showToast(type, title, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = { success: '&#10004;', error: '&#10008;', info: '&#8505;' };
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type]}</span>
+                <div class="toast-content">
+                    <h5>${title}</h5>
+                    <p>${message}</p>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'toast-in 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

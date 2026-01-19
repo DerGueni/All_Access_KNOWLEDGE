@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Integration - Beispiel</title>
+
+    <!-- Unified Header CSS -->
+    <link rel="stylesheet" href="../css/unified-header.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #8080c0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        /* Main Content Area (unter dem Header) */
+        .content-area {
+            padding: 20px;
+            background-color: #d0d0e0;
+            min-height: calc(100vh - 70px); /* 70px = Header-Höhe */
+        }
+
+        /* Beispiel: Datenbereich */
+        .data-section {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #a0a0a0;
+            border-radius: 3px;
+        }
+
+        .data-section h2 {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+            color: #000080;
+        }
+
+        .form-field {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-field label {
+            width: 150px;
+            font-weight: bold;
+            color: #404040;
+        }
+
+        .form-field input,
+        .form-field select {
+            flex: 1;
+            height: 24px;
+            padding: 0 8px;
+            border: 1px solid #a0a0a0;
+            font-size: 11px;
+        }
+
+        /* Beispiel: Tabelle */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .data-table th,
+        .data-table td {
+            border: 1px solid #d0d0d0;
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: #000080;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .data-table td {
+            background-color: white;
+            font-size: 11px;
+        }
+
+        .data-table tr:nth-child(even) td {
+            background-color: #f8f8f8;
+        }
+
+        /* Status-Meldung */
+        .status-message {
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-message.success {
+            background-color: #90e090;
+            border: 1px solid #60b060;
+            color: #006000;
+        }
+
+        .status-message.error {
+            background-color: #f08080;
+            border: 1px solid #d05050;
+            color: #a00000;
+        }
+
+        .status-message.info {
+            background-color: #90d0e0;
+            border: 1px solid #60a0b0;
+            color: #004060;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================
+         UNIFIED HEADER (Variante 1: HTML direkt)
+         ======================================== -->
+    <div class="form-header-unified">
+        <h1 class="form-title-unified">Auftragsverwaltung</h1>
+        <div class="form-header-status">
+            <span class="form-status-badge active">Aktiv</span>
+            <span class="form-status-badge" id="recordId">ID: 12345</span>
+        </div>
+        <div class="form-header-controls-unified">
+            <button class="form-btn form-btn-refresh" id="btnRefresh">Aktualisieren</button>
+            <button class="form-btn form-btn-new" id="btnNew">Neu</button>
+            <button class="form-btn form-btn-copy" id="btnCopy">Kopieren</button>
+            <button class="form-btn form-btn-delete" id="btnDelete">Löschen</button>
+        </div>
+    </div>
+
+    <!-- ========================================
+         CONTENT AREA
+         ======================================== -->
+    <div class="content-area">
+
+        <!-- Status-Meldung (dynamisch) -->
+        <div class="status-message success" id="statusMessage" style="display: none;">
+            Daten erfolgreich geladen!
+        </div>
+
+        <!-- Stammdaten -->
+        <div class="data-section">
+            <h2>Stammdaten</h2>
+            <div class="form-field">
+                <label>Auftragsnummer:</label>
+                <input type="text" id="fldAuftragNr" value="VA-2026-0001" readonly>
+            </div>
+            <div class="form-field">
+                <label>Kunde:</label>
+                <select id="fldKunde">
+                    <option value="1">Kunde AG</option>
+                    <option value="2">Beispiel GmbH</option>
+                    <option value="3">Test & Co. KG</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Objekt:</label>
+                <input type="text" id="fldObjekt" value="Messegelände Nürnberg">
+            </div>
+            <div class="form-field">
+                <label>Datum:</label>
+                <input type="date" id="fldDatum" value="2026-01-15">
+            </div>
+            <div class="form-field">
+                <label>Status:</label>
+                <select id="fldStatus">
+                    <option value="1">In Planung</option>
+                    <option value="2" selected>Bestätigt</option>
+                    <option value="3">Abgeschlossen</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Schichten-Tabelle -->
+        <div class="data-section">
+            <h2>Schichten</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Von</th>
+                        <th>Bis</th>
+                        <th>MA Soll</th>
+                        <th>MA Ist</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="schichtenTable">
+                    <tr>
+                        <td>15.01.2026</td>
+                        <td>08:00</td>
+                        <td>16:00</td>
+                        <td>5</td>
+                        <td>5</td>
+                        <td>Vollständig</td>
+                    </tr>
+                    <tr>
+                        <td>16.01.2026</td>
+                        <td>08:00</td>
+                        <td>16:00</td>
+                        <td>5</td>
+                        <td>3</td>
+                        <td>Unterbesetzt</td>
+                    </tr>
+                    <tr>
+                        <td>17.01.2026</td>
+                        <td>08:00</td>
+                        <td>16:00</td>
+                        <td>5</td>
+                        <td>0</td>
+                        <td>Offen</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- ========================================
+         JAVASCRIPT (Beispiel-Integration)
+         ======================================== -->
+    <script src="../js/unified-header.js"></script>
+    <script>
+        'use strict';
+
+        console.log('[Example] Header Integration geladen');
+
+        // ========================================
+        // VARIANTE 1: Bestehenden Header verwenden (HTML direkt)
+        // ========================================
+
+        // Header-Element referenzieren
+        const header = attachUnifiedHeader('.form-header-unified');
+
+        if (header) {
+            console.log('[Example] Header attached:', header);
+
+            // Button-Events registrieren
+            header.on('refresh', async () => {
+                console.log('[Example] Aktualisieren...');
+                showStatus('Daten werden aktualisiert...', 'info');
+
+                // Simuliere Datenabruf
+                await sleep(1000);
+
+                showStatus('Daten erfolgreich aktualisiert!', 'success');
+
+                // Automatisch ausblenden nach 3 Sekunden
+                setTimeout(() => hideStatus(), 3000);
+            });
+
+            header.on('new', () => {
+                console.log('[Example] Neu...');
+                if (confirm('Neuen Auftrag anlegen?')) {
+                    // Formular leeren
+                    document.getElementById('fldAuftragNr').value = 'VA-2026-XXXX';
+                    document.getElementById('fldKunde').selectedIndex = 0;
+                    document.getElementById('fldObjekt').value = '';
+                    document.getElementById('fldDatum').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('fldStatus').selectedIndex = 0;
+
+                    header.setStatus('Neu', 'pending');
+                    header.setTitle('Auftragsverwaltung - NEU');
+
+                    showStatus('Neuer Datensatz angelegt', 'success');
+                }
+            });
+
+            header.on('copy', () => {
+                console.log('[Example] Kopieren...');
+                if (confirm('Auftrag kopieren?')) {
+                    const currentNr = document.getElementById('fldAuftragNr').value;
+                    document.getElementById('fldAuftragNr').value = currentNr + '-KOPIE';
+
+                    header.setStatus('Kopie', 'pending');
+                    header.setTitle('Auftragsverwaltung - KOPIE');
+
+                    showStatus('Auftrag kopiert', 'success');
+                }
+            });
+
+            header.on('delete', () => {
+                console.log('[Example] Löschen...');
+                if (confirm('Auftrag wirklich löschen?')) {
+                    showStatus('Auftrag gelöscht!', 'error');
+
+                    // Deaktiviere Buttons
+                    header.setButtonEnabled('new', true);
+                    header.setButtonEnabled('copy', false);
+                    header.setButtonEnabled('delete', false);
+
+                    header.setStatus('Gelöscht', 'inactive');
+
+                    // Formular leeren nach 2 Sekunden
+                    setTimeout(() => {
+                        document.getElementById('fldAuftragNr').value = '';
+                        document.getElementById('fldObjekt').value = '';
+                        hideStatus();
+                    }, 2000);
+                }
+            });
+        }
+
+        // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
+
+        function showStatus(message, type = 'info') {
+            const statusMsg = document.getElementById('statusMessage');
+            statusMsg.textContent = message;
+            statusMsg.className = 'status-message ' + type;
+            statusMsg.style.display = 'block';
+        }
+
+        function hideStatus() {
+            const statusMsg = document.getElementById('statusMessage');
+            statusMsg.style.display = 'none';
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ========================================
+        // BEISPIEL: DYNAMISCHE DATEN LADEN
+        // ========================================
+
+        async function loadData() {
+            console.log('[Example] Lade Daten...');
+
+            // Deaktiviere Buttons während Ladevorgang
+            header.setButtonEnabled('refresh', false);
+            header.setButtonLabel('refresh', 'Lädt...');
+
+            showStatus('Lade Daten...', 'info');
+
+            // Simuliere API-Aufruf
+            await sleep(1500);
+
+            // Reaktiviere Button
+            header.setButtonEnabled('refresh', true);
+            header.setButtonLabel('refresh', 'Aktualisieren');
+
+            showStatus('Daten erfolgreich geladen!', 'success');
+            setTimeout(() => hideStatus(), 3000);
+        }
+
+        // ========================================
+        // BEISPIEL: FORMULAR-VALIDIERUNG
+        // ========================================
+
+        function validateForm() {
+            const kunde = document.getElementById('fldKunde').value;
+            const objekt = document.getElementById('fldObjekt').value.trim();
+            const datum = document.getElementById('fldDatum').value;
+
+            if (!kunde || !objekt || !datum) {
+                showStatus('Bitte alle Pflichtfelder ausfüllen!', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        // ========================================
+        // BEISPIEL: KEYBOARD SHORTCUTS
+        // ========================================
+
+        document.addEventListener('keydown', (e) => {
+            // Strg+R = Aktualisieren
+            if (e.ctrlKey && e.key === 'r') {
+                e.preventDefault();
+                document.getElementById('btnRefresh').click();
+            }
+
+            // Strg+N = Neu
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                document.getElementById('btnNew').click();
+            }
+
+            // Strg+D = Löschen
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                document.getElementById('btnDelete').click();
+            }
+        });
+
+        // ========================================
+        // INITIALISIERUNG
+        // ========================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[Example] DOM geladen, initialisiere...');
+
+            // Simuliere Ladevorgang
+            setTimeout(() => {
+                showStatus('Formular erfolgreich geladen!', 'success');
+                setTimeout(() => hideStatus(), 3000);
+            }, 500);
+        });
+
+    </script>
+
+</body>
+</html>

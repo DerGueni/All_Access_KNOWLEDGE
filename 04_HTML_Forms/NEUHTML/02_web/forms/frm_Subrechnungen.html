@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub Rechnungen - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_Subrechnungen.css">
+</head>
+<body class="no-sidebar" data-active-menu="subrechnungen">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="page-title">Sub Rechnungen</h1>
+            </div>
+            <div class="header-center">
+                <div class="filter-controls">
+                    <label>Zeitraum</label>
+                    <select id="cboZeitraum" class="input-medium">
+                        <option value="aktuell" selected>Aktueller Monat</option>
+                        <option value="vormonat">Vormonat</option>
+                        <option value="jahr">Aktuelles Jahr</option>
+                        <option value="custom">Benutzerdefiniert</option>
+                    </select>
+                    <label>von</label>
+                    <input type="date" id="datVon" class="input-date" value="">
+                    <label>bis</label>
+                    <input type="date" id="datBis" class="input-date" value="">
+                    <button class="btn-primary" id="btnAktualisieren">Aktualisieren</button>
+                </div>
+            </div>
+            <div class="header-right">
+                <span id="header-date"></span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Mitarbeiter Filter -->
+            <div class="ma-filter-section">
+                <label>Mitarbeiter</label>
+                <select id="cboMitarbeiter" class="input-large">
+                    <option value="">-- Alle Mitarbeiter --</option>
+                </select>
+            </div>
+
+            <!-- Auftraege Tabelle -->
+            <section class="auftraege-section">
+                <div class="section-header">
+                    <h2>Aufträge</h2>
+                    <div class="header-controls">
+                        <span class="hint-text">RechNr korrigieren: Feld markieren und [ESC] drücken</span>
+                        <label>Status ändern</label>
+                        <select id="cboStatusAendern" class="input-medium">
+                            <option value="">-- Status wählen --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="tblAuftraege">
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Auftrag</th>
+                                <th>Location</th>
+                                <th>Ort</th>
+                                <th>Betrag</th>
+                                <th>RechNr.</th>
+                                <th>Geprüft:</th>
+                                <th>am</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyAuftraege">
+                            <tr class="loading-row">
+                                <td colspan="9">Lade Daten...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Abrechnungsdetails -->
+            <section class="details-section">
+                <div class="section-header">
+                    <h2>Abrechnungsdetails</h2>
+                    <div class="header-controls">
+                        <button class="btn-secondary" id="btnStundenlisteExportieren">Stundenliste Exportieren</button>
+                        <span class="auftrag-info" id="lblAuftragInfo">-- Auftrag wählen --</span>
+                        <button class="btn-secondary" id="btnSpiegelrechnung">Spiegelrechnung</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="tblAbrechnungsdetails">
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Name</th>
+                                <th>von</th>
+                                <th>bis</th>
+                                <th>Stunden</th>
+                                <th>Nacht</th>
+                                <th>Sonntag</th>
+                                <th>Feiertag</th>
+                                <th>Fahrtkosten</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyAbrechnungsdetails">
+                            <tr class="loading-row">
+                                <td colspan="9">Bitte Auftrag auswählen...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summen -->
+                <div class="summen-container">
+                    <div class="summen-row">
+                        <label>SVS</label>
+                        <input type="text" class="input-small" id="txtSummeSVS" value="0,00 EUR" readonly>
+                        <label>NZ</label>
+                        <input type="text" class="input-small" id="txtSummeNZ" value="0,00 EUR" readonly>
+                        <label>SZ</label>
+                        <input type="text" class="input-small" id="txtSummeSZ" value="0,00 EUR" readonly>
+                        <label>FZ</label>
+                        <input type="text" class="input-small" id="txtSummeFZ" value="0,00 EUR" readonly>
+                        <label>Summe</label>
+                        <input type="text" class="input-small" id="txtSummeStunden" value="0" readonly>
+                        <input type="text" class="input-small" id="txtSummeNacht" value="0" readonly>
+                        <input type="text" class="input-small" id="txtSummeSonntag" value="0" readonly>
+                        <input type="text" class="input-small" id="txtSummeFeiertag" value="0" readonly>
+                        <label>Betrag gesamt</label>
+                    </div>
+                    <div class="summen-row">
+                        <label>Betrag</label>
+                        <input type="text" class="input-small" id="txtBetragSVS" value="0,00 EUR" readonly>
+                        <input type="text" class="input-small" id="txtBetragNZ" value="0,00 EUR" readonly>
+                        <input type="text" class="input-small" id="txtBetragSZ" value="0,00 EUR" readonly>
+                        <input type="text" class="input-small" id="txtBetragFZ" value="0,00 EUR" readonly>
+                        <input type="text" class="input-small" id="txtBetragFahrtkosten" value="0,00 EUR" readonly>
+                        <input type="text" class="input-betrag highlight" id="txtBetragGesamt" value="0,00 EUR" readonly>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span>Datensätze: <span id="lblAnzahlAuftraege">0</span></span>
+            </div>
+            <div class="footer-center">
+                <span id="lblRecordInfo"></span>
+            </div>
+            <div class="footer-right">
+                <span id="lblStatus">Bereit</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/sidebar.js"></script>
+    <script type="module" src="frm_Subrechnungen.logic.js"></script>
+</body>
+</html>

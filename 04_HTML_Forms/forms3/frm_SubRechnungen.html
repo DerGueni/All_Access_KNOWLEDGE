@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subunternehmer-Rechnungen - CONSYS</title>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
+    <style>
+        body {
+            background-color: #8080c0;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 11px;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            padding: 20px;
+        }
+
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .filter-input {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 11px;
+            min-width: 150px;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #4316B2;
+        }
+
+        .data-table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        .data-table th {
+            background: #4316B2;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .data-table th:hover {
+            background: #3412a0;
+        }
+
+        .data-table th.sort-asc::after {
+            content: ' \u25B2';
+            font-size: 9px;
+        }
+
+        .data-table th.sort-desc::after {
+            content: ' \u25BC';
+            font-size: 9px;
+        }
+
+        .data-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .data-table tbody tr:hover {
+            background: #e8e4f8;
+            cursor: pointer;
+        }
+
+        .data-table tbody tr.selected {
+            background: #d0c8f0;
+        }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        .status-bezahlt {
+            color: #008000;
+            font-weight: 600;
+            background: #e8f5e9;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+        .status-offen {
+            color: #c00000;
+            font-weight: 600;
+            background: #ffebee;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+        .status-geprueft {
+            color: #0066cc;
+            font-weight: 600;
+            background: #e3f2fd;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+        .status-storniert {
+            color: #808080;
+            text-decoration: line-through;
+            background: #f5f5f5;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #4316B2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3412a0;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border-top: 1px solid #ddd;
+            margin-top: 15px;
+            font-size: 11px;
+        }
+
+        .status-bar .left {
+            color: #666;
+        }
+
+        .status-bar .right {
+            font-weight: bold;
+            color: #4316B2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4316B2;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-message {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        /* Modal-Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            width: 600px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            background: #4316B2;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .form-row label {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .form-row textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-row input:focus,
+        .form-row select:focus,
+        .form-row textarea:focus {
+            outline: none;
+            border-color: #4316B2;
+        }
+    </style>
+    <link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-form="frm_SubRechnungen">
+    <div class="container">
+        <!-- Unified Header -->
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold; color: #000000;">Subunternehmer-Rechnungen</span>
+                <div class="buttons-grid">
+                    <button class="btn unified-btn btn-green" id="btnNeueRechnung" onclick="openNewModal()">Neue Rechnung</button>
+                    <button class="btn unified-btn" id="btnBearbeiten" onclick="editSelected()" disabled>Bearbeiten</button>
+                    <button class="btn unified-btn btn-red" id="btnLoeschen" onclick="deleteSelected()" disabled>Loeschen</button>
+                    <button class="btn unified-btn" id="btnAktualisieren" onclick="loadData()">Aktualisieren</button>
+                    <button class="btn unified-btn btn-blue" id="btnExportExcel" onclick="exportExcel()">Excel</button>
+                </div>
+            </div>
+            <div class="gpt-box">CONSYS<span>Web</span></div>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Filter-Bereich -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <span class="filter-label">Datum von:</span>
+                <input type="date" id="filterDatumVon" class="filter-input" onchange="loadData()">
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Datum bis:</span>
+                <input type="date" id="filterDatumBis" class="filter-input" onchange="loadData()">
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Subunternehmer:</span>
+                <select id="filterSubunternehmer" class="filter-input" onchange="loadData()">
+                    <option value="">Alle</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Status:</span>
+                <select id="filterStatus" class="filter-input" onchange="loadData()">
+                    <option value="">Alle</option>
+                    <option value="Offen">Offen</option>
+                    <option value="Geprueft">Geprueft</option>
+                    <option value="Bezahlt">Bezahlt</option>
+                    <option value="Storniert">Storniert</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Suche:</span>
+                <input type="text" id="filterSuche" class="filter-input" placeholder="Rechnungsnr., Beschreibung..." oninput="filterTable()">
+            </div>
+            <button class="btn btn-secondary" onclick="resetFilter()">Filter zuruecksetzen</button>
+        </div>
+
+        <!-- Datentabelle -->
+        <div class="data-table-container">
+            <table class="data-table" id="dataTable">
+                <thead>
+                    <tr>
+                        <th data-sort="RechNr" style="width: 100px;">Rech.-Nr.</th>
+                        <th data-sort="Datum" style="width: 100px;">Datum</th>
+                        <th data-sort="Subunternehmer" style="width: 200px;">Subunternehmer</th>
+                        <th data-sort="Auftrag" style="width: 150px;">Auftrag</th>
+                        <th data-sort="Beschreibung">Beschreibung</th>
+                        <th data-sort="Betrag" class="text-right" style="width: 120px;">Betrag</th>
+                        <th data-sort="Status" class="text-center" style="width: 100px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="empty-state-icon">&#128196;</div>
+                            <div>Keine Rechnungen gefunden</div>
+                            <div style="margin-top: 10px;">
+                                <button class="btn btn-primary" onclick="openNewModal()">Erste Rechnung anlegen</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Status-Leiste -->
+        <div class="status-bar">
+            <span class="left" id="statusLeft">Bereit</span>
+            <span class="right" id="statusRight">Summe: 0,00 EUR</span>
+        </div>
+    </div>
+
+    <!-- Modal: Neue Rechnung / Bearbeiten -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="modalTitle">Neue Subunternehmer-Rechnung</span>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-row">
+                    <label>Rechnungsnummer:</label>
+                    <input type="text" id="modalRechNr" placeholder="z.B. SUB-2026-001">
+                </div>
+                <div class="form-row">
+                    <label>Rechnungsdatum:</label>
+                    <input type="date" id="modalDatum">
+                </div>
+                <div class="form-row">
+                    <label>Subunternehmer:</label>
+                    <select id="modalSubunternehmer">
+                        <option value="">Bitte waehlen...</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Auftrag:</label>
+                    <select id="modalAuftrag">
+                        <option value="">Optional...</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Betrag (EUR):</label>
+                    <input type="number" id="modalBetrag" step="0.01" min="0" placeholder="0.00">
+                </div>
+                <div class="form-row">
+                    <label>Status:</label>
+                    <select id="modalStatus">
+                        <option value="Offen">Offen</option>
+                        <option value="Geprueft">Geprueft</option>
+                        <option value="Bezahlt">Bezahlt</option>
+                        <option value="Storniert">Storniert</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Beschreibung:</label>
+                    <textarea id="modalBeschreibung" placeholder="Optionale Beschreibung..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
+                <button class="btn btn-success" onclick="saveRechnung()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <div>Daten werden geladen...</div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        // =========================================================================
+        // GLOBALE VARIABLEN
+        // =========================================================================
+
+        const API_BASE = 'http://localhost:5000/api';
+        let allData = [];
+        let selectedId = null;
+        let currentSort = { column: 'Datum', direction: 'desc' };
+
+        // =========================================================================
+        // INITIALISIERUNG
+        // =========================================================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDateFilters();
+            loadSubunternehmer();
+            loadAuftraege();
+            loadData();
+            initSortHandlers();
+        });
+
+        function initializeDateFilters() {
+            const today = new Date();
+            const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            document.getElementById('filterDatumVon').value = formatDateISO(firstOfMonth);
+            document.getElementById('filterDatumBis').value = formatDateISO(today);
+        }
+
+        function initSortHandlers() {
+            document.querySelectorAll('.data-table th[data-sort]').forEach(th => {
+                th.addEventListener('click', function() {
+                    const column = this.dataset.sort;
+                    if (currentSort.column === column) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.column = column;
+                        currentSort.direction = 'asc';
+                    }
+
+                    // Update header styles
+                    document.querySelectorAll('.data-table th').forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                    });
+                    this.classList.add('sort-' + currentSort.direction);
+
+                    sortAndRenderTable();
+                });
+            });
+        }
+
+        // =========================================================================
+        // DATEN LADEN
+        // =========================================================================
+
+        async function loadData() {
+            showLoading(true);
+            document.getElementById('statusLeft').textContent = 'Lade Daten...';
+
+            try {
+                const params = new URLSearchParams();
+                params.append('sub', 'true'); // Filter fuer Subunternehmer-Rechnungen
+
+                const datumVon = document.getElementById('filterDatumVon').value;
+                const datumBis = document.getElementById('filterDatumBis').value;
+                const subunternehmer = document.getElementById('filterSubunternehmer').value;
+                const status = document.getElementById('filterStatus').value;
+
+                if (datumVon) params.append('datum_von', datumVon);
+                if (datumBis) params.append('datum_bis', datumBis);
+                if (subunternehmer) params.append('subunternehmer_id', subunternehmer);
+                if (status) params.append('status', status);
+
+                const response = await fetch(`${API_BASE}/rechnungen?${params.toString()}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                allData = data.rechnungen || data || [];
+
+                sortAndRenderTable();
+                showMessage('success', `${allData.length} Rechnungen geladen`);
+
+            } catch (error) {
+                console.error('[frm_SubRechnungen] Fehler beim Laden:', error);
+                allData = [];
+                renderTable([]);
+                showMessage('error', 'Fehler beim Laden der Daten: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function loadSubunternehmer() {
+            try {
+                // Subunternehmer aus Mitarbeiter-Tabelle laden (IstSubunternehmer = true)
+                const response = await fetch(`${API_BASE}/mitarbeiter?sub=true`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const list = data.mitarbeiter || data || [];
+
+                    const select = document.getElementById('filterSubunternehmer');
+                    const modalSelect = document.getElementById('modalSubunternehmer');
+
+                    list.forEach(item => {
+                        const name = item.Nachname + (item.Vorname ? ', ' + item.Vorname : '');
+                        const option = `<option value="${item.ID}">${name}</option>`;
+                        select.innerHTML += option;
+                        modalSelect.innerHTML += option;
+                    });
+                }
+            } catch (error) {
+                console.log('[frm_SubRechnungen] Subunternehmer konnten nicht geladen werden:', error);
+            }
+        }
+
+        async function loadAuftraege() {
+            try {
+                const response = await fetch(`${API_BASE}/auftraege?limit=100`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const list = data.auftraege || data || [];
+
+                    const select = document.getElementById('modalAuftrag');
+                    list.forEach(item => {
+                        const text = item.Auftrag || `Auftrag ${item.ID}`;
+                        select.innerHTML += `<option value="${item.ID}">${text}</option>`;
+                    });
+                }
+            } catch (error) {
+                console.log('[frm_SubRechnungen] Auftraege konnten nicht geladen werden:', error);
+            }
+        }
+
+        // =========================================================================
+        // TABELLE RENDERN
+        // =========================================================================
+
+        function sortAndRenderTable() {
+            let filtered = [...allData];
+
+            // Textfilter anwenden
+            const searchTerm = document.getElementById('filterSuche').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(row => {
+                    const searchFields = [
+                        row.RechNr,
+                        row.Subunternehmer,
+                        row.Beschreibung,
+                        row.Auftrag
+                    ].map(f => (f || '').toLowerCase());
+
+                    return searchFields.some(f => f.includes(searchTerm));
+                });
+            }
+
+            // Sortieren
+            filtered.sort((a, b) => {
+                let valA = a[currentSort.column] || '';
+                let valB = b[currentSort.column] || '';
+
+                // Numerische Sortierung fuer Betrag
+                if (currentSort.column === 'Betrag') {
+                    valA = parseFloat(valA) || 0;
+                    valB = parseFloat(valB) || 0;
+                }
+
+                // Datum-Sortierung
+                if (currentSort.column === 'Datum') {
+                    valA = new Date(valA);
+                    valB = new Date(valB);
+                }
+
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderTable(filtered);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="empty-state-icon">&#128196;</div>
+                            <div>Keine Rechnungen gefunden</div>
+                            <div style="margin-top: 10px;">
+                                <button class="btn btn-primary" onclick="openNewModal()">Erste Rechnung anlegen</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('statusLeft').textContent = 'Keine Rechnungen';
+                document.getElementById('statusRight').textContent = 'Summe: 0,00 EUR';
+                updateButtonStates();
+                return;
+            }
+
+            let summe = 0;
+
+            tbody.innerHTML = data.map(row => {
+                const betrag = parseFloat(row.Betrag) || 0;
+                if (row.Status !== 'Storniert') {
+                    summe += betrag;
+                }
+
+                const statusClass = getStatusClass(row.Status);
+                const isSelected = row.ID === selectedId ? 'selected' : '';
+
+                return `
+                    <tr class="${isSelected}" onclick="selectRow(${row.ID})" ondblclick="editRechnung(${row.ID})">
+                        <td>${escapeHtml(row.RechNr || '')}</td>
+                        <td>${formatDate(row.Datum)}</td>
+                        <td>${escapeHtml(row.Subunternehmer || '')}</td>
+                        <td>${escapeHtml(row.Auftrag || '')}</td>
+                        <td>${escapeHtml(row.Beschreibung || '')}</td>
+                        <td class="text-right">${formatCurrency(betrag)}</td>
+                        <td class="text-center"><span class="${statusClass}">${escapeHtml(row.Status || '')}</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('statusLeft').textContent = `${data.length} Rechnungen`;
+            document.getElementById('statusRight').textContent = `Summe: ${formatCurrency(summe)}`;
+            updateButtonStates();
+        }
+
+        function filterTable() {
+            sortAndRenderTable();
+        }
+
+        // =========================================================================
+        // AUSWAHL & AKTIONEN
+        // =========================================================================
+
+        function selectRow(id) {
+            selectedId = id;
+
+            // Visual update
+            document.querySelectorAll('.data-table tbody tr').forEach(tr => {
+                tr.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            updateButtonStates();
+        }
+
+        function updateButtonStates() {
+            const hasSelection = selectedId !== null;
+            document.getElementById('btnBearbeiten').disabled = !hasSelection;
+            document.getElementById('btnLoeschen').disabled = !hasSelection;
+        }
+
+        function editSelected() {
+            if (selectedId) {
+                editRechnung(selectedId);
+            }
+        }
+
+        function editRechnung(id) {
+            const row = allData.find(r => r.ID === id);
+            if (!row) return;
+
+            document.getElementById('editId').value = id;
+            document.getElementById('modalTitle').textContent = 'Rechnung bearbeiten';
+            document.getElementById('modalRechNr').value = row.RechNr || '';
+            document.getElementById('modalDatum').value = row.Datum ? row.Datum.substring(0, 10) : '';
+            document.getElementById('modalSubunternehmer').value = row.Subunternehmer_ID || '';
+            document.getElementById('modalAuftrag').value = row.Auftrag_ID || '';
+            document.getElementById('modalBetrag').value = row.Betrag || '';
+            document.getElementById('modalStatus').value = row.Status || 'Offen';
+            document.getElementById('modalBeschreibung').value = row.Beschreibung || '';
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        async function deleteSelected() {
+            if (!selectedId) return;
+
+            const row = allData.find(r => r.ID === selectedId);
+            const confirm = window.confirm(`Rechnung "${row?.RechNr || selectedId}" wirklich loeschen?`);
+
+            if (!confirm) return;
+
+            showLoading(true);
+            try {
+                const response = await fetch(`${API_BASE}/rechnungen/${selectedId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showMessage('success', 'Rechnung geloescht');
+                    selectedId = null;
+                    loadData();
+                } else {
+                    throw new Error('Loeschen fehlgeschlagen');
+                }
+            } catch (error) {
+                showMessage('error', 'Fehler beim Loeschen: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // =========================================================================
+        // MODAL
+        // =========================================================================
+
+        function openNewModal() {
+            document.getElementById('editId').value = '';
+            document.getElementById('modalTitle').textContent = 'Neue Subunternehmer-Rechnung';
+            document.getElementById('modalRechNr').value = '';
+            document.getElementById('modalDatum').value = formatDateISO(new Date());
+            document.getElementById('modalSubunternehmer').value = '';
+            document.getElementById('modalAuftrag').value = '';
+            document.getElementById('modalBetrag').value = '';
+            document.getElementById('modalStatus').value = 'Offen';
+            document.getElementById('modalBeschreibung').value = '';
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        async function saveRechnung() {
+            const editId = document.getElementById('editId').value;
+            const isEdit = editId !== '';
+
+            const data = {
+                RechNr: document.getElementById('modalRechNr').value,
+                Datum: document.getElementById('modalDatum').value,
+                Subunternehmer_ID: document.getElementById('modalSubunternehmer').value || null,
+                Auftrag_ID: document.getElementById('modalAuftrag').value || null,
+                Betrag: parseFloat(document.getElementById('modalBetrag').value) || 0,
+                Status: document.getElementById('modalStatus').value,
+                Beschreibung: document.getElementById('modalBeschreibung').value,
+                IstSubunternehmer: true
+            };
+
+            // Validierung
+            if (!data.RechNr) {
+                showMessage('error', 'Bitte Rechnungsnummer eingeben');
+                return;
+            }
+            if (!data.Datum) {
+                showMessage('error', 'Bitte Datum eingeben');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const url = isEdit ? `${API_BASE}/rechnungen/${editId}` : `${API_BASE}/rechnungen`;
+                const method = isEdit ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showMessage('success', isEdit ? 'Rechnung aktualisiert' : 'Rechnung angelegt');
+                    closeModal();
+                    loadData();
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Speichern fehlgeschlagen');
+                }
+            } catch (error) {
+                showMessage('error', 'Fehler beim Speichern: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // =========================================================================
+        // EXPORT
+        // =========================================================================
+
+        function exportExcel() {
+            showMessage('info', 'Excel-Export wird vorbereitet...');
+
+            // Einfacher CSV-Export als Fallback
+            let csv = 'Rech.-Nr.;Datum;Subunternehmer;Auftrag;Beschreibung;Betrag;Status\n';
+
+            allData.forEach(row => {
+                csv += [
+                    row.RechNr || '',
+                    formatDate(row.Datum),
+                    row.Subunternehmer || '',
+                    row.Auftrag || '',
+                    (row.Beschreibung || '').replace(/;/g, ','),
+                    (row.Betrag || 0).toString().replace('.', ','),
+                    row.Status || ''
+                ].join(';') + '\n';
+            });
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'SubRechnungen_' + formatDateISO(new Date()) + '.csv';
+            link.click();
+
+            showMessage('success', 'Export erstellt');
+        }
+
+        function resetFilter() {
+            initializeDateFilters();
+            document.getElementById('filterSubunternehmer').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterSuche').value = '';
+            loadData();
+        }
+
+        // =========================================================================
+        // HILFSFUNKTIONEN
+        // =========================================================================
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return '';
+            return d.toLocaleDateString('de-DE');
+        }
+
+        function formatDateISO(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatCurrency(value) {
+            return value.toLocaleString('de-DE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + ' EUR';
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'Bezahlt': return 'status-bezahlt';
+                case 'Offen': return 'status-offen';
+                case 'Geprueft': return 'status-geprueft';
+                case 'Storniert': return 'status-storniert';
+                default: return '';
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function showMessage(type, text) {
+            const el = document.getElementById('statusMessage');
+            el.className = 'status-message ' + type;
+            el.textContent = text;
+            el.style.display = 'block';
+
+            // Auto-hide nach 5 Sekunden
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 5000);
+        }
+
+        // =========================================================================
+        // WINDOW EXPORTS (fuer onclick-Handler)
+        // =========================================================================
+
+        window.loadData = loadData;
+        window.openNewModal = openNewModal;
+        window.closeModal = closeModal;
+        window.saveRechnung = saveRechnung;
+        window.editSelected = editSelected;
+        window.editRechnung = editRechnung;
+        window.deleteSelected = deleteSelected;
+        window.selectRow = selectRow;
+        window.exportExcel = exportExcel;
+        window.resetFilter = resetFilter;
+        window.filterTable = filterTable;
+    </script>
+</body>
+</html>

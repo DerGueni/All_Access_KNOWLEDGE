@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menüführung - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        .app-header { background: #4316B2; min-height: 94px; }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .menu-section {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 13px;
+            color: white;
+        }
+        .section-header.stammdaten { background: #4316B2; }
+        .section-header.planung { background: #4316B2; }
+        .section-header.auswertung { background: #4316B2; }
+        .section-header.verwaltung { background: #4316B2; }
+        .section-header.extras { background: #4316B2; }
+
+        .section-content {
+            padding: 8px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+            color: #333;
+        }
+        .menu-item:hover {
+            background: #f0f0f0;
+        }
+        .menu-item-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            border-radius: 6px;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        .menu-item-text {
+            flex: 1;
+        }
+        .menu-item-title {
+            font-weight: 500;
+            font-size: 12px;
+        }
+        .menu-item-desc {
+            font-size: 10px;
+            color: #666;
+            margin-top: 2px;
+        }
+        .menu-item-arrow {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: flex;
+            gap: 16px;
+            padding: 16px 20px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        .quick-stat {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: #f8f8f8;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+        }
+        .quick-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        .quick-stat-label {
+            font-size: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body data-active-menu="">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">CONSYS - Hauptmenü</h1>
+                </div>
+                <div class="header-right">
+                    <span id="lblBenutzer">Benutzer: -</span>
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="quick-stat">
+                    <div>
+                        <div class="quick-stat-value" id="statAufträge">0</div>
+                        <div class="quick-stat-label">Aktive Aufträge</div>
+                    </div>
+                </div>
+                <div class="quick-stat" style="border-left-color:#4316B2;">
+                    <div>
+                        <div class="quick-stat-value" id="statEinsaetze">0</div>
+                        <div class="quick-stat-label">Einsaetze heute</div>
+                    </div>
+                </div>
+                <div class="quick-stat" style="border-left-color:#4316B2;">
+                    <div>
+                        <div class="quick-stat-value" id="statAnfragen">0</div>
+                        <div class="quick-stat-label">Offene Anfragen</div>
+                    </div>
+                </div>
+                <div class="quick-stat" style="border-left-color:#4316B2;">
+                    <div>
+                        <div class="quick-stat-value" id="statAbwesenheit">0</div>
+                        <div class="quick-stat-label">MA abwesend</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content" style="overflow:auto;padding:0;">
+                <div class="menu-grid">
+                    <!-- Stammdaten -->
+                    <div class="menu-section">
+                        <div class="section-header stammdaten">Stammdaten</div>
+                        <div class="section-content">
+                            <a class="menu-item" href="frm_MA_Mitarbeiterstamm.html">
+                                <div class="menu-item-icon">&#128100;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Mitarbeiter</div>
+                                    <div class="menu-item-desc">Mitarbeiterstammdaten verwalten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_KD_Kundenstamm.html">
+                                <div class="menu-item-icon">&#127970;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Kunden</div>
+                                    <div class="menu-item-desc">Kundenstammdaten verwalten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_va_Auftragstamm.html">
+                                <div class="menu-item-icon">&#128203;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Aufträge</div>
+                                    <div class="menu-item-desc">Auftragsstammdaten verwalten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_OB_Objekt.html">
+                                <div class="menu-item-icon">&#127919;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Objekte</div>
+                                    <div class="menu-item-desc">Objektstammdaten verwalten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Planung -->
+                    <div class="menu-section">
+                        <div class="section-header planung">Planung</div>
+                        <div class="section-content">
+                            <a class="menu-item" href="frm_N_Dienstplanübersicht.html">
+                                <div class="menu-item-icon">&#128197;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Dienstplan</div>
+                                    <div class="menu-item-desc">Dienstplanübersicht</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_VA_Planungsübersicht.html">
+                                <div class="menu-item-icon">&#128200;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Planungsübersicht</div>
+                                    <div class="menu-item-desc">Auftragsplanung verwalten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_Einsatzübersicht.html">
+                                <div class="menu-item-icon">&#127939;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Einsatzübersicht</div>
+                                    <div class="menu-item-desc">Aktuelle Einsaetze anzeigen</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_MA_VA_Schnellauswahl.html">
+                                <div class="menu-item-icon">&#9889;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">MA Schnellauswahl</div>
+                                    <div class="menu-item-desc">Schnelle Mitarbeiterzuordnung</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Personal -->
+                    <div class="menu-section">
+                        <div class="section-header auswertung">Personal</div>
+                        <div class="section-content">
+                            <a class="menu-item" href="frm_Abwesenheiten.html">
+                                <div class="menu-item-icon">&#128197;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Abwesenheiten</div>
+                                    <div class="menu-item-desc">Abwesenheiten erfassen</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_MA_Zeitkonten.html">
+                                <div class="menu-item-icon">&#9201;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Zeitkonten</div>
+                                    <div class="menu-item-desc">Mitarbeiter-Zeitkonten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_N_MA_Bewerber_Verarbeitung.html">
+                                <div class="menu-item-icon">&#128101;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Bewerber</div>
+                                    <div class="menu-item-desc">Bewerber verarbeiten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_Ausweis_Create.html">
+                                <div class="menu-item-icon">&#128179;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Ausweise</div>
+                                    <div class="menu-item-desc">Ausweise erstellen</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Extras -->
+                    <div class="menu-section">
+                        <div class="section-header extras">Extras</div>
+                        <div class="section-content">
+                            <a class="menu-item" href="frm_MA_Serien_eMail_Auftrag.html">
+                                <div class="menu-item-icon">&#9993;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Serien-E-Mail</div>
+                                    <div class="menu-item-desc">Massen-E-Mails versenden</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="zfrm_Lohnabrechnungen.html">
+                                <div class="menu-item-icon">&#128176;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Lohnabrechnungen</div>
+                                    <div class="menu-item-desc">Lohnabrechnungen verwalten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="zfrm_Rueckmeldungen.html">
+                                <div class="menu-item-icon">&#128172;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Rueckmeldungen</div>
+                                    <div class="menu-item-desc">Rueckmeldungen bearbeiten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frmTop_Geo_Verwaltung.html">
+                                <div class="menu-item-icon">&#127758;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Geo-Verwaltung</div>
+                                    <div class="menu-item-desc">Standorte verwalten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- NEU: KI-Optimierungen -->
+                    <div class="menu-section">
+                        <div class="section-header" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">KI-Optimierungen</div>
+                        <div class="section-content">
+                            <a class="menu-item" href="frm_N_Dashboard.html" style="background: rgba(39,174,96,0.1);">
+                                <div class="menu-item-icon" style="background: rgba(39,174,96,0.2); color: #27ae60;">&#128202;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Live-Dashboard</div>
+                                    <div class="menu-item-desc">Echtzeit-Uebersicht aller Daten</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="frm_N_Optimierung.html" style="background: rgba(39,174,96,0.1);">
+                                <div class="menu-item-icon" style="background: rgba(39,174,96,0.2); color: #27ae60;">&#9881;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Optimierungs-Hub</div>
+                                    <div class="menu-item-desc">Alle KI-Verbesserungsvorschlaege</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                            <a class="menu-item" href="#" onclick="showKeyboardHelp(); return false;">
+                                <div class="menu-item-icon" style="background: rgba(52,152,219,0.2); color: #3498db;">&#9000;</div>
+                                <div class="menu-item-text">
+                                    <div class="menu-item-title">Tastaturkuerzel</div>
+                                    <div class="menu-item-desc">Strg+K Suche, F1 Hilfe</div>
+                                </div>
+                                <span class="menu-item-arrow">&#8250;</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblVersion">CONSYS v2.0</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/global-search.js"></script>
+    <script src="../js/keyboard-nav.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE', {
+            weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+
+        // Tastaturkuerzel-Hilfe anzeigen
+        function showKeyboardHelp() {
+            if (window.keyboardNav) {
+                window.keyboardNav.showHelp();
+            } else {
+                alert('Tastaturkuerzel:\n\nStrg+K - Globale Suche\nStrg+S - Speichern\nStrg+N - Neu\nF1 - Hilfe\n\nAlt+1 bis Alt+5 - Navigation');
+            }
+        }
+    </script>
+</body>
+</html>

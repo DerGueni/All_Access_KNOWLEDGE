@@ -1,0 +1,6 @@
+-- Query: qry_XL_Import_MA_temp
+-- Type: 0
+SELECT tblZZZ_XL_Auftrag_MA_Einsatz.ID, tblZZZ_XL_Auftrag_MA_Einsatz.VA_ID, tblZZZ_XL_Auftrag_MA_Einsatz.VA_Datum, tblZZZ_XL_Auftrag_MA_Einsatz.VA_Lfd, tblZZZ_XL_Auftrag_MA_Einsatz.MA_ID, tblZZZ_XL_Auftrag_MA_Einsatz.Mitarbeiter AS [Text], tblZZZ_XL_Auftrag_MA_Einsatz.Beginn, tblZZZ_XL_Auftrag_MA_Einsatz.Ende, tblZZZ_XL_Auftrag_MA_Einsatz.MA_PKW, tblZZZ_XL_Auftrag_MA_Einsatz.MA_PKWAnz, tblZZZ_XL_Auftrag_MA_Einsatz.MA_NZug
+FROM tblZZZ_XL_Auftrag_MA_Einsatz
+ORDER BY tblZZZ_XL_Auftrag_MA_Einsatz.VA_ID, tblZZZ_XL_Auftrag_MA_Einsatz.VA_Datum, tblZZZ_XL_Auftrag_MA_Einsatz.VA_Lfd;
+

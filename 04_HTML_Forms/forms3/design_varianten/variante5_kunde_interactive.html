@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variante 5 - Kundenstamm Interactive</title>
+    <style>
+        :root {
+            --primary: #0891b2;
+            --primary-light: #06b6d4;
+            --primary-dark: #0e7490;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-main);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        /* App Container */
+        .app {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            margin-bottom: 32px;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: 600;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        /* Main Content */
+        .main {
+            padding: 24px;
+            overflow: auto;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-main);
+            border-color: var(--primary);
+        }
+
+        /* Kunde Cards Grid */
+        .kunde-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .kunde-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .kunde-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+            border-color: var(--primary-light);
+        }
+
+        .kunde-card.selected {
+            border-color: var(--primary);
+            background: #ecfeff;
+        }
+
+        .kunde-card.dragging {
+            opacity: 0.6;
+            transform: scale(1.02) rotate(1deg);
+        }
+
+        .kunde-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .kunde-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .kunde-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .kunde-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .kunde-type {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .kunde-menu-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .kunde-menu-btn:hover {
+            background: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .kunde-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .kunde-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .kunde-detail svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .kunde-tags {
+            display: flex;
+            gap: 6px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .kunde-tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tag-premium { background: #fef3c7; color: #92400e; }
+        .tag-aktiv { background: #dcfce7; color: #166534; }
+        .tag-neu { background: #dbeafe; color: #1e40af; }
+
+        /* Drag Handle */
+        .drag-indicator {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 20px;
+            height: 20px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            cursor: grab;
+        }
+
+        .kunde-card:hover .drag-indicator {
+            opacity: 0.4;
+        }
+
+        /* Drop Zones */
+        .category-drop-zones {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .category-zone {
+            background: white;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .category-zone.active {
+            border-color: var(--primary);
+            background: #ecfeff;
+        }
+
+        .category-zone.hover {
+            border-color: var(--success);
+            background: #ecfdf5;
+            transform: scale(1.02);
+        }
+
+        .category-zone-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .zone-premium .category-zone-icon { background: #fef3c7; }
+        .zone-standard .category-zone-icon { background: #e0e7ff; }
+        .zone-archiv .category-zone-icon { background: #f3f4f6; }
+
+        .category-zone-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .category-zone-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,0.05);
+            min-width: 220px;
+            padding: 8px;
+            z-index: 9999;
+            opacity: 0;
+            transform: scale(0.95);
+            transform-origin: top left;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .context-menu.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .context-menu-header {
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        .context-menu-item {
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.15s;
+        }
+
+        .context-menu-item:hover {
+            background: var(--bg-main);
+        }
+
+        .context-menu-item.danger:hover {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .context-menu-item .icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .context-menu-item .shortcut {
+            margin-left: auto;
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: var(--bg-main);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 0;
+        }
+
+        .context-menu-submenu {
+            position: relative;
+        }
+
+        .context-menu-submenu > .context-menu-item::after {
+            content: '›';
+            margin-left: auto;
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .context-menu-submenu .submenu {
+            position: absolute;
+            left: 100%;
+            top: 0;
+            margin-left: 4px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 180px;
+            padding: 8px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.15s;
+            pointer-events: none;
+        }
+
+        .context-menu-submenu:hover .submenu {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        /* Search */
+        .search-bar {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+        }
+
+        .search-bar svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10000;
+        }
+
+        .toast {
+            background: white;
+            padding: 14px 18px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: toastIn 0.3s ease;
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.warning { border-left-color: var(--warning); }
+        .toast.error { border-left-color: var(--danger); }
+
+        @keyframes toastIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Selection Box */
+        .selection-box {
+            position: fixed;
+            border: 2px solid var(--primary);
+            background: rgba(8, 145, 178, 0.1);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Bulk Actions Bar */
+        .bulk-actions {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-primary);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .bulk-actions.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .bulk-count {
+            font-weight: 600;
+        }
+
+        .bulk-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .bulk-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .bulk-btn.danger:hover {
+            background: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    Kundenstamm
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item active">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Alle Kunden
+                    <span class="nav-badge">124</span>
+                </div>
+                <div class="nav-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    Premium
+                    <span class="nav-badge">28</span>
+                </div>
+                <div class="nav-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    Neu
+                    <span class="nav-badge">12</span>
+                </div>
+                <div class="nav-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Archiv
+                    <span class="nav-badge">45</span>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <div class="page-header">
+                <h1 class="page-title">Kunden verwalten</h1>
+                <div class="page-actions">
+                    <button class="btn btn-outline">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Exportieren
+                    </button>
+                    <button class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Neuer Kunde
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-bar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <input type="text" placeholder="Kunden suchen... (Ctrl+K)">
+            </div>
+
+            <div class="category-drop-zones">
+                <div class="category-zone zone-premium" data-category="premium">
+                    <div class="category-zone-icon">⭐</div>
+                    <span class="category-zone-label">Premium</span>
+                    <span class="category-zone-count">Kunden hierher ziehen</span>
+                </div>
+                <div class="category-zone zone-standard" data-category="standard">
+                    <div class="category-zone-icon">📋</div>
+                    <span class="category-zone-label">Standard</span>
+                    <span class="category-zone-count">Kunden hierher ziehen</span>
+                </div>
+                <div class="category-zone zone-archiv" data-category="archiv">
+                    <div class="category-zone-icon">📁</div>
+                    <span class="category-zone-label">Archivieren</span>
+                    <span class="category-zone-count">Kunden hierher ziehen</span>
+                </div>
+            </div>
+
+            <div class="kunde-grid" id="kundeGrid">
+                <div class="kunde-card" draggable="true" data-id="K001">
+                    <div class="drag-indicator">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="8" cy="6" r="2"></circle>
+                            <circle cx="16" cy="6" r="2"></circle>
+                            <circle cx="8" cy="12" r="2"></circle>
+                            <circle cx="16" cy="12" r="2"></circle>
+                            <circle cx="8" cy="18" r="2"></circle>
+                            <circle cx="16" cy="18" r="2"></circle>
+                        </svg>
+                    </div>
+                    <div class="kunde-card-header">
+                        <div class="kunde-avatar">MN</div>
+                        <div class="kunde-info">
+                            <div class="kunde-name">Messe Nuernberg GmbH</div>
+                            <div class="kunde-type">Messeveranstalter</div>
+                        </div>
+                        <button class="kunde-menu-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="6" r="2"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                                <circle cx="12" cy="18" r="2"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="kunde-details">
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Nuernberg
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                            </svg>
+                            42 Auftraege
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            285.000 EUR
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"></path>
+                                <path d="M16.36 12.36l5.64-5.64"></path>
+                            </svg>
+                            0911-12345
+                        </div>
+                    </div>
+                    <div class="kunde-tags">
+                        <span class="kunde-tag tag-premium">Premium</span>
+                        <span class="kunde-tag tag-aktiv">Aktiv</span>
+                    </div>
+                </div>
+
+                <div class="kunde-card" draggable="true" data-id="K002">
+                    <div class="drag-indicator">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="8" cy="6" r="2"></circle>
+                            <circle cx="16" cy="6" r="2"></circle>
+                            <circle cx="8" cy="12" r="2"></circle>
+                            <circle cx="16" cy="12" r="2"></circle>
+                            <circle cx="8" cy="18" r="2"></circle>
+                            <circle cx="16" cy="18" r="2"></circle>
+                        </svg>
+                    </div>
+                    <div class="kunde-card-header">
+                        <div class="kunde-avatar">SN</div>
+                        <div class="kunde-info">
+                            <div class="kunde-name">Sparkasse Nuernberg</div>
+                            <div class="kunde-type">Finanzdienstleister</div>
+                        </div>
+                        <button class="kunde-menu-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="6" r="2"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                                <circle cx="12" cy="18" r="2"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="kunde-details">
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Nuernberg
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            </svg>
+                            18 Auftraege
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            95.000 EUR
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2"></path>
+                            </svg>
+                            0911-23456
+                        </div>
+                    </div>
+                    <div class="kunde-tags">
+                        <span class="kunde-tag tag-aktiv">Aktiv</span>
+                    </div>
+                </div>
+
+                <div class="kunde-card" draggable="true" data-id="K003">
+                    <div class="drag-indicator">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="8" cy="6" r="2"></circle>
+                            <circle cx="16" cy="6" r="2"></circle>
+                            <circle cx="8" cy="12" r="2"></circle>
+                            <circle cx="16" cy="12" r="2"></circle>
+                            <circle cx="8" cy="18" r="2"></circle>
+                            <circle cx="16" cy="18" r="2"></circle>
+                        </svg>
+                    </div>
+                    <div class="kunde-card-header">
+                        <div class="kunde-avatar" style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);">BM</div>
+                        <div class="kunde-info">
+                            <div class="kunde-name">BMW AG</div>
+                            <div class="kunde-type">Automobilhersteller</div>
+                        </div>
+                        <button class="kunde-menu-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="6" r="2"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                                <circle cx="12" cy="18" r="2"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="kunde-details">
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Muenchen
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            </svg>
+                            8 Auftraege
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            145.000 EUR
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2"></path>
+                            </svg>
+                            089-99999
+                        </div>
+                    </div>
+                    <div class="kunde-tags">
+                        <span class="kunde-tag tag-premium">Premium</span>
+                        <span class="kunde-tag tag-neu">Neu</span>
+                    </div>
+                </div>
+
+                <div class="kunde-card" draggable="true" data-id="K004">
+                    <div class="drag-indicator">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="8" cy="6" r="2"></circle>
+                            <circle cx="16" cy="6" r="2"></circle>
+                            <circle cx="8" cy="12" r="2"></circle>
+                            <circle cx="16" cy="12" r="2"></circle>
+                            <circle cx="8" cy="18" r="2"></circle>
+                            <circle cx="16" cy="18" r="2"></circle>
+                        </svg>
+                    </div>
+                    <div class="kunde-card-header">
+                        <div class="kunde-avatar" style="background: linear-gradient(135deg, #059669 0%, #34d399 100%);">AD</div>
+                        <div class="kunde-info">
+                            <div class="kunde-name">ADAC e.V.</div>
+                            <div class="kunde-type">Verein</div>
+                        </div>
+                        <button class="kunde-menu-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="6" r="2"></circle>
+                                <circle cx="12" cy="12" r="2"></circle>
+                                <circle cx="12" cy="18" r="2"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="kunde-details">
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Muenchen
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            </svg>
+                            5 Auftraege
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            62.000 EUR
+                        </div>
+                        <div class="kunde-detail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2"></path>
+                            </svg>
+                            089-76543
+                        </div>
+                    </div>
+                    <div class="kunde-tags">
+                        <span class="kunde-tag tag-aktiv">Aktiv</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-header">Kunde bearbeiten</div>
+        <div class="context-menu-item" data-action="edit">
+            <span class="icon">✏️</span>
+            <span>Bearbeiten</span>
+            <span class="shortcut">E</span>
+        </div>
+        <div class="context-menu-item" data-action="view">
+            <span class="icon">👁️</span>
+            <span>Details anzeigen</span>
+            <span class="shortcut">Enter</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-submenu">
+            <div class="context-menu-item">
+                <span class="icon">🏷️</span>
+                <span>Kategorie</span>
+            </div>
+            <div class="submenu">
+                <div class="context-menu-item" data-action="cat-premium">
+                    <span class="icon">⭐</span>
+                    <span>Premium</span>
+                </div>
+                <div class="context-menu-item" data-action="cat-standard">
+                    <span class="icon">📋</span>
+                    <span>Standard</span>
+                </div>
+                <div class="context-menu-item" data-action="cat-archiv">
+                    <span class="icon">📁</span>
+                    <span>Archiv</span>
+                </div>
+            </div>
+        </div>
+        <div class="context-menu-item" data-action="email">
+            <span class="icon">📧</span>
+            <span>E-Mail senden</span>
+        </div>
+        <div class="context-menu-item" data-action="auftrag">
+            <span class="icon">📄</span>
+            <span>Neuer Auftrag</span>
+            <span class="shortcut">N</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="copy">
+            <span class="icon">📋</span>
+            <span>Kopieren</span>
+            <span class="shortcut">Ctrl+C</span>
+        </div>
+        <div class="context-menu-item" data-action="export">
+            <span class="icon">📤</span>
+            <span>Exportieren</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item danger" data-action="delete">
+            <span class="icon">🗑️</span>
+            <span>Loeschen</span>
+            <span class="shortcut">Del</span>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Bulk Actions Bar -->
+    <div class="bulk-actions" id="bulkActions">
+        <span class="bulk-count"><span id="selectedCount">0</span> ausgewaehlt</span>
+        <button class="bulk-btn" data-action="email">📧 E-Mail</button>
+        <button class="bulk-btn" data-action="export">📤 Export</button>
+        <button class="bulk-btn" data-action="category">🏷️ Kategorie</button>
+        <button class="bulk-btn danger" data-action="delete">🗑️ Loeschen</button>
+    </div>
+
+    <script>
+        // State
+        const state = {
+            selectedCards: new Set(),
+            draggedCard: null
+        };
+
+        // Context Menu
+        const contextMenu = document.getElementById('contextMenu');
+        let currentTarget = null;
+
+        // Right-click handler
+        document.addEventListener('contextmenu', (e) => {
+            const card = e.target.closest('.kunde-card');
+            if (card) {
+                e.preventDefault();
+                currentTarget = card;
+                showContextMenu(e.clientX, e.clientY);
+
+                // Select this card if not in multi-select
+                if (state.selectedCards.size <= 1) {
+                    clearSelection();
+                    selectCard(card);
+                }
+            }
+        });
+
+        function showContextMenu(x, y) {
+            // Prevent overflow
+            const menuWidth = 240;
+            const menuHeight = 380;
+            if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth - 10;
+            if (y + menuHeight > window.innerHeight) y = window.innerHeight - menuHeight - 10;
+
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+            contextMenu.classList.add('show');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.context-menu')) {
+                contextMenu.classList.remove('show');
+            }
+        });
+
+        // Context Menu Actions
+        contextMenu.addEventListener('click', (e) => {
+            const item = e.target.closest('.context-menu-item');
+            if (item && currentTarget) {
+                const action = item.dataset.action;
+                handleAction(action, currentTarget);
+                contextMenu.classList.remove('show');
+            }
+        });
+
+        function handleAction(action, target) {
+            const name = target.querySelector('.kunde-name').textContent;
+            switch(action) {
+                case 'edit':
+                    showToast('Bearbeite: ' + name);
+                    break;
+                case 'view':
+                    showToast('Oeffne Details: ' + name);
+                    break;
+                case 'email':
+                    showToast('E-Mail wird vorbereitet...');
+                    break;
+                case 'auftrag':
+                    showToast('Neuer Auftrag fuer ' + name);
+                    break;
+                case 'copy':
+                    showToast('In Zwischenablage kopiert');
+                    break;
+                case 'export':
+                    showToast('Export wird erstellt...');
+                    break;
+                case 'delete':
+                    target.style.animation = 'fadeOut 0.3s ease forwards';
+                    setTimeout(() => target.remove(), 300);
+                    showToast('Kunde geloescht', 'warning');
+                    break;
+                case 'cat-premium':
+                    updateCategory(target, 'Premium');
+                    break;
+                case 'cat-standard':
+                    updateCategory(target, 'Standard');
+                    break;
+                case 'cat-archiv':
+                    updateCategory(target, 'Archiv');
+                    break;
+            }
+        }
+
+        function updateCategory(target, category) {
+            showToast('Kategorie geaendert: ' + category);
+        }
+
+        // Selection with Ctrl+Click
+        document.querySelectorAll('.kunde-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    toggleCard(card);
+                } else if (e.shiftKey && state.selectedCards.size > 0) {
+                    // Shift+Click for range selection
+                    const cards = Array.from(document.querySelectorAll('.kunde-card'));
+                    const lastSelected = Array.from(state.selectedCards).pop();
+                    const startIdx = cards.indexOf(document.querySelector(`[data-id="${lastSelected}"]`));
+                    const endIdx = cards.indexOf(card);
+                    const [from, to] = startIdx < endIdx ? [startIdx, endIdx] : [endIdx, startIdx];
+
+                    for (let i = from; i <= to; i++) {
+                        selectCard(cards[i]);
+                    }
+                } else {
+                    clearSelection();
+                    selectCard(card);
+                }
+            });
+        });
+
+        function selectCard(card) {
+            card.classList.add('selected');
+            state.selectedCards.add(card.dataset.id);
+            updateBulkActions();
+        }
+
+        function toggleCard(card) {
+            if (card.classList.contains('selected')) {
+                card.classList.remove('selected');
+                state.selectedCards.delete(card.dataset.id);
+            } else {
+                selectCard(card);
+            }
+            updateBulkActions();
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.kunde-card.selected').forEach(c => c.classList.remove('selected'));
+            state.selectedCards.clear();
+            updateBulkActions();
+        }
+
+        function updateBulkActions() {
+            const bulkBar = document.getElementById('bulkActions');
+            const countEl = document.getElementById('selectedCount');
+            countEl.textContent = state.selectedCards.size;
+
+            if (state.selectedCards.size > 1) {
+                bulkBar.classList.add('show');
+            } else {
+                bulkBar.classList.remove('show');
+            }
+        }
+
+        // Drag & Drop
+        document.querySelectorAll('.kunde-card').forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                state.draggedCard = card;
+                card.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', card.dataset.id);
+                e.dataTransfer.effectAllowed = 'move';
+
+                // Activate drop zones
+                document.querySelectorAll('.category-zone').forEach(zone => {
+                    zone.classList.add('active');
+                });
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                state.draggedCard = null;
+                document.querySelectorAll('.category-zone').forEach(zone => {
+                    zone.classList.remove('active', 'hover');
+                });
+            });
+        });
+
+        // Drop Zones
+        document.querySelectorAll('.category-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('hover');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('hover');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('hover');
+
+                const category = zone.dataset.category;
+                if (state.draggedCard) {
+                    const name = state.draggedCard.querySelector('.kunde-name').textContent;
+
+                    if (category === 'archiv') {
+                        state.draggedCard.style.animation = 'fadeOut 0.3s ease forwards';
+                        setTimeout(() => state.draggedCard.remove(), 300);
+                        showToast(name + ' archiviert', 'warning');
+                    } else {
+                        showToast(name + ' -> ' + category.charAt(0).toUpperCase() + category.slice(1));
+                    }
+                }
+            });
+        });
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+K for search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('.search-bar input').focus();
+            }
+
+            // Ctrl+A to select all
+            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+                e.preventDefault();
+                document.querySelectorAll('.kunde-card').forEach(selectCard);
+            }
+
+            // Escape to clear selection
+            if (e.key === 'Escape') {
+                clearSelection();
+                contextMenu.classList.remove('show');
+            }
+
+            // Delete selected
+            if (e.key === 'Delete' && state.selectedCards.size > 0) {
+                state.selectedCards.forEach(id => {
+                    const card = document.querySelector(`[data-id="${id}"]`);
+                    if (card) {
+                        card.style.animation = 'fadeOut 0.3s ease forwards';
+                        setTimeout(() => card.remove(), 300);
+                    }
+                });
+                showToast(state.selectedCards.size + ' Kunden geloescht', 'warning');
+                clearSelection();
+            }
+        });
+
+        // Long Press for Touch
+        let longPressTimer;
+        document.querySelectorAll('.kunde-card').forEach(card => {
+            card.addEventListener('touchstart', (e) => {
+                longPressTimer = setTimeout(() => {
+                    currentTarget = card;
+                    const touch = e.touches[0];
+                    showContextMenu(touch.clientX, touch.clientY);
+                    selectCard(card);
+                }, 500);
+            });
+
+            card.addEventListener('touchend', () => clearTimeout(longPressTimer));
+            card.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+        });
+
+        // Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✓' : '⚠'}</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'toastIn 0.3s ease reverse forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Bulk Actions
+        document.getElementById('bulkActions').addEventListener('click', (e) => {
+            const btn = e.target.closest('.bulk-btn');
+            if (btn) {
+                const action = btn.dataset.action;
+                const count = state.selectedCards.size;
+
+                switch(action) {
+                    case 'email':
+                        showToast('E-Mail an ' + count + ' Kunden');
+                        break;
+                    case 'export':
+                        showToast(count + ' Kunden exportiert');
+                        break;
+                    case 'category':
+                        showToast('Kategorie-Dialog oeffnen...');
+                        break;
+                    case 'delete':
+                        state.selectedCards.forEach(id => {
+                            const card = document.querySelector(`[data-id="${id}"]`);
+                            if (card) card.remove();
+                        });
+                        showToast(count + ' Kunden geloescht', 'warning');
+                        clearSelection();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

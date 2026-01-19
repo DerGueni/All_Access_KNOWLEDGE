@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head><title>Filter Test</title></head>
+<body>
+<h1>Datumsfilter Test</h1>
+<input type="text" id="datum" value="01.03.2026">
+<button onclick="testFilter()">Filtern</button>
+<div id="result"></div>
+
+<script src="../data/embedded_data.js"></script>
+<script>
+function parseDate(s) { 
+    if(!s) return null; 
+    const p = s.split('.'); 
+    if(p.length === 3) return new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0])); 
+    return null; 
+}
+
+function testFilter() {
+    const filterStr = document.getElementById('datum').value;
+    const filterD = parseDate(filterStr);
+    
+    console.log('Filter String:', filterStr);
+    console.log('Filter Date:', filterD);
+    console.log('Alle Aufträge:', EMBEDDED_DATA.auftraege.length);
+    
+    const gefiltert = EMBEDDED_DATA.auftraege.filter(a => {
+        const d = parseDate(a.datVon);
+        const pass = d && d >= filterD;
+        if (!pass && a.datVon.startsWith('01.03')) {
+            console.log('Rejected:', a.datVon, d, filterD, d >= filterD);
+        }
+        return pass;
+    });
+    
+    console.log('Gefiltert:', gefiltert.length);
+    
+    document.getElementById('result').innerHTML = 
+        '<p>Filter: ' + filterStr + '</p>' +
+        '<p>Alle: ' + EMBEDDED_DATA.auftraege.length + '</p>' +
+        '<p>Gefiltert: ' + gefiltert.length + '</p>' +
+        '<p>Erste 5:</p><ul>' +
+        gefiltert.slice(0,5).map(a => '<li>' + a.datVon + ' - ' + a.auftrag + '</li>').join('') +
+        '</ul>';
+}
+
+// Auto-test beim Laden
+window.onload = function() {
+    console.log('EMBEDDED_DATA geladen:', typeof EMBEDDED_DATA !== 'undefined');
+    if (typeof EMBEDDED_DATA !== 'undefined') {
+        console.log('Aufträge:', EMBEDDED_DATA.auftraege.length);
+        testFilter();
+    }
+};
+</script>
+</body>
+</html>

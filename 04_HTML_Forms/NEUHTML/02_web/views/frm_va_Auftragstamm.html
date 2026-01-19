@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_va_Auftragstamm.css">
+</head>
+<body>
+    <div class="va-container">
+        <!-- Linkes Menue -->
+
+        <!-- Hauptbereich -->
+        <main class="va-main">
+            <!-- Header -->
+            <header class="va-header">
+                <div class="header-left">
+                    <div class="va-logo"></div>
+                    <h1 class="va-title">Auftragsverwaltung</h1>
+                    <div class="nav-buttons">
+                        <button class="va-btn-nav" id="btnErster" title="Erster">|&#9664;</button>
+                        <button class="va-btn-nav" id="btnVorheriger" title="Zurueck">&#9664;</button>
+                        <button class="va-btn-nav" id="btnNaechster" title="Vor">&#9654;</button>
+                        <button class="va-btn-nav" id="btnLetzter" title="Letzter">&#9654;|</button>
+                        <button class="va-btn-nav" id="btnRueck" title="Rueckgaengig">&#x21B6;</button>
+                    </div>
+                    <button class="va-btn" id="btnReq">Aktualisieren</button>
+                </div>
+                <div class="header-center">
+                    <div class="toolbar-row">
+                        <button class="va-btn" id="btnSchnellPlan">Mitarbeiterauswahl</button>
+                        <button class="va-btn" id="btn_N_HTMLAnsicht">HTML Ansicht</button>
+                        <button class="va-btn" id="btn_Posliste_oeffnen">Positionen</button>
+                        <button class="va-btn" id="btnAuftragKopieren">Auftrag kopieren</button>
+                        <button class="va-btn primary" id="btnneuveranst">Neuer Auftrag</button>
+                        <button class="va-btn danger" id="mcobtnDelete">Auftrag loeschen</button>
+                    </div>
+                    <div class="toolbar-row">
+                        <button class="va-btn" id="btnMailEins">Einsatzliste senden MA</button>
+                        <button class="va-btn" id="btn_Autosend_BOS">Einsatzliste senden BOS</button>
+                        <button class="va-btn" id="btnMailSub">Einsatzliste senden SUB</button>
+                        <button class="va-btn" id="btnDruckZusage">Einsatzliste drucken</button>
+                        <button class="va-btn" id="btn_ListeStd">Namensliste ESS</button>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V1.55</span>
+                        <span id="lblDatum"></span>
+                    </div>
+                    <div class="status-row">
+                        <label>Auftragsstatus:</label>
+                        <select class="va-select" id="Veranst_Status_ID">
+                            <option value="">-- Status --</option>
+                            <option value="1">Geplant</option>
+                            <option value="2">Besetzt</option>
+                            <option value="3">Abgeschlossen</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stammdaten -->
+            <div class="va-stammdaten">
+                <div class="stammdaten-grid">
+                    <div class="field-group">
+                        <label>Datum:</label>
+                        <input type="text" class="va-input" id="Dat_VA_Von" placeholder="Von">
+                        <input type="text" class="va-input" id="Dat_VA_Bis" placeholder="Bis">
+                    </div>
+                    <div class="field-group">
+                        <label>Nr.</label>
+                        <input type="text" class="va-input readonly" id="ID" readonly>
+                    </div>
+                    <div class="field-group wide">
+                        <label>Auftrag:</label>
+                        <select class="va-select wide" id="cboAuftrag">
+                            <option value="">-- Auftrag waehlen --</option>
+                        </select>
+                    </div>
+                    <div class="field-group wide">
+                        <label>Ort:</label>
+                        <select class="va-select wide" id="cboOrt">
+                            <option value="">-- Ort waehlen --</option>
+                        </select>
+                    </div>
+                    <div class="field-group wide">
+                        <label>Objekt:</label>
+                        <select class="va-select" id="cboObjekt">
+                            <option value="">-- Objekt waehlen --</option>
+                        </select>
+                        <select class="va-select small" id="Objekt_ID">
+                            <option value="">ID</option>
+                        </select>
+                        <button class="va-btn-nav" id="btnDatumLeft">&#9664;</button>
+                        <select class="va-select" id="cboVADatum">
+                            <option value="">-- Datum --</option>
+                        </select>
+                        <button class="va-btn-nav" id="btnDatumRight">&#9654;</button>
+                    </div>
+                    <div class="field-group">
+                        <label>Treffpunkt:</label>
+                        <input type="text" class="va-input small" id="Treffp_Zeit" placeholder="Zeit">
+                        <input type="text" class="va-input" id="Treffpunkt">
+                    </div>
+                    <div class="field-group">
+                        <label>PKW Anzahl:</label>
+                        <input type="text" class="va-input small" id="PKW_Anzahl">
+                    </div>
+                    <div class="field-group">
+                        <label>Fahrtkosten pro PKW:</label>
+                        <input type="text" class="va-input small" id="Fahrtkosten">
+                    </div>
+                    <div class="field-group wide">
+                        <label>Dienstkleidung:</label>
+                        <select class="va-select wide" id="cboDienstkleidung">
+                            <option value="">-- Dienstkleidung waehlen --</option>
+                        </select>
+                    </div>
+                    <div class="field-group wide">
+                        <label>Ansprechpartner:</label>
+                        <input type="text" class="va-input wide" id="Ansprechpartner">
+                    </div>
+                    <div class="field-group wide">
+                        <label>Auftraggeber:</label>
+                        <select class="va-select wide" id="veranstalter_id">
+                            <option value="">-- Auftraggeber waehlen --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content mit Tabs und Auftragsliste -->
+            <div class="va-content">
+                <!-- Tab-Bereich links -->
+                <div class="va-tabs-area">
+                    <!-- Tab-Navigation -->
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="pgMA_Zusage">Einsatzliste</button>
+                        <button class="tab-btn" data-tab="pgMA_Plan">Antworten ausstehend</button>
+                        <button class="tab-btn" data-tab="pgAttach">Zusatzdateien</button>
+                        <button class="tab-btn" data-tab="pgRechnung">Rechnung</button>
+                        <button class="tab-btn" data-tab="pgBemerk">Bemerkungen</button>
+                    </div>
+
+                    <!-- Tab-Content -->
+                    <div class="tab-content">
+                        <!-- Tab: Einsatzliste -->
+                        <div class="tab-pane active" id="pgMA_Zusage">
+                            <div class="tab-toolbar">
+                                <button class="va-btn" id="btn_BWN_Druck">BWN drucken</button>
+                            </div>
+                            <div class="einsatzliste-layout">
+                                <div class="einsatzliste-left">
+                                    <div class="section-label">Schichten:</div>
+                                    <div class="schichten-table-container">
+                                        <table class="va-table" id="tblSchichten">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ist</th>
+                                                    <th>Soll</th>
+                                                    <th>Beginn</th>
+                                                    <th>Ende</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="selected"><td>3</td><td>5</td><td>16:00</td><td>22:00</td></tr>
+                                                <tr><td>2</td><td>2</td><td>18:00</td><td>23:30</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="section-label">Absagen:</div>
+                                    <div class="absagen-table-container">
+                                        <table class="va-table" id="tblAbsagen">
+                                            <thead>
+                                                <tr><th>Name</th><th>Grund</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr><td>Mueller Klaus</td><td>Krank</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="einsatzliste-right">
+                                    <div class="section-label">Zugeordnete Mitarbeiter:</div>
+                                    <div class="ma-zuordnung-container">
+                                        <table class="va-table" id="tblMAZuordnung">
+                                            <thead>
+                                                <tr>
+                                                    <th>Lfd</th>
+                                                    <th>Name</th>
+                                                    <th>Beginn</th>
+                                                    <th>Ende</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr><td>1</td><td>Alali Ahmad</td><td>16:00</td><td>22:00</td><td>Zugesagt</td></tr>
+                                                <tr><td>2</td><td>Alayoubi Salim</td><td>16:00</td><td>22:00</td><td>Zugesagt</td></tr>
+                                                <tr><td>3</td><td>Glatz Michaela</td><td>16:00</td><td>22:00</td><td>Angefragt</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Antworten ausstehend -->
+                        <div class="tab-pane" id="pgMA_Plan">
+                            <div class="section-label">Mitarbeiter geplant:</div>
+                            <table class="va-table" id="tblGeplant">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Angefragt am</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Glatz Michaela</td><td>15.12.2025</td><td>Ausstehend</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Tab: Zusatzdateien -->
+                        <div class="tab-pane" id="pgAttach">
+                            <div class="tab-toolbar">
+                                <button class="va-btn primary" id="btnNeuAttach">+ Datei hinzufuegen</button>
+                            </div>
+                            <table class="va-table" id="tblDateien">
+                                <thead>
+                                    <tr>
+                                        <th>Dateiname</th>
+                                        <th>Typ</th>
+                                        <th>Datum</th>
+                                        <th>Aktion</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Lageplan.pdf</td><td>PDF</td><td>10.12.2025</td><td><button class="va-btn-small">Oeffnen</button></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Tab: Rechnung -->
+                        <div class="tab-pane" id="pgRechnung">
+                            <div class="tab-toolbar">
+                                <button class="va-btn" id="btnPDFKopf">Rechnung PDF</button>
+                                <button class="va-btn" id="btnPDFPos">Berechnungsliste PDF</button>
+                                <button class="va-btn" id="btnLoad">Daten laden</button>
+                                <button class="va-btn" id="btnRchLex">Rechnung in Lexware</button>
+                            </div>
+                            <div class="section-label">Rechnungspositionen:</div>
+                            <table class="va-table" id="tblRechPos">
+                                <thead>
+                                    <tr>
+                                        <th>Pos</th>
+                                        <th>Bezeichnung</th>
+                                        <th>Menge</th>
+                                        <th>Einzelpreis</th>
+                                        <th>Gesamt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>1</td><td>Sicherheitspersonal</td><td>25 Std</td><td>25,00 EUR</td><td>625,00 EUR</td></tr>
+                                </tbody>
+                            </table>
+                            <div class="summe-row">
+                                <label>Gesamtsumme Netto:</label>
+                                <span id="lblGesamtsumme">625,00 EUR</span>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Bemerkungen -->
+                        <div class="tab-pane" id="pgBemerk">
+                            <textarea class="va-textarea" id="Bemerkungen" placeholder="Bemerkungen zum Auftrag..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auftragsliste rechts -->
+                <div class="va-auftragsliste">
+                    <div class="liste-header">
+                        <span class="liste-title">Auftraege</span>
+                    </div>
+                    <div class="liste-filter">
+                        <label>Ab:</label>
+                        <input type="text" class="va-input small" id="txtAuftraegeAb">
+                        <button class="va-btn-small" id="btnAbWann">Go</button>
+                        <button class="va-btn-small" id="btnTgBack">&#9664;&#9664;</button>
+                        <button class="va-btn-small" id="btnTgVor">&#9654;&#9654;</button>
+                        <button class="va-btn-small" id="btnHeute">Heute</button>
+                    </div>
+                    <div class="liste-table-container">
+                        <table class="va-liste-table" id="tblAuftragsliste">
+                            <thead>
+                                <tr>
+                                    <th>Datum</th>
+                                    <th>Auftrag</th>
+                                    <th>Ort</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="selected"><td>18.12.25</td><td>NERVY Nuernberg</td><td>Nuernberg</td></tr>
+                                <tr><td>19.12.25</td><td>HC Erlangen</td><td>Erlangen</td></tr>
+                                <tr><td>20.12.25</td><td>1. FC Nuernberg</td><td>Nuernberg</td></tr>
+                                <tr><td>21.12.25</td><td>Studentenverbindung</td><td>Nuernberg</td></tr>
+                                <tr><td>22.12.25</td><td>Doro Nuernberg</td><td>Nuernberg</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="va-footer">
+                <div class="footer-left">
+                    <span>Erstellt:</span>
+                    <span id="lblErstellt">guenther.siegert</span>
+                    <span id="lblErstelltDatum">10.12.2025</span>
+                </div>
+                <div class="footer-center">
+                    <span>Geaendert:</span>
+                    <span id="lblGeaendert">guenther.siegert</span>
+                    <span id="lblGeaendertDatum">18.12.2025</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Datum anzeigen
+        document.getElementById('lblDatum').textContent = new Date().toLocaleDateString('de-DE', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="frm_va_Auftragstamm.logic.js"></script>
+</body>
+</html>

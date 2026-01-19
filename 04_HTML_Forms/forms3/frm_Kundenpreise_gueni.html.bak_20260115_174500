@@ -1,0 +1,573 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenpreise Verwaltung</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <style>
+        /* CONSYS Theme Colors */
+        :root {
+            --consys-bg: #8080c0;
+            --consys-dark: #6060a0;
+            --consys-darker: #49477f;
+            --consys-light: #9090c0;
+            --consys-lighter: #a0a0d0;
+        }
+
+        body {
+            background: var(--consys-bg);
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+            overflow: visible;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:active::before {
+            background: #404070;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn:active::after {
+            background: #ffffff;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.active::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--consys-bg);
+        }
+
+        /* Title Bar - ausgeblendet gemaess Anforderung */
+        .title-bar {
+            display: none;
+            align-items: center;
+            height: 26px;
+            flex-shrink: 0;
+            font-size: 12px;
+        }
+
+        .title-bar-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 20px;
+            height: 20px;
+            background: #e0e0e0;
+            border: 1px solid #808080;
+            cursor: pointer;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-btn.close {
+            background: #c75050;
+            color: white;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: var(--consys-light);
+            padding: 8px 12px;
+            border-bottom: 2px solid var(--consys-darker);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .toolbar-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000080;
+            margin-right: auto;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+            transition: all 0.1s;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #6080d0, #4060a0);
+            color: white;
+            border-color: #8090e0 #203060 #203060 #8090e0;
+        }
+
+        .btn-success {
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+            border-color: #80e080 #104010 #104010 #80e080;
+        }
+
+        .btn-danger {
+            background: linear-gradient(to bottom, #e06060, #c04040);
+            color: white;
+            border-color: #ff8080 #802020 #802020 #ff8080;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .filter-group input[type="text"],
+        .filter-group select {
+            padding: 3px 6px;
+            border: 1px solid #808080;
+            background: white;
+            font-size: 11px;
+            height: 24px;
+        }
+
+        .filter-group input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Main Content Area */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 8px;
+            gap: 8px;
+        }
+
+        /* Table Container */
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            background: white;
+            border: 2px solid var(--consys-darker);
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .price-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .price-table th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .price-table td {
+            border: 1px solid #c0c0c0;
+            padding: 4px 6px;
+            background: white;
+        }
+
+        .price-table tbody tr:hover {
+            background: #e0e0ff;
+        }
+
+        .price-table tbody tr.selected {
+            background: #000080;
+            color: white;
+        }
+
+        .price-table tbody tr.selected input {
+            background: #e0e0ff;
+            color: #000;
+        }
+
+        /* Input Fields in Table */
+        .price-table input[type="text"],
+        .price-table input[type="number"] {
+            width: 100%;
+            border: 1px solid #a0a0a0;
+            padding: 2px 4px;
+            font-size: 11px;
+            font-family: inherit;
+            background: white;
+        }
+
+        .price-table input[type="text"]:focus,
+        .price-table input[type="number"]:focus {
+            outline: 2px solid #4060d0;
+            background: #ffffcc;
+        }
+
+        .price-table input[readonly] {
+            background: #f0f0f0;
+            color: #666;
+            border-color: #c0c0c0;
+            cursor: not-allowed;
+        }
+
+        /* Column Widths */
+        .col-firma { width: 250px; }
+        .col-price { width: 100px; text-align: right; }
+        .col-percent { width: 80px; text-align: right; }
+        .col-action { width: 80px; text-align: center; }
+
+        /* Save Button in Row */
+        .btn-save-row {
+            padding: 2px 8px;
+            font-size: 10px;
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+            border: 1px solid #205020;
+            cursor: pointer;
+        }
+
+        .btn-save-row:hover {
+            background: linear-gradient(to bottom, #70d070, #409040);
+        }
+
+        .btn-save-row.saved {
+            background: #90d090;
+            cursor: default;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 3px 8px;
+            display: flex;
+            gap: 10px;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .status-section {
+            border: 1px inset #808080;
+            padding: 2px 10px;
+            background: #e0e0e0;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 30px;
+            right: 10px;
+            z-index: 1002;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+            font-size: 12px;
+        }
+
+        .toast.success { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+        .toast.warning { background: #f57f17; }
+        .toast.info { background: #0277bd; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #909090;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .col-firma { width: 200px; }
+        }
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-form="frm_Kundenpreise_gueni">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app-container">
+        <!-- Left Menu -->
+
+        <!-- Main Content -->
+        <div class="app-main">
+            <!-- Title Bar -->
+            <div class="title-bar">
+                <span>Ã°Å¸ÂÂ¢ Kundenpreise Verwaltung</span>
+                <div class="title-bar-buttons">
+                    <button class="title-btn tiny-btn" title="Minimieren">_</button>
+                    <button class="title-btn tiny-btn" title="Maximieren">Ã¢â€“Â¡</button>
+                    <button class="title-btn close tiny-btn" onclick="closeForm()" title="Schließen">Ãƒâ€”</button>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <span class="toolbar-title">Kundenpreise</span>
+
+                <button class="btn" onclick="KundenpreiseLogic.refreshData()">
+                    Ã°Å¸â€â€ž Aktualisieren
+                </button>
+
+                <button class="btn btn-success" onclick="KundenpreiseLogic.saveAll()">
+                    Ã°Å¸â€™Â¾ Alle speichern
+                </button>
+
+                <button class="btn" onclick="KundenpreiseLogic.exportToExcel()">
+                    Ã°Å¸â€œÅ  Excel Export
+                </button>
+
+                <!-- Filter Section -->
+                <div class="filter-group">
+                    <label>Kunde:</label>
+                    <input type="text"
+                           id="filterFirma"
+                           placeholder="Firmenname..."
+                           style="width: 200px;"
+                           oninput="KundenpreiseLogic.filterTable()">
+
+                    <input type="checkbox"
+                           id="filterAktiv"
+                           checked
+                           onchange="KundenpreiseLogic.filterTable()">
+                    <label for="filterAktiv">Nur Aktive</label>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-wrapper">
+                <div class="table-container">
+                    <table class="price-table" id="priceTable">
+                        <thead>
+                            <tr>
+                                <th class="col-firma">Firma</th>
+                                <th class="col-price">Sicherheitspersonal (Ã¢â€šÂ¬)</th>
+                                <th class="col-price">Leitungspersonal (Ã¢â€šÂ¬)</th>
+                                <th class="col-percent">Nachtzuschlag (%)</th>
+                                <th class="col-percent">Sonntagszuschlag (%)</th>
+                                <th class="col-percent">Feiertagszuschlag (%)</th>
+                                <th class="col-price">Fahrtkosten (Ã¢â€šÂ¬)</th>
+                                <th class="col-price">Sonstiges (Ã¢â€šÂ¬)</th>
+                                <th class="col-action">Aktion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priceTableBody">
+                            <!-- Wird dynamisch gefüllt -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span class="status-section" id="recordCount">Datensätze: 0</span>
+                <span class="status-section" id="statusText">Bereit</span>
+                <span class="status-section" id="lastUpdate">Letzte Aktualisierung: -</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Script -->
+    <script src="js/sidebar.js"></script>
+
+    <!-- Logic Script -->
+    <script src="logic/frm_Kundenpreise_gueni.logic.js"></script>
+
+    <script>
+        // Close Form Handler
+        function closeForm() {
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ action: 'close' });
+            } else {
+                window.close();
+            }
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            KundenpreiseLogic.init();
+        });
+    </script>
+</body>
+</html>
+
+
+

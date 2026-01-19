@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hauptmenü Sidebar</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 11px; }
+        body { background-color: #6060a0; }
+
+        .menu-wrap {
+            width: 170px;
+            min-height: 100vh;
+            background: #6060a0;
+        }
+
+        .menu-header {
+            background: #000080;
+            color: white;
+            padding: 6px 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            border-bottom: 1px solid #404080;
+        }
+
+        .menu-list {
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .menu-btn {
+            width: 100%;
+            padding: 5px 8px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .menu-btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .menu-btn.active {
+            background: #000080;
+            color: white;
+            font-weight: bold;
+        }
+
+        .menu-btn.disabled {
+            background: #c0c0c0;
+            color: #808080;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            cursor: default;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #404080;
+            margin: 4px 0;
+        }
+    </style>
+    <script src="../js/api-autostart.js"></script>
+    <script>
+        const FORM_MAP = {
+            dienstplanuebersicht: './frm_N_Dienstplanuebersicht.html',
+            planungsuebersicht: './frm_VA_Planungsuebersicht.html',
+            auftragsverwaltung: './frm_va_Auftragstamm.html',
+            mitarbeiterverwaltung: './frm_MA_Mitarbeiterstamm.html',
+            kundenverwaltung: './frm_KD_Kundenstamm.html',
+            schnellauswahl: './frm_MA_VA_Schnellauswahl.html',
+            zeitkonten: '../frm_MA_Zeitkonten.html',
+            abwesenheitsplanung: '../frm_MA_Abwesenheit.html',
+            dienstausweis: '../frm_Ausweis_Create.html',
+            stundenabgleich: '../frm_N_Stundenauswertung.html',
+            offene_mail_anfragen: '../frm_N_Email_versenden.html',
+            excel_zeitkonten: '../frm_MA_Zeitkonten.html',
+            verrechnungssaetze: './frm_KD_Kundenstamm.html',
+            sub_rechnungen: '../frm_N_Lohnabrechnungen.html',
+            email: '../frm_N_Email_versenden.html',
+            menue2: '../frm_Menuefuehrung1.html',
+            htmlansicht: './frm_va_Auftragstamm.html'
+        };
+
+        function inShell() {
+            try { return window.parent && window.parent.ConsysShell; } catch (e) { return false; }
+        }
+
+        function navigate(formId) {
+            const url = FORM_MAP[formId];
+            if (!url) return;
+            if (inShell()) {
+                window.parent.ConsysShell.showForm(formId);
+                return;
+            }
+            const target = new URL(url, window.location.href).href;
+            window.top.location.href = target;
+        }
+
+        async function ensureHtmlApiReady() {
+            if (window.ApiAutostart && typeof window.ApiAutostart.init === 'function') {
+                return window.ApiAutostart.init();
+            }
+            return true;
+        }
+
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.menu-btn');
+            if (!btn || btn.classList.contains('disabled')) return;
+            const formId = btn.dataset.id;
+            if (formId === 'htmlansicht') {
+                const ready = await ensureHtmlApiReady();
+                if (!ready) {
+                    if (window.ApiAutostart?.showStatus) {
+                        window.ApiAutostart.showStatus('API-Server konnte nicht gestartet. Bitte manuellen Start ausführen.', 'error');
+                    } else {
+                        alert('API-Server konnte nicht gestartet. Bitte start_api_server.bat manuell ausführen.');
+                    }
+                    return;
+                }
+            }
+            if (formId) navigate(formId);
+        });
+    </script>
+</head>
+<body>
+    <div class="menu-wrap">
+        <div class="menu-header">HAUPTMENÜ</div>
+        <div class="menu-list">
+            <button class="menu-btn" data-id="dienstplanuebersicht">Dienstplanübersicht</button>
+            <button class="menu-btn" data-id="planungsuebersicht">Planungsübersicht</button>
+            <button class="menu-btn" data-id="auftragsverwaltung">Auftragsverwaltung</button>
+            <button class="menu-btn" data-id="mitarbeiterverwaltung">Mitarbeiterverwaltung</button>
+            <button class="menu-btn" data-id="offene_mail_anfragen">Offene Mail Anfragen</button>
+            <button class="menu-btn" data-id="excel_zeitkonten">Excel Zeitkonten</button>
+            <div class="menu-divider"></div>
+            <button class="menu-btn" data-id="zeitkonten">Zeitkonten</button>
+            <button class="menu-btn" data-id="abwesenheitsplanung">Abwesenheitsplanung</button>
+            <button class="menu-btn" data-id="dienstausweis">Dienstausweis erstellen</button>
+            <button class="menu-btn" data-id="stundenabgleich">Stundenabgleich</button>
+            <div class="menu-divider"></div>
+            <button class="menu-btn" data-id="kundenverwaltung">Kundenverwaltung</button>
+            <button class="menu-btn" data-id="verrechnungssaetze">Verrechnungssätze</button>
+            <button class="menu-btn" data-id="sub_rechnungen">Sub Rechnungen</button>
+            <button class="menu-btn" data-id="email">E-Mail</button>
+            <div class="menu-divider"></div>
+            <button class="menu-btn" data-id="menue2">Menü 2</button>
+            <button class="menu-btn" data-id="htmlansicht">HTML Ansicht</button>
+            <button class="menu-btn disabled">Datenbank wechseln</button>
+        </div>
+    </div>
+</body>
+</html>

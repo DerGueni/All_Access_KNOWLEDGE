@@ -1,0 +1,6 @@
+@echo off
+echo Starte WebView2 Test...
+"C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\WebView2_Access\COM_Wrapper\ConsysWebView2App\bin\Release\ConsysWebView2App.exe" "file:///C:/Users/guenther.siegert/Documents/0006_All_Access_KNOWLEDGE/04_HTML_Forms/forms3/shell.html?form=frm_va_Auftragstamm" --title "Auftragsverwaltung Test" --width 1400 --height 900
+echo.
+echo Fertig. Druecke eine Taste...
+pause

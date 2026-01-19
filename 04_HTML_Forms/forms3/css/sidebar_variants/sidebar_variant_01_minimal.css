@@ -1,0 +1,447 @@
+/**
+ * CONSEC Sidebar - Variante 1: Modern Minimal
+ *
+ * Design-Konzept:
+ * - Schlanke Icon-basierte Navigation
+ * - Collapsed: 60px (nur Icons)
+ * - Expanded: 200px (Icons + Labels)
+ * - Sanfte Hover-Animationen
+ * - Tooltips im collapsed-Zustand
+ * - Moderne Farbpalette mit Graustufen und Akzenten
+ *
+ * Verwendung:
+ * <link rel="stylesheet" href="css/sidebar_variants/sidebar_variant_01_minimal.css">
+ * Klasse .sidebar-collapsed oder .sidebar-expanded auf .sidebar setzen
+ */
+
+/* ============================================
+   CSS VARIABLES - ANPASSBARE DESIGN-TOKENS
+   ============================================ */
+:root {
+    /* Sidebar Dimensionen */
+    --sidebar-width-collapsed: 60px;
+    --sidebar-width-expanded: 200px;
+    --sidebar-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Farben - Moderne Graustufen */
+    --sidebar-bg: #1a1a2e;
+    --sidebar-bg-hover: #16213e;
+    --sidebar-header-bg: #0f0f23;
+    --sidebar-text: #e8e8e8;
+    --sidebar-text-muted: #8b8b9a;
+    --sidebar-accent: #00d9ff;
+    --sidebar-accent-hover: #00b8d9;
+    --sidebar-active-bg: linear-gradient(135deg, #00d9ff22 0%, #00b8d922 100%);
+    --sidebar-border: rgba(255, 255, 255, 0.08);
+    --sidebar-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+
+    /* Button-Sizing */
+    --btn-min-height: 48px;
+    --btn-icon-size: 20px;
+    --btn-border-radius: 8px;
+    --btn-padding: 12px;
+
+    /* Category Header */
+    --category-font-size: 10px;
+    --category-letter-spacing: 1.5px;
+}
+
+/* ============================================
+   SIDEBAR CONTAINER
+   ============================================ */
+.sidebar {
+    width: var(--sidebar-width-expanded);
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border-right: 1px solid var(--sidebar-border);
+    box-shadow: var(--sidebar-shadow);
+    transition: width var(--sidebar-transition);
+    overflow: hidden;
+    position: relative;
+    z-index: 100;
+}
+
+/* Collapsed State */
+.sidebar.sidebar-collapsed {
+    width: var(--sidebar-width-collapsed);
+}
+
+.sidebar.sidebar-collapsed .menu-btn span,
+.sidebar.sidebar-collapsed .category-header {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s, visibility 0.15s;
+}
+
+.sidebar.sidebar-collapsed .menu-btn {
+    justify-content: center;
+    padding: var(--btn-padding);
+}
+
+/* ============================================
+   SIDEBAR HEADER
+   ============================================ */
+.sidebar-header {
+    background: var(--sidebar-header-bg);
+    color: var(--sidebar-accent);
+    padding: 16px;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--sidebar-border);
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar.sidebar-collapsed .sidebar-header {
+    font-size: 10px;
+    letter-spacing: 0;
+    padding: 16px 8px;
+}
+
+/* ============================================
+   TOGGLE BUTTON
+   ============================================ */
+.sidebar-toggle {
+    position: absolute;
+    top: 12px;
+    right: -14px;
+    width: 28px;
+    height: 28px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sidebar-text);
+    font-size: 12px;
+    transition: all 0.2s ease;
+    z-index: 101;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-toggle:hover {
+    background: var(--sidebar-accent);
+    color: var(--sidebar-bg);
+    transform: scale(1.1);
+}
+
+.sidebar-toggle::before {
+    content: '\2039'; /* Left angle bracket */
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.sidebar.sidebar-collapsed .sidebar-toggle::before {
+    content: '\203A'; /* Right angle bracket */
+}
+
+/* ============================================
+   MENU CATEGORIES CONTAINER
+   ============================================ */
+.menu-categories {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px;
+    gap: 4px;
+
+    /* Scrollbar Styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--sidebar-text-muted) transparent;
+}
+
+.menu-categories::-webkit-scrollbar {
+    width: 4px;
+}
+
+.menu-categories::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.menu-categories::-webkit-scrollbar-thumb {
+    background: var(--sidebar-text-muted);
+    border-radius: 4px;
+}
+
+/* ============================================
+   CATEGORY BLOCK
+   ============================================ */
+.category-block {
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.category-block:last-child {
+    margin-bottom: 0;
+}
+
+/* ============================================
+   CATEGORY HEADER
+   ============================================ */
+.category-header {
+    color: var(--sidebar-text-muted);
+    padding: 8px 12px 6px;
+    font-size: var(--category-font-size);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--category-letter-spacing);
+    background: transparent;
+    border: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity var(--sidebar-transition);
+}
+
+.sidebar.sidebar-collapsed .category-header {
+    height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* ============================================
+   MENU BUTTONS
+   ============================================ */
+.menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    padding: var(--btn-padding) 12px;
+    min-height: var(--btn-min-height);
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--sidebar-text);
+    font-weight: 500;
+    border: none;
+    border-radius: var(--btn-border-radius);
+    width: 100%;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Icon Placeholder (::before) */
+.menu-btn::before {
+    content: '';
+    width: var(--btn-icon-size);
+    height: var(--btn-icon-size);
+    min-width: var(--btn-icon-size);
+    background: var(--sidebar-text-muted);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    /* Icon Mask - Standard Icon */
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3C/svg%3E");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3C/svg%3E");
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+}
+
+/* Specific Icons per Button */
+.menu-btn[data-form*="Dienstplan"]::before,
+.menu-btn[data-form*="Planung"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Auftrag"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Mitarbeiter"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Kunden"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M3 21h18'/%3E%3Cpath d='M9 8h1'/%3E%3Cpath d='M9 12h1'/%3E%3Cpath d='M9 16h1'/%3E%3Cpath d='M14 8h1'/%3E%3Cpath d='M14 12h1'/%3E%3Cpath d='M14 16h1'/%3E%3Cpath d='M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M3 21h18'/%3E%3Cpath d='M9 8h1'/%3E%3Cpath d='M9 12h1'/%3E%3Cpath d='M9 16h1'/%3E%3Cpath d='M14 8h1'/%3E%3Cpath d='M14 12h1'/%3E%3Cpath d='M14 16h1'/%3E%3Cpath d='M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Objekt"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Zeitkont"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Abwesenheit"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2'/%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Ccircle cx='12' cy='10' r='2'/%3E%3Cline x1='8' y1='2' x2='8' y2='4'/%3E%3Cline x1='16' y1='2' x2='16' y2='4'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2'/%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Ccircle cx='12' cy='10' r='2'/%3E%3Cline x1='8' y1='2' x2='8' y2='4'/%3E%3Cline x1='16' y1='2' x2='16' y2='4'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-action*="Excel"]::before,
+.menu-btn[data-action*="liste"]::before,
+.menu-btn[data-action*="Stunden"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-action*="sync"]::before,
+.menu-btn[data-action*="Anlegen"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolyline points='23 4 23 10 17 10'/%3E%3Cpolyline points='1 20 1 14 7 14'/%3E%3Cpath d='M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolyline points='23 4 23 10 17 10'/%3E%3Cpolyline points='1 20 1 14 7 14'/%3E%3Cpath d='M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Lohnart"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cline x1='12' y1='1' x2='12' y2='23'/%3E%3Cpath d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cline x1='12' y1='1' x2='12' y2='23'/%3E%3Cpath d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Vorlagen"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Cline x1='3' y1='9' x2='21' y2='9'/%3E%3Cline x1='9' y1='21' x2='9' y2='9'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Cline x1='3' y1='9' x2='21' y2='9'/%3E%3Cline x1='9' y1='21' x2='9' y2='9'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-form*="Lex"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E");
+}
+
+.menu-btn[data-action*="Einsatz"]::before {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+
+/* Hover State */
+.menu-btn:hover {
+    background: var(--sidebar-bg-hover);
+}
+
+.menu-btn:hover::before {
+    background: var(--sidebar-accent);
+}
+
+/* Active State */
+.menu-btn:active {
+    transform: scale(0.98);
+}
+
+/* Selected/Current State */
+.menu-btn.active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-accent);
+}
+
+.menu-btn.active::before {
+    background: var(--sidebar-accent);
+}
+
+.menu-btn.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--sidebar-accent);
+    border-radius: 0 2px 2px 0;
+}
+
+/* ============================================
+   TOOLTIP (Collapsed State)
+   ============================================ */
+.sidebar.sidebar-collapsed .menu-btn {
+    position: relative;
+}
+
+.sidebar.sidebar-collapsed .menu-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--sidebar-header-bg);
+    color: var(--sidebar-text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--sidebar-border);
+    animation: tooltipFadeIn 0.15s ease;
+}
+
+.sidebar.sidebar-collapsed .menu-btn[title]:hover::before {
+    /* Override icon with tooltip arrow */
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+/* ============================================
+   RESPONSIVE - BUTTONS GLEICHMÄSSIG VERTEILEN
+   ============================================ */
+@media (min-height: 700px) {
+    .menu-categories {
+        justify-content: space-evenly;
+    }
+
+    .category-block {
+        margin-bottom: 0;
+    }
+}
+
+/* ============================================
+   LOADING OVERLAY ANPASSUNG
+   ============================================ */
+.loading-overlay {
+    left: var(--sidebar-width-expanded);
+    width: calc(100% - var(--sidebar-width-expanded));
+    transition: left var(--sidebar-transition), width var(--sidebar-transition);
+}
+
+.sidebar.sidebar-collapsed ~ .content-container .loading-overlay,
+.sidebar.sidebar-collapsed + .content-container .loading-overlay {
+    left: var(--sidebar-width-collapsed);
+    width: calc(100% - var(--sidebar-width-collapsed));
+}
+
+/* ============================================
+   OPTIONAL: AUTO-EXPAND ON HOVER
+   ============================================ */
+.sidebar.sidebar-auto-expand.sidebar-collapsed:hover {
+    width: var(--sidebar-width-expanded);
+}
+
+.sidebar.sidebar-auto-expand.sidebar-collapsed:hover .menu-btn span,
+.sidebar.sidebar-auto-expand.sidebar-collapsed:hover .category-header {
+    opacity: 1;
+    visibility: visible;
+}

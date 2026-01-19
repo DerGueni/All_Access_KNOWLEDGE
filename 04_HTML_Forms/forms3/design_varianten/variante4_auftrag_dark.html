@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung - Dark Mode</title>
+    <style>
+        /* ===== DESIGN VARIANTE 4: DARK MODE + ANIMATIONEN ===== */
+
+        /* CSS Custom Properties - Theme Variables */
+        :root {
+            /* Dark Theme (Default) */
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-tertiary: #0f3460;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --bg-input: rgba(255, 255, 255, 0.08);
+            --bg-hover: rgba(255, 255, 255, 0.1);
+
+            --accent-primary: #e94560;
+            --accent-secondary: #0f9b8e;
+            --accent-tertiary: #f39c12;
+            --accent-glow: rgba(233, 69, 96, 0.5);
+
+            --text-primary: #eee;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-glow: rgba(233, 69, 96, 0.3);
+
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 30px var(--accent-glow);
+
+            --transition-fast: 0.2s ease;
+            --transition-medium: 0.3s ease;
+            --transition-slow: 0.5s ease;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        /* Light Theme Override */
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8e8;
+            --bg-card: rgba(0, 0, 0, 0.03);
+            --bg-input: rgba(0, 0, 0, 0.05);
+            --bg-hover: rgba(0, 0, 0, 0.08);
+
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a5a;
+            --text-muted: #8a8a9a;
+
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Reset & Base */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background var(--transition-medium), color var(--transition-medium);
+        }
+
+        /* ===== GLASSMORPHISM CARDS ===== */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            transition: all var(--transition-medium);
+        }
+
+        .glass-card:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px var(--accent-glow); }
+            50% { box-shadow: 0 0 25px var(--accent-glow); }
+        }
+
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: var(--bg-input);
+            border-radius: 15px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-medium);
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+            transition: transform var(--transition-medium);
+            box-shadow: 0 2px 10px var(--accent-glow);
+        }
+
+        [data-theme="light"] .theme-toggle::before {
+            transform: translateX(30px);
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+        }
+
+        .theme-toggle-icons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+            padding: 0 8px;
+            font-size: 12px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            padding: 20px 30px;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-section {
+            padding: 15px;
+        }
+
+        .nav-section h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            color: var(--text-secondary);
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* ===== CONTENT AREA ===== */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ===== TOOLBAR ===== */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== GLOW BUTTONS ===== */
+        .glow-button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--accent-primary), #c73a52);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-fast);
+            box-shadow: 0 0 15px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .glow-button:hover::before {
+            left: 100%;
+        }
+
+        .glow-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .glow-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .glow-button.secondary {
+            background: var(--bg-input);
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .glow-button.secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .glow-button.success {
+            background: linear-gradient(135deg, var(--accent-secondary), #0a7a70);
+            box-shadow: 0 0 15px rgba(15, 155, 142, 0.5);
+        }
+
+        /* ===== FORM SECTION ===== */
+        .form-section {
+            padding: 25px;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: var(--accent-primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            animation: badge-pulse 2s infinite;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== INPUT STYLES ===== */
+        .form-input {
+            padding: 12px 15px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            background: var(--bg-hover);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Input Focus Animation */
+        .form-group.focused label {
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        /* ===== DATA TABLE ===== */
+        .data-table-container {
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 15px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 15px;
+            background: var(--bg-card);
+            border: 1px solid transparent;
+            transition: all var(--transition-fast);
+        }
+
+        .data-table tr td:first-child {
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .data-table tr td:last-child {
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        .data-table tbody tr:hover td {
+            background: var(--bg-hover);
+            border-color: var(--border-glow);
+        }
+
+        .data-table tbody tr {
+            cursor: pointer;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            background: rgba(15, 155, 142, 0.2);
+            color: var(--accent-secondary);
+        }
+
+        .status-badge.pending {
+            background: rgba(243, 156, 18, 0.2);
+            color: var(--accent-tertiary);
+        }
+
+        .status-badge.completed {
+            background: rgba(233, 69, 96, 0.2);
+            color: var(--accent-primary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: status-pulse 1.5s infinite;
+        }
+
+        @keyframes status-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        /* ===== SKELETON LOADING ===== */
+        .skeleton {
+            background: linear-gradient(90deg,
+                var(--bg-input) 25%,
+                var(--bg-hover) 50%,
+                var(--bg-input) 75%);
+            background-size: 200px 100%;
+            animation: skeleton-shimmer 1.5s infinite linear;
+            border-radius: var(--radius-sm);
+        }
+
+        @keyframes skeleton-shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        .skeleton-text {
+            height: 16px;
+            width: 100%;
+        }
+
+        .skeleton-text.short {
+            width: 60%;
+        }
+
+        .skeleton-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .skeleton-row {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            align-items: center;
+        }
+
+        .skeleton-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--bg-input);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spinner-rotate 1s linear infinite;
+        }
+
+        @keyframes spinner-rotate {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 40px;
+        }
+
+        .spinner-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            animation: fade-pulse 1.5s infinite;
+        }
+
+        @keyframes fade-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== SUCCESS ANIMATION ===== */
+        .success-check {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-secondary), #0a7a70);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            animation: success-pop 0.5s ease-out;
+            box-shadow: 0 0 30px rgba(15, 155, 142, 0.5);
+        }
+
+        @keyframes success-pop {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        .success-check svg {
+            animation: check-draw 0.3s ease-out 0.2s both;
+        }
+
+        @keyframes check-draw {
+            0% { stroke-dashoffset: 50; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        /* ===== MICRO INTERACTIONS ===== */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* ===== TOAST NOTIFICATIONS ===== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .toast {
+            padding: 15px 20px;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toast-slide-in 0.3s ease-out;
+            box-shadow: var(--shadow-soft);
+        }
+
+        @keyframes toast-slide-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--accent-secondary);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--accent-tertiary);
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-input);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            animation: progress-glow 2s infinite;
+        }
+
+        @keyframes progress-glow {
+            0%, 100% { box-shadow: 0 0 5px var(--accent-glow); }
+            50% { box-shadow: 0 0 15px var(--accent-glow); }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 15px 30px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .footer-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-value {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-title">
+            <div class="header-icon">&#128188;</div>
+            <h1>Auftragsverwaltung</h1>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln">
+                <div class="theme-toggle-icons">
+                    <span>&#127769;</span>
+                    <span>&#9728;</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="glass-card nav-section">
+                <h3>Navigation</h3>
+                <div class="nav-item active">
+                    <span class="nav-icon">&#128196;</span>
+                    <span>Auftragsübersicht</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">&#10133;</span>
+                    <span>Neuer Auftrag</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">&#128197;</span>
+                    <span>Kalender</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">&#128200;</span>
+                    <span>Statistiken</span>
+                </div>
+            </div>
+
+            <div class="glass-card nav-section">
+                <h3>Filter</h3>
+                <div class="nav-item">
+                    <span class="nav-icon">&#9989;</span>
+                    <span>Aktive Aufträge</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">&#9203;</span>
+                    <span>In Bearbeitung</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">&#10004;</span>
+                    <span>Abgeschlossen</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <div class="content-area">
+            <!-- Toolbar -->
+            <div class="glass-card toolbar">
+                <button class="glow-button ripple" onclick="showSuccessAnimation()">
+                    <span>&#10133;</span> Neuer Auftrag
+                </button>
+                <button class="glow-button secondary ripple">
+                    <span>&#128269;</span> Suchen
+                </button>
+                <button class="glow-button secondary ripple">
+                    <span>&#128438;</span> Exportieren
+                </button>
+                <button class="glow-button success ripple" onclick="showToast('success', 'Daten gespeichert!')">
+                    <span>&#128190;</span> Speichern
+                </button>
+            </div>
+
+            <!-- Form Section -->
+            <div class="glass-card form-section">
+                <div class="form-header">
+                    <h2>
+                        <span>&#128221;</span>
+                        Auftragsdetails
+                        <span class="badge">NEU</span>
+                    </h2>
+                    <div class="progress-bar" style="width: 200px;">
+                        <div class="progress-fill" style="width: 65%;"></div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Auftragsnummer</label>
+                        <input type="text" class="form-input" placeholder="VA-2026-0001" value="VA-2026-0042">
+                    </div>
+                    <div class="form-group">
+                        <label>Kunde</label>
+                        <select class="form-input">
+                            <option>Messe München GmbH</option>
+                            <option>NürnbergMesse</option>
+                            <option>Messe Frankfurt</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Veranstaltung</label>
+                        <input type="text" class="form-input" placeholder="Bezeichnung" value="CONSEC Security Summit 2026">
+                    </div>
+                    <div class="form-group">
+                        <label>Datum</label>
+                        <input type="date" class="form-input" value="2026-03-15">
+                    </div>
+                    <div class="form-group">
+                        <label>Objekt</label>
+                        <input type="text" class="form-input" placeholder="Einsatzort" value="Halle 4, ICM München">
+                    </div>
+                    <div class="form-group">
+                        <label>Mitarbeiter benötigt</label>
+                        <input type="number" class="form-input" value="25">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table with Loading States -->
+            <div class="glass-card data-table-container">
+                <div class="form-header" style="padding: 0 0 15px 0; margin-bottom: 15px;">
+                    <h2><span>&#128203;</span> Letzte Aufträge</h2>
+                    <button class="glow-button secondary" onclick="toggleLoading()">
+                        &#8635; Aktualisieren
+                    </button>
+                </div>
+
+                <div id="tableContent">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Auftrag</th>
+                                <th>Kunde</th>
+                                <th>Datum</th>
+                                <th>MA</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>VA-2026-0041</strong></td>
+                                <td>Messe München GmbH</td>
+                                <td>12.03.2026</td>
+                                <td>18</td>
+                                <td><span class="status-badge active"><span class="status-dot"></span> Aktiv</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>VA-2026-0040</strong></td>
+                                <td>NürnbergMesse</td>
+                                <td>08.03.2026</td>
+                                <td>32</td>
+                                <td><span class="status-badge pending"><span class="status-dot"></span> In Bearbeitung</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>VA-2026-0039</strong></td>
+                                <td>Messe Frankfurt</td>
+                                <td>01.03.2026</td>
+                                <td>45</td>
+                                <td><span class="status-badge completed"><span class="status-dot"></span> Abgeschlossen</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Skeleton Loading State (hidden by default) -->
+                <div id="skeletonContent" style="display: none;">
+                    <div class="skeleton-row">
+                        <div class="skeleton skeleton-avatar"></div>
+                        <div class="skeleton-content">
+                            <div class="skeleton skeleton-text"></div>
+                            <div class="skeleton skeleton-text short"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-row">
+                        <div class="skeleton skeleton-avatar"></div>
+                        <div class="skeleton-content">
+                            <div class="skeleton skeleton-text"></div>
+                            <div class="skeleton skeleton-text short"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-row">
+                        <div class="skeleton skeleton-avatar"></div>
+                        <div class="skeleton-content">
+                            <div class="skeleton skeleton-text"></div>
+                            <div class="skeleton skeleton-text short"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-stats">
+            <div class="stat-item">
+                <span>&#128203;</span>
+                <span>Aufträge: <span class="stat-value">127</span></span>
+            </div>
+            <div class="stat-item">
+                <span>&#128100;</span>
+                <span>MA verfügbar: <span class="stat-value">84</span></span>
+            </div>
+            <div class="stat-item">
+                <span>&#9989;</span>
+                <span>Aktiv: <span class="stat-value">23</span></span>
+            </div>
+        </div>
+        <div>CONSEC Dark Mode v4.0 | Design Variante 4</div>
+    </footer>
+
+    <!-- Success Modal (hidden) -->
+    <div id="successModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="glass-card" style="padding: 40px; text-align: center;">
+            <div class="success-check">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="stroke-dasharray: 50; stroke-dashoffset: 0;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h3 style="margin-top: 20px; color: var(--text-primary);">Erfolgreich!</h3>
+            <p style="color: var(--text-secondary); margin-top: 10px;">Der Vorgang wurde abgeschlossen.</p>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle with localStorage
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            showToast('info', `${newTheme === 'dark' ? 'Dark' : 'Light'} Mode aktiviert`);
+        }
+
+        // Load saved theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+
+        // Toast Notifications
+        function showToast(type, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = { success: '&#10004;', error: '&#10008;', info: '&#8505;' };
+            toast.innerHTML = `<span>${icons[type]}</span><span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'toast-slide-in 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Loading State Toggle
+        function toggleLoading() {
+            const table = document.getElementById('tableContent');
+            const skeleton = document.getElementById('skeletonContent');
+
+            table.style.display = 'none';
+            skeleton.style.display = 'block';
+
+            setTimeout(() => {
+                skeleton.style.display = 'none';
+                table.style.display = 'block';
+                showToast('success', 'Daten aktualisiert');
+            }, 2000);
+        }
+
+        // Success Animation
+        function showSuccessAnimation() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'flex';
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 2000);
+        }
+
+        // Input Focus Animation
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.closest('.form-group')?.classList.add('focused');
+            });
+            input.addEventListener('blur', () => {
+                input.closest('.form-group')?.classList.remove('focused');
+            });
+        });
+    </script>
+</body>
+</html>

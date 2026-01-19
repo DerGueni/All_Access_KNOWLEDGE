@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Header - Test & Beispiele</title>
+    <link rel="stylesheet" href="../css/unified-header.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .test-section {
+            background-color: white;
+            margin-bottom: 30px;
+            border: 2px solid #d0d0d0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .test-info {
+            padding: 15px;
+            background-color: #e8e8e8;
+            border-bottom: 1px solid #d0d0d0;
+        }
+
+        .test-info h2 {
+            font-size: 18px;
+            margin: 0 0 8px 0;
+            color: #000080;
+        }
+
+        .test-info p {
+            font-size: 12px;
+            margin: 0;
+            color: #404040;
+        }
+
+        .test-code {
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-top: 1px solid #d0d0d0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #404040;
+            overflow-x: auto;
+        }
+
+        .test-code pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(to right, #000080, #0000c0);
+            color: white;
+            border-radius: 5px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            margin: 0 0 10px 0;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .test-result {
+            padding: 10px 15px;
+            background-color: #90e090;
+            border-top: 1px solid #60b060;
+            font-size: 12px;
+            text-align: center;
+            color: #006000;
+            font-weight: bold;
+        }
+
+        /* Dummy Content Area */
+        .content-area {
+            padding: 20px;
+            background-color: #ffffff;
+            min-height: 200px;
+            border-top: 2px solid #808080;
+        }
+
+        .content-area p {
+            font-size: 12px;
+            color: #404040;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-header">
+        <h1>Unified Header Design - Test & Beispiele</h1>
+        <p>Alle Varianten des einheitlichen Header-Systems für CONSYS HTML-Formulare</p>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 1: STANDARD-HEADER
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>1. Standard-Header (70px)</h2>
+            <p>Häufigste Verwendung: Stammdaten-Formulare (Aufträge, Mitarbeiter, Kunden, Objekte)</p>
+        </div>
+
+        <div class="form-header-unified">
+            <h1 class="form-title-unified">Auftragsverwaltung</h1>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh" onclick="alert('Aktualisieren geklickt!')">Aktualisieren</button>
+                <button class="form-btn form-btn-new" onclick="alert('Neu geklickt!')">Neu</button>
+                <button class="form-btn form-btn-copy" onclick="alert('Kopieren geklickt!')">Kopieren</button>
+                <button class="form-btn form-btn-delete" onclick="alert('Löschen geklickt!')">Löschen</button>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;div class="form-header-unified"&gt;
+    &lt;h1 class="form-title-unified"&gt;Auftragsverwaltung&lt;/h1&gt;
+    &lt;div class="form-header-controls-unified"&gt;
+        &lt;button class="form-btn form-btn-refresh"&gt;Aktualisieren&lt;/button&gt;
+        &lt;button class="form-btn form-btn-new"&gt;Neu&lt;/button&gt;
+        &lt;button class="form-btn form-btn-copy"&gt;Kopieren&lt;/button&gt;
+        &lt;button class="form-btn form-btn-delete"&gt;Löschen&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 2: HEADER MIT STATUS-BADGE
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>2. Header mit Status-Badge</h2>
+            <p>Für Formulare mit Status-Anzeige (z.B. Aktiv/Inaktiv bei Mitarbeitern)</p>
+        </div>
+
+        <div class="form-header-unified">
+            <h1 class="form-title-unified">Mitarbeiterstamm</h1>
+            <div class="form-header-status">
+                <span class="form-status-badge active">Aktiv</span>
+                <span class="form-status-badge">ID: 12345</span>
+            </div>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+                <button class="form-btn form-btn-new">Neu</button>
+                <button class="form-btn form-btn-delete">Löschen</button>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;div class="form-header-unified"&gt;
+    &lt;h1 class="form-title-unified"&gt;Mitarbeiterstamm&lt;/h1&gt;
+    &lt;div class="form-header-status"&gt;
+        &lt;span class="form-status-badge active"&gt;Aktiv&lt;/span&gt;
+        &lt;span class="form-status-badge"&gt;ID: 12345&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="form-header-controls-unified"&gt;
+        &lt;button class="form-btn form-btn-refresh"&gt;Aktualisieren&lt;/button&gt;
+        &lt;button class="form-btn form-btn-new"&gt;Neu&lt;/button&gt;
+        &lt;button class="form-btn form-btn-delete"&gt;Löschen&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 3: EXTENDED HEADER MIT FILTER
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>3. Extended Header mit Filter (90px)</h2>
+            <p>Für Formulare mit Such-/Filteroptionen (z.B. Dienstplan, Einsatzübersicht)</p>
+        </div>
+
+        <div class="form-header-unified extended">
+            <h1 class="form-title-unified">Dienstplan Mitarbeiter</h1>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+            </div>
+            <div class="form-header-filters">
+                <label class="form-filter-label">Von:</label>
+                <input type="date" class="form-filter-input" value="2026-01-15">
+                <label class="form-filter-label">Bis:</label>
+                <input type="date" class="form-filter-input" value="2026-01-31">
+                <label class="form-filter-label">Mitarbeiter:</label>
+                <select class="form-filter-select">
+                    <option>Alle Mitarbeiter</option>
+                    <option>Müller, Hans</option>
+                    <option>Schmidt, Anna</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;div class="form-header-unified extended"&gt;
+    &lt;h1 class="form-title-unified"&gt;Dienstplan Mitarbeiter&lt;/h1&gt;
+    &lt;div class="form-header-controls-unified"&gt;
+        &lt;button class="form-btn form-btn-refresh"&gt;Aktualisieren&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="form-header-filters"&gt;
+        &lt;label class="form-filter-label"&gt;Von:&lt;/label&gt;
+        &lt;input type="date" class="form-filter-input"&gt;
+        &lt;label class="form-filter-label"&gt;Bis:&lt;/label&gt;
+        &lt;input type="date" class="form-filter-input"&gt;
+        &lt;label class="form-filter-label"&gt;Mitarbeiter:&lt;/label&gt;
+        &lt;select class="form-filter-select"&gt;...&lt;/select&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 4: COMPACT HEADER
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>4. Compact Header (60px)</h2>
+            <p>Für Subformulare oder Dialoge mit begrenztem Platz</p>
+        </div>
+
+        <div class="form-header-unified compact">
+            <h1 class="form-title-unified">Unterformular - Details</h1>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-save">Speichern</button>
+                <button class="form-btn form-btn-close">Schließen</button>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;div class="form-header-unified compact"&gt;
+    &lt;h1 class="form-title-unified"&gt;Unterformular - Details&lt;/h1&gt;
+    &lt;div class="form-header-controls-unified"&gt;
+        &lt;button class="form-btn form-btn-save"&gt;Speichern&lt;/button&gt;
+        &lt;button class="form-btn form-btn-close"&gt;Schließen&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 5: READONLY HEADER
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>5. Readonly Header (nur Ansicht)</h2>
+            <p>Für Berichte und Statistiken ohne Bearbeitungsmöglichkeit</p>
+        </div>
+
+        <div class="form-header-unified readonly">
+            <h1 class="form-title-unified">Stundenauswertung</h1>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+                <button class="form-btn form-btn-close">Schließen</button>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;div class="form-header-unified readonly"&gt;
+    &lt;h1 class="form-title-unified"&gt;Stundenauswertung&lt;/h1&gt;
+    &lt;div class="form-header-controls-unified"&gt;
+        &lt;button class="form-btn form-btn-refresh"&gt;Aktualisieren&lt;/button&gt;
+        &lt;button class="form-btn form-btn-close"&gt;Schließen&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 6: MINIMAL HEADER
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>6. Minimal Header (nur Aktualisieren)</h2>
+            <p>Für einfache Übersichten und Dashboards</p>
+        </div>
+
+        <div class="form-header-unified minimal">
+            <h1 class="form-title-unified">Übersicht - Dashboard</h1>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;div class="form-header-unified minimal"&gt;
+    &lt;h1 class="form-title-unified"&gt;Übersicht - Dashboard&lt;/h1&gt;
+    &lt;div class="form-header-controls-unified"&gt;
+        &lt;button class="form-btn form-btn-refresh"&gt;Aktualisieren&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 7: TITEL MIT ICON
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>7. Titel mit Icon</h2>
+            <p>Visuelles Icon neben dem Titel für schnelle Wiedererkennung</p>
+        </div>
+
+        <div class="form-header-unified">
+            <h1 class="form-title-unified with-icon">
+                <div class="title-icon">VA</div>
+                Auftragsverwaltung
+            </h1>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+                <button class="form-btn form-btn-new">Neu</button>
+                <button class="form-btn form-btn-delete">Löschen</button>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;h1 class="form-title-unified with-icon"&gt;
+    &lt;div class="title-icon"&gt;VA&lt;/div&gt;
+    Auftragsverwaltung
+&lt;/h1&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 8: TITEL MIT UNTERTITEL
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>8. Titel mit Untertitel</h2>
+            <p>Zusätzliche Informationen unter dem Haupttitel</p>
+        </div>
+
+        <div class="form-header-unified">
+            <h1 class="form-title-unified with-subtitle">
+                Kundenstamm
+                <span class="subtitle">Aktive Kunden: 234 | Gesamt: 567</span>
+            </h1>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+                <button class="form-btn form-btn-new">Neu</button>
+                <button class="form-btn form-btn-delete">Löschen</button>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;h1 class="form-title-unified with-subtitle"&gt;
+    Kundenstamm
+    &lt;span class="subtitle"&gt;Aktive Kunden: 234 | Gesamt: 567&lt;/span&gt;
+&lt;/h1&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 9: ALLE BUTTON-VARIANTEN
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>9. Alle Button-Varianten</h2>
+            <p>Übersicht aller verfügbaren Button-Styles</p>
+        </div>
+
+        <div class="form-header-unified">
+            <h1 class="form-title-unified">Button-Übersicht</h1>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+                <button class="form-btn form-btn-new">Neu</button>
+                <button class="form-btn form-btn-copy">Kopieren</button>
+                <button class="form-btn form-btn-save">Speichern</button>
+                <button class="form-btn form-btn-delete">Löschen</button>
+                <button class="form-btn form-btn-close">Schließen</button>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;button class="form-btn form-btn-refresh"&gt;Aktualisieren&lt;/button&gt;  &lt;!-- Blau-Grün --&gt;
+&lt;button class="form-btn form-btn-new"&gt;Neu&lt;/button&gt;              &lt;!-- Grün --&gt;
+&lt;button class="form-btn form-btn-copy"&gt;Kopieren&lt;/button&gt;        &lt;!-- Gelb --&gt;
+&lt;button class="form-btn form-btn-save"&gt;Speichern&lt;/button&gt;       &lt;!-- Blau (primär) --&gt;
+&lt;button class="form-btn form-btn-delete"&gt;Löschen&lt;/button&gt;       &lt;!-- Rot --&gt;
+&lt;button class="form-btn form-btn-close"&gt;Schließen&lt;/button&gt;      &lt;!-- Grau --&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 10: STATUS-BADGES
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>10. Status-Badge Varianten</h2>
+            <p>Verschiedene Status-Anzeigen (Aktiv, Inaktiv, Ausstehend)</p>
+        </div>
+
+        <div class="form-header-unified">
+            <h1 class="form-title-unified">Status-Beispiele</h1>
+            <div class="form-header-status">
+                <span class="form-status-badge active">Aktiv</span>
+                <span class="form-status-badge inactive">Inaktiv</span>
+                <span class="form-status-badge pending">Ausstehend</span>
+                <span class="form-status-badge">Neutral</span>
+            </div>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+            </div>
+        </div>
+
+        <div class="test-code">
+            <pre>&lt;span class="form-status-badge active"&gt;Aktiv&lt;/span&gt;         &lt;!-- Grün --&gt;
+&lt;span class="form-status-badge inactive"&gt;Inaktiv&lt;/span&gt;     &lt;!-- Rot --&gt;
+&lt;span class="form-status-badge pending"&gt;Ausstehend&lt;/span&gt;   &lt;!-- Gelb --&gt;
+&lt;span class="form-status-badge"&gt;Neutral&lt;/span&gt;             &lt;!-- Weiß --&gt;</pre>
+        </div>
+    </div>
+
+    <!-- ========================================
+         BEISPIEL 11: VOLLSTÄNDIGES FORMULAR
+         ======================================== -->
+    <div class="test-section">
+        <div class="test-info">
+            <h2>11. Vollständiges Formular-Beispiel</h2>
+            <p>Header mit Content-Bereich darunter (wie in echten Formularen)</p>
+        </div>
+
+        <div class="form-header-unified">
+            <h1 class="form-title-unified">Objektverwaltung</h1>
+            <div class="form-header-status">
+                <span class="form-status-badge active">Aktiv</span>
+            </div>
+            <div class="form-header-controls-unified">
+                <button class="form-btn form-btn-refresh">Aktualisieren</button>
+                <button class="form-btn form-btn-new">Neu</button>
+                <button class="form-btn form-btn-delete">Löschen</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <p><strong>Formular-Inhalt:</strong> Hier befinden sich die eigentlichen Formularfelder, Tabellen, etc.</p>
+            <p>Der Header bleibt immer am oberen Rand fixiert und trennt sich visuell vom Content-Bereich durch die 2px graue Border.</p>
+        </div>
+
+        <div class="test-result">
+            ✓ Header erfolgreich integriert und funktionsfähig
+        </div>
+    </div>
+
+    <script>
+        console.log('Unified Header Test geladen');
+        console.log('Alle Buttons sind klickbar und zeigen Alerts');
+
+        // Event Listener für alle Buttons
+        document.querySelectorAll('.form-btn').forEach(btn => {
+            if (!btn.onclick) {
+                btn.onclick = () => {
+                    alert('Button "' + btn.textContent.trim() + '" wurde geklickt!');
+                };
+            }
+        });
+    </script>
+
+</body>
+</html>

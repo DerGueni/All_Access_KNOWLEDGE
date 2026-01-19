@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplanuebersicht - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_N_Dienstplanuebersicht.css">
+</head>
+<body>
+    <div class="dp-container no-menu">
+        <!-- Hauptbereich (ohne Menu - wird aus Access geoeffnet) -->
+        <main class="dp-main">
+            <!-- Header -->
+            <header class="dp-header">
+                <div class="header-left">
+                    <div class="dp-logo"></div>
+                    <h1 class="dp-title">Dienstplanuebersicht</h1>
+                </div>
+                <div class="header-center">
+                    <div class="date-nav-group">
+                        <input type="text" id="datStartdatum" class="dp-date-input" value="18.12.2025">
+                        <button class="dp-btn" id="btnStartdatumAendern">Startdatum Aendern</button>
+                    </div>
+                    <button class="dp-btn-nav" id="btnVorwoche">&#9664;</button>
+                    <button class="dp-btn-nav" id="btnNachwoche">&#9654;</button>
+                    <button class="dp-btn" id="btnAbHeute">Ab Heute</button>
+                    <select id="cboMitarbeiterTyp" class="dp-select">
+                        <option value="alle">Alle Mitarbeiter</option>
+                        <option value="fest" selected>Festangestellte</option>
+                        <option value="aushilfe">Aushilfen</option>
+                        <option value="sub">Subunternehmer</option>
+                    </select>
+                </div>
+                <div class="header-right">
+                    <div class="header-buttons">
+                        <div class="senden-group">
+                            <button class="dp-btn" id="btnDienstplaeneSenden">Dienstplaene senden<br>bis</button>
+                            <input type="text" id="datSendenBis" class="dp-date-input" value="27.12.2025">
+                        </div>
+                        <button class="dp-btn" id="btnEinzeldienstplaene">Einzeldienstplaene</button>
+                    </div>
+                    <div class="header-buttons">
+                        <button class="dp-btn" id="btnUebersichtDrucken">Uebersicht drucken</button>
+                    </div>
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V1.55</span>
+                        <span id="lblDatum">05.04.2015</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dienstplan Tabelle -->
+            <div class="dp-table-container">
+                <table class="dp-table" id="tblDienstplan">
+                    <thead>
+                        <tr class="dp-header-row">
+                            <th class="col-ma" rowspan="2">
+                                <div class="th-content cyan">Mitarbeiter</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag1">
+                                <div class="th-content">Do. 18.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag2">
+                                <div class="th-content">Fr. 19.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag3">
+                                <div class="th-content">Sa. 20.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag4">
+                                <div class="th-content">So. 21.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag5">
+                                <div class="th-content">Mo. 22.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag6">
+                                <div class="th-content">Di. 23.12.25</div>
+                            </th>
+                            <th class="col-day" colspan="3" id="thTag7">
+                                <div class="th-content">Mi. 24.12.25</div>
+                            </th>
+                            <th class="col-sum" rowspan="2">
+                                <div class="th-content">Stunden</div>
+                            </th>
+                        </tr>
+                        <tr class="dp-subheader-row">
+                            <th class="sub-col">Auftrag</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Auftrag</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Auftrag</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Auftrag</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Auftrag</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Auftrag</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                            <th class="sub-col">Auftrag</th><th class="sub-col">von</th><th class="sub-col">bis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyDienstplan">
+                        <!-- Beispieldaten nach Screenshot -->
+                        <tr class="dp-row">
+                            <td class="col-ma">Alali Ahmad</td>
+                            <td class="einsatz highlight-cyan">NERVY, Nuernberg</td>
+                            <td class="zeit highlight-cyan">12:00</td>
+                            <td class="zeit highlight-cyan">23:30</td>
+                            <td class="einsatz"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="einsatz highlight-yellow">HC Erlangen - MT Melsun</td>
+                            <td class="zeit highlight-yellow">15:30</td>
+                            <td class="zeit highlight-yellow">20:30</td>
+                            <td class="einsatz highlight-yellow">1. Fc Nuernberg - Hanno</td>
+                            <td class="zeit highlight-yellow">11:15</td>
+                            <td class="zeit highlight-yellow">16:00</td>
+                            <td class="einsatz">Doro, Nuernberg</td>
+                            <td class="zeit">17:30</td>
+                            <td class="zeit">23:30</td>
+                            <td class="einsatz"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="einsatz"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="col-sum">2</td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="col-ma">Alayoubi Salim</td>
+                            <td class="einsatz">NERVY, Nuernberg</td>
+                            <td class="zeit">17:00</td>
+                            <td class="zeit">23:30</td>
+                            <td class="einsatz">NERVY, Nuernberg</td>
+                            <td class="zeit">18:30</td>
+                            <td class="zeit">23:30</td>
+                            <td class="einsatz">HC Erlangen</td>
+                            <td class="zeit">15:30</td>
+                            <td class="zeit">20:30</td>
+                            <td class="einsatz">1. Fc Nuernberg</td>
+                            <td class="zeit">11:15</td>
+                            <td class="zeit">16:00</td>
+                            <td class="einsatz">Doro, Nuernberg</td>
+                            <td class="zeit">18:30</td>
+                            <td class="zeit">23:30</td>
+                            <td class="einsatz"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="einsatz"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="col-sum">28,5</td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="col-ma">Glatz Michaela</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="col-sum">0</td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="col-ma">Goeschelbauer Thomas</td>
+                            <td class="einsatz">NERVY, Nuernberg</td>
+                            <td class="zeit">17:00</td>
+                            <td class="zeit">23:30</td>
+                            <td class="einsatz">Studentenverbindung</td>
+                            <td class="zeit">18:00</td>
+                            <td class="zeit">05:00</td>
+                            <td class="einsatz">Studentenverbindung</td>
+                            <td class="zeit">22:30</td>
+                            <td class="zeit">05:30</td>
+                            <td class="einsatz"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="einsatz">HC Erlangen</td>
+                            <td class="zeit">15:30</td>
+                            <td class="zeit">20:30</td>
+                            <td class="einsatz"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="einsatz"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="col-sum">25,5</td>
+                        </tr>
+                        <tr class="dp-row">
+                            <td class="col-ma">Prost Guido</td>
+                            <td class="einsatz verplant">Privat verplant</td>
+                            <td class="zeit verplant">00:00</td>
+                            <td class="zeit verplant">23:59</td>
+                            <td class="einsatz"></td><td class="zeit"></td><td class="zeit"></td>
+                            <td class="einsatz">HC Erlangen</td>
+                            <td class="zeit">15:30</td>
+                            <td class="zeit">20:30</td>
+                            <td class="einsatz">Doro, Nuernberg</td>
+                            <td class="zeit">18:30</td>
+                            <td class="zeit">23:30</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="einsatz abwesend">Urlaub</td>
+                            <td class="zeit abwesend">00:00</td>
+                            <td class="zeit abwesend">23:59</td>
+                            <td class="col-sum">10,0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <footer class="dp-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblAnzMA">15 Mitarbeiter</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="frm_N_Dienstplanuebersicht.logic.js"></script>
+</body>
+</html>

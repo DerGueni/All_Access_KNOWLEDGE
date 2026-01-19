@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MA-VA Zuordnung Status - Subform</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: white;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 11px;
+        }
+        .subform-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .subform-header {
+            padding: 6px 8px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .subform-title {
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .subform-count {
+            font-size: 10px;
+            color: #666;
+            background: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        .subform-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .status-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .status-table th {
+            background: #f0f0f0;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #ccc;
+            position: sticky;
+            top: 0;
+        }
+        .status-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .status-table tr:hover {
+            background: #f8f8f8;
+        }
+        .status-table tr.selected {
+            background: #e8e8e8;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .status-badge.angefragt { background: #fff3cd; color: #856404; }
+        .status-badge.zugesagt { background: #d4edda; color: #155724; }
+        .status-badge.abgesagt { background: #f8d7da; color: #721c24; }
+        .status-badge.offen { background: #e2e3e5; color: #383d41; }
+        .empty-message {
+            padding: 20px;
+            text-align: center;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">
+            <span class="subform-title">Planungsstatus</span>
+            <span class="subform-count" id="lblCount">0</span>
+        </div>
+        <div class="subform-content">
+            <table class="status-table" id="tblStatus">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Angefragt</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyStatus">
+                    <tr><td colspan="3" class="empty-message">Keine Daten</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Bridge } from '../js/webview2-bridge.js';
+
+        let planungen = [];
+        let linkParams = { VA_ID: null, VADatum: null, VAStart_ID: null };
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        function init() {
+            // PostMessage Listener
+            window.addEventListener('message', handleMessage);
+
+            // Parent informieren dass Subform bereit ist
+            notifyParent('subform_ready', { name: 'sub_MA_VA_Zuordnung_Status' });
+        }
+
+        function handleMessage(event) {
+            const data = event.data;
+            if (!data || !data.type) return;
+
+            switch (data.type) {
+                case 'set_link_params':
+                    linkParams.VA_ID = data.VA_ID;
+                    linkParams.VADatum = data.VADatum;
+                    linkParams.VAStart_ID = data.VAStart_ID;
+                    loadData();
+                    break;
+                case 'requery':
+                    loadData();
+                    break;
+            }
+        }
+
+        async function loadData() {
+            if (!linkParams.VA_ID) {
+                renderEmpty();
+                return;
+            }
+
+            try {
+                let sql = `SELECT p.*, m.Nachname, m.Vorname, p.Status, p.AnfrageDatum
+                           FROM tbl_MA_VA_Planung p
+                           LEFT JOIN tbl_MA_Mitarbeiterstamm m ON p.MA_ID = m.ID
+                           WHERE p.VA_ID = ${linkParams.VA_ID}`;
+
+                if (linkParams.VADatum) {
+                    sql += ` AND p.VADatum = #${linkParams.VADatum}#`;
+                }
+
+                // Nur ausstehende Antworten
+                sql += ` AND (p.Status IS NULL OR p.Status = 'Angefragt' OR p.Status = 'Offen')`;
+                sql += ` ORDER BY m.Nachname, m.Vorname`;
+
+                const result = await Bridge.execute('executeSQL', { sql, fetch: true });
+                planungen = (result && result.rows) || [];
+                render();
+            } catch (error) {
+                console.error('[sub_MA_VA_Zuordnung_Status] Fehler:', error);
+                renderEmpty();
+            }
+        }
+
+        function render() {
+            const tbody = document.getElementById('tbodyStatus');
+            document.getElementById('lblCount').textContent = planungen.length;
+
+            if (planungen.length === 0) {
+                renderEmpty();
+                return;
+            }
+
+            tbody.innerHTML = planungen.map(p => {
+                const name = `${p.Nachname || ''}, ${p.Vorname || ''}`;
+                const angefragt = p.AnfrageDatum ? new Date(p.AnfrageDatum).toLocaleDateString('de-DE') : '-';
+                const status = p.Status || 'Offen';
+                const statusClass = status.toLowerCase().replace(/\s+/g, '');
+
+                return `<tr data-id="${p.ID}">
+                    <td>${name}</td>
+                    <td>${angefragt}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                </tr>`;
+            }).join('');
+
+            // Klick-Handler
+            tbody.querySelectorAll('tr').forEach(row => {
+                row.addEventListener('click', () => {
+                    tbody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+                    row.classList.add('selected');
+                    const id = row.dataset.id;
+                    notifyParent('subform_selection', {
+                        name: 'sub_MA_VA_Zuordnung_Status',
+                        record: planungen.find(p => p.ID == id)
+                    });
+                });
+            });
+        }
+
+        function renderEmpty() {
+            document.getElementById('tbodyStatus').innerHTML =
+                '<tr><td colspan="3" class="empty-message">Keine ausstehenden Antworten</td></tr>';
+            document.getElementById('lblCount').textContent = '0';
+        }
+
+        function notifyParent(type, data) {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type, ...data }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

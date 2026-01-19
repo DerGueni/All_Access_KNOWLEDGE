@@ -1,0 +1,381 @@
+/* Abwesenheitsplanung - Styles nach Access Screenshot */
+
+/* Container */
+.abw-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    background: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 11px;
+}
+
+/* Linkes Menue - HELLGRAU mit BLAUEM Header */
+.abw-menu {
+    width: 140px;
+    min-width: 140px;
+    background: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #cccccc;
+}
+
+.menu-header {
+    background: #4316B2;
+    color: white;
+    padding: 12px 8px;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+.menu-btn {
+    display: block;
+    padding: 8px 6px;
+    background: #e8e8e8;
+    border: 1px solid #cccccc;
+    color: #333333;
+    text-decoration: none;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.menu-btn:hover {
+    background: #d5d5d5;
+}
+
+.menu-btn.active {
+    background: #4316B2;
+    color: white;
+    border-color: #3558c0;
+}
+
+.menu-btn.secondary {
+    background: #d5d5d5;
+    color: #666666;
+}
+
+/* Hauptbereich */
+.abw-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header - BLAU 2,5cm */
+.abw-header {
+    background: #4316B2;
+    color: white;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 94px;
+    border-bottom: 1px solid #3558c0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.abw-logo {
+    width: 32px;
+    height: 32px;
+    background: white;
+    border-radius: 4px;
+}
+
+.abw-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.header-center {
+    display: flex;
+    gap: 8px;
+}
+
+.abw-btn-icon {
+    width: 28px;
+    height: 28px;
+    background: white;
+    border: 1px solid #999;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.abw-btn-icon:hover {
+    background: #e0e0e0;
+}
+
+.header-right {
+    text-align: right;
+}
+
+.version-info {
+    font-size: 10px;
+    opacity: 0.9;
+}
+
+.version-info span {
+    display: block;
+}
+
+/* Content */
+.abw-content {
+    flex: 1;
+    padding: 16px;
+    overflow: auto;
+    background: #f0f0f0;
+}
+
+/* Mitarbeiter Auswahl */
+.abw-ma-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.abw-label {
+    font-weight: 600;
+    min-width: 80px;
+}
+
+.abw-select-large {
+    width: 350px;
+    padding: 4px 8px;
+    font-size: 11px;
+    border: 1px solid #999;
+    background: white;
+}
+
+/* Hauptbereich */
+.abw-main-content {
+    display: flex;
+    gap: 24px;
+}
+
+/* Eingabebereich */
+.abw-input-section {
+    width: 400px;
+}
+
+.abw-fieldset {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.abw-field-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.abw-field-label {
+    width: 80px;
+    font-weight: normal;
+}
+
+.abw-field-label-small {
+    width: 30px;
+    text-align: right;
+    margin-right: 8px;
+}
+
+.abw-select {
+    flex: 1;
+    padding: 4px 8px;
+    font-size: 11px;
+    border: 1px solid #999;
+    background: white;
+}
+
+.abw-input {
+    flex: 1;
+    padding: 4px 8px;
+    font-size: 11px;
+    border: 1px solid #999;
+}
+
+.checkbox-row {
+    padding-left: 80px;
+}
+
+.checkbox-row input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.checkbox-row label {
+    font-size: 11px;
+}
+
+.date-row {
+    padding-left: 80px;
+    gap: 8px;
+}
+
+.abw-date-input {
+    width: 120px;
+    padding: 4px 8px;
+    font-size: 11px;
+    border: 1px solid #999;
+}
+
+.radio-row {
+    padding-left: 80px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.radio-label input[type="radio"] {
+    margin: 0;
+}
+
+.time-row {
+    padding-left: 80px;
+    gap: 8px;
+}
+
+.abw-time-input {
+    width: 80px;
+    padding: 4px 8px;
+    font-size: 11px;
+    border: 1px solid #999;
+    text-align: right;
+}
+
+.abw-time-input:disabled {
+    background: #e0e0e0;
+    color: #999;
+}
+
+/* Buttons */
+.abw-button-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.abw-btn {
+    width: 180px;
+    padding: 8px 16px;
+    font-size: 11px;
+    border: 1px solid #999;
+    background: #f0f0f0;
+    cursor: pointer;
+}
+
+.abw-btn:hover {
+    background: #e0e0e0;
+}
+
+.abw-btn.primary {
+    background: #f0f0f0;
+    font-weight: 600;
+}
+
+/* Liste rechts */
+.abw-list-section {
+    flex: 1;
+}
+
+.abw-list-header {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.abw-table-container {
+    background: white;
+    border: 1px solid #999;
+    height: 400px;
+    overflow: auto;
+}
+
+.abw-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.abw-table thead {
+    background: #e0e0e0;
+    position: sticky;
+    top: 0;
+}
+
+.abw-table th {
+    padding: 6px 8px;
+    text-align: left;
+    border-bottom: 1px solid #999;
+    font-weight: normal;
+}
+
+.abw-table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.abw-table tbody tr:hover {
+    background: #f5f5f5;
+}
+
+.col-select {
+    width: 24px;
+}
+
+.col-datvon {
+    width: 150px;
+}
+
+.col-datbis {
+    width: 150px;
+}
+
+/* Footer */
+.abw-footer {
+    background: #4316B2;
+    color: white;
+    padding: 4px 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .abw-main-content {
+        flex-direction: column;
+    }
+    .abw-input-section {
+        width: 100%;
+    }
+}
+
+@media (max-width: 1000px) {
+    .abw-menu {
+        display: none;
+    }
+}

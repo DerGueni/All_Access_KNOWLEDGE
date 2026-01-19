@@ -1,0 +1,46 @@
+﻿<!doctype html>
+<html lang="de"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CONSYS Bridge Diagnose</title>
+<style>
+body{font-family:Segoe UI,Arial,sans-serif;margin:16px}
+.ok{color:#0a7a0a}.bad{color:#b00020}.muted{color:#666}
+pre{background:#f4f4f4;padding:12px;border-radius:8px;white-space:pre-wrap}
+button{padding:10px 14px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;margin-right:8px}
+</style></head>
+<body>
+<h2>CONSYS Bridge Diagnose</h2>
+<div id="status"></div>
+<p class="muted">Prüft: WebView2? Bridge? Antwort vom Host?</p>
+<button onclick="sendPing()">Bridge Ping</button>
+<button onclick="tryLoadData()">Bridge.loadData('status')</button>
+<h3>Log</h3><pre id="log"></pre>
+<script>
+const $log=document.getElementById('log'), $status=document.getElementById('status');
+function log(m){$log.textContent+=`[${new Date().toISOString()}] ${m}\n`;}
+function detect(){
+ const hasWV=!!(window.chrome&&window.chrome.webview);
+ const hasBridge=typeof window.Bridge!=="undefined";
+ $status.innerHTML=`<div>window.chrome.webview: ${hasWV?'<span class="ok">OK</span>':'<span class="bad">FEHLT</span>'}</div>`+
+                   `<div>window.Bridge: ${hasBridge?'<span class="ok">OK</span>':'<span class="bad">FEHLT</span>'}</div>`;
+ log(`Detect: chrome.webview=${hasWV} Bridge=${hasBridge}`);
+}
+function sendPing(){
+ try{
+  if(window.chrome&&window.chrome.webview){ window.chrome.webview.postMessage({type:"diag_ping",t:Date.now()}); log("postMessage diag_ping gesendet"); }
+  else log("FEHLER: window.chrome.webview fehlt");
+ }catch(e){ log("FEHLER sendPing: "+e.message); }
+}
+function tryLoadData(){
+ try{
+  if(window.Bridge&&typeof Bridge.loadData==="function"){ log("Bridge.loadData('status') aufgerufen"); Bridge.loadData('status'); }
+  else log("FEHLER: Bridge.loadData nicht verfügbar");
+ }catch(e){ log("FEHLER tryLoadData: "+e.message); }
+}
+(function(){
+ detect();
+ if(window.chrome&&window.chrome.webview){
+  window.chrome.webview.addEventListener('message', (ev)=>log("Host->Web message: "+JSON.stringify(ev.data)));
+ }
+})();
+</script></body></html>

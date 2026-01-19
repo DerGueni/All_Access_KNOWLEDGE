@@ -1,0 +1,4 @@
+SELECT qry_KreuzTab_Privat_2025.Mitarbeiter, qry_KreuzTab_Privat_2025.Jan, qry_KreuzTab_Privat_2025.Feb, qry_KreuzTab_Privat_2025.Mrz, qry_KreuzTab_Privat_2025.Apr, qry_KreuzTab_Privat_2025.Mai, qry_KreuzTab_Privat_2025.Jun, qry_KreuzTab_Privat_2025.Jul, qry_KreuzTab_Privat_2025.Aug, qry_KreuzTab_Privat_2025.Sep, qry_KreuzTab_Privat_2025.Okt, qry_KreuzTab_Privat_2025.Nov, qry_KreuzTab_Privat_2025.Dez, qry_KreuzTab_Privat_2025.Gesamt
+FROM qry_KreuzTab_Privat_2025
+ORDER BY qry_KreuzTab_Privat_2025.Mitarbeiter;
+

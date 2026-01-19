@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offene Anfragen - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        /* Form-spezifische Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+        }
+
+        .anfragen-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #ffffff;
+        }
+
+        .anfragen-header {
+            background-color: #ffffff;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000000;
+            margin: 0;
+        }
+
+        .header-label {
+            font-size: 13px;
+            color: #000000;
+            margin-left: 30px;
+        }
+
+        .txt-height {
+            width: 50px;
+            height: 24px;
+            padding: 2px 6px;
+            border: 1px solid #a6a6a6;
+            font-size: 12px;
+            background-color: #ffffff;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-anfragen {
+            background-color: #d7d7d7;
+            color: #000000;
+            border: 1px solid #d7d7d7;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 3px;
+            min-width: 120px;
+        }
+
+        .btn-anfragen:hover {
+            background-color: #c0c0c0;
+            border-color: #c0c0c0;
+        }
+
+        .btn-anfragen:active {
+            background-color: #b0b0b0;
+        }
+
+        .anfragen-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .subform-container {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #a6a6a6;
+            background-color: #ffffff;
+        }
+
+        iframe.subform-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Loading State */
+        .loading-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body data-active-menu="offene_anfragen">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="app-sidebar"></div>
+
+        <!-- Main Content -->
+        <div class="app-main">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-title-section">
+                    <h1 class="header-main-title">Offene Anfragen</h1>
+                    <span class="header-date" id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="anfragen-container">
+                <!-- Header mit Button und Textbox -->
+                <div class="anfragen-header">
+                    <div class="header-left">
+                        <h2 class="header-title">Offene Anfragen</h2>
+                        <span class="header-label">Höhe Unterformular:</span>
+                        <input type="text" id="txSelHeightSub" class="txt-height" value="" />
+                    </div>
+                    <div class="header-right">
+                        <button class="btn-anfragen" id="btnAnfragen">Anfragen</button>
+                    </div>
+                </div>
+
+                <!-- Subform Area -->
+                <div class="anfragen-content">
+                    <div class="subform-container" id="subformContainer">
+                        <div class="loading-placeholder">Anfragen werden geladen...</div>
+                        <!-- Subform iframe wird hier dynamisch geladen -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <div class="footer-status" id="footer-status">Bereit</div>
+                <div class="footer-info" id="footer-info"></div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Sidebar Script -->
+    <script src="../js/sidebar.js"></script>
+
+    <!-- Form Logic -->
+    <script type="module">
+        import { Bridge } from '../js/webview2-bridge.js';
+
+        // DOM Elemente
+        const btnAnfragen = document.getElementById('btnAnfragen');
+        const txSelHeightSub = document.getElementById('txSelHeightSub');
+        const subformContainer = document.getElementById('subformContainer');
+        const footerStatus = document.getElementById('footer-status');
+
+        // Initialisierung
+        async function init() {
+            try {
+                // Subformular laden (falls vorhanden)
+                loadSubform();
+
+                // Button Event
+                btnAnfragen.addEventListener('click', handleAnfragenClick);
+
+                // Textbox Event (Höhe anpassen)
+                txSelHeightSub.addEventListener('change', adjustSubformHeight);
+
+                updateStatus('Bereit');
+            } catch (error) {
+                console.error('Initialisierung fehlgeschlagen:', error);
+                updateStatus('Fehler bei Initialisierung');
+            }
+        }
+
+        // Subformular laden
+        function loadSubform() {
+            // Prüfen ob sub_MA_Offene_Anfragen.html existiert
+            const iframe = document.createElement('iframe');
+            iframe.className = 'subform-iframe';
+            iframe.src = 'sub_MA_Offene_Anfragen.html';
+
+            iframe.onload = function() {
+                updateStatus('Anfragen geladen');
+            };
+
+            iframe.onerror = function() {
+                subformContainer.innerHTML = '<div class="loading-placeholder">Subformular nicht gefunden</div>';
+                updateStatus('Subformular nicht verfügbar');
+            };
+
+            subformContainer.innerHTML = '';
+            subformContainer.appendChild(iframe);
+        }
+
+        // Button Click Handler
+        async function handleAnfragenClick() {
+            try {
+                updateStatus('Anfragen werden verarbeitet...');
+
+                // KORRIGIERT: Anfragen via Bridge laden
+                const anfragen = await Bridge.execute('executeSQL', {
+                    sql: `SELECT a.*, m.Nachname, m.Vorname, va.Auftrag, va.Objekt
+                          FROM tbl_MA_Anfragen a
+                          LEFT JOIN tbl_MA_Mitarbeiterstamm m ON a.MA_ID = m.ID
+                          LEFT JOIN tbl_VA_Auftragstamm va ON a.VA_ID = va.VA_ID
+                          WHERE a.Status = 'Offen'
+                          ORDER BY a.AnfrageDatum DESC`,
+                    fetch: true
+                });
+
+                // Daten an Subformular übergeben via postMessage
+                const iframe = subformContainer.querySelector('iframe');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({
+                        type: 'LOAD_ANFRAGEN',
+                        data: anfragen.rows || []
+                    }, '*');
+                }
+
+                updateStatus('Anfragen aktualisiert');
+            } catch (error) {
+                console.error('Fehler beim Laden der Anfragen:', error);
+                updateStatus('Fehler beim Laden');
+            }
+        }
+
+        // Subformular-Höhe anpassen
+        function adjustSubformHeight() {
+            const height = parseInt(txSelHeightSub.value);
+            if (!isNaN(height) && height > 0) {
+                subformContainer.style.height = `${height}px`;
+            }
+        }
+
+        // Status aktualisieren
+        function updateStatus(message) {
+            if (footerStatus) {
+                footerStatus.textContent = message;
+            }
+        }
+
+        // Initialisierung starten
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

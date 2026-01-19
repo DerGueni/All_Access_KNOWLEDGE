@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planungsübersicht</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 11px;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+
+        /* Hauptcontainer */
+        .form-container {
+            width: 100%;
+            height: 100%;
+            background-color: #8B0000;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section - Dunkelrot */
+        .form-header {
+            position: relative;
+            height: 70px;
+            background-color: #8B0000;
+            border-bottom: 1px solid #5c0000;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        /* Detail Section */
+        .form-detail {
+            display: flex;
+            height: calc(100% - 70px);
+            background-color: #8B0000;
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* ============================================ */
+        /* HEADER CONTROLS                             */
+        /* ============================================ */
+
+        .header-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-right: 20px;
+        }
+
+        .header-date-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #5c0000;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+
+        .header-date-input {
+            width: 90px;
+            height: 22px;
+            font-size: 10px;
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+            margin-right: 5px;
+        }
+
+        .header-btn {
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            margin: 0 2px;
+        }
+
+        .header-btn-small {
+            width: 25px;
+            height: 18px;
+            padding: 0;
+            font-size: 12px;
+        }
+
+        .header-checkbox-group {
+            display: flex;
+            flex-direction: column;
+            margin-left: 15px;
+            color: white;
+            font-size: 10px;
+        }
+
+        .header-checkbox-row {
+            display: flex;
+            align-items: center;
+            margin: 2px 0;
+        }
+
+        .header-checkbox-row input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .header-checkbox-row input[type="text"] {
+            width: 30px;
+            height: 18px;
+            font-size: 10px;
+            text-align: center;
+            margin: 0 5px;
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-btn-export {
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            padding: 6px 12px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .header-btn-close {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* ============================================ */
+        /* MAIN CONTENT                                */
+        /* ============================================ */
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 5px;
+            overflow: hidden;
+        }
+
+        /* Kalender Header - Grün wie Screenshot */
+        .calendar-header-row {
+            display: flex;
+            height: 28px;
+            margin-bottom: 1px;
+        }
+
+        .col-auftrag-header {
+            width: 250px;
+            background-color: #339933;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .day-column-header {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 180px;
+        }
+
+        .day-title {
+            background-color: #339933;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 4px 8px;
+            text-align: center;
+            border-left: 1px solid #2d862d;
+        }
+
+        .day-title.weekend {
+            background-color: #99cc99;
+            color: #333;
+        }
+
+        .day-sub-headers {
+            display: flex;
+            background-color: #ccffcc;
+            font-size: 9px;
+            font-weight: bold;
+            border-left: 1px solid #99cc99;
+        }
+
+        .day-sub-headers span {
+            padding: 2px 4px;
+            text-align: center;
+        }
+
+        .sub-name {
+            flex: 2;
+            border-right: 1px solid #b3e6b3;
+        }
+
+        .sub-von {
+            width: 35px;
+            border-right: 1px solid #b3e6b3;
+        }
+
+        .sub-bis {
+            width: 35px;
+        }
+
+        /* Kalender Body */
+        .calendar-body {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .calendar-row {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            min-height: 60px;
+        }
+
+        .calendar-row:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .col-auftrag {
+            width: 250px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            background-color: #ffffcc;
+            border-right: 1px solid #ddd;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .auftrag-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .auftrag-details {
+            font-weight: normal;
+            font-size: 9px;
+            color: #666;
+        }
+
+        .day-column {
+            flex: 1;
+            min-width: 180px;
+            border-right: 1px solid #eee;
+            padding: 2px;
+            font-size: 9px;
+        }
+
+        .day-column.weekend {
+            background-color: #e6ffe6;
+        }
+
+        /* MA-Eintrag in Tageszelle */
+        .ma-entry {
+            display: flex;
+            padding: 1px 2px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .ma-entry:hover {
+            background-color: #e8f4fc;
+        }
+
+        .ma-name {
+            flex: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .ma-von {
+            width: 35px;
+            text-align: center;
+            color: #009900;
+            font-weight: bold;
+        }
+
+        .ma-bis {
+            width: 35px;
+            text-align: center;
+        }
+
+        .ma-entry.storno .ma-name {
+            color: #cc0000;
+            font-weight: bold;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top-color: #8B0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">CONSYS</div>
+            <nav class="sidebar-menu">
+                <a href="frm_N_Dienstplanuebersicht.html" class="sidebar-btn">Dienstplanübersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="sidebar-btn active">Planungsübersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="sidebar-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="sidebar-btn">Mitarbeiterverwaltung</a>
+                <a href="frm_N_Email_versenden.html" class="sidebar-btn">Offene Mail Anfragen</a>
+                <a href="frm_MA_Zeitkonten.html" class="sidebar-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="sidebar-btn">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="sidebar-btn">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="sidebar-btn">Dienstausweis erstellen</a>
+                <a href="frm_N_Stundenauswertung.html" class="sidebar-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="sidebar-btn">Kundenverwaltung</a>
+                <a href="frm_KD_Kundenstamm.html" class="sidebar-btn">Verrechnungssätze</a>
+                <a href="frm_N_Lohnabrechnungen.html" class="sidebar-btn">Sub Rechnungen</a>
+                <a href="frm_N_Email_versenden.html" class="sidebar-btn">E-Mail</a>
+                <hr class="sidebar-divider">
+                <a href="frm_Menuefuehrung.html" class="sidebar-btn">Hauptmenü</a>
+                <a href="frm_N_Optimierung.html" class="sidebar-btn">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+    <div class="form-container">
+        <!-- HEADER SECTION -->
+        <div class="form-header">
+            <span class="header-title">Planungsübersicht</span>
+
+            <div class="header-date-box">
+                <input type="date" class="header-date-input" id="dtStartdatum">
+                <div style="display:flex; flex-direction:column;">
+                    <button class="header-btn header-btn-small" id="btnVor">&gt;</button>
+                    <button class="header-btn header-btn-small" id="btnrueck">&lt;</button>
+                </div>
+            </div>
+
+            <button class="header-btn" id="btnStartdatum">Startdatum Ändern</button>
+            <button class="header-btn" id="btn_Heute">Ab Heute</button>
+
+            <div class="header-checkbox-group">
+                <div class="header-checkbox-row">
+                    <input type="checkbox" id="NurIstNichtZugeordnet">
+                    <label for="NurIstNichtZugeordnet">Nur freie Schichten anzeigen</label>
+                </div>
+                <div class="header-checkbox-row">
+                    <input type="checkbox" id="IstAuftrAusblend">
+                    <label for="IstAuftrAusblend">Nur Aufträge mit weniger als</label>
+                    <input type="text" id="PosAusblendAb" value="25">
+                    <label>Positionen anzeigen</label>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <button class="header-btn-export" id="btnOutpExcel">Übersicht drucken</button>
+                <button class="header-btn-close" id="Befehl37" title="Schließen">&times;</button>
+            </div>
+        </div>
+
+        <!-- DETAIL SECTION -->
+        <div class="form-detail">
+            <div class="main-content">
+                <!-- Kalender Header -->
+                <div class="calendar-header-row">
+                    <div class="col-auftrag-header">Auftrag / Veranstaltung</div>
+                    <div class="day-column-header" id="day_1">
+                        <div class="day-title">Mo. 28.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_2">
+                        <div class="day-title">Di. 29.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_3">
+                        <div class="day-title">Mi. 30.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_4">
+                        <div class="day-title">Do. 31.07.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_5">
+                        <div class="day-title">Fr. 01.08.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_6">
+                        <div class="day-title weekend">Sa. 02.08.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                    <div class="day-column-header" id="day_7">
+                        <div class="day-title weekend">So. 03.08.25</div>
+                        <div class="day-sub-headers">
+                            <span class="sub-name">Name</span>
+                            <span class="sub-von">von</span>
+                            <span class="sub-bis">bis</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kalender Body -->
+                <div class="calendar-body" id="calendarBody">
+                    <div class="loading">Lade Planungsübersicht...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        const state = {
+            startDate: new Date(),
+            auftraege: [],
+            zuordnungen: {},
+            nurFreieSchichten: false,
+            posAusblendAb: 25,
+            istAuftrAusblend: false
+        };
+
+        const WOCHENTAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Aktuelles Datum auf Montag dieser Woche setzen
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            state.startDate = new Date(today.setDate(today.getDate() + diff));
+
+            updateDateInputs();
+            setupEventListeners();
+            await loadData();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('btnVor').addEventListener('click', () => navigateWeek(1));
+            document.getElementById('btnrueck').addEventListener('click', () => navigateWeek(-1));
+            document.getElementById('btn_Heute').addEventListener('click', goToToday);
+            document.getElementById('btnStartdatum').addEventListener('click', () => {
+                const newDate = document.getElementById('dtStartdatum').value;
+                if (newDate) {
+                    state.startDate = new Date(newDate);
+                    const dayOfWeek = state.startDate.getDay();
+                    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                    state.startDate.setDate(state.startDate.getDate() + diff);
+                    updateDateInputs();
+                    loadData();
+                }
+            });
+
+            document.getElementById('NurIstNichtZugeordnet').addEventListener('change', (e) => {
+                state.nurFreieSchichten = e.target.checked;
+                renderCalendar();
+            });
+
+            document.getElementById('IstAuftrAusblend').addEventListener('change', (e) => {
+                state.istAuftrAusblend = e.target.checked;
+                renderCalendar();
+            });
+
+            document.getElementById('PosAusblendAb').addEventListener('change', (e) => {
+                state.posAusblendAb = parseInt(e.target.value) || 25;
+                renderCalendar();
+            });
+
+            document.getElementById('Befehl37').addEventListener('click', () => window.close());
+            document.getElementById('btnOutpExcel').addEventListener('click', () => alert('Übersicht drucken'));
+        }
+
+        function navigateWeek(direction) {
+            state.startDate.setDate(state.startDate.getDate() + (direction * 7));
+            updateDateInputs();
+            loadData();
+        }
+
+        function goToToday() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            state.startDate = new Date(today.setDate(today.getDate() + diff));
+            updateDateInputs();
+            loadData();
+        }
+
+        function updateDateInputs() {
+            document.getElementById('dtStartdatum').value = formatDateForInput(state.startDate);
+            updateHeaderLabels();
+        }
+
+        function updateHeaderLabels() {
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(state.startDate);
+                date.setDate(date.getDate() + i);
+                const dayName = WOCHENTAGE[date.getDay()];
+                const dateStr = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear().toString().slice(-2)}`;
+                const dayHeader = document.querySelector(`#day_${i + 1} .day-title`);
+                if (dayHeader) {
+                    dayHeader.textContent = `${dayName}. ${dateStr}`;
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                    dayHeader.classList.toggle('weekend', isWeekend);
+                }
+            }
+        }
+
+        async function loadData() {
+            const container = document.getElementById('calendarBody');
+            container.innerHTML = '<div class="loading">Lade Planungsübersicht...</div>';
+
+            try {
+                const startStr = formatDateForInput(state.startDate);
+                const endDate = new Date(state.startDate);
+                endDate.setDate(endDate.getDate() + 6);
+                const endStr = formatDateForInput(endDate);
+
+                // Aufträge laden
+                const auftragResponse = await fetch(`${API_BASE}/auftraege?von=${startStr}&bis=${endStr}`);
+                const auftragResult = await auftragResponse.json();
+                state.auftraege = auftragResult.data || [];
+
+                // Zuordnungen laden
+                state.zuordnungen = {};
+                try {
+                    const zuordResponse = await fetch(`${API_BASE}/zuordnungen?von=${startStr}&bis=${endStr}`);
+                    if (zuordResponse.ok) {
+                        const zuordResult = await zuordResponse.json();
+                        for (const z of (zuordResult.data || [])) {
+                            const key = `${z.VA_ID}_${formatDateForInput(new Date(z.VADatum))}`;
+                            if (!state.zuordnungen[key]) {
+                                state.zuordnungen[key] = [];
+                            }
+                            state.zuordnungen[key].push(z);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Zuordnungen laden fehlgeschlagen:', e);
+                }
+
+                renderCalendar();
+            } catch (error) {
+                console.error('Fehler beim Laden:', error);
+                container.innerHTML = '<div style="padding: 20px; color: red;">Fehler beim Laden der Daten</div>';
+            }
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendarBody');
+
+            let auftraege = state.auftraege;
+
+            if (auftraege.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Keine Aufträge im gewählten Zeitraum</div>';
+                return;
+            }
+
+            let html = '';
+
+            for (const auftrag of auftraege.slice(0, 50)) {
+                const auftragName = auftrag.Auftrag || auftrag.VA_Bezeichnung || 'Unbekannt';
+                const objekt = auftrag.Objekt || '';
+                const ort = auftrag.Ort || '';
+
+                html += '<div class="calendar-row">';
+                html += `<div class="col-auftrag">
+                    <span class="auftrag-name">${escapeHtml(auftragName)}, ${escapeHtml(ort)}</span>
+                    <span class="auftrag-details">Auftrag Objekt Ort</span>
+                </div>`;
+
+                // 7 Tage
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(state.startDate);
+                    date.setDate(date.getDate() + i);
+                    const dateKey = formatDateForInput(date);
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+                    const key = `${auftrag.ID}_${dateKey}`;
+                    const zuordnungen = state.zuordnungen[key] || [];
+
+                    html += `<div class="day-column ${isWeekend ? 'weekend' : ''}">`;
+
+                    for (const z of zuordnungen) {
+                        const maName = z.MAName || z.Nachname || 'MA';
+                        const von = formatTime(z.VA_Start);
+                        const bis = formatTime(z.VA_Ende);
+                        const isStorno = (z.Status || '').toLowerCase().includes('storno');
+
+                        html += `<div class="ma-entry ${isStorno ? 'storno' : ''}">
+                            <span class="ma-name">${escapeHtml(maName)}</span>
+                            <span class="ma-von">${von}</span>
+                            <span class="ma-bis">${bis}</span>
+                        </div>`;
+                    }
+
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function formatDateForInput(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const day = d.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatTime(t) {
+            if (!t) return '';
+            if (typeof t === 'number' && t < 1) {
+                const h = Math.floor(t * 24), m = Math.round((t * 24 - h) * 60);
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            }
+            return typeof t === 'string' && t.includes(':') ? t.substring(0, 5) : t;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+    </script>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">Ready</div>
+                <div class="status-right">
+                    <span id="timestamp"></span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="../js/sidebar.js"></script>
+    <script>
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = now.toLocaleString('de-DE');
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+    </script>
+</body>
+</html>

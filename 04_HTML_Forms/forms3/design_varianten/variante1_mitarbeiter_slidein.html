@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstammblatt - Slide-in Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Farbpalette - Modern Orange/Coral */
+            --primary-gradient: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-color: #ff6b6b;
+            --accent-hover: #ee5a5a;
+            --bg-dark: #1a1a2e;
+            --bg-medium: #16213e;
+            --bg-light: #0f3460;
+            --text-light: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
+            --card-bg: #ffffff;
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+
+            /* Layout */
+            --sidebar-width: 280px;
+            --header-height: 64px;
+            --fab-size: 56px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #fef3e2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           OVERLAY
+           ============================================ */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed) ease;
+            z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ============================================
+           SLIDE-IN SIDEBAR
+           ============================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: calc(-1 * var(--sidebar-width));
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--primary-gradient);
+            transition: left var(--transition-speed) ease;
+            z-index: 1000;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sidebar-logo-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-light);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: var(--text-light);
+            border-left-color: var(--text-light);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           HAMBURGER MENU BUTTON
+           ============================================ */
+        .hamburger {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            width: 48px;
+            height: 48px;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .hamburger-line {
+            width: 22px;
+            height: 2px;
+            background: #333;
+            border-radius: 2px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            height: var(--header-height);
+            background: var(--card-bg);
+            padding: 0 24px 0 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn-outline {
+            background: transparent;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+
+        .header-btn-outline:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .header-btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .header-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .main-content {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Mitarbeiter Profil Header */
+        .employee-profile-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 24px;
+        }
+
+        .employee-photo-section {
+            width: 180px;
+            flex-shrink: 0;
+        }
+
+        .employee-photo {
+            width: 180px;
+            height: 220px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: #bbb;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .employee-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-upload-btn {
+            width: 100%;
+            padding: 10px;
+            background: #f5f5f5;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            transition: all 0.2s ease;
+        }
+
+        .photo-upload-btn:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .employee-main-info {
+            flex: 1;
+        }
+
+        .employee-name-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .employee-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .employee-number {
+            font-size: 14px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .employee-badges {
+            display: flex;
+            gap: 8px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-active { background: #e8f5e9; color: #2e7d32; }
+        .badge-inactive { background: #ffebee; color: #c62828; }
+        .badge-type { background: #e3f2fd; color: #1565c0; }
+        .badge-warning { background: #fff3e0; color: #ef6c00; }
+
+        .employee-quick-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .quick-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .quick-info-icon {
+            font-size: 20px;
+        }
+
+        .quick-info-content {
+            flex: 1;
+        }
+
+        .quick-info-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quick-info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Tab Navigation */
+        .tabs-nav {
+            display: flex;
+            gap: 4px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+
+        .tab-nav-btn {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-nav-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .tab-nav-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        /* Tab Content */
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .form-card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #fef9f9 0%, #ffffff 100%);
+        }
+
+        .form-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-card-title-icon {
+            font-size: 18px;
+        }
+
+        .form-card-body {
+            padding: 24px;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .form-grid-2col {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .form-grid-3col {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .form-grid-4col {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group.span-2 {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .form-input:read-only {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        /* Checkbox Group */
+        .checkbox-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ff6b6b;
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* Section Divider */
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 16px;
+            margin-top: 8px;
+            grid-column: 1 / -1;
+        }
+
+        /* Einsätze Liste */
+        .einsatz-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .einsatz-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .einsatz-item:hover {
+            background: #fff5f5;
+            transform: translateX(4px);
+        }
+
+        .einsatz-date {
+            width: 60px;
+            text-align: center;
+        }
+
+        .einsatz-date-day {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff6b6b;
+        }
+
+        .einsatz-date-month {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .einsatz-details {
+            flex: 1;
+        }
+
+        .einsatz-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .einsatz-meta {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .einsatz-time {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* ============================================
+           FLOATING ACTION BUTTON (FAB) + SPEED DIAL
+           ============================================ */
+        .fab-container {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 1000;
+        }
+
+        .fab {
+            width: var(--fab-size);
+            height: var(--fab-size);
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-speed) ease;
+            color: white;
+            font-size: 24px;
+        }
+
+        .fab:hover {
+            background: var(--accent-hover);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .fab.active {
+            transform: rotate(45deg);
+        }
+
+        /* Speed Dial Actions */
+        .speed-dial {
+            position: absolute;
+            bottom: calc(var(--fab-size) + 16px);
+            right: 4px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .speed-dial.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .speed-dial-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .speed-dial-label {
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .speed-dial-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .speed-dial-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .speed-dial-btn.save { background: #4caf50; }
+        .speed-dial-btn.ausweis { background: #2196f3; }
+        .speed-dial-btn.email { background: #ff9800; }
+        .speed-dial-btn.delete { background: #f44336; }
+        .speed-dial-btn.dienstplan { background: #9c27b0; }
+        .speed-dial-btn.dokument { background: #607d8b; }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 1024px) {
+            .employee-profile-card {
+                flex-direction: column;
+            }
+
+            .employee-photo-section {
+                width: 100%;
+                display: flex;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .employee-photo {
+                width: 120px;
+                height: 150px;
+            }
+
+            .form-grid-4col {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding-left: 70px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .employee-photo-section {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .employee-name-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid-2col,
+            .form-grid-3col,
+            .form-grid-4col {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs-nav {
+                padding: 4px;
+            }
+
+            .tab-nav-btn {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger" id="hamburger" aria-label="Menü öffnen">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Slide-in Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">C</div>
+                <span class="sidebar-logo-text">CONSEC</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Stammdaten</div>
+                <a class="nav-item active">
+                    <span class="nav-icon">👤</span>
+                    <span>Mitarbeiter</span>
+                </a>
+                <a class="nav-item" href="variante1_kunde_slidein.html">
+                    <span class="nav-icon">🏢</span>
+                    <span>Kunden</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📍</span>
+                    <span>Objekte</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Planung</div>
+                <a class="nav-item" href="variante1_auftrag_slidein.html">
+                    <span class="nav-icon">📋</span>
+                    <span>Aufträge</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    <span>Dienstplan</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Einsatzübersicht</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Personal</div>
+                <a class="nav-item">
+                    <span class="nav-icon">⏰</span>
+                    <span>Zeitkonten</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">🏖️</span>
+                    <span>Abwesenheiten</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span>Lohnabrechnung</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">GS</div>
+                <div class="user-details">
+                    <div class="user-name">Günther Siegert</div>
+                    <div class="user-role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Header -->
+    <header class="header">
+        <div>
+            <h1 class="header-title">Mitarbeiterstammblatt</h1>
+            <p class="header-subtitle">Personal-Nr: MA-2019-0142</p>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn header-btn-outline">Zurück zur Liste</button>
+            <button class="header-btn header-btn-primary">Speichern</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Mitarbeiter Profil Header -->
+        <div class="employee-profile-card">
+            <div class="employee-photo-section">
+                <div class="employee-photo">👤</div>
+                <button class="photo-upload-btn">📷 Foto hochladen</button>
+            </div>
+            <div class="employee-main-info">
+                <div class="employee-name-row">
+                    <div>
+                        <h2 class="employee-name">Max Mustermann</h2>
+                        <p class="employee-number">MA-2019-0142</p>
+                    </div>
+                    <div class="employee-badges">
+                        <span class="badge badge-active">Aktiv</span>
+                        <span class="badge badge-type">Festangestellt</span>
+                    </div>
+                </div>
+
+                <div class="employee-quick-info">
+                    <div class="quick-info-item">
+                        <span class="quick-info-icon">📞</span>
+                        <div class="quick-info-content">
+                            <div class="quick-info-label">Mobil</div>
+                            <div class="quick-info-value">+49 176 12345678</div>
+                        </div>
+                    </div>
+                    <div class="quick-info-item">
+                        <span class="quick-info-icon">✉️</span>
+                        <div class="quick-info-content">
+                            <div class="quick-info-label">E-Mail</div>
+                            <div class="quick-info-value">m.mustermann@email.de</div>
+                        </div>
+                    </div>
+                    <div class="quick-info-item">
+                        <span class="quick-info-icon">📅</span>
+                        <div class="quick-info-content">
+                            <div class="quick-info-label">Eintrittsdatum</div>
+                            <div class="quick-info-value">01.04.2019</div>
+                        </div>
+                    </div>
+                    <div class="quick-info-item">
+                        <span class="quick-info-icon">📋</span>
+                        <div class="quick-info-content">
+                            <div class="quick-info-label">Letzte Einsätze</div>
+                            <div class="quick-info-value">147 (2024: 42)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs-nav">
+            <button class="tab-nav-btn active" data-tab="stammdaten">Stammdaten</button>
+            <button class="tab-nav-btn" data-tab="adresse">Adresse & Kontakt</button>
+            <button class="tab-nav-btn" data-tab="vertrag">Vertrag & Lohn</button>
+            <button class="tab-nav-btn" data-tab="qualifikationen">Qualifikationen</button>
+            <button class="tab-nav-btn" data-tab="einsaetze">Einsätze</button>
+            <button class="tab-nav-btn" data-tab="dokumente">Dokumente</button>
+        </div>
+
+        <!-- Tab: Stammdaten -->
+        <div class="tab-panel active" id="panel-stammdaten">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <span class="form-card-title">
+                        <span class="form-card-title-icon">👤</span>
+                        Persönliche Daten
+                    </span>
+                </div>
+                <div class="form-card-body">
+                    <div class="form-grid form-grid-4col">
+                        <div class="form-group">
+                            <label class="form-label">Anrede</label>
+                            <select class="form-input" id="MA_Anrede">
+                                <option value="Herr" selected>Herr</option>
+                                <option value="Frau">Frau</option>
+                                <option value="Divers">Divers</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vorname</label>
+                            <input type="text" class="form-input" id="MA_Vorname" value="Max">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nachname</label>
+                            <input type="text" class="form-input" id="MA_Nachname" value="Mustermann">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Geburtsdatum</label>
+                            <input type="date" class="form-input" id="MA_Geburtsdatum" value="1985-07-15">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Geburtsort</label>
+                            <input type="text" class="form-input" id="MA_Geburtsort" value="München">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nationalität</label>
+                            <input type="text" class="form-input" id="MA_Nationalitaet" value="Deutsch">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Familienstand</label>
+                            <select class="form-input" id="MA_Familienstand">
+                                <option value="ledig">Ledig</option>
+                                <option value="verheiratet" selected>Verheiratet</option>
+                                <option value="geschieden">Geschieden</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Kinder</label>
+                            <input type="number" class="form-input" id="MA_Kinder" value="2">
+                        </div>
+
+                        <div class="section-title">Beschäftigung</div>
+
+                        <div class="form-group">
+                            <label class="form-label">Eintrittsdatum</label>
+                            <input type="date" class="form-input" id="MA_Eintrittsdatum" value="2019-04-01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Anstellungsart</label>
+                            <select class="form-input" id="MA_Anstellungsart">
+                                <option value="1" selected>Festangestellt</option>
+                                <option value="2">Minijob</option>
+                                <option value="3">Freelancer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Abteilung</label>
+                            <select class="form-input" id="MA_Abteilung">
+                                <option value="1" selected>Sicherheitsdienst</option>
+                                <option value="2">Veranstaltung</option>
+                                <option value="3">VIP-Service</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Position</label>
+                            <input type="text" class="form-input" id="MA_Position" value="Schichtleiter">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="form-label">Optionen</label>
+                            <div class="checkbox-row">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="MA_IstAktiv" checked>
+                                    <label for="MA_IstAktiv">Aktiv</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="MA_HatFuehrerschein" checked>
+                                    <label for="MA_HatFuehrerschein">Führerschein</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="MA_HatPKW">
+                                    <label for="MA_HatPKW">Eigenes Fahrzeug</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="MA_IstSchichtleiter" checked>
+                                    <label for="MA_IstSchichtleiter">Schichtleiter</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="MA_HatSachkundepruefung" checked>
+                                    <label for="MA_HatSachkundepruefung">Sachkundeprüfung §34a</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Adresse & Kontakt -->
+        <div class="tab-panel" id="panel-adresse">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <span class="form-card-title">
+                        <span class="form-card-title-icon">📍</span>
+                        Adresse & Kontaktdaten
+                    </span>
+                </div>
+                <div class="form-card-body">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label">Straße & Hausnummer</label>
+                            <input type="text" class="form-input" id="MA_Strasse" value="Musterstraße 42">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">PLZ</label>
+                            <input type="text" class="form-input" id="MA_PLZ" value="80331">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ort</label>
+                            <input type="text" class="form-input" id="MA_Ort" value="München">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Land</label>
+                            <input type="text" class="form-input" id="MA_Land" value="Deutschland">
+                        </div>
+
+                        <div class="section-title">Kontakt</div>
+
+                        <div class="form-group">
+                            <label class="form-label">Telefon Mobil</label>
+                            <input type="tel" class="form-input" id="MA_Tel_Mobil" value="+49 176 12345678">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telefon Privat</label>
+                            <input type="tel" class="form-input" id="MA_Tel_Privat" value="+49 89 9876543">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">E-Mail</label>
+                            <input type="email" class="form-input" id="MA_Email" value="max.mustermann@email.de">
+                        </div>
+
+                        <div class="section-title">Notfallkontakt</div>
+
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-input" id="MA_Notfall_Name" value="Maria Mustermann">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Beziehung</label>
+                            <input type="text" class="form-input" id="MA_Notfall_Beziehung" value="Ehefrau">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telefon</label>
+                            <input type="tel" class="form-input" id="MA_Notfall_Telefon" value="+49 176 87654321">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Einsätze (Beispiel) -->
+        <div class="tab-panel" id="panel-einsaetze">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <span class="form-card-title">
+                        <span class="form-card-title-icon">📋</span>
+                        Kommende Einsätze
+                    </span>
+                </div>
+                <div class="form-card-body">
+                    <div class="einsatz-list">
+                        <div class="einsatz-item">
+                            <div class="einsatz-date">
+                                <div class="einsatz-date-day">18</div>
+                                <div class="einsatz-date-month">Jan</div>
+                            </div>
+                            <div class="einsatz-details">
+                                <div class="einsatz-title">Messe München - BAU 2026</div>
+                                <div class="einsatz-meta">Messegelände Halle 1 • Einlasskontrolle</div>
+                            </div>
+                            <div class="einsatz-time">08:00 - 16:00</div>
+                        </div>
+                        <div class="einsatz-item">
+                            <div class="einsatz-date">
+                                <div class="einsatz-date-day">19</div>
+                                <div class="einsatz-date-month">Jan</div>
+                            </div>
+                            <div class="einsatz-details">
+                                <div class="einsatz-title">Messe München - BAU 2026</div>
+                                <div class="einsatz-meta">Messegelände Halle 1 • Einlasskontrolle</div>
+                            </div>
+                            <div class="einsatz-time">08:00 - 16:00</div>
+                        </div>
+                        <div class="einsatz-item">
+                            <div class="einsatz-date">
+                                <div class="einsatz-date-day">25</div>
+                                <div class="einsatz-date-month">Jan</div>
+                            </div>
+                            <div class="einsatz-details">
+                                <div class="einsatz-title">Konzert Olympiahalle</div>
+                                <div class="einsatz-meta">Olympiahalle München • VIP-Betreuung</div>
+                            </div>
+                            <div class="einsatz-time">17:00 - 01:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weitere Tabs würden hier folgen... -->
+        <div class="tab-panel" id="panel-vertrag">
+            <div class="form-card">
+                <div class="form-card-body">
+                    <p style="color: #888; text-align: center; padding: 40px;">Vertragsdaten werden hier angezeigt...</p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-panel" id="panel-qualifikationen">
+            <div class="form-card">
+                <div class="form-card-body">
+                    <p style="color: #888; text-align: center; padding: 40px;">Qualifikationen werden hier angezeigt...</p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-panel" id="panel-dokumente">
+            <div class="form-card">
+                <div class="form-card-body">
+                    <p style="color: #888; text-align: center; padding: 40px;">Dokumente werden hier angezeigt...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Action Button mit Speed Dial -->
+    <div class="fab-container">
+        <div class="speed-dial" id="speedDial">
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Dokument hochladen</span>
+                <button class="speed-dial-btn dokument" title="Dokument">📄</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Mitarbeiter löschen</span>
+                <button class="speed-dial-btn delete" title="Löschen">🗑️</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">E-Mail senden</span>
+                <button class="speed-dial-btn email" title="E-Mail">✉️</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Ausweis drucken</span>
+                <button class="speed-dial-btn ausweis" title="Ausweis">🪪</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Dienstplan anzeigen</span>
+                <button class="speed-dial-btn dienstplan" title="Dienstplan">📅</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Speichern</span>
+                <button class="speed-dial-btn save" title="Speichern">💾</button>
+            </div>
+        </div>
+        <button class="fab" id="fab" aria-label="Aktionen">
+            <span class="fab-icon">+</span>
+        </button>
+    </div>
+
+    <script>
+        // === Sidebar Toggle ===
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function toggleSidebar() {
+            hamburger.classList.toggle('active');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        hamburger.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // ESC schließt Sidebar
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        });
+
+        // === FAB Speed Dial ===
+        const fab = document.getElementById('fab');
+        const speedDial = document.getElementById('speedDial');
+
+        fab.addEventListener('click', () => {
+            fab.classList.toggle('active');
+            speedDial.classList.toggle('active');
+        });
+
+        // Klick außerhalb schließt Speed Dial
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.fab-container') && speedDial.classList.contains('active')) {
+                fab.classList.remove('active');
+                speedDial.classList.remove('active');
+            }
+        });
+
+        // Speed Dial Button Actions
+        document.querySelectorAll('.speed-dial-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const action = btn.classList[1];
+                console.log('Action:', action);
+
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => btn.style.transform = '', 150);
+
+                switch(action) {
+                    case 'save': alert('Mitarbeiter gespeichert!'); break;
+                    case 'dienstplan': alert('Dienstplan wird geöffnet...'); break;
+                    case 'ausweis': alert('Ausweis wird gedruckt...'); break;
+                    case 'email': alert('E-Mail-Dialog wird geöffnet...'); break;
+                    case 'delete': if(confirm('Mitarbeiter wirklich löschen?')) alert('Gelöscht!'); break;
+                    case 'dokument': alert('Dokument-Upload Dialog...'); break;
+                }
+            });
+        });
+
+        // === Tab Navigation ===
+        document.querySelectorAll('.tab-nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Button aktiv setzen
+                document.querySelectorAll('.tab-nav-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Panel anzeigen
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('panel-' + tabId)?.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

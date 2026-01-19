@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung mit Minijobber-Panel</title>
+    <style>
+        :root {
+            --base-font-size: 11px;
+            --small-font-size: 10px;
+            --header-font-size: 12px;
+            --title-font-size: 16px;
+            --primary-color: #000080;
+            --primary-light: #6060a0;
+            --bg-main: #8080c0;
+            --bg-content: #d3d3d3;
+            --bg-section: #b8b8d8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: var(--base-font-size);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .window-frame {
+            background-color: var(--bg-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header-row {
+            background-color: var(--bg-content);
+            border: none;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4040a0, #8080c0);
+            border: 2px solid #404080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .title-text {
+            font-size: var(--title-font-size);
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 180px;
+            background-color: var(--primary-light);
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: var(--base-font-size);
+            margin-bottom: 5px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: var(--base-font-size);
+            color: #000;
+            font-weight: 500;
+            border: none;
+            margin: 2px 0;
+            position: relative;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            min-height: 0;
+            background-color: var(--bg-content);
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Button Row */
+        .button-row {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 1px solid #808080;
+            height: 26px;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: var(--base-font-size);
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-green {
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+        }
+
+        .btn-green:hover {
+            background: linear-gradient(to bottom, #70d070, #409040);
+        }
+
+        .btn-yellow {
+            background: linear-gradient(to bottom, #e0e080, #c0c040);
+        }
+
+        .btn-red {
+            background: linear-gradient(to bottom, #e06060, #c04040);
+            color: white;
+        }
+
+        /* Form Section */
+        .form-section {
+            background-color: var(--bg-section);
+            border: 1px solid #606090;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: var(--base-font-size);
+            font-weight: 500;
+            min-width: 80px;
+        }
+
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 3px 6px;
+            font-size: var(--base-font-size);
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 3px var(--primary-color);
+        }
+
+        .form-input.readonly {
+            background: #e8e8e8;
+        }
+
+        /* Auftrags-Liste Container */
+        .list-container {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auftraege-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Listbox Styles */
+        .listbox {
+            flex: 1;
+            background: white;
+            border: 1px solid #808080;
+            overflow: auto;
+        }
+
+        .listbox-header {
+            display: flex;
+            background: #e0e0e0;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+            padding: 5px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .listbox-row {
+            display: flex;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .listbox-row:hover {
+            background-color: #e8f4fc;
+        }
+
+        .listbox-row.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* ============================================
+           MINIJOBBER SLIDE-OUT PANEL
+           ============================================ */
+        .minijobber-panel {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 35px;
+            background: var(--primary-light);
+            transition: width 0.35s ease, box-shadow 0.35s ease;
+            overflow: hidden;
+            z-index: 100;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .minijobber-panel:hover,
+        .minijobber-panel.expanded {
+            width: 360px;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .minijobber-tab {
+            width: 35px;
+            min-width: 35px;
+            background: linear-gradient(to right, #5050a0, #6060a0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .minijobber-tab-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            letter-spacing: 2px;
+            padding: 10px 0;
+            user-select: none;
+        }
+
+        .minijobber-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            overflow: hidden;
+        }
+
+        .minijobber-panel:hover .minijobber-content,
+        .minijobber-panel.expanded .minijobber-content {
+            opacity: 1;
+        }
+
+        /* Panel in zwei Hälften teilen */
+        .panel-half {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .festangestellte-section {
+            border-bottom: 2px solid #606090;
+        }
+
+        .festangestellte-header {
+            background: #2e7d32 !important;
+        }
+
+        .minijobber-header {
+            background: #1565c0 !important;
+        }
+
+        .panel-hint {
+            padding: 4px 8px;
+            font-size: 9px;
+            color: #666;
+            text-align: center;
+            background: #f0f0f0;
+            border-top: 1px solid #ddd;
+        }
+
+        .ma-list {
+            flex: 1;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .auswahl-bereich {
+            display: flex;
+            flex-direction: column;
+            max-height: 80px;
+            background: #f8f8f8;
+            border-top: 1px solid #ccc;
+        }
+
+        .auswahl-bereich .auswahl-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px;
+            font-size: 10px;
+        }
+
+        .auswahl-bereich .auswahl-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            background: #e0e0e0;
+            position: static;
+        }
+
+        .auswahl-bereich .btn-anfragen {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 10px;
+        }
+
+        .auswahl-bereich .auswahl-count {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .panel-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 10px;
+            font-weight: bold;
+            font-size: var(--header-font-size);
+        }
+
+        .search-box {
+            padding: 8px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 5px 8px;
+            border: 1px solid #808080;
+            font-size: var(--base-font-size);
+        }
+
+        .minijobber-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .minijobber-item {
+            padding: 3px 10px;
+            border-bottom: none;
+            cursor: pointer;
+            transition: background 0.15s;
+            user-select: none;
+            line-height: 1.3;
+        }
+
+        .minijobber-item:hover {
+            background: #e8f4fc;
+        }
+
+        .minijobber-item.selected {
+            background: #c0e0ff;
+        }
+
+        .minijobber-item.disabled {
+            background: #e8e8e8;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .mj-name {
+            font-weight: 500;
+        }
+
+        .mj-info {
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* Rechte Seite: Auswahl */
+        .auswahl-panel {
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            background: #f8f8f8;
+            position: relative;
+        }
+
+        .auswahl-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .auswahl-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 8px;
+            background: white;
+            border: 1px solid #ccc;
+            margin-bottom: 4px;
+            border-radius: 3px;
+        }
+
+        .auswahl-item-name {
+            flex: 1;
+            font-size: var(--base-font-size);
+        }
+
+        .auswahl-item-remove {
+            background: #c04040;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+            border-radius: 2px;
+        }
+
+        .auswahl-item-remove:hover {
+            background: #e05050;
+        }
+
+        .auswahl-footer {
+            padding: 10px;
+            background: #e0e0e0;
+            border-top: 1px solid #ccc;
+            margin-top: auto;
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+        }
+
+        .btn-anfragen {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+            border: 2px solid;
+            border-color: #80d080 #206020 #206020 #80d080;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: var(--header-font-size);
+        }
+
+        .btn-anfragen:hover {
+            background: linear-gradient(to bottom, #70d070, #409040);
+        }
+
+        .btn-anfragen:disabled {
+            background: #a0a0a0;
+            border-color: #808080;
+            cursor: not-allowed;
+        }
+
+        .auswahl-count {
+            text-align: center;
+            margin-top: 8px;
+            font-size: var(--small-font-size);
+            color: #666;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .status-verfügbar { background: #d4edda; color: #155724; }
+        .status-eingeteilt { background: #fff3cd; color: #856404; }
+        .status-nicht-verfügbar { background: #f8d7da; color: #721c24; }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: var(--header-font-size);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+
+        /* Loading Spinner */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .status-bar {
+            background: #e0e0e0;
+            border-top: 1px solid #808080;
+            padding: 4px 10px;
+            font-size: var(--small-font-size);
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <!-- Header -->
+        <div class="header-row">
+            <div class="logo-box">C</div>
+            <span class="title-text">Auftragsverwaltung mit Minijobber-Schnellauswahl</span>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+            <div class="left-menu">
+                <div class="menu-header">Navigation</div>
+                <div class="menu-btn active">Aufträge</div>
+                <div class="menu-btn">Stammdaten</div>
+                <div class="menu-btn">Tagesübersicht</div>
+                <div class="menu-btn">Positionen</div>
+                <div class="menu-btn">Eventdaten</div>
+                <div class="menu-btn">MA-Zuordnung</div>
+                <div class="menu-btn">Schichten</div>
+                <div class="menu-btn">Kosten</div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Button Row -->
+                <div class="button-row">
+                    <button class="btn btn-green" id="btnNeu">Neu</button>
+                    <button class="btn" id="btnSpeichern">Speichern</button>
+                    <button class="btn btn-red" id="btnLöschen">Löschen</button>
+                    <span style="width: 20px;"></span>
+                    <button class="btn" id="btnMA_Auswahl">MA-Schnellauswahl</button>
+                    <button class="btn" id="btnPositionen">Positionen</button>
+                    <button class="btn" id="btnSchichten">Schichten</button>
+                    <span style="flex: 1;"></span>
+                    <button class="btn" id="btnDrucken">Drucken</button>
+                    <button class="btn" id="btnExport">Export</button>
+                </div>
+
+                <!-- Formular-Bereich -->
+                <div class="form-section">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <span class="form-label">Auftrag:</span>
+                            <input type="text" id="txtAuftrag" class="form-input" style="width: 200px;">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Objekt:</span>
+                            <select id="cboObjekt" class="form-select" style="width: 200px;">
+                                <option value="">-- Objekt wählen --</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Kunde:</span>
+                            <select id="cboKunde" class="form-select" style="width: 200px;">
+                                <option value="">-- Kunde wählen --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <span class="form-label">Von:</span>
+                            <input type="date" id="datVon" class="form-input">
+                            <span class="form-label" style="min-width: auto;">Bis:</span>
+                            <input type="date" id="datBis" class="form-input">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Status:</span>
+                            <select id="cboStatus" class="form-select" style="width: 120px;">
+                                <option value="1">Geplant</option>
+                                <option value="2">Bestätigt</option>
+                                <option value="3">Abgeschlossen</option>
+                                <option value="4">Storniert</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Ort:</span>
+                            <input type="text" id="txtOrt" class="form-input" style="width: 200px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <span class="form-label">MA Soll:</span>
+                            <input type="number" id="txtMA_Soll" class="form-input" style="width: 60px;" value="0">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">MA Ist:</span>
+                            <input type="text" id="txtMA_Ist" class="form-input readonly" style="width: 60px;" value="0" readonly>
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label">Offen:</span>
+                            <input type="text" id="txtMA_Offen" class="form-input readonly" style="width: 60px; color: red; font-weight: bold;" value="0" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aufträge-Liste mit Minijobber-Panel -->
+                <div class="list-container">
+                    <div class="auftraege-wrapper">
+                        <div class="listbox" id="auftraegeListe">
+                            <div class="listbox-header">
+                                <span style="flex: 0 0 60px;">ID</span>
+                                <span style="flex: 1;">Auftrag</span>
+                                <span style="flex: 0 0 120px;">Datum</span>
+                                <span style="flex: 0 0 150px;">Objekt</span>
+                                <span style="flex: 0 0 80px;">MA Soll</span>
+                                <span style="flex: 0 0 80px;">MA Ist</span>
+                                <span style="flex: 0 0 100px;">Status</span>
+                            </div>
+                            <div id="auftraegeBody">
+                                <div class="loading"><div class="spinner"></div>Lade Aufträge...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MA SLIDE-OUT PANEL (Festangestellte + Minijobber) -->
+                    <div class="minijobber-panel" id="minijobberPanel">
+                        <div class="minijobber-tab" onclick="toggleMinijobberPanel()">
+                            <span class="minijobber-tab-text">MA</span>
+                        </div>
+
+                        <div class="minijobber-content">
+                            <!-- OBERE HÄLFTE: Festangestellte -->
+                            <div class="panel-half festangestellte-section">
+                                <div class="panel-header festangestellte-header">Festangestellte</div>
+                                <div class="search-box">
+                                    <input type="text" id="faSuche" placeholder="Suche..." oninput="filterFestangestellte(this.value)">
+                                </div>
+                                <div class="ma-list" id="festangestellteList">
+                                    <div class="loading"><div class="spinner"></div>Lade...</div>
+                                </div>
+                                <div class="panel-hint">Doppelklick = direkt einteilen</div>
+                            </div>
+
+                            <!-- UNTERE HÄLFTE: Minijobber -->
+                            <div class="panel-half minijobber-section">
+                                <div class="panel-header minijobber-header">Minijobber</div>
+                                <div class="search-box">
+                                    <input type="text" id="mjSuche" placeholder="Suche..." oninput="filterMinijobber(this.value)">
+                                </div>
+                                <div class="ma-list" id="minijobberList">
+                                    <div class="loading"><div class="spinner"></div>Lade...</div>
+                                </div>
+
+                                <!-- Auswahl für Anfragen -->
+                                <div class="auswahl-bereich">
+                                    <div class="auswahl-list" id="auswahlList"></div>
+                                    <div class="auswahl-footer">
+                                        <button class="btn-anfragen" id="btnAnfragen" disabled onclick="sendeAnfragen()">
+                                            Anfragen senden
+                                        </button>
+                                        <span class="auswahl-count" id="auswahlCount">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span id="statusText">Bereit</span>
+                    <span id="statusTime"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+    // ============================================
+    // State Management
+    // ============================================
+    const state = {
+        auftraege: [],
+        minijobber: [],
+        filteredMinijobber: [],
+        festangestellte: [],
+        filteredFestangestellte: [],
+        selectedAuftrag: null,
+        selectedSchicht: null,
+        selectedMinijobber: [],
+        currentObjektId: null
+    };
+
+    // ============================================
+    // API Konfiguration
+    // ============================================
+    const API_BASE = 'http://localhost:5000/api';
+    const VBA_BRIDGE = 'http://localhost:5002/api/vba';
+
+    // ============================================
+    // Initialisierung
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('[Init] Auftragsverwaltung mit Minijobber-Panel');
+
+        // Event Listener
+        setupEventListeners();
+
+        // Daten laden
+        await loadAufträge();
+        await loadFestangestellte();
+        await loadMinijobber();
+
+        // Zeit aktualisieren
+        updateTime();
+        setInterval(updateTime, 1000);
+    });
+
+    function setupEventListeners() {
+        // Suche in Minijobber-Liste
+        document.getElementById('mjSuche').addEventListener('input', function() {
+            filterMinijobber(this.value);
+        });
+
+        // Auftrags-Auswahl aktualisiert Minijobber-Verfuegbarkeit
+        // (wird bei Klick auf Auftrags-Zeile getriggert)
+    }
+
+    // ============================================
+    // Aufträge laden
+    // ============================================
+    async function loadAufträge() {
+        setStatus('Lade Aufträge...');
+
+        try {
+            const heute = new Date().toISOString().split('T')[0];
+            const response = await fetch(`${API_BASE}/auftraege?ab_datum=${heute}&limit=100`);
+            const result = await response.json();
+
+            if (result.success && result.data) {
+                state.auftraege = result.data;
+                renderAufträge();
+                setStatus(`${state.auftraege.length} Aufträge geladen`);
+            } else {
+                // Demo-Daten falls API nicht erreichbar
+                loadDemoAufträge();
+            }
+        } catch (error) {
+            console.warn('[loadAufträge] API nicht erreichbar, lade Demo-Daten');
+            loadDemoAufträge();
+        }
+    }
+
+    function loadDemoAufträge() {
+        state.auftraege = [
+            { ID: 101, Auftrag: 'Konzert Messehalle', Dat_VA_Von: '2026-01-20', Objekt: 'Messehalle Nuernberg', MA_Anzahl: 12, MA_Anzahl_Ist: 8, Status: 'Geplant' },
+            { ID: 102, Auftrag: 'Firmenfeier BMW', Dat_VA_Von: '2026-01-22', Objekt: 'BMW Werk', MA_Anzahl: 6, MA_Anzahl_Ist: 6, Status: 'Bestätigt' },
+            { ID: 103, Auftrag: 'Messe BIOFACH', Dat_VA_Von: '2026-01-25', Objekt: 'NuernbergMesse', MA_Anzahl: 25, MA_Anzahl_Ist: 15, Status: 'Geplant' },
+            { ID: 104, Auftrag: 'Sportveranstaltung', Dat_VA_Von: '2026-01-28', Objekt: 'Arena Nuernberg', MA_Anzahl: 8, MA_Anzahl_Ist: 3, Status: 'Geplant' },
+            { ID: 105, Auftrag: 'Konferenz Hotel', Dat_VA_Von: '2026-02-01', Objekt: 'Maritim Hotel', MA_Anzahl: 4, MA_Anzahl_Ist: 4, Status: 'Bestätigt' },
+        ];
+        renderAufträge();
+        setStatus('Demo-Daten geladen (API nicht verfügbar)');
+    }
+
+    function renderAufträge() {
+        const body = document.getElementById('auftraegeBody');
+
+        if (state.auftraege.length === 0) {
+            body.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Keine Aufträge gefunden</div>';
+            return;
+        }
+
+        body.innerHTML = state.auftraege.map(a => {
+            // Flexible Feldnamen - unterstuetzt API und Demo-Daten
+            const id = a.VA_ID || a.ID || a.id;
+            const auftrag = a.Auftrag || a.auftrag || '';
+            const datum = formatDate(a.Dat_VA_Von || a.VADatum || a.datum);
+            const objekt = a.Objekt || a.ObjektName || a.objekt || '';
+            const maSoll = a.MA_Anzahl || a.ma_soll || 0;
+            const maIst = a.MA_Anzahl_Ist || a.ma_ist || 0;
+            const status = a.AuftragStatus || a.Status || a.status || '-';
+            const offen = maSoll - maIst;
+            const openClass = offen > 0 ? 'style="color: red; font-weight: bold;"' : '';
+
+            return `
+                <div class="listbox-row ${state.selectedAuftrag?.ID === id ? 'selected' : ''}"
+                     onclick="selectAuftrag(${id})" data-id="${id}">
+                    <span style="flex: 0 0 60px;">${id}</span>
+                    <span style="flex: 1;">${auftrag}</span>
+                    <span style="flex: 0 0 120px;">${datum}</span>
+                    <span style="flex: 0 0 150px;">${objekt}</span>
+                    <span style="flex: 0 0 80px;">${maSoll}</span>
+                    <span style="flex: 0 0 80px;">${maIst}</span>
+                    <span style="flex: 0 0 100px;" ${openClass}>${status}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function selectAuftrag(id) {
+        const auftrag = state.auftraege.find(a => (a.VA_ID || a.ID || a.id) == id);
+        if (!auftrag) return;
+
+        // ID normalisieren
+        auftrag.ID = id;
+
+        state.selectedAuftrag = auftrag;
+        state.currentObjektId = auftrag.Objekt_ID || auftrag.VA_Objekt_ID;
+
+        // Formular befuellen
+        document.getElementById('txtAuftrag').value = auftrag.Auftrag || '';
+        document.getElementById('datVon').value = auftrag.Dat_VA_Von || '';
+        document.getElementById('datBis').value = auftrag.Dat_VA_Bis || auftrag.Dat_VA_Von || '';
+        document.getElementById('txtOrt').value = auftrag.Ort || '';
+        document.getElementById('txtMA_Soll').value = auftrag.MA_Anzahl || 0;
+        document.getElementById('txtMA_Ist').value = auftrag.MA_Anzahl_Ist || 0;
+        document.getElementById('txtMA_Offen').value = (auftrag.MA_Anzahl || 0) - (auftrag.MA_Anzahl_Ist || 0);
+
+        // Auswahl in Liste markieren
+        document.querySelectorAll('#auftraegeBody .listbox-row').forEach(row => {
+            row.classList.toggle('selected', parseInt(row.dataset.id) === id);
+        });
+
+        // Minijobber-Verfuegbarkeit aktualisieren
+        updateMinijobberVerfuegbarkeit();
+
+        setStatus(`Auftrag ${auftrag.Auftrag} ausgewählt`);
+    }
+
+    // ============================================
+    // Minijobber laden
+    // ============================================
+    async function loadMinijobber() {
+        const listEl = document.getElementById('minijobberList');
+        listEl.innerHTML = '<div class="loading"><div class="spinner"></div>Lade Minijobber...</div>';
+
+        try {
+            // Lade nur Minijobber (Anstellungsart_ID = 5) die verfügbar sind
+            // Falls Auftrag ausgewählt, pruefe Verfuegbarkeit fuer diesen Tag/Zeit
+            let url = `${API_BASE}/mitarbeiter?anstellungsart_id=5&aktiv=true`;
+
+            if (state.selectedAuftrag) {
+                const datum = state.selectedAuftrag.Dat_VA_Von || state.selectedAuftrag.VADatum;
+                const vaId = state.selectedAuftrag.VA_ID || state.selectedAuftrag.ID;
+                if (datum) {
+                    url += `&verfügbar_am=${datum}`;
+                }
+                if (vaId) {
+                    url += `&nicht_eingeplant_va=${vaId}`;
+                }
+            }
+
+            let response = await fetch(url);
+
+            // Fallback: alle Mitarbeiter laden und clientseitig filtern
+            if (!response.ok) {
+                response = await fetch(`${API_BASE}/mitarbeiter?aktiv=true&limit=500`);
+            }
+
+            const result = await response.json();
+
+            if (result.success && result.data) {
+                const alleMitarbeiter = result.data.mitarbeiter || result.data;
+
+                // Strikt nur Anstellungsart_ID = 5 (Minijobber)
+                state.minijobber = alleMitarbeiter.filter(m => {
+                    const anstellungsartId = m.Anstellungsart_ID || m.anstellungsart_id;
+                    return anstellungsartId === 5;
+                });
+
+                // Falls Auftrag ausgewählt: Filtere bereits eingeplante und privat verplante
+                if (state.selectedAuftrag && state.minijobber.length > 0) {
+                    state.minijobber = state.minijobber.filter(m => {
+                        // Nicht bereits eingeplant
+                        if (m.IstEingeplant === true) return false;
+                        // Nicht privat verplant
+                        if (m.IstPrivatVerplant === true || m.NichtVerfuegbar === true) return false;
+                        return true;
+                    });
+                }
+
+                state.filteredMinijobber = [...state.minijobber];
+
+                // Fallback: Demo-Daten wenn keine Minijobber gefunden
+                if (state.minijobber.length === 0) {
+                    console.log('[loadMinijobber] Keine Minijobber in API gefunden, lade Demo-Daten');
+                    loadDemoMinijobber();
+                } else {
+                    renderMinijobber();
+                    console.log(`[loadMinijobber] ${state.minijobber.length} verfügbare Minijobber geladen`);
+                }
+            } else {
+                loadDemoMinijobber();
+            }
+        } catch (error) {
+            console.warn('[loadMinijobber] API nicht erreichbar, lade Demo-Daten:', error);
+            loadDemoMinijobber();
+        }
+    }
+
+    function loadDemoMinijobber() {
+        state.minijobber = [
+            { ID: 1001, Nachname: 'Müller', Vorname: 'Max', Tel_Mobil: '0176-1234567', LetzterEinsatz: '2026-01-10', IstVerfuegbar: true },
+            { ID: 1002, Nachname: 'Schmidt', Vorname: 'Anna', Tel_Mobil: '0172-9876543', LetzterEinsatz: '2026-01-08', IstVerfuegbar: true },
+            { ID: 1003, Nachname: 'Fischer', Vorname: 'Tom', Tel_Mobil: '0151-5555555', LetzterEinsatz: '2026-01-05', IstVerfuegbar: false },
+            { ID: 1004, Nachname: 'Weber', Vorname: 'Lisa', Tel_Mobil: '0170-1111111', LetzterEinsatz: '2025-12-28', IstVerfuegbar: true },
+            { ID: 1005, Nachname: 'Bauer', Vorname: 'Peter', Tel_Mobil: '0175-2222222', LetzterEinsatz: '2026-01-12', IstVerfuegbar: true },
+            { ID: 1006, Nachname: 'Böhm', Vorname: 'Julia', Tel_Mobil: '0163-3333333', LetzterEinsatz: '2026-01-09', IstVerfuegbar: true },
+            { ID: 1007, Nachname: 'Schröder', Vorname: 'Michael', Tel_Mobil: '0176-4444444', LetzterEinsatz: '2026-01-11', IstVerfuegbar: false },
+            { ID: 1008, Nachname: 'Weiß', Vorname: 'Sarah', Tel_Mobil: '0157-6666666', LetzterEinsatz: '2025-12-20', IstVerfuegbar: true },
+            { ID: 1009, Nachname: 'Günther', Vorname: 'David', Tel_Mobil: '0152-7777777', LetzterEinsatz: '2026-01-07', IstVerfuegbar: true },
+            { ID: 1010, Nachname: 'Köhler', Vorname: 'Laura', Tel_Mobil: '0178-8888888', LetzterEinsatz: '2026-01-14', IstVerfuegbar: true },
+        ];
+        state.filteredMinijobber = [...state.minijobber];
+        renderMinijobber();
+    }
+
+    function renderMinijobber() {
+        const listEl = document.getElementById('minijobberList');
+
+        // Filtere Einträge ohne gültigen Namen
+        const gueltigeMinijobber = state.filteredMinijobber.filter(m => {
+            const nachname = m.Nachname || m.nachname || '';
+            const vorname = m.Vorname || m.vorname || '';
+            return nachname.trim() !== '' || vorname.trim() !== '';
+        });
+
+        if (gueltigeMinijobber.length === 0) {
+            listEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Keine Minijobber gefunden</div>';
+            return;
+        }
+
+        // Sortieren nach Nachname
+        const sorted = [...gueltigeMinijobber].sort((a, b) => {
+            const nameA = (a.Nachname || a.nachname || '').toLowerCase();
+            const nameB = (b.Nachname || b.nachname || '').toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+
+        listEl.innerHTML = sorted.map(m => {
+            const id = m.ID || m.id || m.MA_ID;
+            const nachname = m.Nachname || m.nachname || '';
+            const vorname = m.Vorname || m.vorname || '';
+            const isSelected = state.selectedMinijobber.some(s => (s.ID || s.id) === id);
+
+            return `
+                <div class="minijobber-item ${isSelected ? 'selected' : ''}"
+                     ondblclick="toggleMinijobber(${id})" data-id="${id}">
+                    ${nachname} ${vorname}
+                </div>
+            `;
+        }).join('');
+    }
+
+    function filterMinijobber(suchtext) {
+        const suche = suchtext.toLowerCase();
+
+        if (!suche) {
+            state.filteredMinijobber = [...state.minijobber];
+        } else {
+            state.filteredMinijobber = state.minijobber.filter(m => {
+                const name = `${m.Nachname || ''} ${m.Vorname || ''}`.toLowerCase();
+                return name.includes(suche);
+            });
+        }
+
+        renderMinijobber();
+    }
+
+    function updateMinijobberVerfuegbarkeit() {
+        // In einer echten Implementierung wuerde hier die Verfuegbarkeit
+        // fuer den ausgewählten Auftrag geprueft werden
+        if (state.selectedAuftrag) {
+            console.log('[updateMinijobberVerfuegbarkeit] Auftrag:', state.selectedAuftrag.Auftrag);
+            // API-Aufruf: /api/mitarbeiter?verfügbar=true&va_id=xxx
+        }
+        renderMinijobber();
+    }
+
+    // ============================================
+    // Festangestellte laden (Anstellungsart_ID = 3)
+    // ============================================
+    async function loadFestangestellte() {
+        const listEl = document.getElementById('festangestellteList');
+        listEl.innerHTML = '<div class="loading"><div class="spinner"></div>Lade...</div>';
+
+        try {
+            // Lade nur Festangestellte (Anstellungsart_ID = 3) die verfügbar sind
+            let url = `${API_BASE}/mitarbeiter?anstellungsart_id=3&aktiv=true`;
+
+            if (state.selectedAuftrag) {
+                const datum = state.selectedAuftrag.Dat_VA_Von || state.selectedAuftrag.VADatum;
+                const vaId = state.selectedAuftrag.VA_ID || state.selectedAuftrag.ID;
+                if (datum) {
+                    url += `&verfügbar_am=${datum}`;
+                }
+                if (vaId) {
+                    url += `&nicht_eingeplant_va=${vaId}`;
+                }
+            }
+
+            let response = await fetch(url);
+
+            // Fallback: alle Mitarbeiter laden und clientseitig filtern
+            if (!response.ok) {
+                response = await fetch(`${API_BASE}/mitarbeiter?aktiv=true&limit=500`);
+            }
+
+            const result = await response.json();
+
+            if (result.success && result.data) {
+                const alleMitarbeiter = result.data.mitarbeiter || result.data;
+
+                // Strikt nur Anstellungsart_ID = 3 (Festangestellte)
+                state.festangestellte = alleMitarbeiter.filter(m => {
+                    const anstellungsartId = m.Anstellungsart_ID || m.anstellungsart_id;
+                    return anstellungsartId === 3;
+                });
+
+                // Filtere bereits eingeplante, privat verplante, kranke und Urlauber
+                if (state.selectedAuftrag && state.festangestellte.length > 0) {
+                    state.festangestellte = state.festangestellte.filter(m => {
+                        // Nicht bereits eingeplant
+                        if (m.IstEingeplant === true) return false;
+                        // Nicht privat verplant
+                        if (m.IstPrivatVerplant === true || m.NichtVerfuegbar === true) return false;
+                        // Nicht krank
+                        if (m.IstKrank === true) return false;
+                        // Nicht im Urlaub
+                        if (m.IstUrlaub === true) return false;
+                        return true;
+                    });
+                }
+
+                state.filteredFestangestellte = [...state.festangestellte];
+
+                // Fallback: Demo-Daten wenn keine Festangestellten gefunden
+                if (state.festangestellte.length === 0) {
+                    console.log('[loadFestangestellte] Keine Festangestellten in API gefunden, lade Demo-Daten');
+                    loadDemoFestangestellte();
+                } else {
+                    renderFestangestellte();
+                    console.log(`[loadFestangestellte] ${state.festangestellte.length} verfügbare Festangestellte geladen`);
+                }
+            } else {
+                loadDemoFestangestellte();
+            }
+        } catch (error) {
+            console.warn('[loadFestangestellte] API nicht erreichbar, lade Demo-Daten:', error);
+            loadDemoFestangestellte();
+        }
+    }
+
+    function loadDemoFestangestellte() {
+        state.festangestellte = [
+            { ID: 501, Nachname: 'Hofmann', Vorname: 'Thomas', IstVerfuegbar: true },
+            { ID: 502, Nachname: 'Krüger', Vorname: 'Sabine', IstVerfuegbar: true },
+            { ID: 503, Nachname: 'Lehmann', Vorname: 'Andreas', IstVerfuegbar: true },
+            { ID: 504, Nachname: 'Zimmermann', Vorname: 'Petra', IstVerfuegbar: true },
+            { ID: 505, Nachname: 'Neumann', Vorname: 'Frank', IstVerfuegbar: true },
+            { ID: 506, Nachname: 'Hartmann', Vorname: 'Claudia', IstVerfuegbar: true },
+            { ID: 507, Nachname: 'Schwarz', Vorname: 'Markus', IstVerfuegbar: true },
+            { ID: 508, Nachname: 'Braun', Vorname: 'Kerstin', IstVerfuegbar: true },
+        ];
+        state.filteredFestangestellte = [...state.festangestellte];
+        renderFestangestellte();
+    }
+
+    function renderFestangestellte() {
+        const listEl = document.getElementById('festangestellteList');
+
+        // Filtere Einträge ohne gültigen Namen
+        const gueltigeFestangestellte = state.filteredFestangestellte.filter(m => {
+            const nachname = m.Nachname || m.nachname || '';
+            const vorname = m.Vorname || m.vorname || '';
+            return nachname.trim() !== '' || vorname.trim() !== '';
+        });
+
+        if (gueltigeFestangestellte.length === 0) {
+            listEl.innerHTML = '<div style="padding: 20px; text-align: center; color: #888;">Keine Festangestellten verfügbar</div>';
+            return;
+        }
+
+        // Sortieren nach Nachname
+        const sorted = [...gueltigeFestangestellte].sort((a, b) => {
+            const nameA = (a.Nachname || a.nachname || '').toLowerCase();
+            const nameB = (b.Nachname || b.nachname || '').toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+
+        listEl.innerHTML = sorted.map(m => {
+            const id = m.ID || m.id || m.MA_ID;
+            const nachname = m.Nachname || m.nachname || '';
+            const vorname = m.Vorname || m.vorname || '';
+
+            return `
+                <div class="minijobber-item"
+                     ondblclick="assignToSchicht(${id})" data-id="${id}">
+                    ${nachname} ${vorname}
+                </div>
+            `;
+        }).join('');
+    }
+
+    function filterFestangestellte(suchtext) {
+        const suche = suchtext.toLowerCase();
+
+        if (!suche) {
+            state.filteredFestangestellte = [...state.festangestellte];
+        } else {
+            state.filteredFestangestellte = state.festangestellte.filter(m => {
+                const name = `${m.Nachname || ''} ${m.Vorname || ''}`.toLowerCase();
+                return name.includes(suche);
+            });
+        }
+
+        renderFestangestellte();
+    }
+
+    // Festangestellten direkt in die ausgewählte Schicht einteilen
+    async function assignToSchicht(maId) {
+        // Prüfe ob ein Auftrag ausgewählt ist
+        if (!state.selectedAuftrag) {
+            showToast('Bitte erst einen Auftrag auswählen', 'error');
+            return;
+        }
+
+        // Prüfe ob eine Schicht ausgewählt ist (optional: falls mehrere Schichten)
+        const vaId = state.selectedAuftrag.VA_ID || state.selectedAuftrag.ID;
+        const datum = state.selectedAuftrag.Dat_VA_Von || state.selectedAuftrag.VADatum;
+        const schichtId = state.selectedSchicht?.ID || null;
+
+        // Mitarbeiter-Info holen
+        const ma = state.festangestellte.find(m => (m.ID || m.id || m.MA_ID) == maId);
+        if (!ma) {
+            showToast('Mitarbeiter nicht gefunden', 'error');
+            return;
+        }
+
+        const maName = `${ma.Nachname || ''} ${ma.Vorname || ''}`.trim();
+
+        setStatus(`Teile ${maName} ein...`);
+
+        try {
+            // Versuche VBA Bridge (bevorzugt)
+            const vbaResult = await fetch(`${VBA_BRIDGE}/zuordnung`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    function: 'HTML_ZuordneMAZuSchicht',
+                    params: {
+                        va_id: vaId,
+                        ma_id: maId,
+                        vadatum: datum,
+                        schicht_id: schichtId
+                    }
+                })
+            });
+
+            if (vbaResult.ok) {
+                const result = await vbaResult.json();
+                if (result.success) {
+                    showToast(`${maName} erfolgreich eingeteilt!`, 'success');
+                    // Mitarbeiter aus Liste entfernen
+                    state.festangestellte = state.festangestellte.filter(m => (m.ID || m.id || m.MA_ID) != maId);
+                    state.filteredFestangestellte = state.filteredFestangestellte.filter(m => (m.ID || m.id || m.MA_ID) != maId);
+                    renderFestangestellte();
+                    // MA-Zahlen aktualisieren
+                    updateMAZahlen();
+                    setStatus(`${maName} eingeteilt`);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('[assignToSchicht] VBA Bridge nicht verfügbar:', e);
+        }
+
+        // Fallback: REST API
+        try {
+            const response = await fetch(`${API_BASE}/zuordnungen`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    va_id: vaId,
+                    ma_id: maId,
+                    vadatum: datum,
+                    schicht_id: schichtId
+                })
+            });
+
+            if (response.ok) {
+                showToast(`${maName} erfolgreich eingeteilt!`, 'success');
+                // Mitarbeiter aus Liste entfernen
+                state.festangestellte = state.festangestellte.filter(m => (m.ID || m.id || m.MA_ID) != maId);
+                state.filteredFestangestellte = state.filteredFestangestellte.filter(m => (m.ID || m.id || m.MA_ID) != maId);
+                renderFestangestellte();
+                updateMAZahlen();
+                setStatus(`${maName} eingeteilt`);
+            } else {
+                throw new Error('API Fehler');
+            }
+        } catch (e) {
+            // Demo-Modus: Simuliere Erfolg
+            console.log('[assignToSchicht] Demo-Modus - simuliere Erfolg');
+            showToast(`${maName} eingeteilt (Demo-Modus)`, 'success');
+            // Mitarbeiter aus Liste entfernen
+            state.festangestellte = state.festangestellte.filter(m => (m.ID || m.id || m.MA_ID) != maId);
+            state.filteredFestangestellte = state.filteredFestangestellte.filter(m => (m.ID || m.id || m.MA_ID) != maId);
+            renderFestangestellte();
+            // Simuliere MA-Zahlen Update
+            if (state.selectedAuftrag) {
+                state.selectedAuftrag.MA_Anzahl_Ist = (state.selectedAuftrag.MA_Anzahl_Ist || 0) + 1;
+                document.getElementById('txtMA_Ist').value = state.selectedAuftrag.MA_Anzahl_Ist;
+                const offen = (state.selectedAuftrag.MA_Anzahl || 0) - state.selectedAuftrag.MA_Anzahl_Ist;
+                document.getElementById('txtMA_Offen').value = offen;
+            }
+            setStatus('Demo-Modus: Einteilung simuliert');
+        }
+    }
+
+    function updateMAZahlen() {
+        // Aktualisiert die MA Soll/Ist/Offen Felder
+        if (state.selectedAuftrag) {
+            const soll = state.selectedAuftrag.MA_Anzahl || 0;
+            const ist = state.selectedAuftrag.MA_Anzahl_Ist || 0;
+            document.getElementById('txtMA_Soll').value = soll;
+            document.getElementById('txtMA_Ist').value = ist;
+            document.getElementById('txtMA_Offen').value = soll - ist;
+        }
+    }
+
+    // ============================================
+    // Minijobber-Auswahl
+    // ============================================
+    function toggleMinijobber(id) {
+        // Flexible ID-Suche
+        const mj = state.minijobber.find(m => (m.ID || m.id || m.MA_ID) == id);
+        if (!mj) return;
+
+        // ID normalisieren
+        const mjId = mj.ID || mj.id || mj.MA_ID;
+
+        // Pruefen ob verfügbar
+        if (mj.IstVerfuegbar === false || mj.IstAktiv === false) {
+            showToast('Mitarbeiter ist nicht verfügbar', 'error');
+            return;
+        }
+
+        // Pruefen ob bereits ausgewählt
+        const idx = state.selectedMinijobber.findIndex(s => (s.ID || s.id || s.MA_ID) == mjId);
+
+        if (idx >= 0) {
+            // Entfernen
+            state.selectedMinijobber.splice(idx, 1);
+        } else {
+            // Hinzufuegen mit normalisierter ID
+            mj.ID = mjId;
+            state.selectedMinijobber.push(mj);
+        }
+
+        renderMinijobber();
+        renderAuswahl();
+    }
+
+    function removeFromAuswahl(id) {
+        state.selectedMinijobber = state.selectedMinijobber.filter(s => (s.ID || s.id || s.MA_ID) != id);
+        renderMinijobber();
+        renderAuswahl();
+    }
+
+    function renderAuswahl() {
+        const listEl = document.getElementById('auswahlList');
+        const btnAnfragen = document.getElementById('btnAnfragen');
+        const countEl = document.getElementById('auswahlCount');
+
+        if (state.selectedMinijobber.length === 0) {
+            listEl.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: #888; font-size: 10px;">
+                    Doppelklick auf Namen zum Auswählen
+                </div>
+            `;
+            btnAnfragen.disabled = true;
+            countEl.textContent = '0 ausgewählt';
+            return;
+        }
+
+        listEl.innerHTML = state.selectedMinijobber.map(m => {
+            const id = m.ID || m.id || m.MA_ID;
+            const nachname = m.Nachname || m.nachname || '';
+            const vorname = m.Vorname || m.vorname || '';
+            return `
+            <div class="auswahl-item">
+                <span class="auswahl-item-name">${nachname} ${vorname}</span>
+                <button class="auswahl-item-remove" onclick="removeFromAuswahl(${id})" title="Entfernen">X</button>
+            </div>
+        `;
+        }).join('');
+
+        btnAnfragen.disabled = false;
+        countEl.textContent = `${state.selectedMinijobber.length} ausgewählt`;
+    }
+
+    // ============================================
+    // Anfragen senden
+    // ============================================
+    async function sendeAnfragen() {
+        if (state.selectedMinijobber.length === 0) {
+            showToast('Keine Mitarbeiter ausgewählt', 'error');
+            return;
+        }
+
+        if (!state.selectedAuftrag) {
+            showToast('Bitte erst einen Auftrag auswählen', 'error');
+            return;
+        }
+
+        const anzahl = state.selectedMinijobber.length;
+        const auftrag = state.selectedAuftrag.Auftrag;
+
+        // Bestaetigung
+        if (!confirm(`${anzahl} Mitarbeiter fuer "${auftrag}" anfragen?`)) {
+            return;
+        }
+
+        setStatus('Sende Anfragen...');
+
+        const ma_ids = state.selectedMinijobber.map(m => m.ID);
+        const va_id = state.selectedAuftrag.ID;
+
+        try {
+            // Versuche VBA Bridge (bevorzugt)
+            const vbaResult = await fetch(`${VBA_BRIDGE}/anfragen`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    function: 'HTML_SendeAnfragen',
+                    params: { va_id: va_id, ma_ids: ma_ids }
+                })
+            });
+
+            if (vbaResult.ok) {
+                const result = await vbaResult.json();
+                showToast(`${anzahl} Anfragen erfolgreich gesendet!`, 'success');
+                clearAuswahl();
+                setStatus(`${anzahl} Anfragen gesendet`);
+                return;
+            }
+        } catch (e) {
+            console.warn('[sendeAnfragen] VBA Bridge nicht verfügbar:', e);
+        }
+
+        // Fallback: REST API
+        try {
+            const response = await fetch(`${API_BASE}/anfragen`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    va_id: va_id,
+                    ma_ids: ma_ids,
+                    typ: 'email'
+                })
+            });
+
+            if (response.ok) {
+                showToast(`${anzahl} Anfragen erfolgreich gesendet!`, 'success');
+                clearAuswahl();
+                setStatus(`${anzahl} Anfragen gesendet`);
+            } else {
+                throw new Error('API Fehler');
+            }
+        } catch (e) {
+            // Demo-Modus: Simuliere Erfolg
+            console.log('[sendeAnfragen] Demo-Modus - simuliere Erfolg');
+            showToast(`${anzahl} Anfragen wuerden gesendet (Demo-Modus)`, 'success');
+            clearAuswahl();
+            setStatus('Demo-Modus: Anfragen simuliert');
+        }
+    }
+
+    function clearAuswahl() {
+        state.selectedMinijobber = [];
+        renderMinijobber();
+        renderAuswahl();
+    }
+
+    // ============================================
+    // Minijobber-Panel Toggle
+    // ============================================
+    function toggleMinijobberPanel() {
+        const panel = document.getElementById('minijobberPanel');
+        panel.classList.toggle('expanded');
+    }
+
+    // ============================================
+    // Helper Functions
+    // ============================================
+    function formatDate(d) {
+        if (!d) return '';
+        try {
+            const date = new Date(d);
+            return date.toLocaleDateString('de-DE');
+        } catch {
+            return d;
+        }
+    }
+
+    function setStatus(text) {
+        document.getElementById('statusText').textContent = text;
+    }
+
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('statusTime').textContent = now.toLocaleTimeString('de-DE');
+    }
+
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast ' + type;
+        toast.classList.add('show');
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // ============================================
+    // Globale Funktionen fuer onclick
+    // ============================================
+    window.selectAuftrag = selectAuftrag;
+    window.toggleMinijobber = toggleMinijobber;
+    window.removeFromAuswahl = removeFromAuswahl;
+    window.sendeAnfragen = sendeAnfragen;
+    window.toggleMinijobberPanel = toggleMinijobberPanel;
+    window.filterFestangestellte = filterFestangestellte;
+    window.assignToSchicht = assignToSchicht;
+    window.filterMinijobber = filterMinijobber;
+    </script>
+</body>
+</html>

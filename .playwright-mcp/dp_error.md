@@ -1,0 +1,159 @@
+### Page state
+- Page URL: http://localhost:8080/shell.html?form=frm_DP_Dienstplan_MA
+- Page Title: CONSYS - Verwaltung
+- Page Snapshot:
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: CONSYS PLANUNG
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: PLANUNG
+        - button "Dienstplan MA Dienstplan aller Mitarbeiter anzeigen" [active] [ref=e65] [cursor=pointer]
+        - button "Planung Objekt" [ref=e9] [cursor=pointer]
+      - generic [ref=e10]:
+        - generic [ref=e11]: STAMMDATEN
+        - button "Aufträge" [ref=e12] [cursor=pointer]
+        - button "Mitarbeiter" [ref=e13] [cursor=pointer]
+        - button "Kunden" [ref=e63] [cursor=pointer]
+        - button "Objekte" [ref=e66] [cursor=pointer]
+      - generic [ref=e16]:
+        - generic [ref=e17]: PERSONAL
+        - button "Zeitkonten" [ref=e18] [cursor=pointer]
+        - button "Stundenauswertung" [ref=e19] [cursor=pointer]
+        - button "Abwesenheiten" [ref=e20] [cursor=pointer]
+        - button "Telefonliste" [ref=e21] [cursor=pointer]
+        - button "Letzter Einsatz" [ref=e22] [cursor=pointer]
+        - button "Lohnarten" [ref=e23] [cursor=pointer]
+      - generic [ref=e24]:
+        - generic [ref=e25]: EXTRAS
+        - button "Schnellauswahl" [ref=e26] [cursor=pointer]
+        - button "Einsatzübersicht" [ref=e27] [cursor=pointer]
+        - button "Vorlagen" [ref=e28] [cursor=pointer]
+      - generic [ref=e29]:
+        - generic [ref=e30]: EXPORT
+        - button "MA Stamm Excel" [ref=e31] [cursor=pointer]
+        - button "FCN Meldeliste" [ref=e32] [cursor=pointer]
+        - button "Fürth Namensliste" [ref=e33] [cursor=pointer]
+        - button "Sub Stunden" [ref=e34] [cursor=pointer]
+        - button "Stunden MA" [ref=e35] [cursor=pointer]
+      - generic [ref=e36]:
+        - generic [ref=e37]: SYSTEM
+        - button "Lex Aktiv" [ref=e38] [cursor=pointer]
+        - button "Löwensaal Sync" [ref=e39] [cursor=pointer]
+  - generic [ref=e40]:
+    - generic [ref=e41]:
+      - generic "Aufträge" [ref=e43] [cursor=pointer]
+      - generic [ref=e47] [cursor=pointer]:
+        - generic "Kunden" [ref=e48]
+        - button "Ã—" [ref=e49]
+      - generic [ref=e53] [cursor=pointer]:
+        - generic "Objekte" [ref=e54]
+        - button "Ã—" [ref=e55]
+      - generic [ref=e56] [cursor=pointer]:
+        - generic "Dienstplan MA" [ref=e57]
+        - button "Ã—" [ref=e58]
+    - iframe [ref=e59]:
+      - generic [active] [ref=f20e1]:
+        - button "⛶" [ref=f20e2] [cursor=pointer]
+        - main [ref=f20e4]:
+          - main [ref=f20e6]:
+            - generic [ref=f20e7]:
+              - generic [ref=f20e8]:
+                - generic [ref=f20e9]:
+                  - generic [ref=f20e10]: C
+                  - generic [ref=f20e11]: Dienstplanübersicht
+                  - generic [ref=f20e12]:
+                    - button "<" [ref=f20e13] [cursor=pointer]
+                    - textbox [ref=f20e14]: 2026-01-12
+                    - combobox [ref=f20e15]:
+                      - option "01"
+                      - option "02"
+                      - option "03" [selected]
+                      - option "04"
+                      - option "05"
+                      - option "06"
+                      - option "07"
+                      - option "08"
+                      - option "09"
+                      - option "10"
+                      - option "11"
+                      - option "12"
+                      - option "13"
+                      - option "14"
+                      - option "15"
+                      - option "16"
+                      - option "17"
+                      - option "18"
+                      - option "19"
+                      - option "20"
+                      - option "21"
+                      - option "22"
+                      - option "23"
+                      - option "24"
+                      - option "25"
+                      - option "26"
+                      - option "27"
+                      - option "28"
+                      - option "29"
+                      - option "30"
+                      - option "31"
+                      - option "32"
+                      - option "33"
+                      - option "34"
+                      - option "35"
+                      - option "36"
+                      - option "37"
+                      - option "38"
+                      - option "39"
+                      - option "40"
+                      - option "41"
+                      - option "42"
+                      - option "43"
+                      - option "44"
+                      - option "45"
+                      - option "46"
+                      - option "47"
+                      - option "48"
+                      - option "49"
+                      - option "50"
+                      - option "51"
+                      - option "52"
+                      - option "53"
+                    - button ">" [ref=f20e16] [cursor=pointer]
+                    - button "Ab Heute" [ref=f20e17] [cursor=pointer]
+                    - combobox [ref=f20e18]:
+                      - option "Alle anzeigen"
+                      - option "Alle aktiven" [selected]
+                      - option "Festangestellte"
+                      - option "Minijobber"
+                      - option "Sub"
+                    - button "Dienstpläne senden" [ref=f20e19] [cursor=pointer]
+                    - textbox [ref=f20e20]: 2026-01-18
+                    - button "Einzeldienstpläne" [ref=f20e21] [cursor=pointer]
+                    - button "Übersicht drucken" [ref=f20e22] [cursor=pointer]
+                - generic [ref=f20e23]:
+                  - text: CONSYS
+                  - generic [ref=f20e24]: Web
+              - generic:
+                - generic [ref=f20e25]: Mitarbeiter
+                - 'generic "Doppelklick: Startdatum auf diesen Tag setzen" [ref=f20e26] [cursor=pointer]': Montag 12.01.2026
+                - 'generic "Doppelklick: Startdatum auf diesen Tag setzen" [ref=f20e27] [cursor=pointer]': Dienstag 13.01.2026
+                - 'generic "Doppelklick: Startdatum auf diesen Tag setzen" [ref=f20e28] [cursor=pointer]': Mittwoch 14.01.2026
+                - 'generic "Doppelklick: Startdatum auf diesen Tag setzen" [ref=f20e29] [cursor=pointer]': Donnerstag 15.01.2026
+                - 'generic "Doppelklick: Startdatum auf diesen Tag setzen" [ref=f20e30] [cursor=pointer]': Freitag 16.01.2026
+                - 'generic "Doppelklick: Startdatum auf diesen Tag setzen" [ref=f20e31] [cursor=pointer]': Samstag 17.01.2026
+                - 'generic "Doppelklick: Startdatum auf diesen Tag setzen" [ref=f20e32] [cursor=pointer]': Sonntag 18.01.2026
+                - generic [ref=f20e47]: "Fehler beim Laden: Failed to fetch"
+            - generic [ref=f20e35]:
+              - generic [ref=f20e36]: Ready
+              - generic [ref=f20e37]: 17.1.2026, 10:27:11
+        - generic [ref=f20e39]:
+          - heading "API-Server nicht verfuegbar" [level=2] [ref=f20e40]
+          - paragraph [ref=f20e41]: Der API-Server auf Port 5000 antwortet nicht. Das Formular kann keine Daten laden.
+          - generic [ref=f20e42]:
+            - strong [ref=f20e43]: "Server starten:"
+            - code [ref=f20e44]: C:\Users\guenther.siegert\Documents\Access Bridge\start_api_hidden.vbs
+          - button "Erneut versuchen" [ref=f20e45] [cursor=pointer]
+          - button "Trotzdem fortfahren" [ref=f20e46] [cursor=pointer]
+```

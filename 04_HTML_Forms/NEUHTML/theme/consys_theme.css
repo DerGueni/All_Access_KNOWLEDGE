@@ -1,0 +1,406 @@
+/**
+ * consys_theme.css
+ * CONSYS Einheitliches Theme - STRIKT
+ *
+ * ERLAUBTE FARBEN:
+ * - Header: BLAU (#4316B2)
+ * - Footer: BLAU (#4316B2)
+ * - Buttons: HELLGRAU (#e8e8e8)
+ * - Text: Schwarz/Dunkelgrau
+ *
+ * VERBOTEN: ROT, BORDEAUX, GRÜN, GELB, LILA, TÜRKIS
+ *
+ * HAUPTFORMULARE:
+ * - Linkes Hauptmenü (frm_Menuefuehrung) MUSS vorhanden sein
+ * - Header: BLAU, Höhe 2,5cm (≈94,5px)
+ * - Footer: BLAU, Höhe 0,5cm (≈18,9px)
+ * - Menübuttons: HELLGRAU
+ *
+ * UNTERFORMULARE:
+ * - KEIN Menü, KEIN Header, KEIN Footer
+ */
+
+/* ========== FARB-VARIABLEN ========== */
+:root {
+    /* BLAU - Einzige Hauptfarbe */
+    --consys-primary: #4316B2;
+    --consys-primary-dark: #3558c0;
+
+    /* Header/Footer - NUR BLAU */
+    --consys-header-bg: #4316B2;
+    --consys-footer-bg: #4316B2;
+
+    /* Menü-Buttons - NUR HELLGRAU */
+    --consys-menu-btn-bg: #e8e8e8;
+    --consys-menu-btn-hover: #d5d5d5;
+    --consys-menu-btn-active: #4316B2;
+
+    /* Hintergründe */
+    --consys-bg-light: #f0f0f0;
+    --consys-bg-white: #ffffff;
+    --consys-border: #cccccc;
+
+    /* Größen */
+    --consys-header-height: 94.5px;  /* 2,5cm */
+    --consys-footer-height: 18.9px;  /* 0,5cm */
+    --consys-menu-width: 140px;
+
+    /* Text */
+    --consys-text-primary: #333333;
+    --consys-text-secondary: #666666;
+    --consys-text-light: #ffffff;
+
+    /* Schrift */
+    --consys-font: "Segoe UI", Tahoma, Arial, sans-serif;
+    --consys-font-size: 11px;
+}
+
+/* ========== RESET ========== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--consys-font);
+    font-size: var(--consys-font-size);
+    background: var(--consys-bg-light);
+    overflow: hidden;
+}
+
+/* ========== HAUPTCONTAINER ========== */
+.app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ========== LINKES MENÜ (frm_Menuefuehrung) ========== */
+.app-menu {
+    width: var(--consys-menu-width);
+    min-width: var(--consys-menu-width);
+    background: var(--consys-bg-light);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--consys-border);
+}
+
+.menu-header {
+    padding: 8px;
+    background: var(--consys-primary);
+    color: var(--consys-text-light);
+    font-weight: bold;
+    font-size: 11px;
+    text-align: center;
+}
+
+.menu-buttons {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+.menu-btn {
+    padding: 6px 8px;
+    background: var(--consys-menu-btn-bg);
+    border: 1px solid var(--consys-border);
+    color: var(--consys-text-primary);
+    text-decoration: none;
+    font-size: 10px;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.menu-btn:hover {
+    background: var(--consys-menu-btn-hover);
+}
+
+.menu-btn.active {
+    background: var(--consys-menu-btn-active);
+    color: var(--consys-text-light);
+    border-color: var(--consys-primary-dark);
+}
+
+/* ========== HAUPTBEREICH ========== */
+.app-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--consys-bg-light);
+}
+
+/* ========== HEADER - BLAU 2,5cm ========== */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--consys-header-bg);
+    min-height: var(--consys-header-height);
+    height: var(--consys-header-height);
+    color: var(--consys-text-light);
+    border-bottom: 1px solid var(--consys-primary-dark);
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-center {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.app-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--consys-text-light);
+    margin: 0;
+}
+
+.version-info {
+    font-size: 10px;
+    color: rgba(255,255,255,0.9);
+    text-align: right;
+}
+
+/* ========== FOOTER - BLAU 0,5cm ========== */
+.app-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 12px;
+    background: var(--consys-footer-bg);
+    min-height: var(--consys-footer-height);
+    height: var(--consys-footer-height);
+    color: var(--consys-text-light);
+    font-size: 10px;
+    border-top: 1px solid var(--consys-primary-dark);
+}
+
+.footer-left,
+.footer-center,
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* ========== CONTENT BEREICH ========== */
+.app-content {
+    flex: 1;
+    overflow: auto;
+    background: var(--consys-bg-white);
+    margin: 4px;
+    border: 1px solid var(--consys-border);
+}
+
+/* ========== BUTTONS - HELLGRAU ========== */
+.btn {
+    padding: 4px 10px;
+    background: var(--consys-menu-btn-bg);
+    border: 1px solid var(--consys-border);
+    font-size: 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    color: var(--consys-text-primary);
+}
+
+.btn:hover {
+    background: var(--consys-menu-btn-hover);
+}
+
+.btn-primary {
+    background: var(--consys-primary);
+    color: var(--consys-text-light);
+    border-color: var(--consys-primary-dark);
+}
+
+.btn-primary:hover {
+    background: var(--consys-primary-dark);
+}
+
+/* ========== INPUTS ========== */
+.input,
+.select,
+input[type="text"],
+input[type="date"],
+input[type="email"],
+select,
+textarea {
+    padding: 3px 6px;
+    border: 1px solid var(--consys-border);
+    font-size: 10px;
+    font-family: var(--consys-font);
+    background: var(--consys-bg-white);
+}
+
+/* ========== TABELLEN ========== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+.table th,
+.table td {
+    border: 1px solid #ddd;
+    padding: 4px 8px;
+    text-align: left;
+}
+
+.table th {
+    background: var(--consys-bg-light);
+    font-weight: 600;
+}
+
+.table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.table tbody tr:hover {
+    background: #f5f5f5;
+}
+
+/* ========== TABS ========== */
+.tab-nav {
+    display: flex;
+    background: var(--consys-bg-light);
+    border-bottom: 1px solid var(--consys-border);
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    font-size: 11px;
+    cursor: pointer;
+    border-right: 1px solid #ccc;
+}
+
+.tab-btn:hover {
+    background: #d0d0d0;
+}
+
+.tab-btn.active {
+    background: var(--consys-bg-white);
+    border-bottom: 2px solid var(--consys-primary);
+    font-weight: 600;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: auto;
+}
+
+.tab-pane {
+    display: none;
+    height: 100%;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* ========== UNTERFORMULARE (KEIN Shell) ========== */
+.subform-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--consys-bg-white);
+}
+
+/* Unterformulare haben KEINE Shell-Elemente */
+.subform-container .app-menu,
+.subform-container .app-header,
+.subform-container .app-footer {
+    display: none !important;
+}
+
+/* ========== RESPONSIVE ========== */
+
+/* 21"-23" Monitore (1920px+) */
+@media (min-width: 1920px) {
+    :root {
+        --consys-menu-width: 160px;
+        --consys-header-height: 100px;
+        --consys-footer-height: 22px;
+    }
+    .menu-btn {
+        font-size: 11px;
+        padding: 8px 10px;
+    }
+    .app-title {
+        font-size: 18px;
+    }
+}
+
+/* 15"-20" Monitore (1400px-1919px) */
+@media (min-width: 1400px) and (max-width: 1919px) {
+    :root {
+        --consys-menu-width: 140px;
+    }
+}
+
+/* 13"-14" Monitore (1200px-1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    :root {
+        --consys-menu-width: 130px;
+        --consys-header-height: 85px;
+    }
+    .menu-btn {
+        font-size: 9px;
+        padding: 5px 6px;
+    }
+    .app-title {
+        font-size: 14px;
+    }
+}
+
+/* 11"-12" Monitore (1000px-1199px) */
+@media (min-width: 1000px) and (max-width: 1199px) {
+    :root {
+        --consys-menu-width: 110px;
+        --consys-header-height: 75px;
+        --consys-footer-height: 16px;
+    }
+    .menu-btn {
+        font-size: 8px;
+        padding: 4px 5px;
+    }
+    .app-title {
+        font-size: 12px;
+    }
+    .btn {
+        font-size: 9px;
+        padding: 2px 6px;
+    }
+}
+
+/* Unter 1000px - Menü verstecken */
+@media (max-width: 999px) {
+    .app-menu {
+        display: none;
+    }
+    .header-right {
+        display: none;
+    }
+}

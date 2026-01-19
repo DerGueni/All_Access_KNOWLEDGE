@@ -1,0 +1,4 @@
+SELECT tbl_MA_VA_Zuordnung.VA_ID, tbl_MA_VA_Zuordnung.MA_ID, tbl_MA_VA_Zuordnung.VADatum_ID, tbl_MA_VA_Zuordnung.VADatum, tbl_VA_Auftragstamm.Auftrag, tbl_VA_Auftragstamm.Ort, tbl_VA_Auftragstamm.Objekt, tbl_MA_VA_Zuordnung.MA_Start AS Beginn, tbl_MA_VA_Zuordnung.MA_Ende AS Ende, tbl_MA_VA_Zuordnung.ma_brutto_std2 AS MA_Brutto_Std, tbl_MA_VA_Zuordnung.ma_netto_std2 AS MA_Netto_Std, ([nachname] & " " & [Vorname]) AS Name, tbl_VA_Auftragstamm.Treffp_Zeit, tbl_VA_Auftragstamm.Treffpunkt, Format([VADatum],"ddd") & ", " & Format([VADatum],"dd/mm/yy") AS VADatum1, tbl_MA_VA_Zuordnung.PKW
+FROM (tbl_MA_VA_Zuordnung INNER JOIN tbl_VA_Auftragstamm ON tbl_MA_VA_Zuordnung.VA_ID = tbl_VA_Auftragstamm.ID) INNER JOIN tbl_MA_Mitarbeiterstamm ON tbl_MA_VA_Zuordnung.MA_ID = tbl_MA_Mitarbeiterstamm.ID
+WHERE (((tbl_MA_VA_Zuordnung.VA_ID)>0) AND ((tbl_MA_VA_Zuordnung.MA_ID)>0) AND ((tbl_MA_VA_Zuordnung.VADatum_ID)>0));
+

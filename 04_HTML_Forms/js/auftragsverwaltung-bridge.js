@@ -1,0 +1,466 @@
+﻿// Auftragsverwaltung WebView2 Bridge Integration
+// Version 2.0 - Stand: 30.12.2025
+
+// ==================== GLOBALE VARIABLEN ====================
+let alleAuftraege = [];
+let filteredAuftraege = [];
+let currentIndex = 0;
+let currentVA = null;
+let isWebView2 = false;
+let currentDatum = null;
+
+// ==================== INITIALISIERUNG ====================
+document.addEventListener('DOMContentLoaded', function() {
+    isWebView2 = typeof window.chrome !== 'undefined' && window.chrome.webview;
+    
+    if (typeof Bridge !== 'undefined') {
+        Bridge.init();
+        Bridge.on('onDataReceived', handleDataReceived);
+        Bridge.on('onSearchResults', handleSearchResults);
+        Bridge.on('onSaveComplete', handleSaveComplete);
+            }
+            if (!isWebView2) { console.log('Browser-Modus VA'); setTimeout(loadDemoData, 100);
+        console.log('WebView2 Bridge initialisiert (Auftragsverwaltung)');
+    }
+    
+    currentDatum = new Date();
+    initDateFields();
+    loadAllData();
+    setupEventListeners();
+});
+
+function initDateFields() {
+    const today = formatDateISO(currentDatum);
+    const datumVon = document.getElementById('txtDatVon');
+    const datumBis = document.getElementById('txtDatBis');
+    if (datumVon) datumVon.value = today;
+    if (datumBis) datumBis.value = today;
+}
+
+function setupEventListeners() {
+    // Datum-Navigation
+    document.querySelectorAll('.date-nav').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const direction = this.dataset.direction;
+            if (direction === 'prev') currentDatum.setDate(currentDatum.getDate() - 1);
+            else if (direction === 'next') currentDatum.setDate(currentDatum.getDate() + 1);
+            loadAuftraegeForDate();
+        });
+    });
+    
+    // Objekt-Dropdown
+    const objektSelect = document.getElementById('objektSelect');
+    if (objektSelect) {
+        objektSelect.addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            if (selected && selected.dataset.ort) {
+                setElementValue('selOrt', selected.dataset.ort);
+            }
+        });
+    }
+}
+
+// ==================== DATEN LADEN ====================
+async function loadAllData() {
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('loadData', { type: 'auftragsverwaltungComplete', id: 0, datum: formatDateISO(currentDatum) });
+    } else {
+        loadDemoData();
+    }
+}
+
+function loadDemoData() {
+    console.log('Lade Auftrags-Echtdaten...');
+    
+    if (typeof AUFTRAEGE_ECHTDATEN !== 'undefined' && AUFTRAEGE_ECHTDATEN.length > 0) {
+        console.log('AUFTRAEGE_ECHTDATEN gefunden:', AUFTRAEGE_ECHTDATEN.length, 'Aufträge');
+        
+        const data = {
+            type: 'auftrag',
+            auftrag: AUFTRAEGE_ECHTDATEN[0],
+            alleAuftraege: AUFTRAEGE_ECHTDATEN
+        };
+        
+        handleDataReceived(data);
+    } else {
+        console.warn('Keine Auftrags-Echtdaten gefunden');
+    }
+},
+            { id: 9153, datum: '13.12.2025', auftrag: '1. Fc Nürnberg Frauen', ort: 'Nürnberg', soll: 20, ist: 18 },
+            { id: 9154, datum: '14.12.2025', auftrag: 'Weihnachtsmarkt Altdorf', ort: 'Altdorf', soll: 8, ist: 8 }
+        ],
+        stammdaten: {
+            id: 9152, auftrag: 'Spvgg Greuther Fürth - Hertha Bsc',
+            objekt: 'Sportpark am Ronhof', ort: 'Fürth',
+            datVon: '12.12.2025', datBis: '12.12.2025',
+            auftraggeber: 'SPVGG Greuther Fürth GmbH & Co. KG',
+            treffpunkt: '15 min vor DB vor Ort', dienstkleidung: 'schwarz neutral',
+            fahrtkosten: 0, statusId: 2, autosend: true, elGesendet: false,
+            soll: 42, ist: 0
+        },
+        schichten: [
+            { id: 1, soll: 2, beginn: '15:00', ende: '21:00' },
+            { id: 2, soll: 40, beginn: '16:00', ende: '21:00' }
+        ],
+        zuordnungen: [
+            { lfd: 1, maId: 707, nachname: 'Alali', vorname: 'Ahmad', von: '15:00', bis: '21:00', stunden: 6.0 },
+            { lfd: 2, maId: 708, nachname: 'Alayoubi', vorname: 'Salim', von: '16:00', bis: '21:00', stunden: 5.0 }
+        ],
+        objekte: [
+            { id: 1, name: 'Sportpark am Ronhof', ort: 'Fürth' },
+            { id: 2, name: 'Max Morlock Stadion', ort: 'Nürnberg' },
+            { id: 3, name: 'Arena', ort: 'Nürnberg' }
+        ],
+        orte: ['Nürnberg', 'Fürth', 'Erlangen', 'Bamberg'],
+        kunden: [
+            { id: 1, firma: 'SPVGG Greuther Fürth GmbH & Co. KG' },
+            { id: 2, firma: '1. FC Nürnberg e.V.' }
+        ],
+        status: [
+            { id: 1, name: 'In Planung' },
+            { id: 2, name: 'Bestätigt' },
+            { id: 3, name: 'Abgeschlossen' }
+        ]
+    };
+    handleDataReceived(demoData);
+}
+
+function handleDataReceived(data) {
+    console.log('Auftragsdaten empfangen:', data);
+    
+    if (data.alleAuftraege) {
+        alleAuftraege = data.alleAuftraege;
+        filterAuftraege();
+    }
+    
+    if (data.stammdaten) {
+        currentVA = data.stammdaten;
+        fillStammdaten(data.stammdaten);
+    }
+    
+    if (data.schichten) fillSchichten(data.schichten);
+    if (data.zuordnungen) fillZuordnungen(data.zuordnungen);
+    if (data.objekte) fillObjekteDropdown(data.objekte);
+    if (data.orte) fillOrteDropdown(data.orte);
+    if (data.kunden) fillKundenDropdown(data.kunden);
+}
+
+// ==================== FORMULAR BEFÜLLEN ====================
+function fillStammdaten(va) {
+    setElementValue('txtID', va.id);
+    setElementValue('selAuftrag', va.auftrag);
+    setElementValue('selObjekt', va.objekt);
+    setElementValue('selOrt', va.ort);
+    setElementValue('txtDatVon', formatDateInput(va.datVon));
+    setElementValue('txtDatBis', formatDateInput(va.datBis));
+    setElementValue('selAuftraggeber', va.auftraggeber);
+    setElementValue('txtTreffpunkt', va.treffpunkt);
+    setElementValue('selKleidung', va.dienstkleidung);
+    setElementValue('txtAnsprech', va.ansprechpartner);
+    setElementValue('txtFahrt', va.fahrtkosten);
+    setElementChecked('chkAutosend', va.autosend);
+    setElementChecked('chkGesendet', va.elGesendet);
+    
+    // Soll/Ist Anzeige
+    setElementValue('sollAnz', va.soll || 0);
+    setElementValue('istAnz', va.ist || 0);
+    
+    // Status
+    updateAuftragStatus(va);
+}
+
+function fillSchichten(schichten) {
+    const tbody = document.getElementById('schichtenBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    schichten.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align:center">${s.soll}</td>
+            <td>${s.beginn}</td>
+            <td>${s.ende}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function fillZuordnungen(zuordnungen) {
+    const tbody = document.getElementById('zuordnungenBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    zuordnungen.forEach(z => {
+        const tr = document.createElement('tr');
+        tr.className = z.maId > 0 ? '' : 'empty-slot';
+        tr.innerHTML = `
+            <td>${z.lfd}</td>
+            <td>${z.nachname || ''} ${z.vorname || ''}</td>
+            <td>${z.von || ''}</td>
+            <td>${z.bis || ''}</td>
+            <td style="text-align:right">${formatNumber(z.stunden)}</td>
+            <td>${z.bemerkung || ''}</td>
+        `;
+        tr.onclick = () => selectZuordnung(z);
+        tbody.appendChild(tr);
+    });
+}
+
+function fillObjekteDropdown(objekte) {
+    const select = document.getElementById('objektSelect');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">-- Objekt wählen --</option>';
+    objekte.forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o.id;
+        opt.textContent = o.name;
+        opt.dataset.ort = o.ort;
+        select.appendChild(opt);
+    });
+}
+
+function fillOrteDropdown(orte) {
+    const select = document.getElementById('ortSelect');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">-- Ort wählen --</option>';
+    orte.forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o;
+        opt.textContent = o;
+        select.appendChild(opt);
+    });
+}
+
+function fillKundenDropdown(kunden) {
+    const select = document.getElementById('auftraggeberSelect');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">-- Auftraggeber wählen --</option>';
+    kunden.forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k.id;
+        opt.textContent = k.firma;
+        select.appendChild(opt);
+    });
+}
+
+function updateAuftragStatus(va) {
+    const statusBox = document.getElementById('statusBox');
+    if (!statusBox) return;
+    
+    let statusText = 'In Planung';
+    let statusColor = '#ffa500';
+    
+    if (va.ist >= va.soll && va.soll > 0) {
+        statusText = 'Vollständig besetzt';
+        statusColor = '#00aa00';
+    } else if (va.ist > 0) {
+        statusText = 'Teilweise besetzt';
+        statusColor = '#ffcc00';
+    }
+    
+    statusBox.textContent = statusText;
+    statusBox.style.background = statusColor;
+}
+
+// ==================== AUFTRÄGE-LISTE ====================
+function filterAuftraege() {
+    filteredAuftraege = alleAuftraege;
+    renderAuftrageListe();
+}
+
+function renderAuftrageListe() {
+    const listBody = document.getElementById('vaListBody');
+    if (!listBody) return;
+    
+    listBody.innerHTML = '';
+    filteredAuftraege.forEach((va, idx) => {
+        const row = document.createElement('div');
+        row.className = 'va-list-row' + (idx === currentIndex ? ' selected' : '');
+        row.innerHTML = `
+            <div>${va.datum}</div>
+            <div>${va.auftrag || ''}</div>
+        `;
+        row.onclick = () => selectAuftrag(idx);
+        listBody.appendChild(row);
+    });
+}
+
+function selectAuftrag(idx) {
+    currentIndex = idx;
+    renderAuftrageListe();
+    const va = filteredAuftraege[idx];
+    if (va) loadAuftrag(va.id);
+}
+
+function loadAuftrag(vaId) {
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('loadData', { type: 'auftragsverwaltungComplete', id: vaId });
+    }
+}
+
+function loadAuftraegeForDate() {
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('loadData', { type: 'auftraegeFuerDatum', datum: formatDateISO(currentDatum) });
+    }
+    // Update Datumsanzeige
+    const datumDisplay = document.getElementById('datumDisplay');
+    if (datumDisplay) datumDisplay.textContent = formatDateDE(currentDatum);
+}
+
+// ==================== NAVIGATION ====================
+function navFirst() { if (filteredAuftraege.length > 0) selectAuftrag(0); }
+function navPrev() { if (currentIndex > 0) selectAuftrag(currentIndex - 1); }
+function navNext() { if (currentIndex < filteredAuftraege.length - 1) selectAuftrag(currentIndex + 1); }
+function navLast() { if (filteredAuftraege.length > 0) selectAuftrag(filteredAuftraege.length - 1); }
+
+// ==================== AKTIONEN ====================
+function saveVA() {
+    const data = collectFormData();
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('save', { type: 'selAuftrag', data: data });
+    } else {
+        console.log('Speichere Auftrag:', data);
+        alert('Gespeichert (Demo)');
+    }
+}
+
+function deleteVA() {
+    if (!currentVA || !confirm('Auftrag wirklich löschen?')) return;
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('delete', { type: 'selAuftrag', id: currentVA.id });
+    }
+}
+
+function copyVA() {
+    if (!currentVA) return;
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('action', { type: 'auftragKopieren', id: currentVA.id });
+    }
+}
+
+function newVA() {
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('navigate', { target: 'neuerAuftrag' });
+    }
+}
+
+function openMitarbeiterauswahl() {
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('navigate', { target: 'mitarbeiterauswahl', vaId: currentVA?.id });
+    }
+}
+
+function sendEinsatzliste(target) {
+    if (!currentVA) return;
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('action', { type: 'einsatzlisteSenden', id: currentVA.id, target: target });
+    }
+}
+
+function printEinsatzliste() {
+    if (!currentVA) return;
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('action', { type: 'einsatzlisteDrucken', id: currentVA.id });
+    }
+}
+
+function collectFormData() {
+    return {
+        id: currentVA?.id || 0,
+        auftrag: getElementValue('selAuftrag'),
+        objekt: getElementValue('selObjekt'),
+        ort: getElementValue('selOrt'),
+        datVon: getElementValue('txtDatVon'),
+        datBis: getElementValue('txtDatBis'),
+        auftraggeber: getElementValue('selAuftraggeber'),
+        treffpunkt: getElementValue('txtTreffpunkt'),
+        dienstkleidung: getElementValue('selKleidung'),
+        ansprechpartner: getElementValue('txtAnsprech'),
+        fahrtkosten: getElementValue('txtFahrt'),
+        autosend: getElementChecked('chkAutosend'),
+        elGesendet: getElementChecked('chkGesendet')
+    };
+}
+
+function selectZuordnung(z) {
+    console.log('Zuordnung ausgewählt:', z);
+}
+
+// ==================== TABS ====================
+function showTab(tabId, btn) {
+    document.querySelectorAll('.tab-body').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
+    const tab = document.getElementById('tab-' + tabId);
+    if (tab) tab.classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+
+// ==================== HILFSFUNKTIONEN ====================
+function setElementValue(id, value) {
+    const el = document.getElementById(id);
+    if (el) {
+        if (el.tagName === 'DIV' || el.tagName === 'SPAN') el.textContent = value ?? '';
+        else el.value = value ?? '';
+    }
+}
+
+function getElementValue(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+}
+
+function setElementChecked(id, checked) {
+    const el = document.getElementById(id);
+    if (el) el.checked = !!checked;
+}
+
+function getElementChecked(id) {
+    const el = document.getElementById(id);
+    return el ? el.checked : false;
+}
+
+function formatNumber(num) {
+    if (num === undefined || num === null) return '';
+    return Number(num).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatDateISO(d) {
+    if (!d) return '';
+    return d.toISOString().split('T')[0];
+}
+
+function formatDateDE(d) {
+    if (!d) return '';
+    return d.toLocaleDateString('de-DE');
+}
+
+function formatDateInput(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('.');
+    if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    return dateStr;
+}
+
+function handleSearchResults(results) {}
+function handleSaveComplete(result) {
+    if (result.success) alert('Erfolgreich gespeichert');
+    else alert('Fehler: ' + result.error);
+}
+
+// ==================== MENÜ ====================
+function openMenu(target) {
+    const urls = {
+        'dienstplan': '../frm_N_DP_Dienstplan_MA.html',
+        'planung': '../frm_N_DP_Dienstplan_Objekt.html',
+        'mitarbeiter': '../mitarbeiterverwaltung/frm_N_MA_Mitarbeiterstamm_V2.html',
+        'kunden': '../kundenverwaltung/frm_N_KD_Kundenstamm.html'
+    };
+    if (urls[target]) window.location.href = urls[target];
+}
+
+
+

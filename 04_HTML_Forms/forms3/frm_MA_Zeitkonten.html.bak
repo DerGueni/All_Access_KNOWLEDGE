@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter-Zeitkonten - CONSYS</title>
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <style>
+        /* CONSYS Standard: Body-Hintergrund */
+        body {
+            background-color: #8080c0;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Container Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+        }
+
+        .menu-btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .menu-btn:active { background: linear-gradient(to bottom, #b0b0d0, #9090b0); }
+        .menu-btn.active { background: linear-gradient(to bottom, #a0a0d0, #8080b0); }
+
+        /* Main Content */
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .app-header {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title { font-size: 23px !important; font-weight: bold !important; } /* +8px gemaess Anforderung */
+
+        /* Toolbar - VBA: Form_Open setzt Anstellungsart */
+        .app-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 8px;
+            background-color: #9090c0;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toolbar-label { font-size: 11px; color: #000; }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 20px;
+            background-color: #606090;
+            margin: 0 5px;
+        }
+
+        /* Form Controls */
+        .form-control {
+            padding: 3px 6px;
+            border: 1px solid #7070a0;
+            background-color: white;
+            font-size: 11px;
+        }
+
+        select.form-control { min-width: 120px; }
+
+        /* Buttons - VBA Button Events */
+        .btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: none;
+            padding: 4px 12px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-primary, .btn-blue {
+            background: linear-gradient(to bottom, #9090c0, #6060a0);
+        }
+
+        .btn-primary:hover, .btn-blue:hover { background: linear-gradient(to bottom, #a0a0d0, #7070b0); }
+
+        .btn-success, .btn-green {
+            background: linear-gradient(to bottom, #90c090, #60a060);
+        }
+
+        .btn-danger, .btn-red {
+            background: linear-gradient(to bottom, #c09090, #a06060);
+        }
+
+        /* Content Area */
+        .app-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 0.5rem;
+            padding: 8px;
+            background-color: #b8b8d8;
+        }
+
+        .content-main {
+            flex: 1;
+            overflow: auto;
+            min-width: 0;
+        }
+
+        /* Summary Bar - VBA: fSumme_Stunden_ges, fSumme_Stunden_abger */
+        .summary-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 8px;
+            background-color: #c0c0d8;
+            border: 1px solid #7070a0;
+            margin-bottom: 8px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .summary-label { font-size: 10px; color: #404040; }
+        .summary-value { font-size: 12px; font-weight: bold; color: #000; }
+        .summary-value.positive { color: #008000; }
+        .summary-value.negative { color: #c00000; }
+
+        /* Datasheet - VBA: Sub_MA_Stunden, sub_Abgleich */
+        .datasheet {
+            width: 100%;
+            background-color: white;
+            border-collapse: collapse;
+        }
+
+        .datasheet th {
+            background-color: #000080;
+            color: white;
+            padding: 4px 6px;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: left;
+            border: 1px solid #606090;
+            position: sticky;
+            top: 0;
+        }
+
+        .datasheet td {
+            padding: 3px 6px;
+            font-size: 11px;
+            border: 1px solid #d0d0d0;
+        }
+
+        .datasheet tbody tr:nth-child(even) { background-color: #f5f5f5; }
+        .datasheet tbody tr:hover { background-color: #e0e0f0; cursor: pointer; }
+        .datasheet tbody tr.selected { background-color: #c0d0f0; }
+        .datasheet .sum-row { background-color: #d0d0e0; font-weight: bold; }
+
+        /* Typ-Badges */
+        .typ-badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+        .typ-badge.arbeit { background-color: #d0f0d0; color: #206020; }
+        .typ-badge.urlaub { background-color: #ffe0a0; color: #805000; }
+        .typ-badge.krank { background-color: #ffd0d0; color: #a02020; }
+        .typ-badge.frei { background-color: #e0e0e0; color: #606060; }
+
+        /* Month Panel - VBA: Monatsauswertung */
+        .month-panel {
+            width: clamp(250px, 18vw, 320px);
+            flex-shrink: 0;
+            overflow: auto;
+            background-color: #c0c0d8;
+            padding: 8px;
+            border: 1px solid #7070a0;
+        }
+
+        .month-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .month-content { background-color: white; padding: 8px; }
+
+        .chart-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .chart-label { font-size: 10px; width: 35px; }
+        .chart-bar-wrapper { flex: 1; height: 14px; background-color: #e0e0e0; }
+        .chart-bar { height: 100%; background-color: #4060a0; }
+        .chart-bar.low { background-color: #c08040; }
+        .chart-bar.over { background-color: #40a040; }
+        .chart-value { font-size: 10px; width: 40px; text-align: right; }
+
+        .month-stats { margin-top: 8px; padding-top: 8px; border-top: 1px solid #d0d0d0; }
+        .stat-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11px; }
+        .stat-label { color: #404040; }
+        .stat-value { font-weight: bold; }
+
+        /* Tabs - VBA: RegLex Register */
+        .tab-container { margin-bottom: 8px; }
+
+        .tab-buttons {
+            display: flex;
+            gap: 2px;
+            background-color: #9090c0;
+            padding: 4px 4px 0;
+        }
+
+        .tab-btn {
+            padding: 6px 16px;
+            font-size: 11px;
+            background: linear-gradient(to bottom, #d0d0e0, #b0b0c0);
+            border: 1px solid #7070a0;
+            border-bottom: none;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .tab-btn.active {
+            background: #b8b8d8;
+            border-bottom: 1px solid #b8b8d8;
+            margin-bottom: -1px;
+        }
+
+        .tab-content {
+            display: none;
+            background-color: #b8b8d8;
+            border: 1px solid #7070a0;
+            padding: 8px;
+        }
+
+        .tab-content.active { display: block; }
+
+        /* Status Bar */
+        .app-footer {
+            background-color: #9090c0;
+            color: #000;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            border-top: 1px solid #7070a0;
+        }
+
+        /* Fullscreen Button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            border: none;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover { background: linear-gradient(to bottom, #e0e0f0, #b0b0d0); }
+        .fullscreen-btn:active { background: linear-gradient(to bottom, #b0b0d0, #9090b0); }
+
+        /* Weekend/Holiday rows */
+        .datasheet tr.weekend { background-color: #f0f0f0 !important; color: #808080; }
+        .datasheet tr.urlaub { background-color: #fff8e0 !important; }
+        .datasheet tr.krank { background-color: #ffe8e8 !important; }
+
+        .loading-cell { text-align: center; padding: 40px; color: #999; }
+
+        @media (max-width: 1366px) {
+            .month-panel { width: 250px; }
+        }
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-active-menu="zeitkonten">
+    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">&#x26F6;</button>
+
+    <div class="app-container">
+        <!-- Left Menu -->
+        <nav class="left-menu">
+            <div class="menu-header">CONSYS Menu</div>
+            <button class="menu-btn" data-form="frm_Menuefuehrung1">Dashboard</button>
+            <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiter</button>
+            <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kunden</button>
+            <button class="menu-btn" data-form="frm_va_Auftragstamm">Aufträge</button>
+            <button class="menu-btn" data-form="frm_OB_Objekt">Objekte</button>
+            <button class="menu-btn" data-form="frm_N_Dienstplanübersicht">Dienstplan</button>
+            <button class="menu-btn active" data-form="frm_MA_Zeitkonten">Zeitkonten</button>
+            <button class="menu-btn" data-form="frm_MA_Abwesenheit">Abwesenheit</button>
+            <button class="menu-btn" data-form="frm_N_Lohnabrechnungen">Lohnabrechnung</button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Mitarbeiter-Zeitkonten</h1>
+                </div>
+                <div class="header-center">
+                    <span id="lblRecordInfo">Zeitraum: - / -</span>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Toolbar - VBA: Form_Open, cboZeitraum_AfterUpdate, cboAnstArt_AfterUpdate, cboMA_BeforeUpdate -->
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Mitarbeiter:</label>
+                    <select id="cboMitarbeiter" class="form-control input-lg">
+                        <option value="">-- Mitarbeiter waehlen --</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Anstellungsart:</label>
+                    <select id="cboAnstArt" class="form-control">
+                        <option value="">Alle</option>
+                        <option value="3">Festangestellt</option>
+                        <option value="5" selected>Minijobber</option>
+                        <option value="13">Fest + Mini</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Zeitraum:</label>
+                    <select id="cboZeitraum" class="form-control">
+                        <option value="8">Aktueller Monat</option>
+                        <option value="9">Letzter Monat</option>
+                        <option value="14">Aktuelles Quartal</option>
+                        <option value="11">Aktuelles Jahr</option>
+                        <option value="12">Letztes Jahr</option>
+                    </select>
+                </div>
+                <div class="toolbar-group" id="customDates" style="display:none;">
+                    <input type="date" id="AU_von" class="form-control">
+                    <span style="margin:0 4px;">bis</span>
+                    <input type="date" id="AU_bis" class="form-control">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <!-- VBA: btnImport_Click -->
+                    <button class="btn btn-primary" id="btnImport" title="Zeitkonten aus Excel importieren">Import ZK</button>
+                    <!-- VBA: btnImporteinzel_Click -->
+                    <button class="btn" id="btnImporteinzel" title="Einzelnes Zeitkonto importieren">Import Einzel</button>
+                    <!-- VBA: btnExport_Click -->
+                    <button class="btn btn-success" id="btnExport" title="Lexware Importdatei erstellen">Export Lexware</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <!-- VBA: btnZKFest_Click, btnZKMini_Click -->
+                    <button class="btn" id="btnZKFest" title="Zeitkonten Festangestellte fortschreiben">ZK Fest</button>
+                    <button class="btn" id="btnZKMini" title="Zeitkonten Minijobber fortschreiben">ZK Mini</button>
+                    <!-- VBA: btnZKeinzel_Click -->
+                    <button class="btn" id="btnZKeinzel" title="Selektiertes Zeitkonto fortschreiben">ZK Einzel</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <!-- VBA: btnAbgleich_Click -->
+                    <button class="btn" id="btnAbgleich" title="Stundenabgleich anzeigen">Abgleich</button>
+                    <!-- VBA: btnExportDiff_Click -->
+                    <button class="btn" id="btnExportDiff" title="Differenzreport exportieren">Export Diff</button>
+                </div>
+            </div>
+
+            <!-- Summary Bar - VBA: fSumme_Stunden_ges, fSumme_Stunden_abger, fSumme_stunden_consys -->
+            <div class="summary-bar">
+                <div class="summary-item">
+                    <span class="summary-label">Soll-Stunden</span>
+                    <span class="summary-value" id="summSoll">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Ist-Stunden</span>
+                    <span class="summary-value" id="summIst">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Saldo</span>
+                    <span class="summary-value" id="summSaldo">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Ueberstunden</span>
+                    <span class="summary-value" id="summUeberstunden">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Urlaub (Tage)</span>
+                    <span class="summary-value" id="summUrlaub">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Krank (Tage)</span>
+                    <span class="summary-value" id="summKrank">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">ZK Ausgezahlt</span>
+                    <span class="summary-value" id="summAusgezahlt">0,00</span>
+                </div>
+            </div>
+
+            <!-- Tabs - VBA: RegLex Register -->
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="tabStunden">Stunden</button>
+                    <button class="tab-btn" data-tab="tabAbgleich">Abgleich</button>
+                    <button class="tab-btn" data-tab="tabImportfehler">Importfehler</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="app-content">
+                <div class="content-main">
+                    <!-- Tab: Stunden - VBA: Sub_MA_Stunden -->
+                    <div class="tab-content active" id="tabStunden">
+                        <table class="datasheet" id="tblStunden">
+                            <thead>
+                                <tr>
+                                    <th style="width:80px;">Datum</th>
+                                    <th style="width:30px;">Tag</th>
+                                    <th style="width:150px;">Objekt</th>
+                                    <th style="width:50px;">Beginn</th>
+                                    <th style="width:50px;">Ende</th>
+                                    <th style="width:50px;">Dauer</th>
+                                    <th style="width:50px;">Pause</th>
+                                    <th style="width:50px;">Netto</th>
+                                    <th style="width:70px;">Typ</th>
+                                    <th>Bemerkung</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody_Zeitkonto">
+                                <tr><td colspan="10" class="loading-cell">Bitte Mitarbeiter auswählen...</td></tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="sum-row">
+                                    <td colspan="5" style="text-align:right;"><strong>Summe:</strong></td>
+                                    <td id="sumDauer">0:00</td>
+                                    <td id="sumPause">0:00</td>
+                                    <td id="sumNetto">0:00</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Tab: Abgleich - VBA: sub_Abgleich -->
+                    <div class="tab-content" id="tabAbgleich">
+                        <table class="datasheet" id="tblAbgleich">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Anstellungsart</th>
+                                    <th>Consys Std</th>
+                                    <th>ZK Aktuell</th>
+                                    <th>ZK Abgerechnet</th>
+                                    <th>Differenz</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody_Abgleich">
+                                <tr><td colspan="7" class="loading-cell">Filter anwenden um Daten zu laden...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tab: Importfehler - VBA: sub_Importfehler -->
+                    <div class="tab-content" id="tabImportfehler">
+                        <table class="datasheet" id="tblImportfehler">
+                            <thead>
+                                <tr>
+                                    <th>Datei</th>
+                                    <th>Jahr</th>
+                                    <th>Monat</th>
+                                    <th>MA_ID</th>
+                                    <th>Fehler</th>
+                                    <th>Bemerkung</th>
+                                    <th>Zeitstempel</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody_Importfehler">
+                                <tr><td colspan="7" class="loading-cell">Keine Importfehler</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Month Panel -->
+                <aside class="month-panel">
+                    <div class="month-header">Monatsauswertung</div>
+                    <div class="month-content">
+                        <div id="monthChart"></div>
+                        <div class="month-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Arbeitstage:</span>
+                                <span class="stat-value" id="statArbeitstage">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Einsaetze:</span>
+                                <span class="stat-value" id="statEinsaetze">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Durchschnitt/Tag:</span>
+                                <span class="stat-value" id="statDurchschnitt">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <span id="lblStatus">Bereit</span>
+                <span id="lblAnzahl">0 Eintraege</span>
+                <span id="lblPeriode">-</span>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        /**
+         * frm_MA_Zeitkonten - VBA Events als JavaScript
+         * Basierend auf Form_zfrm_MA_Stunden_Lexware.bas
+         */
+
+        // ============================================
+        // STATE
+        // ============================================
+        const state = {
+            records: [],
+            selectedMA: null,
+            zeitraum: 8,
+            AU_von: null,
+            AU_bis: null,
+            anstArt: 5, // Default: Minijobber (VBA: Form_Open)
+            maLookup: [],
+            activeTab: 'tabStunden'
+        };
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const el = {};
+
+        // ============================================
+        // INITIALIZATION - VBA: Form_Open
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[Zeitkonten] Form_Open Event');
+
+            // Cache DOM elements
+            el.cboMitarbeiter = document.getElementById('cboMitarbeiter');
+            el.cboAnstArt = document.getElementById('cboAnstArt');
+            el.cboZeitraum = document.getElementById('cboZeitraum');
+            el.AU_von = document.getElementById('AU_von');
+            el.AU_bis = document.getElementById('AU_bis');
+            el.customDates = document.getElementById('customDates');
+            el.tbody_Zeitkonto = document.getElementById('tbody_Zeitkonto');
+            el.tbody_Abgleich = document.getElementById('tbody_Abgleich');
+            el.tbody_Importfehler = document.getElementById('tbody_Importfehler');
+            el.summSoll = document.getElementById('summSoll');
+            el.summIst = document.getElementById('summIst');
+            el.summSaldo = document.getElementById('summSaldo');
+            el.summUeberstunden = document.getElementById('summUeberstunden');
+            el.summUrlaub = document.getElementById('summUrlaub');
+            el.summKrank = document.getElementById('summKrank');
+            el.summAusgezahlt = document.getElementById('summAusgezahlt');
+            el.sumDauer = document.getElementById('sumDauer');
+            el.sumPause = document.getElementById('sumPause');
+            el.sumNetto = document.getElementById('sumNetto');
+            el.monthChart = document.getElementById('monthChart');
+            el.statArbeitstage = document.getElementById('statArbeitstage');
+            el.statEinsaetze = document.getElementById('statEinsaetze');
+            el.statDurchschnitt = document.getElementById('statDurchschnitt');
+            el.lblStatus = document.getElementById('lblStatus');
+            el.lblAnzahl = document.getElementById('lblAnzahl');
+            el.lblPeriode = document.getElementById('lblPeriode');
+
+            // VBA: Form_Open - Set defaults
+            // Me.cboMA = Null
+            // Me.cboAnstArt.Value = 5
+            el.cboAnstArt.value = '5';
+            state.anstArt = 5;
+
+            // Setup Event Listeners
+            setupEventListeners();
+
+            // VBA: Call cboZeitraum_AfterUpdate
+            cboZeitraum_AfterUpdate();
+
+            // Load Mitarbeiter
+            loadMitarbeiter();
+
+            // Set header date
+            document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+
+            setStatus('Bereit - Bitte Mitarbeiter auswählen');
+        });
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        function setupEventListeners() {
+            // VBA: cboMA_BeforeUpdate
+            el.cboMitarbeiter.addEventListener('change', cboMA_BeforeUpdate);
+
+            // VBA: cboAnstArt_AfterUpdate
+            el.cboAnstArt.addEventListener('change', cboAnstArt_AfterUpdate);
+
+            // VBA: cboZeitraum_AfterUpdate
+            el.cboZeitraum.addEventListener('change', cboZeitraum_AfterUpdate);
+
+            // VBA: AU_von_BeforeUpdate, AU_bis_BeforeUpdate
+            el.AU_von.addEventListener('change', AU_von_BeforeUpdate);
+            el.AU_bis.addEventListener('change', AU_bis_BeforeUpdate);
+
+            // Button Events
+            document.getElementById('btnImport').addEventListener('click', btnImport_Click);
+            document.getElementById('btnImporteinzel').addEventListener('click', btnImporteinzel_Click);
+            document.getElementById('btnExport').addEventListener('click', btnExport_Click);
+            document.getElementById('btnZKFest').addEventListener('click', btnZKFest_Click);
+            document.getElementById('btnZKMini').addEventListener('click', btnZKMini_Click);
+            document.getElementById('btnZKeinzel').addEventListener('click', btnZKeinzel_Click);
+            document.getElementById('btnAbgleich').addEventListener('click', btnAbgleich_Click);
+            document.getElementById('btnExportDiff').addEventListener('click', btnExportDiff_Click);
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Menu navigation
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const formName = this.dataset.form;
+                    if (formName) navigateToForm(formName);
+                });
+            });
+        }
+
+        // ============================================
+        // VBA EVENT IMPLEMENTATIONS
+        // ============================================
+
+        /**
+         * VBA: cboZeitraum_AfterUpdate
+         * Setzt den Zeitraum basierend auf Auswahl
+         */
+        function cboZeitraum_AfterUpdate() {
+            const zeitraum = parseInt(el.cboZeitraum.value) || 8;
+            state.zeitraum = zeitraum;
+
+            const result = StdZeitraum_Von_Bis(zeitraum);
+            state.AU_von = result.von;
+            state.AU_bis = result.bis;
+
+            el.AU_von.value = formatDateISO(result.von);
+            el.AU_bis.value = formatDateISO(result.bis);
+
+            updatePeriodeAnzeige();
+            filtern();
+        }
+
+        /**
+         * VBA: cboAnstArt_AfterUpdate
+         * Filtert nach Anstellungsart
+         */
+        function cboAnstArt_AfterUpdate() {
+            // Me.cboMA = Null
+            el.cboMitarbeiter.value = '';
+            state.selectedMA = null;
+            state.anstArt = parseInt(el.cboAnstArt.value) || null;
+            filtern();
+        }
+
+        /**
+         * VBA: cboMA_BeforeUpdate
+         * Filtert nach Mitarbeiter
+         */
+        function cboMA_BeforeUpdate() {
+            // Me.cboAnstArt = Null
+            el.cboAnstArt.value = '';
+            state.anstArt = null;
+            state.selectedMA = el.cboMitarbeiter.value || null;
+            filtern();
+        }
+
+        /**
+         * VBA: AU_von_BeforeUpdate
+         */
+        function AU_von_BeforeUpdate() {
+            state.AU_von = new Date(el.AU_von.value);
+            filtern();
+        }
+
+        /**
+         * VBA: AU_bis_BeforeUpdate
+         */
+        function AU_bis_BeforeUpdate() {
+            state.AU_bis = new Date(el.AU_bis.value);
+            filtern();
+        }
+
+        /**
+         * VBA: filtern() Function
+         * Hauptfilterfunktion
+         */
+        async function filtern() {
+            setStatus('Lade Daten...');
+
+            try {
+                // Build filter
+                let filter = '';
+
+                if (state.selectedMA) {
+                    filter = `ID = ${state.selectedMA}`;
+                } else if (state.anstArt) {
+                    if (state.anstArt === 13) {
+                        filter = '( Anstellungsart_ID = 3 OR Anstellungsart_ID = 5 )';
+                    } else {
+                        filter = `Anstellungsart_ID = ${state.anstArt}`;
+                    }
+                }
+
+                // Add date filter
+                if (state.AU_von && state.AU_bis) {
+                    if (filter) filter += ' AND ';
+                    filter += `Datum BETWEEN '${formatDateSQL(state.AU_von)}' AND '${formatDateSQL(state.AU_bis)}'`;
+                }
+
+                console.log('[Zeitkonten] Filter:', filter);
+
+                // Load data via API
+                await loadStundenDaten();
+
+                setStatus('Daten geladen');
+            } catch (error) {
+                console.error('[Zeitkonten] Fehler beim Filtern:', error);
+                setStatus('Fehler: ' + error.message);
+            }
+        }
+
+        /**
+         * VBA: btnImport_Click - Zeitkonten importieren
+         */
+        function btnImport_Click() {
+            const monat = state.AU_von ? state.AU_von.getMonth() + 1 : new Date().getMonth() + 1;
+            const jahr = state.AU_von ? state.AU_von.getFullYear() : new Date().getFullYear();
+
+            if (monat > 12 || monat === 0) {
+                alert('Ungültiger Monat');
+                return;
+            }
+
+            setStatus(`Importiere Zeitkonten für ${monat}/${jahr}...`);
+
+            // VBA: Call import_Zeitkonten(Monat, Jahr)
+            // API call would go here
+            callAccessVBA('import_Zeitkonten', [monat, jahr])
+                .then(() => {
+                    filtern();
+                    setStatus('Import abgeschlossen');
+                })
+                .catch(err => setStatus('Import Fehler: ' + err.message));
+        }
+
+        /**
+         * VBA: btnImporteinzel_Click - Einzelnes Zeitkonto importieren
+         */
+        function btnImporteinzel_Click() {
+            if (!state.selectedMA) {
+                alert('Bitte zuerst Mitarbeiter auswählen');
+                return;
+            }
+
+            const monat = state.AU_von ? state.AU_von.getMonth() + 1 : new Date().getMonth() + 1;
+            const jahr = state.AU_von ? state.AU_von.getFullYear() : new Date().getFullYear();
+
+            setStatus(`Importiere Zeitkonto für MA ${state.selectedMA}...`);
+
+            // VBA: Call ZK_Import_einzel(xlWb, Jahr, Monat, MA_ID)
+            callAccessVBA('ZK_Import_einzel', [jahr, monat, state.selectedMA])
+                .then(() => {
+                    filtern();
+                    setStatus('Einzel-Import abgeschlossen');
+                })
+                .catch(err => setStatus('Import Fehler: ' + err.message));
+        }
+
+        /**
+         * VBA: btnExport_Click - Lexware Importdatei erstellen
+         */
+        function btnExport_Click() {
+            if (!state.AU_von) {
+                alert('Bitte Zeitraum auswählen');
+                return;
+            }
+
+            setStatus('Erstelle Lexware Export...');
+
+            // Export to CSV
+            exportToCSV('Lexware_Import');
+
+            setStatus('Export erstellt');
+        }
+
+        /**
+         * VBA: btnZKFest_Click - Zeitkonten Festangestellte fortschreiben
+         */
+        function btnZKFest_Click() {
+            if (!confirm(`Einsaetze der Festangestellten von ${formatDateDE(state.AU_von)} bis ${formatDateDE(state.AU_bis)} in die Zeitkonten uebertragen?`)) {
+                return;
+            }
+
+            setStatus('Uebertrage Zeitkonten Festangestellte...');
+            disableButtons(true);
+
+            callAccessVBA('fa_uebertragen', [false])
+                .then(() => {
+                    filtern();
+                    alert('Einsaetze der Festangestellten wurden in die Zeitkonten uebertragen!');
+                })
+                .finally(() => disableButtons(false));
+        }
+
+        /**
+         * VBA: btnZKMini_Click - Zeitkonten Minijobber fortschreiben
+         */
+        function btnZKMini_Click() {
+            if (!confirm(`Einsaetze der Minijobber von ${formatDateDE(state.AU_von)} bis ${formatDateDE(state.AU_bis)} in die Zeitkonten uebertragen?`)) {
+                return;
+            }
+
+            setStatus('Uebertrage Zeitkonten Minijobber...');
+            disableButtons(true);
+
+            callAccessVBA('mj_uebertragen', [false])
+                .then(() => {
+                    filtern();
+                    alert('Einsaetze der Minijobber wurden in die Zeitkonten uebertragen!');
+                })
+                .finally(() => disableButtons(false));
+        }
+
+        /**
+         * VBA: btnZKeinzel_Click - Einzelnes Zeitkonto fortschreiben
+         */
+        function btnZKeinzel_Click() {
+            if (!state.selectedMA) {
+                alert('Bitte zuerst Mitarbeiter auswählen');
+                return;
+            }
+
+            setStatus('Uebertrage Zeitkonto...');
+
+            callAccessVBA('ZK_Daten_uebertragen', [state.selectedMA, state.AU_von, state.AU_bis, true])
+                .then(() => {
+                    filtern();
+                    setStatus('Zeitkonto uebertragen');
+                })
+                .catch(err => setStatus('Fehler: ' + err.message));
+        }
+
+        /**
+         * VBA: btnAbgleich_Click - Stundenabgleich anzeigen
+         */
+        function btnAbgleich_Click() {
+            switchTab('tabAbgleich');
+        }
+
+        /**
+         * VBA: btnExportDiff_Click - Differenzreport exportieren
+         */
+        function btnExportDiff_Click() {
+            if (!state.AU_von) {
+                alert('Bitte Zeitraum auswählen');
+                return;
+            }
+
+            const jahr = state.AU_von.getFullYear();
+            const monat = state.AU_von.getMonth() + 1;
+            const fileName = `Differenzen_Lohnabrechnung_${jahr}-${monat}.csv`;
+
+            exportToCSV(fileName, 'abgleich');
+
+            setStatus('Differenzreport exportiert');
+        }
+
+        // ============================================
+        // VBA HELPER FUNCTIONS
+        // ============================================
+
+        /**
+         * VBA: StdZeitraum_Von_Bis - Berechnet Zeitraum basierend auf ID
+         */
+        function StdZeitraum_Von_Bis(zeitraum) {
+            const heute = new Date();
+            let von, bis;
+
+            switch (zeitraum) {
+                case 8: // Aktueller Monat
+                    von = new Date(heute.getFullYear(), heute.getMonth(), 1);
+                    bis = new Date(heute.getFullYear(), heute.getMonth() + 1, 0);
+                    break;
+                case 9: // Letzter Monat
+                    von = new Date(heute.getFullYear(), heute.getMonth() - 1, 1);
+                    bis = new Date(heute.getFullYear(), heute.getMonth(), 0);
+                    break;
+                case 14: // Aktuelles Quartal
+                    const q = Math.floor(heute.getMonth() / 3);
+                    von = new Date(heute.getFullYear(), q * 3, 1);
+                    bis = new Date(heute.getFullYear(), q * 3 + 3, 0);
+                    break;
+                case 11: // Aktuelles Jahr
+                    von = new Date(heute.getFullYear(), 0, 1);
+                    bis = new Date(heute.getFullYear(), 11, 31);
+                    break;
+                case 12: // Letztes Jahr
+                    von = new Date(heute.getFullYear() - 1, 0, 1);
+                    bis = new Date(heute.getFullYear() - 1, 11, 31);
+                    break;
+                default:
+                    von = new Date(heute.getFullYear(), heute.getMonth(), 1);
+                    bis = new Date(heute.getFullYear(), heute.getMonth() + 1, 0);
+            }
+
+            return { von, bis };
+        }
+
+        // ============================================
+        // DATA LOADING
+        // ============================================
+
+        async function loadMitarbeiter() {
+            try {
+                // API call to load Mitarbeiter
+                const response = await fetch('http://localhost:5000/api/mitarbeiter?aktiv=true');
+                if (!response.ok) throw new Error('API nicht erreichbar');
+
+                const data = await response.json();
+                state.maLookup = (data.data || data || []).map(ma => ({
+                    ID: ma.MA_ID || ma.ID,
+                    Name: `${ma.MA_Nachname || ma.Nachname}, ${ma.MA_Vorname || ma.Vorname}`
+                }));
+
+                // Populate dropdown
+                el.cboMitarbeiter.innerHTML = '<option value="">-- Mitarbeiter waehlen --</option>';
+                state.maLookup.forEach(ma => {
+                    const option = document.createElement('option');
+                    option.value = ma.ID;
+                    option.textContent = ma.Name;
+                    el.cboMitarbeiter.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error('[Zeitkonten] Fehler beim Laden der Mitarbeiter:', error);
+                setStatus('API-Fehler: Mitarbeiter konnten nicht geladen werden');
+            }
+        }
+
+        async function loadStundenDaten() {
+            if (!state.selectedMA) {
+                renderEmptyTable();
+                return;
+            }
+
+            try {
+                const von = formatDateSQL(state.AU_von);
+                const bis = formatDateSQL(state.AU_bis);
+
+                // API call
+                const response = await fetch(`http://localhost:5000/api/zeitkonten?ma_id=${state.selectedMA}&von=${von}&bis=${bis}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    state.records = data.data || data || [];
+                } else {
+                    // Fallback: generate empty records for date range
+                    state.records = generateDateRange(state.AU_von, state.AU_bis);
+                }
+
+                renderTable();
+                renderSummary();
+                renderMonthChart();
+
+                el.lblAnzahl.textContent = `${state.records.length} Eintraege`;
+
+            } catch (error) {
+                console.error('[Zeitkonten] Laden fehlgeschlagen:', error);
+                state.records = generateDateRange(state.AU_von, state.AU_bis);
+                renderTable();
+                renderSummary();
+            }
+        }
+
+        // ============================================
+        // RENDERING
+        // ============================================
+
+        function renderTable() {
+            if (state.records.length === 0) {
+                renderEmptyTable();
+                return;
+            }
+
+            let sumDauer = 0, sumPause = 0, sumNetto = 0;
+
+            el.tbody_Zeitkonto.innerHTML = state.records.map(rec => {
+                sumDauer += rec.Dauer || 0;
+                sumPause += rec.Pause || 0;
+                sumNetto += rec.Netto || 0;
+
+                const datum = formatDateDE(rec.Datum);
+                const rowClass = [];
+                if (rec.isWeekend) rowClass.push('weekend');
+                if (rec.Typ === 'Urlaub') rowClass.push('urlaub');
+                if (rec.Typ === 'Krank') rowClass.push('krank');
+
+                return `
+                    <tr class="${rowClass.join(' ')}">
+                        <td>${datum}</td>
+                        <td>${rec.Tag || ''}</td>
+                        <td>${rec.Objekt || '-'}</td>
+                        <td>${rec.Beginn || '-'}</td>
+                        <td>${rec.Ende || '-'}</td>
+                        <td>${formatMinutes(rec.Dauer)}</td>
+                        <td>${formatMinutes(rec.Pause)}</td>
+                        <td>${formatMinutes(rec.Netto)}</td>
+                        <td><span class="typ-badge ${(rec.Typ || 'frei').toLowerCase()}">${rec.Typ || 'Frei'}</span></td>
+                        <td>${rec.Bemerkung || ''}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            el.sumDauer.textContent = formatMinutes(sumDauer);
+            el.sumPause.textContent = formatMinutes(sumPause);
+            el.sumNetto.textContent = formatMinutes(sumNetto);
+        }
+
+        function renderEmptyTable() {
+            el.tbody_Zeitkonto.innerHTML = '<tr><td colspan="10" class="loading-cell">Bitte Mitarbeiter auswählen...</td></tr>';
+            el.sumDauer.textContent = '0:00';
+            el.sumPause.textContent = '0:00';
+            el.sumNetto.textContent = '0:00';
+        }
+
+        function renderSummary() {
+            // Calculate summaries
+            const sollMinuten = countWorkdays(state.AU_von, state.AU_bis) * 8 * 60;
+            const istMinuten = state.records.reduce((sum, r) => sum + (r.Netto || 0), 0);
+            const saldo = istMinuten - sollMinuten;
+            const urlaubTage = state.records.filter(r => r.Typ === 'Urlaub').length;
+            const krankTage = state.records.filter(r => r.Typ === 'Krank').length;
+            const ueberstunden = state.records.reduce((sum, r) => {
+                if (r.Netto > 8 * 60) return sum + (r.Netto - 8 * 60);
+                return sum;
+            }, 0);
+
+            el.summSoll.textContent = formatMinutes(sollMinuten);
+            el.summIst.textContent = formatMinutes(istMinuten);
+            el.summSaldo.textContent = formatMinutes(saldo);
+            el.summSaldo.className = 'summary-value ' + (saldo >= 0 ? 'positive' : 'negative');
+            el.summUeberstunden.textContent = formatMinutes(ueberstunden);
+            el.summUrlaub.textContent = urlaubTage;
+            el.summKrank.textContent = krankTage;
+        }
+
+        function renderMonthChart() {
+            const wochen = {};
+            state.records.forEach(rec => {
+                if (!rec.Datum) return;
+                const kw = getWeekNumber(new Date(rec.Datum));
+                if (!wochen[kw]) wochen[kw] = 0;
+                wochen[kw] += rec.Netto || 0;
+            });
+
+            const kwList = Object.keys(wochen).sort((a, b) => a - b);
+            const maxMinuten = Math.max(...Object.values(wochen), 40 * 60);
+
+            let html = '';
+            kwList.forEach(kw => {
+                const minuten = wochen[kw];
+                const stunden = minuten / 60;
+                const prozent = (minuten / maxMinuten) * 100;
+                let barClass = stunden < 35 ? 'low' : (stunden > 45 ? 'over' : '');
+
+                html += `
+                    <div class="chart-bar-container">
+                        <span class="chart-label">KW${kw}</span>
+                        <div class="chart-bar-wrapper">
+                            <div class="chart-bar ${barClass}" style="width: ${prozent}%"></div>
+                        </div>
+                        <span class="chart-value">${stunden.toFixed(1)}h</span>
+                    </div>
+                `;
+            });
+
+            el.monthChart.innerHTML = html || '<div class="loading-cell">Keine Daten</div>';
+
+            // Stats
+            const arbeitsTage = state.records.filter(r => r.Typ === 'Arbeit' && r.Netto > 0).length;
+            const einsaetze = state.records.filter(r => r.Objekt && r.Objekt !== '-').length;
+            const totalMinuten = state.records.reduce((sum, r) => sum + (r.Netto || 0), 0);
+            const durchschnitt = arbeitsTage > 0 ? totalMinuten / arbeitsTage : 0;
+
+            el.statArbeitstage.textContent = arbeitsTage;
+            el.statEinsaetze.textContent = einsaetze;
+            el.statDurchschnitt.textContent = formatMinutes(Math.round(durchschnitt));
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+
+        function formatDateISO(date) {
+            if (!date) return '';
+            if (typeof date === 'string') date = new Date(date);
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatDateDE(date) {
+            if (!date) return '';
+            if (typeof date === 'string') date = new Date(date);
+            return date.toLocaleDateString('de-DE');
+        }
+
+        function formatDateSQL(date) {
+            return formatDateISO(date);
+        }
+
+        function formatMinutes(minutes) {
+            if (!minutes || minutes === 0) return '0:00';
+            const h = Math.floor(Math.abs(minutes) / 60);
+            const m = Math.abs(minutes) % 60;
+            const sign = minutes < 0 ? '-' : '';
+            return `${sign}${h}:${m.toString().padStart(2, '0')}`;
+        }
+
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        function countWorkdays(von, bis) {
+            let count = 0;
+            const current = new Date(von);
+            while (current <= bis) {
+                const day = current.getDay();
+                if (day !== 0 && day !== 6) count++;
+                current.setDate(current.getDate() + 1);
+            }
+            return count;
+        }
+
+        function generateDateRange(von, bis) {
+            const records = [];
+            const current = new Date(von);
+            const tags = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+
+            while (current <= bis) {
+                const day = current.getDay();
+                records.push({
+                    Datum: new Date(current),
+                    Tag: tags[day],
+                    Objekt: '-',
+                    Beginn: '-',
+                    Ende: '-',
+                    Dauer: 0,
+                    Pause: 0,
+                    Netto: 0,
+                    Typ: 'Frei',
+                    Bemerkung: '',
+                    isWeekend: day === 0 || day === 6
+                });
+                current.setDate(current.getDate() + 1);
+            }
+
+            return records;
+        }
+
+        function updatePeriodeAnzeige() {
+            const vonStr = formatDateDE(state.AU_von);
+            const bisStr = formatDateDE(state.AU_bis);
+            el.lblPeriode.textContent = `${vonStr} - ${bisStr}`;
+        }
+
+        function setStatus(text) {
+            el.lblStatus.textContent = text;
+        }
+
+        function disableButtons(disabled) {
+            ['btnImport', 'btnImporteinzel', 'btnExport', 'btnZKFest', 'btnZKMini', 'btnZKeinzel', 'btnAbgleich', 'btnExportDiff']
+                .forEach(id => {
+                    const btn = document.getElementById(id);
+                    if (btn) btn.disabled = disabled;
+                });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === tabId);
+            });
+            state.activeTab = tabId;
+        }
+
+        function navigateToForm(formName, recordId) {
+            // Verwende shell-detector.js Funktion wenn verfuegbar
+            if (typeof window._shellNavigateToForm === 'function') {
+                window._shellNavigateToForm(formName, recordId);
+            } else if (window.parent && window.parent !== window) {
+                // WICHTIG: formName nicht form! Shell erwartet formName
+                window.parent.postMessage({ type: 'NAVIGATE', formName: formName, id: recordId }, '*');
+            } else {
+                var url = formName + '.html';
+                if (recordId) url += '?id=' + recordId;
+                window.location.href = url;
+            }
+        }
+
+        function exportToCSV(fileName, type) {
+            let headers, rows;
+
+            if (type === 'abgleich') {
+                // Export Abgleich data
+                headers = ['ID', 'Name', 'Anstellungsart', 'Consys Std', 'ZK Aktuell', 'ZK Abger', 'Differenz'];
+                rows = []; // Would be populated from abgleich data
+            } else {
+                headers = ['Datum', 'Tag', 'Objekt', 'Beginn', 'Ende', 'Dauer', 'Pause', 'Netto', 'Typ', 'Bemerkung'];
+                rows = state.records.map(rec => [
+                    formatDateDE(rec.Datum),
+                    rec.Tag || '',
+                    rec.Objekt || '',
+                    rec.Beginn || '',
+                    rec.Ende || '',
+                    formatMinutes(rec.Dauer),
+                    formatMinutes(rec.Pause),
+                    formatMinutes(rec.Netto),
+                    rec.Typ || '',
+                    rec.Bemerkung || ''
+                ]);
+            }
+
+            const csv = [headers, ...rows]
+                .map(row => row.map(cell => `"${cell}"`).join(';'))
+                .join('\n');
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName.endsWith('.csv') ? fileName : fileName + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function callAccessVBA(functionName, args) {
+            // Check for WebView2 bridge
+            if (window.chrome && window.chrome.webview) {
+                return new Promise((resolve, reject) => {
+                    window.chrome.webview.postMessage({
+                        type: 'VBA_CALL',
+                        function: functionName,
+                        arguments: args
+                    });
+                    // Would need response handling
+                    resolve();
+                });
+            } else {
+                // Fallback: API call
+                console.log(`[Zeitkonten] VBA Call: ${functionName}(${args.join(', ')})`);
+                return Promise.resolve();
+            }
+        }
+
+        // Fullscreen toggle
+        function toggleFullscreen() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.title = 'Vollbild beenden';
+                }).catch(err => console.error('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen().then(() => {
+                    btn.title = 'Vollbild';
+                }).catch(err => console.error('Exit fullscreen error:', err));
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            if (btn) btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+
+        // Global access
+        window.Zeitkonten = {
+            loadData: filtern,
+            exportData: () => exportToCSV('Zeitkonto_Export')
+        };
+    </script>
+
+    <!-- Shell-Detector für iframe-Integration -->
+    <script src="js/shell-detector.js"></script>
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="js/webview2-bridge.js"></script>
+    <!-- API-Server Lifecycle -->
+    <script src="js/api-lifecycle.js"></script>
+</body>
+</html>
+
+

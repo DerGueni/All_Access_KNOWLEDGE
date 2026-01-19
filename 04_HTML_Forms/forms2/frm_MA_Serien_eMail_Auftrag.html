@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einsatzliste senden - CONSYS</title>
+    <style>
+        /* CSS Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 11px; }
+        body { background-color: #8080c0; height: 100vh; overflow: hidden; }
+
+        /* App Container */
+        .app-container { display: flex; height: 100vh; }
+
+        /* Sidebar */
+        .app-sidebar {
+            width: 180px;
+            background: #6060a0;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #404070;
+        }
+
+        .sidebar-header {
+            background: #000080;
+            color: white;
+            padding: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            text-align: center;
+            border-bottom: 2px solid #404070;
+        }
+
+        /* Main Area */
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #8080c0;
+        }
+
+        /* Header */
+        .app-header {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 32px;
+            border-bottom: 2px solid #000080;
+        }
+
+        .app-title {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* Toolbar */
+        .app-toolbar {
+            background: #d4d0c8;
+            padding: 6px 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #808080;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .toolbar-label {
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 20px;
+            background: #808080;
+            margin: 0 4px;
+        }
+
+        /* Form Controls */
+        .form-control {
+            border: 1px solid #808080;
+            padding: 2px 4px;
+            font-size: 10px;
+            background: white;
+            height: 20px;
+        }
+
+        select.form-control {
+            height: 20px;
+        }
+
+        textarea.form-control {
+            height: auto;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 10px;
+            height: 24px;
+            line-height: 14px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #4169e1, #1e49a0);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Content Area */
+        .app-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .content-main {
+            flex: 1;
+            background: #b8b8d8;
+            overflow: auto;
+        }
+
+        .content-sidebar {
+            width: 300px;
+            background: #b8b8d8;
+            border-left: 2px solid #808080;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Fieldset */
+        .fieldset {
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #d4d0c8;
+        }
+
+        .fieldset legend {
+            font-weight: bold;
+            font-size: 10px;
+            padding: 0 4px;
+        }
+
+        /* Field Row */
+        .field-row {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-row label {
+            font-size: 10px;
+        }
+
+        /* Datasheet */
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .datasheet th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 3px 6px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        .datasheet td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 6px;
+            font-size: 10px;
+        }
+
+        .datasheet tr:hover {
+            background: #e0e0ff;
+        }
+
+        /* Detail Section */
+        .detail-header {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 10px;
+            border-bottom: 1px solid #808080;
+        }
+
+        .detail-content {
+            flex: 1;
+            padding: 8px;
+            overflow: auto;
+        }
+
+        /* Email Preview */
+        .email-preview {
+            background: white;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px;
+        }
+
+        .email-header {
+            border-bottom: 1px solid #c0c0c0;
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+        }
+
+        .email-field {
+            display: flex;
+            margin-bottom: 3px;
+            font-size: 10px;
+        }
+
+        .email-field label {
+            width: 60px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .email-body {
+            min-height: 150px;
+            font-size: 10px;
+            white-space: pre-wrap;
+        }
+
+        /* Stats */
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px;
+            background: white;
+            border: 1px solid #808080;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: 10px;
+            color: #000080;
+        }
+
+        /* Footer */
+        .app-footer {
+            background: #d4d0c8;
+            padding: 2px 8px;
+            border-top: 2px solid #808080;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            min-height: 20px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body data-active-menu="email">
+    <div class="app-container">
+        <aside class="app-sidebar">
+            <div class="sidebar-header">CONSYS</div>
+        </aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Einsatzliste senden</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Auftrag:</label>
+                    <select id="cboAuftrag" class="form-control" style="width:250px;">
+                        <option value="">-- Auftrag wählen --</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Vorlage:</label>
+                    <select id="cboVorlage" class="form-control" style="width:180px;">
+                        <option value="einsatzinfo">Einsatzinformation</option>
+                        <option value="anfrage">Anfrage</option>
+                        <option value="erinnerung">Erinnerung</option>
+                        <option value="absage">Absage</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnSenden">E-Mails senden</button>
+                    <button class="btn" id="btnVorschau">Vorschau</button>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="content-main" style="padding:12px;overflow:auto;">
+                    <fieldset class="fieldset">
+                        <legend>Empfaenger auswählen</legend>
+                        <div class="field-row">
+                            <label>
+                                <input type="checkbox" id="chkAlle" checked> Alle Mitarbeiter des Auftrags
+                            </label>
+                        </div>
+                        <div class="field-row">
+                            <label>
+                                <input type="checkbox" id="chkNurZugesagt"> Nur zugesagte
+                            </label>
+                            <label style="margin-left:16px;">
+                                <input type="checkbox" id="chkNurAnfrage"> Nur mit Anfrage
+                            </label>
+                        </div>
+                        <div style="margin-top:8px;">
+                            <table class="datasheet">
+                                <thead>
+                                    <tr>
+                                        <th style="width:30px;"><input type="checkbox" id="chkSelectAll" checked></th>
+                                        <th>Name</th>
+                                        <th style="width:180px;">E-Mail</th>
+                                        <th style="width:80px;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody_Empfaenger">
+                                    <tr><td colspan="4" style="text-align:center;color:#999;">Bitte Auftrag wählen</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="fieldset">
+                        <legend>E-Mail Inhalt</legend>
+                        <div class="field-row">
+                            <label style="width:60px;">Betreff:</label>
+                            <input type="text" id="txtBetreff" class="form-control" style="flex:1;" value="Einsatzinformation">
+                        </div>
+                        <div style="margin-top:8px;">
+                            <label>Nachricht:</label>
+                            <textarea id="txtNachricht" class="form-control" rows="8" style="width:100%;margin-top:4px;">Sehr geehrte/r {Anrede} {Nachname},
+
+hiermit erhalten Sie die Einsatzinformationen für den Auftrag {Auftrag}.
+
+Datum: {Datum}
+Zeit: {Zeit}
+Ort: {Ort}
+Treffpunkt: {Treffpunkt}
+
+Mit freundlichen Grüßen
+CONSYS Security</textarea>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="content-sidebar">
+                    <div class="detail-header">
+                        <span class="detail-title">Vorschau</span>
+                    </div>
+                    <div class="detail-content">
+                        <div class="email-preview">
+                            <div class="email-header">
+                                <div class="email-field"><label>An:</label><span id="previewAn">-</span></div>
+                                <div class="email-field"><label>Betreff:</label><span id="previewBetreff">Einsatzinformation</span></div>
+                            </div>
+                            <div class="email-body" id="previewBody">
+                                Wählen Sie einen Empfaenger für die Vorschau...
+                            </div>
+                        </div>
+                        <div style="margin-top:12px;">
+                            <div class="stat-item" style="margin-bottom:8px;">
+                                <span class="stat-label">Ausgewählte Empfaenger:</span>
+                                <span class="stat-value" id="statEmpfaenger">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 E-Mails ausgewählt</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+</body>
+</html>

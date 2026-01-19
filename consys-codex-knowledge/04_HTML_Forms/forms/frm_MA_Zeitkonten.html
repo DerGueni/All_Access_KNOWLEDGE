@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter-Zeitkonten - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        /* Responsive Layout für 12-24 Zoll (1024px - 2560px) */
+        .app-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 1rem;
+        }
+        .content-main {
+            flex: 1;
+            overflow: auto;
+            min-width: 0;
+        }
+        .month-panel {
+            width: clamp(250px, 18vw, 350px);
+            flex-shrink: 0;
+            overflow: auto;
+        }
+        .datasheet {
+            width: 100%;
+            table-layout: auto;
+        }
+        .datasheet th,
+        .datasheet td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .summary-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .app-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .toolbar-group select,
+        .toolbar-group input[type="date"] {
+            min-width: 0;
+        }
+        #cboMitarbeiter {
+            width: clamp(150px, 15vw, 250px);
+        }
+        #cboPeriode {
+            width: clamp(120px, 12vw, 180px);
+        }
+        @media (max-width: 1366px) {
+            .month-panel {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body data-active-menu="zeitkonten">
+    <div class="app-container">
+        <!-- Sidebar wird dynamisch geladen -->
+        <aside class="app-sidebar"></aside>
+
+        <!-- Hauptbereich -->
+        <main class="app-main">
+            <!-- Header -->
+            <header class="app-header" style="background: #4316B2; color: white; min-height: 94px; height: 94px;">
+                <div class="header-left">
+                    <h1 class="app-title">Mitarbeiter-Zeitkonten</h1>
+                </div>
+                <div class="header-right">
+                    <span id="lblPeriode">-</span>
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Toolbar -->
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Mitarbeiter:</label>
+                    <select id="cboMitarbeiter" class="form-control">
+                        <option value="">-- Mitarbeiter wählen --</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Zeitraum:</label>
+                    <select id="cboPeriode" class="form-control">
+                        <option value="monat">Aktueller Monat</option>
+                        <option value="vormonat">Vormonat</option>
+                        <option value="quartal">Aktuelles Quartal</option>
+                        <option value="jahr">Aktuelles Jahr</option>
+                        <option value="custom">Benutzerdefiniert</option>
+                    </select>
+                </div>
+                <div class="toolbar-group" id="customDates" style="display:none;">
+                    <input type="date" id="datVon" class="form-control">
+                    <span>bis</span>
+                    <input type="date" id="datBis" class="form-control">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button id="btnAktualisieren" class="btn btn-primary">Aktualisieren</button>
+                    <button id="btnExport" class="btn">Export</button>
+                    <button id="btnDrucken" class="btn">Drucken</button>
+                </div>
+            </div>
+
+            <!-- Zusammenfassung -->
+            <div class="summary-bar">
+                <div class="summary-item">
+                    <span class="summary-label">Sollstunden:</span>
+                    <span class="summary-value" id="summSoll">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Iststunden:</span>
+                    <span class="summary-value" id="summIst">0:00</span>
+                </div>
+                <div class="summary-item highlight">
+                    <span class="summary-label">Saldo:</span>
+                    <span class="summary-value" id="summSaldo">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Überstunden:</span>
+                    <span class="summary-value" id="summUeberstunden">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Urlaub (Tage):</span>
+                    <span class="summary-value" id="summUrlaub">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Krank (Tage):</span>
+                    <span class="summary-value" id="summKrank">0</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="app-content">
+                <!-- Zeitkonto-Tabelle -->
+                <div class="content-main">
+                    <table class="datasheet" id="tblZeitkonto">
+                        <thead>
+                            <tr>
+                                <th style="width:90px;">Datum</th>
+                                <th style="width:40px;">Tag</th>
+                                <th style="min-width:180px;">Objekt/Auftrag</th>
+                                <th style="width:60px;">Beginn</th>
+                                <th style="width:60px;">Ende</th>
+                                <th style="width:60px;">Dauer</th>
+                                <th style="width:60px;">Pause</th>
+                                <th style="width:60px;">Netto</th>
+                                <th style="width:70px;">Typ</th>
+                                <th style="min-width:120px;">Bemerkung</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_Zeitkonto">
+                            <tr><td colspan="10" style="text-align:center; padding:40px; color:#999;">Bitte Mitarbeiter auswählen...</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="sum-row">
+                                <td colspan="5" class="sum-label">Summe:</td>
+                                <td id="sumDauer">0:00</td>
+                                <td id="sumPause">0:00</td>
+                                <td id="sumNetto">0:00</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Monatsübersicht rechts -->
+                <div class="month-panel">
+                    <div class="month-header">Monatsübersicht</div>
+                    <div class="month-content">
+                        <div class="month-chart" id="monthChart">
+                            <!-- Balkendiagramm wird hier generiert -->
+                        </div>
+                        <div class="month-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Arbeitstage:</span>
+                                <span class="stat-value" id="statArbeitstage">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Einsätze:</span>
+                                <span class="stat-value" id="statEinsaetze">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Durchschnitt pro Tag:</span>
+                                <span class="stat-value" id="statDurchschnitt">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer" style="height: 19px; min-height: 19px; max-height: 19px;">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Einträge</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Sidebar JS dynamisch laden -->
+    <script type="module" src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="logic/frm_MA_Zeitkonten.logic.js"></script>
+</body>
+</html>

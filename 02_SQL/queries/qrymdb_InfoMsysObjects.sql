@@ -1,0 +1,3 @@
+SELECT MSysObjects.*
+FROM MSysObjects;
+

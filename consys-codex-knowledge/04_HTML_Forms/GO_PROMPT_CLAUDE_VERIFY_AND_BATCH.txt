@@ -1,0 +1,46 @@
+﻿GO
+
+AUFGABE 1 (Pflicht, zuerst, ohne Abkuerzungen):
+- Vergleiche das HTML-Formular 'frm_va_Auftragstamm' EXAKT mit dem Original Access-Formular.
+- Nutze dafuer die Exporte in: Consys_HTML\01_specs\access_exports\
+  - frm_va_Auftragstamm.Form.txt
+  - Controls_frm_va_Auftragstamm.csv
+- Abgleich-Kriterien (alles muss passen):
+  - Layout/Optik: Positionen, Groessen, Reihenfolge, Ausrichtung
+  - Beschriftungen (Caption), Feldtypen, Tab-Reihenfolge soweit moeglich
+  - Bereiche/Sections sinngemaess (Header/Detail/Footer)
+  - Buttons/Labels/Inputs vorhanden wie im Original
+- Danach aktualisiere/ersetze NUR diese 3 Dateien:
+  - Consys_HTML\02_web\forms\frm_va_Auftragstamm.html
+  - Consys_HTML\02_web\forms\frm_va_Auftragstamm.css
+  - Consys_HTML\02_web\forms\frm_va_Auftragstamm.logic.js
+
+WICHTIGE REGELN (immer):
+- Kein Framework, keine CDNs.
+- JavaScript strikt IE-sicher: nur 'var' und 'function'. Keine Backticks, kein const/let, keine Arrow-Functions.
+- Dateischema pro Formular bleibt wie folgt:
+  - <FORMNAME>.html
+  - <FORMNAME>.css
+  - <FORMNAME>.logic.js
+
+AUFGABE 2 (danach automatisch weiterarbeiten, ohne Rueckfragen):
+- Erstelle die naechsten HTML-Formulare Schritt fuer Schritt im EXAKT selben Schema wie 'frm_va_Auftragstamm'.
+- Ziel-Liste: Consys_HTML\01_specs\target_forms.txt (jede Zeile ein Formularname)
+- Fuer jedes Formular <FORMNAME> in dieser Liste:
+  1) Nutze Exporte in Consys_HTML\01_specs\access_exports\
+     - Wenn <FORMNAME>.Form.txt und Controls_<FORMNAME>.csv vorhanden sind: damit arbeiten.
+     - Wenn etwas fehlt: trotzdem ein lauffaehiges 1:1 Grundgeruest erstellen und dann weitermachen.
+  2) Schreibe/aktualisiere:
+     - Consys_HTML\02_web\forms\<FORMNAME>.html
+     - Consys_HTML\02_web\forms\<FORMNAME>.css
+     - Consys_HTML\02_web\forms\<FORMNAME>.logic.js
+  3) Unterformulare/Subforms:
+     - Wenn das Formular Unterformulare hat: als Bereiche nachbilden (und die zugehoerigen Subforms aus den Exporten ebenfalls als eigene HTML-Dateien erzeugen, falls sie benoetigt werden).
+  4) Nach jedem Formular schreibe eine Statuszeile:
+     FERTIG: <FORMNAME>
+
+ABSCHLUSS:
+- Aktualisiere/erstelle: Consys_HTML\02_web\forms\_manifest.txt
+  (eine Zeile pro fertig erstelltem Formularname)
+
+JETZT STARTEN.

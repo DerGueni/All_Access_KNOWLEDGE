@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung</title>
+    <style>
+/* ========== AUTO-GENERATED FROM ACCESS SPEC ========== */
+/* Form: frm_va_Auftragstamm */
+
+:root {
+    --header-bg: #4A1570;
+    --detail-bg: #F0F0F0;
+    --footer-bg: #E8E8E8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    font-size: 11px;
+    background: #C0C0C0;
+    overflow: auto;
+}
+
+.form-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--detail-bg);
+}
+
+/* Labels */
+.access-label {
+    position: absolute;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+
+/* TextBoxes */
+.access-textbox {
+    position: absolute;
+    border: 1px solid #808080;
+    background: #FFFFFF;
+    padding: 2px 4px;
+}
+
+.access-textbox:focus {
+    outline: none;
+    border-color: #0066CC;
+}
+
+/* ComboBoxes */
+.access-combobox {
+    position: absolute;
+    border: 1px solid #808080;
+    background: #FFFFFF;
+    padding: 1px 2px;
+}
+
+/* Buttons */
+.access-button {
+    position: absolute;
+    border: 1px solid #666;
+    background: linear-gradient(180deg, #F8F8F8 0%, #E0E0E0 100%);
+    cursor: pointer;
+    padding: 2px 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.access-button:hover {
+    background: linear-gradient(180deg, #E8E8E8 0%, #D0D0D0 100%);
+}
+
+/* Checkboxes */
+.access-checkbox {
+    position: absolute;
+}
+
+/* Rectangles */
+.access-rectangle {
+    position: absolute;
+    border: 1px solid #666;
+}
+
+/* Subforms */
+.access-subform {
+    position: absolute;
+    border: 1px solid #999;
+    background: #FFFFFF;
+    overflow: auto;
+}
+
+/* Pages (Tabs) */
+.access-page {
+    position: absolute;
+    background: #FFFFFF;
+}
+</style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="access-subform" id="frm_Menuefuehrung" data-source="" style="position: absolute; left: 1px; top: 0px; width: 174px; height: 792px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <button class="access-button" id="btn_N_HTMLAnsicht" style="position: absolute; left: 567px; top: 3px; width: 93px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt">HTML Ansicht</button>
+        <span class="access-label" id="Bezeichnungsfeld417" style="position: absolute; left: 0px; top: 4px; width: 53px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Erstellt</span>
+        <input type="text" class="access-textbox" id="Text416" style="position: absolute; left: 72px; top: 4px; width: 125px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <select class="access-combobox" id="cboEinsatzliste" style="position: absolute; left: 102px; top: 4px; width: 50px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <input type="text" class="access-textbox" id="Text418" style="position: absolute; left: 212px; top: 4px; width: 125px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt" readonly>
+        <select class="access-combobox" id="IstStatus" style="position: absolute; left: 219px; top: 4px; width: 21px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <button class="access-button" id="btnmailpos" style="position: absolute; left: 242px; top: 4px; width: 17px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Positionsliste senden</button>
+        <span class="access-label" id="Bezeichnungsfeld421" style="position: absolute; left: 420px; top: 4px; width: 53px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Geändert</span>
+        <input type="text" class="access-textbox" id="Text419" style="position: absolute; left: 492px; top: 4px; width: 125px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <input type="text" class="access-textbox" id="Text422" style="position: absolute; left: 632px; top: 4px; width: 125px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt" readonly>
+        <span class="access-label" id="Bezeichnungsfeld272" style="position: absolute; left: 186px; top: 8px; width: 57px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Datum:</span>
+        <input type="text" class="access-textbox" id="Dat_VA_Von" style="position: absolute; left: 248px; top: 8px; width: 87px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <input type="text" class="access-textbox" id="Dat_VA_Bis" style="position: absolute; left: 351px; top: 8px; width: 87px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <span class="access-label" id="Bezeichnungsfeld466" style="position: absolute; left: 446px; top: 8px; width: 28px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Nr.</span>
+        <span class="access-label" id="Bezeichnungsfeld327" style="position: absolute; left: 782px; top: 8px; width: 116px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Treffpunkt:</span>
+        <span class="access-label" id="lbl_Version" style="position: absolute; left: 1757px; top: 8px; width: 102px; height: 21px; font-family: "Segoe UI", sans-serif; font-size: 8pt">GPT | TEST</span>
+        <button class="access-button" id="Befehl38" style="position: absolute; left: 1867px; top: 8px; width: 20px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt">btn_Formular_schliessen</button>
+        <input type="text" class="access-textbox" id="ID" style="position: absolute; left: 474px; top: 8px; width: 41px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt" readonly>
+        <input type="text" class="access-textbox" id="Treffp_Zeit" style="position: absolute; left: 905px; top: 8px; width: 58px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <input type="text" class="access-textbox" id="Treffpunkt" style="position: absolute; left: 966px; top: 8px; width: 204px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <button class="access-button" id="Befehl640" style="position: absolute; left: 703px; top: 11px; width: 133px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Auftrag kopieren</button>
+        <button class="access-button" id="mcobtnDelete" style="position: absolute; left: 858px; top: 11px; width: 133px; height: 24px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Auftrag löschen</button>
+        <button class="access-button" id="btnMailEins" style="position: absolute; left: 1013px; top: 11px; width: 153px; height: 24px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Einsatzliste senden MA</button>
+        <button class="access-button" id="btn_Autosend_BOS" style="position: absolute; left: 1183px; top: 11px; width: 174px; height: 24px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Einsatzliste senden BOS</button>
+        <button class="access-button" id="btnMailSub" style="position: absolute; left: 1365px; top: 11px; width: 128px; height: 34px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Einsatzliste senden SUB</button>
+        <div class="access-subform" id="sub_VA_Anzeige" data-source="" style="position: absolute; left: 1274px; top: 11px; width: 628px; height: 82px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <div class="access-rectangle" id="Rechteck620" style="position: absolute; left: 348px; top: 14px; width: 106px; height: 29px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <button class="access-button" id="btn_rueck" style="position: absolute; left: 431px; top: 19px; width: 16px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Befehl649</button>
+        <span class="access-label" id="Bezeichnungsfeld344" style="position: absolute; left: 1504px; top: 19px; width: 107px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Auftragsstatus:</span>
+        <select class="access-combobox" id="Veranst_Status_ID" style="position: absolute; left: 1621px; top: 19px; width: 114px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <button class="access-button" id="Befehl43" style="position: absolute; left: 353px; top: 19px; width: 16px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">btn_erster_Datensatz</button>
+        <button class="access-button" id="Befehl41" style="position: absolute; left: 373px; top: 19px; width: 16px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">btn_Datensatz_zurueck</button>
+        <button class="access-button" id="Befehl40" style="position: absolute; left: 392px; top: 19px; width: 16px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">btn_Datensatz_vor</button>
+        <button class="access-button" id="btn_letzer_Datensatz" style="position: absolute; left: 411px; top: 19px; width: 16px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">btn_letzter_Datensatz</button>
+        <button class="access-button" id="btnRibbonAus" style="position: absolute; left: 49px; top: 22px; width: 19px; height: 16px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Befehl179</button>
+        <span class="access-label" id="Bezeichnungsfeld339" style="position: absolute; left: 541px; top: 23px; width: 125px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt">PKW Anzahl:</span>
+        <input type="text" class="access-textbox" id="PKW_Anzahl" style="position: absolute; left: 669px; top: 23px; width: 69px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <span class="access-label" id="lbl_Datum" style="position: absolute; left: 1762px; top: 26px; width: 91px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">03.12.2025</span>
+        <span class="access-label" id="Auto_Kopfzeile0" style="position: absolute; left: 121px; top: 26px; width: 195px; height: 25px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Auftragsverwaltung</span>
+        <button class="access-button" id="btnSchnellPlan" style="position: absolute; left: 533px; top: 30px; width: 129px; height: 31px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Mitarbeiterauswahl</button>
+        <select class="access-combobox" id="Kombinationsfeld656" style="position: absolute; left: 248px; top: 32px; width: 268px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <span class="access-label" id="Bezeichnungsfeld330" style="position: absolute; left: 782px; top: 32px; width: 116px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Dienstkleidung:</span>
+        <span class="access-label" id="Bezeichnungsfeld657" style="position: absolute; left: 185px; top: 33px; width: 57px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Auftrag:</span>
+        <select class="access-combobox" id="Dienstkleidung" style="position: absolute; left: 905px; top: 33px; width: 264px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <button class="access-button" id="btnDaBaAus" style="position: absolute; left: 30px; top: 34px; width: 19px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Befehl179</button>
+        <button class="access-button" id="btnDaBaEin" style="position: absolute; left: 68px; top: 34px; width: 19px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Befehl179</button>
+        <button class="access-button" id="btnRibbonEin" style="position: absolute; left: 49px; top: 45px; width: 19px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Befehl179</button>
+        <button class="access-button" id="btnneuveranst" style="position: absolute; left: 703px; top: 49px; width: 133px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Neuer Auftrag</button>
+        <span class="access-label" id="Bezeichnungsfeld655" style="position: absolute; left: 541px; top: 49px; width: 147px; height: 21px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Fahrtkosten pro PKW:</span>
+        <button class="access-button" id="btn_ListeStd" style="position: absolute; left: 860px; top: 49px; width: 133px; height: 24px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Namensliste ESS</button>
+        <button class="access-button" id="btnDruckZusage" style="position: absolute; left: 1013px; top: 49px; width: 153px; height: 24px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Einsatzliste drucken</button>
+        <input type="text" class="access-textbox" id="Fahrtkosten" style="position: absolute; left: 669px; top: 49px; width: 68px; height: 20px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <button class="access-button" id="btnReq" style="position: absolute; left: 355px; top: 53px; width: 82px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Aktualisieren</button>
+        <button class="access-button" id="Befehl709" style="position: absolute; left: 1285px; top: 53px; width: 71px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">EL gesendet</button>
+        <span class="access-label" id="lbl_EL_Autosend" style="position: absolute; left: 1183px; top: 53px; width: 73px; height: 18px; font-family: "Segoe UI", sans-serif; font-size: 8pt">EL Autosend</span>
+        <button class="access-button" id="btn_Rueckmeld" style="position: absolute; left: 121px; top: 57px; width: 95px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Rückmelde-Statistik</button>
+        <button class="access-button" id="btnSyncErr" style="position: absolute; left: 231px; top: 57px; width: 69px; height: 15px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Syncfehler checken</button>
+        <input type="checkbox" class="access-checkbox" id="cbAutosendEL" style="position: absolute; left: 1266px; top: 57px; font-family: "Segoe UI", sans-serif; font-size: 8pt">
+        <select class="access-combobox" id="Ort" style="position: absolute; left: 248px; top: 58px; width: 268px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <span class="access-label" id="Bezeichnungsfeld333" style="position: absolute; left: 782px; top: 58px; width: 116px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Ansprechpartner:</span>
+        <span class="access-label" id="Bezeichnungsfeld467" style="position: absolute; left: 186px; top: 59px; width: 57px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Ort:</span>
+        <input type="text" class="access-textbox" id="Ansprechpartner" style="position: absolute; left: 905px; top: 59px; width: 264px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <button class="access-button" id="btn_Posliste_oeffnen" style="position: absolute; left: 544px; top: 64px; width: 100px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Positionen</button>
+        <select class="access-combobox" id="Objekt" style="position: absolute; left: 248px; top: 84px; width: 248px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <select class="access-combobox" id="Objekt_ID" style="position: absolute; left: 486px; top: 84px; width: 30px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <button class="access-button" id="btnDatumLeft" style="position: absolute; left: 554px; top: 84px; width: 19px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt">btn_Datensatz_zurueck</button>
+        <select class="access-combobox" id="cboVADatum" style="position: absolute; left: 577px; top: 84px; width: 145px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <button class="access-button" id="btnDatumRight" style="position: absolute; left: 725px; top: 84px; width: 19px; height: 23px; font-family: "Segoe UI", sans-serif; font-size: 8pt">btn_Datensatz_vor</button>
+        <span class="access-label" id="Bezeichnungsfeld243" style="position: absolute; left: 185px; top: 85px; width: 57px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Objekt:</span>
+        <span class="access-label" id="Bezeichnungsfeld592" style="position: absolute; left: 782px; top: 85px; width: 116px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Auftraggeber:</span>
+        <select class="access-combobox" id="veranstalter_id" style="position: absolute; left: 905px; top: 85px; width: 264px; height: 22px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <button class="access-button" id="btn_AbWann" style="position: absolute; left: 1432px; top: 106px; width: 28px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Go</button>
+        <input type="text" class="access-textbox" id="Auftraege_ab" style="position: absolute; left: 1357px; top: 106px; width: 72px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <button class="access-button" id="btnTgBack" style="position: absolute; left: 1468px; top: 106px; width: 29px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt"><<</button>
+        <button class="access-button" id="btnTgVor" style="position: absolute; left: 1499px; top: 106px; width: 27px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt">>></button>
+        <button class="access-button" id="btnHeute" style="position: absolute; left: 1536px; top: 106px; width: 70px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Ab Heute</button>
+        <select class="access-combobox" id="cboID" style="position: absolute; left: 1758px; top: 106px; width: 100px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <span class="access-label" id="Bezeichnungsfeld482" style="position: absolute; left: 1281px; top: 107px; width: 71px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Aufträge ab: </span>
+        <div class="access-subform" id="zsub_lstAuftrag" data-source="" style="position: absolute; left: 1278px; top: 133px; width: 636px; height: 662px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <div class="access-page" id="pgMA_Zusage" style="position: absolute; left: 190px; top: 147px; width: 1076px; height: 658px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Einsatzliste</div>
+        <div class="access-page" id="pgMA_Plan" style="position: absolute; left: 190px; top: 147px; width: 1076px; height: 658px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Antworten ausstehend</div>
+        <div class="access-page" id="pgAttach" style="position: absolute; left: 190px; top: 147px; width: 1076px; height: 658px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Zusatzdateien</div>
+        <div class="access-page" id="pgRechnung" style="position: absolute; left: 190px; top: 147px; width: 1076px; height: 658px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Rechnung</div>
+        <button class="access-button" id="btn_BWN_Druck" style="position: absolute; left: 558px; top: 155px; width: 110px; font-family: "Segoe UI", sans-serif; font-size: 8pt">BWN drucken</button>
+        <span class="access-label" id="Bezeichnungsfeld386" style="position: absolute; left: 208px; top: 162px; width: 130px; height: 21px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Mitarbeiter geplant:</span>
+        <div class="access-subform" id="sub_MA_VA_Zuordnung_Status" data-source="" style="position: absolute; left: 212px; top: 169px; width: 920px; height: 606px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <!-- Unknown: optiongroup MA_Selektion -->
+        <select class="access-combobox" id="cboQuali" style="position: absolute; left: 249px; top: 182px; width: 11px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <div class="access-subform" id="sub_VA_Start" data-source="" style="position: absolute; left: 197px; top: 187px; width: 251px; height: 186px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <div class="access-subform" id="sub_MA_VA_Zuordnung" data-source="" style="position: absolute; left: 455px; top: 187px; width: 811px; height: 617px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <select class="access-combobox" id="cboAnstArt" style="position: absolute; left: 1014px; top: 188px; width: 150px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></select>
+        <button class="access-button" id="btnRchLex" style="position: absolute; left: 1120px; top: 192px; width: 132px; height: 38px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Rechnung in Lexware erstellen</button>
+        <button class="access-button" id="btnNeuAttach" style="position: absolute; left: 853px; top: 200px; width: 212px; height: 42px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Neuen Attach hinzufügen</button>
+        <button class="access-button" id="btnPDFKopf" style="position: absolute; left: 368px; top: 203px; width: 132px; height: 26px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Rechnung PDF</button>
+        <button class="access-button" id="btnPDFPos" style="position: absolute; left: 516px; top: 203px; width: 177px; height: 26px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Berechnungsliste PDF</button>
+        <span class="access-label" id="Bezeichnungsfeld355" style="position: absolute; left: 225px; top: 204px; width: 578px; height: 42px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Doppelklick auf Dateinamen zeigt Inhalt an bzw. öffnet Office-Pgm </span>
+        <button class="access-button" id="btnLoad" style="position: absolute; left: 720px; top: 204px; height: 27px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Daten laden</button>
+        <span class="access-label" id="Bezeichnungsfeld470" style="position: absolute; left: 224px; top: 209px; width: 133px; height: 21px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Rechnungspositionen:</span>
+        <input type="text" class="access-textbox" id="Bemerkungen" style="position: absolute; left: 214px; top: 234px; width: 850px; height: 553px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <div class="access-subform" id="sub_rch_Pos" data-source="" style="position: absolute; left: 224px; top: 234px; width: 949px; height: 117px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <div class="access-subform" id="sub_ZusatzDateien" data-source="" style="position: absolute; left: 215px; top: 237px; width: 900px; height: 561px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <span class="access-label" id="Bezeichnungsfeld439" style="position: absolute; left: 862px; top: 354px; width: 143px; height: 21px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Gesamtsumme Netto:</span>
+        <input type="text" class="access-textbox" id="PosGesamtsumme" style="position: absolute; left: 1017px; top: 354px; width: 154px; height: 21px; font-family: "Segoe UI", sans-serif; font-size: 8pt" >
+        <span class="access-label" id="Bezeichnungsfeld472" style="position: absolute; left: 224px; top: 362px; width: 143px; height: 21px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Berechnungsliste:</span>
+        <div class="access-subform" id="sub_Berechnungsliste" data-source="" style="position: absolute; left: 226px; top: 386px; width: 951px; height: 408px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+        <span class="access-label" id="Bezeichnungsfeld526" style="position: absolute; left: 197px; top: 392px; width: 64px; height: 19px; font-family: "Segoe UI", sans-serif; font-size: 8pt">Absagen:</span>
+        <div class="access-subform" id="sub_MA_VA_Planung_Absage" data-source="" style="position: absolute; left: 193px; top: 414px; width: 254px; height: 390px; font-family: "Segoe UI", sans-serif; font-size: 8pt"></div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('frm_va_Auftragstamm initialisiert');
+            // TODO: Load data from API
+        });
+    </script>
+</body>
+</html>

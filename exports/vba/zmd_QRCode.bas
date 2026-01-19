@@ -1,0 +1,370 @@
+Attribute VB_Name = "zmd_QRCode"
+Option Explicit
+Dim mat() As Byte, kanji As String ' matrix of QR, unicode to kanji conversion
+
+' QR Code 2005 bar code symbol creation according ISO/IEC 18004:2006
+'   param text: barcode data
+'   param level optional: quality level LMQH
+'   param version optional: minimum version size (-3:M1, -2:M2, .. 1, .. 40)
+'  called from report Detail_Format() to draw DataMatrix barcode QR and micro QR bar code symbol
+Public Sub drawQuickResponse(Text As TextBox, Optional level As String, Optional VERSION As Integer = 1)
+Dim mode As Byte, lev As Byte, s As Long, a As Long, blk As Long, ec As Long
+Dim i As Long, j As Long, k As Long, l As Long, c As Long, b As Long
+Dim w As Long, x As Long, y As Long, v As Double, el As Long, eb As Long
+Dim m As Long, p As Variant, ecw As Variant, ecb As Variant
+Dim rpt As Report, txt As String, k1 As String, k2 As String, r As Double
+Const alpha = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:"
+Set rpt = Text.Parent
+On Error Resume Next ' get unicode to kanji conversion string
+If kanji = "" Then kanji = " ": kanji = CurrentDb.OpenRecordset("kanji", dbOpenTable, dbReadOnly)("kanji")
+On Error GoTo failed
+If level = "" Then
+    i = InStr(LCase(Text.TAG), "qrcode") ' get quality level from name postfix
+    If (i > 0 And i + 5 < Len(Text.TAG)) Then level = Mid(Text.TAG, i + 6, 1)
+End If
+lev = (InStr("LMQHlmqh0123", level) - 1) And 3
+For i = 1 To Len(Text) ' compute mode
+    c = AscW(Mid(Text, i, 1))
+    If c < 48 Or c > 57 Then
+        If mode = 0 Then mode = 1 ' alphanumeric mode
+        If InStr(alpha, ChrW(c)) = 0 Then
+            If mode = 1 Then mode = 2 ' binary or kanji ?
+            If c < 32 Or c > 126 Then
+                If InStr(Len(kanji) / 2 + 1, kanji, ChrW(c)) = 0 Then mode = 2: Exit For ' binary
+                mode = 3 ' kanji
+            End If
+        End If
+    End If
+Next i
+txt = IIf(mode = 2, utf16to8(Text), Text) ' for reader conformity
+l = Len(txt)
+w = Int(l * Array(10 / 3, 11 / 2, 8, 13)(mode) + 0.5) ' 3 digits in 10 bits, 2 chars in 11 bits, 1 byte, 13 bits/byte
+p = Array(Array(10, 12, 14), Array(9, 11, 13), Array(8, 16, 16), Array(8, 10, 12))(mode) ' # of bits of count indicator
+' error correction words L,M,Q,H and blocks L,M,Q,H for all version sizes (99=N/A)
+ecw = Array(Array(2, 5, 6, 8, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30), _
+    Array(99, 6, 8, 10, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28), _
+    Array(99, 99, 99, 14, 13, 22, 18, 26, 18, 24, 18, 22, 20, 24, 28, 26, 24, 20, 30, 24, 28, 28, 26, 30, 28, 30, 30, 30, 30, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30), _
+    Array(99, 99, 99, 99, 17, 28, 22, 16, 22, 28, 26, 26, 24, 28, 24, 28, 22, 24, 24, 30, 28, 28, 26, 28, 30, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30))
+ecb = Array(Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 6, 6, 6, 6, 7, 8, 8, 9, 9, 10, 12, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 20, 21, 22, 24, 25), _
+    Array(1, 1, 1, 1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5, 5, 8, 9, 9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 33, 35, 37, 38, 40, 43, 45, 47, 49), _
+    Array(1, 1, 1, 1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 8, 10, 12, 16, 12, 17, 16, 18, 21, 20, 23, 23, 25, 27, 29, 34, 34, 35, 38, 40, 43, 45, 48, 51, 53, 56, 59, 62, 65, 68), _
+    Array(1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 5, 6, 8, 8, 11, 11, 16, 16, 18, 16, 19, 21, 25, 25, 25, 34, 30, 32, 35, 37, 40, 42, 45, 48, 51, 54, 57, 60, 63, 66, 70, 74, 77, 81))
+VERSION = IIf(VERSION < mode - 3, mode - 3, VERSION) - 1
+Do ' compute QR size
+    VERSION = VERSION + 1
+    If VERSION + 3 > UBound(ecb(0)) Then Err.Raise 515, "QRCode", "Message too long"
+    s = VERSION * IIf(VERSION < 1, 2, 4) + 17 ' symbol size
+    j = ecb(lev)(VERSION + 3) * ecw(lev)(VERSION + 3)   ' error correction
+    a = IIf(VERSION < 2, 0, VERSION \ 7 + 2) ' # of align pattern
+    el = (s - 1) * (s - 1) - (5 * a - 1) * (5 * a - 1) ' total bits - align - timing
+    el = el - IIf(VERSION < 1, 59, IIf(VERSION < 2, 191, IIf(VERSION < 7, 136, 172))) ' finder, version, format
+    k = IIf(VERSION < 1, VERSION + (19 - 2 * mode) \ 3, p((VERSION + 7) \ 17)) ' count indcator bits
+    i = IIf(VERSION < 1, VERSION + (VERSION And 1) * 4 + 3, 4) ' mode indicator bits, M1+M3: +4 bits
+Loop While (el And -8) - 8 * j < w + i + k
+For lev = lev To 2 ' increase security level if data still fits
+    j = ecb(lev + 1)(VERSION + 3) * ecw(lev + 1)(VERSION + 3)
+    If (el And -8) - 8 * j < w + i + k Then Exit For
+Next lev
+blk = ecb(lev)(VERSION + 3) ' # of error correction blocks
+ec = ecw(lev)(VERSION + 3) ' # of error correction bytes
+el = el \ 8 - ec * blk ' data capacity
+w = el \ blk ' # of words in group 1
+b = blk + w * blk - el ' # of blocks in group 1
+
+ReDim enc(el + ec * blk) As Byte, mat(s - 1, s - 1) As Byte
+c = 0 ' encode head indicator bits
+If VERSION > 0 Then v = 2 ^ mode: eb = 4 Else v = mode: eb = VERSION + 3 ' mode indicator
+eb = eb + k: v = v * 2 ^ k + l ' character count indicator
+For i = 1 To l ' encode data
+    Select Case mode
+    Case 0: ' numeric
+        v = v * IIf(i + 1 < l, 1024, IIf(i < l, 128, 16)) + val(Mid(txt, i, 3))
+        eb = eb + IIf(i + 1 < l, 10, 4 + 3 * (l - i)): i = i + 2
+    Case 1: ' alphanumeric
+        j = InStr(alpha, Mid(txt, i, 1)) - 1
+        If i < l Then j = 45 * j + InStr(alpha, Mid(txt, i + 1, 1)) - 1
+        v = v * IIf(i < l, 2048, 64) + j
+        eb = eb + IIf(i < l, 11, 6): i = i + 1
+    Case 2: ' binary
+        v = v * 256 + Asc(Mid(txt, i, 1))
+        eb = eb + 8
+    Case 3: ' Kanji
+        j = InStr(Len(kanji) / 2 + 1, kanji, Mid(txt, i, 1)) - Len(kanji) / 2
+        j = (AscW(Mid(kanji, j, 1)) And &H3FFF) - 320 ' unicode to shift JIS X 2008
+        v = v * 8192 + (j \ 256) * 192 + (j And 255) ' to 13 bit kanji
+        eb = eb + 13
+    End Select
+    For eb = eb To 8 Step -8 ' add data to bit stream
+        j = 2 ^ (eb - 8): enc(c) = v \ j
+        v = v - enc(c) * j: c = c + 1
+    Next eb
+Next i
+If el > c Then i = IIf(VERSION > 0, 4, VERSION + 6): v = v * 2 ^ i: eb = eb + i ' terminator
+enc(c) = v * 256 \ 2 ^ eb: c = c + 1: enc(c) = (v * 65536 \ 2 ^ eb) And 255
+If eb > 8 And el >= c Then c = c + 1 ' bit padding
+If (VERSION And -3) = -3 And el = c Then enc(c) = enc(c) \ 16 ' M1,M3: shift high bits to low nibble
+i = 236
+For c = c To el - 1 ' byte padding
+    enc(c) = IIf((VERSION And -3) = -3 And c = el - 1, 0, i)
+    i = i Xor 236 Xor 17
+Next c
+
+ReDim rs(ec + 1) As Integer ' compute Reed Solomon error detection and correction
+Dim lg(256) As Integer, ex(255) As Integer ' log/exp table
+j = 1
+For i = 0 To 254
+    ex(i) = j: lg(j) = i ' compute log/exp table of Galois field
+    j = j + j: If j > 255 Then j = j Xor 285 ' GF polynomial a^8+a^4+a^3+a^2+1 = 100011101b = 285
+Next i
+rs(0) = 1 ' compute RS generator polynomial
+For i = 0 To ec - 1
+    rs(i + 1) = 0
+    For j = i + 1 To 1 Step -1
+        rs(j) = rs(j) Xor ex((lg(rs(j - 1)) + i) Mod 255)
+    Next j
+Next i
+eb = el: k = 0
+For c = 1 To blk  ' compute RS correction data for each block
+    For i = IIf(c <= b, 1, 0) To w
+        x = enc(eb) Xor enc(k)
+        For j = 1 To ec
+            enc(eb + j - 1) = enc(eb + j) Xor IIf(x, ex((lg(rs(j)) + lg(x)) Mod 255), 0)
+        Next j
+        k = k + 1
+    Next i
+    eb = eb + ec
+Next c
+
+' fill QR matrix
+For i = 8 To s - 1 ' timing pattern
+    mat(i, IIf(VERSION < 1, 0, 6)) = i And 1 Xor 3
+    mat(IIf(VERSION < 1, 0, 6), i) = i And 1 Xor 3
+Next i
+If VERSION > 6 Then ' reserve version area
+    For i = 0 To 17
+        mat(i \ 3, s - 11 + i Mod 3) = 2
+        mat(s - 11 + i Mod 3, i \ 3) = 2
+    Next i
+End If
+If a < 2 Then a = IIf(VERSION < 1, 1, 2)
+For x = 1 To a ' layout finder/align pattern
+    For y = 1 To a
+        If x = 1 And y = 1 Then ' finder upper left
+            i = 0: j = 0
+            p = Array(383, 321, 349, 349, 349, 321, 383, 256, 511)
+        ElseIf x = 1 And y = a Then  ' finder lower left
+            i = 0: j = s - 8
+            p = Array(256, 383, 321, 349, 349, 349, 321, 383)
+        ElseIf x = a And y = 1 Then  ' finder upper right
+            i = s - 8: j = 0
+            p = Array(254, 130, 186, 186, 186, 130, 254, 0, 255)
+        Else ' alignment grid
+            c = 2 * Int(2 * (VERSION + 1) / (1 - a)) ' pattern spacing
+            i = IIf(x = 1, 4, s - 9 + c * (a - x))
+            j = IIf(y = 1, 4, s - 9 + c * (a - y))
+            p = Array(31, 17, 21, 17, 31) ' alignment pattern
+        End If
+        If VERSION <> 1 Or x + y < 4 Then ' no align pattern for version 1
+            For c = 0 To UBound(p) ' set fixed pattern, reserve space
+                m = p(c): k = 0
+                Do
+                    mat(i + k, j + c) = (m And 1) Or 2
+                    m = m \ 2: k = k + 1
+                Loop While 2 ^ k <= p(0)
+            Next c
+        End If
+    Next y
+Next x
+x = s: y = s - 1 ' layout codewords
+For i = 0 To eb - 1
+    c = 0: k = 0: j = w + 1 ' interleave data
+    If i >= el Then
+        c = el: k = el: j = ec ' interleave checkwords
+    ElseIf i + blk - b >= el Then
+        c = -b: k = c ' interleave group 2 last bytes
+    ElseIf (i Mod blk) >= b Then
+        c = -b ' interleave group 2
+    Else
+        j = j - 1 ' interleave group 1
+    End If
+    c = enc(c + ((i - k) Mod blk) * j + (i - k) \ blk) ' interleave data
+    For j = IIf((-3 And VERSION) = -3 And i = el - 1, 3, 7) To 0 Step -1 ' M1,M3: 4 bit
+        k = IIf(VERSION > 0 And x < 6, 1, 0) ' skip vertical timing pattern
+        Do ' advance x,y
+            x = x - 1
+            If 1 And (x + 1) Xor k Then
+                If s - x - k And 2 Then
+                    If y > 0 Then y = y - 1: x = x + 2 ' up, top turn
+                Else
+                    If y < s - 1 Then y = y + 1: x = x + 2 ' down, bottom turn
+                End If
+            End If
+        Loop While mat(x, y) And 2 ' skip reserved area
+        If c And 2 ^ j Then mat(x, y) = 1
+    Next j
+Next i
+
+m = 0: p = 1000000 ' data masking
+For k = 0 To IIf(VERSION < 1, 3, 7)
+    If VERSION < 1 Then ' penalty micro QR
+        x = 1: y = 1
+        For i = 1 To s - 1
+            x = x - getPattern(i, s - 1, k, VERSION)
+            y = y - getPattern(s - 1, i, k, VERSION)
+        Next i
+        j = IIf(x > y, 16 * x + y, x + 16 * y)
+    Else ' penalty QR
+        l = 0: k2 = "": j = 0
+        For y = 0 To s - 1 ' horizontal
+            c = 0: i = 0: k1 = "0000"
+            For x = 0 To s - 1
+                w = getPattern(x, y, k, VERSION)
+                l = l + w: k1 = k1 & w ' rule 4: count darks
+                If c = w Then ' same as prev
+                    i = i + 1
+                    If x And Mid(k2, x + 4, 2) = c & c Then j = j + 3 ' rule 2: block 2x2
+                Else
+                    If i > 5 Then j = j + i - 2 ' rule 1: >5 adjacent
+                    c = 1 - c: i = 1
+                End If
+            Next x
+            If i > 5 Then j = j + i - 2 ' rule 1: >5 adjacent
+            i = 0
+            Do ' rule 3: like finder pattern
+                i = InStr(i + 4, k1, "1011101")
+                If i < 1 Then Exit Do
+                If Mid(k1, i - 4, 4) = "0000" Or Mid(k1 & "0000", i + 7, 4) = "0000" Then j = j + 40
+            Loop
+            k2 = k1 ' rule 2: remember last line
+        Next y
+        For x = 0 To s - 1 ' vertical
+            c = 0: i = 0: k1 = "0000"
+            For y = 0 To s - 1
+                w = getPattern(x, y, k, VERSION)
+                k1 = k1 & w ' vertical to string
+                If c = w Then ' same as prev
+                    i = i + 1
+                Else
+                    If i > 5 Then j = j + i - 2 ' rule 1: >5 adjacent
+                    c = 1 - c: i = 1
+                End If
+            Next y
+            If i > 5 Then j = j + i - 2 ' rule 1: >5 adjacent
+            i = 0
+            Do ' rule 3: like finder pattern
+                i = InStr(i + 4, k1, "1011101")
+                If i < 1 Then Exit Do
+                If Mid(k1, i - 4, 4) = "0000" Or Mid(k1 & "0000", i + 7, 4) = "0000" Then j = j + 40
+            Loop
+        Next x
+        j = j + Int(Abs(10 - 20 * l / (s * s))) * 10 ' rule 4: darks
+    End If
+    If j < p Then p = j: m = k ' take mask of lower penalty
+Next k
+' add format information, code level and mask
+j = IIf(VERSION = -3, m, IIf(VERSION < 1, (2 * VERSION + lev + 5) * 4 + m, ((5 - lev) And 3) * 8 + m))
+j = j * 1024: k = j
+For i = 4 To 0 Step -1 ' BCH error correction: 5 data, 10 error bits
+    If j >= 1024 * 2 ^ i Then j = j Xor 1335 * 2 ^ i
+Next i ' generator polynom: x^10+x^8+x^5+x^4+x^2+x+1 = 10100110111b = 1335
+k = k Xor j Xor IIf(VERSION < 1, 17477, 21522) ' XOR masking
+For j = 0 To 14 ' layout format information
+    If VERSION < 1 Then
+        mat(IIf(j < 8, 8, 15 - j), IIf(j < 8, j + 1, 8)) = k And 1 Xor 2 ' micro QR
+    Else
+        mat(IIf(j < 8, s - j - 1, IIf(j = 8, 7, 14 - j)), 8) = k And 1 Xor 2 ' QR horizontal
+        mat(8, IIf(j < 6, j, IIf(j < 8, j + 1, s + j - 15))) = k And 1 Xor 2 ' vertical
+    End If
+    k = k \ 2
+Next j
+If VERSION > 6 Then ' add version information
+    k = VERSION * 4096&
+    For i = 5 To 0 Step -1 ' BCH error correction: 6 data, 12 error bits
+        If k >= 4096 * 2 ^ i Then k = k Xor 7973 * 2 ^ i
+    Next i ' generator polynom: x^12+x^11+x^10+x^9+x^8+x^5+x^2+1 = 1111100100101b = 7973
+    k = k Xor (VERSION * 4096&)
+    For j = 0 To 17 ' layout version information
+        mat(j \ 3, s + j Mod 3 - 11) = k And 1 Xor 2
+        mat(s + j Mod 3 - 11, j \ 3) = k And 1 Xor 2
+        k = k \ 2
+    Next j
+End If
+    
+rpt.ScaleMode = 1 ' scale barcode to textbox
+x = IIf(Text.width < Text.height, 0, Text.height - Text.width) / 2 - Text.Left
+y = IIf(Text.width < Text.height, Text.width - Text.height, 0) / 2 - Text.Top
+r = IIf(Text.width < Text.height, Text.width, Text.height) / s
+rpt.Scale (x / r, y / r)-((rpt.ScaleWidth + x) / r, (rpt.ScaleHeight + y) / r)
+
+For y = 0 To s - 1 ' layout barcode
+    For x = 0 To s - 1
+        If getPattern(x, y, m, VERSION) Then ' apply mask
+            rpt.Line (x, y)-Step(1, 1), Text.ForeColor, BF
+        End If
+    Next x
+Next y
+
+failed:
+Text.Visible = Err.Number
+If Err.Number Then Debug.Print "ERROR: " & Err.description
+End Sub
+
+' get QR pattern mask
+Private Function getPattern(ByVal x As Long, ByVal y As Long, ByVal m As Integer, ByVal VERSION As Integer) As Integer
+Dim i As Integer, j As Long
+If VERSION < 1 Then m = Array(1, 4, 6, 7)(m) ' mask pattern of micro QR
+i = mat(x, y)
+If i < 2 Then
+    Select Case m
+    Case 0: j = (x + y) And 1
+    Case 1: j = y And 1
+    Case 2: j = x Mod 3
+    Case 3: j = (x + y) Mod 3
+    Case 4: j = (x \ 3 + y \ 2) And 1
+    Case 5: j = ((x * y) And 1) + (x * y) Mod 3
+    Case 6: j = (x * y + (x * y) Mod 3) And 1
+    Case 7: j = (x + y + (x * y) Mod 3) And 1
+    End Select
+    If j = 0 Then i = i Xor 1 ' invert only data according mask
+End If
+getPattern = i And 1
+End Function
+
+
+
+' Barcode symbol creation in MS office Access reports by VBA
+' Author: alois zingl
+' Version: V1.2 feb 2016
+' Copyright: Free and open-source software
+' http://members.chello.at/~easyfilter/barcode.html
+'
+' Description: the indention of this library is a short and compact implementation to create barcodes
+'  of Code 128, Data Matrix, (micro) QR or Aztec symbols so it could be easily adapted for individual requirements.
+'  Each TextBox in reports containing 'Aztec','Code128', 'DataMatrix' or 'QRCode' in the name
+'  is replaced by the corresponding barcode image.
+'  Individual settings are possible but require adjustments in the Sub Detail_Format().
+'  The smallest bar code symbol fitting the data is automatically selected,
+'  but no size optimization for mixed data types in one code is done.
+' Functions:
+'   drawAztec(text as TextBox, Optional security as integer, Optional layers as integer)
+'   drawCode128(text As TextBox)
+'   drawDataMatrix(text As TextBox)
+'   drawQuickResponse(text As TextBox, Optional level As String, Optional version As Integer = 1)
+'
+
+' convert UTF-16 (Windows) to UTF-8
+Public Function utf16to8(ByVal Text As String) As String
+Dim i As Integer, c As Long
+utf16to8 = Text
+For i = Len(Text) To 1 Step -1
+    c = AscW(Mid(Text, i, 1)) And 65535
+    If c > 127 Then
+        If c > 4095 Then
+            utf16to8 = Left(utf16to8, i - 1) + Chr(224 + c \ 4096) + Chr(128 + (c \ 64 And 63)) + Chr(128 + (c And 63)) & Mid(utf16to8, i + 1)
+        Else
+            utf16to8 = Left(utf16to8, i - 1) + Chr(192 + c \ 64) + Chr(128 + (c And 63)) & Mid(utf16to8, i + 1)
+        End If
+    End If
+Next i
+End Function
+

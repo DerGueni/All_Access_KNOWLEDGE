@@ -1,0 +1,241 @@
+/* sub_MA_VA_Zuordnung.css - MA-Zuordnung Subform (Datenblatt) */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    background: #f0f0f0;
+}
+
+.subform-container {
+    background: #ffffff;
+    border: 1px solid #999;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Datenblatt */
+.datasheet-container {
+    flex: 1;
+    overflow: auto;
+}
+
+.datasheet {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+    table-layout: fixed;
+}
+
+.datasheet thead {
+    background: #e8e8e8;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.datasheet th {
+    padding: 3px 4px;
+    text-align: left;
+    border: 1px solid #cccccc;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.datasheet td {
+    padding: 2px 4px;
+    border: 1px solid #d0d0d0;
+    background: #fff;
+    vertical-align: middle;
+}
+
+.datasheet tr:nth-child(even) td {
+    background: #f8f9fa;
+}
+
+.datasheet tr:hover td {
+    background: #f0f0f0;
+}
+
+.datasheet tr.selected td {
+    background: #e8e8e8;
+}
+
+.datasheet tr.new-record td {
+    background: #f5f5f5;
+}
+
+/* Spaltenbreiten */
+.col-hidden { display: none; }
+.col-lfd { width: 35px; text-align: center; }
+.col-time { width: 50px; text-align: center; }
+.col-ma { width: 180px; }
+.col-pkw { width: 40px; text-align: center; }
+.col-schicht { width: 100px; }
+.col-bemerk { width: 150px; }
+.col-el { width: 30px; text-align: center; }
+.col-info { width: 30px; text-align: center; }
+.col-preis { width: 80px; }
+.col-pkwanz { width: 50px; text-align: right; }
+.col-std { width: 50px; text-align: right; }
+
+/* Eingabefelder in Tabelle */
+.datasheet input[type="text"],
+.datasheet select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 1px 2px;
+    font-size: 10px;
+    font-family: Arial, sans-serif;
+}
+
+.datasheet input[type="text"]:focus,
+.datasheet select:focus {
+    outline: 2px solid #4316B2;
+    background: #fff;
+}
+
+.datasheet input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* Combobox in Tabelle */
+.datasheet select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%23666" d="M2 4l4 4 4-4z"/></svg>') no-repeat right 2px center;
+    padding-right: 16px;
+}
+
+/* Neue Zeile Bereich */
+.new-row-area {
+    padding: 4px;
+    background: #f5f5f5;
+    border-top: 1px solid #ccc;
+}
+
+.new-row-fields {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.txt-input {
+    padding: 4px;
+    border: 1px solid #ccc;
+    font-size: 10px;
+}
+
+.txt-input.txt-time {
+    width: 55px;
+    text-align: center;
+}
+
+.cbo-input {
+    padding: 3px;
+    border: 1px solid #ccc;
+    font-size: 10px;
+}
+
+.cbo-input.cbo-ma {
+    width: 200px;
+}
+
+.btn-add {
+    padding: 4px 12px;
+    background: #4316B2;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.btn-add:hover {
+    background: #3558c0;
+}
+
+/* Readonly-Zellen */
+.cell-readonly {
+    background: #f0f0f0 !important;
+    color: #666;
+}
+
+/* Zahlen */
+.cell-number {
+    text-align: right;
+    font-family: 'Consolas', monospace;
+}
+
+/* Zeit-Felder */
+.cell-time {
+    text-align: center;
+    font-family: 'Consolas', monospace;
+}
+
+/* Status-Farben - ALLE GRAU */
+.status-zugesagt {
+    background: #e8e8e8 !important;
+}
+
+.status-abgesagt {
+    background: #e8e8e8 !important;
+}
+
+.status-offen {
+    background: #e8e8e8 !important;
+}
+
+/* Einsatzleitung markieren */
+.is-el td {
+    font-weight: bold;
+}
+
+/* PKW-Fahrer markieren */
+.has-pkw .col-pkw {
+    background: #f0f0f0 !important;
+}
+
+/* Loeschen-Button in Zeile */
+.btn-delete {
+    background: transparent;
+    border: none;
+    color: #666666;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 4px;
+}
+
+.btn-delete:hover {
+    color: #333333;
+}
+
+/* Scrollbar-Styling */
+.datasheet-container::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.datasheet-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.datasheet-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 6px;
+}
+
+.datasheet-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

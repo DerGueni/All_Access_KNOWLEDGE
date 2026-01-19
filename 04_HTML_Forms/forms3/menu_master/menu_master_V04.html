@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Master V04 - Objektzentriert - CONSYS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #4a4a7a 0%, #6060a0 50%, #5050a0 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 15px;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            border-radius: 8px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 1px;
+        }
+
+        /* ============================================
+           GRID LAYOUT 2x3
+           ============================================ */
+        .tile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(3, auto);
+            gap: 15px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           TILE DESIGN
+           ============================================ */
+        .tile {
+            background: linear-gradient(145deg, #7070b0, #5050a0);
+            border: 2px solid #4040a0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tile:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            border-color: #8080c0;
+        }
+
+        .tile-header {
+            background: linear-gradient(90deg, #4040a0, #5050b0);
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #3030a0;
+        }
+
+        .tile-number {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(145deg, #f0a050, #e09040);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .tile-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tile-body {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* ============================================
+           MENU BUTTONS
+           ============================================ */
+        .menu-btn {
+            width: 100%;
+            background: linear-gradient(145deg, #e0e0f0, #c8c8e0);
+            border: 1px solid #8080b0;
+            border-radius: 5px;
+            padding: 9px 12px;
+            cursor: pointer;
+            font-size: 11px;
+            text-align: left;
+            color: #303060;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(145deg, #f0f0ff, #e0e0f0);
+            border-color: #6060a0;
+            transform: translateX(3px);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(145deg, #c0c0d0, #b0b0c0);
+            transform: translateX(1px);
+        }
+
+        .menu-btn:focus {
+            outline: 2px solid #f0a050;
+            outline-offset: 1px;
+        }
+
+        .menu-btn .icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .menu-btn.highlight {
+            background: linear-gradient(145deg, #f0c080, #e0a060);
+            border-color: #c08040;
+            color: #402000;
+            font-weight: 600;
+        }
+
+        .menu-btn.highlight:hover {
+            background: linear-gradient(145deg, #ffd090, #f0b070);
+        }
+
+        .menu-btn.secondary {
+            background: linear-gradient(145deg, #9090c0, #7070a0);
+            border: 1px dashed #6060a0;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 7px 10px;
+        }
+
+        .menu-btn.secondary:hover {
+            background: linear-gradient(145deg, #a0a0d0, #8080b0);
+            border-style: solid;
+        }
+
+        /* ============================================
+           SEPARATOR
+           ============================================ */
+        .separator {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            margin: 4px 0;
+        }
+
+        /* ============================================
+           CLOSE BUTTON
+           ============================================ */
+        .close-btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .close-btn {
+            background: linear-gradient(145deg, #c06060, #a04040);
+            border: 2px solid #803030;
+            border-radius: 8px;
+            padding: 12px 40px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            color: #ffffff;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .close-btn:hover {
+            background: linear-gradient(145deg, #d07070, #b05050);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(160,64,64,0.4);
+        }
+
+        .close-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ============================================
+           TOAST NOTIFICATION
+           ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(145deg, #303060, #202040);
+            color: #ffffff;
+            padding: 12px 24px;
+            border: 2px solid #6060a0;
+            border-radius: 8px;
+            z-index: 10001;
+            font-size: 12px;
+            white-space: nowrap;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.success {
+            border-color: #50a050;
+            background: linear-gradient(145deg, #306030, #204020);
+        }
+
+        .toast.error {
+            border-color: #c04040;
+            background: linear-gradient(145deg, #603030, #402020);
+        }
+
+        .toast.info {
+            border-color: #6060a0;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 600px) {
+            .tile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            .header-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-title">CONSYS Menu - Objektzentriert</div>
+        <div class="header-subtitle">Objekt / Auftrag als Zentrum</div>
+    </header>
+
+    <!-- Tile Grid 2x3 -->
+    <main class="tile-grid">
+        <!-- 1. Objektstamm -->
+        <section class="tile" id="tile-1">
+            <div class="tile-header">
+                <div class="tile-number">1</div>
+                <div class="tile-title">Objektstamm</div>
+            </div>
+            <div class="tile-body">
+                <button class="menu-btn highlight" data-testid="menu-v04-objektverwaltung" onclick="navigateTo('frm_OB_Objekt')">
+                    <span class="icon">&#127970;</span> Objektverwaltung
+                </button>
+                <button class="menu-btn highlight" data-testid="menu-v04-auftragsverwaltung" onclick="navigateTo('frm_va_Auftragstamm')">
+                    <span class="icon">&#128203;</span> Auftragsverwaltung
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-kundenstamm" onclick="navigateTo('frm_KD_Kundenstamm')">
+                    <span class="icon">&#128101;</span> Kundenverwaltung
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-verrechnungssaetze" onclick="navigateTo('frm_KD_Verrechnungssaetze')">
+                    <span class="icon">&#128176;</span> Verrechnungssaetze
+                </button>
+                <div class="separator"></div>
+                <button class="menu-btn secondary" data-testid="menu-v04-loewensaal-excel" onclick="btn_LoewensaalSync_Click()">
+                    <span class="icon">&#128259;</span> Loewensaal Sync (Excel)
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-loewensaal-hp" onclick="btn_Loewensaal_Sync_HP_Click()">
+                    <span class="icon">&#127760;</span> Loewensaal Sync (Homepage)
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Einsatzanweisung / Lage / Risiko -->
+        <section class="tile" id="tile-2">
+            <div class="tile-header">
+                <div class="tile-number">2</div>
+                <div class="tile-title">Einsatzanweisung / Lage</div>
+            </div>
+            <div class="tile-body">
+                <button class="menu-btn" data-testid="menu-v04-einsatzuebersicht" onclick="navigateTo('frm_Einsatzuebersicht')">
+                    <span class="icon">&#128197;</span> Einsatzuebersicht
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-positionslisten" onclick="btnPositionslisten_Click()">
+                    <span class="icon">&#128203;</span> Positionslisten (Objekte)
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-namensliste" onclick="btnNamensliste_Click()">
+                    <span class="icon">&#128221;</span> Namensliste Fuerth
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-fcn-meldeliste" onclick="btnFCN_Meldeliste_Click()">
+                    <span class="icon">&#9917;</span> FCN Meldeliste
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-telefonliste" onclick="openReport('rpt_telefonliste')">
+                    <span class="icon">&#128222;</span> Telefonliste drucken
+                </button>
+                <div class="separator"></div>
+                <button class="menu-btn secondary" data-testid="menu-v04-weitere-masken" onclick="btn_weitere_Masken_Click()">
+                    <span class="icon">&#128193;</span> Weitere Masken
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. Personalzuordnung -->
+        <section class="tile" id="tile-3">
+            <div class="tile-header">
+                <div class="tile-number">3</div>
+                <div class="tile-title">Personalzuordnung</div>
+            </div>
+            <div class="tile-body">
+                <button class="menu-btn highlight" data-testid="menu-v04-mitarbeiterstamm" onclick="navigateTo('frm_MA_Mitarbeiterstamm')">
+                    <span class="icon">&#128101;</span> Mitarbeiterverwaltung
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-schnellauswahl" onclick="navigateTo('frm_MA_VA_Schnellauswahl')">
+                    <span class="icon">&#9889;</span> Schnellauswahl / Mail-Anfragen
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-abwesenheiten" onclick="navigateTo('frm_MA_Abwesenheit')">
+                    <span class="icon">&#128197;</span> Abwesenheiten
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-dienstausweis" onclick="navigateTo('frm_Ausweis_Create')">
+                    <span class="icon">&#127380;</span> Dienstausweis
+                </button>
+                <div class="separator"></div>
+                <button class="menu-btn secondary" data-testid="menu-v04-auto-minijobber" onclick="btnAutoZuordnungSport_Click()">
+                    <span class="icon">&#129302;</span> Auto-Zuordnung Minijobber
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-festangestellte" onclick="btn_FA_eintragen_Click()">
+                    <span class="icon">&#128101;</span> Festangestellte zuordnen
+                </button>
+            </div>
+        </section>
+
+        <!-- 4. Dienstplan / Schichten -->
+        <section class="tile" id="tile-4">
+            <div class="tile-header">
+                <div class="tile-number">4</div>
+                <div class="tile-title">Dienstplan / Schichten</div>
+            </div>
+            <div class="tile-body">
+                <button class="menu-btn highlight" data-testid="menu-v04-dienstplanuebersicht" onclick="navigateTo('frm_N_Dienstplanuebersicht')">
+                    <span class="icon">&#128197;</span> Dienstplanuebersicht
+                </button>
+                <button class="menu-btn highlight" data-testid="menu-v04-planungsuebersicht" onclick="navigateTo('frm_VA_Planungsuebersicht')">
+                    <span class="icon">&#128200;</span> Planungsuebersicht
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-zeitkonten" onclick="navigateTo('frm_MA_Zeitkonten')">
+                    <span class="icon">&#9201;</span> Zeitkonten
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-letzter-einsatz" onclick="btnLetzterEinsatz_Click()">
+                    <span class="icon">&#128269;</span> Letzter Einsatz MA
+                </button>
+                <div class="separator"></div>
+                <button class="menu-btn secondary" data-testid="menu-v04-monatsstunden" onclick="openReport('rpt_monatsstunden')">
+                    <span class="icon">&#128200;</span> Monatsstunden drucken
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-jahresuebersicht" onclick="openReport('rpt_jahresuebersicht_mitarbeiter')">
+                    <span class="icon">&#128197;</span> Jahresuebersicht MA
+                </button>
+            </div>
+        </section>
+
+        <!-- 5. Dokumente / Exporte -->
+        <section class="tile" id="tile-5">
+            <div class="tile-header">
+                <div class="tile-number">5</div>
+                <div class="tile-title">Dokumente / Exporte</div>
+            </div>
+            <div class="tile-body">
+                <button class="menu-btn" data-testid="menu-v04-stundenauswertung" onclick="navigateTo('frm_N_Stundenauswertung')">
+                    <span class="icon">&#128202;</span> Stundenauswertung
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-lohnabrechnungen" onclick="navigateTo('frm_N_Lohnabrechnungen')">
+                    <span class="icon">&#128176;</span> Lohnabrechnungen
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-sub-rechnungen" onclick="showToast('Ziel fehlt', 'info')">
+                    <span class="icon">&#128179;</span> Sub Rechnungen
+                </button>
+                <div class="separator"></div>
+                <button class="menu-btn secondary" data-testid="menu-v04-ma-stamm-excel" onclick="exportMAStamm()">
+                    <span class="icon">&#128196;</span> Mitarbeiterstamm Excel
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-stunden-kreuztab" onclick="btnStundenMA_Click()">
+                    <span class="icon">&#128202;</span> Stunden MA Kreuztabelle
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-stunden-sub-export" onclick="btn_stunden_sub_Click()">
+                    <span class="icon">&#128229;</span> Stunden Sub Export
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-lohnarten" onclick="btnLohnarten_Click()">
+                    <span class="icon">&#128178;</span> Lohnarten / Zuschlaege
+                </button>
+            </div>
+        </section>
+
+        <!-- 6. Kommunikation -->
+        <section class="tile" id="tile-6">
+            <div class="tile-header">
+                <div class="tile-number">6</div>
+                <div class="tile-title">Kommunikation</div>
+            </div>
+            <div class="tile-body">
+                <button class="menu-btn highlight" data-testid="menu-v04-email" onclick="navigateTo('frm_N_Email_versenden')">
+                    <span class="icon">&#9993;</span> E-Mail
+                </button>
+                <button class="menu-btn" data-testid="menu-v04-email-vorlagen" onclick="btn_mailvorlage_Click()">
+                    <span class="icon">&#128196;</span> E-Mail Vorlagen
+                </button>
+                <div class="separator"></div>
+                <button class="menu-btn secondary" data-testid="menu-v04-bos-import" onclick="btn_BOS_Click()">
+                    <span class="icon">&#128229;</span> BOS Mail-Import
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-hirsch-import" onclick="btn_Hirsch_Click()">
+                    <span class="icon">&#128229;</span> Hirsch Import
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-stawa-email" onclick="btn_Stawa_Click()">
+                    <span class="icon">&#128231;</span> E-Mail zu Auftrag
+                </button>
+                <div class="separator"></div>
+                <button class="menu-btn secondary" data-testid="menu-v04-systeminfo" onclick="navigateTo('frm_Systeminfo')">
+                    <span class="icon">&#9881;</span> System Info
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-db-wechseln" onclick="showToast('Ziel fehlt', 'info')">
+                    <span class="icon">&#128451;</span> Datenbank wechseln
+                </button>
+                <button class="menu-btn secondary" data-testid="menu-v04-auswahl-master" onclick="btn_masterbtn_Click()">
+                    <span class="icon">&#128736;</span> Auswahl-Master
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Close Button -->
+    <div class="close-btn-container">
+        <button class="close-btn" data-testid="menu-v04-close" onclick="closeForm()">
+            &#10006; Menu schliessen
+        </button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- WebView2 Bridge -->
+    <script src="../js/webview2-bridge.js"></script>
+    <!-- Global Handlers -->
+    <script src="../js/global-handlers.js"></script>
+
+    <script>
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function navigateTo(formName) {
+            try {
+                // An Shell/Parent mitteilen
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'NAVIGATE',
+                        formName: formName
+                    }, '*');
+                    console.log('[MenuV04] NAVIGATE gesendet:', formName);
+                }
+
+                // WebView2 Bridge falls verfuegbar
+                if (window.Bridge) {
+                    Bridge.navigate(formName);
+                }
+
+                // WebView2 native Kommunikation
+                if (window.chrome && window.chrome.webview) {
+                    window.chrome.webview.postMessage({
+                        action: 'navigate',
+                        form: formName
+                    });
+                }
+
+                showToast('Oeffne ' + formName + '...', 'success');
+
+                // Popup schliessen nach kurzer Verzoegerung
+                setTimeout(closeMenu, 300);
+            } catch (error) {
+                console.error('Navigation-Fehler:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================
+        // CLOSE MENU
+        // ============================================
+        function closeMenu() {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'CLOSE_MENU' }, '*');
+                console.log('[MenuV04] CLOSE_MENU gesendet');
+            }
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({ action: 'close' });
+            }
+        }
+
+        function closeForm() {
+            closeMenu();
+            // Fallback: Fenster schliessen
+            setTimeout(() => {
+                window.close();
+            }, 100);
+        }
+
+        // ============================================
+        // TOAST NOTIFICATION
+        // ============================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // ============================================
+        // REPORT & EXPORT FUNCTIONS
+        // ============================================
+        function openReport(reportName, view = 'acViewPreview') {
+            try {
+                if (window.Bridge) {
+                    Bridge.sendEvent('openReport', { report: reportName, view: view });
+                    showToast('Report wird geoeffnet...', 'success');
+                } else {
+                    showToast('Report ' + reportName + ' - nur in Access verfuegbar', 'info');
+                }
+            } catch (error) {
+                console.error('Report-Fehler:', error);
+                showToast('Fehler: ' + error.message, 'error');
+            }
+        }
+
+        async function exportMAStamm() {
+            const datum = new Date().toISOString().split('T')[0];
+            const dateiname = 'Mitarbeiterstamm_' + datum + '.xlsx';
+
+            try {
+                if (window.Bridge) {
+                    Bridge.sendEvent('export', { type: 'MAStamm', dateiname: dateiname });
+                    showToast('Export wird erstellt...', 'success');
+                } else {
+                    showToast('Export nur in Access verfuegbar', 'info');
+                }
+            } catch (error) {
+                console.error('Export-Fehler:', error);
+                showToast('Export-Funktion nur in Access verfuegbar', 'error');
+            }
+        }
+
+        // ============================================
+        // VBA BUTTON EVENTS
+        // ============================================
+        function btn_mailvorlage_Click() {
+            navigateTo('frm_ma_serien_email_vorlage');
+        }
+
+        function btnStundenMA_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openQuery', { query: 'zqry_MA_VA_Stunden_Plan_Ist_aktJahr_Kreuztabelle' });
+                showToast('Kreuztabelle wird geoeffnet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_stunden_sub_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('exportToExcel', {
+                    query: 'zqry_MA_VA_ZUO_PLAN_SUB',
+                    filename: 'Stunden_Sub_' + new Date().toISOString().split('T')[0] + '.xlsx'
+                });
+                showToast('Export wird erstellt...', 'success');
+            } else {
+                showToast('Export nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_LoewensaalSync_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'RunLoewensaalSync_WithWebScan' });
+                showToast('Synchronisation gestartet...', 'success');
+            } else {
+                showToast('Sync nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_Loewensaal_Sync_HP_Click() {
+            if (!confirm('Loewensaal-Events von der Homepage synchronisieren?\n\nDies kann einige Sekunden dauern.')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'mod_N_Loewensaal_HP.SyncLoewensaalEventsFromHomepage' });
+                showToast('Homepage-Synchronisation gestartet...', 'success');
+            } else {
+                showToast('Sync nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btnAutoZuordnungSport_Click() {
+            if (!confirm('Minijobber fuer Auftragsanfragen vorbereiten?')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Auto_MA_Zuordnung_Sport_Venues' });
+                showToast('Auto-Zuordnung gestartet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_FA_eintragen_Click() {
+            if (!confirm('Festangestellte Mitarbeiter automatisch zuordnen?')) {
+                return;
+            }
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Auto_Festangestellte_Zuordnen' });
+                showToast('Auto-Zuordnung Festangestellte...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_Stawa_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'Email_Zu_Auftrag' });
+                showToast('E-Mail zu Auftrag...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_Hirsch_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'HirschImport_Starten' });
+                showToast('Hirsch Import gestartet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_BOS_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'MailToAuftrag_FromMailText' });
+                showToast('BOS Mail-Import...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btnNamensliste_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'btnNamensliste_Click' });
+                showToast('Namensliste wird erstellt...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar (benoetigt offenen Auftragstamm)', 'info');
+            }
+            closeForm();
+        }
+
+        function btnFCN_Meldeliste_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('runVBA', { procedure: 'btnFCN_Meldeliste_Click' });
+                showToast('FCN Meldeliste wird erstellt...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar (benoetigt offenen Auftragstamm)', 'info');
+            }
+            closeForm();
+        }
+
+        function btn_weitere_Masken_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openForm', { form: '__frmHlpMenu_Weitere_Masken' });
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+        }
+
+        function btnLohnarten_Click() {
+            navigateTo('zfrm_ZK_Lohnarten_Zuschlag');
+        }
+
+        function btnLetzterEinsatz_Click() {
+            if (window.Bridge) {
+                Bridge.sendEvent('openQuery', { query: 'qry_MA_letzter _Einsatz_Gueni' });
+                showToast('Abfrage wird geoeffnet...', 'success');
+            } else {
+                showToast('Nur in Access verfuegbar', 'info');
+            }
+            closeForm();
+        }
+
+        function btnPositionslisten_Click() {
+            navigateTo('frm_OB_Objekt');
+        }
+
+        function btn_masterbtn_Click() {
+            navigateTo('frm_N_AuswahlMaster');
+        }
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeForm();
+            }
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[MenuV04] Objektzentriertes Menu initialisiert');
+            console.log('[MenuV04] 6 Kategorien (2x3 Grid), 39 Buttons aktiv');
+            console.log('[MenuV04] Tastaturkuerzel: ESC zum Schliessen');
+
+            // Bridge Event Handler
+            if (window.Bridge) {
+                Bridge.on('onDataReceived', (data) => {
+                    console.log('[MenuV04] Daten empfangen:', data);
+                });
+            }
+
+            // WebView2 Message Handler
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.addEventListener('message', function(event) {
+                    console.log('[MenuV04] WebView2 message:', event.data);
+                    if (event.data.type === 'TOAST') {
+                        showToast(event.data.message, event.data.level || 'info');
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Shell-Detector -->
+    <script src="../js/shell-detector.js"></script>
+</body>
+</html>

@@ -1,0 +1,507 @@
+/**
+ * SIDEBAR VARIANTE 6: Accordion Sections
+ * =======================================
+ * Klappbare Kategorien mit Icons
+ * - Personal, Aufträge, Planung, etc.
+ * - Nur aktive Gruppe expanded
+ * - Smooth expand/collapse Animation
+ * - Touch-freundlich (min 44px)
+ *
+ * VERWENDUNG: In shell.html einbinden:
+ * <link rel="stylesheet" href="css/sidebar_variants/sidebar_variant_06_accordion.css">
+ *
+ * JAVASCRIPT ERFORDERLICH - siehe Ende der Datei
+ */
+
+/* ============================================
+   ACCORDION - CSS VARIABLEN
+   ============================================ */
+:root {
+    /* Farben - CONSEC Palette */
+    --acc-bg: #f5f5f7;
+    --acc-surface: #ffffff;
+    --acc-primary: #1a237e;
+    --acc-primary-light: #534bae;
+    --acc-primary-dark: #000051;
+    --acc-text: #1f1f1f;
+    --acc-text-secondary: #5f5f5f;
+    --acc-border: #e0e0e0;
+    --acc-hover: rgba(26, 35, 126, 0.06);
+    --acc-active: rgba(26, 35, 126, 0.12);
+    --acc-selected: #e8eaf6;
+
+    /* Shadows */
+    --acc-shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --acc-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --acc-shadow-header: 0 2px 8px rgba(0,0,0,0.15);
+
+    /* Typography */
+    --acc-font: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* Animation */
+    --acc-transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --acc-transition-fast: 150ms ease;
+}
+
+/* ============================================
+   SIDEBAR CONTAINER
+   ============================================ */
+.sidebar {
+    width: 240px !important;
+    background: var(--acc-bg) !important;
+    border-right: 1px solid var(--acc-border) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    box-shadow: var(--acc-shadow-md) !important;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.sidebar-header {
+    background: linear-gradient(135deg, var(--acc-primary) 0%, var(--acc-primary-light) 100%) !important;
+    color: white !important;
+    padding: 18px 16px !important;
+    font-family: var(--acc-font) !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    text-align: left !important;
+    min-height: 56px !important;
+    display: flex !important;
+    align-items: center !important;
+    box-shadow: var(--acc-shadow-header) !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+/* ============================================
+   MENU KATEGORIEN CONTAINER
+   ============================================ */
+.menu-categories {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 8px !important;
+    gap: 6px !important;
+    background: var(--acc-bg) !important;
+}
+
+/* Custom Scrollbar */
+.menu-categories::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.menu-categories::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.menu-categories::-webkit-scrollbar-thumb {
+    background: var(--acc-border) !important;
+    border-radius: 3px !important;
+}
+
+.menu-categories::-webkit-scrollbar-thumb:hover {
+    background: #bdbdbd !important;
+}
+
+/* ============================================
+   KATEGORIE BLOCK (Accordion Section)
+   ============================================ */
+.category-block {
+    background: var(--acc-surface) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: var(--acc-shadow-sm) !important;
+    border: 1px solid var(--acc-border) !important;
+    transition: box-shadow var(--acc-transition), border-color var(--acc-transition) !important;
+}
+
+.category-block:hover {
+    box-shadow: var(--acc-shadow-md) !important;
+    border-color: rgba(26, 35, 126, 0.2) !important;
+}
+
+/* Expanded State */
+.category-block.expanded {
+    box-shadow: var(--acc-shadow-md) !important;
+    border-color: var(--acc-primary) !important;
+}
+
+/* ============================================
+   KATEGORIE HEADER (Accordion Trigger)
+   ============================================ */
+.category-header {
+    /* Layout */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 14px 16px !important;
+
+    /* Appearance */
+    background: var(--acc-surface) !important;
+    color: var(--acc-primary) !important;
+    border: none !important;
+    border-bottom: 1px solid transparent !important;
+
+    /* Typography */
+    font-family: var(--acc-font) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.8px !important;
+
+    /* Cursor */
+    cursor: pointer !important;
+
+    /* Transition */
+    transition:
+        background var(--acc-transition-fast),
+        color var(--acc-transition-fast),
+        border-color var(--acc-transition) !important;
+
+    /* Position für Chevron */
+    position: relative !important;
+}
+
+.category-header:hover {
+    background: var(--acc-hover) !important;
+}
+
+/* Chevron Icon (CSS-only) */
+.category-header::after {
+    content: '' !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-right: 2px solid var(--acc-primary) !important;
+    border-bottom: 2px solid var(--acc-primary) !important;
+    transform: rotate(45deg) !important;
+    transition: transform var(--acc-transition) !important;
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+}
+
+/* Expanded Header */
+.category-block.expanded .category-header {
+    background: var(--acc-selected) !important;
+    border-bottom: 1px solid var(--acc-border) !important;
+}
+
+.category-block.expanded .category-header::after {
+    transform: rotate(-135deg) !important;
+}
+
+/* ============================================
+   ACCORDION CONTENT WRAPPER
+   ============================================ */
+/* Die Buttons werden in einen unsichtbaren Wrapper gehüllt */
+.category-block .menu-btn {
+    /* Initial collapsed */
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    transition:
+        max-height var(--acc-transition),
+        padding var(--acc-transition),
+        opacity var(--acc-transition),
+        visibility 0s var(--acc-transition) !important;
+}
+
+/* Expanded Content */
+.category-block.expanded .menu-btn {
+    max-height: 60px !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition:
+        max-height var(--acc-transition),
+        padding var(--acc-transition),
+        opacity var(--acc-transition),
+        visibility 0s 0s !important;
+}
+
+/* ============================================
+   MENU BUTTONS
+   ============================================ */
+.menu-btn {
+    /* Layout */
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-height: 0 !important; /* Controlled by max-height */
+    padding: 0 16px !important;
+    margin: 0 !important;
+
+    /* Typography */
+    font-family: var(--acc-font) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+    color: var(--acc-text) !important;
+
+    /* Appearance */
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+
+    /* Transition */
+    transition:
+        background var(--acc-transition-fast),
+        color var(--acc-transition-fast),
+        padding-left var(--acc-transition-fast) !important;
+}
+
+/* Hover State */
+.menu-btn:hover {
+    background: var(--acc-hover) !important;
+    padding-left: 20px !important;
+}
+
+/* Active/Pressed State */
+.menu-btn:active {
+    background: var(--acc-active) !important;
+}
+
+/* Selected State (.active) */
+.menu-btn.active {
+    background: var(--acc-selected) !important;
+    color: var(--acc-primary) !important;
+    font-weight: 600 !important;
+    border-left: 3px solid var(--acc-primary) !important;
+    padding-left: 13px !important;
+}
+
+.menu-btn.active:hover {
+    background: var(--acc-active) !important;
+}
+
+/* Focus State */
+.menu-btn:focus-visible {
+    outline: 2px solid var(--acc-primary) !important;
+    outline-offset: -2px !important;
+    background: var(--acc-hover) !important;
+}
+
+/* ============================================
+   BUTTON ICONS (Optional - via data-icon)
+   ============================================ */
+.menu-btn::before {
+    content: '' !important;
+    display: inline-block !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 10px !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    opacity: 0.7 !important;
+    flex-shrink: 0 !important;
+}
+
+/* Icon Mappings - Unicode Symbole als Fallback */
+.menu-btn[data-form="frm_DP_Dienstplan_MA"]::before { content: '\1F4C5' !important; } /* Kalender */
+.menu-btn[data-form="frm_DP_Dienstplan_Objekt"]::before { content: '\1F4CB' !important; } /* Clipboard */
+.menu-btn[data-form="frm_va_Auftragstamm"]::before { content: '\1F4C4' !important; } /* Dokument */
+.menu-btn[data-form="frm_MA_Mitarbeiterstamm"]::before { content: '\1F464' !important; } /* Person */
+.menu-btn[data-form="frm_KD_Kundenstamm"]::before { content: '\1F3E2' !important; } /* Gebäude */
+.menu-btn[data-form="frm_OB_Objekt"]::before { content: '\1F4CD' !important; } /* Pin */
+.menu-btn[data-form="frm_MA_Zeitkonten"]::before { content: '\23F0' !important; } /* Uhr */
+.menu-btn[data-form="frm_MA_Abwesenheit"]::before { content: '\1F3D6' !important; } /* Strand */
+.menu-btn[data-action]::before { content: '\26A1' !important; } /* Blitz für Actions */
+
+/* ============================================
+   TOOLTIP
+   ============================================ */
+.menu-btn[title]:hover::after {
+    content: attr(title) !important;
+    position: absolute !important;
+    left: calc(100% + 8px) !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: var(--acc-text) !important;
+    color: white !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    white-space: nowrap !important;
+    z-index: 1000 !important;
+    box-shadow: var(--acc-shadow-md) !important;
+    pointer-events: none !important;
+}
+
+/* ============================================
+   AUTO-EXPAND: Aktive Kategorie öffnen
+   ============================================ */
+/* CSS-only: Kategorie mit aktivem Button öffnen */
+.category-block:has(.menu-btn.active) {
+    /* Simuliert expanded state */
+}
+
+.category-block:has(.menu-btn.active) .menu-btn {
+    max-height: 60px !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.category-block:has(.menu-btn.active) .category-header {
+    background: var(--acc-selected) !important;
+    border-bottom: 1px solid var(--acc-border) !important;
+}
+
+.category-block:has(.menu-btn.active) .category-header::after {
+    transform: rotate(-135deg) !important;
+}
+
+/* ============================================
+   RESPONSIVE: Höhenverteilung
+   ============================================ */
+@media (min-height: 700px) {
+    .category-block.expanded .menu-btn {
+        min-height: 48px !important;
+        padding-top: 14px !important;
+        padding-bottom: 14px !important;
+    }
+}
+
+@media (min-height: 900px) {
+    .category-header {
+        min-height: 52px !important;
+        padding: 16px 18px !important;
+    }
+
+    .category-block.expanded .menu-btn {
+        min-height: 52px !important;
+        padding: 16px 18px !important;
+    }
+}
+
+/* ============================================
+   SINGLE EXPANSION MODE
+   Nur eine Kategorie gleichzeitig offen
+   (via JavaScript gesteuert)
+   ============================================ */
+
+/* ============================================
+   JAVASCRIPT FÜR ACCORDION FUNKTIONALITÄT
+   ============================================ */
+/*
+   ERFORDERLICH: Füge dieses Script in shell.html ein:
+
+   <script>
+   // Accordion Functionality
+   document.addEventListener('DOMContentLoaded', function() {
+       const categoryHeaders = document.querySelectorAll('.category-header');
+
+       categoryHeaders.forEach(header => {
+           header.addEventListener('click', function(e) {
+               e.preventDefault();
+               e.stopPropagation();
+
+               const block = this.closest('.category-block');
+               const isExpanded = block.classList.contains('expanded');
+
+               // Single Expansion: Alle anderen schließen
+               document.querySelectorAll('.category-block.expanded').forEach(b => {
+                   if (b !== block) {
+                       b.classList.remove('expanded');
+                   }
+               });
+
+               // Toggle current
+               block.classList.toggle('expanded', !isExpanded);
+           });
+       });
+
+       // Auto-expand category with active button
+       const activeBtn = document.querySelector('.menu-btn.active');
+       if (activeBtn) {
+           const block = activeBtn.closest('.category-block');
+           if (block) {
+               block.classList.add('expanded');
+           }
+       }
+
+       // Expand first category by default if none has active
+       if (!document.querySelector('.category-block.expanded')) {
+           const firstBlock = document.querySelector('.category-block');
+           if (firstBlock) {
+               firstBlock.classList.add('expanded');
+           }
+       }
+   });
+   </script>
+*/
+
+/* ============================================
+   ANIMATION KEYFRAMES
+   ============================================ */
+@keyframes accordion-slide-down {
+    from {
+        max-height: 0;
+        opacity: 0;
+    }
+    to {
+        max-height: 60px;
+        opacity: 1;
+    }
+}
+
+@keyframes accordion-slide-up {
+    from {
+        max-height: 60px;
+        opacity: 1;
+    }
+    to {
+        max-height: 0;
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   CATEGORY COUNT BADGE (Optional)
+   ============================================ */
+.category-header[data-count]::before {
+    content: attr(data-count) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 0 6px !important;
+    margin-right: 8px !important;
+    background: var(--acc-primary) !important;
+    color: white !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --acc-bg: #1a1a1a;
+        --acc-surface: #2d2d2d;
+        --acc-primary: #7986cb;
+        --acc-primary-light: #aab6fe;
+        --acc-text: #e0e0e0;
+        --acc-text-secondary: #a0a0a0;
+        --acc-border: #404040;
+        --acc-hover: rgba(121, 134, 203, 0.15);
+        --acc-active: rgba(121, 134, 203, 0.25);
+        --acc-selected: rgba(121, 134, 203, 0.2);
+    }
+}

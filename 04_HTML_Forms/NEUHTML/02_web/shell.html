@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS - Shell</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Shell Container */
+        .shell-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Alle Formulare sind iframes, initial hidden */
+        .form-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+            background: #f0f0f0;
+        }
+
+        .form-frame.active {
+            display: block;
+            z-index: 10;
+        }
+
+        /* Frame Container */
+        .frame-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #4316B2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+        }
+
+        #loadingOverlay.hidden {
+            display: none;
+        }
+
+        .loading-logo {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .loading-progress {
+            width: 300px;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: white;
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        .loading-status {
+            font-size: 11px;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="loading-logo">CONSYS</div>
+        <div class="loading-text">Formulare werden geladen...</div>
+        <div class="loading-progress">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+        <div class="loading-status" id="loadingStatus">Initialisiere...</div>
+    </div>
+
+    <!-- Frame Container fuer alle Formulare -->
+    <div class="frame-container" id="frameContainer">
+        <!-- Frames werden dynamisch eingefuegt -->
+    </div>
+
+    <script>
+    /**
+     * CONSYS Shell - Preload Manager
+     * Laedt alle Formulare beim Start vor
+     */
+    const ConsysShell = {
+        // Haupt-Formulare die vorgeladen werden sollen
+        forms: [
+            // Stammdaten
+            { id: 'mitarbeiter', file: 'frm_MA_Mitarbeiterstamm.html', menu: 'stammdaten' },
+            { id: 'kunden', file: 'frm_KD_Kundenstamm.html', menu: 'stammdaten' },
+            { id: 'auftraege', file: 'frm_va_Auftragstamm.html', menu: 'stammdaten' },
+            { id: 'objekte', file: 'frm_OB_Objekt.html', menu: 'stammdaten' },
+
+            // Planung
+            { id: 'dienstplan', file: 'frm_N_Dienstplanuebersicht.html', menu: 'planung' },
+            { id: 'planungsuebersicht', file: 'frm_VA_Planungsuebersicht.html', menu: 'planung' },
+            { id: 'einsatzuebersicht', file: 'frm_Einsatzuebersicht.html', menu: 'planung' },
+            { id: 'dienstplan_objekt', file: 'frm_DP_Dienstplan_Objekt.html', menu: 'planung' },
+            { id: 'dienstplan_ma', file: 'frm_DP_Dienstplan_MA.html', menu: 'planung' },
+
+            // Personal
+            { id: 'abwesenheit', file: 'frm_MA_Abwesenheit.html', menu: 'personal' },
+            { id: 'abwesenheiten', file: 'frm_Abwesenheiten.html', menu: 'personal' },
+            { id: 'zeitkonten', file: 'frm_MA_Zeitkonten.html', menu: 'personal' },
+            { id: 'bewerber', file: 'frm_N_MA_Bewerber_Verarbeitung.html', menu: 'personal' },
+            { id: 'ausweis', file: 'frm_Ausweis_Create.html', menu: 'personal' },
+
+            // Lohn
+            { id: 'lohnabrechnungen', file: 'frm_N_Lohnabrechnungen.html', menu: 'lohn' },
+            { id: 'stundenauswertung', file: 'frm_N_Stundenauswertung.html', menu: 'lohn' },
+
+            // Kommunikation
+            { id: 'email_versenden', file: 'frm_N_Email_versenden.html', menu: 'kommunikation' },
+            { id: 'mitarbeiterauswahl', file: 'frm_N_Mitarbeiterauswahl.html', menu: 'kommunikation' },
+
+            // MA-Auswahl
+            { id: 'ma_schnellauswahl', file: 'frm_MA_VA_Schnellauswahl.html', menu: 'planung' },
+            { id: 'ma_positionszuordnung', file: 'frm_MA_VA_Positionszuordnung.html', menu: 'planung' },
+
+            // Dashboard
+            { id: 'dashboard', file: 'frm_Menuefuehrung1.html', menu: 'dashboard' }
+        ],
+
+        loadedCount: 0,
+        activeFormId: null,
+        frames: {},
+
+        /**
+         * Shell initialisieren
+         */
+        init() {
+            this.preloadAllForms();
+        },
+
+        /**
+         * Alle Formulare vorladen
+         */
+        preloadAllForms() {
+            const container = document.getElementById('frameContainer');
+            const total = this.forms.length;
+
+            this.forms.forEach((form, index) => {
+                // Iframe erstellen
+                const iframe = document.createElement('iframe');
+                iframe.id = 'frame_' + form.id;
+                iframe.className = 'form-frame';
+                iframe.src = 'forms/' + form.file;
+                iframe.dataset.formId = form.id;
+
+                // Load-Event
+                iframe.onload = () => {
+                    this.loadedCount++;
+                    this.updateLoadingProgress(this.loadedCount, total, form.file);
+
+                    // Shell-API in iframe injizieren
+                    this.injectShellAPI(iframe, form.id);
+
+                    // Wenn alle geladen sind
+                    if (this.loadedCount === total) {
+                        this.onAllFormsLoaded();
+                    }
+                };
+
+                // Fehler abfangen
+                iframe.onerror = () => {
+                    console.error('Fehler beim Laden von: ' + form.file);
+                    this.loadedCount++;
+                    if (this.loadedCount === total) {
+                        this.onAllFormsLoaded();
+                    }
+                };
+
+                container.appendChild(iframe);
+                this.frames[form.id] = iframe;
+            });
+        },
+
+        /**
+         * Loading-Fortschritt aktualisieren
+         */
+        updateLoadingProgress(loaded, total, currentFile) {
+            const percent = Math.round((loaded / total) * 100);
+            document.getElementById('loadingBar').style.width = percent + '%';
+            document.getElementById('loadingStatus').textContent =
+                loaded + '/' + total + ' - ' + currentFile;
+        },
+
+        /**
+         * Wird aufgerufen wenn alle Formulare geladen sind
+         */
+        onAllFormsLoaded() {
+            // Loading Overlay ausblenden
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+
+                // Start-Formular anzeigen (aus URL oder Dashboard)
+                const startForm = this.getStartFormFromURL() || 'dashboard';
+                this.showForm(startForm);
+
+                console.log('CONSYS Shell: Alle ' + this.forms.length + ' Formulare geladen');
+            }, 300);
+        },
+
+        /**
+         * Start-Formular aus URL-Parameter lesen
+         */
+        getStartFormFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('form');
+        },
+
+        /**
+         * Shell-API in iframe injizieren
+         */
+        injectShellAPI(iframe, formId) {
+            try {
+                const iframeWindow = iframe.contentWindow;
+
+                // Shell-Navigation in iframe verfuegbar machen
+                iframeWindow.ConsysShellNavigate = (targetFormId) => {
+                    this.showForm(targetFormId);
+                };
+
+                // Form-ID setzen
+                iframeWindow.CONSYS_FORM_ID = formId;
+
+            } catch (e) {
+                // Cross-origin Fehler ignorieren
+            }
+        },
+
+        /**
+         * Formular anzeigen (schaltet Sichtbarkeit)
+         */
+        showForm(formId) {
+            // Aktuelles Formular ausblenden
+            if (this.activeFormId && this.frames[this.activeFormId]) {
+                this.frames[this.activeFormId].classList.remove('active');
+            }
+
+            // Neues Formular einblenden
+            if (this.frames[formId]) {
+                this.frames[formId].classList.add('active');
+                this.activeFormId = formId;
+
+                // URL aktualisieren (ohne Reload)
+                const url = new URL(window.location);
+                url.searchParams.set('form', formId);
+                window.history.replaceState({}, '', url);
+
+                // Formular benachrichtigen dass es aktiv ist
+                try {
+                    const iframeWindow = this.frames[formId].contentWindow;
+                    if (iframeWindow.onFormActivated) {
+                        iframeWindow.onFormActivated();
+                    }
+                } catch (e) {}
+
+            } else {
+                console.warn('Formular nicht gefunden: ' + formId);
+            }
+        },
+
+        /**
+         * Formular-ID aus Dateiname ermitteln
+         */
+        getFormIdByFile(fileName) {
+            const form = this.forms.find(f => f.file === fileName);
+            return form ? form.id : null;
+        }
+    };
+
+    // Global verfuegbar machen
+    window.ConsysShell = ConsysShell;
+
+    // Shell starten
+    document.addEventListener('DOMContentLoaded', () => {
+        ConsysShell.init();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+SELECT tbl_Rch_Kopf.kun_ID, tbl_Rch_Kopf.ID, tbl_Rch_Kopf.RchDatum, tbl_Rch_Kopf.RchNr_Ext, tbl_VA_Auftragstamm.Auftrag, tbl_VA_Auftragstamm.Objekt, tbl_VA_Auftragstamm.Ort, tbl_Rch_Kopf.Dateiname, tbl_Rch_Kopf.Leist_Datum_von, tbl_Rch_Kopf.Leist_Datum_Bis, tbl_Rch_Kopf.Zwi_Sum1, tbl_Rch_Kopf.MwSt19_Sum1, tbl_Rch_Kopf.Gesamtsumme1, tbl_Rch_Kopf.Zahlung_Bis, tbl_Rch_Kopf.IstBezahlt, tbl_Rch_Kopf.Zahlung_am, tbl_Rch_Kopf.Zahlbetrag1, tbl_Rch_Kopf.Bemerkungen, Year([RchDatum]) AS RchJahr, Month([RchDatum]) AS RchMon, tbl_Rch_Kopf.VA_ID
+FROM tbl_Rch_Kopf LEFT JOIN tbl_VA_Auftragstamm ON tbl_Rch_Kopf.VA_ID = tbl_VA_Auftragstamm.ID
+WHERE (((tbl_Rch_Kopf.RchTyp)=4 Or (tbl_Rch_Kopf.RchTyp)=12))
+ORDER BY tbl_Rch_Kopf.kun_ID, tbl_Rch_Kopf.RchDatum DESC , tbl_Rch_Kopf.ID;
+

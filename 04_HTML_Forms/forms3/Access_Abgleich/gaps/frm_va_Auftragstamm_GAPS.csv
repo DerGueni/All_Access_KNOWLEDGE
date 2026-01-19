@@ -1,0 +1,108 @@
+Kategorie,Access,HTML,Implementiert,Fehlend,Zusätzlich,Completion_Prozent,Kritikalität,Aufwand_Stunden
+Buttons,45,44,35,10,2,78%,MITTEL,8-12
+TextBoxen,19,37,19,0,18,100%,OK,0
+ComboBoxen,13,4,4,9,0,31%,KRITISCH,6-10
+Unterformulare,10,0,0,10,0,0%,KRITISCH,40-60
+CheckBoxen,2,1,1,1,0,50%,MITTEL,1
+TabControl,1,1,1,0,0,100%,OK,0
+Labels,34,?,?,?,?,?%,NIEDRIG,2-4
+Events,13,8,8,5,0,62%,MITTEL,4-6
+VBA-Funktionen,50,60,45,5,10,90%,OK,6-10
+GESAMT,187,155,113,40,30,68%,MITTEL,70-104
+
+Gap_ID,Gap_Typ,Access_Name,HTML_Name,Beschreibung,Status,Kritikalität,Aufwand_h,Phase
+G001,Subform,sub_MA_VA_Zuordnung,,Einsatzliste Mitarbeiter-Zuordnungen,FEHLT,KRITISCH,10,1
+G002,Subform,sub_VA_Start,,Schichten/Zeiten,FEHLT,KRITISCH,8,1
+G003,Subform,sub_MA_VA_Planung_Absage,,Absagen,FEHLT,KRITISCH,6,3
+G004,Subform,sub_MA_VA_Planung_Status,,Status,FEHLT,KRITISCH,4,3
+G005,Subform,sub_ZusatzDateien,,Anhänge,FEHLT,KRITISCH,4,3
+G006,Subform,sub_tbl_Rch_Kopf,,Rechnungskopf,FEHLT,WICHTIG,4,3
+G007,Subform,sub_tbl_Rch_Pos_Auftrag,,Rechnungspositionen,FEHLT,WICHTIG,4,3
+G008,Subform,sub_VA_Anzeige,,VA-Anzeige,FEHLT,NIEDRIG,2,3
+G009,Subform,frm_Menuefuehrung,,Menü,FEHLT,NIEDRIG,2,3
+G010,Subform,zsub_lstAuftrag,,Auftragsliste Sidebar,FEHLT,WICHTIG,6,2
+G011,ComboBox,IstStatus,,Filter nach Status,FEHLT,KRITISCH,1,2
+G012,ComboBox,cboEinsatzliste,,Druck-Optionen Einsatzliste,FEHLT,WICHTIG,1,2
+G013,ComboBox,Objekt,,Objekt-Auswahl (distinct),FEHLT,WICHTIG,1,2
+G014,ComboBox,Ort,,Ort-Auswahl (distinct),FEHLT,WICHTIG,1,2
+G015,ComboBox,Dienstkleidung,,Dienstkleidung-Auswahl,FEHLT,WICHTIG,1,2
+G016,ComboBox,cboAnstArt,,Anstellungsart Filter,FEHLT,KRITISCH,1,2
+G017,ComboBox,cboQuali,,Qualifikation Filter,FEHLT,KRITISCH,1,2
+G018,ComboBox,cboID,,Direktsprung Auftrag-ID,FEHLT,NIEDRIG,2,3
+G019,ComboBox,Kombinationsfeld656,,Auftrag-Name distinct,FEHLT,NIEDRIG,1,3
+G020,CheckBox,IstVerfuegbar,,Filter verfügbare MA,FEHLT,KRITISCH,1,1
+G021,Button,btnAuftrBerech,,Auftragsberechnung,FEHLT,WICHTIG,2,2
+G022,Button,btn_aenderungsprotokoll,,Änderungsprotokoll,FEHLT,NIEDRIG,1,3
+G023,Button,btnmailpos,,Mail Positionen,FEHLT,WICHTIG,2,2
+G024,Button,btn_Posliste_oeffnen,btnPositionen,Positionsliste öffnen,TEILWEISE,WICHTIG,2,1
+G025,Button,btnCheck,,Check/Validierung,FEHLT,NIEDRIG,1,3
+G026,Button,btnVAPlanCrea,,VA-Plan erstellen,FEHLT,WICHTIG,2,1
+G027,Button,btn_VA_Abwesenheiten,,VA-Abwesenheiten,FEHLT,WICHTIG,2,1
+G028,Button,btn_Tag_loeschen,,Tag löschen,FEHLT,WICHTIG,1,2
+G029,Button,cmd_Messezettel_NameEintragen,,Messezettel Namen,FEHLT,NIEDRIG,1,3
+G030,Button,btnPDFKopf,,PDF Kopfdaten,FEHLT,WICHTIG,2,2
+G031,Button,btnPDFPos,,PDF Positionen,FEHLT,WICHTIG,2,2
+G032,Event,BeforeUpdate,,Validierung vor Speichern,FEHLT,WICHTIG,2,2
+G033,Event,OnError,,Error-Handler,FEHLT,MITTEL,1,2
+G034,Event,OnTimer,,Timer-Events,FEHLT,NIEDRIG,1,3
+G035,Event,OnApplyFilter,,Filter anwenden,FEHLT,WICHTIG,2,2
+G036,Event,OnFilter,,Filter-Logik,FEHLT,WICHTIG,2,2
+G037,Event,OnDblClick (Datum),,Datum DblClick,FEHLT,NIEDRIG,1,3
+G038,API,/api/auftraege/:id/attachments,,Anhänge laden,FEHLT,WICHTIG,3,3
+G039,API,/api/auftraege/:id/rechnung,,Rechnungsdaten laden,FEHLT,WICHTIG,3,3
+G040,API,/api/auftraege/:id/positionen,,Positionen laden,FEHLT,WICHTIG,2,2
+
+Button_ID,Access_Name,HTML_Name,Funktion,Status,Kritikalität,Event_Handler
+B001,btnSchnellPlan,auftrag-btn-mitarbeiterauswahl,Mitarbeiter-Schnellauswahl,BUTTON_OK_EVENT_FEHLT,WICHTIG,openSchnellauswahl()
+B002,btnMailEins,auftrag-btn-el-senden-ma,E-Mail an MA,OK,MITTEL,sendEinsatzliste('MA')
+B003,btnDruckZusage,btnDruckZusage / btn_BWN_Druck,BWN drucken,OK,MITTEL,druckeBWN()
+B004,btn_letzer_Datensatz,Navigation Logic,Letzter Datensatz,OK,OK,gotoRecord('last')
+B005,Befehl40,Navigation Logic,Erster Datensatz,OK,OK,gotoRecord('first')
+B006,Befehl41,Navigation Logic,Vorheriger Datensatz,OK,OK,gotoRecord('prev')
+B007,Befehl43,Navigation Logic,Nächster Datensatz,OK,OK,gotoRecord('next')
+B008,mcobtnDelete,auftrag-btn-loeschen,Auftrag löschen,OK,WICHTIG,loeschenAuftrag()
+B009,Befehl38,auftrag-btn-neu,Neuer Auftrag,OK,WICHTIG,neuerAuftrag()
+B010,btnRibbonAus,,Ribbon ausblenden,NICHT_RELEVANT,NIEDRIG,
+B011,btnRibbonEin,,Ribbon einblenden,NICHT_RELEVANT,NIEDRIG,
+B012,btnDaBaEin,,Datenbank-Fenster ein,NICHT_RELEVANT,NIEDRIG,
+B013,btnDaBaAus,,Datenbank-Fenster aus,NICHT_RELEVANT,NIEDRIG,
+B014,btnReq,,Anforderungen,UNKLAR,NIEDRIG,
+B015,btnneuveranst,,Neuer Veranstalter,UNKLAR,NIEDRIG,
+B016,Befehl640,auftrag-btn-aktualisieren,Aktualisieren,OK,MITTEL,loadAuftrag()
+B017,btn_rueck,,Rückmeldungen öffnen,FEHLT,WICHTIG,openRueckmeldungen()
+B018,btnSyncErr,,Sync-Fehler prüfen,TEILWEISE,MITTEL,checkSyncErrors()
+B019,btn_ListeStd,btnListeStd,Stundenliste,BUTTON_OK,MITTEL,
+B020,btn_Autosend_BOS,auftrag-btn-el-senden-bos,Auto-Senden BOS,OK,MITTEL,sendEinsatzliste('BOS')
+B021,Befehl709,,Unbekannt,UNKLAR,NIEDRIG,
+B022,btnMailSub,auftrag-btn-el-senden-sub,Mail Subunternehmer,OK,MITTEL,sendEinsatzliste('SUB')
+B023,btnDatumLeft,auftrag-btn-datum-links,Datum zurück,OK,OK,navigateVADatum(-1)
+B024,btnDatumRight,auftrag-btn-datum-rechts,Datum vor,OK,OK,navigateVADatum(1)
+B025,btnPlan_Kopie,auftrag-btn-kopieren,Planung kopieren,OK,MITTEL,kopierenAuftrag()
+B026,btnNeuAttach,auftrag-btn-attach-hinzufuegen,Anhang hinzufügen,BUTTON_OK,MITTEL,addNewAttachment()
+B027,btnPDFKopf,,PDF Kopfdaten,FEHLT,WICHTIG,
+B028,btnPDFPos,,PDF Positionen,FEHLT,WICHTIG,
+B029,btn_AbWann,Auftraege_ab Input,Filter ab Datum,TEILWEISE,MITTEL,
+B030,btnHeute,auftrag-btn-ab-heute,Filter ab Heute,OK,OK,setFilterDatum('today')
+B031,btnTgBack,auftrag-btn-tage-zurueck,Tage zurück,OK,OK,navigateTage(-1)
+B032,btnTgVor,auftrag-btn-tage-vor,Tage vor,OK,OK,navigateTage(1)
+B033,btnAuftrBerech,,Auftragsberechnung,FEHLT,WICHTIG,
+B034,btn_aenderungsprotokoll,,Änderungsprotokoll,FEHLT,NIEDRIG,
+B035,btnmailpos,,Mail Positionen,FEHLT,WICHTIG,
+B036,btn_Posliste_oeffnen,btnPositionen,Positionsliste öffnen,TEILWEISE,WICHTIG,openPositionsliste()
+B037,btnCheck,,Check/Validierung,FEHLT,NIEDRIG,
+B038,btnDruckZusage1,,Zusage drucken (alt),DUPLIKAT,NIEDRIG,
+B039,btnVAPlanCrea,,VA-Plan erstellen,FEHLT,WICHTIG,createVAPlan()
+B040,btn_VA_Abwesenheiten,,VA-Abwesenheiten,FEHLT,WICHTIG,openVAAbwesenheiten()
+B041,btn_Tag_loeschen,,Tag löschen,FEHLT,WICHTIG,deleteVATag()
+B042,cmd_Messezettel_NameEintragen,,Messezettel Namen,FEHLT,NIEDRIG,
+B043,Befehl543,,Unbekannt,UNKLAR,NIEDRIG,
+B044,,auftrag-btn-eventdaten-speichern,Eventdaten speichern (NEU),ZUSÄTZLICH,MITTEL,saveEventdaten()
+B045,,auftrag-btn-webdaten-laden,Eventdaten laden (NEU),ZUSÄTZLICH,MITTEL,loadEventdaten()
+
+Priorität,Phase,Gap_IDs,Beschreibung,Aufwand_h,Ziel_Completion
+P0,1,"G001,G002,G020","Einsatzliste + Schichten + IstVerfuegbar",19,75%
+P1,2,"G010,G011,G012,G016,G017,G032,G035,G036","Filter-Funktionen + Auftragsliste",12,80%
+P2,3,"G003,G004,G005,G006,G007,G038,G039,G040","Restliche Subforms + API",20,85%
+P3,4,"G024,G026,G027,G028,G021,G030,G031","Wichtige Buttons",12,90%
+P4,5,"G008,G009,G013,G014,G015,G018,G019,G022,G025,G029,G033,G034,G037","Nice-to-have",15,95%
+SUMME,,"1-40","Alle Gaps",78,95%

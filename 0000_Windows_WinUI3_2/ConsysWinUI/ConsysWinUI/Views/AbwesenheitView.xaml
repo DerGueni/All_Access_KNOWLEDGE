@@ -1,0 +1,522 @@
+<Page
+    x:Class="ConsysWinUI.Views.AbwesenheitView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ConsysWinUI.ViewModels"
+    xmlns:controls="using:ConsysWinUI.Controls"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.UI.Controls"
+    mc:Ignorable="d"
+    Background="#F0F0F0">
+
+    <Page.Resources>
+        <!-- Sidebar Button Style - Access-Look -->
+        <Style x:Key="SidebarButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="MinHeight" Value="28"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+
+        <!-- Access Button Style (blau) -->
+        <Style x:Key="AccessBlueButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#95B3D7"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#7A97BE"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="185"/>  <!-- Sidebar - Access Original: 185px -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="#8B0000">
+            <StackPanel>
+                <!-- Logo/Titel - KRITISCH: Weiße Box mit schwarzem Rahmen wie Access Original -->
+                <Border Background="White" BorderBrush="Black" BorderThickness="1"
+                        Margin="8,10" Padding="8,3">
+                    <TextBlock Text="HAUPTMENÜ"
+                               Foreground="Black"
+                               FontWeight="Bold"
+                               FontSize="11"
+                               HorizontalAlignment="Center"/>
+                </Border>
+
+                <!-- Menü-Buttons -->
+                <Button Content="Dienstplanübersicht" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Planungsübersicht" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Auftragsverwaltung" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Mitarbeiterstamm" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Kundenstamm" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Objektstamm" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Abwesenheiten" Background="#D4A574" Foreground="Black" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Zeitkonten" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Lohnabrechnungen" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Bewerber" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+                <Button Content="Einstellungen" Style="{StaticResource SidebarButtonStyle}" Margin="5,2"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Hauptinhalt -->
+        <Grid Grid.Column="1" Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="Auto"/> <!-- Filter -->
+            <RowDefinition Height="*"/>    <!-- Hauptinhalt -->
+            <RowDefinition Height="Auto"/> <!-- Detail Bereich -->
+            <RowDefinition Height="Auto"/> <!-- Buttons -->
+            <RowDefinition Height="Auto"/> <!-- Statusleiste -->
+        </Grid.RowDefinitions>
+
+        <!-- Header: MA-Auswahl -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="Mitarbeiter:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"
+                       Style="{StaticResource BodyStrongTextBlockStyle}"/>
+
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding MitarbeiterListe}"
+                      SelectedValue="{Binding SelectedMaId, Mode=TwoWay}"
+                      SelectedValuePath="MaId"
+                      DisplayMemberPath="DisplayName"
+                      HorizontalAlignment="Stretch"/>
+
+            <StackPanel Grid.Column="3"
+                        Orientation="Horizontal"
+                        Spacing="10">
+                <Button Content="MA öffnen"
+                        Command="{Binding OpenMitarbeiterCommand}"
+                        IsEnabled="{Binding SelectedMaId, Converter={StaticResource NullToBooleanConverter}}"
+                        Style="{StaticResource AccessBlueButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Filter: Zeitraum -->
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="Von:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"/>
+
+            <DatePicker Grid.Column="1"
+                        Date="{Binding VonDatum, Mode=TwoWay}"
+                        HorizontalAlignment="Stretch"/>
+
+            <TextBlock Grid.Column="2"
+                       Text="Bis:"
+                       VerticalAlignment="Center"
+                       Margin="20,0,10,0"/>
+
+            <DatePicker Grid.Column="3"
+                        Date="{Binding BisDatum, Mode=TwoWay}"
+                        HorizontalAlignment="Stretch"/>
+
+            <StackPanel Grid.Column="4"
+                        Orientation="Horizontal"
+                        Spacing="10"
+                        Margin="20,0,0,0">
+                <Button Content="Filter anwenden"
+                        Command="{Binding ApplyFilterCommand}"
+                        Style="{StaticResource AccessBlueButtonStyle}"/>
+                <Button Content="Reset"
+                        Command="{Binding ResetFilterCommand}"
+                        Style="{StaticResource AccessBlueButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Hauptinhalt: Liste + Kalender -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Linke Seite: Abwesenheitsliste + Statistik -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Abwesenheitsliste -->
+                <Border Grid.Row="0"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0"
+                                   Text="Abwesenheiten"
+                                   Style="{StaticResource SubtitleTextBlockStyle}"
+                                   Margin="15,10,15,10"/>
+
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto">
+                            <toolkit:DataGrid ItemsSource="{Binding Abwesenheiten}"
+                                              SelectedItem="{Binding SelectedAbwesenheit, Mode=TwoWay}"
+                                              AutoGenerateColumns="False"
+                                              CanUserReorderColumns="False"
+                                              CanUserSortColumns="True"
+                                              GridLinesVisibility="Horizontal"
+                                              HeadersVisibility="Column"
+                                              SelectionMode="Single"
+                                              IsReadOnly="True"
+                                              Margin="15,0,15,15">
+                                <toolkit:DataGrid.Columns>
+                                    <toolkit:DataGridTextColumn Header="Von"
+                                                                Binding="{Binding VonDatText}"
+                                                                Width="100"/>
+                                    <toolkit:DataGridTextColumn Header="Bis"
+                                                                Binding="{Binding BisDatText}"
+                                                                Width="100"/>
+                                    <toolkit:DataGridTextColumn Header="Tage"
+                                                                Binding="{Binding AnzahlTage}"
+                                                                Width="60"/>
+                                    <toolkit:DataGridTextColumn Header="Grund"
+                                                                Binding="{Binding GrundText}"
+                                                                Width="*"/>
+                                    <toolkit:DataGridTextColumn Header="Bemerkung"
+                                                                Binding="{Binding Bemerkung}"
+                                                                Width="*"/>
+                                </toolkit:DataGrid.Columns>
+                            </toolkit:DataGrid>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- Statistik -->
+                <Border Grid.Row="1"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        Padding="15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Gesamt Abwesenheiten"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{Binding AnzahlAbwesenheiten}"
+                                       Style="{StaticResource TitleTextBlockStyle}"
+                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Gesamt Tage"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{Binding GesamtTage}"
+                                       Style="{StaticResource TitleTextBlockStyle}"
+                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Urlaub Tage"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{Binding UrlaubTage}"
+                                       Style="{StaticResource TitleTextBlockStyle}"
+                                       Foreground="#FF8C00"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="Krank Tage"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{Binding KrankTage}"
+                                       Style="{StaticResource TitleTextBlockStyle}"
+                                       Foreground="#B22222"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Rechte Seite: Kalender -->
+            <Border Grid.Column="2"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="Kalender-Vorschau"
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               Margin="15,10,15,10"/>
+
+                    <!-- Monat Navigation -->
+                    <Grid Grid.Row="1" Margin="15,0,15,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0"
+                                Content="&#xE76B;"
+                                FontFamily="Segoe MDL2 Assets"
+                                Command="{Binding PreviousMonthCommand}"
+                                Style="{StaticResource IconButtonStyle}"/>
+
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding MonatJahrText}"
+                                   Style="{StaticResource BodyStrongTextBlockStyle}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+
+                        <Button Grid.Column="2"
+                                Content="&#xE76C;"
+                                FontFamily="Segoe MDL2 Assets"
+                                Command="{Binding NextMonthCommand}"
+                                Style="{StaticResource IconButtonStyle}"/>
+                    </Grid>
+
+                    <!-- Kalender Grid -->
+                    <controls:MonthCalendarView Grid.Row="2"
+                                                Month="{Binding KalenderMonat}"
+                                                Year="{Binding KalenderJahr}"
+                                                Entries="{Binding KalenderEintraege}"
+                                                Margin="15,0,15,15"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Detail Bereich: Neue/Bearbeiten Abwesenheit -->
+        <Border Grid.Row="3"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                Padding="15"
+                Margin="0,20,0,20"
+                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="{Binding IsNewRecord, Converter={StaticResource NewEditTitleConverter}}"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           Margin="0,0,0,15"/>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Zeile 1: Von, Bis, Grund -->
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                               Text="Von:"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,10"/>
+
+                    <DatePicker Grid.Row="0" Grid.Column="1"
+                                Date="{Binding EditVonDat, Mode=TwoWay}"
+                                HorizontalAlignment="Stretch"
+                                Margin="0,0,20,10"/>
+
+                    <TextBlock Grid.Row="0" Grid.Column="2"
+                               Text="Bis:"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,10"/>
+
+                    <DatePicker Grid.Row="0" Grid.Column="3"
+                                Date="{Binding EditBisDat, Mode=TwoWay}"
+                                HorizontalAlignment="Stretch"
+                                Margin="0,0,20,10"/>
+
+                    <TextBlock Grid.Row="0" Grid.Column="4"
+                               Text="Grund:"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,10"/>
+
+                    <ComboBox Grid.Row="0" Grid.Column="5"
+                              ItemsSource="{Binding GruendeListe}"
+                              SelectedValue="{Binding SelectedGrundId, Mode=TwoWay}"
+                              SelectedValuePath="GrundId"
+                              DisplayMemberPath="Bezeichnung"
+                              HorizontalAlignment="Stretch"
+                              Margin="0,0,0,10"/>
+
+                    <!-- Zeile 2: Ganzer Tag, Zeiten, Bemerkung -->
+                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                              Content="Ganzer Tag"
+                              IsChecked="{Binding GanzerTag, Mode=TwoWay}"
+                              Margin="0,0,0,10"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="2"
+                               Text="Von:"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding ZeitfelderSichtbar, Converter={StaticResource BooleanToVisibilityConverter}}"
+                               Margin="0,0,10,10"/>
+
+                    <TimePicker Grid.Row="1" Grid.Column="3"
+                                Time="{Binding EditVonZeit, Mode=TwoWay}"
+                                Visibility="{Binding ZeitfelderSichtbar, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                HorizontalAlignment="Stretch"
+                                Margin="0,0,20,10"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="4"
+                               Text="Bis:"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding ZeitfelderSichtbar, Converter={StaticResource BooleanToVisibilityConverter}}"
+                               Margin="0,0,10,10"/>
+
+                    <TimePicker Grid.Row="1" Grid.Column="5"
+                                Time="{Binding EditBisZeit, Mode=TwoWay}"
+                                Visibility="{Binding ZeitfelderSichtbar, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                HorizontalAlignment="Stretch"
+                                Margin="0,0,0,10"/>
+                </Grid>
+
+                <!-- Bemerkung -->
+                <Grid Grid.Row="2" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="Bemerkung:"
+                               VerticalAlignment="Top"
+                               Margin="0,8,10,0"/>
+
+                    <TextBox Grid.Column="1"
+                             Text="{Binding Bemerkung, Mode=TwoWay}"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             Height="80"
+                             HorizontalAlignment="Stretch"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    HorizontalAlignment="Left">
+            <Button Content="Neu"
+                    Command="{Binding NewRecordCommand}"
+                    Style="{StaticResource AccentButtonStyle}"
+                    IsEnabled="{Binding SelectedMaId, Converter={StaticResource NullToBooleanConverter}}">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="N" Modifiers="Control"/>
+                </Button.KeyboardAccelerators>
+            </Button>
+
+            <Button Content="Speichern"
+                    Command="{Binding SaveCommand}"
+                    Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="S" Modifiers="Control"/>
+                </Button.KeyboardAccelerators>
+            </Button>
+
+            <Button Content="Löschen"
+                    Command="{Binding DeleteCommand}"
+                    Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Delete"/>
+                </Button.KeyboardAccelerators>
+            </Button>
+
+            <Button Content="Abbrechen"
+                    Command="{Binding CancelCommand}"
+                    Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Escape"/>
+                </Button.KeyboardAccelerators>
+            </Button>
+        </StackPanel>
+
+        <!-- Statusleiste -->
+        <Border Grid.Row="5"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="0,10,0,0"
+                Margin="0,10,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusMessage}"
+                           Foreground="{Binding HasError, Converter={StaticResource ErrorToColorConverter}}"
+                           VerticalAlignment="Center"/>
+
+                <ProgressRing Grid.Column="1"
+                              IsActive="{Binding IsLoading}"
+                              Width="20"
+                              Height="20"
+                              Margin="10,0,0,0"/>
+            </Grid>
+        </Border>
+        </Grid>
+    </Grid>
+</Page>

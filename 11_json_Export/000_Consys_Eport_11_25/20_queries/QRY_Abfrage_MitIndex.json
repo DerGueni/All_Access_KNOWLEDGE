@@ -1,0 +1,1 @@
+{"id":"QRY_Abfrage_MitIndex","name":"Abfrage/Mit Index","sql":{"raw":"SELECT DISTINCTROW [Kunden/Mit Index].*, DCount(\"*\",\"[Bestellungen]\",\"[Empfänger]='\" & [Firma] & \"'\") AS AnzBest\nFROM [Kunden/Mit Index]\nORDER BY [Kunden/Mit Index].Firma;\n","sources":[],"select_fields":[]},"parameters":[],"meta":{"connect":null,"returns_records":wahr,"odbctimeout":60}}

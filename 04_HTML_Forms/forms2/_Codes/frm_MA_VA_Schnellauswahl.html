@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter Auswahl</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 11px;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+
+        body.hide-app-sidebar .app-sidebar { display: none; }
+        body.hide-app-sidebar .app-main { margin-left: 0; }
+
+        body.embedded #frm_Menuefuehrung { display: none; }
+        body.embedded .main-content { margin-left: 0; }
+
+        /* Hauptcontainer - responsive zwischen 1024px und 2560px */
+        .form-container {
+            width: 100%;
+            max-width: 2560px;
+            min-width: 1024px;
+            height: 100vh;
+            background-color: #ffffff;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section - min 94px */
+        .form-header {
+            position: relative;
+            min-height: 94px;
+            background-color: #4316B2;
+            border-bottom: 2px solid #2a0d6e;
+            flex-shrink: 0;
+        }
+
+        /* Detail Section - flexible height */
+        .form-detail {
+            position: relative;
+            flex: 1;
+            background-color: #ffffff;
+            overflow: auto;
+            min-height: 0;
+        }
+
+        /* ============================================ */
+        /* HEADER CONTROLS - Flexbox Layout           */
+        /* ============================================ */
+
+        /* Header Layout mit Flexbox - vollständig responsive */
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .header-left-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .header-center-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .header-right-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Titel: Mitarbeiterauswahl */
+        #Auto_Kopfzeile0 {
+            font-size: 15px;
+            font-weight: bold;
+            color: #ffffff;
+            white-space: nowrap;
+        }
+
+        /* Datum Label rechts oben */
+        #lbl_Datum {
+            font-size: 11px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        /* Hilfe Button */
+        #btnHilfe {
+            width: 26px;
+            height: 26px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        /* Schliessen Button */
+        #Befehl38 {
+            width: 30px;
+            height: 26px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Action Buttons */
+        #btnAuftrag,
+        #btnPosListe,
+        #btnZuAbsage {
+            min-width: 150px;
+            padding: 0.25rem 0.5rem;
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Ribbon Buttons (versteckt, aber mit Flexbox falls benötigt) */
+        .ribbon-buttons {
+            display: none; /* Standardmäßig versteckt */
+            flex-wrap: wrap;
+            gap: 2px;
+            width: 60px;
+        }
+        #btnRibbonAus, #btnDaBaAus, #btnDaBaEin, #btnRibbonEin {
+            width: 19px;
+            height: 15px;
+            font-size: 8px;
+            border: 1px solid #999;
+            background: #e0e0e0;
+            cursor: pointer;
+        }
+
+        /* Auftrag Info Label */
+        #lbAuftrag {
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffffff;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            flex: 1;
+            max-width: 600px;
+        }
+
+        /* ============================================ */
+        /* DETAIL CONTROLS - Grid/Flexbox Layout      */
+        /* ============================================ */
+
+        /* Detail Layout: Sidebar + Content */
+        .detail-content {
+            display: grid;
+            grid-template-columns: 193px 1fr;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Subform Menuefuehrung (Sidebar) */
+        #frm_Menuefuehrung {
+            border: none;
+            background-color: #8B0000;
+            height: 100%;
+            grid-row: 1 / -1;
+        }
+
+        /* Hauptinhalt-Bereich */
+        .main-content-area {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Filter-Zeile als Grid */
+        .filter-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 0.5rem 1rem;
+            align-items: center;
+        }
+
+        /* Control-Gruppen für bessere Organisation */
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* 6-Spalten-Layout für Listen (mit Button-Spalten) */
+        .lists-container {
+            display: grid;
+            grid-template-columns: 210px 1fr 70px 320px 70px 260px;
+            gap: 0.5rem;
+            min-height: 400px;
+            max-height: calc(100vh - 320px);
+        }
+
+        /* Button-Spalten zwischen Listen */
+        .button-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem;
+        }
+
+        .button-column button {
+            width: 60px;
+            height: 28px;
+            font-size: 9px;
+            background-color: #e0e0e0;
+            border: 1px solid #999;
+            cursor: pointer;
+        }
+
+        .button-column button:hover {
+            background-color: #d0d0d0;
+        }
+
+        /* Linke Spalte: Zeiten + Parallele Einsätze */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        /* Mittlere Spalte: MA-Liste + Buttons */
+        .center-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        /* Rechte Spalten: Geplant + Zugesagt */
+        .right-column-plan {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .right-column-zusage {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* === AUFTRAG-ZEILE === */
+        .auftrag-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto 1fr auto auto auto;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* Auftrag Label */
+        #Bezeichnungsfeld1 {
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* Auftrag ComboBox */
+        #VA_ID {
+            min-width: 250px;
+            height: 25px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+        }
+
+        /* Datum Label */
+        #Bezeichnungsfeld26 {
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* Datum ComboBox */
+        #cboVADatum {
+            width: 132px;
+            height: 25px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+        }
+
+        /* Nur Selektierte anfragen Button - GRÜN */
+        #btnMailSelected {
+            min-width: 160px;
+            padding: 0.25rem 0.5rem;
+            height: 29px;
+            background-color: #f0f0f0;
+            border: 1px solid #666;
+            font-weight: bold;
+            font-size: 10px;
+            color: #008000;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* Auftragsstatus Label */
+        #Bezeichnungsfeld35 {
+            font-size: 11px;
+            color: #7f7f7f;
+            white-space: nowrap;
+        }
+
+        /* Auftragsstatus ComboBox */
+        #cboAuftrStatus {
+            width: 50px;
+            height: 21px;
+            background-color: #8EB4E3;
+            border: 1px solid #ccc;
+        }
+
+        /* === FILTER-ZEILEN === */
+        .filter-row-1 {
+            display: grid;
+            grid-template-columns: auto auto 1fr auto auto;
+            gap: 0.5rem 1rem;
+            align-items: center;
+        }
+
+        .filter-row-2 {
+            display: grid;
+            grid-template-columns: auto auto auto auto 1fr auto auto;
+            gap: 0.5rem 1rem;
+            align-items: center;
+        }
+
+        .filter-row-3 {
+            display: grid;
+            grid-template-columns: auto auto auto auto 1fr auto auto;
+            gap: 0.5rem 1rem;
+            align-items: center;
+        }
+
+        /* Mitarbeiter Label */
+        #Bezeichnungsfeld263 {
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* Checkboxen & Labels */
+        #cbVerplantVerfuegbar,
+        #IstVerfuegbar,
+        #IstAktiv,
+        #cbNur34a {
+            width: 17px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        #lbl_VerplantVerfuegbar,
+        #lbl_NurFreie,
+        #lbl_IstAktiv,
+        #lbl_Nur34a {
+            font-size: 10px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Alle Mitarbeiter anfragen Button - GRÜN */
+        #btnMail {
+            min-width: 160px;
+            padding: 0.25rem 0.5rem;
+            height: 28px;
+            background-color: #f0f0f0;
+            border: 1px solid #666;
+            font-weight: bold;
+            font-size: 10px;
+            color: #008000;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* Anstellung Label & ComboBox */
+        #Bezeichnungsfeld517 {
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        #cboAnstArt {
+            width: 133px;
+            height: 19px;
+            font-size: 10px;
+            border: 1px solid #ccc;
+        }
+
+        /* Gesamt Label & TextBox */
+        #Bezeichnungsfeld9 {
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        #iGes_MA {
+            width: 80px;
+            height: 19px;
+            font-size: 10px;
+            font-weight: bold;
+            background-color: #e9e9e9;
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+        }
+
+        /* Kategorie Label & ComboBox */
+        #Bezeichnungsfeld269 {
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        #cboQuali {
+            width: 133px;
+            height: 19px;
+            font-size: 10px;
+            border: 1px solid #ccc;
+        }
+
+        /* === LISTEN-HEADER-ZEILE === */
+        .lists-header-row {
+            display: grid;
+            grid-template-columns: 210px 1fr 70px 320px 70px 260px;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .list-header-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: space-between;
+        }
+
+        .search-group {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Dienstbeginn Label */
+        #Bezeichnungsfeld7 {
+            font-size: 11px;
+            color: #404040;
+            white-space: nowrap;
+        }
+
+        /* Mitarbeiterauswahl durch Doppelklick Label */
+        #Bezeichnungsfeld5 {
+            font-size: 11px;
+            color: #404040;
+            white-space: nowrap;
+        }
+
+        /* Schnellsuche */
+        #strSchnellSuche {
+            width: 80px;
+            height: 19px;
+            font-size: 10px;
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+        }
+        #btnSchnellGo {
+            width: 38px;
+            height: 20px;
+            background-color: #8B0000;
+            color: white;
+            border: none;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Mitarbeiter geplant Label */
+        #Bezeichnungsfeld24 {
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        #btnSortPLan {
+            width: 77px;
+            height: 19px;
+            font-size: 9px;
+            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        /* Mitarbeiter zugesagt Label */
+        #Bezeichnungsfeld32 {
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        #btnSortZugeord {
+            width: 77px;
+            height: 19px;
+            font-size: 9px;
+            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        /* === LISTBOXES === */
+        /* Zeiten ListBox */
+        #lstZeiten {
+            width: 100%;
+            height: 150px;
+            flex-shrink: 0;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            overflow-y: auto;
+            font-size: 10px;
+        }
+
+        /* MA ListBox */
+        #List_MA {
+            width: 100%;
+            flex: 1;
+            min-height: 300px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            overflow-y: auto;
+            font-size: 10px;
+        }
+
+        /* MA Geplant ListBox */
+        #lstMA_Plan {
+            width: 100%;
+            flex: 1;
+            min-height: 300px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            overflow-y: auto;
+            font-size: 10px;
+        }
+
+        /* MA Zugesagt ListBox */
+        #lstMA_Zusage {
+            width: 100%;
+            flex: 1;
+            min-height: 300px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            overflow-y: auto;
+            font-size: 10px;
+        }
+
+        /* Parallele Einsätze ListBox */
+        #Lst_Parallel_Einsatz {
+            width: 100%;
+            flex: 1;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            overflow-y: auto;
+            font-size: 10px;
+        }
+
+        /* === BUTTON-GRUPPEN === */
+        .button-group-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .button-group-center {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            justify-content: flex-start;
+            padding: 1rem 0;
+        }
+
+        /* Sort/Standard/Entfernung Buttons */
+        #cmdListMA_Standard,
+        #cmdListMA_Entfernung {
+            width: 100%;
+            max-width: 100px;
+            height: 23px;
+            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Auswählen Button */
+        #btnAddSelected {
+            width: 100%;
+            max-width: 100px;
+            height: 34px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Entfernen Button */
+        #btnDelSelected {
+            width: 100%;
+            max-width: 100px;
+            height: 34px;
+            background-color: #ffcccc;
+            border: 1px solid #cc0000;
+            font-weight: bold;
+            font-size: 10px;
+            color: #cc0000;
+            cursor: pointer;
+        }
+
+        /* Alle Button */
+        #btnDelAll {
+            width: 100%;
+            max-width: 100px;
+            height: 34px;
+            background-color: #ffcccc;
+            border: 1px solid #cc0000;
+            font-weight: bold;
+            font-size: 10px;
+            color: #cc0000;
+            cursor: pointer;
+        }
+
+        /* Auswählen (Geplant) Button */
+        #btnAddZusage {
+            width: 100%;
+            max-width: 100px;
+            height: 34px;
+            background-color: #95B3D7;
+            border: 1px solid #666;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Verschieben Button */
+        #btnMoveZusage {
+            width: 100%;
+            max-width: 100px;
+            height: 34px;
+            background-color: #D6DFEC;
+            border: 1px solid #666;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Löschen Button */
+        #btnDelZusage {
+            width: 100%;
+            max-width: 100px;
+            height: 34px;
+            background-color: #ffcccc;
+            border: 1px solid #cc0000;
+            font-weight: bold;
+            font-size: 10px;
+            color: #cc0000;
+            cursor: pointer;
+        }
+
+        /* === ZUSÄTZLICHE CONTROLS === */
+        /* Endzeit Label & TextBox */
+        .endzeit-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #Bezeichnungsfeld48 {
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        #DienstEnde {
+            width: 67px;
+            height: 19px;
+            font-size: 10px;
+            background-color: #e9e9e9;
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+        }
+
+        /* Parallele Einsätze Label */
+        #Bezeichnungsfeld37 {
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* Info Labels */
+        .info-row {
+            display: grid;
+            grid-template-columns: 210px 1fr 350px 280px;
+            gap: 0.75rem;
+        }
+
+        #Bezeichnungsfeld62,
+        #Bezeichnungsfeld63 {
+            font-size: 8px;
+            color: #666;
+        }
+
+        /* ============================================ */
+        /* LISTBOX STYLES                              */
+        /* ============================================ */
+
+        .listbox-header {
+            display: grid;
+            background-color: #e0e0e0;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+            padding: 4px;
+        }
+
+        .listbox-row {
+            display: grid;
+            padding: 3px 4px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .listbox-row:hover {
+            background-color: #e8f4fc;
+        }
+
+        .listbox-row.selected {
+            background-color: #8B0000;
+            color: white;
+        }
+
+        .listbox-row.geplant {
+            background-color: #fff3cd;
+        }
+
+        .listbox-row.zugesagt {
+            background-color: #d4edda;
+        }
+
+        /* Zeit ListBox Grid */
+        #lstZeiten .listbox-header {
+            grid-template-columns: 50px 50px 35px 35px;
+        }
+        #lstZeiten .listbox-row {
+            grid-template-columns: 50px 50px 35px 35px;
+        }
+
+        /* MA ListBox Grid - 5 Spalten wie im Screenshot */
+        #List_MA .listbox-header {
+            grid-template-columns: 140px 45px 50px 50px 100px;
+        }
+        #List_MA .listbox-row {
+            grid-template-columns: 140px 45px 50px 50px 100px;
+        }
+
+        /* Plan ListBox Grid - 4 Spalten wie im Screenshot */
+        #lstMA_Plan .listbox-header {
+            grid-template-columns: 30px 100px 80px 50px;
+        }
+        #lstMA_Plan .listbox-row {
+            grid-template-columns: 30px 100px 80px 50px;
+        }
+
+        /* Zusage ListBox Grid */
+        #lstMA_Zusage .listbox-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Button Hover Effects */
+        button:hover {
+            filter: brightness(0.95);
+        }
+
+        /* Standard Button Style */
+        button {
+            font-family: inherit;
+        }
+
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+        }
+
+        /* ============================================ */
+        /* MEDIA QUERIES - Responsive Design          */
+        /* ============================================ */
+
+        /* Extra große Bildschirme (2K+) - 6 Spalten */
+        @media (min-width: 2000px) {
+            .form-container {
+                max-width: 2400px;
+            }
+            .lists-container {
+                grid-template-columns: 250px 1fr 80px 380px 80px 300px;
+            }
+            .lists-header-row {
+                grid-template-columns: 250px 1fr 80px 380px 80px 300px;
+            }
+        }
+
+        /* Große Bildschirme (Full HD) - 6 Spalten */
+        @media (min-width: 1600px) and (max-width: 1999px) {
+            .lists-container {
+                grid-template-columns: 210px 1fr 70px 320px 70px 260px;
+            }
+            .lists-header-row {
+                grid-template-columns: 210px 1fr 70px 320px 70px 260px;
+            }
+        }
+
+        /* Mittlere Bildschirme (kleiner als Full HD) - 6 Spalten */
+        @media (max-width: 1599px) {
+            .lists-container {
+                grid-template-columns: 180px 1fr 60px 280px 60px 220px;
+                gap: 0.4rem;
+            }
+            .lists-header-row {
+                grid-template-columns: 180px 1fr 60px 280px 60px 220px;
+                gap: 0.4rem;
+            }
+            .detail-content {
+                grid-template-columns: 160px 1fr;
+            }
+            #frm_Menuefuehrung {
+                width: 160px;
+            }
+            .button-column button {
+                width: 50px;
+                font-size: 8px;
+            }
+        }
+
+        /* Kleine Bildschirme (1024-1366px) - Vertikales Layout */
+        @media (max-width: 1366px) {
+            .form-container {
+                min-width: 1024px;
+            }
+            .lists-container {
+                grid-template-columns: 1fr 60px 1fr 60px 1fr;
+                grid-template-rows: auto auto;
+                max-height: none;
+            }
+            .lists-header-row {
+                grid-template-columns: 1fr 60px 1fr 60px 1fr;
+            }
+            .left-column {
+                grid-column: 1 / -1;
+                grid-row: 1;
+                max-height: 200px;
+            }
+            .center-column {
+                grid-column: 1;
+                grid-row: 2;
+                max-height: 400px;
+            }
+            .button-column:first-of-type {
+                grid-column: 2;
+                grid-row: 2;
+            }
+            .right-column-plan {
+                grid-column: 3;
+                grid-row: 2;
+                max-height: 400px;
+            }
+            .button-column:last-of-type {
+                grid-column: 4;
+                grid-row: 2;
+            }
+            .right-column-zusage {
+                grid-column: 5;
+                grid-row: 2;
+                max-height: 400px;
+            }
+            .detail-content {
+                grid-template-columns: 1fr;
+            }
+            #frm_Menuefuehrung {
+                display: none; /* Sidebar ausblenden bei kleinen Bildschirmen */
+            }
+            .auftrag-row {
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .filter-row-1,
+            .filter-row-2,
+            .filter-row-3 {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Hochformat-Modus */
+        @media (orientation: portrait) {
+            .lists-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body data-active-menu="schnellauswahl" data-menu-style="access" class="hide-app-sidebar">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="app-main">
+    <div class="form-container">
+        <!-- HEADER SECTION -->
+        <div class="form-header">
+            <div class="header-content">
+                <div class="header-left-section">
+                    <span id="Auto_Kopfzeile0">Mitarbeiterauswahl</span>
+                    <span id="lbl_Datum"></span>
+                    <button id="btnHilfe" title="Hilfe">?</button>
+                    <button id="Befehl38" title="Schließen">&times;</button>
+                </div>
+                <div class="header-center-section">
+                    <button id="btnAuftrag">Zurück zum Auftrag</button>
+                    <button id="btnPosListe">Positionsliste</button>
+                    <button id="btnZuAbsage">Manuelles Bearbeiten</button>
+                    <span id="lbAuftrag">-- Bitte Auftrag wählen --</span>
+                </div>
+                <div class="header-right-section">
+                    <button id="btnRibbonAus" style="display:none">-</button>
+                    <button id="btnDaBaAus" style="display:none">-</button>
+                    <button id="btnDaBaEin" style="display:none">+</button>
+                    <button id="btnRibbonEin" style="display:none">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAIL SECTION -->
+        <div class="form-detail">
+            <div class="detail-content">
+                <!-- Sidebar/Menu - ROT -->
+                <iframe id="frm_Menuefuehrung" src="./frm_Menuefuehrung_sidebar.html"></iframe>
+
+                <!-- Hauptinhalt -->
+                <div class="main-content-area">
+                    <!-- Auftrag Zeile -->
+                    <div class="auftrag-row">
+                        <span id="Bezeichnungsfeld1">Auftrag:</span>
+                        <select id="VA_ID">
+                            <option value="">-- Auftrag wählen --</option>
+                        </select>
+                        <span id="Bezeichnungsfeld26">Datum:</span>
+                        <select id="cboVADatum">
+                            <option value="">-- Datum --</option>
+                        </select>
+                        <button id="btnMailSelected">Nur Selektierte anfragen</button>
+                        <span id="Bezeichnungsfeld35">Auftragsstatus</span>
+                        <select id="cboAuftrStatus">
+                            <option value="">-</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Zeile 1 -->
+                    <div class="filter-row-1">
+                        <span id="Bezeichnungsfeld263">Mitarbeiter</span>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="cbVerplantVerfuegbar">
+                            <label id="lbl_VerplantVerfuegbar" for="cbVerplantVerfuegbar">geplant = verfügbar</label>
+                        </div>
+                        <div></div>
+                        <button id="btnMail">Alle Mitarbeiter anfragen</button>
+                        <div class="control-group">
+                            <span id="Bezeichnungsfeld517">Anstellung:</span>
+                            <select id="cboAnstArt">
+                                <option value="">Alle</option>
+                                <option value="3">Festangestellt</option>
+                                <option value="5">Aushilfe</option>
+                                <option value="9">Subunternehmer</option>
+                                <option value="11">Student</option>
+                                <option value="13">Minijob</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Filter Zeile 2 -->
+                    <div class="filter-row-2">
+                        <span id="Bezeichnungsfeld9">Gesamt:</span>
+                        <input type="text" id="iGes_MA" readonly value="0">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="IstVerfuegbar">
+                            <label id="lbl_NurFreie" for="IstVerfuegbar">Nur freie anzeigen</label>
+                        </div>
+                        <div></div>
+                        <div></div>
+                        <span id="Bezeichnungsfeld269">Kategorie:</span>
+                        <select id="cboQuali">
+                            <option value="">Alle</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Zeile 3 -->
+                    <div class="filter-row-3">
+                        <div></div>
+                        <div></div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="IstAktiv" checked>
+                            <label id="lbl_IstAktiv" for="IstAktiv">Nur aktive anzeigen</label>
+                        </div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+
+                    <!-- Listen Header Zeile (6 Spalten) -->
+                    <div class="lists-header-row">
+                        <span id="Bezeichnungsfeld7">Dienstbeginn auswählen:</span>
+                        <div class="list-header-section">
+                            <span id="Bezeichnungsfeld5">Mitarbeiterauswahl durch Doppelklick</span>
+                            <div class="search-group">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="cbNur34a">
+                                    <label id="lbl_Nur34a" for="cbNur34a">Nur 34a</label>
+                                </div>
+                                <input type="text" id="strSchnellSuche" placeholder="Suche...">
+                                <button id="btnSchnellGo">GO</button>
+                            </div>
+                        </div>
+                        <div></div><!-- Platzhalter für Button-Spalte 3 -->
+                        <div class="list-header-section">
+                            <span id="Bezeichnungsfeld24">Mitarbeiter geplant:</span>
+                            <button id="btnSortPLan">Sortieren</button>
+                        </div>
+                        <div></div><!-- Platzhalter für Button-Spalte 5 -->
+                        <div class="list-header-section">
+                            <span id="Bezeichnungsfeld32">Mitarbeiter zugesagt:</span>
+                            <button id="btnSortZugeord">Sortieren</button>
+                        </div>
+                    </div>
+
+                    <!-- Listen Container (6 Spalten) -->
+                    <div class="lists-container">
+                        <!-- Spalte 1: Zeiten + Parallele Einsätze -->
+                        <div class="left-column">
+                            <div id="lstZeiten">
+                                <div class="listbox-header">
+                                    <span>Ist</span>
+                                    <span>Soll</span>
+                                    <span>Beginn</span>
+                                    <span>Ende</span>
+                                </div>
+                            </div>
+                            <div class="endzeit-group">
+                                <span id="Bezeichnungsfeld48">Endzeit:</span>
+                                <input type="text" id="DienstEnde" readonly>
+                            </div>
+                            <span id="Bezeichnungsfeld37">Parallele Einsätze:</span>
+                            <div id="Lst_Parallel_Einsatz"></div>
+                        </div>
+
+                        <!-- Spalte 2: MA-Liste -->
+                        <div class="center-column">
+                            <div id="List_MA">
+                                <div class="listbox-header">
+                                    <span>Name</span>
+                                    <span>Std</span>
+                                    <span>Beginn</span>
+                                    <span>Ende</span>
+                                    <span>Grund</span>
+                                </div>
+                                <div id="List_MA_Body"></div>
+                            </div>
+                            <div class="button-group-vertical">
+                                <button id="cmdListMA_Standard">Standard</button>
+                                <button id="cmdListMA_Entfernung">Entfernung</button>
+                            </div>
+                        </div>
+
+                        <!-- Spalte 3: Buttons MA → Plan -->
+                        <div class="button-column">
+                            <button id="btnAddSelected" title="Ausgewählte MA zur Planung hinzufügen">→</button>
+                            <button id="btnDelSelected" title="Ausgewählte MA aus Planung entfernen">←</button>
+                            <button id="btnDelAll" title="Alle aus Planung entfernen">✕</button>
+                        </div>
+
+                        <!-- Spalte 4: Plan-Liste -->
+                        <div class="right-column-plan">
+                            <div id="lstMA_Plan">
+                                <div class="listbox-header">
+                                    <span>Lfd</span>
+                                    <span>Nachname</span>
+                                    <span>Vorname</span>
+                                    <span>Beginn</span>
+                                </div>
+                                <div id="lstMA_Plan_Body"></div>
+                            </div>
+                        </div>
+
+                        <!-- Spalte 5: Buttons Plan → Zusage -->
+                        <div class="button-column">
+                            <button id="btnAddZusage" title="Zur Zusage verschieben">→</button>
+                            <button id="btnMoveZusage" title="Zurück zur Planung">←</button>
+                            <button id="btnDelZusage" title="Aus Zusage entfernen">✕</button>
+                        </div>
+
+                        <!-- Spalte 6: Zusage-Liste -->
+                        <div class="right-column-zusage">
+                            <div id="lstMA_Zusage"></div>
+                        </div>
+                    </div>
+
+                    <!-- Info Zeile (6 Spalten) -->
+                    <div class="info-row" style="display: grid; grid-template-columns: 210px 1fr 70px 320px 70px 260px; gap: 0.5rem;">
+                        <div></div>
+                        <span id="Bezeichnungsfeld62" style="font-size: 10px; color: #666;">Doppelklick wählt automatisch aus</span>
+                        <div></div>
+                        <span id="Bezeichnungsfeld63" style="font-size: 10px; color: #666;">Doppelklick entfernt automatisch</span>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/api-autostart.js"></script>
+    <script>
+        // =====================================================
+        // API & State
+        // =====================================================
+        const API_BASE = 'http://localhost:5000/api';
+
+        const state = {
+            auftraege: [],
+            mitarbeiter: [],
+            geplant: [],
+            zugesagt: [],
+            zeiten: [],
+            selectedVA: null,
+            selectedVADatum: null,
+            selectedZeit: null,
+            selectedMAs: new Set()
+        };
+
+        // =====================================================
+        // Init
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('embedded') === '1') {
+                document.body.classList.add('embedded');
+            }
+            if (window.ApiAutostart) {
+                await window.ApiAutostart.init();
+            }
+            // Datum setzen
+            document.getElementById('lbl_Datum').textContent = new Date().toLocaleDateString('de-DE');
+
+            // Event Listener
+            setupEventListeners();
+
+            // Daten laden
+            await loadAuftraege();
+            await loadQualifikationen();
+
+            // URL Parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            let vaId = urlParams.get('va_id');
+            if (!vaId) {
+                vaId = localStorage.getItem('consec_va_id');
+            }
+            if (vaId) {
+                document.getElementById('VA_ID').value = vaId;
+                await handleAuftragChange(vaId);
+            }
+        });
+
+        // =====================================================
+        // Event Listeners
+        // =====================================================
+        function setupEventListeners() {
+            // Auftrag
+            document.getElementById('VA_ID').addEventListener('change', (e) => handleAuftragChange(e.target.value));
+            document.getElementById('cboVADatum').addEventListener('change', (e) => handleDatumChange(e.target.value));
+
+            // Filter
+            document.getElementById('IstAktiv').addEventListener('change', renderMAListe);
+            document.getElementById('IstVerfuegbar').addEventListener('change', renderMAListe);
+            document.getElementById('cbNur34a').addEventListener('change', renderMAListe);
+            document.getElementById('cboAnstArt').addEventListener('change', renderMAListe);
+            document.getElementById('cboQuali').addEventListener('change', renderMAListe);
+            document.getElementById('strSchnellSuche').addEventListener('input', renderMAListe);
+            document.getElementById('btnSchnellGo').addEventListener('click', renderMAListe);
+
+            // Buttons
+            document.getElementById('btnAddSelected').addEventListener('click', addSelectedToGeplant);
+            document.getElementById('btnDelSelected').addEventListener('click', removeSelectedFromGeplant);
+            document.getElementById('btnAuftrag').addEventListener('click', () => {
+                if (state.selectedVA) {
+                    const url = new URL(`frm_VA_Auftragstamm.html?id=${state.selectedVA}`, window.location.href).href;
+                    window.location.href = url;
+                }
+            });
+            document.getElementById('Befehl38').addEventListener('click', () => window.close());
+            document.getElementById('btnMail').addEventListener('click', () => sendMailRequest('all'));
+            document.getElementById('btnMailSelected').addEventListener('click', () => sendMailRequest('selected'));
+        }
+
+        // =====================================================
+        // Data Loading
+        // =====================================================
+        async function loadAuftraege() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const response = await fetch(`${API_BASE}/auftraege?ab_datum=${today}&limit=200`);
+                const result = await response.json();
+                state.auftraege = result.data || [];
+
+                const select = document.getElementById('VA_ID');
+                select.innerHTML = '<option value="">-- Auftrag wählen --</option>' +
+                    state.auftraege.map(a =>
+                        `<option value="${a.ID}">${formatDate(a.Dat_VA_Von)} ${a.Auftrag || ''} ${a.Objekt || ''} ${a.Ort || ''}</option>`
+                    ).join('');
+            } catch (e) {
+                console.error('Fehler:', e);
+            }
+        }
+
+        async function loadQualifikationen() {
+            const select = document.getElementById('cboQuali');
+            select.innerHTML = '<option value="">Alle</option><option value="1">Sicherheit</option><option value="2">Ordner</option><option value="3">Fahrer</option>';
+        }
+
+        async function handleAuftragChange(vaId) {
+            if (!vaId) { state.selectedVA = null; return; }
+            state.selectedVA = parseInt(vaId);
+
+            try {
+                const response = await fetch(`${API_BASE}/auftraege/${vaId}`);
+                const result = await response.json();
+                const auftrag = result.data?.auftrag || result.data || result;
+
+                document.getElementById('lbAuftrag').textContent =
+                    `${formatDate(auftrag.Dat_VA_Von)} ${auftrag.Auftrag || ''} ${auftrag.Objekt || ''} ${auftrag.Ort || ''}`;
+
+                // Einsatztage laden
+                const tageResp = await fetch(`${API_BASE}/einsatztage?va_id=${vaId}`);
+                const tageResult = await tageResp.json();
+                const tage = tageResult.data || [];
+
+                const datumSelect = document.getElementById('cboVADatum');
+                datumSelect.innerHTML = '<option value="">-- Datum --</option>' +
+                    tage.map(t => `<option value="${t.ID}">${formatDate(t.VADatum)}</option>`).join('');
+
+            } catch (e) {
+                console.error('Fehler:', e);
+            }
+        }
+
+        async function handleDatumChange(vaDatumId) {
+            if (!vaDatumId) { state.selectedVADatum = null; return; }
+            state.selectedVADatum = parseInt(vaDatumId);
+
+            await loadSchichten();
+            await loadMitarbeiter();
+            await loadGeplantZugesagt();
+        }
+
+        async function loadSchichten() {
+            try {
+                const response = await fetch(`${API_BASE}/dienstplan/schichten?va_id=${state.selectedVA}`);
+                const result = await response.json();
+                state.zeiten = result.data || [];
+                renderZeitenListe();
+
+                const gesamt = state.zeiten.reduce((s, z) => s + (z.MA_Anzahl || 0), 0);
+                document.getElementById('iGes_MA').value = gesamt;
+            } catch (e) {
+                console.error('Fehler:', e);
+            }
+        }
+
+        async function loadMitarbeiter() {
+            try {
+                const response = await fetch(`${API_BASE}/mitarbeiter?aktiv=true`);
+                const result = await response.json();
+                state.mitarbeiter = result.data || [];
+                renderMAListe();
+            } catch (e) {
+                console.error('Fehler:', e);
+            }
+        }
+
+        async function loadGeplantZugesagt() {
+            try {
+                const response = await fetch(`${API_BASE}/zuordnungen?va_id=${state.selectedVA}`);
+                const result = await response.json();
+                const zuordnungen = result.data || [];
+
+                state.geplant = zuordnungen.filter(z => !z.Bestaetigt);
+                state.zugesagt = zuordnungen.filter(z => z.Bestaetigt);
+
+                renderGeplantListe();
+                renderZugesagtListe();
+            } catch (e) {
+                console.error('Fehler:', e);
+            }
+        }
+
+        // =====================================================
+        // Rendering
+        // =====================================================
+        function renderZeitenListe() {
+            const container = document.getElementById('lstZeiten');
+            const header = '<div class="listbox-header"><span>Ist</span><span>Soll</span><span>Beginn</span><span>Ende</span></div>';
+
+            if (!state.zeiten.length) {
+                container.innerHTML = header + '<div style="padding:10px;color:#888;">Keine Schichten</div>';
+                return;
+            }
+
+            container.innerHTML = header + state.zeiten.map((z, i) => `
+                <div class="listbox-row ${state.selectedZeit === i ? 'selected' : ''}" data-idx="${i}">
+                    <span>${z.MA_Anzahl_Ist || 0}</span>
+                    <span>${z.MA_Anzahl || 0}</span>
+                    <span>${formatTime(z.VA_Start)}</span>
+                    <span>${formatTime(z.VA_Ende)}</span>
+                </div>
+            `).join('');
+
+            container.querySelectorAll('.listbox-row[data-idx]').forEach(row => {
+                row.addEventListener('click', () => {
+                    state.selectedZeit = parseInt(row.dataset.idx);
+                    container.querySelectorAll('.listbox-row').forEach(r => r.classList.remove('selected'));
+                    row.classList.add('selected');
+                    document.getElementById('DienstEnde').value = formatTime(state.zeiten[state.selectedZeit]?.VA_Ende);
+        });
+
+        async function sendMailRequest(mode) {
+            const vaId = document.getElementById('VA_ID').value;
+            const vadatumId = document.getElementById('cboVADatum').value;
+            if (!vaId || !vadatumId) {
+                alert('Bitte Auftrag und Datum waehlen.');
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/requests/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        va_id: parseInt(vaId, 10),
+                        vadatum_id: parseInt(vadatumId, 10),
+                        mode,
+                        recipient: 'siegert@consec-nuernberg.de'
+                    })
+                });
+                const result = await res.json();
+                if (!res.ok || !result.ok) {
+                    alert('E-Mail Fehler: ' + (result.error || result.stderr || 'Unbekannt'));
+                    return;
+                }
+                alert('E-Mail Versand ausgelost (nur Testadresse).');
+            } catch (err) {
+                alert('E-Mail Fehler: ' + err.message);
+            }
+        }
+            });
+        }
+
+        function renderMAListe() {
+            const container = document.getElementById('List_MA_Body');
+            const nurAktive = document.getElementById('IstAktiv').checked;
+            const nurFreie = document.getElementById('IstVerfuegbar').checked;
+            const nur34a = document.getElementById('cbNur34a').checked;
+            const anst = document.getElementById('cboAnstArt').value;
+            const suche = document.getElementById('strSchnellSuche').value.toLowerCase();
+
+            let filtered = state.mitarbeiter.filter(ma => {
+                if (nurAktive && !ma.IstAktiv) return false;
+                if (nur34a && !ma.Hat34a) return false;
+                if (anst && ma.Anstellungsart_ID != anst) return false;
+                if (suche && !`${ma.Nachname} ${ma.Vorname}`.toLowerCase().includes(suche)) return false;
+                return true;
+            });
+
+            if (!filtered.length) {
+                container.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">Keine Mitarbeiter</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(ma => {
+                const isGeplant = state.geplant.some(g => g.MA_ID === ma.ID);
+                const isZugesagt = state.zugesagt.some(z => z.MA_ID === ma.ID);
+                const isSelected = state.selectedMAs.has(ma.ID);
+                let cls = isZugesagt ? 'zugesagt' : (isGeplant ? 'geplant' : (isSelected ? 'selected' : ''));
+
+                return `
+                    <div class="listbox-row ${cls}" data-id="${ma.ID}">
+                        <span>${ma.Nachname || ''}, ${ma.Vorname || ''}</span>
+                        <span>${ma.Stunden || ''}</span>
+                        <span>${ma.Beginn || ''}</span>
+                        <span>${ma.Ende || ''}</span>
+                        <span>${isZugesagt ? 'Zugesagt' : (isGeplant ? 'Geplant' : (ma.Grund || ''))}</span>
+                    </div>
+                `;
+            }).join('');
+
+            container.querySelectorAll('.listbox-row[data-id]').forEach(row => {
+                const id = parseInt(row.dataset.id);
+
+                row.addEventListener('click', () => {
+                    if (state.selectedMAs.has(id)) {
+                        state.selectedMAs.delete(id);
+                        row.classList.remove('selected');
+                    } else {
+                        state.selectedMAs.add(id);
+                        row.classList.add('selected');
+                    }
+                });
+
+                row.addEventListener('dblclick', () => {
+                    addMAToGeplant(id);
+                });
+            });
+        }
+
+        function renderGeplantListe() {
+            const container = document.getElementById('lstMA_Plan_Body');
+            if (!state.geplant.length) {
+                container.innerHTML = '<div style="padding:10px;color:#888;">Keine geplanten MA</div>';
+                return;
+            }
+            container.innerHTML = state.geplant.map((z, i) => `
+                <div class="listbox-row" data-id="${z.ID}">
+                    <span>${i + 1}</span>
+                    <span>${z.Nachname || ''}</span>
+                    <span>${z.Vorname || ''}</span>
+                    <span>${formatTime(z.VA_Start)}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderZugesagtListe() {
+            const container = document.getElementById('lstMA_Zusage');
+            if (!state.zugesagt.length) {
+                container.innerHTML = '<div style="padding:10px;color:#888;">Keine zugesagten MA</div>';
+                return;
+            }
+            container.innerHTML = state.zugesagt.map(z => `
+                <div class="listbox-row" data-id="${z.ID}">
+                    <span>${z.Nachname}, ${z.Vorname}</span>
+                    <span style="font-size:9px;color:#666;">${formatTime(z.VA_Start)}</span>
+                </div>
+            `).join('');
+        }
+
+        // =====================================================
+        // Actions
+        // =====================================================
+        async function addSelectedToGeplant() {
+            if (!state.selectedMAs.size) { alert('Bitte Mitarbeiter auswählen'); return; }
+            if (!state.selectedVA || !state.selectedVADatum) { alert('Bitte Auftrag und Datum wählen'); return; }
+
+            for (const maId of state.selectedMAs) {
+                await addMAToGeplant(maId);
+            }
+            state.selectedMAs.clear();
+            await loadGeplantZugesagt();
+            renderMAListe();
+        }
+
+        async function addMAToGeplant(maId) {
+            try {
+                await fetch(`${API_BASE}/zuordnungen`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ma_id: maId,
+                        va_id: state.selectedVA,
+                        vadatum_id: state.selectedVADatum,
+                        vastart_id: state.zeiten[state.selectedZeit]?.ID
+                    })
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function removeSelectedFromGeplant() {
+            alert('Funktion: Entfernen');
+        }
+
+        // =====================================================
+        // Helpers
+        // =====================================================
+        function formatDate(d) {
+            if (!d) return '';
+            try { return new Date(d).toLocaleDateString('de-DE'); } catch { return d; }
+        }
+
+        function formatTime(t) {
+            if (!t) return '';
+            if (typeof t === 'number' && t < 1) {
+                const h = Math.floor(t * 24), m = Math.round((t * 24 - h) * 60);
+                return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+            }
+            return typeof t === 'string' && t.includes(':') ? t.substring(0,5) : t;
+        }
+    </script>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+</body>
+</html>

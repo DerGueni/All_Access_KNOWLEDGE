@@ -1,0 +1,551 @@
+/* ========================================
+   frm_va_Auftragstamm.css
+   Access-ähnliches Layout
+   ======================================== */
+
+/* Reset & Base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 11px;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+/* ========== FORM CONTAINER ========== */
+.access-form {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #e8e8e8;
+}
+
+/* ========== HEADER ========== */
+.form-header {
+    display: flex;
+    background: linear-gradient(180deg, #4316B2 0%, #2f5496 100%);
+    color: white;
+    padding: 8px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.header-left {
+    width: 180px;
+    flex-shrink: 0;
+}
+
+.header-main {
+    flex: 1;
+    min-width: 600px;
+}
+
+.header-right {
+    width: 200px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+
+.title-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 6px;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.toolbar-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.version-label,
+.date-label {
+    font-size: 10px;
+    color: #ccc;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+}
+
+.status-row label {
+    white-space: nowrap;
+}
+
+/* ========== BUTTONS ========== */
+.btn-action {
+    background: linear-gradient(180deg, #fff 0%, #e0e0e0 100%);
+    border: 1px solid #888;
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-action:hover {
+    background: linear-gradient(180deg, #e8f0ff 0%, #c0d0f0 100%);
+    border-color: #4316B2;
+}
+
+.btn-action:active {
+    background: #c0d0f0;
+}
+
+.btn-nav {
+    background: #fff;
+    border: 1px solid #888;
+    border-radius: 2px;
+    padding: 2px 6px;
+    font-size: 10px;
+    cursor: pointer;
+    min-width: 22px;
+}
+
+.btn-nav:hover {
+    background: #e0e8ff;
+}
+
+.btn-small {
+    background: #fff;
+    border: 1px solid #888;
+    border-radius: 2px;
+    padding: 2px 8px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.btn-small:hover {
+    background: #e0e8ff;
+}
+
+.btn-tiny {
+    background: #ddd;
+    border: 1px solid #999;
+    border-radius: 2px;
+    padding: 1px 4px;
+    font-size: 9px;
+    cursor: pointer;
+}
+
+.btn-close {
+    background: #c00;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.btn-close:hover {
+    background: #f00;
+}
+
+/* ========== INPUT CONTROLS ========== */
+.txt-control {
+    border: 1px solid #888;
+    border-radius: 2px;
+    padding: 3px 5px;
+    font-size: 11px;
+    background: white;
+}
+
+.txt-control:focus {
+    border-color: #4316B2;
+    outline: none;
+    box-shadow: 0 0 3px rgba(68, 114, 196, 0.5);
+}
+
+.txt-readonly {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.txt-small {
+    width: 80px;
+}
+
+.txt-time {
+    width: 60px;
+}
+
+.txt-date {
+    width: 80px;
+}
+
+.txt-wide {
+    width: 280px;
+}
+
+.txt-multiline {
+    width: 100%;
+    height: 300px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 11px;
+    padding: 5px;
+    border: 1px solid #888;
+}
+
+.cbo-control {
+    border: 1px solid #888;
+    border-radius: 2px;
+    padding: 2px 4px;
+    font-size: 11px;
+    background: white;
+    cursor: pointer;
+}
+
+.cbo-control:focus {
+    border-color: #4316B2;
+    outline: none;
+}
+
+.cbo-wide {
+    width: 280px;
+}
+
+.cbo-small {
+    width: 60px;
+}
+
+/* ========== STAMMDATEN SECTION ========== */
+.stammdaten-section {
+    background: #f8f8f8;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 15px;
+}
+
+.stammdaten-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 8px 20px;
+}
+
+.field-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.field-group label {
+    min-width: 100px;
+    font-weight: 500;
+    color: #333;
+}
+
+.field-wide {
+    grid-column: span 2;
+}
+
+@media (max-width: 800px) {
+    .field-wide {
+        grid-column: span 1;
+    }
+}
+
+/* ========== MAIN CONTENT ========== */
+.main-content {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+/* ========== TAB CONTAINER ========== */
+.tab-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.tab-buttons {
+    display: flex;
+    background: #e0e0e0;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab-btn {
+    background: #e8e8e8;
+    border: none;
+    border-right: 1px solid #ccc;
+    padding: 8px 16px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.tab-btn:hover {
+    background: #d0d8e8;
+}
+
+.tab-btn.active {
+    background: white;
+    border-bottom: 2px solid #4316B2;
+    font-weight: bold;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: auto;
+    padding: 10px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.tab-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ========== EINSATZLISTE TAB LAYOUT ========== */
+.einsatzliste-layout {
+    display: flex;
+    gap: 10px;
+    height: calc(100% - 50px);
+}
+
+.einsatzliste-left {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.einsatzliste-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ========== SUBFORM PLACEHOLDERS ========== */
+.subform-placeholder {
+    background: #f5f5f5;
+    border: 2px dashed #999;
+    border-radius: 4px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    color: #666;
+}
+
+.subform-placeholder .placeholder-label {
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.subform-placeholder .placeholder-link {
+    font-size: 10px;
+    color: #888;
+}
+
+.subform-large {
+    flex: 1;
+    min-height: 250px;
+}
+
+.subform-full {
+    flex: 1;
+    min-height: 300px;
+}
+
+/* ========== SIDEBAR (Auftragsliste) ========== */
+.auftragsliste-sidebar {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 10px;
+}
+
+/* ========== LABELS ========== */
+.section-label {
+    font-weight: bold;
+    font-size: 11px;
+    color: #333;
+    margin: 8px 0 4px 0;
+}
+
+.info-text {
+    font-size: 10px;
+    color: #666;
+    font-style: italic;
+}
+
+.lbl-inline {
+    font-size: 10px;
+    color: white;
+}
+
+/* ========== FOOTER ========== */
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    background: #e8e8e8;
+    border-top: 1px solid #ccc;
+    padding: 6px 15px;
+    font-size: 10px;
+}
+
+.footer-left,
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ========== UTILITY BUTTONS ========== */
+.utility-buttons {
+    position: fixed;
+    bottom: 50px;
+    left: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* ========== SUMME ROW ========== */
+.summe-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0;
+    justify-content: flex-end;
+}
+
+.summe-row label {
+    font-weight: bold;
+}
+
+/* ========== FILTER ROW ========== */
+.filter-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1200px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .auftragsliste-sidebar {
+        width: 100%;
+        max-height: 300px;
+    }
+
+    .einsatzliste-layout {
+        flex-direction: column;
+    }
+
+    .einsatzliste-left {
+        width: 100%;
+    }
+}
+
+@media (max-width: 800px) {
+    .form-header {
+        flex-direction: column;
+    }
+
+    .header-left,
+    .header-right {
+        width: 100%;
+    }
+
+    .header-main {
+        min-width: auto;
+    }
+
+    .toolbar-row {
+        justify-content: flex-start;
+    }
+
+    .tab-buttons {
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        flex: 1;
+        min-width: 100px;
+    }
+}
+
+/* ========== OPTIONGROUP / CHECKBOX ========== */
+input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* ========== RECTANGLES (decorative) ========== */
+.rectangle {
+    background: #ddd;
+    border: 1px solid #999;
+}

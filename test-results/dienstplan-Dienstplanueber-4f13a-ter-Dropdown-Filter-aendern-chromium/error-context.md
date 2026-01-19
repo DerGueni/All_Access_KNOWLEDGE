@@ -1,0 +1,43 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]: HAUPTMENUE
+    - button "Dienstplanübersicht" [ref=e4] [cursor=pointer]
+    - button "Planungsübersicht" [ref=e5] [cursor=pointer]
+    - button "Auftragsverwaltung" [ref=e6] [cursor=pointer]
+    - button "Mitarbeiterverwaltung" [ref=e7] [cursor=pointer]
+    - button "Offene Anfragen" [ref=e8] [cursor=pointer]
+  - generic [ref=e10]:
+    - generic [ref=e11]:
+      - button "X" [ref=e12] [cursor=pointer]
+      - generic [ref=e13]: Dienstplanübersicht
+      - textbox [ref=e15]: 2026-01-07
+      - button "Aktualisieren" [ref=e16] [cursor=pointer]
+      - button "+2" [ref=e17] [cursor=pointer]
+      - button "-2" [ref=e18] [cursor=pointer]
+      - button "Heute" [ref=e19] [cursor=pointer]
+      - combobox [ref=e20]:
+        - option "Nur aktive MA"
+        - option "Alle MA" [selected]
+        - option "Nur mit Einsatz"
+      - button "Dienstplaene senden" [ref=e21] [cursor=pointer]
+      - button "Einzeldienstplaene" [ref=e22] [cursor=pointer]
+      - textbox [ref=e23]: 2026-01-13
+      - button "Übersicht drucken" [ref=e24] [cursor=pointer]
+      - button "Outlook" [ref=e25] [cursor=pointer]
+      - button "Übersicht senden" [ref=e26] [cursor=pointer]
+      - generic [ref=e27]: HTML 1.0 | WebView2
+      - generic [ref=e28]: Mi., 07.01.26
+    - generic [ref=e29]:
+      - generic [ref=e30]: Mitarbeiter
+      - generic [ref=e31] [cursor=pointer]: Mi 07.01.
+      - generic [ref=e32] [cursor=pointer]: Do 08.01.
+      - generic [ref=e33] [cursor=pointer]: Fr 09.01.
+      - generic [ref=e34] [cursor=pointer]: Sa 10.01.
+      - generic [ref=e35] [cursor=pointer]: So 11.01.
+      - generic [ref=e36] [cursor=pointer]: Mo 12.01.
+      - generic [ref=e37] [cursor=pointer]: Di 13.01.
+      - generic [ref=e39]: "Fehler beim Laden: (zuordnungen || []).forEach is not a function"
+```

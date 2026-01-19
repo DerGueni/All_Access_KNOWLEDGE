@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter-Zeitkonten - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_MA_Zeitkonten.css">
+</head>
+<body>
+    <div class="zk-container">
+        <!-- Linkes Menue -->
+        <aside class="zk-menu">
+            <div class="menu-header">HAUPTMENUE</div>
+            <nav class="menu-buttons">
+                <a href="frm_N_Dienstplanuebersicht.html" class="menu-btn">Dienstplanuebersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="menu-btn">Planungsuebersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="menu-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="menu-btn">Mitarbeiterverwaltung</a>
+                <a href="frm_N_Email_versenden.html" class="menu-btn">Offene Mail Anfragen</a>
+                <a href="frm_MA_Zeitkonten.html" class="menu-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="menu-btn active">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="menu-btn">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="menu-btn">Dienstausweis erstellen</a>
+                <a href="frm_N_Stundenauswertung.html" class="menu-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="menu-btn">Kundenverwaltung</a>
+                <a href="frm_KD_Kundenstamm.html" class="menu-btn">Verrechnungssaetze</a>
+                <a href="frm_N_Lohnabrechnungen.html" class="menu-btn">Sub Rechnungen</a>
+                <a href="frm_N_Email_versenden.html" class="menu-btn">E-Mail</a>
+                <a href="frm_Menuefuehrung.html" class="menu-btn secondary">Menue 2</a>
+                <a href="frm_N_Optimierung.html" class="menu-btn secondary">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Hauptbereich -->
+        <main class="zk-main">
+            <!-- Header -->
+            <header class="zk-header">
+                <div class="header-left">
+                    <div class="zk-logo"></div>
+                    <h1 class="zk-title">Mitarbeiter-Zeitkonten</h1>
+                </div>
+                <div class="header-right">
+                    <span id="lblPeriode">-</span>
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Toolbar -->
+            <div class="zk-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Mitarbeiter:</label>
+                    <select id="cboMitarbeiter" class="zk-select" style="width:200px;">
+                        <option value="">-- Mitarbeiter waehlen --</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Zeitraum:</label>
+                    <select id="cboPeriode" class="zk-select" style="width:150px;">
+                        <option value="monat">Aktueller Monat</option>
+                        <option value="vormonat">Vormonat</option>
+                        <option value="quartal">Aktuelles Quartal</option>
+                        <option value="jahr">Aktuelles Jahr</option>
+                        <option value="custom">Benutzerdefiniert</option>
+                    </select>
+                </div>
+                <div class="toolbar-group" id="customDates" style="display:none;">
+                    <input type="date" id="datVon" class="zk-input">
+                    <span>bis</span>
+                    <input type="date" id="datBis" class="zk-input">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button id="btnAktualisieren" class="zk-btn primary">Aktualisieren</button>
+                    <button id="btnExport" class="zk-btn">Export</button>
+                    <button id="btnDrucken" class="zk-btn">Drucken</button>
+                </div>
+            </div>
+
+            <!-- Zusammenfassung -->
+            <div class="summary-bar">
+                <div class="summary-item">
+                    <span class="summary-label">Sollstunden:</span>
+                    <span class="summary-value" id="summSoll">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Iststunden:</span>
+                    <span class="summary-value" id="summIst">0:00</span>
+                </div>
+                <div class="summary-item highlight">
+                    <span class="summary-label">Saldo:</span>
+                    <span class="summary-value" id="summSaldo">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Ueberstunden:</span>
+                    <span class="summary-value" id="summUeberstunden">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Urlaub (Tage):</span>
+                    <span class="summary-value" id="summUrlaub">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Krank (Tage):</span>
+                    <span class="summary-value" id="summKrank">0</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="zk-content">
+                <!-- Zeitkonto-Tabelle -->
+                <div class="zk-table-container">
+                    <table class="zk-table" id="tblZeitkonto">
+                        <thead>
+                            <tr>
+                                <th style="width:90px;">Datum</th>
+                                <th style="width:40px;">Tag</th>
+                                <th style="min-width:180px;">Objekt/Auftrag</th>
+                                <th style="width:60px;">Beginn</th>
+                                <th style="width:60px;">Ende</th>
+                                <th style="width:60px;">Dauer</th>
+                                <th style="width:60px;">Pause</th>
+                                <th style="width:60px;">Netto</th>
+                                <th style="width:70px;">Typ</th>
+                                <th style="min-width:120px;">Bemerkung</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_Zeitkonto">
+                            <tr><td colspan="10" style="text-align:center; padding:40px; color:#999;">Bitte Mitarbeiter auswaehlen...</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="sum-row">
+                                <td colspan="5" class="sum-label">Summe:</td>
+                                <td id="sumDauer">0:00</td>
+                                <td id="sumPause">0:00</td>
+                                <td id="sumNetto">0:00</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Monatsuebersicht rechts -->
+                <div class="month-panel">
+                    <div class="month-header">Monatsuebersicht</div>
+                    <div class="month-content">
+                        <div class="month-chart" id="monthChart">
+                            <!-- Balkendiagramm wird hier generiert -->
+                        </div>
+                        <div class="month-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Arbeitstage:</span>
+                                <span class="stat-value" id="statArbeitstage">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Einsaetze:</span>
+                                <span class="stat-value" id="statEinsaetze">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Durchschnitt pro Tag:</span>
+                                <span class="stat-value" id="statDurchschnitt">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="zk-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Eintraege</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="frm_MA_Zeitkonten.logic.js"></script>
+</body>
+</html>

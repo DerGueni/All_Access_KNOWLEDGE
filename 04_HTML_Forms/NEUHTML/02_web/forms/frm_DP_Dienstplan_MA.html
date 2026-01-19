@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplanuebersicht - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4316B2; }
+        .app-header { background: #4316B2; min-height: 94px; }
+        .dp-grid { display: grid; grid-template-columns: 180px repeat(7, 1fr); gap: 1px; background: #ccc; }
+        .dp-header { background: #e8e8e8; padding: 8px 4px; font-weight: 600; text-align: center; font-size: 11px; }
+        .dp-header-date { font-size: 10px; color: #666; }
+        .dp-ma { background: white; padding: 6px 8px; font-size: 11px; border-right: 2px solid #4316B2; }
+        .dp-cell { background: white; min-height: 60px; padding: 2px; font-size: 10px; }
+        .dp-cell.weekend { background: #f5f5f5; }
+        .dp-einsatz {
+            background: #f0f0f0;
+            border-left: 3px solid #4316B2;
+            padding: 2px 4px;
+            margin: 1px 0;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        .dp-einsatz:hover { background: #d5d5d5; }
+        .dp-einsatz .zeit { font-weight: 600; }
+        .dp-einsatz .objekt { color: #666; font-size: 9px; }
+    </style>
+</head>
+<body data-active-menu="dienstplan">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Dienstplanuebersicht</h1>
+                </div>
+                <div class="header-center">
+                    <button class="btn btn-nav" id="btnVorwoche">&#9664;&#9664;</button>
+                    <span id="lblWoche" style="min-width:200px;text-align:center;font-weight:600;">KW --</span>
+                    <button class="btn btn-nav" id="btnNachwoche">&#9654;&#9654;</button>
+                    <button class="btn" id="btnHeute" style="margin-left:10px;">Heute</button>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Zeitraum:</label>
+                    <input type="date" id="datVon" class="form-control">
+                    <span style="margin:0 4px;">bis</span>
+                    <input type="date" id="datBis" class="form-control">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">MA-Filter:</label>
+                    <select id="cboMAFilter" class="form-control" style="width:150px;">
+                        <option value="">Alle Mitarbeiter</option>
+                        <option value="aktiv">Nur aktive</option>
+                        <option value="eingeplant">Mit Einsaetzen</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnAktualisieren">Aktualisieren</button>
+                    <button class="btn" id="btnDrucken">Drucken</button>
+                    <button class="btn" id="btnExport">Export</button>
+                </div>
+            </div>
+
+            <div class="app-content" style="padding:8px;overflow:auto;">
+                <div class="dp-grid" id="dpGrid">
+                    <!-- Header-Zeile -->
+                    <div class="dp-header">Mitarbeiter</div>
+                    <div class="dp-header">Mo<br><span class="dp-header-date">01.01.</span></div>
+                    <div class="dp-header">Di<br><span class="dp-header-date">02.01.</span></div>
+                    <div class="dp-header">Mi<br><span class="dp-header-date">03.01.</span></div>
+                    <div class="dp-header">Do<br><span class="dp-header-date">04.01.</span></div>
+                    <div class="dp-header">Fr<br><span class="dp-header-date">05.01.</span></div>
+                    <div class="dp-header weekend">Sa<br><span class="dp-header-date">06.01.</span></div>
+                    <div class="dp-header weekend">So<br><span class="dp-header-date">07.01.</span></div>
+
+                    <!-- Beispiel-Zeile -->
+                    <div class="dp-ma">Mustermann, Max</div>
+                    <div class="dp-cell">
+                        <div class="dp-einsatz">
+                            <div class="zeit">08:00-16:00</div>
+                            <div class="objekt">Messe Stuttgart</div>
+                        </div>
+                    </div>
+                    <div class="dp-cell"></div>
+                    <div class="dp-cell">
+                        <div class="dp-einsatz">
+                            <div class="zeit">10:00-18:00</div>
+                            <div class="objekt">Arena</div>
+                        </div>
+                    </div>
+                    <div class="dp-cell"></div>
+                    <div class="dp-cell"></div>
+                    <div class="dp-cell weekend"></div>
+                    <div class="dp-cell weekend"></div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Mitarbeiter | 0 Einsaetze</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script type="module">
+        import { Bridge } from '../js/webview2-bridge.js';
+
+        // State
+        let currentWeekStart = getMonday(new Date());
+        let mitarbeiter = [];
+        let einsaetze = [];
+
+        // DOM-Referenzen
+        const dpGrid = document.getElementById('dpGrid');
+        const lblWoche = document.getElementById('lblWoche');
+        const lblStatus = document.getElementById('lblStatus');
+        const lblAnzahl = document.getElementById('lblAnzahl');
+        const datVon = document.getElementById('datVon');
+        const datBis = document.getElementById('datBis');
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+
+            // Event Listener
+            document.getElementById('btnVorwoche').addEventListener('click', () => changeWeek(-1));
+            document.getElementById('btnNachwoche').addEventListener('click', () => changeWeek(1));
+            document.getElementById('btnHeute').addEventListener('click', gotoToday);
+            document.getElementById('btnAktualisieren').addEventListener('click', loadData);
+            document.getElementById('btnDrucken').addEventListener('click', () => window.print());
+            document.getElementById('btnExport').addEventListener('click', exportCSV);
+
+            updateWeekDisplay();
+            await loadData();
+        }
+
+        // Woche wechseln
+        function changeWeek(delta) {
+            currentWeekStart.setDate(currentWeekStart.getDate() + (delta * 7));
+            updateWeekDisplay();
+            loadData();
+        }
+
+        function gotoToday() {
+            currentWeekStart = getMonday(new Date());
+            updateWeekDisplay();
+            loadData();
+        }
+
+        function getMonday(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function updateWeekDisplay() {
+            const kw = getWeekNumber(currentWeekStart);
+            const endOfWeek = new Date(currentWeekStart);
+            endOfWeek.setDate(endOfWeek.getDate() + 6);
+            lblWoche.textContent = `KW ${kw} (${formatDate(currentWeekStart)} - ${formatDate(endOfWeek)})`;
+
+            datVon.value = formatDateISO(currentWeekStart);
+            datBis.value = formatDateISO(endOfWeek);
+        }
+
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // Daten laden via WebView2
+        async function loadData() {
+            try {
+                setStatus('Lade Daten...');
+
+                // Mitarbeiter laden
+                const maResult = await Bridge.mitarbeiter.list({ aktiv: true });
+                mitarbeiter = maResult.data || maResult || [];
+
+                // Einsätze für Woche laden
+                const von = formatDateISO(currentWeekStart);
+                const bis = formatDateISO(new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000));
+
+                // KORRIGIERT: executeSQL statt getDienstplan
+                const einsatzResult = await Bridge.execute('executeSQL', {
+                    sql: `SELECT p.MA_ID, p.VA_ID, p.VADatum, p.VA_Start, p.VA_Ende, a.Objekt
+                          FROM tbl_MA_VA_Planung p
+                          LEFT JOIN tbl_VA_Auftragstamm a ON p.VA_ID = a.VA_ID
+                          WHERE p.VADatum >= #${von}# AND p.VADatum <= #${bis}#`,
+                    fetch: true
+                });
+                einsaetze = (einsatzResult && einsatzResult.rows) || [];
+
+                renderGrid();
+                lblAnzahl.textContent = `${mitarbeiter.length} Mitarbeiter | ${einsaetze.length} Einsätze`;
+                setStatus('Bereit');
+            } catch (error) {
+                console.error('Fehler beim Laden:', error);
+                setStatus('Fehler beim Laden');
+                // Fallback: Leeres Grid
+                renderGrid();
+            }
+        }
+
+        // Grid rendern
+        function renderGrid() {
+            // Header-Zeile
+            let html = '<div class="dp-header">Mitarbeiter</div>';
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(currentWeekStart);
+                day.setDate(day.getDate() + i);
+                const isWeekend = i >= 5;
+                const dayNames = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+                html += `<div class="dp-header ${isWeekend ? 'weekend' : ''}">${dayNames[i]}<br><span class="dp-header-date">${formatDate(day)}</span></div>`;
+            }
+
+            // Mitarbeiter-Zeilen
+            mitarbeiter.forEach(ma => {
+                const maName = `${ma.Nachname || ''}, ${ma.Vorname || ''}`;
+                html += `<div class="dp-ma">${maName}</div>`;
+
+                for (let i = 0; i < 7; i++) {
+                    const day = new Date(currentWeekStart);
+                    day.setDate(day.getDate() + i);
+                    const dayStr = formatDateISO(day);
+                    const isWeekend = i >= 5;
+
+                    // Einsätze für diesen MA an diesem Tag
+                    const dayEinsaetze = einsaetze.filter(e =>
+                        e.MA_ID === ma.ID &&
+                        formatDateISO(new Date(e.VADatum)) === dayStr
+                    );
+
+                    html += `<div class="dp-cell ${isWeekend ? 'weekend' : ''}">`;
+                    dayEinsaetze.forEach(e => {
+                        html += `<div class="dp-einsatz" data-va-id="${e.VA_ID}">
+                            <div class="zeit">${e.VA_Start || ''}-${e.VA_Ende || ''}</div>
+                            <div class="objekt">${e.Objekt || ''}</div>
+                        </div>`;
+                    });
+                    html += '</div>';
+                }
+            });
+
+            dpGrid.innerHTML = html;
+
+            // Click-Handler für Einsätze
+            dpGrid.querySelectorAll('.dp-einsatz').forEach(el => {
+                el.addEventListener('click', () => {
+                    const vaId = el.dataset.vaId;
+                    if (vaId) Bridge.navigate('frm_va_Auftragstamm', vaId);
+                });
+            });
+        }
+
+        // CSV Export
+        function exportCSV() {
+            let csv = 'Mitarbeiter;Mo;Di;Mi;Do;Fr;Sa;So\n';
+            mitarbeiter.forEach(ma => {
+                const row = [`${ma.Nachname}, ${ma.Vorname}`];
+                for (let i = 0; i < 7; i++) {
+                    const day = new Date(currentWeekStart);
+                    day.setDate(day.getDate() + i);
+                    const dayStr = formatDateISO(day);
+                    const dayEinsaetze = einsaetze.filter(e =>
+                        e.MA_ID === ma.ID && formatDateISO(new Date(e.VADatum)) === dayStr
+                    );
+                    row.push(dayEinsaetze.map(e => `${e.VA_Start}-${e.VA_Ende}`).join(', '));
+                }
+                csv += row.join(';') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Dienstplan_KW${getWeekNumber(currentWeekStart)}.csv`;
+            link.click();
+        }
+
+        // Helper
+        function setStatus(text) { lblStatus.textContent = text; }
+        function formatDate(d) { return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }); }
+        function formatDateISO(d) { return d.toISOString().split('T')[0]; }
+    </script>
+</body>
+</html>

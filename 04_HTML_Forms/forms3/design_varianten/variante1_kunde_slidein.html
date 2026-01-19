@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenstammblatt - Slide-in Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Farbpalette - Modern Teal/Cyan */
+            --primary-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-color: #00bcd4;
+            --accent-hover: #0097a7;
+            --bg-dark: #1a1a2e;
+            --bg-medium: #16213e;
+            --bg-light: #0f3460;
+            --text-light: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
+            --card-bg: #ffffff;
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+
+            /* Layout */
+            --sidebar-width: 280px;
+            --header-height: 64px;
+            --fab-size: 56px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #e0f2f1 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           OVERLAY
+           ============================================ */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed) ease;
+            z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ============================================
+           SLIDE-IN SIDEBAR
+           ============================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: calc(-1 * var(--sidebar-width));
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--primary-gradient);
+            transition: left var(--transition-speed) ease;
+            z-index: 1000;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sidebar-logo-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-light);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: var(--text-light);
+            border-left-color: var(--text-light);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           HAMBURGER MENU BUTTON
+           ============================================ */
+        .hamburger {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            width: 48px;
+            height: 48px;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .hamburger-line {
+            width: 22px;
+            height: 2px;
+            background: #333;
+            border-radius: 2px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            height: var(--header-height);
+            background: var(--card-bg);
+            padding: 0 24px 0 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn-outline {
+            background: transparent;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+
+        .header-btn-outline:hover {
+            border-color: #11998e;
+            color: #11998e;
+        }
+
+        .header-btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .header-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .main-content {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Kunden-Header Card */
+        .customer-header-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .customer-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-gradient);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .customer-info {
+            flex: 1;
+        }
+
+        .customer-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .customer-meta {
+            display: flex;
+            gap: 24px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .customer-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .customer-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .customer-status.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .customer-status.inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .form-card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .form-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-card-title-icon {
+            font-size: 18px;
+        }
+
+        .form-card-body {
+            padding: 24px;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-grid-2col {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .form-grid-3col {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #11998e;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+        }
+
+        .form-input:read-only {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #11998e;
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* Two Column Layout */
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* Ansprechpartner Liste */
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .contact-item:hover {
+            background: #e8f5e9;
+        }
+
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .contact-details {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .contact-role {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .contact-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .contact-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Aufträge Tabelle */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table tr:hover td {
+            background: #f0fdf4;
+        }
+
+        .data-table tr {
+            cursor: pointer;
+        }
+
+        /* ============================================
+           FLOATING ACTION BUTTON (FAB) + SPEED DIAL
+           ============================================ */
+        .fab-container {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 1000;
+        }
+
+        .fab {
+            width: var(--fab-size);
+            height: var(--fab-size);
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-speed) ease;
+            color: white;
+            font-size: 24px;
+        }
+
+        .fab:hover {
+            background: var(--accent-hover);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.5);
+        }
+
+        .fab.active {
+            transform: rotate(45deg);
+        }
+
+        /* Speed Dial Actions */
+        .speed-dial {
+            position: absolute;
+            bottom: calc(var(--fab-size) + 16px);
+            right: 4px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .speed-dial.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .speed-dial-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .speed-dial-label {
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .speed-dial-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .speed-dial-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .speed-dial-btn.save { background: #4caf50; }
+        .speed-dial-btn.auftrag { background: #2196f3; }
+        .speed-dial-btn.email { background: #ff9800; }
+        .speed-dial-btn.delete { background: #f44336; }
+        .speed-dial-btn.contact { background: #9c27b0; }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 1024px) {
+            .two-column-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding-left: 70px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .customer-header-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .customer-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger" id="hamburger" aria-label="Menü öffnen">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Slide-in Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">C</div>
+                <span class="sidebar-logo-text">CONSEC</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Stammdaten</div>
+                <a class="nav-item" href="variante1_mitarbeiter_slidein.html">
+                    <span class="nav-icon">👤</span>
+                    <span>Mitarbeiter</span>
+                </a>
+                <a class="nav-item active">
+                    <span class="nav-icon">🏢</span>
+                    <span>Kunden</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📍</span>
+                    <span>Objekte</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Planung</div>
+                <a class="nav-item" href="variante1_auftrag_slidein.html">
+                    <span class="nav-icon">📋</span>
+                    <span>Aufträge</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    <span>Dienstplan</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Einsatzübersicht</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Finanzen</div>
+                <a class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span>Rechnungen</span>
+                </a>
+                <a class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span>Umsatz</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">GS</div>
+                <div class="user-details">
+                    <div class="user-name">Günther Siegert</div>
+                    <div class="user-role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Header -->
+    <header class="header">
+        <div>
+            <h1 class="header-title">Kundenstammblatt</h1>
+            <p class="header-subtitle">Kunden-ID: KD-2024-0089</p>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn header-btn-outline">Zurück zur Liste</button>
+            <button class="header-btn header-btn-primary">Speichern</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Kunden-Header Card -->
+        <div class="customer-header-card">
+            <div class="customer-avatar">MM</div>
+            <div class="customer-info">
+                <h2 class="customer-name">Messe München GmbH</h2>
+                <div class="customer-meta">
+                    <span class="customer-meta-item">📍 München</span>
+                    <span class="customer-meta-item">📅 Kunde seit 2019</span>
+                    <span class="customer-meta-item">📋 47 Aufträge</span>
+                    <span class="customer-meta-item">💰 €485.000 Umsatz</span>
+                </div>
+            </div>
+            <span class="customer-status active">Aktiv</span>
+        </div>
+
+        <div class="two-column-layout">
+            <!-- Linke Spalte: Stammdaten -->
+            <div>
+                <!-- Firmendaten -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <span class="form-card-title">
+                            <span class="form-card-title-icon">🏢</span>
+                            Firmendaten
+                        </span>
+                    </div>
+                    <div class="form-card-body">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Firma</label>
+                                <input type="text" class="form-input" id="kun_Firma" value="Messe München GmbH">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Zusatz</label>
+                                <input type="text" class="form-input" id="kun_Zusatz" value="Veranstaltungszentrum">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Straße</label>
+                                <input type="text" class="form-input" id="kun_Strasse" value="Am Messeturm 5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">PLZ</label>
+                                <input type="text" class="form-input" id="kun_PLZ" value="81829">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Ort</label>
+                                <input type="text" class="form-input" id="kun_Ort" value="München">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Land</label>
+                                <input type="text" class="form-input" id="kun_Land" value="Deutschland">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kontaktdaten -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <span class="form-card-title">
+                            <span class="form-card-title-icon">📞</span>
+                            Kontaktdaten
+                        </span>
+                    </div>
+                    <div class="form-card-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Telefon</label>
+                                <input type="tel" class="form-input" id="kun_Telefon" value="+49 89 949-0">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Fax</label>
+                                <input type="tel" class="form-input" id="kun_Fax" value="+49 89 949-1234">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">E-Mail</label>
+                                <input type="email" class="form-input" id="kun_Email" value="kontakt@messe-muenchen.de">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-input" id="kun_Website" value="www.messe-muenchen.de">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optionen -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <span class="form-card-title">
+                            <span class="form-card-title-icon">⚙️</span>
+                            Optionen
+                        </span>
+                    </div>
+                    <div class="form-card-body">
+                        <div class="form-grid" style="gap: 16px;">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="kun_IstAktiv" checked>
+                                <label for="kun_IstAktiv">Kunde ist aktiv</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="kun_IstLieferant">
+                                <label for="kun_IstLieferant">Ist auch Lieferant</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="kun_Rechnungsempfaenger" checked>
+                                <label for="kun_Rechnungsempfaenger">Ist Rechnungsempfänger</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="kun_Sammelrechnung">
+                                <label for="kun_Sammelrechnung">Sammelrechnung</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rechte Spalte: Ansprechpartner & Aufträge -->
+            <div>
+                <!-- Ansprechpartner -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <span class="form-card-title">
+                            <span class="form-card-title-icon">👥</span>
+                            Ansprechpartner
+                        </span>
+                        <button class="header-btn header-btn-outline" style="padding: 6px 12px; font-size: 12px;">+ Hinzufügen</button>
+                    </div>
+                    <div class="form-card-body">
+                        <div class="contact-list">
+                            <div class="contact-item">
+                                <div class="contact-avatar">TS</div>
+                                <div class="contact-details">
+                                    <div class="contact-name">Thomas Schmidt</div>
+                                    <div class="contact-role">Einkaufsleiter • +49 89 949-2100</div>
+                                </div>
+                                <div class="contact-actions">
+                                    <button class="contact-btn" title="Anrufen">📞</button>
+                                    <button class="contact-btn" title="E-Mail">✉️</button>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-avatar">SM</div>
+                                <div class="contact-details">
+                                    <div class="contact-name">Sandra Meyer</div>
+                                    <div class="contact-role">Projektleiterin • +49 89 949-2105</div>
+                                </div>
+                                <div class="contact-actions">
+                                    <button class="contact-btn" title="Anrufen">📞</button>
+                                    <button class="contact-btn" title="E-Mail">✉️</button>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-avatar">MK</div>
+                                <div class="contact-details">
+                                    <div class="contact-name">Martin Klein</div>
+                                    <div class="contact-role">Buchhaltung • +49 89 949-3000</div>
+                                </div>
+                                <div class="contact-actions">
+                                    <button class="contact-btn" title="Anrufen">📞</button>
+                                    <button class="contact-btn" title="E-Mail">✉️</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Letzte Aufträge -->
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <span class="form-card-title">
+                            <span class="form-card-title-icon">📋</span>
+                            Letzte Aufträge
+                        </span>
+                        <button class="header-btn header-btn-outline" style="padding: 6px 12px; font-size: 12px;">Alle anzeigen</button>
+                    </div>
+                    <div class="form-card-body" style="padding: 0;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nr.</th>
+                                    <th>Veranstaltung</th>
+                                    <th>Datum</th>
+                                    <th>Betrag</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr onclick="window.location='variante1_auftrag_slidein.html'">
+                                    <td>2026-0142</td>
+                                    <td>Messe München 2026</td>
+                                    <td>15.-19.03.2026</td>
+                                    <td>€24.500</td>
+                                </tr>
+                                <tr>
+                                    <td>2025-0398</td>
+                                    <td>BAU 2025</td>
+                                    <td>13.-17.01.2025</td>
+                                    <td>€18.200</td>
+                                </tr>
+                                <tr>
+                                    <td>2025-0312</td>
+                                    <td>ISPO 2025</td>
+                                    <td>26.-29.11.2024</td>
+                                    <td>€15.800</td>
+                                </tr>
+                                <tr>
+                                    <td>2024-0289</td>
+                                    <td>Electronica 2024</td>
+                                    <td>12.-15.11.2024</td>
+                                    <td>€22.100</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Action Button mit Speed Dial -->
+    <div class="fab-container">
+        <div class="speed-dial" id="speedDial">
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Ansprechpartner hinzufügen</span>
+                <button class="speed-dial-btn contact" title="Ansprechpartner">👤</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Kunde löschen</span>
+                <button class="speed-dial-btn delete" title="Löschen">🗑️</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">E-Mail senden</span>
+                <button class="speed-dial-btn email" title="E-Mail">✉️</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Neuer Auftrag</span>
+                <button class="speed-dial-btn auftrag" title="Auftrag">📋</button>
+            </div>
+            <div class="speed-dial-item">
+                <span class="speed-dial-label">Speichern</span>
+                <button class="speed-dial-btn save" title="Speichern">💾</button>
+            </div>
+        </div>
+        <button class="fab" id="fab" aria-label="Aktionen">
+            <span class="fab-icon">+</span>
+        </button>
+    </div>
+
+    <script>
+        // === Sidebar Toggle ===
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        function toggleSidebar() {
+            hamburger.classList.toggle('active');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        hamburger.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // ESC schließt Sidebar
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        });
+
+        // === FAB Speed Dial ===
+        const fab = document.getElementById('fab');
+        const speedDial = document.getElementById('speedDial');
+
+        fab.addEventListener('click', () => {
+            fab.classList.toggle('active');
+            speedDial.classList.toggle('active');
+        });
+
+        // Klick außerhalb schließt Speed Dial
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.fab-container') && speedDial.classList.contains('active')) {
+                fab.classList.remove('active');
+                speedDial.classList.remove('active');
+            }
+        });
+
+        // Speed Dial Button Actions
+        document.querySelectorAll('.speed-dial-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const action = btn.classList[1];
+                console.log('Action:', action);
+
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => btn.style.transform = '', 150);
+
+                switch(action) {
+                    case 'save': alert('Kunde gespeichert!'); break;
+                    case 'auftrag': window.location = 'variante1_auftrag_slidein.html'; break;
+                    case 'email': alert('E-Mail-Dialog wird geöffnet...'); break;
+                    case 'delete': if(confirm('Kunde wirklich löschen?')) alert('Gelöscht!'); break;
+                    case 'contact': alert('Neuer Ansprechpartner Dialog...'); break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

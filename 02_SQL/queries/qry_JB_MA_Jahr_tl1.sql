@@ -1,0 +1,3 @@
+SELECT tbl_MA_Jahresuebersicht.MA_ID, tbl_MA_Jahresuebersicht.AktJahr, tbl_MA_Jahresuebersicht.AktMon, tbl_MA_Jahresuebersicht.[Ist], tbl_MA_Jahresuebersicht.RestAusVormonat, tbl_MA_Jahresuebersicht.IstGes, tbl_MA_Jahresuebersicht.UeberlaufAktMonat, tbl_MA_Jahresuebersicht.HabVerr, tbl_MA_Jahresuebersicht.InfBrutto, tbl_MA_Jahresuebersicht.Lst, tbl_MA_Jahresuebersicht.InfNetto, tbl_MA_Jahresuebersicht.InfGesamt, tbl_MA_Jahresuebersicht.Lohn, tbl_MA_Jahresuebersicht.LohnVon, tbl_MA_Jahresuebersicht.RestGut
+FROM tbl_MA_Jahresuebersicht;
+

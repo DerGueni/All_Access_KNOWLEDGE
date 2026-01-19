@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS Menu - Rollenorientiert (V02)</title>
+    <style>
+        /* ==========================================================
+           CSS RESET & BASE
+           ========================================================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 14px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8080c0 0%, #6060a0 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        /* ==========================================================
+           ROLLEN-FARBEN (Primaer-Palette)
+           ========================================================== */
+        :root {
+            --color-disponent: #4a90d9;
+            --color-disponent-dark: #3a7bc8;
+            --color-disponent-light: #6aa8e8;
+
+            --color-objekt: #5cb85c;
+            --color-objekt-dark: #4cae4c;
+            --color-objekt-light: #7cc67c;
+
+            --color-personal: #f0ad4e;
+            --color-personal-dark: #ec971f;
+            --color-personal-light: #f4c37d;
+
+            --color-abrechnung: #d9534f;
+            --color-abrechnung-dark: #c9302c;
+            --color-abrechnung-light: #e27c79;
+
+            --color-management: #5bc0de;
+            --color-management-dark: #31b0d5;
+            --color-management-light: #85d0e7;
+
+            --bg-body: #8080c0;
+            --bg-card: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-inverse: #ffffff;
+            --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-btn: 0 2px 4px rgba(0, 0, 0, 0.2);
+            --border-radius: 8px;
+            --transition: 0.2s ease;
+        }
+
+        /* ==========================================================
+           HEADER / TITLE BAR
+           ========================================================== */
+        .title-bar {
+            background: linear-gradient(90deg, #000080 0%, #4040a0 50%, #1084d0 100%);
+            color: var(--text-inverse);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .title-bar h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .title-bar .subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* ==========================================================
+           MAIN CONTAINER
+           ========================================================== */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ==========================================================
+           ROLLEN-KATEGORIEN
+           ========================================================== */
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .role-category {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+
+        .role-category:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Kategorie-Header mit Rollen-Farbe */
+        .role-header {
+            padding: 14px 18px;
+            color: var(--text-inverse);
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .role-header .icon {
+            font-size: 1.3rem;
+        }
+
+        /* Rollen-spezifische Header-Farben */
+        .role-disponent .role-header {
+            background: linear-gradient(135deg, var(--color-disponent) 0%, var(--color-disponent-dark) 100%);
+        }
+
+        .role-objekt .role-header {
+            background: linear-gradient(135deg, var(--color-objekt) 0%, var(--color-objekt-dark) 100%);
+        }
+
+        .role-personal .role-header {
+            background: linear-gradient(135deg, var(--color-personal) 0%, var(--color-personal-dark) 100%);
+        }
+
+        .role-abrechnung .role-header {
+            background: linear-gradient(135deg, var(--color-abrechnung) 0%, var(--color-abrechnung-dark) 100%);
+        }
+
+        .role-management .role-header {
+            background: linear-gradient(135deg, var(--color-management) 0%, var(--color-management-dark) 100%);
+        }
+
+        /* Button-Container */
+        .role-buttons {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* ==========================================================
+           MENU BUTTONS
+           ========================================================== */
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-align: left;
+            width: 100%;
+            background: #f5f5f5;
+            color: var(--text-primary);
+            border-left: 4px solid transparent;
+        }
+
+        .menu-btn:hover {
+            background: #e8e8e8;
+            transform: translateX(4px);
+        }
+
+        .menu-btn:active {
+            transform: translateX(2px);
+        }
+
+        .menu-btn:focus {
+            outline: 2px solid var(--color-disponent);
+            outline-offset: 2px;
+        }
+
+        .menu-btn .btn-icon {
+            font-size: 1.1rem;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        /* Rollen-spezifische Button-Akzente */
+        .role-disponent .menu-btn {
+            border-left-color: var(--color-disponent);
+        }
+        .role-disponent .menu-btn:hover {
+            background: var(--color-disponent-light);
+            color: var(--text-inverse);
+        }
+
+        .role-objekt .menu-btn {
+            border-left-color: var(--color-objekt);
+        }
+        .role-objekt .menu-btn:hover {
+            background: var(--color-objekt-light);
+            color: var(--text-inverse);
+        }
+
+        .role-personal .menu-btn {
+            border-left-color: var(--color-personal);
+        }
+        .role-personal .menu-btn:hover {
+            background: var(--color-personal-light);
+            color: var(--text-primary);
+        }
+
+        .role-abrechnung .menu-btn {
+            border-left-color: var(--color-abrechnung);
+        }
+        .role-abrechnung .menu-btn:hover {
+            background: var(--color-abrechnung-light);
+            color: var(--text-inverse);
+        }
+
+        .role-management .menu-btn {
+            border-left-color: var(--color-management);
+        }
+        .role-management .menu-btn:hover {
+            background: var(--color-management-light);
+            color: var(--text-inverse);
+        }
+
+        /* ==========================================================
+           TOAST NOTIFICATION
+           ========================================================== */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            max-width: 350px;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, var(--color-objekt) 0%, var(--color-objekt-dark) 100%);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, var(--color-disponent) 0%, var(--color-disponent-dark) 100%);
+        }
+
+        .toast.warning {
+            background: linear-gradient(135deg, var(--color-personal) 0%, var(--color-personal-dark) 100%);
+            color: var(--text-primary);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, var(--color-abrechnung) 0%, var(--color-abrechnung-dark) 100%);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+        }
+
+        /* ==========================================================
+           STATUS BAR
+           ========================================================== */
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #000080 0%, #4040a0 100%);
+            color: var(--text-inverse);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .status-bar .status-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #5cb85c;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ==========================================================
+           RESPONSIVE DESIGN
+           ========================================================== */
+        @media (max-width: 768px) {
+            .title-bar {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+                padding: 12px 16px;
+            }
+
+            .title-bar h1 {
+                font-size: 1.2rem;
+            }
+
+            .main-container {
+                padding: 16px;
+            }
+
+            .role-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .menu-btn {
+                padding: 14px 12px;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                gap: 4px;
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .role-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        /* ==========================================================
+           PRINT STYLES
+           ========================================================== */
+        @media print {
+            .toast-container,
+            .status-bar {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .role-category {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TITLE BAR -->
+    <header class="title-bar">
+        <h1>
+            <span>CONSYS</span>
+            <span style="font-weight: 400;">Hauptmenu</span>
+        </h1>
+        <span class="subtitle">Rollenorientierte Navigation (V02)</span>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="main-container">
+        <div class="role-grid">
+
+            <!-- ========================================
+                 KATEGORIE 1: DISPONENT
+                 ======================================== -->
+            <section class="role-category role-disponent">
+                <div class="role-header">
+                    <span class="icon">&#128197;</span>
+                    <span>Disponent</span>
+                </div>
+                <div class="role-buttons">
+                    <button class="menu-btn"
+                            data-testid="menu-v02-dienstplan"
+                            onclick="navigateTo('frm_N_Dienstplanuebersicht')">
+                        <span class="btn-icon">&#128198;</span>
+                        <span>Dienstplan</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-planungsuebersicht"
+                            onclick="navigateTo('frm_VA_Planungsuebersicht')">
+                        <span class="btn-icon">&#128202;</span>
+                        <span>Planungsuebersicht</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-schnellauswahl"
+                            onclick="navigateTo('frm_MA_VA_Schnellauswahl')">
+                        <span class="btn-icon">&#9889;</span>
+                        <span>Schnellauswahl MA</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-einsatzuebersicht"
+                            onclick="navigateTo('frm_Einsatzuebersicht')">
+                        <span class="btn-icon">&#128221;</span>
+                        <span>Einsatzuebersicht</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-autozuordnung"
+                            onclick="startAutoZuordnung()">
+                        <span class="btn-icon">&#129302;</span>
+                        <span>Auto-Zuordnung</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-anfragen"
+                            onclick="navigateTo('frm_Anfragen')">
+                        <span class="btn-icon">&#128172;</span>
+                        <span>Anfragen verwalten</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 KATEGORIE 2: OBJEKTLEITUNG
+                 ======================================== -->
+            <section class="role-category role-objekt">
+                <div class="role-header">
+                    <span class="icon">&#127970;</span>
+                    <span>Objektleitung</span>
+                </div>
+                <div class="role-buttons">
+                    <button class="menu-btn"
+                            data-testid="menu-v02-objekte"
+                            onclick="navigateTo('frm_OB_Objekt')">
+                        <span class="btn-icon">&#127970;</span>
+                        <span>Objekte</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-positionslisten"
+                            onclick="navigateTo('frm_Positionslisten')">
+                        <span class="btn-icon">&#128203;</span>
+                        <span>Positionslisten</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-namenslisten"
+                            onclick="navigateTo('frm_Namenslisten')">
+                        <span class="btn-icon">&#128209;</span>
+                        <span>Namenslisten</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-objektkalender"
+                            onclick="navigateTo('frm_Objektkalender')">
+                        <span class="btn-icon">&#128197;</span>
+                        <span>Objektkalender</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-schichtvorlagen"
+                            onclick="navigateTo('frm_Schichtvorlagen')">
+                        <span class="btn-icon">&#128203;</span>
+                        <span>Schichtvorlagen</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 KATEGORIE 3: PERSONALBUERO
+                 ======================================== -->
+            <section class="role-category role-personal">
+                <div class="role-header">
+                    <span class="icon">&#128101;</span>
+                    <span>Personalbuero</span>
+                </div>
+                <div class="role-buttons">
+                    <button class="menu-btn"
+                            data-testid="menu-v02-mitarbeiter"
+                            onclick="navigateTo('frm_MA_Mitarbeiterstamm')">
+                        <span class="btn-icon">&#128100;</span>
+                        <span>Mitarbeiterstamm</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-zeitkonten"
+                            onclick="navigateTo('frm_MA_Zeitkonten')">
+                        <span class="btn-icon">&#128337;</span>
+                        <span>Zeitkonten</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-abwesenheiten"
+                            onclick="navigateTo('frm_MA_Abwesenheit')">
+                        <span class="btn-icon">&#128197;</span>
+                        <span>Abwesenheiten</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-bewerber"
+                            onclick="navigateTo('frm_N_MA_Bewerber_Verarbeitung')">
+                        <span class="btn-icon">&#128203;</span>
+                        <span>Bewerber</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-ausweis"
+                            onclick="navigateTo('frm_MA_Ausweis')">
+                        <span class="btn-icon">&#127380;</span>
+                        <span>Ausweis drucken</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-qualifikationen"
+                            onclick="navigateTo('frm_MA_Qualifikationen')">
+                        <span class="btn-icon">&#127942;</span>
+                        <span>Qualifikationen</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 KATEGORIE 4: ABRECHNUNG
+                 ======================================== -->
+            <section class="role-category role-abrechnung">
+                <div class="role-header">
+                    <span class="icon">&#128176;</span>
+                    <span>Abrechnung</span>
+                </div>
+                <div class="role-buttons">
+                    <button class="menu-btn"
+                            data-testid="menu-v02-stundenauswertung"
+                            onclick="navigateTo('frm_N_Stundenauswertung')">
+                        <span class="btn-icon">&#128337;</span>
+                        <span>Stundenauswertung</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-lohnabrechnungen"
+                            onclick="navigateTo('frm_N_Lohnabrechnungen')">
+                        <span class="btn-icon">&#128176;</span>
+                        <span>Lohnabrechnungen</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-verrechnungssaetze"
+                            onclick="navigateTo('frm_Verrechnungssaetze')">
+                        <span class="btn-icon">&#128181;</span>
+                        <span>Verrechnungssaetze</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-stundenexport"
+                            onclick="exportStunden()">
+                        <span class="btn-icon">&#128190;</span>
+                        <span>Stunden exportieren</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-rechnungen"
+                            onclick="navigateTo('frm_Rechnungen')">
+                        <span class="btn-icon">&#128196;</span>
+                        <span>Rechnungen</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-rueckmeldungen"
+                            onclick="navigateTo('frm_Rueckmeldungen')">
+                        <span class="btn-icon">&#128172;</span>
+                        <span>Rueckmeldungen</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 KATEGORIE 5: MANAGEMENT
+                 ======================================== -->
+            <section class="role-category role-management">
+                <div class="role-header">
+                    <span class="icon">&#128188;</span>
+                    <span>Management</span>
+                </div>
+                <div class="role-buttons">
+                    <button class="menu-btn"
+                            data-testid="menu-v02-auftraege"
+                            onclick="navigateTo('frm_va_Auftragstamm')">
+                        <span class="btn-icon">&#128203;</span>
+                        <span>Auftraege</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-kunden"
+                            onclick="navigateTo('frm_KD_Kundenstamm')">
+                        <span class="btn-icon">&#128101;</span>
+                        <span>Kunden</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-dashboard"
+                            onclick="navigateTo('frm_Menuefuehrung1')">
+                        <span class="btn-icon">&#128200;</span>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-reports"
+                            onclick="navigateTo('frm_Reports')">
+                        <span class="btn-icon">&#128202;</span>
+                        <span>Reports</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-statistiken"
+                            onclick="navigateTo('frm_Statistiken')">
+                        <span class="btn-icon">&#128201;</span>
+                        <span>Statistiken</span>
+                    </button>
+                    <button class="menu-btn"
+                            data-testid="menu-v02-system"
+                            onclick="navigateTo('frm_System')">
+                        <span class="btn-icon">&#9881;</span>
+                        <span>System</span>
+                    </button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- STATUS BAR -->
+    <footer class="status-bar">
+        <div class="status-left">
+            <span class="status-indicator"></span>
+            <span>Bereit</span>
+        </div>
+        <span id="currentTime"></span>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        /**
+         * CONSYS Menu V02 - Rollenorientiert
+         * Navigation und Feedback-Funktionen
+         */
+
+        // ========================================
+        // NAVIGATION
+        // ========================================
+
+        /**
+         * Navigiert zu einem Formular
+         * @param {string} formName - Name des Zielformulars
+         */
+        function navigateTo(formName) {
+            console.log('[Menu V02] Navigation zu:', formName);
+
+            // WebView2-Integration pruefen
+            if (window.chrome && window.chrome.webview) {
+                // WebView2-Modus: Nachricht an Host senden
+                window.chrome.webview.postMessage({
+                    type: 'NAVIGATE',
+                    form: formName,
+                    timestamp: Date.now()
+                });
+                showToast('info', 'Oeffne ' + formName + '...');
+            } else if (window.parent !== window) {
+                // iframe-Modus: postMessage an Parent
+                window.parent.postMessage({
+                    type: 'NAVIGATE',
+                    form: formName,
+                    source: 'menu_master_V02'
+                }, '*');
+                showToast('info', 'Navigation zu ' + formName);
+            } else {
+                // Standalone-Modus: Direkte Navigation
+                const formPath = '../' + formName + '.html';
+                showToast('info', 'Navigiere zu ' + formName + '...');
+
+                setTimeout(function() {
+                    window.location.href = formPath;
+                }, 300);
+            }
+        }
+
+        // ========================================
+        // SPEZIAL-FUNKTIONEN
+        // ========================================
+
+        /**
+         * Startet die automatische MA-Zuordnung
+         */
+        function startAutoZuordnung() {
+            showToast('info', 'Auto-Zuordnung wird gestartet...');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    type: 'ACTION',
+                    action: 'AUTO_ZUORDNUNG',
+                    timestamp: Date.now()
+                });
+            } else {
+                // Fallback: API aufrufen
+                fetch('http://localhost:5000/api/auto-zuordnung', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(function(response) {
+                    if (response.ok) {
+                        showToast('success', 'Auto-Zuordnung erfolgreich!');
+                    } else {
+                        showToast('error', 'Fehler bei Auto-Zuordnung');
+                    }
+                })
+                .catch(function(err) {
+                    showToast('warning', 'API nicht erreichbar');
+                    console.warn('[Menu V02] API-Fehler:', err);
+                });
+            }
+        }
+
+        /**
+         * Exportiert Stunden als Datei
+         */
+        function exportStunden() {
+            showToast('info', 'Stunden-Export wird vorbereitet...');
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage({
+                    type: 'ACTION',
+                    action: 'EXPORT_STUNDEN',
+                    timestamp: Date.now()
+                });
+            } else {
+                // Fallback: Download-Link
+                window.open('http://localhost:5000/api/lohn/stunden-export?format=csv', '_blank');
+                showToast('success', 'Export gestartet');
+            }
+        }
+
+        // ========================================
+        // TOAST NOTIFICATIONS
+        // ========================================
+
+        /**
+         * Zeigt eine Toast-Benachrichtigung an
+         * @param {string} type - Typ: 'success', 'info', 'warning', 'error'
+         * @param {string} message - Nachrichtentext
+         * @param {number} duration - Anzeigedauer in ms (default: 3000)
+         */
+        function showToast(type, message, duration) {
+            duration = duration || 3000;
+
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+
+            // Icon basierend auf Typ
+            var icons = {
+                success: '&#10004;',
+                info: '&#9432;',
+                warning: '&#9888;',
+                error: '&#10006;'
+            };
+
+            toast.innerHTML = '<span>' + (icons[type] || '') + '</span><span>' + message + '</span>';
+            container.appendChild(toast);
+
+            // Toast nach Dauer entfernen
+            setTimeout(function() {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, duration);
+        }
+
+        // ========================================
+        // UTILITY FUNKTIONEN
+        // ========================================
+
+        /**
+         * Aktualisiert die Uhrzeitanzeige
+         */
+        function updateTime() {
+            var now = new Date();
+            var timeStr = now.toLocaleString('de-DE', {
+                weekday: 'short',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            var timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = timeStr;
+            }
+        }
+
+        // ========================================
+        // KEYBOARD NAVIGATION
+        // ========================================
+
+        document.addEventListener('keydown', function(e) {
+            // Escape: Zurueck zum Dashboard
+            if (e.key === 'Escape') {
+                navigateTo('frm_Menuefuehrung1');
+            }
+
+            // F1: Hilfe (falls vorhanden)
+            if (e.key === 'F1') {
+                e.preventDefault();
+                showToast('info', 'Hilfe: Waehlen Sie eine Kategorie und klicken Sie auf eine Funktion.');
+            }
+        });
+
+        // ========================================
+        // INITIALISIERUNG
+        // ========================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[Menu V02] Rollenorientiertes Menu geladen');
+
+            // Zeit initial setzen und alle 30 Sekunden aktualisieren
+            updateTime();
+            setInterval(updateTime, 30000);
+
+            // WebView2-Listener registrieren
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.addEventListener('message', function(event) {
+                    var data = event.data;
+                    console.log('[Menu V02] WebView2 Message:', data);
+
+                    if (data.type === 'TOAST') {
+                        showToast(data.toastType || 'info', data.message);
+                    }
+                });
+
+                // Host informieren, dass Menu bereit ist
+                window.chrome.webview.postMessage({
+                    type: 'READY',
+                    source: 'menu_master_V02',
+                    version: '2.0'
+                });
+            }
+        });
+    </script>
+</body>
+</html>

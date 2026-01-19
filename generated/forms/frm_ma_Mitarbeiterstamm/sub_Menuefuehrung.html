@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Menüführung - Navigation</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 11px;
+      background-color: #f5f5f5;
+    }
+
+    #app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 8px;
+      gap: 4px;
+    }
+
+    .menu-section {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+      background-color: #fff;
+      border-radius: 2px;
+      border: 1px solid #ddd;
+    }
+
+    .menu-title {
+      font-weight: bold;
+      font-size: 10px;
+      color: #333;
+      margin-bottom: 4px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .menu-button {
+      padding: 6px 8px;
+      background-color: #f0f0f0;
+      border: 1px solid #999;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 10px;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .menu-button:hover {
+      background-color: #e0e0e0;
+      border-color: #666;
+    }
+
+    .menu-button:active {
+      background-color: #d0d0d0;
+    }
+
+    .menu-icon {
+      display: inline-block;
+      width: 12px;
+      margin-right: 4px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- STAMMDATEN SECTION -->
+    <div class="menu-section">
+      <div class="menu-title">Stammdaten</div>
+      <button class="menu-button" data-form="frm_MA_Mitarbeiterstamm">
+        <span class="menu-icon">👤</span> Mitarbeiterstamm
+      </button>
+      <button class="menu-button" data-form="frm_KD_Kundenstamm">
+        <span class="menu-icon">🏢</span> Kundenstamm
+      </button>
+      <button class="menu-button" data-form="frm_OB_Objekt">
+        <span class="menu-icon">📍</span> Objekte
+      </button>
+      <button class="menu-button" data-form="frm_va_Auftragstamm">
+        <span class="menu-icon">📋</span> Aufträge
+      </button>
+    </div>
+
+    <!-- PLANUNG SECTION -->
+    <div class="menu-section">
+      <div class="menu-title">Planung</div>
+      <button class="menu-button" data-form="frm_VA_Planungsuebersicht">
+        <span class="menu-icon">📊</span> Planungsübersicht
+      </button>
+      <button class="menu-button" data-form="frm_N_Dienstplanuebersicht">
+        <span class="menu-icon">📅</span> Dienstplanübersicht
+      </button>
+    </div>
+
+    <!-- PERSONAL SECTION -->
+    <div class="menu-section">
+      <div class="menu-title">Personal</div>
+      <button class="menu-button" data-form="frm_MA_Abwesenheit">
+        <span class="menu-icon">🚫</span> Abwesenheiten
+      </button>
+      <button class="menu-button" data-form="frm_MA_Zeitkonten">
+        <span class="menu-icon">⏱️</span> Zeitkonten
+      </button>
+      <button class="menu-button" data-form="frm_N_MA_Bewerber_Verarbeitung">
+        <span class="menu-icon">✉️</span> Bewerber
+      </button>
+    </div>
+
+    <!-- ABRECHNUNG SECTION -->
+    <div class="menu-section">
+      <div class="menu-title">Abrechnung</div>
+      <button class="menu-button" data-form="frm_N_Lohnabrechnungen">
+        <span class="menu-icon">💰</span> Lohnabrechnungen
+      </button>
+      <button class="menu-button" data-form="frm_N_Stundenauswertung">
+        <span class="menu-icon">📈</span> Stundenauswertung
+      </button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // Globale Bridge-Referenz (vom Parent)
+      const bridge = window.parent.Bridge || window.Bridge;
+
+      // Menu-Button Event Listener
+      document.querySelectorAll('.menu-button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const formName = e.currentTarget.getAttribute('data-form');
+          console.log(`Menu: Opening form ${formName}`);
+
+          // Sende zu Parent via PostMessage
+          window.parent.postMessage({
+            type: 'MENU_OPEN_FORM',
+            formName: formName,
+            source: 'sub_Menuefuehrung'
+          }, '*');
+
+          // Optional: auch zu Access via Bridge
+          if (bridge && bridge.callAccess) {
+            bridge.callAccess('OpenForm', {
+              formName: formName
+            });
+          }
+        });
+      });
+
+      // Debug: Parent-Nachricht testen
+      window.parent.postMessage({
+        type: 'SUBFORM_READY',
+        source: 'sub_Menuefuehrung'
+      }, '*');
+
+      console.log('Menüführung SubForm loaded and ready');
+    })();
+  </script>
+</body>
+</html>

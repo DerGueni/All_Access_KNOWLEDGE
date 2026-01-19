@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serien-E-Mail Dienstplan - CONSYS</title>
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #6B1C23; }
+        .app-header { background: #4316B2; min-height: 95px; height: 95px; color: white; }
+        .app-footer { min-height: 19px; height: 19px; }
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-active-menu="email" data-menu-style="access">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Serien-E-Mail Dienstplan</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Zeitraum:</label>
+                    <input type="date" id="datVon" class="form-control">
+                    <span style="margin:0 4px;">bis</span>
+                    <input type="date" id="datBis" class="form-control">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Vorlage:</label>
+                    <select id="cboVorlage" class="form-control" style="width:180px;">
+                        <option value="wochenplan">Wochenplan</option>
+                        <option value="monatsplan">Monatsplan</option>
+                        <option value="änderung">Planänderung</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnSenden">E-Mails senden</button>
+                    <button class="btn" id="btnVorschau">Vorschau</button>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="content-main" style="padding:12px;overflow:auto;">
+                    <fieldset class="fieldset">
+                        <legend>Empfaenger auswählen</legend>
+                        <div class="field-row">
+                            <label>
+                                <input type="checkbox" id="chkAlle" checked> Alle Mitarbeiter mit Einsaetzen
+                            </label>
+                        </div>
+                        <div style="margin-top:8px;">
+                            <table class="datasheet">
+                                <thead>
+                                    <tr>
+                                        <th style="width:30px;"><input type="checkbox" id="chkSelectAll" checked></th>
+                                        <th>Name</th>
+                                        <th style="width:180px;">E-Mail</th>
+                                        <th style="width:60px;">Einsaetze</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody_Empfaenger">
+                                    <tr><td colspan="4" style="text-align:center;color:#999;">Bitte Zeitraum wählen</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="fieldset">
+                        <legend>E-Mail Inhalt</legend>
+                        <div class="field-row">
+                            <label style="width:60px;">Betreff:</label>
+                            <input type="text" id="txtBetreff" class="form-control" style="flex:1;" value="Ihr Dienstplan">
+                        </div>
+                        <div style="margin-top:8px;">
+                            <label>Nachricht:</label>
+                            <textarea id="txtNachricht" class="form-control" rows="8" style="width:100%;margin-top:4px;">Sehr geehrte/r {Anrede} {Nachname},
+
+anbei erhalten Sie Ihren Dienstplan für den Zeitraum {VonDatum} bis {BisDatum}.
+
+{Einsatzliste}
+
+Mit freundlichen Grüßen
+CONSYS Security</textarea>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="content-sidebar">
+                    <div class="detail-header">
+                        <span class="detail-title">Status</span>
+                    </div>
+                    <div class="detail-content">
+                        <div class="stat-item" style="margin-bottom:8px;">
+                            <span class="stat-label">Empfaenger:</span>
+                            <span class="stat-value" id="statEmpfaenger">0</span>
+                        </div>
+                        <div class="stat-item" style="margin-bottom:8px;">
+                            <span class="stat-label">Einsaetze gesamt:</span>
+                            <span class="stat-value" id="statEinsaetze">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 E-Mails</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="js/webview2-bridge.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsliste - Subform</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: white;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 11px;
+        }
+        .subform-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .subform-header {
+            padding: 6px 8px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .subform-title {
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .filter-row {
+            padding: 6px 8px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-row label {
+            font-size: 10px;
+            color: #666;
+        }
+        .filter-row input[type="date"] {
+            padding: 3px 6px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+        .filter-row input:focus {
+            border-color: #4316B2;
+            outline: none;
+        }
+        .subform-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .auftrag-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .auftrag-item {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .auftrag-item:hover {
+            background: #f5f5f5;
+        }
+        .auftrag-item.selected {
+            background: #e8e8e8;
+            border-left: 3px solid #4316B2;
+        }
+        .auftrag-item.aktiv {
+            border-left: 3px solid #28a745;
+        }
+        .auftrag-item.abgeschlossen {
+            opacity: 0.7;
+        }
+        .auftrag-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 4px;
+        }
+        .auftrag-name {
+            font-weight: 600;
+            font-size: 11px;
+            color: #333;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .auftrag-id {
+            font-size: 9px;
+            color: #999;
+            margin-left: 8px;
+        }
+        .auftrag-details {
+            display: flex;
+            gap: 12px;
+            font-size: 10px;
+            color: #666;
+        }
+        .auftrag-datum {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .auftrag-ort {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 500;
+        }
+        .status-badge.anfrage { background: #fff3cd; color: #856404; }
+        .status-badge.geplant { background: #d4edda; color: #155724; }
+        .status-badge.aktiv { background: #cce5ff; color: #004085; }
+        .status-badge.abgeschlossen { background: #e2e3e5; color: #383d41; }
+        .subform-footer {
+            padding: 6px 8px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: #666;
+        }
+        .empty-message {
+            padding: 20px;
+            text-align: center;
+            color: #999;
+        }
+        .count-badge {
+            background: #e8e8e8;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">
+            <span class="subform-title">Auftraege</span>
+            <span class="count-badge" id="lblCount">0</span>
+        </div>
+        <div class="filter-row">
+            <label>Ab:</label>
+            <input type="date" id="txtDatumAb">
+            <label>Bis:</label>
+            <input type="date" id="txtDatumBis">
+        </div>
+        <div class="subform-content">
+            <ul class="auftrag-list" id="lstAuftraege">
+                <li class="empty-message">Keine Auftraege</li>
+            </ul>
+        </div>
+        <div class="subform-footer">
+            <span id="lblStatus">Bereit</span>
+            <span id="lblSelected">-</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Bridge } from '../js/webview2-bridge.js';
+
+        let auftraege = [];
+        let selectedVaId = null;
+        let filterParams = { datumAb: null, datumBis: null };
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        function init() {
+            // Filter Events
+            document.getElementById('txtDatumAb').addEventListener('change', onFilterChange);
+            document.getElementById('txtDatumBis').addEventListener('change', onFilterChange);
+
+            // Standard: Ab heute
+            const heute = new Date();
+            document.getElementById('txtDatumAb').value = formatDateInput(heute);
+            filterParams.datumAb = heute;
+
+            window.addEventListener('message', handleMessage);
+            notifyParent('subform_ready', { name: 'zsub_lstAuftrag' });
+
+            loadData();
+        }
+
+        function handleMessage(event) {
+            const data = event.data;
+            if (!data || !data.type) return;
+
+            switch (data.type) {
+                case 'set_filter':
+                    if (data.datumAb) {
+                        document.getElementById('txtDatumAb').value = data.datumAb;
+                        filterParams.datumAb = new Date(data.datumAb);
+                    }
+                    if (data.datumBis) {
+                        document.getElementById('txtDatumBis').value = data.datumBis;
+                        filterParams.datumBis = new Date(data.datumBis);
+                    }
+                    loadData();
+                    break;
+                case 'select_auftrag':
+                    if (data.VA_ID) {
+                        selectAuftragById(data.VA_ID);
+                    }
+                    break;
+                case 'requery':
+                    loadData();
+                    break;
+            }
+        }
+
+        function onFilterChange() {
+            const abValue = document.getElementById('txtDatumAb').value;
+            const bisValue = document.getElementById('txtDatumBis').value;
+
+            filterParams.datumAb = abValue ? new Date(abValue) : null;
+            filterParams.datumBis = bisValue ? new Date(bisValue) : null;
+
+            loadData();
+        }
+
+        async function loadData() {
+            try {
+                setStatus('Lade...');
+
+                let sql = `SELECT VA_ID, Auftrag, Ort, Dat_VA_Von, Dat_VA_Bis, Veranst_Status_ID
+                           FROM tbl_VA_Auftragstamm
+                           WHERE 1=1`;
+
+                if (filterParams.datumAb) {
+                    sql += ` AND Dat_VA_Von >= #${formatDateForSQL(filterParams.datumAb)}#`;
+                }
+
+                if (filterParams.datumBis) {
+                    sql += ` AND Dat_VA_Bis <= #${formatDateForSQL(filterParams.datumBis)}#`;
+                }
+
+                sql += ` ORDER BY Dat_VA_Von ASC, Auftrag ASC`;
+
+                const result = await Bridge.execute('executeSQL', {
+                    sql: sql,
+                    fetch: true
+                });
+
+                auftraege = (result && result.rows) || [];
+                render();
+                setStatus(`${auftraege.length} Auftraege geladen`);
+            } catch (error) {
+                console.error('[zsub_lstAuftrag] Fehler:', error);
+                renderEmpty();
+                setStatus('Fehler beim Laden');
+            }
+        }
+
+        function render() {
+            const list = document.getElementById('lstAuftraege');
+            document.getElementById('lblCount').textContent = auftraege.length;
+
+            if (auftraege.length === 0) {
+                renderEmpty();
+                return;
+            }
+
+            list.innerHTML = auftraege.map(a => {
+                const isSelected = selectedVaId === a.VA_ID;
+                const statusClass = getStatusClass(a.Veranst_Status_ID);
+                const statusText = getStatusText(a.Veranst_Status_ID);
+                const datumVon = a.Dat_VA_Von ? new Date(a.Dat_VA_Von).toLocaleDateString('de-DE') : '-';
+                const datumBis = a.Dat_VA_Bis ? new Date(a.Dat_VA_Bis).toLocaleDateString('de-DE') : '-';
+
+                return `<li class="auftrag-item ${isSelected ? 'selected' : ''} ${statusClass}" data-id="${a.VA_ID}">
+                    <div class="auftrag-header">
+                        <span class="auftrag-name" title="${escapeHtml(a.Auftrag)}">${escapeHtml(a.Auftrag)}</span>
+                        <span class="auftrag-id">#${a.VA_ID}</span>
+                    </div>
+                    <div class="auftrag-details">
+                        <span class="auftrag-datum">${datumVon} - ${datumBis}</span>
+                        <span class="auftrag-ort" title="${escapeHtml(a.Ort || '')}">${escapeHtml(a.Ort || '-')}</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                </li>`;
+            }).join('');
+
+            // Klick-Handler
+            list.querySelectorAll('.auftrag-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = parseInt(item.dataset.id);
+                    selectAuftrag(id);
+                });
+
+                item.addEventListener('dblclick', () => {
+                    const id = parseInt(item.dataset.id);
+                    openAuftrag(id);
+                });
+            });
+
+            // Wenn vorher selektierter Auftrag noch in Liste, markieren
+            if (selectedVaId) {
+                const existiert = auftraege.find(a => a.VA_ID === selectedVaId);
+                if (existiert) {
+                    updateSelectedDisplay(existiert);
+                }
+            }
+        }
+
+        function renderEmpty() {
+            document.getElementById('lstAuftraege').innerHTML =
+                '<li class="empty-message">Keine Auftraege gefunden</li>';
+            document.getElementById('lblCount').textContent = '0';
+            document.getElementById('lblSelected').textContent = '-';
+        }
+
+        function selectAuftrag(vaId) {
+            selectedVaId = vaId;
+            const auftrag = auftraege.find(a => a.VA_ID === vaId);
+
+            // UI Update
+            document.querySelectorAll('.auftrag-item').forEach(item => {
+                item.classList.toggle('selected', parseInt(item.dataset.id) === vaId);
+            });
+
+            if (auftrag) {
+                updateSelectedDisplay(auftrag);
+            }
+
+            // Parent informieren
+            notifyParent('subform_selection', {
+                name: 'zsub_lstAuftrag',
+                VA_ID: vaId,
+                record: auftrag
+            });
+        }
+
+        function selectAuftragById(vaId) {
+            const auftrag = auftraege.find(a => a.VA_ID === vaId);
+            if (auftrag) {
+                selectAuftrag(vaId);
+
+                // Scroll to selected
+                const item = document.querySelector(`.auftrag-item[data-id="${vaId}"]`);
+                if (item) {
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
+        function openAuftrag(vaId) {
+            notifyParent('open_auftrag', {
+                name: 'zsub_lstAuftrag',
+                VA_ID: vaId
+            });
+        }
+
+        function updateSelectedDisplay(auftrag) {
+            document.getElementById('lblSelected').textContent =
+                `${auftrag.Auftrag} (#${auftrag.VA_ID})`;
+        }
+
+        function getStatusClass(statusId) {
+            switch (statusId) {
+                case 1: return 'anfrage';
+                case 2: return 'geplant';
+                case 3: return 'aktiv';
+                case 4: return 'abgeschlossen';
+                default: return '';
+            }
+        }
+
+        function getStatusText(statusId) {
+            switch (statusId) {
+                case 1: return 'Anfrage';
+                case 2: return 'Geplant';
+                case 3: return 'Aktiv';
+                case 4: return 'Abgeschl.';
+                default: return 'Offen';
+            }
+        }
+
+        function formatDateInput(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            if (isNaN(d)) return '';
+            return d.toISOString().split('T')[0];
+        }
+
+        function formatDateForSQL(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${month}/${day}/${year}`;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function setStatus(text) {
+            document.getElementById('lblStatus').textContent = text;
+        }
+
+        function notifyParent(type, data) {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type, ...data }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

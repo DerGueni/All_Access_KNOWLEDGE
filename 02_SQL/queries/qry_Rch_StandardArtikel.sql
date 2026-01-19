@@ -1,0 +1,3 @@
+SELECT tbl_KD_Artikelbeschreibung.ID, tbl_KD_Artikelbeschreibung.MwSt_Satz, tbl_KD_Artikelbeschreibung.Mengenheit, qry_Rch_AktKunde_StandardPreis.StdPreis, tbl_KD_Artikelbeschreibung.Beschreibung, Get_Priv_Property("prp_Rechnung_AktKunde") AS kun_ID
+FROM qry_Rch_AktKunde_StandardPreis RIGHT JOIN tbl_KD_Artikelbeschreibung ON qry_Rch_AktKunde_StandardPreis.Preisart_ID = tbl_KD_Artikelbeschreibung.ID;
+

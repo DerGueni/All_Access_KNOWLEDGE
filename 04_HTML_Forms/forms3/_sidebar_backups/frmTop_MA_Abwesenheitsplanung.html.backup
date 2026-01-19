@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abwesenheitsplanung</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        .form-container {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            height: 100%;
+        }
+
+        .form-left {
+            flex: 0 0 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .fieldset {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 12px;
+            background: white;
+        }
+
+        .fieldset legend {
+            font-weight: 600;
+            color: #4316B2;
+            padding: 0 6px;
+            font-size: 12px;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+
+        .field-row label {
+            min-width: 100px;
+            text-align: right;
+            font-size: 11px;
+            color: #333;
+        }
+
+        .field-row select,
+        .field-row input[type="text"],
+        .field-row input[type="date"],
+        .field-row input[type="time"] {
+            flex: 1;
+            padding: 4px 6px;
+            border: 1px solid #ccc;
+            font-size: 11px;
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+        }
+
+        .field-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-left: 108px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .radio-item input[type="radio"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .radio-item label {
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .list-header {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-title {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .list-container {
+            flex: 1;
+            overflow: auto;
+            padding: 8px;
+        }
+
+        .list-box {
+            width: 100%;
+            border: 1px solid #ccc;
+            background: white;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            padding: 6px 8px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .list-item:hover {
+            background: #f5f5f5;
+        }
+
+        .list-item.selected {
+            background: #cce5ff;
+        }
+
+        .list-item input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+        }
+
+        .item-date {
+            font-weight: 600;
+            min-width: 90px;
+        }
+
+        .item-day {
+            min-width: 40px;
+            color: #666;
+        }
+
+        .item-type {
+            flex: 1;
+            color: #333;
+        }
+
+        .time-fields {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-left: 108px;
+        }
+
+        .time-fields label {
+            font-size: 11px;
+        }
+
+        .time-fields input {
+            width: 80px;
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.2);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4316B2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: #333;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 10000;
+            display: none;
+            font-size: 12px;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success { background: #5cb85c; }
+        .toast.error { background: #d9534f; }
+        .toast.warning { background: #f0ad4e; }
+        .toast.info { background: #5bc0de; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+            overflow: visible;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:active::before {
+            background: #404070;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn:active::after {
+            background: #ffffff;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.active::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <div class="app-container">
+        <!-- Left Menu -->
+        <div class="left-menu">
+            <div>
+                <div class="menu-header">HAUPTMENU</div>
+            </div>
+            <div class="menu-buttons">
+                <button class="menu-btn" data-form="frm_DP_Dienstplan_MA">Dienstplanübersicht</button>
+                <button class="menu-btn" data-form="frm_DP_Dienstplan_Objekt">Planungsübersicht</button>
+                <button class="menu-btn" data-form="frm_va_Auftragstamm">Auftragsverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_VA_Schnellauswahl">Offene Mail Anfragen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Excel Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Zeitkonten</button>
+                <button class="menu-btn active" data-form="frm_Abwesenheiten">Abwesenheitsplanung</button>
+                <button class="menu-btn">Dienstausweis erstellen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Stundenabgleich</button>
+                <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kundenverwaltung</button>
+                <button class="menu-btn">Verrechnungssätze</button>
+                <button class="menu-btn">Sub Rechnungen</button>
+                <button class="menu-btn" data-form="frmOff_Outlook_aufrufen">E-Mail</button>
+                <button class="menu-btn" data-form="frm_Menuefuehrung1">Menu 2</button>
+                <button class="menu-btn" onclick="openHtmlAnsicht()">HTML Ansicht</button>
+                <button class="menu-btn">System Info</button>
+            </div>
+        </div>
+
+        <!-- Main Area -->
+        <div class="app-main">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Abwesenheitsplanung</h1>
+                </div>
+                <div class="header-center">
+                    <button class="btn btn-primary" id="btnSpeichern">Speichern</button>
+                    <button class="btn" id="btnSchliessen">Schließen</button>
+                </div>
+                <div class="header-right">
+                    <div class="version-info">
+                        <div>Version 1.0</div>
+                        <div id="currentDate"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="app-content">
+                <div class="form-container">
+                    <!-- Left Side: Form Inputs -->
+                    <div class="form-left">
+                        <!-- Mitarbeiter Selection -->
+                        <div class="fieldset">
+                            <legend>Mitarbeiter</legend>
+                            <div class="field-row">
+                                <label>Mitarbeiter:</label>
+                                <select id="cbo_MA_ID" class="form-control">
+                                    <option value="">-- Bitte wählen --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Abwesenheitsart -->
+                        <div class="fieldset">
+                            <legend>Abwesenheitsart</legend>
+                            <div class="field-row">
+                                <label>Grund:</label>
+                                <select id="cboAbwGrund" class="form-control">
+                                    <option value="">-- Bitte wählen --</option>
+                                </select>
+                            </div>
+                            <div class="field-row">
+                                <label>Bemerkung:</label>
+                                <input type="text" id="Bemerkung" class="form-control" placeholder="Optional">
+                            </div>
+                        </div>
+
+                        <!-- Zeitraum -->
+                        <div class="fieldset">
+                            <legend>Zeitraum</legend>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" id="optGanztag" name="AbwesenArt" value="ganztag" checked>
+                                    <label for="optGanztag">Ganztägig</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="optTeilzeit" name="AbwesenArt" value="teilzeit">
+                                    <label for="optTeilzeit">Teilzeit</label>
+                                </div>
+                            </div>
+
+                            <div class="field-row" style="margin-top: 12px;">
+                                <label>Von Datum:</label>
+                                <input type="date" id="DatVon" class="form-control">
+                            </div>
+                            <div class="field-row">
+                                <label>Bis Datum:</label>
+                                <input type="date" id="DatBis" class="form-control">
+                            </div>
+
+                            <!-- Teilzeit-Uhrzeiten (initial hidden) -->
+                            <div id="teilzeitFelder" style="display: none; margin-top: 8px;">
+                                <div class="time-fields">
+                                    <label>Von:</label>
+                                    <input type="time" id="TlZeitVon" class="form-control">
+                                    <label>Bis:</label>
+                                    <input type="time" id="TlZeitBis" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="field-row" style="margin-top: 8px;">
+                                <label></label>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <input type="checkbox" id="NurWerktags">
+                                    <label for="NurWerktags" style="min-width: auto; text-align: left;">Nur Werktage (Mo-Fr)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="button-group">
+                            <button class="btn btn-primary" id="btnAbwBerechnen">Berechnen</button>
+                            <button class="btn" id="btnReset">Zurücksetzen</button>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Calculated Days List -->
+                    <div class="form-right">
+                        <div class="list-header">
+                            <span class="list-title">Berechnete Abwesenheitstage (<span id="countTage">0</span>)</span>
+                            <div class="list-actions">
+                                <button class="btn btn-sm" id="btnMarkLoesch">Markierte löschen</button>
+                                <button class="btn btn-sm" id="btnAllLoesch">Alle löschen</button>
+                            </div>
+                        </div>
+                        <div class="list-container">
+                            <div id="lsttmp_Fehlzeiten" class="list-box"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <div class="footer-left">
+                    <span>CONSYS Abwesenheitsplanung</span>
+                </div>
+                <div class="footer-center">
+                    <span id="statusText">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="userInfo">Benutzer: System</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Sidebar Script -->
+    <script src="../js/sidebar.js"></script>
+
+    <!-- Load Logic Script -->
+    <script type="module" src="./logic/frmTop_MA_Abwesenheitsplanung.logic.js"></script>
+</body>
+</html>

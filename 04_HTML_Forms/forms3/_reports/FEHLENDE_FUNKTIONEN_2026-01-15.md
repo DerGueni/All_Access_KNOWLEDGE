@@ -1,0 +1,2406 @@
+# Fehlende Funktionen - Checkliste
+
+**Erstellt:** 2026-01-15 21:45
+
+## Was fehlt in HTML?
+
+### frmTop_DP_MA_Auftrag_Zuo.html
+
+**Fehlende Controls:**
+- [ ] `ListeAuft` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld11` (Typ: 100, Caption: Offene Aufträge im Zeitraum:)
+- [ ] `LstSchicht` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld1` (Typ: 100, Caption: Schichten:)
+- [ ] `dtPlanDatum` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld7` (Typ: 100, Caption: Plandatum)
+- [ ] `cboMA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: Mitarbeiter:)
+- [ ] `btn_Auswahl_Zuo` (Typ: 104, Caption: Zuweisen)
+- [ ] `MAemail` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld23` (Typ: 100, Caption: eMail)
+- [ ] `Befehl38` (Typ: 104, Caption:    Schliessen)
+
+**Fehlende Events:**
+- [ ] `btn_auswahl_zuo` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl38` → OnClick (Erwartet: onclick, click)
+
+### frmTop_Geo_Verwaltung.html
+
+**Fehlende Controls:**
+- [ ] `cmdBatchObjekte` (Typ: 104, Caption: Alle Objekte geocodieren)
+- [ ] `cmdBatchMA` (Typ: 104, Caption: Alle Mitarbeiter geocodieren)
+- [ ] `cmdBuildDistances` (Typ: 104, Caption: Entfernungen berechnen)
+- [ ] `cmdStats` (Typ: 104, Caption: Statistik anzeigen)
+- [ ] `cmdClose` (Typ: 104, Caption: Schließen)
+
+**Fehlende Events:**
+- [ ] `cmdbatchobjekte` → OnClick (Erwartet: onclick, click)
+- [ ] `cmdbatchma` → OnClick (Erwartet: onclick, click)
+- [ ] `cmdbuilddistances` → OnClick (Erwartet: onclick, click)
+- [ ] `cmdstats` → OnClick (Erwartet: onclick, click)
+- [ ] `cmdclose` → OnClick (Erwartet: onclick, click)
+
+### frmTop_KD_Adressart.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Logo0` (Typ: 103, Caption: )
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Kunden Adressart)
+- [ ] `Rechteck37` (Typ: 101, Caption: )
+- [ ] `Befehl11` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `Befehl39` (Typ: 104, Caption: btn_letzter_Datensatz)
+- [ ] `Befehl40` (Typ: 104, Caption: btn_Datensatz_vor)
+- [ ] `Befehl41` (Typ: 104, Caption: btn_Datensatz_zurueck)
+- [ ] `Befehl42` (Typ: 104, Caption: drucken)
+- [ ] `Befehl43` (Typ: 104, Caption: btn_erster_Datensatz)
+- [ ] `Befehl44` (Typ: 104, Caption: btn_suchen)
+- [ ] `Befehl45` (Typ: 104, Caption: btn_weitersuchen)
+- [ ] `Befehl46` (Typ: 104, Caption: btn_neuer_Datensatz)
+- [ ] `btnHilfe` (Typ: 104, Caption: Hilfe)
+- [ ] `mcobtnDelete` (Typ: 104, Caption: Befehl286)
+- [ ] `Befehl12` (Typ: 104, Caption: M)
+- [ ] `ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: ID)
+- [ ] `Beschreibung` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: Beschreibung)
+
+**Fehlende Events:**
+- [ ] `befehl11` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl39` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl40` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl41` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl42` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl43` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl44` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl45` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl46` → OnClick (Erwartet: onclick, click)
+- [ ] `btnhilfe` → OnClick (Erwartet: onclick, click)
+- [ ] `mcobtndelete` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl12` → OnClick (Erwartet: onclick, click)
+
+### frmTop_MA_Abwesenheitsplanung.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Abwesenheitsplanung)
+- [ ] `Befehl38` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `btnHilfe` (Typ: 104, Caption: Hilfe)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `cbo_MA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld1` (Typ: 100, Caption: Mitarbeiter)
+- [ ] `DatVon` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: von)
+- [ ] `TlZeitBis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld5` (Typ: 100, Caption: bis)
+- [ ] `cboAbwGrund` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld7` (Typ: 100, Caption: Grund:)
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Zeiten)
+- [ ] `Option10` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld11` (Typ: 100, Caption: Ganztägig)
+- [ ] `Option12` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld13` (Typ: 100, Caption: Stundenweise)
+- [ ] `TlZeitVon` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld15` (Typ: 100, Caption: von )
+- [ ] `btnAbwBerechnen` (Typ: 104, Caption: Übernehmen)
+- [ ] `lsttmp_Fehlzeiten` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: Abwesenheitszeiten:)
+- [ ] `DatBis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld20` (Typ: 100, Caption: bis)
+- [ ] `Bemerkung` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld22` (Typ: 100, Caption: Bemerkung:)
+- [ ] `btnMarkLoesch` (Typ: 104, Caption: Markierte löschen <-)
+- [ ] `btnAllLoesch` (Typ: 104, Caption: Alle löschen <<--)
+- [ ] `bznUebernehmen` (Typ: 104, Caption: Bestätigen)
+- [ ] `NurWerktags` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld40` (Typ: 100, Caption: Nur Werktags (Mo - Fr, wenn kein Feiertag in Bayern))
+- [ ] `Menü` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld449` (Typ: 100, Caption: Menü)
+
+**Fehlende Events:**
+- [ ] `befehl38` → OnClick (Erwartet: onclick, click)
+- [ ] `btnhilfe` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnabwberechnen` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmarkloesch` → OnClick (Erwartet: onclick, click)
+- [ ] `btnallloesch` → OnClick (Erwartet: onclick, click)
+- [ ] `bznuebernehmen` → OnClick (Erwartet: onclick, click)
+
+### frmTop_VA_Akt_Objekt_Kopf.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Objektpositionen)
+- [ ] `Befehl53` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `Befehl39` (Typ: 104, Caption: btn_letzter_Datensatz)
+- [ ] `Befehl40` (Typ: 104, Caption: btn_Datensatz_vor)
+- [ ] `Befehl41` (Typ: 104, Caption: btn_Datensatz_zurueck)
+- [ ] `Befehl42` (Typ: 104, Caption: drucken)
+- [ ] `Befehl43` (Typ: 104, Caption: btn_erster_Datensatz)
+- [ ] `Befehl46` (Typ: 104, Caption: Neue Positionsliste)
+- [ ] `btnHilfe` (Typ: 104, Caption: Hilfe)
+- [ ] `mcobtnDelete` (Typ: 104, Caption: Positionsliste löschen)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: Nr.:)
+- [ ] `VA_Start_Abs` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld15` (Typ: 100, Caption: Beginn)
+- [ ] `VA_Ende_Abs` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: Ende)
+- [ ] `VA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: Auftrag:)
+- [ ] `Obj_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: Location:)
+- [ ] `AnzMA_VA` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld38` (Typ: 100, Caption: Anzahl Positionen Auftrag )
+- [ ] `sub_VA_Start` (Typ: 112, Caption: )
+- [ ] `sub_VA_Akt_Objekt_Pos` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld42` (Typ: 100, Caption: Anzahl Positionen Objekt abgleichen:)
+- [ ] `AnzMA_Obj` (Typ: 109, Caption: )
+- [ ] `btn_VA_Objekt_Akt_Teil2` (Typ: 104, Caption: Positionen zuordnen)
+- [ ] `Bezeichnungsfeld47` (Typ: 100, Caption:    Anzahl Mitarbeiter muss gleich sein)
+- [ ] `btn_OB_Bearb` (Typ: 104, Caption: Positionsliste (Original) Bearbeiten)
+- [ ] `btn_VA_Akt_OB_Pos_Neu` (Typ: 104, Caption: Positionsliste (Original) neu einlesen)
+- [ ] `cboVADatum` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Datum:)
+- [ ] `btnAbsTime` (Typ: 104, Caption:  Zeiten zuordnen)
+- [ ] `Menü` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld449` (Typ: 100, Caption: Menü)
+- [ ] `Kombinationsfeld58` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld59` (Typ: 100, Caption: Ort:)
+
+**Fehlende Events:**
+- [ ] `befehl53` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl39` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl40` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl41` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl42` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl43` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl46` → OnClick (Erwartet: onclick, click)
+- [ ] `btnhilfe` → OnClick (Erwartet: onclick, click)
+- [ ] `mcobtndelete` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_va_objekt_akt_teil2` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_ob_bearb` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_va_akt_ob_pos_neu` → OnClick (Erwartet: onclick, click)
+- [ ] `btnabstime` → OnClick (Erwartet: onclick, click)
+
+### frm_Abwesenheiten.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Abwesenheitsübersicht)
+- [ ] `Zeittyp_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: Zeittyp_ID)
+- [ ] `AbwDat` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: AbwDat)
+- [ ] `Nachname` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: Nachname)
+- [ ] `Vorname` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Vorname)
+
+### frm_Ausweis_Create.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Ausweisdruck)
+- [ ] `Befehl38` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `btnHilfe` (Typ: 104, Caption: Hilfe)
+- [ ] `lbl_Datum` (Typ: 100, Caption: 15.01.2026)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `lstMA_Alle` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: Mitarbeiter alle:)
+- [ ] `lstMA_Ausweis` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld32` (Typ: 100, Caption: Mitarbeiter Ausweis:)
+- [ ] `btnAddAll` (Typ: 104, Caption: Alle)
+- [ ] `btnAddSelected` (Typ: 104, Caption: Auswählen)
+- [ ] `btnDelAll` (Typ: 104, Caption: Alle)
+- [ ] `btnDelSelected` (Typ: 104, Caption: Entfernen)
+- [ ] `Bezeichnungsfeld22` (Typ: 100, Caption: Löschen)
+- [ ] `GueltBis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld1` (Typ: 100, Caption: Gültig bis:)
+- [ ] `btnAusweisReport` (Typ: 104, Caption: 1. Ausweis mit Namen)
+- [ ] `btnDeselect` (Typ: 104, Caption: Deselect)
+- [ ] `frm_Menuefuehrung` (Typ: 112, Caption: )
+- [ ] `btnDienstauswNr` (Typ: 104, Caption: Pers-Nr.als Ausweis-Nr. setzen)
+- [ ] `Befehl7` (Typ: 104, Caption: Ausweis erstellen)
+- [ ] `Befehl8` (Typ: 104, Caption: Ausweis erstellen)
+- [ ] `btn_ausweiseinsatzleitung` (Typ: 104, Caption: 2. Einsatzleitung)
+- [ ] `btn_ausweisservice` (Typ: 104, Caption: 5. Servicepersonal)
+- [ ] `btn_ausweisstaff` (Typ: 104, Caption: 7. Verwaltung)
+- [ ] `btn_ausweisBereichsleiter` (Typ: 104, Caption: 3. Bereichsleiter)
+- [ ] `btn_ausweissec` (Typ: 104, Caption: 4. Sicherheitspersonal)
+- [ ] `Bezeichnungsfeld16` (Typ: 100, Caption: Ausweisdruck alt)
+- [ ] `btn_ausweisplatzanweiser` (Typ: 104, Caption: 6. Platzanweiser)
+- [ ] `lbl_Kartendruck` (Typ: 100, Caption: KARTENDRUCK)
+- [ ] `btn_Karte_Sicherheit` (Typ: 104, Caption: Sicherheitspersonal)
+- [ ] `btn_Karte_Service` (Typ: 104, Caption: Servicepersonal)
+- [ ] `btn_Karte_Rueck` (Typ: 104, Caption: Rückseite)
+- [ ] `cbo_Kartendrucker` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld26` (Typ: 100, Caption: Kartendrucker:)
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: Kartendrucker ändern:)
+- [ ] `lbl_Kartendrucker` (Typ: 100, Caption: Badgy200)
+- [ ] `btn_Sonder` (Typ: 104, Caption: Vorderseite 2-zeilig)
+
+**Fehlende Events:**
+- [ ] `befehl38` → OnClick (Erwartet: onclick, click)
+- [ ] `btnhilfe` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaddall` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaddselected` → OnClick (Erwartet: onclick, click)
+- [ ] `btndelall` → OnClick (Erwartet: onclick, click)
+- [ ] `btndelselected` → OnClick (Erwartet: onclick, click)
+- [ ] `btnausweisreport` → OnClick (Erwartet: onclick, click)
+- [ ] `btndeselect` → OnClick (Erwartet: onclick, click)
+- [ ] `btndienstauswnr` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_ausweiseinsatzleitung` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_ausweisservice` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_ausweisstaff` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_ausweisbereichsleiter` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_ausweissec` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_ausweisplatzanweiser` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_karte_sicherheit` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_karte_service` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_karte_rueck` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_sonder` → OnClick (Erwartet: onclick, click)
+
+### frm_DP_Dienstplan_MA.html
+
+**Fehlende Controls:**
+- [ ] `lbl_Datum` (Typ: 100, Caption: 05.04.2015)
+- [ ] `Bezeichnungsfeld96` (Typ: 100, Caption: Dienstplanübersicht)
+- [ ] `Rechteck108` (Typ: 101, Caption: )
+- [ ] `dtStartdatum` (Typ: 109, Caption: )
+- [ ] `btnStartdatum` (Typ: 104, Caption: Startdatum Ändern)
+- [ ] `btnVor` (Typ: 104, Caption: None)
+- [ ] `btnrueck` (Typ: 104, Caption: None)
+- [ ] `tmpFokus` (Typ: 109, Caption: )
+- [ ] `btn_Heute` (Typ: 104, Caption: Ab Heute)
+- [ ] `NurAktiveMA` (Typ: 111, Caption: )
+- [ ] `btnOutpExcelSend` (Typ: 104, Caption: Übersicht senden)
+- [ ] `btnOutpExcel` (Typ: 104, Caption: Übersicht drucken)
+- [ ] `Befehl37` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `lbl_Version` (Typ: 100, Caption: Test | Test)
+- [ ] `btnMADienstpl` (Typ: 104, Caption: Einzeldienstpläne)
+- [ ] `Befehl20` (Typ: 104, Caption: Senden)
+- [ ] `btnDPSenden` (Typ: 104, Caption: Dienstpläne senden bis)
+- [ ] `dtEnddatum` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_7` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_6` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_5` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_4` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_3` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_2` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_1` (Typ: 109, Caption: )
+- [ ] `lbl_Auftrag` (Typ: 100, Caption: Mitarbeiter)
+- [ ] `sub_DP_Grund` (Typ: 112, Caption: )
+- [ ] `frm_Menuefuehrung` (Typ: 112, Caption: )
+
+**Fehlende Events:**
+- [ ] `btnstartdatum` → OnClick (Erwartet: onclick, click)
+- [ ] `btnvor` → OnClick (Erwartet: onclick, click)
+- [ ] `btnrueck` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_heute` → OnClick (Erwartet: onclick, click)
+- [ ] `btnoutpexcelsend` → OnClick (Erwartet: onclick, click)
+- [ ] `btnoutpexcel` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl37` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmadienstpl` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl20` → OnClick (Erwartet: onclick, click)
+- [ ] `btndpsenden` → OnClick (Erwartet: onclick, click)
+
+### frm_DP_Dienstplan_Objekt.html
+
+**Fehlende Controls:**
+- [ ] `lbl_Datum` (Typ: 100, Caption: 05.04.2015)
+- [ ] `Bezeichnungsfeld96` (Typ: 100, Caption: Planungsübersicht)
+- [ ] `Rechteck108` (Typ: 101, Caption: )
+- [ ] `dtStartdatum` (Typ: 109, Caption: )
+- [ ] `btnStartdatum` (Typ: 104, Caption: Startdatum Ändern)
+- [ ] `btnVor` (Typ: 104, Caption: None)
+- [ ] `btnrueck` (Typ: 104, Caption: None)
+- [ ] `tmpFokus` (Typ: 109, Caption: )
+- [ ] `btn_Heute` (Typ: 104, Caption: Ab Heute)
+- [ ] `NurIstNichtZugeordnet` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld15` (Typ: 100, Caption: Nur freie Schichten anzeigen)
+- [ ] `PosAusblendAb` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld17` (Typ: 100, Caption: Nur Aufträge mit weniger  als )
+- [ ] `Bezeichnungsfeld20` (Typ: 100, Caption: Positionen anzeigen)
+- [ ] `IstAuftrAusblend` (Typ: 106, Caption: )
+- [ ] `btnOutpExcelSend` (Typ: 104, Caption: Übersicht senden)
+- [ ] `btnOutpExcel` (Typ: 104, Caption: Übersicht drucken)
+- [ ] `Befehl37` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `lbl_Version` (Typ: 100, Caption: Test | Test)
+- [ ] `sub_DP_Grund` (Typ: 112, Caption: )
+- [ ] `lbl_Auftrag` (Typ: 100, Caption: Auftrag / Veranstaltung)
+- [ ] `lbl_Tag_1` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_2` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_3` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_4` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_5` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_6` (Typ: 109, Caption: )
+- [ ] `lbl_Tag_7` (Typ: 109, Caption: )
+- [ ] `frm_Menuefuehrung` (Typ: 112, Caption: )
+
+**Fehlende Events:**
+- [ ] `btnstartdatum` → OnClick (Erwartet: onclick, click)
+- [ ] `btnvor` → OnClick (Erwartet: onclick, click)
+- [ ] `btnrueck` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_heute` → OnClick (Erwartet: onclick, click)
+- [ ] `btnoutpexcelsend` → OnClick (Erwartet: onclick, click)
+- [ ] `btnoutpexcel` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl37` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+
+### frm_KD_Kundenstamm.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Kundenstammblatt)
+- [ ] `lbl_Datum` (Typ: 100, Caption: 22.01.2015)
+- [ ] `cboSuchPLZ` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld294` (Typ: 100, Caption: Schnellsuche : Kunde D PLZ)
+- [ ] `cboSuchOrt` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld330` (Typ: 100, Caption: Kunde D Ort)
+- [ ] `btnAlle` (Typ: 104, Caption: Auswahlfilter)
+- [ ] `Rechteck37` (Typ: 101, Caption: )
+- [ ] `Befehl39` (Typ: 104, Caption: btn_letzter_Datensatz)
+- [ ] `Befehl40` (Typ: 104, Caption: btn_Datensatz_vor)
+- [ ] `Befehl41` (Typ: 104, Caption: btn_Datensatz_zurueck)
+- [ ] `Befehl43` (Typ: 104, Caption: btn_erster_Datensatz)
+- [ ] `Befehl46` (Typ: 104, Caption: Neuer Kunde)
+- [ ] `mcobtnDelete` (Typ: 104, Caption: Kunden löschen)
+- [ ] `cboKDNrSuche` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld456` (Typ: 100, Caption: KundenNr)
+- [ ] `lbl_Version` (Typ: 100, Caption: Test | Test)
+- [ ] `btnUmsAuswert` (Typ: 104, Caption: Umsatzauswertung)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnAuswertung` (Typ: 104, Caption: Verrechnungssätze)
+- [ ] `RegStammKunde` (Typ: 123, Caption: )
+- [ ] `pgMain` (Typ: 124, Caption: Stammdaten)
+- [ ] `kun_IstAktiv` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld418` (Typ: 100, Caption: Ist aktiv)
+- [ ] `Bezeichnungsfeld42` (Typ: 100, Caption: Kreditinstitut)
+- [ ] `kun_kreditinstitut` (Typ: 109, Caption: )
+- [ ] `kun_Matchcode` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld237` (Typ: 100, Caption: Kunden-Kürzel)
+- [ ] `Bezeichnungsfeld45` (Typ: 100, Caption: BLZ)
+- [ ] `kun_blz` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld48` (Typ: 100, Caption: KontoNr.)
+- [ ] `kun_kontonummer` (Typ: 109, Caption: )
+- [ ] `kun_strasse` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Straße)
+- [ ] `Bezeichnungsfeld51` (Typ: 100, Caption: IBAN)
+- [ ] `kun_iban` (Typ: 109, Caption: )
+- [ ] `kun_plz` (Typ: 109, Caption: )
+- [ ] `kun_ort` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: PLZ Ort)
+- [ ] `Bezeichnungsfeld54` (Typ: 100, Caption: BIC)
+- [ ] `kun_bic` (Typ: 109, Caption: )
+- [ ] `kun_LKZ` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld21` (Typ: 100, Caption: Land)
+- [ ] `Bezeichnungsfeld57` (Typ: 100, Caption: UStIDNr.)
+- [ ] `kun_ustidnr` (Typ: 109, Caption: )
+- [ ] `kun_Zahlbed` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld370` (Typ: 100, Caption: Zahlungsbed.)
+- [ ] `kun_telefon` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: Telefon )
+- [ ] `kun_telefax` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld30` (Typ: 100, Caption: Telefax)
+- [ ] `kun_IstSammelRechnung` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld372` (Typ: 100, Caption: Sammelrechnung)
+- [ ] `kun_mobil` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld33` (Typ: 100, Caption: Mobil)
+- [ ] `kun_email` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld36` (Typ: 100, Caption: E-Mail)
+- [ ] `kun_BriefKopf` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: Anschrift)
+- [ ] `kun_URL` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld214` (Typ: 100, Caption: Homepage)
+- [ ] `kun_ans_manuell` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld223` (Typ: 100, Caption: manuell)
+- [ ] `adr_mobil` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld218` (Typ: 100, Caption: Mobil)
+- [ ] `adr_eMail` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld356` (Typ: 100, Caption: Ansp eMail)
+- [ ] `Anschreiben` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld267` (Typ: 100, Caption: Anschreiben)
+- [ ] `adr_telefon` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld216` (Typ: 100, Caption: Ansp Telefon )
+- [ ] `kun_land_vorwahl` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld246` (Typ: 100, Caption: Landesvorwahl )
+- [ ] `Bezeichnungsfeld63` (Typ: 100, Caption: geloescht)
+- [ ] `kun_geloescht` (Typ: 109, Caption: )
+- [ ] `kun_IDF_PersonID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld212` (Typ: 100, Caption: Anspr.Partner)
+- [ ] `pgPreise` (Typ: 124, Caption: Konditionen)
+- [ ] `sub_KD_Standardpreise` (Typ: 112, Caption: )
+- [ ] `Auftragsübersicht` (Typ: 124, Caption: None)
+- [ ] `sub_KD_Auftragskopf` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld424` (Typ: 100, Caption: Auftragskopf:)
+- [ ] `sub_KD_Rch_Auftragspos` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld426` (Typ: 100, Caption: Positionen pro Auftrag:)
+- [ ] `KD_Ges` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld428` (Typ: 100, Caption: Alles Netto - Gesamt:)
+- [ ] `KD_VJ` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld430` (Typ: 100, Caption: Vorjahr:)
+- [ ] `KD_LJ` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld432` (Typ: 100, Caption: Lfd Jahr:)
+- [ ] `KD_LM` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld434` (Typ: 100, Caption: Akt Monat:)
+- [ ] `btnAufRchPDF` (Typ: 104, Caption: Rechnung)
+- [ ] `btnAufRchPosPDF` (Typ: 104, Caption: Berechnungsliste)
+- [ ] `btnAufEinsPDF` (Typ: 104, Caption: Einsatzliste)
+- [ ] `PosGesamtsumme` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld439` (Typ: 100, Caption: Gesamtsumme Netto:)
+- [ ] `pg_Rch_Kopf` (Typ: 124, Caption: Auftragsübersicht)
+- [ ] `Rechteck414` (Typ: 101, Caption: )
+- [ ] `Bezeichnungsfeld415` (Typ: 100, Caption: Aufträge Berechnet)
+- [ ] `Bezeichnungsfeld413` (Typ: 100, Caption: Aufträge Gesamt)
+- [ ] `Rechteck412` (Typ: 101, Caption: )
+- [ ] `Bezeichnungsfeld105` (Typ: 100, Caption: Auftr)
+- [ ] `Bezeichnungsfeld106` (Typ: 100, Caption: Pers)
+- [ ] `Bezeichnungsfeld107` (Typ: 100, Caption: h)
+- [ ] `Bezeichnungsfeld411` (Typ: 100, Caption: Umsatz)
+- [ ] `Bezeichnungsfeld92` (Typ: 100, Caption:  davon Freitag  h / P)
+- [ ] `Bezeichnungsfeld95` (Typ: 100, Caption: Samstag h / P)
+- [ ] `Bezeichnungsfeld98` (Typ: 100, Caption: Sonntag h / P)
+- [ ] `UmsNGes1` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld384` (Typ: 100, Caption: Umsatz netto Ges)
+- [ ] `PersGes1` (Typ: 109, Caption: )
+- [ ] `StdGes1` (Typ: 109, Caption: )
+- [ ] `UmsGes1` (Typ: 109, Caption: )
+- [ ] `Std51` (Typ: 109, Caption: )
+- [ ] `Pers51` (Typ: 109, Caption: )
+- [ ] `Std61` (Typ: 109, Caption: )
+- [ ] `Pers61` (Typ: 109, Caption: )
+- [ ] `Std71` (Typ: 109, Caption: )
+- [ ] `Pers71` (Typ: 109, Caption: )
+- [ ] `AufAnz1` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld392` (Typ: 100, Caption: Anzahl Aufträge Ges)
+- [ ] `UmsNGes2` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld388` (Typ: 100, Caption: Davon offen)
+- [ ] `AufAnz2` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld394` (Typ: 100, Caption: Letzte 90 Tage)
+- [ ] `PersGes2` (Typ: 109, Caption: )
+- [ ] `StdGes2` (Typ: 109, Caption: )
+- [ ] `UmsGes2` (Typ: 109, Caption: )
+- [ ] `Std52` (Typ: 109, Caption: )
+- [ ] `Pers52` (Typ: 109, Caption: )
+- [ ] `Std62` (Typ: 109, Caption: )
+- [ ] `Pers62` (Typ: 109, Caption: )
+- [ ] `Std72` (Typ: 109, Caption: )
+- [ ] `Pers72` (Typ: 109, Caption: )
+- [ ] `UmsNGes3` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld390` (Typ: 100, Caption: Gemahnt)
+- [ ] `AufAnz3` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld396` (Typ: 100, Caption: Letzte 30 Tage)
+- [ ] `PersGes3` (Typ: 109, Caption: )
+- [ ] `StdGes3` (Typ: 109, Caption: )
+- [ ] `UmsGes3` (Typ: 109, Caption: )
+- [ ] `Std53` (Typ: 109, Caption: )
+- [ ] `Pers53` (Typ: 109, Caption: )
+- [ ] `Std63` (Typ: 109, Caption: )
+- [ ] `Pers63` (Typ: 109, Caption: )
+- [ ] `Std73` (Typ: 109, Caption: )
+- [ ] `Pers73` (Typ: 109, Caption: )
+- [ ] `pg_Ang` (Typ: 124, Caption: Angebote)
+- [ ] `sub_Rch_Kopf_Ang` (Typ: 112, Caption: )
+- [ ] `pgAttach` (Typ: 124, Caption: Zusatzdateien)
+- [ ] `sub_ZusatzDateien` (Typ: 112, Caption: )
+- [ ] `btnNeuAttach` (Typ: 104, Caption: Neuen Anlage hinzufügen)
+- [ ] `Bezeichnungsfeld355` (Typ: 100, Caption: Doppelklick auf Dateinamen zeigt Inhalt)
+- [ ] `pgAnsprech` (Typ: 124, Caption: Ansprechpartner)
+- [ ] `sub_Ansprechpartner` (Typ: 112, Caption: )
+- [ ] `pgBemerk` (Typ: 124, Caption: Bemerkungen)
+- [ ] `kun_memo` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld253` (Typ: 100, Caption: Text formatieren: Textteil markieren und dann mit der Maus nach oben, dann erscheint eine kleine Menüleiste )
+- [ ] `kun_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld236` (Typ: 100, Caption: Kunden-Nr.)
+- [ ] `kun_bezeichnung` (Typ: 109, Caption: )
+- [ ] `kun_firma` (Typ: 109, Caption: )
+- [ ] `kun_AdressArt` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld348` (Typ: 100, Caption: kun_AdressArt)
+- [ ] `TabellenNr` (Typ: 109, Caption: )
+- [ ] `lst_KD` (Typ: 110, Caption: )
+- [ ] `Menü` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld422` (Typ: 100, Caption: Menü)
+- [ ] `Textschnell` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld333` (Typ: 100, Caption: Suche)
+- [ ] `NurAktiveKD` (Typ: 106, Caption: )
+- [ ] `lbl_nur_aktive_anzeigen` (Typ: 100, Caption: Nur Aktive anzeigen)
+- [ ] `cbo_Auswahl` (Typ: 111, Caption: )
+- [ ] `Zusatzanzeige:_Bezeichnungsfeld` (Typ: 100, Caption: Zusatzanzeige:)
+- [ ] `Text473` (Typ: 109, Caption: )
+- [ ] `kunnr_Lex` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld481` (Typ: 100, Caption: Kunden-Nr. Lex)
+- [ ] `Erst_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld188` (Typ: 100, Caption: Erstellt am)
+- [ ] `Erst_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld194` (Typ: 100, Caption: von)
+- [ ] `Aend_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld196` (Typ: 100, Caption: Geändert am)
+- [ ] `Aend_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld198` (Typ: 100, Caption: von)
+
+**Fehlende Events:**
+- [ ] `btnalle` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl39` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl40` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl41` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl43` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl46` → OnClick (Erwartet: onclick, click)
+- [ ] `mcobtndelete` → OnClick (Erwartet: onclick, click)
+- [ ] `btnumsauswert` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnauswertung` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaufrchpdf` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaufrchpospdf` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaufeinspdf` → OnClick (Erwartet: onclick, click)
+- [ ] `btnneuattach` → OnClick (Erwartet: onclick, click)
+
+### frm_Kundenpreise_gueni.html
+
+**Fehlende Controls:**
+- [ ] `kun_Firma_Bezeichnungsfeld` (Typ: 100, Caption: Firma)
+- [ ] `Sicherheitspersonal_Bezeichnungsfeld` (Typ: 100, Caption: SVS)
+- [ ] `Leitungspersonal_Bezeichnungsfeld` (Typ: 100, Caption: EL)
+- [ ] `Nachtzuschlag_Bezeichnungsfeld` (Typ: 100, Caption: NZ)
+- [ ] `Sonntagszuschlag_Bezeichnungsfeld` (Typ: 100, Caption: SZ)
+- [ ] `Feiertagszuschlag_Bezeichnungsfeld` (Typ: 100, Caption: FZ)
+- [ ] `Fahrtkosten_Bezeichnungsfeld` (Typ: 100, Caption: Fahrtkosten)
+- [ ] `Sonstiges_Bezeichnungsfeld` (Typ: 100, Caption: Div.)
+- [ ] `Bezeichnungsfeld16` (Typ: 100, Caption: Verrechnungssätze)
+- [ ] `kun_Firma` (Typ: 109, Caption: )
+- [ ] `Sicherheitspersonal` (Typ: 109, Caption: )
+- [ ] `Leitungspersonal` (Typ: 109, Caption: )
+- [ ] `Nachtzuschlag` (Typ: 109, Caption: )
+- [ ] `Sonntagszuschlag` (Typ: 109, Caption: )
+- [ ] `Feiertagszuschlag` (Typ: 109, Caption: )
+- [ ] `Fahrtkosten` (Typ: 109, Caption: )
+- [ ] `Sonstiges` (Typ: 109, Caption: )
+
+### frm_MA_Mitarbeiterstamm.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Mitarbeiterstammblatt)
+- [ ] `lbl_Datum` (Typ: 100, Caption: 15.01.2026)
+- [ ] `Rechteck37` (Typ: 101, Caption: )
+- [ ] `Befehl39` (Typ: 104, Caption: btn_letzter_Datensatz)
+- [ ] `Befehl40` (Typ: 104, Caption: btn_Datensatz_vor)
+- [ ] `Befehl41` (Typ: 104, Caption: btn_Datensatz_zurueck)
+- [ ] `Befehl43` (Typ: 104, Caption: btn_erster_Datensatz)
+- [ ] `Befehl46` (Typ: 104, Caption:  Neuer Mitarbeiter)
+- [ ] `mcobtnDelete` (Typ: 104, Caption: Mitarbeiter löschen)
+- [ ] `lbl_Vorname` (Typ: 100, Caption: Ediz)
+- [ ] `lbl_Nachname` (Typ: 100, Caption: Akcay)
+- [ ] `lbl_PersNr` (Typ: 100, Caption: 852)
+- [ ] `btnLstDruck` (Typ: 104, Caption: Listen drucken)
+- [ ] `lbl_Version` (Typ: 100, Caption: Test | Test)
+- [ ] `DiDatumAb` (Typ: 109, Caption: )
+- [ ] `btnMADienstpl` (Typ: 104, Caption: Wochen-Dienstplan)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `lbl_ab` (Typ: 109, Caption: )
+- [ ] `lbl_Mitarbeitertabelle` (Typ: 104, Caption: Mitarbeiter Tabelle)
+- [ ] `Bezeichnungsfeld575` (Typ: 100, Caption:  MA - ID:)
+- [ ] `btnZeitkonto` (Typ: 104, Caption: Zeitkonto )
+- [ ] `Bezeichnungsfeld604` (Typ: 100, Caption: MA Adressen)
+- [ ] `btnZKFest` (Typ: 104, Caption: Einsätze übertragen FA)
+- [ ] `btnZKMini` (Typ: 104, Caption: Einsätze übertragen MJ)
+- [ ] `lst_MA` (Typ: 110, Caption: )
+- [ ] `Menü` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld449` (Typ: 100, Caption: Menü)
+- [ ] `Bezeichnungsfeld473` (Typ: 100, Caption: Anstellung:)
+- [ ] `reg_MA` (Typ: 123, Caption: )
+- [ ] `pgAdresse` (Typ: 124, Caption: Stammdaten)
+- [ ] `PersNr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld325` (Typ: 100, Caption: PersNr:)
+- [ ] `LEXWare_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld349` (Typ: 100, Caption: LexNr:)
+- [ ] `IstAktiv` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld351` (Typ: 100, Caption: Aktiv)
+- [ ] `IstSubunternehmer` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld353` (Typ: 100, Caption: Subunternehmer)
+- [ ] `Nachname` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld291` (Typ: 100, Caption: Nachname)
+- [ ] `Vorname` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld293` (Typ: 100, Caption: Vorname)
+- [ ] `Strasse` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld295` (Typ: 100, Caption: Strasse)
+- [ ] `Nr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Nr)
+- [ ] `PLZ` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld297` (Typ: 100, Caption: PLZ)
+- [ ] `Ort` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld299` (Typ: 100, Caption: Ort)
+- [ ] `Land` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld300` (Typ: 100, Caption: Land)
+- [ ] `Bundesland` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld301` (Typ: 100, Caption: Bundesland)
+- [ ] `Tel_Mobil` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld302` (Typ: 100, Caption: Tel. Mobil)
+- [ ] `Tel_Festnetz` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld303` (Typ: 100, Caption: Tel. Festnetz)
+- [ ] `Email` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld305` (Typ: 100, Caption: Email)
+- [ ] `Geschlecht` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld306` (Typ: 100, Caption: Geschlecht)
+- [ ] `Staatsang` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld307` (Typ: 100, Caption: Staatsangehörigkeit)
+- [ ] `Geb_Dat` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld308` (Typ: 100, Caption: Geb. Datum)
+- [ ] `Geb_Ort` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld309` (Typ: 100, Caption: Geb. Ort)
+- [ ] `Geb_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld392` (Typ: 100, Caption: Geb. Name)
+- [ ] `Eintrittsdatum` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld48` (Typ: 100, Caption: Eintrittsdatum)
+- [ ] `Austrittsdatum` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld51` (Typ: 100, Caption: Austrittsdatum)
+- [ ] `Anstellungsart` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld54` (Typ: 100, Caption: Anstellungsart)
+- [ ] `Kostenstelle` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld57` (Typ: 100, Caption: Kostenstelle)
+- [ ] `Eigener_PKW` (Typ: 106, Caption: )
+- [ ] `DienstausweisNr` (Typ: 109, Caption: )
+- [ ] `Ausweis_Endedatum` (Typ: 109, Caption: )
+- [ ] `Ausweis_Funktion` (Typ: 109, Caption: )
+- [ ] `Epin_DFB` (Typ: 109, Caption: )
+- [ ] `Bewacher_ID` (Typ: 109, Caption: )
+- [ ] `MA_Bild` (Typ: 103, Caption: )
+- [ ] `sub_MA_ErsatzEmail` (Typ: 112, Caption: )
+- [ ] `Auszahlungsart` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld60` (Typ: 100, Caption: Auszahlungsart)
+- [ ] `Bankname` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld63` (Typ: 100, Caption: Bankname)
+- [ ] `Bankleitzahl` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld66` (Typ: 100, Caption: Bankleitzahl)
+- [ ] `Kontonummer` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld69` (Typ: 100, Caption: Kontonummer)
+- [ ] `BIC` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld72` (Typ: 100, Caption: BIC)
+- [ ] `IBAN` (Typ: 109, Caption: )
+- [ ] `Kontoinhaber` (Typ: 109, Caption: )
+- [ ] `Bezuege_gezahlt_als` (Typ: 109, Caption: )
+- [ ] `Sozialvers_Nr` (Typ: 109, Caption: )
+- [ ] `SteuerNr` (Typ: 109, Caption: )
+- [ ] `KV_Kasse` (Typ: 109, Caption: )
+- [ ] `Ist_RV_Befrantrag` (Typ: 106, Caption: )
+- [ ] `Steuerklasse` (Typ: 109, Caption: )
+- [ ] `Arbst_pro_Arbeitstag` (Typ: 109, Caption: )
+- [ ] `Arbeitstage_pro_Woche` (Typ: 109, Caption: )
+- [ ] `Resturl_Vorjahr` (Typ: 109, Caption: )
+- [ ] `Urlaubsanspr_pro_Jahr` (Typ: 109, Caption: )
+- [ ] `StundenZahlMax` (Typ: 109, Caption: )
+- [ ] `Kosten_pro_MAStunde` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld443` (Typ: 100, Caption: Kosten MA pro Stunde)
+- [ ] `IstNSB` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld434` (Typ: 100, Caption: Brutto-Std)
+- [ ] `Datum_34a` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld439` (Typ: 100, Caption: seit)
+- [ ] `Hat_keine_34a` (Typ: 106, Caption: )
+- [ ] `HatSachkunde` (Typ: 106, Caption: )
+- [ ] `btnDateisuch` (Typ: 104, Caption: ...)
+- [ ] `tblBilddatei` (Typ: 109, Caption: )
+- [ ] `Bemerkungen` (Typ: 109, Caption: )
+- [ ] `sub_MA_Einsatz_Zuo` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld396` (Typ: 100, Caption: Auftrags-Kategorien:)
+- [ ] `btnDateisuch2` (Typ: 104, Caption: ...)
+- [ ] `tblSignaturdatei` (Typ: 109, Caption: )
+- [ ] `MA_Signatur` (Typ: 103, Caption: )
+- [ ] `Bezeichnungsfeld75` (Typ: 100, Caption: IBAN)
+- [ ] `Bezeichnungsfeld78` (Typ: 100, Caption: Kontoinhaber)
+- [ ] `Bezeichnungsfeld81` (Typ: 100, Caption: Lohngruppe)
+- [ ] `Bezeichnungsfeld84` (Typ: 100, Caption: Bezüge gezahlt als)
+- [ ] `Bezeichnungsfeld87` (Typ: 100, Caption: Sozialvers. Nr)
+- [ ] `Bezeichnungsfeld90` (Typ: 100, Caption: Steuer-ID)
+- [ ] `Bezeichnungsfeld324` (Typ: 100, Caption: Tätigkeit Bezeichnung)
+- [ ] `Bezeichnungsfeld99` (Typ: 100, Caption: Krankenkasse)
+- [ ] `Bezeichnungsfeld102` (Typ: 100, Caption: RV Befreiung beantragt)
+- [ ] `Bezeichnungsfeld105` (Typ: 100, Caption: Steuerklasse)
+- [ ] `Bezeichnungsfeld428` (Typ: 100, Caption: Weitere eMail-Adressen:)
+- [ ] `Bezeichnungsfeld108` (Typ: 100, Caption: Arbeitsstd. pro Arbeitstag)
+- [ ] `Bezeichnungsfeld111` (Typ: 100, Caption: Arbeitstage pro Woche)
+- [ ] `Bezeichnungsfeld114` (Typ: 100, Caption: Resturlaub Vorjahr)
+- [ ] `Bezeichnungsfeld117` (Typ: 100, Caption: Urlaubsanspruch pro Jahr)
+- [ ] `Bezeichnungsfeld120` (Typ: 100, Caption: Stundenzahl Monat max.)
+- [ ] `Bezeichnungsfeld132` (Typ: 100, Caption: Kleidergrösse)
+- [ ] `Bezeichnungsfeld135` (Typ: 100, Caption: Fahrerlaubnis)
+- [ ] `Bezeichnungsfeld394` (Typ: 100, Caption: Sachkunde § 34a)
+- [ ] `Bezeichnungsfeld123` (Typ: 100, Caption: Unterweisung § 34a)
+- [ ] `Bezeichnungsfeld138` (Typ: 100, Caption: Eigener PKW)
+- [ ] `Bezeichnungsfeld144` (Typ: 100, Caption: Lichtbild)
+- [ ] `Bezeichnungsfeld141` (Typ: 100, Caption: Dienstausweis)
+- [ ] `Bezeichnungsfeld432` (Typ: 100, Caption: Personalausweis-Nr.)
+- [ ] `Bezeichnungsfeld527` (Typ: 100, Caption: Bemerkungen:)
+- [ ] `Bezeichnungsfeld538` (Typ: 100, Caption: Signatur)
+- [ ] `Bezeichnungsfeld549` (Typ: 100, Caption: Bewacher ID)
+- [ ] `Bezeichnungsfeld548` (Typ: 100, Caption: DFB Epin)
+- [ ] `btnMaps` (Typ: 104, Caption: Maps öffnen)
+- [ ] `Stundenlohn_brutto` (Typ: 111, Caption: )
+- [ ] `Fahrerlaubnis` (Typ: 111, Caption: )
+- [ ] `Taetigkeit_Bezeichnung` (Typ: 111, Caption: )
+- [ ] `btnZuAb` (Typ: 104, Caption: Abzüge)
+- [ ] `Amt_Pruefung` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld605` (Typ: 100, Caption:  Zuständige Behörde)
+- [ ] `Datum_Pruefung` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld606` (Typ: 100, Caption:  Letzte Überprüfung OA)
+- [ ] `Lex_Aktiv` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld682` (Typ: 100, Caption: Lex_Aktiv)
+- [ ] `cbMailAbrech` (Typ: 106, Caption: )
+- [ ] `lblMailAbrech` (Typ: 100, Caption: Abrechnung per eMail)
+- [ ] `Kleidergroesse` (Typ: 111, Caption: )
+- [ ] `Modul1_DFB` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld695` (Typ: 100, Caption:  DFB Modul 1)
+- [ ] `pgMonat` (Typ: 124, Caption: Zeitkonto)
+- [ ] `Bezeichnungsfeld163` (Typ: 100, Caption: Monatsübersicht)
+- [ ] `lblDatum` (Typ: 100, Caption: Okt 2022)
+- [ ] `Mon_aktdat` (Typ: 109, Caption: )
+- [ ] `btnXLZeitkto` (Typ: 104, Caption: Excel Export)
+- [ ] `btnLesen` (Typ: 104, Caption: Aktualisieren)
+- [ ] `btnUpdJahr` (Typ: 104, Caption: Update Jahr)
+- [ ] `EinsProMon` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld202` (Typ: 100, Caption:  EInsätze / Monat )
+- [ ] `TagProMon` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld204` (Typ: 100, Caption:  Tage / Monat )
+- [ ] `cboMonat` (Typ: 111, Caption: )
+- [ ] `cboJahr` (Typ: 111, Caption: )
+- [ ] `sub_tbl_MA_Zeitkonto_Aktmon2` (Typ: 112, Caption: )
+- [ ] `lst_Tl1M` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld338` (Typ: 100, Caption: Monatsübersicht)
+- [ ] `lst_Tl2M` (Typ: 110, Caption: )
+- [ ] `sub_tbl_MA_Zeitkonto_Aktmon1` (Typ: 112, Caption: )
+- [ ] `pgJahr` (Typ: 124, Caption: Jahresübersicht)
+- [ ] `lst_Tl1` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld334` (Typ: 100, Caption: Zeiten und Werte:)
+- [ ] `lst_Tl2` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld336` (Typ: 100, Caption: Kostenblock:)
+- [ ] `cboJahrJa` (Typ: 111, Caption: )
+- [ ] `btnXLJahr` (Typ: 104, Caption: Excel-Export)
+- [ ] `pgAuftrUeb` (Typ: 124, Caption: Einsatzübersicht)
+- [ ] `btnXLEinsUeber` (Typ: 104, Caption: Excel-Export)
+- [ ] `btnZKeinzel` (Typ: 104, Caption: Einsätze übertragen einzeln)
+- [ ] `Bezeichnungsfeld364` (Typ: 100, Caption: Erledigte Einsätze:)
+- [ ] `Bericht_drucken` (Typ: 104, Caption: Drucken)
+- [ ] `btnAU_Lesen` (Typ: 104, Caption: Aktualisieren)
+- [ ] `cboFilterAuftrag` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld617` (Typ: 100, Caption: Auftrag)
+- [ ] `lbSummeStunden` (Typ: 100, Caption: Gesamt netto: 10,01 h)
+- [ ] `lst_Zuo` (Typ: 110, Caption: )
+- [ ] `txRechSub` (Typ: 109, Caption: )
+- [ ] `lbRechSub` (Typ: 100, Caption: Rechnungsnr.Sub)
+- [ ] `btnRch` (Typ: 104, Caption: Rechnungsdetails)
+- [ ] `btnCalc` (Typ: 104, Caption: Stundennachweis)
+- [ ] `txRechCheck` (Typ: 109, Caption: )
+- [ ] `lbRechCheck` (Typ: 100, Caption: Rechnung geprüft)
+- [ ] `txRechBezahlt` (Typ: 109, Caption: )
+- [ ] `lbRechBez` (Typ: 100, Caption: Rechnung bezahlt)
+- [ ] `pgStundenuebersicht` (Typ: 124, Caption: Stundenübersicht)
+- [ ] `btnXLUeberhangStd` (Typ: 104, Caption: Excel-Export)
+- [ ] `btnau_lesen2` (Typ: 104, Caption: Aktualisieren)
+- [ ] `frmStundenübersicht` (Typ: 112, Caption: )
+- [ ] `pgPlan` (Typ: 124, Caption: Dienstplan)
+- [ ] `Bezeichnungsfeld550` (Typ: 100, Caption: Dienstplan zuletzt gesendet am)
+- [ ] `txDatumDP` (Typ: 109, Caption: )
+- [ ] `btnAUPl_Lesen` (Typ: 104, Caption: Aktualisieren)
+- [ ] `btn_Diensplan_prnt` (Typ: 104, Caption: Drucken)
+- [ ] `btn_Dienstplan_send` (Typ: 104, Caption: Senden)
+- [ ] `btnXLDiePl` (Typ: 104, Caption: Excel-Export)
+- [ ] `lstPl_Zuo` (Typ: 110, Caption: )
+- [ ] `pgnVerfueg` (Typ: 124, Caption: Nicht Verfügbar)
+- [ ] `btnMehrfachtermine` (Typ: 104, Caption: Termine  eingeben)
+- [ ] `TermineAbHeute` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld403` (Typ: 100, Caption: Termine ab Heute)
+- [ ] `sub_MA_tbl_MA_NVerfuegZeiten` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld457` (Typ: 100, Caption: Nicht verfügbar:)
+- [ ] `btnXLNverfueg` (Typ: 104, Caption: Excel-Export)
+- [ ] `pgDienstKl` (Typ: 124, Caption: Bestand Dienstkleidung)
+- [ ] `btnReport_Dienstkleidung` (Typ: 104, Caption: Ausgabeformular)
+- [ ] `sub_MA_Dienstkleidung` (Typ: 112, Caption: )
+- [ ] `lbGesamt` (Typ: 100, Caption: Gesamt: )
+- [ ] `pgVordr` (Typ: 124, Caption: Vordrucke)
+- [ ] `sub_tbltmp_MA_Ausgef_Vorlagen` (Typ: 112, Caption: )
+- [ ] `btn_MA_EinlesVorlageDatei` (Typ: 104, Caption: Vordrucke für MA aktualisieren / einlesen)
+- [ ] `btnXLVordrucke` (Typ: 104, Caption: Excel-Export)
+- [ ] `pgBrief` (Typ: 124, Caption: Briefkopf)
+- [ ] `Briefkopf` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld408` (Typ: 100, Caption: Briefkopf)
+- [ ] `IstBrfAuto` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld410` (Typ: 100, Caption: manuell (keine Änderung bei Adressänderung))
+- [ ] `Anr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld412` (Typ: 100, Caption: Anrede)
+- [ ] `Anr_Brief` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld414` (Typ: 100, Caption: Anrede Brief)
+- [ ] `Anr_eMail` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld417` (Typ: 100, Caption: Anrede eMail)
+- [ ] `pgStdUeberlaufstd` (Typ: 124, Caption: Überhang Stunden)
+- [ ] `Untergeordnet360` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld361` (Typ: 100, Caption: Überlaufstunden des aktuellen Monats:)
+- [ ] `pgJahrStdVorMon` (Typ: 111, Caption: )
+- [ ] `pgMaps` (Typ: 124, Caption: Karte)
+- [ ] `ufrm_Maps` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld582` (Typ: 100, Caption: Karte:)
+- [ ] `pgSubRech` (Typ: 124, Caption: Sub Rechnungen)
+- [ ] `subAuftragRech` (Typ: 112, Caption: )
+- [ ] `subZuoStunden` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld681` (Typ: 100, Caption: Details:)
+- [ ] `EmptyCell683` (Typ: 127, Caption: )
+- [ ] `Bezeichnungsfeld332` (Typ: 100, Caption: Filter:)
+- [ ] `cboAuswahl` (Typ: 111, Caption: )
+- [ ] `NurAktiveMA` (Typ: 111, Caption: )
+- [ ] `MANameEingabe` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld451` (Typ: 100, Caption: Suche:)
+- [ ] `cboIDSuche` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld471` (Typ: 100, Caption: Suche:)
+- [ ] `Bezeichnungsfeld474` (Typ: 100, Caption: Zusatz:)
+- [ ] `Kombinationsfeld674` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld675` (Typ: 100, Caption: Zeitraum)
+- [ ] `Text676` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld677` (Typ: 100, Caption: von)
+- [ ] `Text678` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld679` (Typ: 100, Caption: bis)
+- [ ] `cboZeitraum` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld366` (Typ: 100, Caption: Zeitraum)
+- [ ] `AU_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld368` (Typ: 100, Caption: von)
+- [ ] `AU_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld370` (Typ: 100, Caption: bis)
+- [ ] `Erst_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld416` (Typ: 100, Caption: Erstellt)
+- [ ] `Erst_am` (Typ: 109, Caption: )
+- [ ] `Aend_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld420` (Typ: 100, Caption: Geändert)
+- [ ] `Aend_am` (Typ: 109, Caption: )
+
+**Fehlende Events:**
+- [ ] `befehl39` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl40` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl41` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl43` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl46` → OnClick (Erwartet: onclick, click)
+- [ ] `mcobtndelete` → OnClick (Erwartet: onclick, click)
+- [ ] `btnlstdruck` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmadienstpl` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `lbl_mitarbeitertabelle` → OnClick (Erwartet: onclick, click)
+- [ ] `btnzeitkonto` → OnClick (Erwartet: onclick, click)
+- [ ] `btnzkfest` → OnClick (Erwartet: onclick, click)
+- [ ] `btnzkmini` → OnClick (Erwartet: onclick, click)
+- [ ] `btndateisuch` → OnClick (Erwartet: onclick, click)
+- [ ] `btndateisuch2` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmaps` → OnClick (Erwartet: onclick, click)
+- [ ] `btnzuab` → OnClick (Erwartet: onclick, click)
+- [ ] `btnxlzeitkto` → OnClick (Erwartet: onclick, click)
+- [ ] `btnlesen` → OnClick (Erwartet: onclick, click)
+- [ ] `btnupdjahr` → OnClick (Erwartet: onclick, click)
+- [ ] `btnxljahr` → OnClick (Erwartet: onclick, click)
+- [ ] `btnxleinsueber` → OnClick (Erwartet: onclick, click)
+- [ ] `btnzkeinzel` → OnClick (Erwartet: onclick, click)
+- [ ] `bericht_drucken` → OnClick (Erwartet: onclick, click)
+- [ ] `btnau_lesen` → OnClick (Erwartet: onclick, click)
+- [ ] `btnrch` → OnClick (Erwartet: onclick, click)
+- [ ] `btncalc` → OnClick (Erwartet: onclick, click)
+- [ ] `btnxlueberhangstd` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaupl_lesen` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_diensplan_prnt` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_dienstplan_send` → OnClick (Erwartet: onclick, click)
+- [ ] `btnxldiepl` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmehrfachtermine` → OnClick (Erwartet: onclick, click)
+- [ ] `btnxlnverfueg` → OnClick (Erwartet: onclick, click)
+- [ ] `btnreport_dienstkleidung` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_ma_einlesvorlagedatei` → OnClick (Erwartet: onclick, click)
+- [ ] `btnxlvordrucke` → OnClick (Erwartet: onclick, click)
+
+### frm_MA_Offene_Anfragen.html
+
+**Fehlende Controls:**
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: Offene Mail Anfragen)
+- [ ] `txSelHeightSub` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld7` (Typ: 100, Caption: Markierte Datensätze:)
+- [ ] `btnAnfragen` (Typ: 104, Caption: Auswahl erneut anfragen)
+- [ ] `sub_MA_Offene_Anfragen` (Typ: 112, Caption: )
+- [ ] `sub_MA_Offene_Anfragen Beschriftung` (Typ: 100, Caption: sub_MA_Offene_Anfragen)
+
+**Fehlende Events:**
+- [ ] `btnanfragen` → OnClick (Erwartet: onclick, click)
+
+### frm_MA_Serien_eMail_Auftrag.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Einsatzliste senden)
+- [ ] `Befehl38` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `lbl_Datum` (Typ: 100, Caption: 15.01.2026)
+- [ ] `btnSendEmail` (Typ: 104, Caption:  Senden)
+- [ ] `btnSchnellPlan` (Typ: 104, Caption: Mitarbeiterauswahl)
+- [ ] `btnZuAbsage` (Typ: 104, Caption: Zu / Absagen bearbeiten)
+- [ ] `btnAuftrag` (Typ: 104, Caption: Zurück zum Auftrag)
+- [ ] `btnHilfe` (Typ: 104, Caption: Hilfe)
+- [ ] `btnPosListeAtt` (Typ: 104, Caption: Positionsliste hinzufügen)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnPDFCrea` (Typ: 104, Caption: Einsatzliste drucken)
+- [ ] `VA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld1` (Typ: 100, Caption: Auftrag:)
+- [ ] `cboVADatum` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld26` (Typ: 100, Caption: Datum)
+- [ ] `lstZeiten` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld7` (Typ: 100, Caption: Anzahl:      Dienstbeginn:    )
+- [ ] `lstMA_Plan` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: Mitarbeiter:)
+- [ ] `Textinhalt` (Typ: 109, Caption: )
+- [ ] `IstPlanAlle` (Typ: 107, Caption: )
+- [ ] `Bezeichnungsfeld8` (Typ: 100, Caption:  Auswahlfilter:)
+- [ ] `Option9` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld10` (Typ: 100, Caption: geplant)
+- [ ] `Option11` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Zugesagt)
+- [ ] `Option13` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld14` (Typ: 100, Caption: alle)
+- [ ] `Option96` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld97` (Typ: 100, Caption: Sub)
+- [ ] `Voting_Text` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld197` (Typ: 100, Caption: Voting-Text:)
+- [ ] `Betreffzeile` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld16` (Typ: 100, Caption: Betreffzeile:)
+- [ ] `cboeMail_Vorlage` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: E-Mail Vorlage:)
+- [ ] `sub_tbltmp_Attachfile` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld199` (Typ: 100, Caption: Anhänge:)
+- [ ] `btnAttachSuch` (Typ: 104, Caption: ...)
+- [ ] `btnAttLoesch` (Typ: 104, Caption: Löschen)
+- [ ] `iGes_MA` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Gesamt Ist / Soll:)
+- [ ] `IstAlleZeiten` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld25` (Typ: 100, Caption: Alle Zeiten)
+- [ ] `cboSendPrio` (Typ: 111, Caption: )
+- [ ] `IstHTML` (Typ: 122, Caption: Unformatierter Text (ASCII))
+- [ ] `frm_Menuefuehrung` (Typ: 112, Caption: )
+- [ ] `AbsendenAls` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld193` (Typ: 100, Caption: Absender:)
+- [ ] `ogZeitraum` (Typ: 107, Caption: )
+- [ ] `Bezeichnungsfeld83` (Typ: 100, Caption:  Zeitraum Auswahl:)
+- [ ] `opGesamt` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld78` (Typ: 100, Caption: Liste kpl.)
+- [ ] `opAbHeute` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld80` (Typ: 100, Caption: Liste kpl. ab Datum)
+- [ ] `opDatum` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld82` (Typ: 100, Caption: nur dieser Tag)
+- [ ] `opMA` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld87` (Typ: 100, Caption: Liste kpl. MA)
+- [ ] `txEmpfaenger` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld89` (Typ: 100, Caption: Empfänger)
+- [ ] `cbInfoAtConsec` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld95` (Typ: 100, Caption: an Info@Consec)
+
+**Fehlende Events:**
+- [ ] `befehl38` → OnClick (Erwartet: onclick, click)
+- [ ] `btnsendemail` → OnClick (Erwartet: onclick, click)
+- [ ] `btnschnellplan` → OnClick (Erwartet: onclick, click)
+- [ ] `btnzuabsage` → OnClick (Erwartet: onclick, click)
+- [ ] `btnauftrag` → OnClick (Erwartet: onclick, click)
+- [ ] `btnhilfe` → OnClick (Erwartet: onclick, click)
+- [ ] `btnposlisteatt` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnpdfcrea` → OnClick (Erwartet: onclick, click)
+- [ ] `btnattachsuch` → OnClick (Erwartet: onclick, click)
+- [ ] `btnattloesch` → OnClick (Erwartet: onclick, click)
+
+### frm_MA_Serien_eMail_dienstplan.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Einsatzliste senden)
+- [ ] `Befehl38` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `lbl_Datum` (Typ: 100, Caption: 15.01.2026)
+- [ ] `btnSendEmail` (Typ: 104, Caption:  Senden)
+- [ ] `btnSchnellPlan` (Typ: 104, Caption: Mitarbeiterauswahl)
+- [ ] `btnZuAbsage` (Typ: 104, Caption: Zu / Absagen bearbeiten)
+- [ ] `btnAuftrag` (Typ: 104, Caption: Einsatzliste)
+- [ ] `btnHilfe` (Typ: 104, Caption: Hilfe)
+- [ ] `btnPosListeAtt` (Typ: 104, Caption: Positionsliste hinzufügen)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnPDFCrea` (Typ: 104, Caption: Einsatzliste drucken)
+- [ ] `VA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld1` (Typ: 100, Caption: Auftrag:)
+- [ ] `cboVADatum` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld26` (Typ: 100, Caption: Datum)
+- [ ] `lstZeiten` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld7` (Typ: 100, Caption: Anzahl:      Dienstbeginn:    )
+- [ ] `lstMA_Plan` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: Mitarbeiter:)
+- [ ] `Textinhalt` (Typ: 109, Caption: )
+- [ ] `IstPlanAlle` (Typ: 107, Caption: )
+- [ ] `Bezeichnungsfeld8` (Typ: 100, Caption:  Auswahlfilter:)
+- [ ] `Option9` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld10` (Typ: 100, Caption: geplant)
+- [ ] `Option11` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Zugesagt)
+- [ ] `Option13` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld14` (Typ: 100, Caption: alle)
+- [ ] `Voting_Text` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld197` (Typ: 100, Caption: Voting-Text:)
+- [ ] `Betreffzeile` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld16` (Typ: 100, Caption: Betreffzeile:)
+- [ ] `cboeMail_Vorlage` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: E-Mail Vorlage:)
+- [ ] `sub_tbltmp_Attachfile` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld199` (Typ: 100, Caption: Anhänge:)
+- [ ] `btnAttachSuch` (Typ: 104, Caption: ...)
+- [ ] `btnAttLoesch` (Typ: 104, Caption: Löschen)
+- [ ] `iGes_MA` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Gesamt Ist / Soll:)
+- [ ] `IstAlleZeiten` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld25` (Typ: 100, Caption: Alle Zeiten)
+- [ ] `cboSendPrio` (Typ: 111, Caption: )
+- [ ] `IstHTML` (Typ: 122, Caption: Unformatierter Text (ASCII))
+- [ ] `frm_Menuefuehrung` (Typ: 112, Caption: )
+- [ ] `AbsendenAls` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld193` (Typ: 100, Caption: Absender:)
+
+**Fehlende Events:**
+- [ ] `befehl38` → OnClick (Erwartet: onclick, click)
+- [ ] `btnsendemail` → OnClick (Erwartet: onclick, click)
+- [ ] `btnschnellplan` → OnClick (Erwartet: onclick, click)
+- [ ] `btnzuabsage` → OnClick (Erwartet: onclick, click)
+- [ ] `btnauftrag` → OnClick (Erwartet: onclick, click)
+- [ ] `btnhilfe` → OnClick (Erwartet: onclick, click)
+- [ ] `btnposlisteatt` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnpdfcrea` → OnClick (Erwartet: onclick, click)
+- [ ] `btnattachsuch` → OnClick (Erwartet: onclick, click)
+- [ ] `btnattloesch` → OnClick (Erwartet: onclick, click)
+
+### frm_MA_VA_Positionszuordnung.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Positionsplanung)
+- [ ] `lbl_Datum` (Typ: 100, Caption: 08.04.2015)
+- [ ] `btnAuftrag` (Typ: 104, Caption: Einsatzliste)
+- [ ] `Befehl48` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `Befehl39` (Typ: 104, Caption: btn_letzter_Datensatz)
+- [ ] `Befehl40` (Typ: 104, Caption: btn_Datensatz_vor)
+- [ ] `Befehl41` (Typ: 104, Caption: btn_Datensatz_zurueck)
+- [ ] `Befehl42` (Typ: 104, Caption: drucken)
+- [ ] `Befehl43` (Typ: 104, Caption: btn_erster_Datensatz)
+- [ ] `Befehl49` (Typ: 104, Caption: Neue Positionsliste)
+- [ ] `btnHilfe` (Typ: 104, Caption: Hilfe)
+- [ ] `mcobtnDelete` (Typ: 104, Caption: Positionsliste löschen)
+- [ ] `btnPosList_PDF` (Typ: 104, Caption: Positionsliste drucken)
+- [ ] `btnBack_PosKopfTl1` (Typ: 104, Caption: Objektpositionen)
+- [ ] `Befehl68` (Typ: 104, Caption: Positionsliste senden)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnAddAll` (Typ: 104, Caption: Alle)
+- [ ] `btnAddSelected` (Typ: 104, Caption: Auswählen)
+- [ ] `btnDelAll` (Typ: 104, Caption: Alle löschen)
+- [ ] `btnDelSelected` (Typ: 104, Caption: Auswahl löschen)
+- [ ] `Bezeichnungsfeld22` (Typ: 100, Caption: Löschen)
+- [ ] `lstMA_Zusage` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld32` (Typ: 100, Caption: Mitarbeiter:)
+- [ ] `List_Pos` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld5` (Typ: 100, Caption: Positionsgruppe auswählen:)
+- [ ] `frm_Menuefuehrung` (Typ: 112, Caption: )
+- [ ] `Lst_MA_Zugeordnet` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld43` (Typ: 100, Caption: Zugewiesene Position:)
+- [ ] `btnRepeat` (Typ: 104, Caption: Befehl51)
+- [ ] `cbo_Akt_Objekt_Kopf` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld1` (Typ: 100, Caption: Auftrag)
+- [ ] `MA_Typ` (Typ: 107, Caption: )
+- [ ] `Bezeichnungsfeld55` (Typ: 100, Caption: MA)
+- [ ] `Option56` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld57` (Typ: 100, Caption: Alle)
+- [ ] `Option58` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld59` (Typ: 100, Caption: männl)
+- [ ] `Option60` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld61` (Typ: 100, Caption: weibl)
+- [ ] `btnRepeatAus` (Typ: 104, Caption: Befehl51)
+- [ ] `AnzAusw` (Typ: 109, Caption: )
+- [ ] `cboVADatum` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld26` (Typ: 100, Caption: Datum)
+
+**Fehlende Events:**
+- [ ] `btnauftrag` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl48` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl39` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl40` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl41` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl42` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl43` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl49` → OnClick (Erwartet: onclick, click)
+- [ ] `btnhilfe` → OnClick (Erwartet: onclick, click)
+- [ ] `mcobtndelete` → OnClick (Erwartet: onclick, click)
+- [ ] `btnposlist_pdf` → OnClick (Erwartet: onclick, click)
+- [ ] `btnback_poskopftl1` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaddall` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaddselected` → OnClick (Erwartet: onclick, click)
+- [ ] `btndelall` → OnClick (Erwartet: onclick, click)
+- [ ] `btndelselected` → OnClick (Erwartet: onclick, click)
+- [ ] `btnrepeat` → OnClick (Erwartet: onclick, click)
+- [ ] `btnrepeataus` → OnClick (Erwartet: onclick, click)
+
+### frm_MA_VA_Schnellauswahl.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Mitarbeiterauswahl)
+- [ ] `Befehl38` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `btnZuAbsage` (Typ: 104, Caption: Manuelles Bearbeiten)
+- [ ] `lbl_Datum` (Typ: 100, Caption: 15.01.2026)
+- [ ] `btnAuftrag` (Typ: 104, Caption: Zurück zum Auftrag)
+- [ ] `btnHilfe` (Typ: 104, Caption: Hilfe)
+- [ ] `btnPosListe` (Typ: 104, Caption: Positionsliste)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `lbAuftrag` (Typ: 100, Caption: 24.08.2024 Greuther Fürth - SC Paderborn 07 Sportpark am Ronhof Fürth)
+- [ ] `iGes_MA` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Gesamt:)
+- [ ] `lstZeiten` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld7` (Typ: 100, Caption: Dienstbeginn auswählen:)
+- [ ] `lstMA_Plan` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: Mitarbeiter geplant:)
+- [ ] `VA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld1` (Typ: 100, Caption: Auftrag:)
+- [ ] `btnAddSelected` (Typ: 104, Caption: Auswählen)
+- [ ] `btnDelAll` (Typ: 104, Caption: Alle )
+- [ ] `btnDelSelected` (Typ: 104, Caption: Entfernen)
+- [ ] `cboVADatum` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld26` (Typ: 100, Caption: Datum:)
+- [ ] `List_MA` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld5` (Typ: 100, Caption: Mitarbeiterauswahl durch Doppelklick)
+- [ ] `lstMA_Zusage` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld32` (Typ: 100, Caption: Mitarbeiter zugesagt:)
+- [ ] `cboAuftrStatus` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld35` (Typ: 100, Caption: Auftragsstatus)
+- [ ] `strSchnellSuche` (Typ: 109, Caption: )
+- [ ] `btnSchnellGo` (Typ: 104, Caption: GO)
+- [ ] `Lst_Parallel_Einsatz` (Typ: 110, Caption: )
+- [ ] `Bezeichnungsfeld37` (Typ: 100, Caption: Parallele Einsätze:)
+- [ ] `cboAnstArt` (Typ: 111, Caption: )
+- [ ] `IstVerfuegbar` (Typ: 106, Caption: )
+- [ ] `lbl_NurFreie` (Typ: 100, Caption: Nur freie anzeigen)
+- [ ] `cboQuali` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld269` (Typ: 100, Caption: Kategorie:)
+- [ ] `Bezeichnungsfeld263` (Typ: 100, Caption: Mitarbeiter)
+- [ ] `Bezeichnungsfeld517` (Typ: 100, Caption: Anstellung:)
+- [ ] `DienstEnde` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld48` (Typ: 100, Caption: Endzeit: (geplant))
+- [ ] `frm_Menuefuehrung` (Typ: 112, Caption: )
+- [ ] `btnAddZusage` (Typ: 104, Caption: Auswählen)
+- [ ] `btnMoveZusage` (Typ: 104, Caption: Verschieben)
+- [ ] `btnDelZusage` (Typ: 104, Caption: Löschen)
+- [ ] `btnSortZugeord` (Typ: 104, Caption: Sortieren)
+- [ ] `btnSortPLan` (Typ: 104, Caption: Sortieren)
+- [ ] `IstAktiv` (Typ: 106, Caption: )
+- [ ] `lbl_IstAktiv` (Typ: 100, Caption: Nur aktive anzeigen)
+- [ ] `btnMail` (Typ: 104, Caption: Alle Mitarbeiter anfragen)
+- [ ] `Bezeichnungsfeld62` (Typ: 100, Caption: Doppelklick wählt automatisch aus)
+- [ ] `Bezeichnungsfeld63` (Typ: 100, Caption: Doppelklick entfernt automatisch)
+- [ ] `btnMailSelected` (Typ: 104, Caption: Nur Selektierte anfragen)
+- [ ] `cbVerplantVerfuegbar` (Typ: 106, Caption: )
+- [ ] `lbl_VerplantVerfuegbar` (Typ: 100, Caption: geplant = verfügbar)
+- [ ] `cbNur34a` (Typ: 106, Caption: )
+- [ ] `lbl_Nur34a` (Typ: 100, Caption: Nur 34a)
+- [ ] `cmdListMA_Standard` (Typ: 104, Caption: Standard)
+- [ ] `cmdListMA_Entfernung` (Typ: 104, Caption: Entfernung)
+
+**Fehlende Events:**
+- [ ] `befehl38` → OnClick (Erwartet: onclick, click)
+- [ ] `btnzuabsage` → OnClick (Erwartet: onclick, click)
+- [ ] `btnauftrag` → OnClick (Erwartet: onclick, click)
+- [ ] `btnhilfe` → OnClick (Erwartet: onclick, click)
+- [ ] `btnposliste` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaddselected` → OnClick (Erwartet: onclick, click)
+- [ ] `btndelselected` → OnClick (Erwartet: onclick, click)
+- [ ] `btnschnellgo` → OnClick (Erwartet: onclick, click)
+- [ ] `btnaddzusage` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmovezusage` → OnClick (Erwartet: onclick, click)
+- [ ] `btndelzusage` → OnClick (Erwartet: onclick, click)
+- [ ] `btnsortzugeord` → OnClick (Erwartet: onclick, click)
+- [ ] `btnsortplan` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmail` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmailselected` → OnClick (Erwartet: onclick, click)
+- [ ] `cmdlistma_standard` → OnClick (Erwartet: onclick, click)
+- [ ] `cmdlistma_entfernung` → OnClick (Erwartet: onclick, click)
+
+### frm_Menuefuehrung1.html
+
+**Fehlende Controls:**
+- [ ] `lbl_Menue2` (Typ: 100, Caption: MENÜ 2)
+- [ ] `btn_1` (Typ: 104, Caption: Telefonliste)
+- [ ] `Rechteck18` (Typ: 101, Caption: )
+- [ ] `Rechteck19` (Typ: 101, Caption: )
+- [ ] `Rechteck20` (Typ: 101, Caption: )
+- [ ] `Befehl22` (Typ: 104, Caption: Vorlagen)
+- [ ] `Befehl24` (Typ: 104, Caption: Monatsstunden)
+- [ ] `btnLetzterEinsatz` (Typ: 104, Caption: Letzter Einsatz MA)
+- [ ] `btn_Abwesenheiten` (Typ: 104, Caption: Abwesenheiten)
+- [ ] `btnLohnabrech` (Typ: 104, Caption: Lohnabrechnungen)
+- [ ] `btnFCN_Meldeliste` (Typ: 104, Caption: FCN Meldeliste)
+- [ ] `btnNamensliste` (Typ: 104, Caption: Fürth Namensliste)
+- [ ] `btnLohnarten` (Typ: 104, Caption: Lohnarten)
+- [ ] `btn_MAStamm_Excel` (Typ: 104, Caption: Mitarbeiterstamm Excel)
+- [ ] `btn_stunden_sub` (Typ: 104, Caption: Sub Stunden)
+- [ ] `Befehl37` (Typ: 104, Caption: Lex Aktiv)
+- [ ] `Befehl40` (Typ: 104, Caption: Menü 2 schliessen)
+- [ ] `btn_Stawa` (Typ: 104, Caption: Stawa Auftrag anlegen)
+- [ ] `btn_BOS` (Typ: 104, Caption: BOS Auftrag anlegen)
+- [ ] `btn_Hirsch` (Typ: 104, Caption: Hirsch Auftrag erstellen)
+- [ ] `btn_masterbtn` (Typ: 104, Caption: Auftrag FA MJ Masterbtn )
+- [ ] `Befehl48` (Typ: 104, Caption: Mitarbeiterstatistik)
+- [ ] `Btn_Personalvorlagen` (Typ: 104, Caption: Personalvorlagen)
+- [ ] `btn_menue2_close` (Typ: 104, Caption: Menü 2 schliessen)
+- [ ] `btnStundenMA` (Typ: 104, Caption: Stunden Mitarbeiter)
+
+**Fehlende Events:**
+- [ ] `btn_1` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl22` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl24` → OnClick (Erwartet: onclick, click)
+- [ ] `btnletztereinsatz` → OnClick (Erwartet: onclick, click)
+- [ ] `btnlohnabrech` → OnClick (Erwartet: onclick, click)
+- [ ] `btnfcn_meldeliste` → OnClick (Erwartet: onclick, click)
+- [ ] `btnnamensliste` → OnClick (Erwartet: onclick, click)
+- [ ] `btnlohnarten` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_mastamm_excel` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_stunden_sub` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl37` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl40` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_stawa` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_bos` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_hirsch` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_masterbtn` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl48` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_personalvorlagen` → OnClick (Erwartet: onclick, click)
+- [ ] `btnstundenma` → OnClick (Erwartet: onclick, click)
+
+### frm_OB_Objekt.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Objektpositionen)
+- [ ] `lbl_Datum` (Typ: 100, Caption: 02.03.2015)
+- [ ] `btn_Back_akt_Pos_List` (Typ: 104, Caption: Aktuelle Positionsliste)
+- [ ] `btnReport` (Typ: 104, Caption: Objektliste drucken)
+- [ ] `btn_letzer_Datensatz` (Typ: 104, Caption: btn_letzter_Datensatz)
+- [ ] `Befehl40` (Typ: 104, Caption: btn_Datensatz_vor)
+- [ ] `Befehl41` (Typ: 104, Caption: btn_Datensatz_zurueck)
+- [ ] `Befehl42` (Typ: 104, Caption: Drucken)
+- [ ] `Befehl43` (Typ: 104, Caption: btn_erster_Datensatz)
+- [ ] `btnHilfe` (Typ: 104, Caption: Hilfe)
+- [ ] `mcobtnDelete` (Typ: 104, Caption: Objektliste löschen)
+- [ ] `btnNeuVeranst` (Typ: 104, Caption: Neues Objekt)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: Objekt:)
+- [ ] `Objekt` (Typ: 109, Caption: )
+- [ ] `Reg_VA` (Typ: 123, Caption: )
+- [ ] `pgPos` (Typ: 124, Caption: Positionen)
+- [ ] `sub_OB_Objekt_Positionen` (Typ: 112, Caption: )
+- [ ] `pgAttach` (Typ: 124, Caption: Zusatzdateien)
+- [ ] `sub_ZusatzDateien` (Typ: 112, Caption: )
+- [ ] `btnNeuAttach` (Typ: 104, Caption: Neue Objektvorlage)
+- [ ] `TabellenNr` (Typ: 109, Caption: )
+- [ ] `PLZ` (Typ: 109, Caption: )
+- [ ] `Ort` (Typ: 109, Caption: )
+- [ ] `Strasse` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Strasse:)
+- [ ] `Treffpunkt` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld327` (Typ: 100, Caption: Treffpunkt:)
+- [ ] `Treffp_Zeit` (Typ: 109, Caption: )
+- [ ] `Dienstkleidung` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld330` (Typ: 100, Caption: Dienstkleidung:)
+- [ ] `Ansprechpartner` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld333` (Typ: 100, Caption: Ansprechpartner:)
+- [ ] `Bezeichnungsfeld354` (Typ: 100, Caption: Uhr)
+- [ ] `Bezeichnungsfeld322` (Typ: 100, Caption: Ort:)
+- [ ] `Liste_Obj` (Typ: 110, Caption: )
+- [ ] `frm_Menuefuehrung` (Typ: 112, Caption: )
+- [ ] `Text435` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld436` (Typ: 100, Caption: Auftraggeber:)
+- [ ] `Erst_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld416` (Typ: 100, Caption: Erstellt)
+- [ ] `Erst_am` (Typ: 109, Caption: )
+- [ ] `Aend_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld420` (Typ: 100, Caption: Geändert)
+- [ ] `Aend_am` (Typ: 109, Caption: )
+
+**Fehlende Events:**
+- [ ] `btn_back_akt_pos_list` → OnClick (Erwartet: onclick, click)
+- [ ] `btnreport` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_letzer_datensatz` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl40` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl41` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl42` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl43` → OnClick (Erwartet: onclick, click)
+- [ ] `btnhilfe` → OnClick (Erwartet: onclick, click)
+- [ ] `mcobtndelete` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnneuattach` → OnClick (Erwartet: onclick, click)
+
+### frm_abwesenheitsuebersicht.html
+
+**Fehlende Controls:**
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: qry_DP_MA_NVerfueg)
+- [ ] `VA_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: VA_ID)
+- [ ] `ZuordID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: ZuordID)
+- [ ] `Anz_MA` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: Anz_MA)
+- [ ] `ObjOrt` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: ObjOrt)
+- [ ] `VADatum` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: VADatum)
+- [ ] `Pos_Nr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld15` (Typ: 100, Caption: Pos_Nr)
+- [ ] `MA_Start` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: MA_Start)
+- [ ] `MA_Ende` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld21` (Typ: 100, Caption: MA_Ende)
+- [ ] `MA_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: MA_ID)
+- [ ] `MAName` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: MAName)
+- [ ] `IstFraglich` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld30` (Typ: 100, Caption: IstFraglich)
+- [ ] `Hlp` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld33` (Typ: 100, Caption: Hlp)
+
+### frm_va_Auftragstamm.html
+
+**Fehlende Controls:**
+- [ ] `Rechteck620` (Typ: 101, Caption: )
+- [ ] `Auto_Kopfzeile0` (Typ: 100, Caption: Auftragsverwaltung)
+- [ ] `lbl_Datum` (Typ: 100, Caption: 15.01.2026)
+- [ ] `Bezeichnungsfeld344` (Typ: 100, Caption: Auftragsstatus:)
+- [ ] `btnSchnellPlan` (Typ: 104, Caption: Mitarbeiterauswahl)
+- [ ] `btnMailEins` (Typ: 104, Caption: Einsatzliste senden MA)
+- [ ] `btnAuftrBerech` (Typ: 104, Caption: Auftrag berechnen)
+- [ ] `btnDruckZusage` (Typ: 104, Caption: Einsatzliste drucken)
+- [ ] `btn_letzer_Datensatz` (Typ: 104, Caption: btn_letzter_Datensatz)
+- [ ] `Befehl40` (Typ: 104, Caption: btn_Datensatz_vor)
+- [ ] `Befehl41` (Typ: 104, Caption: btn_Datensatz_zurueck)
+- [ ] `Befehl43` (Typ: 104, Caption: btn_erster_Datensatz)
+- [ ] `mcobtnDelete` (Typ: 104, Caption: Auftrag löschen)
+- [ ] `Befehl38` (Typ: 104, Caption: btn_Formular_schliessen)
+- [ ] `btnRibbonAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnRibbonEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaEin` (Typ: 104, Caption: Befehl179)
+- [ ] `btnDaBaAus` (Typ: 104, Caption: Befehl179)
+- [ ] `btnReq` (Typ: 104, Caption: Aktualisieren)
+- [ ] `lbl_Version` (Typ: 100, Caption: Test | Test)
+- [ ] `btnneuveranst` (Typ: 104, Caption: Neuer Auftrag)
+- [ ] `btn_aenderungsprotokoll` (Typ: 104, Caption: Änderungsprotokoll)
+- [ ] `IstStatus` (Typ: 111, Caption: )
+- [ ] `Befehl640` (Typ: 104, Caption: Auftrag kopieren)
+- [ ] `btnmailpos` (Typ: 104, Caption: Positionsliste senden)
+- [ ] `btn_Posliste_oeffnen` (Typ: 104, Caption: Positionen zuweisen)
+- [ ] `btn_rueck` (Typ: 104, Caption: Befehl649)
+- [ ] `btnCheck` (Typ: 104, Caption: Aufträge prüfen)
+- [ ] `cboEinsatzliste` (Typ: 111, Caption: )
+- [ ] `btnDruckZusage1` (Typ: 104, Caption: Mehrtagesliste drucken)
+- [ ] `btn_Rueckmeld` (Typ: 104, Caption: Rückmelde-Statistik)
+- [ ] `lbl_rechnungsnr` (Typ: 100, Caption: Rechnung Nr.:)
+- [ ] `btnSyncErr` (Typ: 104, Caption: Syncfehler checken)
+- [ ] `btn_ListeStd` (Typ: 104, Caption: Namensliste ESS)
+- [ ] `btn_Autosend_BOS` (Typ: 104, Caption: Einsatzliste senden BOS)
+- [ ] `cbAutosendEL` (Typ: 106, Caption: )
+- [ ] `lbl_EL_Autosend` (Typ: 100, Caption: EL Autosend)
+- [ ] `Befehl709` (Typ: 104, Caption: EL gesendet)
+- [ ] `btnMailSub` (Typ: 104, Caption: Einsatzliste senden SUB)
+- [ ] `Bezeichnungsfeld466` (Typ: 100, Caption: Nr.)
+- [ ] `Bezeichnungsfeld272` (Typ: 100, Caption: Datum:)
+- [ ] `PLZ` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld327` (Typ: 100, Caption: Treffpunkt:)
+- [ ] `Bezeichnungsfeld333` (Typ: 100, Caption: Ansprechpartner:)
+- [ ] `Objekt_ID` (Typ: 111, Caption: )
+- [ ] `cboVADatum` (Typ: 111, Caption: )
+- [ ] `btnDatumLeft` (Typ: 104, Caption: btn_Datensatz_zurueck)
+- [ ] `btnDatumRight` (Typ: 104, Caption: btn_Datensatz_vor)
+- [ ] `Bezeichnungsfeld243` (Typ: 100, Caption: Objekt:)
+- [ ] `Bezeichnungsfeld467` (Typ: 100, Caption: Ort:)
+- [ ] `Bezeichnungsfeld330` (Typ: 100, Caption: Dienstkleidung:)
+- [ ] `frm_Menuefuehrung` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld339` (Typ: 100, Caption: PKW Anzahl:)
+- [ ] `Bezeichnungsfeld592` (Typ: 100, Caption: Auftraggeber:)
+- [ ] `Reg_VA` (Typ: 123, Caption: )
+- [ ] `pgMA_Zusage` (Typ: 124, Caption: Einsatzliste)
+- [ ] `MA_Selektion` (Typ: 107, Caption: )
+- [ ] `Option264` (Typ: 105, Caption: )
+- [ ] `Bezeichnungsfeld265` (Typ: 100, Caption: Alle)
+- [ ] `Bezeichnungsfeld517` (Typ: 100, Caption: Anstellungsart:)
+- [ ] `cboAnstArt` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld263` (Typ: 100, Caption: Filter:)
+- [ ] `btnPlan_Kopie` (Typ: 104, Caption: Daten in Folgetag kopieren)
+- [ ] `Befehl543` (Typ: 104, Caption: btn_Datensatz_vor)
+- [ ] `btnVAPlanCrea` (Typ: 104, Caption: Liste aktualisieren)
+- [ ] `VerrSatz` (Typ: 109, Caption: )
+- [ ] `cboQuali` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld269` (Typ: 100, Caption: Kategorie:)
+- [ ] `IstVerfuegbar` (Typ: 106, Caption: )
+- [ ] `lbl_NurFreie` (Typ: 100, Caption: Nur freie anzeigen)
+- [ ] `lbl_KeineEingabe` (Typ: 100, Caption: Keine Eingabe möglich - Auftrag bereits berechnet)
+- [ ] `sub_MA_VA_Zuordnung` (Typ: 112, Caption: )
+- [ ] `sub_VA_Start` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld255` (Typ: 100, Caption: Anzahl     )
+- [ ] `btn_VA_Abwesenheiten` (Typ: 104, Caption: Abwesenheiten)
+- [ ] `sub_MA_VA_Planung_Absage` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld526` (Typ: 100, Caption: Absagen:)
+- [ ] `btn_sortieren` (Typ: 104, Caption: sortieren)
+- [ ] `btn_BWN_Druck` (Typ: 104, Caption: BWN Drucken)
+- [ ] `cmd_BWN_send` (Typ: 104, Caption: BWN senden)
+- [ ] `pgMA_Plan` (Typ: 124, Caption: Antworten ausstehend)
+- [ ] `sub_MA_VA_Zuordnung_Status` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld386` (Typ: 100, Caption: Mitarbeiter geplant:)
+- [ ] `pgAttach` (Typ: 124, Caption: Zusatzdateien)
+- [ ] `sub_ZusatzDateien` (Typ: 112, Caption: )
+- [ ] `btnNeuAttach` (Typ: 104, Caption: Neuen Attach hinzufügen)
+- [ ] `Bezeichnungsfeld355` (Typ: 100, Caption: Doppelklick auf Dateinamen zeigt Inhalt an bzw. öffnet Office-Pgm )
+- [ ] `TabellenNr` (Typ: 109, Caption: )
+- [ ] `pgRechnung` (Typ: 124, Caption: Rechnung)
+- [ ] `sub_rch_Pos` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld470` (Typ: 100, Caption: Rechnungspositionen:)
+- [ ] `sub_Berechnungsliste` (Typ: 112, Caption: )
+- [ ] `Bezeichnungsfeld472` (Typ: 100, Caption: Berechnungsliste:)
+- [ ] `btnPDFKopf` (Typ: 104, Caption: Rechnung PDF)
+- [ ] `btnPDFPos` (Typ: 104, Caption: Berechnungsliste PDF)
+- [ ] `PosGesamtsumme` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld439` (Typ: 100, Caption: Gesamtsumme Netto:)
+- [ ] `btnLoad` (Typ: 104, Caption: Daten laden)
+- [ ] `btnRchLex` (Typ: 104, Caption: Rechnung in Lexware erstellen)
+- [ ] `pgBemerk` (Typ: 124, Caption: Bemerkungen)
+- [ ] `sub_VA_Anzeige` (Typ: 112, Caption: )
+- [ ] `Auftraege_ab` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld482` (Typ: 100, Caption: Aufträge ab: )
+- [ ] `btn_AbWann` (Typ: 104, Caption: Go)
+- [ ] `btnHeute` (Typ: 104, Caption: Ab Heute)
+- [ ] `btnTgBack` (Typ: 104, Caption: <<)
+- [ ] `btnTgVor` (Typ: 104, Caption: >>)
+- [ ] `cboID` (Typ: 111, Caption: )
+- [ ] `lblSearch` (Typ: 100, Caption: Suchen)
+- [ ] `btn_Tag_loeschen` (Typ: 104, Caption: Tag löschen)
+- [ ] `Rechteck619` (Typ: 101, Caption: )
+- [ ] `Bezeichnungsfeld655` (Typ: 100, Caption: Fahrtkosten pro PKW:)
+- [ ] `Kombinationsfeld656` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld657` (Typ: 100, Caption: Auftrag:)
+- [ ] `EmptyCell689` (Typ: 127, Caption: )
+- [ ] `EmptyCell691` (Typ: 127, Caption: )
+- [ ] `EmptyCell693` (Typ: 127, Caption: )
+- [ ] `zsub_lstAuftrag` (Typ: 112, Caption: )
+- [ ] `Text416` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld417` (Typ: 100, Caption: Erstellt)
+- [ ] `Text418` (Typ: 109, Caption: )
+- [ ] `Text419` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld421` (Typ: 100, Caption: Geändert)
+- [ ] `Text422` (Typ: 109, Caption: )
+
+**Fehlende Events:**
+- [ ] `btnschnellplan` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmaileins` → OnClick (Erwartet: onclick, click)
+- [ ] `btnauftrberech` → OnClick (Erwartet: onclick, click)
+- [ ] `btndruckzusage` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_letzer_datensatz` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl40` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl41` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl43` → OnClick (Erwartet: onclick, click)
+- [ ] `mcobtndelete` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl38` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnribbonein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaein` → OnClick (Erwartet: onclick, click)
+- [ ] `btndabaaus` → OnClick (Erwartet: onclick, click)
+- [ ] `btnreq` → OnClick (Erwartet: onclick, click)
+- [ ] `btnneuveranst` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl640` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmailpos` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_posliste_oeffnen` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_rueck` → OnClick (Erwartet: onclick, click)
+- [ ] `btncheck` → OnClick (Erwartet: onclick, click)
+- [ ] `btndruckzusage1` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_rueckmeld` → OnClick (Erwartet: onclick, click)
+- [ ] `btnsyncerr` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_listestd` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_autosend_bos` → OnClick (Erwartet: onclick, click)
+- [ ] `befehl709` → OnClick (Erwartet: onclick, click)
+- [ ] `btnmailsub` → OnClick (Erwartet: onclick, click)
+- [ ] `btndatumleft` → OnClick (Erwartet: onclick, click)
+- [ ] `btndatumright` → OnClick (Erwartet: onclick, click)
+- [ ] `btnplan_kopie` → OnClick (Erwartet: onclick, click)
+- [ ] `btnvaplancrea` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_va_abwesenheiten` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_sortieren` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_bwn_druck` → OnClick (Erwartet: onclick, click)
+- [ ] `cmd_bwn_send` → OnClick (Erwartet: onclick, click)
+- [ ] `btnneuattach` → OnClick (Erwartet: onclick, click)
+- [ ] `btnpdfkopf` → OnClick (Erwartet: onclick, click)
+- [ ] `btnpdfpos` → OnClick (Erwartet: onclick, click)
+- [ ] `btnload` → OnClick (Erwartet: onclick, click)
+- [ ] `btnrchlex` → OnClick (Erwartet: onclick, click)
+- [ ] `btn_abwann` → OnClick (Erwartet: onclick, click)
+- [ ] `btnheute` → OnClick (Erwartet: onclick, click)
+- [ ] `btntgback` → OnClick (Erwartet: onclick, click)
+- [ ] `btntgvor` → OnClick (Erwartet: onclick, click)
+
+### sub_DP_Grund.html
+
+**Fehlende Controls:**
+- [ ] `ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: ID)
+- [ ] `ObjOrt` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: ObjOrt)
+- [ ] `ObjOrt_Anzeige` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: Auftrag Objekt Ort)
+- [ ] `PosNr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Pos_Nr)
+- [ ] `Tag1_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Tag1_Zuo_ID)
+- [ ] `Tag1_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: Name)
+- [ ] `Tag1_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld21` (Typ: 100, Caption: fraglich)
+- [ ] `Tag1_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: von)
+- [ ] `Tag1_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: bis)
+- [ ] `Tag2_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld30` (Typ: 100, Caption: Tag2_Zuo_ID)
+- [ ] `Tag2_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld36` (Typ: 100, Caption: Name)
+- [ ] `Tag2_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld39` (Typ: 100, Caption: fraglich)
+- [ ] `Tag2_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld42` (Typ: 100, Caption: von)
+- [ ] `Tag2_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld45` (Typ: 100, Caption: bis)
+- [ ] `Tag3_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld48` (Typ: 100, Caption: Tag3_Zuo_ID)
+- [ ] `Tag3_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld54` (Typ: 100, Caption: Name)
+- [ ] `Tag3_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld57` (Typ: 100, Caption: fraglich)
+- [ ] `Tag3_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld60` (Typ: 100, Caption: von)
+- [ ] `Tag3_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld63` (Typ: 100, Caption: bis)
+- [ ] `Tag4_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld66` (Typ: 100, Caption: Tag4_Zuo_ID)
+- [ ] `Tag4_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld72` (Typ: 100, Caption: Name)
+- [ ] `Tag4_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld75` (Typ: 100, Caption: fraglich)
+- [ ] `Tag4_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld78` (Typ: 100, Caption: von)
+- [ ] `Tag4_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld81` (Typ: 100, Caption: bis)
+- [ ] `Tag5_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Tag5_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld90` (Typ: 100, Caption: Name)
+- [ ] `Tag5_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld93` (Typ: 100, Caption: fraglich)
+- [ ] `Tag5_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld96` (Typ: 100, Caption: von)
+- [ ] `Tag5_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld99` (Typ: 100, Caption: bis)
+- [ ] `Tag6_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Tag6_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld108` (Typ: 100, Caption: Name)
+- [ ] `Tag6_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld111` (Typ: 100, Caption: fraglich)
+- [ ] `Tag6_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld114` (Typ: 100, Caption: von)
+- [ ] `Tag6_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld117` (Typ: 100, Caption: bis)
+- [ ] `Tag7_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Tag7_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld126` (Typ: 100, Caption: Name)
+- [ ] `Tag7_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld129` (Typ: 100, Caption: fraglich)
+- [ ] `Tag7_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld132` (Typ: 100, Caption: von)
+- [ ] `Tag7_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld135` (Typ: 100, Caption: bis)
+- [ ] `Bezeichnungsfeld69` (Typ: 100, Caption: Tag4_MA_ID)
+- [ ] `Bezeichnungsfeld84` (Typ: 100, Caption: Tag5_Zuo_ID)
+- [ ] `Bezeichnungsfeld87` (Typ: 100, Caption: Tag5_MA_ID)
+- [ ] `Bezeichnungsfeld102` (Typ: 100, Caption: Tag6_Zuo_ID)
+- [ ] `Bezeichnungsfeld120` (Typ: 100, Caption: Tag7_Zuo_ID)
+- [ ] `Bezeichnungsfeld105` (Typ: 100, Caption: Tag6_MA_ID)
+- [ ] `Bezeichnungsfeld123` (Typ: 100, Caption: Tag7_MA_ID)
+- [ ] `Startdat` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld387` (Typ: 100, Caption: Startdatum)
+- [ ] `Tag4_MA_ID` (Typ: 111, Caption: )
+- [ ] `Tag1_MA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld15` (Typ: 100, Caption: Tag1_MA_ID)
+- [ ] `Tag5_MA_ID` (Typ: 111, Caption: )
+- [ ] `Tag2_MA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld33` (Typ: 100, Caption: Tag2_MA_ID)
+- [ ] `Tag3_MA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld51` (Typ: 100, Caption: Tag3_MA_ID)
+- [ ] `Tag7_MA_ID` (Typ: 111, Caption: )
+- [ ] `Tag6_MA_ID` (Typ: 111, Caption: )
+
+### sub_DP_Grund_MA.html
+
+**Fehlende Controls:**
+- [ ] `ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: ID)
+- [ ] `MA_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: MA_ID)
+- [ ] `MAName` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: MA Name)
+- [ ] `Hlp` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Pos_Nr)
+- [ ] `Tag1_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Tag1_Zuo_ID)
+- [ ] `Tag1_MA_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld15` (Typ: 100, Caption: Tag1_MA_ID)
+- [ ] `Tag1_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: Obj Name)
+- [ ] `Tag1_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld21` (Typ: 100, Caption: fraglich)
+- [ ] `Tag1_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: von)
+- [ ] `Tag1_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: bis)
+- [ ] `Tag2_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld30` (Typ: 100, Caption: Tag2_Zuo_ID)
+- [ ] `Tag2_MA_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld33` (Typ: 100, Caption: Tag2_MA_ID)
+- [ ] `Tag2_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld36` (Typ: 100, Caption: Obj Name)
+- [ ] `Tag2_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld39` (Typ: 100, Caption: fraglich)
+- [ ] `Tag2_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld42` (Typ: 100, Caption: von)
+- [ ] `Tag2_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld45` (Typ: 100, Caption: bis)
+- [ ] `Tag3_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld48` (Typ: 100, Caption: Tag3_Zuo_ID)
+- [ ] `Tag3_MA_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld51` (Typ: 100, Caption: Tag3_MA_ID)
+- [ ] `Tag3_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld54` (Typ: 100, Caption: Obj Name)
+- [ ] `Tag3_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld57` (Typ: 100, Caption: fraglich)
+- [ ] `Tag3_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld60` (Typ: 100, Caption: von)
+- [ ] `Tag3_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld63` (Typ: 100, Caption: bis)
+- [ ] `Tag4_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld66` (Typ: 100, Caption: Tag4_Zuo_ID)
+- [ ] `Tag4_MA_ID` (Typ: 109, Caption: )
+- [ ] `Tag4_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld72` (Typ: 100, Caption: Obj Name)
+- [ ] `Tag4_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld75` (Typ: 100, Caption: fraglich)
+- [ ] `Tag4_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld78` (Typ: 100, Caption: von)
+- [ ] `Tag4_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld81` (Typ: 100, Caption: bis)
+- [ ] `Tag5_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Tag5_MA_ID` (Typ: 109, Caption: )
+- [ ] `Tag5_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld90` (Typ: 100, Caption: Obj Name)
+- [ ] `Tag5_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld93` (Typ: 100, Caption: fraglich)
+- [ ] `Tag5_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld96` (Typ: 100, Caption: von)
+- [ ] `Tag5_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld99` (Typ: 100, Caption: bis)
+- [ ] `Tag6_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Tag6_MA_ID` (Typ: 109, Caption: )
+- [ ] `Tag6_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld108` (Typ: 100, Caption: Obj Name)
+- [ ] `Tag6_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld111` (Typ: 100, Caption: fraglich)
+- [ ] `Tag6_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld114` (Typ: 100, Caption: von)
+- [ ] `Tag6_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld117` (Typ: 100, Caption: bis)
+- [ ] `Tag7_Zuo_ID` (Typ: 109, Caption: )
+- [ ] `Tag7_MA_ID` (Typ: 109, Caption: )
+- [ ] `Tag7_Name` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld126` (Typ: 100, Caption: Obj Name)
+- [ ] `Tag7_fraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld129` (Typ: 100, Caption: fraglich)
+- [ ] `Tag7_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld132` (Typ: 100, Caption: von)
+- [ ] `Tag7_bis` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld135` (Typ: 100, Caption: bis)
+- [ ] `Bezeichnungsfeld69` (Typ: 100, Caption: Tag4_MA_ID)
+- [ ] `Bezeichnungsfeld84` (Typ: 100, Caption: Tag5_Zuo_ID)
+- [ ] `Bezeichnungsfeld87` (Typ: 100, Caption: Tag5_MA_ID)
+- [ ] `Bezeichnungsfeld102` (Typ: 100, Caption: Tag6_Zuo_ID)
+- [ ] `Bezeichnungsfeld120` (Typ: 100, Caption: Tag7_Zuo_ID)
+- [ ] `Bezeichnungsfeld105` (Typ: 100, Caption: Tag6_MA_ID)
+- [ ] `Bezeichnungsfeld123` (Typ: 100, Caption: Tag7_MA_ID)
+- [ ] `Startdat` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld385` (Typ: 100, Caption: Startdatum)
+- [ ] `Stunden_gesamt` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld386` (Typ: 100, Caption: Stunden_gesamt)
+
+### sub_MA_Offene_Anfragen.html
+
+**Fehlende Controls:**
+- [ ] `Name` (Typ: 109, Caption: )
+- [ ] `Name_Bezeichnungsfeld` (Typ: 100, Caption: Name)
+- [ ] `VADatum` (Typ: 109, Caption: )
+- [ ] `Datum` (Typ: 100, Caption: Datum)
+- [ ] `Auftrag` (Typ: 109, Caption: )
+- [ ] `Auftrag_Bezeichnungsfeld` (Typ: 100, Caption: Auftrag)
+- [ ] `Ort` (Typ: 109, Caption: )
+- [ ] `Ort_Bezeichnungsfeld` (Typ: 100, Caption: Ort)
+- [ ] `von` (Typ: 109, Caption: )
+- [ ] `von_Bezeichnungsfeld` (Typ: 100, Caption: von)
+- [ ] `bis` (Typ: 109, Caption: )
+- [ ] `bis_Bezeichnungsfeld` (Typ: 100, Caption: bis)
+- [ ] `Anfragezeitpunkt` (Typ: 109, Caption: )
+- [ ] `Anfragezeitpunkt_Bezeichnungsfeld` (Typ: 100, Caption: Anfragezeitpunkt)
+
+### sub_MA_VA_Planung_Absage.html
+
+**Fehlende Controls:**
+- [ ] `ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: ID)
+- [ ] `VA_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: VA_ID)
+- [ ] `PosNr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: Lfd.)
+- [ ] `VA_Start` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: Beginn)
+- [ ] `Bemerkungen` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: Bemerkungen)
+- [ ] `MA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Mitarbeiter)
+- [ ] `VA_Ende` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld53` (Typ: 100, Caption: Ende)
+- [ ] `MA_Brutto_Std` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld55` (Typ: 100, Caption: Brutto)
+- [ ] `VADatum_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Datum)
+- [ ] `VAStart_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld63` (Typ: 100, Caption: Schicht)
+- [ ] `MA_Netto_Std` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld65` (Typ: 100, Caption: Std.)
+- [ ] `Erst_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld66` (Typ: 100, Caption: Erst_von)
+- [ ] `Erst_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld67` (Typ: 100, Caption: Erst_am)
+- [ ] `Aend_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld69` (Typ: 100, Caption: Aend_von)
+- [ ] `Aend_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld72` (Typ: 100, Caption: Aend_am)
+- [ ] `VADatum` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld41` (Typ: 100, Caption: VADatum)
+- [ ] `MVA_Start` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld42` (Typ: 100, Caption: MVA_Start)
+- [ ] `MVA_Ende` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld43` (Typ: 100, Caption: MVA_Ende)
+- [ ] `Status_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld70` (Typ: 100, Caption: Status)
+- [ ] `PKW` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld51` (Typ: 100, Caption: PKW)
+
+### sub_MA_VA_Planung_Status.html
+
+**Fehlende Controls:**
+- [ ] `ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: ID)
+- [ ] `VA_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: VA_ID)
+- [ ] `PosNr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: Lfd.)
+- [ ] `VA_Start` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: Beginn)
+- [ ] `Bemerkungen` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: Bemerkungen)
+- [ ] `MA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Mitarbeiter)
+- [ ] `VA_Ende` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld53` (Typ: 100, Caption: Ende)
+- [ ] `MA_Brutto_Std` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld55` (Typ: 100, Caption: Brutto)
+- [ ] `VADatum_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Datum)
+- [ ] `VAStart_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld63` (Typ: 100, Caption: Schicht)
+- [ ] `MA_Netto_Std` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld65` (Typ: 100, Caption: Std.)
+- [ ] `Erst_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld66` (Typ: 100, Caption: Erst_von)
+- [ ] `Erst_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld67` (Typ: 100, Caption: Erst_am)
+- [ ] `Aend_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld69` (Typ: 100, Caption: Aend_von)
+- [ ] `Aend_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld72` (Typ: 100, Caption: Aend_am)
+- [ ] `VADatum` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld41` (Typ: 100, Caption: VADatum)
+- [ ] `MVA_Start` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld42` (Typ: 100, Caption: MVA_Start)
+- [ ] `MVA_Ende` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld43` (Typ: 100, Caption: MVA_Ende)
+- [ ] `Status_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld70` (Typ: 100, Caption: Status)
+- [ ] `PKW` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld51` (Typ: 100, Caption: PKW)
+- [ ] `Text75` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld76` (Typ: 100, Caption: Anfragezeitpunkt)
+- [ ] `Text77` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld78` (Typ: 100, Caption: Rueckmeldezeitpunkt)
+
+### sub_MA_VA_Zuordnung.html
+
+**Fehlende Controls:**
+- [ ] `ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: ID)
+- [ ] `VA_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: VA_ID)
+- [ ] `PosNr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: Lfd.)
+- [ ] `MA_Start` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: von)
+- [ ] `Bemerkungen` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: Bemerkungen)
+- [ ] `MA_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Mitarbeiter)
+- [ ] `MA_Ende` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld53` (Typ: 100, Caption: bis)
+- [ ] `PKW` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld51` (Typ: 100, Caption: PKW)
+- [ ] `VADatum_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Datum)
+- [ ] `VAStart_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld63` (Typ: 100, Caption: Schicht)
+- [ ] `Erst_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld66` (Typ: 100, Caption: Erstellt von)
+- [ ] `Erst_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld67` (Typ: 100, Caption: Erstellt am)
+- [ ] `Aend_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld69` (Typ: 100, Caption: Geändert von)
+- [ ] `Aend_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld72` (Typ: 100, Caption: Geändert am)
+- [ ] `RL_34a` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld70` (Typ: 100, Caption: 34a RL)
+- [ ] `VADatum` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld41` (Typ: 100, Caption: VADatum)
+- [ ] `MVA_Start` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld42` (Typ: 100, Caption: MVA_Start)
+- [ ] `MVA_Ende` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld43` (Typ: 100, Caption: MVA_Ende)
+- [ ] `PreisArt_ID` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld74` (Typ: 100, Caption: Preisgruppe)
+- [ ] `IstFraglich` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld78` (Typ: 100, Caption: Informieren)
+- [ ] `cboMA_Ausw` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld83` (Typ: 100, Caption: Mitarbeiter Eing.)
+- [ ] `PKW_Anzahl` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld82` (Typ: 100, Caption: PKW Anz)
+- [ ] `MA_Brutto_Std` (Typ: 109, Caption: )
+- [ ] `MA-Brutto` (Typ: 100, Caption: Std)
+- [ ] `MA_netto_std` (Typ: 109, Caption: )
+- [ ] `MA_Netto_std2` (Typ: 100, Caption: Netto Std2)
+- [ ] `Info` (Typ: 109, Caption: )
+- [ ] `Anfragezeitpunkt` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld95` (Typ: 100, Caption: Anfragezeitpunkt)
+- [ ] `Rueckmeldezeitpunkt` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld96` (Typ: 100, Caption: Rueckmeldezeitpunkt)
+- [ ] `Einsatzleitung` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld97` (Typ: 100, Caption: Einsatzleitung)
+- [ ] `Rch_Erstellt` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld98` (Typ: 100, Caption: Rechnung erstellt)
+
+### sub_OB_Objekt_Positionen.html
+
+**Fehlende Controls:**
+- [ ] `ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: ID)
+- [ ] `PosLst_ID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: OB_Objekt_Kopf_ID)
+- [ ] `Gruppe` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: Bereich)
+- [ ] `Zusatztext` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Bezeichnung)
+- [ ] `Zusatztext2` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: Bereichsleiter ECO)
+- [ ] `Anzahl` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: Anzahl)
+- [ ] `Rel_Beginn` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld21` (Typ: 100, Caption: Dienstbeginn)
+- [ ] `Rel_Ende` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: Dienstende)
+- [ ] `TagesArt` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: TagesArt)
+- [ ] `TagesNr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld30` (Typ: 100, Caption: TagesNr)
+- [ ] `Geschlecht` (Typ: 111, Caption: )
+- [ ] `Bezeichnungsfeld15` (Typ: 100, Caption: Geschlecht)
+- [ ] `Sort` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld34` (Typ: 100, Caption: Sort)
+
+### sub_ZusatzDateien.html
+
+**Fehlende Controls:**
+- [ ] `ZusatzNr` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld0` (Typ: 100, Caption: ZusatzNr)
+- [ ] `TabellenID` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld3` (Typ: 100, Caption: TabellenID)
+- [ ] `Ueberordnung` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld6` (Typ: 100, Caption: Ueberordnung)
+- [ ] `Dateiname` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld9` (Typ: 100, Caption: Dateiname)
+- [ ] `DFiledate` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld12` (Typ: 100, Caption: DFiledate)
+- [ ] `DLaenge` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld15` (Typ: 100, Caption: DLaenge)
+- [ ] `Texttyp` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld18` (Typ: 100, Caption: Texttyp)
+- [ ] `Kurzbeschreibung` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld21` (Typ: 100, Caption: Kurzbeschreibung)
+- [ ] `Langtext` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld24` (Typ: 100, Caption: Langtext)
+- [ ] `JNVerteiler` (Typ: 106, Caption: )
+- [ ] `Bezeichnungsfeld27` (Typ: 100, Caption: JNVerteiler)
+- [ ] `Erst_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld30` (Typ: 100, Caption: Erst_von)
+- [ ] `Erst_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld33` (Typ: 100, Caption: Erst_am)
+- [ ] `Aend_von` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld36` (Typ: 100, Caption: Aend_von)
+- [ ] `Aend_am` (Typ: 109, Caption: )
+- [ ] `Bezeichnungsfeld39` (Typ: 100, Caption: Aend_am)
+
+
+## Was ist besser in HTML?
+
+### frm_va_Auftragstamm.html
+
+**Zusätzliche Controls:**
+- `Auftrag` (Typ: text)
+- `VA_ID_Display` (Typ: text)
+- `Autosend_EL` (Typ: checkbox)
+
+
+## Was muss migriert werden?
+
+Basierend auf kritischen Abweichungen:
+
+### frmTop_DP_MA_Auftrag_Zuo.html
+
+- [ ] Fehlendes Control: Control 'btn_Auswahl_Zuo' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl38' fehlt in HTML
+
+### frmTop_Geo_Verwaltung.html
+
+- [ ] Fehlendes Control: Control 'cmdBatchObjekte' fehlt in HTML
+- [ ] Fehlendes Control: Control 'cmdBatchMA' fehlt in HTML
+- [ ] Fehlendes Control: Control 'cmdBuildDistances' fehlt in HTML
+- [ ] Fehlendes Control: Control 'cmdStats' fehlt in HTML
+- [ ] Fehlendes Control: Control 'cmdClose' fehlt in HTML
+
+### frmTop_KD_Adressart.html
+
+- [ ] Fehlendes Control: Control 'Befehl11' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl39' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl40' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl41' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl42' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl43' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl44' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl45' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl46' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHilfe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'mcobtnDelete' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl12' fehlt in HTML
+
+### frmTop_MA_Abwesenheitsplanung.html
+
+- [ ] Fehlendes Control: Control 'Befehl38' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHilfe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAbwBerechnen' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMarkLoesch' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAllLoesch' fehlt in HTML
+- [ ] Fehlendes Control: Control 'bznUebernehmen' fehlt in HTML
+
+### frmTop_VA_Akt_Objekt_Kopf.html
+
+- [ ] Fehlendes Control: Control 'Befehl53' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl39' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl40' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl41' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl42' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl43' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl46' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHilfe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'mcobtnDelete' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_VA_Objekt_Akt_Teil2' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_OB_Bearb' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_VA_Akt_OB_Pos_Neu' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAbsTime' fehlt in HTML
+
+### frm_Ausweis_Create.html
+
+- [ ] Fehlendes Control: Control 'Befehl38' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHilfe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAddAll' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAddSelected' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDelAll' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDelSelected' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAusweisReport' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDeselect' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDienstauswNr' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl7' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl8' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_ausweiseinsatzleitung' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_ausweisservice' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_ausweisstaff' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_ausweisBereichsleiter' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_ausweissec' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_ausweisplatzanweiser' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Karte_Sicherheit' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Karte_Service' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Karte_Rueck' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Sonder' fehlt in HTML
+
+### frm_DP_Dienstplan_MA.html
+
+- [ ] Fehlendes Control: Control 'btnStartdatum' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnVor' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnrueck' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Heute' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnOutpExcelSend' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnOutpExcel' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl37' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMADienstpl' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl20' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDPSenden' fehlt in HTML
+
+### frm_DP_Dienstplan_Objekt.html
+
+- [ ] Fehlendes Control: Control 'btnStartdatum' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnVor' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnrueck' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Heute' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnOutpExcelSend' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnOutpExcel' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl37' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+
+### frm_KD_Kundenstamm.html
+
+- [ ] Fehlendes Control: Control 'btnAlle' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl39' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl40' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl41' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl43' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl46' fehlt in HTML
+- [ ] Fehlendes Control: Control 'mcobtnDelete' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnUmsAuswert' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAuswertung' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAufRchPDF' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAufRchPosPDF' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAufEinsPDF' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnNeuAttach' fehlt in HTML
+
+### frm_MA_Mitarbeiterstamm.html
+
+- [ ] Fehlendes Control: Control 'Befehl39' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl40' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl41' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl43' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl46' fehlt in HTML
+- [ ] Fehlendes Control: Control 'mcobtnDelete' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnLstDruck' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMADienstpl' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'lbl_Mitarbeitertabelle' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnZeitkonto' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnZKFest' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnZKMini' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDateisuch' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDateisuch2' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMaps' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnZuAb' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnXLZeitkto' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnLesen' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnUpdJahr' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnXLJahr' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnXLEinsUeber' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnZKeinzel' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Bericht_drucken' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAU_Lesen' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRch' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnCalc' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnXLUeberhangStd' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnau_lesen2' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAUPl_Lesen' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Diensplan_prnt' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Dienstplan_send' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnXLDiePl' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMehrfachtermine' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnXLNverfueg' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnReport_Dienstkleidung' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_MA_EinlesVorlageDatei' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnXLVordrucke' fehlt in HTML
+
+### frm_MA_Offene_Anfragen.html
+
+- [ ] Fehlendes Control: Control 'btnAnfragen' fehlt in HTML
+
+### frm_MA_Serien_eMail_Auftrag.html
+
+- [ ] Fehlendes Control: Control 'Befehl38' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnSendEmail' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnSchnellPlan' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnZuAbsage' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAuftrag' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHilfe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnPosListeAtt' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnPDFCrea' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAttachSuch' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAttLoesch' fehlt in HTML
+
+### frm_MA_Serien_eMail_dienstplan.html
+
+- [ ] Fehlendes Control: Control 'Befehl38' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnSendEmail' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnSchnellPlan' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnZuAbsage' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAuftrag' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHilfe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnPosListeAtt' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnPDFCrea' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAttachSuch' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAttLoesch' fehlt in HTML
+
+### frm_MA_VA_Positionszuordnung.html
+
+- [ ] Fehlendes Control: Control 'btnAuftrag' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl48' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl39' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl40' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl41' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl42' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl43' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl49' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHilfe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'mcobtnDelete' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnPosList_PDF' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnBack_PosKopfTl1' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl68' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAddAll' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAddSelected' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDelAll' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDelSelected' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRepeat' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRepeatAus' fehlt in HTML
+
+### frm_MA_VA_Schnellauswahl.html
+
+- [ ] Fehlendes Control: Control 'Befehl38' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnZuAbsage' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAuftrag' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHilfe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnPosListe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAddSelected' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDelAll' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDelSelected' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnSchnellGo' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAddZusage' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMoveZusage' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDelZusage' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnSortZugeord' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnSortPLan' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMail' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMailSelected' fehlt in HTML
+- [ ] Fehlendes Control: Control 'cmdListMA_Standard' fehlt in HTML
+- [ ] Fehlendes Control: Control 'cmdListMA_Entfernung' fehlt in HTML
+
+### frm_Menuefuehrung1.html
+
+- [ ] Fehlendes Control: Control 'btn_1' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl22' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl24' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnLetzterEinsatz' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Abwesenheiten' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnLohnabrech' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnFCN_Meldeliste' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnNamensliste' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnLohnarten' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_MAStamm_Excel' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_stunden_sub' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl37' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl40' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Stawa' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_BOS' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Hirsch' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_masterbtn' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl48' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Btn_Personalvorlagen' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_menue2_close' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnStundenMA' fehlt in HTML
+
+### frm_OB_Objekt.html
+
+- [ ] Fehlendes Control: Control 'btn_Back_akt_Pos_List' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnReport' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_letzer_Datensatz' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl40' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl41' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl42' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl43' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHilfe' fehlt in HTML
+- [ ] Fehlendes Control: Control 'mcobtnDelete' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnNeuVeranst' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnNeuAttach' fehlt in HTML
+
+### frm_va_Auftragstamm.html
+
+- [ ] Fehlendes Control: Control 'btnSchnellPlan' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMailEins' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnAuftrBerech' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDruckZusage' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_letzer_Datensatz' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl40' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl41' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl43' fehlt in HTML
+- [ ] Fehlendes Control: Control 'mcobtnDelete' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl38' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRibbonEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaEin' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDaBaAus' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnReq' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnneuveranst' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_aenderungsprotokoll' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl640' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnmailpos' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Posliste_oeffnen' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_rueck' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnCheck' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDruckZusage1' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Rueckmeld' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnSyncErr' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_ListeStd' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Autosend_BOS' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl709' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnMailSub' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDatumLeft' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnDatumRight' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnPlan_Kopie' fehlt in HTML
+- [ ] Fehlendes Control: Control 'Befehl543' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnVAPlanCrea' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_VA_Abwesenheiten' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_sortieren' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_BWN_Druck' fehlt in HTML
+- [ ] Fehlendes Control: Control 'cmd_BWN_send' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnNeuAttach' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnPDFKopf' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnPDFPos' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnLoad' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnRchLex' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_AbWann' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnHeute' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnTgBack' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btnTgVor' fehlt in HTML
+- [ ] Fehlendes Control: Control 'btn_Tag_loeschen' fehlt in HTML

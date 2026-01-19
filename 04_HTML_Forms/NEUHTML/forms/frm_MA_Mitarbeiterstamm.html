@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstammblatt - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_MA_Mitarbeiterstamm.css">
+</head>
+<body>
+    <div class="ma-container">
+        <!-- Linkes Menue -->
+        <aside class="ma-menu">
+            <div class="menu-header">HAUPTMENUE</div>
+            <nav class="menu-buttons">
+                <a href="frm_N_Dienstplanuebersicht.html" class="menu-btn">Dienstplanuebersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="menu-btn">Planungsuebersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="menu-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="menu-btn active">Mitarbeiterverwaltung</a>
+                <a href="#" class="menu-btn">Offene Mail Anfragen</a>
+                <a href="#" class="menu-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="menu-btn">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="menu-btn">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="menu-btn">Dienstausweis erstellen</a>
+                <a href="#" class="menu-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="menu-btn">Kundenverwaltung</a>
+                <a href="#" class="menu-btn">Verrechnungssaetze</a>
+                <a href="#" class="menu-btn">Sub Rechnungen</a>
+                <a href="#" class="menu-btn">E-Mail</a>
+                <a href="#" class="menu-btn secondary">Menue 2</a>
+                <a href="#" class="menu-btn secondary">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Hauptbereich -->
+        <main class="ma-main">
+            <!-- Header -->
+            <header class="ma-header">
+                <div class="header-left">
+                    <div class="ma-logo"></div>
+                    <h1 class="ma-title">Mitarbeiterstammblatt</h1>
+                    <button class="ma-btn special" id="btnMAAdresse">MA Adressen</button>
+                    <div class="nav-buttons">
+                        <button class="ma-btn-nav" id="btnErster" title="Erster">|&#9664;</button>
+                        <button class="ma-btn-nav" id="btnVorheriger" title="Vorheriger">&#9664;</button>
+                        <button class="ma-btn-nav" id="btnNaechster" title="Naechster">&#9654;</button>
+                        <button class="ma-btn-nav" id="btnLetzter" title="Letzter">&#9654;|</button>
+                    </div>
+                </div>
+                <div class="header-center">
+                    <span class="ma-kuerzel" id="lblKuerzel">AR</span>
+                    <span class="ma-name" id="lblNachname">Alali</span>
+                    <span class="ma-name" id="lblVorname">Ahmad</span>
+                    <span class="ma-id">MA - ID: <span id="lblMAID">707</span></span>
+                </div>
+                <div class="header-right">
+                    <div class="header-buttons-row">
+                        <button class="ma-btn danger" id="btnLoeschen">Mitarbeiter löschen</button>
+                        <button class="ma-btn" id="btnEinsaetzeFA">Einsätze übertragen FA</button>
+                        <button class="ma-btn" id="btnListenDrucken">Listen drucken</button>
+                    </div>
+                    <div class="header-buttons-row">
+                        <button class="ma-btn success" id="btnSpeichern">Speichern</button>
+                        <button class="ma-btn primary" id="btnZeitkonto">Zeitkonto</button>
+                        <button class="ma-btn primary" id="btnNeuMA">Neuer Mitarbeiter</button>
+                        <button class="ma-btn" id="btnEinsaetzeMJ">Einsätze übertragen MJ</button>
+                        <button class="ma-btn" id="btnMATabelle">Mitarbeiter Tabelle</button>
+                    </div>
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V</span>
+                        <span id="lblDatum"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content mit Tabs und MA-Liste -->
+            <div class="ma-content">
+                <!-- Tabs Bereich -->
+                <div class="ma-tabs-area">
+                    <!-- Tab Navigation -->
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="tabStammdaten">Stammdaten</button>
+                        <button class="tab-btn" data-tab="tabEinsatzuebersicht">Einsatzuebersicht</button>
+                        <button class="tab-btn" data-tab="tabDienstplan">Dienstplan</button>
+                        <button class="tab-btn" data-tab="tabNichtVerfuegbar">Nicht Verfuegbar</button>
+                        <button class="tab-btn" data-tab="tabBestandDienstkleidung">Bestand Dienstkleidung</button>
+                        <button class="tab-btn" data-tab="tabSubRechnungen">Sub Rechnungen</button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Stammdaten Tab -->
+                        <div class="tab-pane active" id="tabStammdaten">
+                            <div class="stammdaten-header">
+                                <div class="stammdaten-ids">
+                                    <label>PersNr</label>
+                                    <input type="text" id="txtPersNr" class="input-small" value="707">
+                                    <label>LexNr:</label>
+                                    <input type="text" id="txtLexNr" class="input-small" value="27">
+                                    <label class="checkbox-inline"><input type="checkbox" id="chkAktiv" checked> Aktiv</label>
+                                    <label class="checkbox-inline"><input type="checkbox" id="chkSubunternehmer"> Subunternehmer</label>
+                                    <label class="checkbox-inline"><input type="checkbox" id="chkLexAktiv" checked> Lex_Aktiv</label>
+                                </div>
+                            </div>
+                            <div class="stammdaten-content">
+                                <!-- Linke Spalte -->
+                                <div class="stammdaten-left">
+                                    <div class="field-row">
+                                        <label>Nachname</label>
+                                        <input type="text" id="txtNachname" class="input-medium" value="Alali">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Vorname</label>
+                                        <input type="text" id="txtVorname" class="input-medium" value="Ahmad">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Strasse</label>
+                                        <input type="text" id="txtStrasse" class="input-medium" value="Hintere Cramergasse">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Nr</label>
+                                        <input type="text" id="txtNr" class="input-small" value="3">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>PLZ</label>
+                                        <input type="text" id="txtPLZ" class="input-small" value="90478">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Ort</label>
+                                        <input type="text" id="txtOrt" class="input-medium" value="Nuernberg">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Land</label>
+                                        <input type="text" id="txtLand" class="input-medium" value="Deutschland">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Bundesland</label>
+                                        <input type="text" id="txtBundesland" class="input-medium" value="Bayern">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Tel. Mobil</label>
+                                        <input type="text" id="txtTelMobil" class="input-medium" value="0176 - 725 86 744">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Tel. Festnetz</label>
+                                        <input type="text" id="txtTelFestnetz" class="input-medium">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Email</label>
+                                        <input type="text" id="txtEmail" class="input-medium" value="mood5@gmx.de">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Geschlecht</label>
+                                        <select id="cboGeschlecht" class="input-medium">
+                                            <option value="maennlich" selected>maennlich</option>
+                                            <option value="weiblich">weiblich</option>
+                                            <option value="divers">divers</option>
+                                        </select>
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Staatsangehoerigkeit</label>
+                                        <input type="text" id="txtStaatsangehoerigkeit" class="input-medium" value="Syrien">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Geb. Datum</label>
+                                        <input type="text" id="txtGebDatum" class="input-medium" value="01.01.1991">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Geb. Ort</label>
+                                        <input type="text" id="txtGebOrt" class="input-medium" value="Deir Ezzor">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Geb. Name</label>
+                                        <input type="text" id="txtGebName" class="input-medium">
+                                    </div>
+                                </div>
+                                <!-- Rechte Spalte -->
+                                <div class="stammdaten-right">
+                                    <div class="field-row">
+                                        <label>Kontoinhaber</label>
+                                        <input type="text" id="txtKontoinhaber" class="input-medium" value="Alali Ahmad">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>BIC</label>
+                                        <input type="text" id="txtBIC" class="input-medium">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>IBAN</label>
+                                        <input type="text" id="txtIBAN" class="input-medium" value="DE60 7605 0101 0013 6075 69">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Lohngruppe</label>
+                                        <select id="cboLohngruppe" class="input-medium">
+                                            <option value="BY Lohn 2a/b Okl. 1" selected>BY Lohn 2a/b Okl. 1</option>
+                                        </select>
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Bezuege gezahlt als</label>
+                                        <input type="text" id="txtBezuege" class="input-medium" value="Stundenlohn">
+                                    </div>
+                                    <div class="field-row">
+                                        <button class="ma-btn" id="btnKoordinaten">Koordinaten</button>
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Steuer-ID</label>
+                                        <input type="text" id="txtSteuerID" class="input-medium" value="18 010191 A 212">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Steuer-ID</label>
+                                        <input type="text" id="txtSteuerID2" class="input-medium" value="61 342 856 061">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Taetigkeit Bezeichnung</label>
+                                        <select id="cboTaetigkeit" class="input-medium">
+                                            <option value="Sicherheitspersonal" selected>Sicherheitspersonal</option>
+                                        </select>
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Krankenkasse</label>
+                                        <input type="text" id="txtKrankenkasse" class="input-medium" value="AOK BY">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Steuerklasse</label>
+                                        <input type="text" id="txtSteuerklasse" class="input-medium">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Urlaubsanspruch pro Jahr</label>
+                                        <input type="text" id="txtUrlaubsanspruch" class="input-small" value="28">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Stundenzahl Monat max.</label>
+                                        <input type="text" id="txtStundenzahl" class="input-small" value="171,38">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>RV Befreiung beantragt</label>
+                                        <input type="checkbox" id="chkRVBefreiung" checked>
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Brutto-Std</label>
+                                        <input type="checkbox" id="chkBruttoStd">
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Abrechnung per eMail</label>
+                                        <input type="checkbox" id="chkAbrechnungEmail" checked>
+                                    </div>
+                                    <div class="field-row">
+                                        <label>Lichtbild</label>
+                                        <input type="text" id="txtLichtbild" class="input-small" value="Alali.jpg">
+                                        <button class="ma-btn-small">...</button>
+                                    </div>
+                                </div>
+                                <!-- Foto Bereich -->
+                                <div class="stammdaten-foto">
+                                    <div class="foto-container" id="fotoContainer">
+                                        <div class="foto-placeholder">Foto</div>
+                                    </div>
+                                    <button class="ma-btn" id="btnMapsOeffnen">Maps oeffnen</button>
+                                    <div class="arbeitsstd-info">
+                                        <div class="info-row">
+                                            <label>Arbeitsstd. pro Arbeitstag</label>
+                                            <span id="lblArbeitsstdTag">7,67</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <label>Arbeitstage pro Woche</label>
+                                            <span id="lblArbeitstageWoche">5,16</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Einsatzuebersicht Tab -->
+                        <div class="tab-pane" id="tabEinsatzuebersicht">
+                            <div class="einsatz-header">
+                                <label>Zeitraum</label>
+                                <select id="cboZeitraum" class="input-medium">
+                                    <option value="aktuell" selected>Aktueller Monat</option>
+                                    <option value="vormonat">Vormonat</option>
+                                    <option value="jahr">Aktuelles Jahr</option>
+                                </select>
+                                <label>von</label>
+                                <input type="date" id="datEinsatzVon" class="input-date">
+                                <label>bis</label>
+                                <input type="date" id="datEinsatzBis" class="input-date">
+                            </div>
+                            <p style="padding: 20px; color: #999;">Einsatzdaten werden geladen...</p>
+                        </div>
+
+                        <!-- Dienstplan Tab -->
+                        <div class="tab-pane" id="tabDienstplan">
+                            <p style="padding: 20px; color: #999;">Dienstplan wird geladen...</p>
+                        </div>
+
+                        <!-- Nicht Verfuegbar Tab -->
+                        <div class="tab-pane" id="tabNichtVerfuegbar">
+                            <p style="padding: 20px; color: #999;">Nichtverfuegbarkeiten werden geladen...</p>
+                        </div>
+
+                        <!-- Bestand Dienstkleidung Tab -->
+                        <div class="tab-pane" id="tabBestandDienstkleidung">
+                            <p style="padding: 20px; color: #999;">Dienstkleidung wird geladen...</p>
+                        </div>
+
+                        <!-- Sub Rechnungen Tab -->
+                        <div class="tab-pane" id="tabSubRechnungen">
+                            <div class="sub-header">
+                                <label>Zeitraum</label>
+                                <select id="cboSubZeitraum" class="input-medium">
+                                    <option value="aktuell" selected>Aktueller Monat</option>
+                                </select>
+                                <label>von</label>
+                                <input type="date" id="datSubVon" class="input-date" value="2025-12-01">
+                                <label>bis</label>
+                                <input type="date" id="datSubBis" class="input-date" value="2025-12-31">
+                            </div>
+
+                            <!-- Auftraege Tabelle -->
+                            <div class="sub-auftraege">
+                                <div class="sub-auftraege-header">
+                                    <span class="section-title">Auftraege</span>
+                                    <span class="hint-text">RechRr korrigieren: Feld markieren und [ESC] druecken</span>
+                                    <label>Status aendern</label>
+                                    <select id="cboStatusAendern" class="input-medium">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="table-container">
+                                    <table class="data-table" id="tblAuftraege">
+                                        <thead>
+                                            <tr>
+                                                <th>Datum</th>
+                                                <th>Auftrag</th>
+                                                <th>Location</th>
+                                                <th>Ort</th>
+                                                <th>Betrag</th>
+                                                <th>RechNr.</th>
+                                                <th>Geprueft:</th>
+                                                <th>am</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="selected">
+                                                <td>08.12.2025</td>
+                                                <td>TREAM</td>
+                                                <td>PSD Bank Arena</td>
+                                                <td>Nuernberg</td>
+                                                <td>1.174,13 EUR</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>Ungeprueft</td>
+                                            </tr>
+                                            <tr>
+                                                <td>13.12.2025</td>
+                                                <td>01099</td>
+                                                <td>KIA Arena</td>
+                                                <td>Nuernberg</td>
+                                                <td>852,19 EUR</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>Ungeprueft</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Abrechnungsdetails -->
+                            <div class="sub-details">
+                                <div class="sub-details-header">
+                                    <span class="section-title">Abrechnungsdetails</span>
+                                    <button class="ma-btn" id="btnStundenlisteExportieren">Stundenliste Exportieren</button>
+                                    <span class="auftrag-info" id="lblAuftragInfo">TREAM PSD Bank Arena Nuernberg</span>
+                                    <button class="ma-btn" id="btnSpiegelrechnung">Spiegelrechnung</button>
+                                </div>
+                                <div class="table-container">
+                                    <table class="data-table" id="tblAbrechnungsdetails">
+                                        <thead>
+                                            <tr>
+                                                <th>Datum</th>
+                                                <th>Name</th>
+                                                <th>von</th>
+                                                <th>bis</th>
+                                                <th>Stunden</th>
+                                                <th>Nacht</th>
+                                                <th>Sonntag</th>
+                                                <th>Feiertag</th>
+                                                <th>Fahrtkosten</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>08.12.2025</td>
+                                                <td>Motzek Heimo</td>
+                                                <td>12:00</td>
+                                                <td>22:45</td>
+                                                <td>10,75</td>
+                                                <td>2,75</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0,00 EUR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>08.12.2025</td>
+                                                <td>Kuster Gilbert</td>
+                                                <td>12:00</td>
+                                                <td>22:45</td>
+                                                <td>10,75</td>
+                                                <td>2,75</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0,00 EUR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>08.12.2025</td>
+                                                <td>Azeer</td>
+                                                <td>17:15</td>
+                                                <td>23:30</td>
+                                                <td>6,25</td>
+                                                <td>3,5</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0,00 EUR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>08.12.2025</td>
+                                                <td>Shant Aramyan</td>
+                                                <td>17:15</td>
+                                                <td>23:30</td>
+                                                <td>6,25</td>
+                                                <td>3,5</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0,00 EUR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>08.12.2025</td>
+                                                <td>Pogosjan</td>
+                                                <td>17:15</td>
+                                                <td>23:30</td>
+                                                <td>6,25</td>
+                                                <td>3,5</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0,00 EUR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>08.12.2025</td>
+                                                <td>Makina</td>
+                                                <td>17:15</td>
+                                                <td>23:30</td>
+                                                <td>6,25</td>
+                                                <td>3,5</td>
+                                                <td>0</td>
+                                                <td>0</td>
+                                                <td>0,00 EUR</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Summen -->
+                                <div class="sub-summen">
+                                    <div class="summen-row">
+                                        <label>SVS</label>
+                                        <input type="text" class="input-small" value="25,25 EUR" readonly>
+                                        <label>NZ</label>
+                                        <input type="text" class="input-small" value="0,00 EUR" readonly>
+                                        <label>SZ</label>
+                                        <input type="text" class="input-small" value="0,00 EUR" readonly>
+                                        <label>FZ</label>
+                                        <input type="text" class="input-small" value="0,00 EUR" readonly>
+                                        <label>Summe</label>
+                                        <input type="text" class="input-small" value="46,5" readonly>
+                                        <input type="text" class="input-small" value="19,5" readonly>
+                                        <input type="text" class="input-small" value="0" readonly>
+                                        <input type="text" class="input-small" value="0" readonly>
+                                        <label>Betrag gesamt</label>
+                                    </div>
+                                    <div class="summen-row">
+                                        <label>Betrag</label>
+                                        <input type="text" class="input-small" value="1.174,13 EUR" readonly>
+                                        <input type="text" class="input-small" value="0,00 EUR" readonly>
+                                        <input type="text" class="input-small" value="0,00 EUR" readonly>
+                                        <input type="text" class="input-small" value="0,00 EUR" readonly>
+                                        <input type="text" class="input-small" value="0,00 EUR" readonly>
+                                        <input type="text" class="input-betrag highlight" value="1.174,13 EUR" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MA Liste rechts -->
+                <div class="ma-list-section">
+                    <div class="ma-list-header">
+                        <div class="list-filter-row">
+                            <label>Suche:</label>
+                            <input type="text" id="txtSuche" class="input-medium">
+                        </div>
+                        <div class="list-filter-row">
+                            <label>Filter:</label>
+                            <select id="cboFilter" class="input-medium">
+                                <option value="unternehmer">Unternehmer</option>
+                                <option value="alle">Alle</option>
+                            </select>
+                            <label>Zusatz:</label>
+                            <select id="cboZusatz" class="input-medium">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ma-list-table-container">
+                        <table class="ma-list-table" id="tblMAListe">
+                            <thead>
+                                <tr>
+                                    <th>Nachname</th>
+                                    <th>Vorname</th>
+                                    <th>Ort</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="selected"><td>A&R</td><td>Sec</td><td>Oberasbach</td></tr>
+                                <tr><td>Auinger</td><td>Peter</td><td>Marktsteft</td></tr>
+                                <tr><td>B&M</td><td>Sec</td><td></td></tr>
+                                <tr><td>Berg</td><td>Security</td><td></td></tr>
+                                <tr><td>BOS</td><td>Sec</td><td></td></tr>
+                                <tr><td>Continus</td><td>Sicherheit</td><td>Kalchreuth</td></tr>
+                                <tr><td>ECO</td><td>Parkservice</td><td></td></tr>
+                                <tr><td>Edgar</td><td>Security</td><td>Nuernberg</td></tr>
+                                <tr><td>EH</td><td>Gruppe</td><td>Nuernberg</td></tr>
+                                <tr><td>ESS</td><td>Sicherheit</td><td>Erlangen</td></tr>
+                                <tr><td>KS</td><td>Security</td><td>Nuernberg</td></tr>
+                                <tr><td>Power</td><td>GmbH</td><td></td></tr>
+                                <tr><td>Sec</td><td>Concept</td><td></td></tr>
+                                <tr><td>Alali</td><td>Ahmad</td><td>Nuernberg</td></tr>
+                                <tr><td>Alayoubi</td><td>Salim</td><td>Nuernberg</td></tr>
+                                <tr><td>Aldaba</td><td>Wesam</td><td>Fuerth</td></tr>
+                                <tr><td>Alhajjaj</td><td>Mohammad</td><td>Wendelst</td></tr>
+                                <tr><td>Aliyev</td><td>Khayyam</td><td>Nuernberg</td></tr>
+                                <tr><td>Ameri Targhi</td><td>Mohammad</td><td>Nuernberg</td></tr>
+                                <tr><td>Antakia Khalaf</td><td>Abd Alhaleem</td><td>Feucht</td></tr>
+                                <tr><td>Argentino</td><td>Luigi</td><td>Nuernberg</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="ma-footer">
+                <div class="footer-left">
+                    <span>Erstellt</span>
+                    <span id="lblErstellt">guenther.siegert</span>
+                    <span id="lblErstelltDatum">08.05.2025 12:20:36</span>
+                </div>
+                <div class="footer-center">
+                    <span>Geaendert</span>
+                    <span id="lblGeaendert">guenther.siegert</span>
+                    <span id="lblGeaendertDatum">19.05.2025 11:14:49</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Datum anzeigen
+        document.getElementById('lblDatum').textContent = new Date().toLocaleDateString('de-DE', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+
+        // Tab-Switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="frm_MA_Mitarbeiterstamm.logic.js"></script>
+</body>
+</html>

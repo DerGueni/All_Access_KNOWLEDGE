@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lohnabrechnungen - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #4A90A4; }
+        .app-header { background: #4A90A4; min-height: 60px; }
+
+        /* Tabellen-Styling */
+        .lohn-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .lohn-table thead th {
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+            padding: 8px 6px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .lohn-table tbody td {
+            padding: 6px;
+            border-bottom: 1px solid #eee;
+        }
+        .lohn-table tbody tr:hover {
+            background: #f8f8f8;
+        }
+
+        /* Spalten-Breiten */
+        .col-monat { width: 50px; }
+        .col-name { width: 200px; }
+        .col-versenden { width: 70px; text-align: center; }
+        .col-datei { max-width: 300px; }
+        .col-versendet { width: 140px; }
+        .col-protokoll { min-width: 150px; }
+
+        .datei-cell {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 300px;
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* Select All Checkbox im Header */
+        .lohn-table thead th input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body data-active-menu="lohnabrechnungen">
+    <div class="app-container">
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Lohnabrechnungen</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Jahr:</label>
+                    <select id="cboJahr" class="form-control" style="width:80px;">
+                        <option value="2025" selected>2025</option>
+                        <option value="2024">2024</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Monat:</label>
+                    <select id="cboMonat" class="form-control" style="width:120px;">
+                        <option value="1">Januar</option>
+                        <option value="2">Februar</option>
+                        <option value="3">Maerz</option>
+                        <option value="4">April</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Dezember</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Anstellungsart:</label>
+                    <select id="cboAnstArt" class="form-control" style="width:140px;">
+                        <option value="fest" selected>Fest + Mini</option>
+                        <option value="fest_nur">Nur Festangestellte</option>
+                        <option value="mini_nur">Nur Minijobber</option>
+                        <option value="alle">Alle</option>
+                    </select>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-primary" id="btnLaden">Laden</button>
+                    <button class="btn btn-primary" id="btnVersenden">Versenden</button>
+                </div>
+            </div>
+
+            <div class="app-content" style="padding:0;">
+                <div class="content-main" style="overflow:auto;">
+                    <table class="lohn-table" id="tblLohnabrechnungen">
+                        <thead>
+                            <tr>
+                                <th class="col-monat">Monat</th>
+                                <th class="col-name">Name</th>
+                                <th class="col-versenden"><input type="checkbox" title="Alle auswaehlen"></th>
+                                <th class="col-datei">Datei</th>
+                                <th class="col-versendet">Versendet am</th>
+                                <th class="col-protokoll">Protokoll</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyLohnabrechnungen">
+                            <!-- Daten werden via JS geladen -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Mitarbeiter</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="frm_N_Lohnabrechnungen.logic.js"></script>
+</body>
+</html>

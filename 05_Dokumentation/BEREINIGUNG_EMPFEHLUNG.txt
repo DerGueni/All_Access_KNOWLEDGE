@@ -1,0 +1,184 @@
+============================================================================
+BEREINIGUNG: DOPPELTE MODULE UND FUNKTIONEN
+Erstellt: 02.12.2025
+============================================================================
+
+ZUSAMMENFASSUNG:
+- 1112 Funktionen/Subs insgesamt gefunden
+- 56 davon sind Duplikate (in mehreren Modulen vorhanden)
+
+============================================================================
+EMPFEHLUNG: FOLGENDE MODULE KOMPLETT LOESCHEN
+============================================================================
+
+Diese Module sind Duplikate oder alte Versionen und koennen geloescht werden:
+
+1. mod_WorkflowDetector1.bas
+   -> LOESCHEN (Duplikat von mod_WorkflowDetector.bas)
+   Enthält 8 identische Funktionen
+
+2. modProtokoll.bas
+   -> LOESCHEN (Duplikat von mdl_modProtokoll.bas)
+   Enthält 6 identische Funktionen:
+   - Änderungsprotokoll
+   - Datensatzlöschung
+   - NetworkComputerName
+   - NetworkUserName
+   - ProtokollEnde
+   - Protokollieren
+
+3. mdl_Exl_Import2.bas
+   -> LOESCHEN (Duplikat von mdl_CONSEC_Excel.bas)
+   Enthält 4 identische Funktionen:
+   - Cons_XL_Import_1
+   - Cons_XL_Import_2
+   - Cons_XL_Import_Test
+   - dirkurz
+
+4. mdl_OB_Position_Sort.bas
+   -> LOESCHEN (Duplikat von mdl_ObjektPositionen.bas)
+   Enthält 2 identische Funktionen:
+   - MovePositionUp
+   - MovePositionDown
+
+5. mdl_ReportHelper.bas
+   -> PRUEFEN (moeglicherweise Duplikat von mdl_ReportBuilder.bas)
+   CreateOrdnerkonzeptReport ist doppelt
+
+6. mdl_Setup_Monatsuebersicht.bas
+   -> PRUEFEN (teilweise Duplikat von mdl_Ribbon_DaBaFenster_EinAus.bas)
+   Enthält 4 identische Funktionen:
+   - DaBa_Fenster_aus
+   - DaBa_Fenster_ein
+   - Ribbon_aus
+   - Ribbon_ein
+
+============================================================================
+EMPFEHLUNG: FUNKTIONEN KONSOLIDIEREN (in einem Modul behalten)
+============================================================================
+
+Folgende Funktionen existieren in mehreren Modulen und sollten
+in EINEM zentralen Modul zusammengefasst werden:
+
+GRUPPE 1: Export-Module (Empfehlung: alle in mod_ExportConsys.bas)
+-------------------------------------------------------------------
+Diese Funktionen sind in mod_ExportConsys.bas UND in separaten Modulen:
+- ExportFormsToJSON (auch in mod_ExportForms.bas)
+- ExportModulesToJSON (auch in mod_ExportModules.bas)
+- ExportQueryDefsToJSON (auch in mod_ExportQueries.bas)
+- ExportRelationsToJSON (auch in mod_ExportRelations.bas)
+- ExportReportsToJSON (auch in mod_ExportReports.bas)
+- ExportTableDefsToJSON (auch in mod_ExportTables.bas)
+- DetectWorkflows (auch in mod_WorkflowDetector.bas)
+
+ENTSCHEIDUNG: Entweder mod_ExportConsys.bas ODER die Einzel-Module behalten
+
+GRUPPE 2: Datenbank-Hilfsfunktionen
+-------------------------------------------------------------------
+AccessEigenschaftEinstellen:
+  - mdl_DbAuswerten_Ver_2.bas (BEHALTEN)
+  - mdlTstTabField.bas (dort entfernen)
+
+ArrFill_DAO:
+  - mdlKalenderfill.bas (BEHALTEN - spezifischer Kontext)
+  - mdlSonstiges4.bas (dort entfernen)
+
+ArrFill_DAO_Acc:
+  - mdl_DbAuswerten_Ver_2.bas (BEHALTEN)
+  - mdlSonstiges4.bas (dort entfernen)
+
+CreateQuery:
+  - mdl_DbAuswerten_Ver_2.bas (BEHALTEN)
+  - mdlSonstiges4.bas (dort entfernen)
+
+fieldType:
+  - mdl_DbAuswerten_Ver_2.bas (BEHALTEN)
+  - mdlTstTabField.bas (dort entfernen)
+
+ObjectExists:
+  - mdl_DbAuswerten_Ver_2.bas (BEHALTEN)
+  - mdlPrivProperty.bas (dort entfernen)
+
+TableExists:
+  - mdl_CONSEC_FULL_AUTO_FINAL.bas (BEHALTEN)
+  - mdl_CONSEC_PREFERENCES.bas (dort entfernen)
+
+GRUPPE 3: Outlook/Mail-Funktionen
+-------------------------------------------------------------------
+xSendMessage, xTestsend1, xTestsend2:
+  - mdlOutlookSendMail.bas (BEHALTEN)
+  - mdlOutlook_HTML_Serienemail_SAP.bas (dort entfernen)
+
+GRUPPE 4: Verbindungs-Module
+-------------------------------------------------------------------
+frmClose, frmOpen, TabTempLosesch:
+  - Diese sind in mdlVerbindenACCESS.bas UND mdlVerbindeSQL.bas
+  - PRUEFEN: Sind beide Module noetig? (SQL vs ACCESS)
+  - Falls ja, Funktionen umbenennen (z.B. frmClose_SQL, frmClose_ACC)
+
+GRUPPE 5: Excel-Funktionen
+-------------------------------------------------------------------
+XLSSuch, XLSSuchNeu:
+  - clsExcel.bas (BEHALTEN - ist eine Klasse)
+  - mdlFileDialogBeispiel.bas (dort entfernen)
+
+GRUPPE 6: Sonstige
+-------------------------------------------------------------------
+ChgSaSoCondition:
+  - mdlDatasheetSizeChange.bas (BEHALTEN)
+  - mdlSonstiges4.bas (dort entfernen)
+
+DatumFuerSQL, KorrigiereAuftragBooleans:
+  - mod_N_UniversalAuftragErstellung.bas (BEHALTEN - allgemeiner Name)
+  - mod_N_Loewensaal.bas (dort entfernen)
+
+GetControlProperty:
+  - mod_ExportForms.bas (BEHALTEN)
+  - mod_ExportReports.bas (dort entfernen - oder umbenennen)
+  - mod_WorkflowDetector.bas (dort entfernen)
+
+GetControlTypeName:
+  - mod_ExportForms.bas (BEHALTEN)
+  - mod_ExportReports.bas (dort entfernen)
+
+GetFieldTypeName:
+  - mod_ExportTables.bas (BEHALTEN)
+  - mod_ExportQueries.bas (dort entfernen)
+
+SafeGetProperty:
+  - mod_ExportForms.bas (BEHALTEN)
+  - mod_ExportReports.bas (dort entfernen)
+
+ExtractTablesFromSQL:
+  - mod_ExportQueries.bas (BEHALTEN)
+  - mod_WorkflowDetector.bas (dort entfernen)
+
+TotalCleanAndRebuild:
+  - mdl_FinalRebuild.bas (BEHALTEN)
+  - mdl_FixFormular.bas (dort entfernen)
+
+AI_Log:
+  - modAIEngine.bas (BEHALTEN)
+  - mdl_AIRunner.bas (dort entfernen)
+
+============================================================================
+SOFORT-AKTIONEN (sichere Loeschungen)
+============================================================================
+
+Diese Module koennen SOFORT geloescht werden (sind 100% Duplikate):
+
+1. mod_WorkflowDetector1.bas
+2. modProtokoll.bas
+3. mdl_Exl_Import2.bas
+4. mdl_OB_Position_Sort.bas
+
+============================================================================
+NACH DER BEREINIGUNG PRUEFEN
+============================================================================
+
+Nach dem Loeschen der Module bitte pruefen:
+1. Kompilieren (Strg+Umschalt+F5 im VBA-Editor)
+2. Alle Formulare oeffnen und testen
+3. Bei Fehlern: Fehlende Referenz auf geloeschte Funktion suchen
+
+============================================================================

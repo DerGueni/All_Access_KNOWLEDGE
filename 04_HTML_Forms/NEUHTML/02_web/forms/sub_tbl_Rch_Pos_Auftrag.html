@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rechnungspositionen - Subform</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: white;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 11px;
+        }
+        .subform-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .subform-header {
+            padding: 6px 8px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .subform-title {
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .toolbar {
+            display: flex;
+            gap: 6px;
+        }
+        .btn {
+            padding: 4px 10px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        .btn:hover {
+            background: #f0f0f0;
+        }
+        .btn-primary {
+            background: #4316B2;
+            color: white;
+            border-color: #4316B2;
+        }
+        .btn-primary:hover {
+            background: #3a13a0;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .subform-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .pos-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .pos-table th {
+            background: #f0f0f0;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #ccc;
+            position: sticky;
+            top: 0;
+            font-size: 10px;
+        }
+        .pos-table th.num {
+            text-align: right;
+        }
+        .pos-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        .pos-table td.num {
+            text-align: right;
+            font-family: 'Consolas', monospace;
+        }
+        .pos-table tr:hover {
+            background: #f8f8f8;
+        }
+        .pos-table tr.selected {
+            background: #e8e8e8;
+        }
+        .pos-table tr.editing {
+            background: #fff9e6;
+        }
+        .pos-table input, .pos-table select {
+            width: 100%;
+            padding: 3px 5px;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            font-size: 10px;
+            box-sizing: border-box;
+        }
+        .pos-table input:focus, .pos-table select:focus {
+            border-color: #4316B2;
+            outline: none;
+        }
+        .pos-table input[type="number"] {
+            text-align: right;
+        }
+        .subform-footer {
+            padding: 8px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summe-group {
+            display: flex;
+            gap: 20px;
+        }
+        .summe-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .summe-label {
+            font-weight: 500;
+            color: #666;
+        }
+        .summe-value {
+            font-weight: 700;
+            font-size: 12px;
+            color: #4316B2;
+            font-family: 'Consolas', monospace;
+        }
+        .empty-message {
+            padding: 20px;
+            text-align: center;
+            color: #999;
+        }
+        .pos-nr {
+            width: 40px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="subform-container">
+        <div class="subform-header">
+            <span class="subform-title">Rechnungspositionen</span>
+            <div class="toolbar">
+                <button class="btn" id="btnNeu">+ Neu</button>
+                <button class="btn btn-danger" id="btnLoeschen">Loeschen</button>
+                <button class="btn btn-primary" id="btnSpeichern">Speichern</button>
+            </div>
+        </div>
+        <div class="subform-content">
+            <table class="pos-table" id="tblPositionen">
+                <thead>
+                    <tr>
+                        <th style="width:40px;">Pos</th>
+                        <th style="width:40%;">Bezeichnung</th>
+                        <th style="width:80px;" class="num">Menge</th>
+                        <th style="width:60px;">Einheit</th>
+                        <th style="width:100px;" class="num">Einzelpreis</th>
+                        <th style="width:100px;" class="num">Gesamt</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyPositionen">
+                    <tr><td colspan="6" class="empty-message">Keine Positionen</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="subform-footer">
+            <span id="lblPosCount">0 Positionen</span>
+            <div class="summe-group">
+                <div class="summe-item">
+                    <span class="summe-label">Netto:</span>
+                    <span class="summe-value" id="lblNettoSumme">0,00 EUR</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Bridge } from '../js/webview2-bridge.js';
+
+        let positionen = [];
+        let selectedPosId = null;
+        let editingRowId = null;
+        let linkParams = { Rch_ID: null, VA_ID: null };
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        function init() {
+            document.getElementById('btnNeu').addEventListener('click', neuePosition);
+            document.getElementById('btnLoeschen').addEventListener('click', loeschenPosition);
+            document.getElementById('btnSpeichern').addEventListener('click', speichernAlle);
+
+            window.addEventListener('message', handleMessage);
+            notifyParent('subform_ready', { name: 'sub_tbl_Rch_Pos_Auftrag' });
+        }
+
+        function handleMessage(event) {
+            const data = event.data;
+            if (!data || !data.type) return;
+
+            switch (data.type) {
+                case 'set_link_params':
+                    linkParams.Rch_ID = data.Rch_ID;
+                    linkParams.VA_ID = data.VA_ID;
+                    loadData();
+                    break;
+                case 'requery':
+                    loadData();
+                    break;
+            }
+        }
+
+        async function loadData() {
+            if (!linkParams.Rch_ID) {
+                renderEmpty();
+                return;
+            }
+
+            try {
+                const result = await Bridge.execute('executeSQL', {
+                    sql: `SELECT * FROM tbl_Rch_Pos
+                          WHERE Rch_ID = ${linkParams.Rch_ID}
+                          ORDER BY Pos_Nr`,
+                    fetch: true
+                });
+
+                positionen = (result && result.rows) || [];
+                render();
+            } catch (error) {
+                console.error('[sub_tbl_Rch_Pos_Auftrag] Fehler:', error);
+                renderEmpty();
+            }
+        }
+
+        function render() {
+            const tbody = document.getElementById('tbodyPositionen');
+            document.getElementById('lblPosCount').textContent = `${positionen.length} Positionen`;
+
+            if (positionen.length === 0) {
+                renderEmpty();
+                return;
+            }
+
+            tbody.innerHTML = positionen.map((pos, idx) => {
+                const gesamt = (pos.Menge || 0) * (pos.Einzelpreis || 0);
+                const isSelected = selectedPosId === pos.ID;
+                const isEditing = editingRowId === pos.ID;
+
+                if (isEditing) {
+                    return `<tr class="editing" data-id="${pos.ID}">
+                        <td class="pos-nr">${pos.Pos_Nr || idx + 1}</td>
+                        <td><input type="text" id="edit_Bezeichnung" value="${escapeHtml(pos.Bezeichnung || '')}"></td>
+                        <td><input type="number" id="edit_Menge" value="${pos.Menge || 0}" step="0.01"></td>
+                        <td>
+                            <select id="edit_Einheit">
+                                <option value="Std" ${pos.Einheit === 'Std' ? 'selected' : ''}>Std</option>
+                                <option value="Stk" ${pos.Einheit === 'Stk' ? 'selected' : ''}>Stk</option>
+                                <option value="Psch" ${pos.Einheit === 'Psch' ? 'selected' : ''}>Psch</option>
+                                <option value="km" ${pos.Einheit === 'km' ? 'selected' : ''}>km</option>
+                            </select>
+                        </td>
+                        <td><input type="number" id="edit_Einzelpreis" value="${pos.Einzelpreis || 0}" step="0.01"></td>
+                        <td class="num">${formatCurrency(gesamt)}</td>
+                    </tr>`;
+                }
+
+                return `<tr class="${isSelected ? 'selected' : ''}" data-id="${pos.ID}">
+                    <td class="pos-nr">${pos.Pos_Nr || idx + 1}</td>
+                    <td>${escapeHtml(pos.Bezeichnung || '')}</td>
+                    <td class="num">${formatNumber(pos.Menge || 0)}</td>
+                    <td>${pos.Einheit || 'Std'}</td>
+                    <td class="num">${formatCurrency(pos.Einzelpreis || 0)}</td>
+                    <td class="num">${formatCurrency(gesamt)}</td>
+                </tr>`;
+            }).join('');
+
+            // Event-Handler
+            tbody.querySelectorAll('tr').forEach(row => {
+                row.addEventListener('click', () => selectRow(row));
+                row.addEventListener('dblclick', () => editRow(row));
+            });
+
+            // Edit-Inputs Events
+            if (editingRowId) {
+                const inputs = tbody.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    input.addEventListener('change', updateEditingRow);
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') saveEditingRow();
+                        if (e.key === 'Escape') cancelEdit();
+                    });
+                });
+            }
+
+            updateSummen();
+        }
+
+        function renderEmpty() {
+            document.getElementById('tbodyPositionen').innerHTML =
+                '<tr><td colspan="6" class="empty-message">Keine Positionen</td></tr>';
+            document.getElementById('lblPosCount').textContent = '0 Positionen';
+            document.getElementById('lblNettoSumme').textContent = '0,00 EUR';
+        }
+
+        function selectRow(row) {
+            if (editingRowId && editingRowId !== parseInt(row.dataset.id)) {
+                saveEditingRow();
+            }
+
+            const id = parseInt(row.dataset.id);
+            selectedPosId = id;
+
+            document.querySelectorAll('.pos-table tr').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+
+            notifyParent('subform_selection', {
+                name: 'sub_tbl_Rch_Pos_Auftrag',
+                record: positionen.find(p => p.ID === id)
+            });
+        }
+
+        function editRow(row) {
+            const id = parseInt(row.dataset.id);
+            editingRowId = id;
+            selectedPosId = id;
+            render();
+
+            // Focus first input
+            setTimeout(() => {
+                const firstInput = row.querySelector('input');
+                if (firstInput) firstInput.focus();
+            }, 50);
+        }
+
+        function updateEditingRow() {
+            const pos = positionen.find(p => p.ID === editingRowId);
+            if (!pos) return;
+
+            pos.Bezeichnung = document.getElementById('edit_Bezeichnung')?.value || '';
+            pos.Menge = parseFloat(document.getElementById('edit_Menge')?.value) || 0;
+            pos.Einheit = document.getElementById('edit_Einheit')?.value || 'Std';
+            pos.Einzelpreis = parseFloat(document.getElementById('edit_Einzelpreis')?.value) || 0;
+            pos._dirty = true;
+
+            updateSummen();
+        }
+
+        async function saveEditingRow() {
+            if (!editingRowId) return;
+
+            updateEditingRow();
+            const pos = positionen.find(p => p.ID === editingRowId);
+
+            if (pos && pos._dirty) {
+                try {
+                    await Bridge.execute('executeSQL', {
+                        sql: `UPDATE tbl_Rch_Pos SET
+                              Bezeichnung = '${escapeSql(pos.Bezeichnung)}',
+                              Menge = ${pos.Menge},
+                              Einheit = '${pos.Einheit}',
+                              Einzelpreis = ${pos.Einzelpreis}
+                              WHERE ID = ${pos.ID}`,
+                        fetch: false
+                    });
+                    delete pos._dirty;
+                } catch (error) {
+                    console.error('[sub_tbl_Rch_Pos_Auftrag] Speichern fehlgeschlagen:', error);
+                }
+            }
+
+            editingRowId = null;
+            render();
+        }
+
+        function cancelEdit() {
+            editingRowId = null;
+            loadData();
+        }
+
+        async function neuePosition() {
+            if (!linkParams.Rch_ID) {
+                alert('Bitte zuerst eine Rechnung auswaehlen');
+                return;
+            }
+
+            try {
+                const maxPosResult = await Bridge.execute('executeSQL', {
+                    sql: `SELECT MAX(Pos_Nr) AS MaxPos FROM tbl_Rch_Pos WHERE Rch_ID = ${linkParams.Rch_ID}`,
+                    fetch: true
+                });
+
+                const maxPos = (maxPosResult?.rows?.[0]?.MaxPos) || 0;
+                const neuePos = maxPos + 1;
+
+                await Bridge.execute('executeSQL', {
+                    sql: `INSERT INTO tbl_Rch_Pos (Rch_ID, Pos_Nr, Bezeichnung, Menge, Einheit, Einzelpreis)
+                          VALUES (${linkParams.Rch_ID}, ${neuePos}, 'Neue Position', 1, 'Std', 0)`,
+                    fetch: false
+                });
+
+                await loadData();
+                notifyParent('data_changed', { name: 'sub_tbl_Rch_Pos_Auftrag' });
+
+                // Letzte Position zum Editieren auswaehlen
+                if (positionen.length > 0) {
+                    const lastPos = positionen[positionen.length - 1];
+                    editingRowId = lastPos.ID;
+                    selectedPosId = lastPos.ID;
+                    render();
+                }
+            } catch (error) {
+                console.error('[sub_tbl_Rch_Pos_Auftrag] Neue Position fehlgeschlagen:', error);
+                alert('Fehler: ' + error.message);
+            }
+        }
+
+        async function loeschenPosition() {
+            if (!selectedPosId) {
+                alert('Bitte zuerst eine Position auswaehlen');
+                return;
+            }
+
+            if (!confirm('Position wirklich loeschen?')) return;
+
+            try {
+                await Bridge.execute('executeSQL', {
+                    sql: `DELETE FROM tbl_Rch_Pos WHERE ID = ${selectedPosId}`,
+                    fetch: false
+                });
+
+                selectedPosId = null;
+                editingRowId = null;
+                await loadData();
+                notifyParent('data_changed', { name: 'sub_tbl_Rch_Pos_Auftrag' });
+            } catch (error) {
+                console.error('[sub_tbl_Rch_Pos_Auftrag] Loeschen fehlgeschlagen:', error);
+            }
+        }
+
+        async function speichernAlle() {
+            const dirtyPositionen = positionen.filter(p => p._dirty);
+
+            for (const pos of dirtyPositionen) {
+                try {
+                    await Bridge.execute('executeSQL', {
+                        sql: `UPDATE tbl_Rch_Pos SET
+                              Bezeichnung = '${escapeSql(pos.Bezeichnung)}',
+                              Menge = ${pos.Menge},
+                              Einheit = '${pos.Einheit}',
+                              Einzelpreis = ${pos.Einzelpreis}
+                              WHERE ID = ${pos.ID}`,
+                        fetch: false
+                    });
+                    delete pos._dirty;
+                } catch (error) {
+                    console.error('[sub_tbl_Rch_Pos_Auftrag] Speichern fehlgeschlagen:', error);
+                }
+            }
+
+            editingRowId = null;
+            render();
+            notifyParent('data_changed', { name: 'sub_tbl_Rch_Pos_Auftrag' });
+        }
+
+        function updateSummen() {
+            const netto = positionen.reduce((sum, pos) => {
+                return sum + ((pos.Menge || 0) * (pos.Einzelpreis || 0));
+            }, 0);
+
+            document.getElementById('lblNettoSumme').textContent = formatCurrency(netto);
+
+            // Parent ueber Summenänderung informieren
+            notifyParent('summe_changed', {
+                name: 'sub_tbl_Rch_Pos_Auftrag',
+                netto: netto
+            });
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value || 0);
+        }
+
+        function formatNumber(value) {
+            return new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value || 0);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function escapeSql(str) {
+            if (!str) return '';
+            return String(str).replace(/'/g, "''");
+        }
+
+        function notifyParent(type, data) {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type, ...data }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

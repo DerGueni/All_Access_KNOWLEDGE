@@ -1,0 +1,494 @@
+Attribute VB_Name = "mod_N_WebView2_forms3"
+' =====================================================
+' mod_N_WebView2_forms3
+' WebView2 Integration fuer forms3 HTML-Formulare
+' Korrigiert: 05.01.2026 - Parameter via -data statt URL-Query
+' =====================================================
+
+' Pfade
+Private Const FORMS3_PATH As String = "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\04_HTML_Forms\forms3\"
+Private Const WEBVIEW2_EXE As String = "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\WebView2_Access\COM_Wrapper\ConsysWebView2App\bin\Release\ConsysWebView2App.exe"
+Private Const API_SERVER_PATH As String = "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\08_Tools\python\api_server.py"
+Private Const API_PORT As Integer = 5000
+Private Const HTML_PORT As Integer = 5000  ' KORRIGIERT: mini_api.py serviert HTML+API auf Port 5000
+
+' VBA Bridge Server (fuer HTML-Button Aufrufe von VBA-Funktionen)
+Private Const VBA_BRIDGE_PATH As String = "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\04_HTML_Forms\api\vba_bridge_server.py"
+Private Const VBA_BRIDGE_PORT As Integer = 5002
+' VBA Bridge Watchdog (startet Bridge und ueberwacht/restartet bei Crash)
+Private Const VBA_BRIDGE_WATCHDOG_PATH As String = "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\08_Tools\python\vba_bridge_watchdog.py"
+
+' Windows API fuer Sleep
+Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As LongPtr)
+
+' =====================================================
+' HAUPT-FUNKTIONEN: HTML-Formulare oeffnen
+' =====================================================
+
+Public Sub OpenAuftragstamm_WebView2(Optional VA_ID As Long = 0)
+    ' Fallback zu Browser-Modus wenn WebView2App nicht existiert
+    If Dir(WEBVIEW2_EXE) = "" Then
+        Debug.Print "[WebView2] WebView2App.exe fehlt - Fallback zu Browser-Modus"
+        OpenAuftragstamm_Browser VA_ID
+        Exit Sub
+    End If
+
+    Dim jsonData As String
+    jsonData = "{""form"":""frm_va_Auftragstamm"""
+    If VA_ID > 0 Then
+        jsonData = jsonData & ",""id"":" & VA_ID
+    End If
+    jsonData = jsonData & "}"
+
+    OpenWebView2Form FORMS3_PATH & "shell.html", "Auftragsverwaltung", 1500, 900, jsonData
+End Sub
+
+Public Sub OpenMitarbeiterstamm_WebView2(Optional MA_ID As Long = 0)
+    ' Fallback zu Browser-Modus wenn WebView2App nicht existiert
+    If Dir(WEBVIEW2_EXE) = "" Then
+        Debug.Print "[WebView2] WebView2App.exe fehlt - Fallback zu Browser-Modus"
+        OpenMitarbeiterstamm_Browser MA_ID
+        Exit Sub
+    End If
+
+    Dim jsonData As String
+    jsonData = "{""form"":""frm_MA_Mitarbeiterstamm"""
+    If MA_ID > 0 Then
+        jsonData = jsonData & ",""id"":" & MA_ID
+    End If
+    jsonData = jsonData & "}"
+
+    OpenWebView2Form FORMS3_PATH & "shell.html", "Mitarbeiterstamm", 1400, 900, jsonData
+End Sub
+
+Public Sub OpenKundenstamm_WebView2(Optional KD_ID As Long = 0)
+    ' Fallback zu Browser-Modus wenn WebView2App nicht existiert
+    If Dir(WEBVIEW2_EXE) = "" Then
+        Debug.Print "[WebView2] WebView2App.exe fehlt - Fallback zu Browser-Modus"
+        OpenKundenstamm_Browser KD_ID
+        Exit Sub
+    End If
+
+    Dim jsonData As String
+    jsonData = "{""form"":""frm_KD_Kundenstamm"""
+    If KD_ID > 0 Then
+        jsonData = jsonData & ",""id"":" & KD_ID
+    End If
+    jsonData = jsonData & "}"
+
+    OpenWebView2Form FORMS3_PATH & "shell.html", "Kundenstamm", 1300, 800, jsonData
+End Sub
+
+Public Sub OpenDienstplan_WebView2(Optional StartDatum As Date)
+    ' Fallback zu Browser-Modus wenn WebView2App nicht existiert
+    If Dir(WEBVIEW2_EXE) = "" Then
+        Debug.Print "[WebView2] WebView2App.exe fehlt - Fallback zu Browser-Modus"
+        OpenDienstplan_Browser StartDatum
+        Exit Sub
+    End If
+
+    Dim jsonData As String
+    jsonData = "{""form"":""frm_N_DP_Dienstplan_MA"""
+    If StartDatum > 0 Then
+        jsonData = jsonData & ",""datum"":""" & Format(StartDatum, "yyyy-mm-dd") & """"
+    End If
+    jsonData = jsonData & "}"
+
+    OpenWebView2Form FORMS3_PATH & "shell.html", "Dienstplan MA", 1400, 800, jsonData
+End Sub
+
+Public Sub OpenObjekt_WebView2(Optional OB_ID As Long = 0)
+    ' Fallback zu Browser-Modus wenn WebView2App nicht existiert
+    If Dir(WEBVIEW2_EXE) = "" Then
+        Debug.Print "[WebView2] WebView2App.exe fehlt - Fallback zu Browser-Modus"
+        OpenObjekt_Browser OB_ID
+        Exit Sub
+    End If
+
+    Dim jsonData As String
+    jsonData = "{""form"":""frm_OB_Objekt"""
+    If OB_ID > 0 Then
+        jsonData = jsonData & ",""id"":" & OB_ID
+    End If
+    jsonData = jsonData & "}"
+
+    OpenWebView2Form FORMS3_PATH & "shell.html", "Objektverwaltung", 1200, 700, jsonData
+End Sub
+
+' =====================================================
+' ZENTRALE WEBVIEW2 FORM-OEFFNUNG
+' =====================================================
+Private Sub OpenWebView2Form(htmlPath As String, title As String, width As Long, height As Long, Optional jsonData As String = "{}")
+    On Error GoTo ErrorHandler
+
+    Dim cmd As String
+    Dim httpUrl As String
+
+    ' WICHTIG: API-Server MUSS laufen fuer Datenzugriff!
+    StartAPIServerIfNeeded
+
+    ' Pruefen ob HTML-Datei existiert (fuer Fehlermeldung)
+    If Dir(htmlPath) = "" Then
+        MsgBox "HTML-Datei nicht gefunden:" & vbCrLf & htmlPath, vbExclamation, "CONSYS"
+        Exit Sub
+    End If
+
+    ' Pruefen ob WebView2App.exe existiert
+    If Dir(WEBVIEW2_EXE) = "" Then
+        MsgBox "WebView2App.exe nicht gefunden:" & vbCrLf & WEBVIEW2_EXE, vbCritical, "CONSYS"
+        Exit Sub
+    End If
+
+    ' KORREKTUR: HTTP-URL statt lokaler Pfad verwenden!
+    ' Lokale file:// URLs koennen nicht auf localhost:5000 API zugreifen (CORS)
+    ' Extrahiere Dateinamen aus Pfad und baue HTTP-URL
+    Dim fileName As String
+    fileName = Mid(htmlPath, InStrRev(htmlPath, "\") + 1)
+    httpUrl = "http://localhost:" & HTML_PORT & "/" & fileName
+
+    ' JSON escapen fuer Kommandozeile
+    Dim escapedJson As String
+    escapedJson = Replace(jsonData, """", "\""")
+
+    ' Kommandozeile bauen - JETZT mit HTTP-URL statt lokalem Pfad!
+    cmd = """" & WEBVIEW2_EXE & """ -html """ & httpUrl & """ -title """ & title & """ -width " & width & " -height " & height
+
+    ' Daten anhaengen falls vorhanden
+    If Len(jsonData) > 2 Then
+        cmd = cmd & " -data """ & escapedJson & """"
+    End If
+
+    Debug.Print "[WebView2] Starte: " & cmd
+
+    ' Ausfuehren
+    Shell cmd, vbNormalFocus
+
+    Debug.Print "[WebView2] Geoeffnet: " & httpUrl
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Fehler beim Oeffnen des HTML-Formulars:" & vbCrLf & Err.Description, vbCritical, "CONSYS"
+    Debug.Print "[WebView2] ERROR: " & Err.Description
+End Sub
+
+' =====================================================
+' TEST-FUNKTIONEN
+' =====================================================
+Public Sub Test_Auftragstamm()
+    OpenAuftragstamm_WebView2
+End Sub
+
+Public Sub Test_Auftragstamm_ID()
+    OpenAuftragstamm_WebView2 1
+End Sub
+
+Public Sub Test_Mitarbeiterstamm()
+    OpenMitarbeiterstamm_WebView2
+End Sub
+
+Public Sub Test_Mitarbeiterstamm_ID()
+    OpenMitarbeiterstamm_WebView2 707
+End Sub
+
+Public Sub Test_Kundenstamm()
+    OpenKundenstamm_WebView2
+End Sub
+
+' =====================================================
+' API-SERVER FUNKTIONEN (fuer Browser-Fallback)
+' =====================================================
+
+' Prueft ob API-Server auf Port 5000 laeuft
+Private Function IsAPIServerRunning() As Boolean
+    On Error Resume Next
+
+    Dim objHTTP As Object
+    Set objHTTP = CreateObject("MSXML2.XMLHTTP")
+
+    objHTTP.Open "GET", "http://localhost:" & API_PORT & "/api/health", False
+    objHTTP.setRequestHeader "Content-Type", "application/json"
+    objHTTP.Send
+
+    IsAPIServerRunning = (objHTTP.Status = 200)
+
+    Set objHTTP = Nothing
+    On Error GoTo 0
+End Function
+
+' Startet API-Server falls nicht bereits aktiv
+Public Sub StartAPIServerIfNeeded()
+    On Error GoTo ErrorHandler
+
+    If IsAPIServerRunning() Then
+        Debug.Print "[API] Server laeuft bereits auf Port " & API_PORT
+        Exit Sub
+    End If
+
+    ' Pruefen ob mini_api.py existiert
+    If Dir(API_SERVER_PATH) = "" Then
+        Debug.Print "[API] mini_api.py nicht gefunden: " & API_SERVER_PATH
+        Exit Sub
+    End If
+
+    Dim cmd As String
+    Dim workDir As String
+    workDir = Left(API_SERVER_PATH, InStrRev(API_SERVER_PATH, "\") - 1)
+
+    ' Python API-Server im Hintergrund starten
+    cmd = "cmd /c cd /d """ & workDir & """ && start /min python api_server.py"
+    Shell cmd, vbHide
+
+    Debug.Print "[API] Server gestartet auf Port " & API_PORT
+
+    ' Kurz warten bis Server hochgefahren (2 Sekunden)
+    DoEvents
+    Sleep 2000
+
+    Exit Sub
+
+ErrorHandler:
+    Debug.Print "[API] Fehler: " & Err.Description
+End Sub
+
+' Manuell API-Server starten
+Public Sub StartAPIServer()
+    StartAPIServerIfNeeded
+End Sub
+
+' API-Server Status pruefen
+Public Sub CheckAPIServer()
+    If IsAPIServerRunning() Then
+        MsgBox "API-Server laeuft auf Port " & API_PORT, vbInformation, "CONSYS"
+    Else
+        If MsgBox("API-Server laeuft NICHT." & vbCrLf & vbCrLf & _
+                  "Soll der Server jetzt gestartet werden?", _
+                  vbQuestion + vbYesNo, "CONSYS") = vbYes Then
+            StartAPIServerIfNeeded
+        End If
+    End If
+End Sub
+
+' =====================================================
+' VBA BRIDGE SERVER FUNKTIONEN (fuer HTML-Button VBA-Aufrufe)
+' Hinzugefuegt: 16.01.2026 - Startet automatisch mit HTML-Ansicht
+' =====================================================
+
+' Prueft ob VBA Bridge Server auf Port 5002 laeuft
+Private Function IsVBABridgeRunning() As Boolean
+    On Error Resume Next
+
+    Dim objHTTP As Object
+    Set objHTTP = CreateObject("MSXML2.XMLHTTP")
+
+    objHTTP.Open "GET", "http://localhost:" & VBA_BRIDGE_PORT & "/api/health", False
+    objHTTP.setRequestHeader "Content-Type", "application/json"
+    objHTTP.Send
+
+    IsVBABridgeRunning = (objHTTP.Status = 200)
+
+    Set objHTTP = Nothing
+    On Error GoTo 0
+End Function
+
+' Startet VBA Bridge Server via Watchdog (automatischer Neustart bei Crash)
+Public Sub StartVBABridgeServerIfNeeded()
+    On Error GoTo ErrorHandler
+
+    If IsVBABridgeRunning() Then
+        Debug.Print "[VBA-Bridge] Server laeuft bereits auf Port " & VBA_BRIDGE_PORT
+        Exit Sub
+    End If
+
+    ' Bevorzugt: Watchdog verwenden (ueberwacht und restartet bei Crash)
+    If Dir(VBA_BRIDGE_WATCHDOG_PATH) <> "" Then
+        Dim watchdogCmd As String
+        Dim watchdogDir As String
+        watchdogDir = Left(VBA_BRIDGE_WATCHDOG_PATH, InStrRev(VBA_BRIDGE_WATCHDOG_PATH, "\") - 1)
+
+        ' pythonw fuer verstecktes Fenster
+        watchdogCmd = "cmd /c cd /d """ & watchdogDir & """ && start /b pythonw vba_bridge_watchdog.py"
+        Shell watchdogCmd, vbHide
+
+        Debug.Print "[VBA-Bridge] Watchdog gestartet (Auto-Restart bei Crash)"
+
+    ' Fallback: Direkt starten (ohne Watchdog)
+    ElseIf Dir(VBA_BRIDGE_PATH) <> "" Then
+        Dim cmd As String
+        Dim workDir As String
+        workDir = Left(VBA_BRIDGE_PATH, InStrRev(VBA_BRIDGE_PATH, "\") - 1)
+
+        cmd = "cmd /c cd /d """ & workDir & """ && start /min python vba_bridge_server.py"
+        Shell cmd, vbHide
+
+        Debug.Print "[VBA-Bridge] Server direkt gestartet (KEIN Watchdog)"
+    Else
+        Debug.Print "[VBA-Bridge] FEHLER: Weder Watchdog noch Bridge-Server gefunden!"
+        Exit Sub
+    End If
+
+    Debug.Print "[VBA-Bridge] Warte auf Server-Start..."
+
+    ' Warten bis Server hochgefahren (max 5 Sekunden)
+    Dim i As Integer
+    For i = 1 To 10
+        DoEvents
+        Sleep 500
+        If IsVBABridgeRunning() Then
+            Debug.Print "[VBA-Bridge] Server laeuft auf Port " & VBA_BRIDGE_PORT
+            Exit Sub
+        End If
+    Next i
+
+    Debug.Print "[VBA-Bridge] Server noch nicht erreichbar (wird im Hintergrund gestartet)"
+
+    Exit Sub
+
+ErrorHandler:
+    Debug.Print "[VBA-Bridge] Fehler: " & Err.Description
+End Sub
+
+' Manuell VBA Bridge Server starten
+Public Sub StartVBABridgeServer()
+    StartVBABridgeServerIfNeeded
+End Sub
+
+' VBA Bridge Server Status pruefen
+Public Sub CheckVBABridgeServer()
+    If IsVBABridgeRunning() Then
+        MsgBox "VBA Bridge Server laeuft auf Port " & VBA_BRIDGE_PORT, vbInformation, "CONSYS"
+    Else
+        If MsgBox("VBA Bridge Server laeuft NICHT." & vbCrLf & vbCrLf & _
+                  "Soll der Server jetzt gestartet werden?", _
+                  vbQuestion + vbYesNo, "CONSYS") = vbYes Then
+            StartVBABridgeServerIfNeeded
+        End If
+    End If
+End Sub
+
+' =====================================================
+' BROWSER-MODUS: Formulare im Standard-Browser oeffnen
+' Der API-Server serviert HTML + Daten auf localhost:5000
+' =====================================================
+
+' Auftragsverwaltung im Browser oeffnen (via shell.html fuer Sidebar!)
+Public Sub OpenAuftragstamm_Browser(Optional VA_ID As Long = 0)
+    StartAPIServerIfNeeded
+    StartVBABridgeServerIfNeeded
+
+    Dim url As String
+    url = "http://localhost:" & HTML_PORT & "/forms/shell.html?form=frm_va_Auftragstamm"
+    If VA_ID > 0 Then url = url & "&id=" & VA_ID
+
+    Shell "cmd /c start """" """ & url & """", vbHide
+    Debug.Print "[Browser] Geoeffnet: " & url
+End Sub
+
+' Mitarbeiterstamm im Browser oeffnen (via shell.html fuer Sidebar!)
+Public Sub OpenMitarbeiterstamm_Browser(Optional MA_ID As Long = 0)
+    StartAPIServerIfNeeded
+    StartVBABridgeServerIfNeeded
+
+    Dim url As String
+    url = "http://localhost:" & HTML_PORT & "/forms/shell.html?form=frm_MA_Mitarbeiterstamm"
+    If MA_ID > 0 Then url = url & "&id=" & MA_ID
+
+    Shell "cmd /c start """" """ & url & """", vbHide
+    Debug.Print "[Browser] Geoeffnet: " & url
+End Sub
+
+' Kundenstamm im Browser oeffnen (via shell.html fuer Sidebar!)
+Public Sub OpenKundenstamm_Browser(Optional KD_ID As Long = 0)
+    StartAPIServerIfNeeded
+    StartVBABridgeServerIfNeeded
+
+    Dim url As String
+    url = "http://localhost:" & HTML_PORT & "/forms/shell.html?form=frm_KD_Kundenstamm"
+    If KD_ID > 0 Then url = url & "&id=" & KD_ID
+
+    Shell "cmd /c start """" """ & url & """", vbHide
+    Debug.Print "[Browser] Geoeffnet: " & url
+End Sub
+
+' Objektverwaltung im Browser oeffnen (via shell.html fuer Sidebar!)
+Public Sub OpenObjekt_Browser(Optional OB_ID As Long = 0)
+    StartAPIServerIfNeeded
+    StartVBABridgeServerIfNeeded
+
+    Dim url As String
+    url = "http://localhost:" & HTML_PORT & "/forms/shell.html?form=frm_OB_Objekt"
+    If OB_ID > 0 Then url = url & "&id=" & OB_ID
+
+    Shell "cmd /c start """" """ & url & """", vbHide
+    Debug.Print "[Browser] Geoeffnet: " & url
+End Sub
+
+' Dienstplan im Browser oeffnen (via shell.html fuer Sidebar!)
+Public Sub OpenDienstplan_Browser(Optional StartDatum As Date)
+    StartAPIServerIfNeeded
+    StartVBABridgeServerIfNeeded
+
+    Dim url As String
+    url = "http://localhost:" & HTML_PORT & "/forms/shell.html?form=frm_N_DP_Dienstplan_MA"
+    If StartDatum > 0 Then url = url & "&datum=" & Format(StartDatum, "yyyy-mm-dd")
+
+    Shell "cmd /c start """" """ & url & """", vbHide
+    Debug.Print "[Browser] Geoeffnet: " & url
+End Sub
+
+' Hauptmenue/Dashboard im Browser oeffnen - OEFFNET IMMER AUFTRAGSTAMM MIT AKTUELLEM AUFTRAG
+Public Function OpenHTMLAnsicht()
+    ' Beide Server starten: API (Port 5000) + VBA Bridge (Port 5002)
+    StartAPIServerIfNeeded
+    StartVBABridgeServerIfNeeded
+
+    Dim url As String
+    ' KORRIGIERT: Route ist /forms/shell.html (nicht /shell.html!)
+    ' Der aktuellste Auftrag wird automatisch vom Formular geladen
+    url = "http://localhost:" & HTML_PORT & "/forms/shell.html?form=frm_va_Auftragstamm"
+
+    Shell "cmd /c start """" """ & url & """", vbHide
+    Debug.Print "[Browser] Geoeffnet: " & url
+    OpenHTMLAnsicht = True
+End Function
+
+' =====================================================
+' WRAPPER-FUNKTIONEN (Abwaertskompatibilitaet)
+' Hinzugefuegt: 13.01.2026 - Fuer bestehende Button-OnClick Aufrufe
+' WICHTIG: Als Function deklariert (nicht Sub) damit Button OnClick funktioniert!
+' =====================================================
+
+' Wrapper fuer generischen "HTML Ansicht" Button (oeffnet Hauptmenue)
+Public Function HTMLAnsichtOeffnen()
+    OpenHTMLAnsicht
+    HTMLAnsichtOeffnen = True
+End Function
+
+' Wrapper fuer "HTML Menue" Button
+Public Function OpenHTMLMenu()
+    OpenHTMLAnsicht
+    OpenHTMLMenu = True
+End Function
+
+' Wrapper fuer Auftragsverwaltung (ALTER Name)
+Public Function OpenAuftragsverwaltungHTML(Optional VA_ID As Long = 0)
+    OpenAuftragstamm_WebView2 VA_ID
+    OpenAuftragsverwaltungHTML = True
+End Function
+
+' Wrapper fuer Mitarbeiterstamm (ALTER Name aus mdl_N_WebView2Bridge.bas)
+Public Function OpenMitarbeiterstammHTML(Optional MA_ID As Long = 0)
+    OpenMitarbeiterstamm_WebView2 MA_ID
+    OpenMitarbeiterstammHTML = True
+End Function
+
+' Wrapper fuer Kundenstamm (ALTER Name aus mdl_N_WebView2Bridge.bas)
+Public Function OpenKundenstammHTML(Optional KD_ID As Long = 0)
+    OpenKundenstamm_WebView2 KD_ID
+    OpenKundenstammHTML = True
+End Function
+
+' Wrapper fuer Auftragstamm (NEUER Name - Alias)
+Public Function OpenAuftragstammHTML(Optional VA_ID As Long = 0)
+    OpenAuftragstamm_WebView2 VA_ID
+    OpenAuftragstammHTML = True
+End Function

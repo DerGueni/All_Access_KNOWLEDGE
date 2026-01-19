@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>frm_MA_Mitarbeiterstamm</title>
+  <link rel="stylesheet" href="./form.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-section toolbar-nav">
+        <button class="nav-btn nav-first" title="Erster Datensatz">|&lt;</button>
+        <button class="nav-btn nav-prev" title="Vorheriger Datensatz">&lt;</button>
+        <button class="nav-btn nav-next" title="Nächster Datensatz">&gt;</button>
+        <button class="nav-btn nav-last" title="Letzter Datensatz">&gt;|</button>
+      </div>
+
+      <div class="toolbar-section toolbar-title">
+        <span class="version-label">Version: <span id="lbl_Version">-</span></span>
+      </div>
+
+      <div class="toolbar-section toolbar-actions">
+        <button class="btn-save" id="btnSave" title="Datensatz speichern">Speichern</button>
+        <button class="btn-delete" id="mcobtnDelete" title="Datensatz löschen">Löschen</button>
+        <button class="btn-print" id="btnLstDruck" title="Mitarbeiterliste drucken">Druck</button>
+        <button class="btn-timeacct" id="btnZeitkonto" title="Zeitkonto">Zeitkonto</button>
+        <button class="btn-action" id="Befehl46" title="Aktion">Aktion</button>
+        <button class="btn-timeacct-fixed" id="btnZKFest" title="Zeitkonto fest">ZK Fest</button>
+        <button class="btn-timeacct-mini" id="btnZKMini" title="Zeitkonto Mini">ZK Mini</button>
+        <button class="btn-stafftable" id="lbl_Mitarbeitertabelle" title="Mitarbeiterstamm anzeigen">Tabelle</button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+      <!-- SIDEBAR (MENU) -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <button class="btn-ribbon-toggle btn-ribbon-hide" id="btnRibbonAus" title="Menü ausblenden">−</button>
+        </div>
+        <div class="sidebar-header">
+          <button class="btn-ribbon-toggle btn-ribbon-show" id="btnRibbonEin" title="Menü anzeigen">+</button>
+        </div>
+        <div class="sidebar-header">
+          <button class="btn-dataarea-toggle btn-dataarea-hide" id="btnDaBaAus" title="Datenbereich ausblenden">−</button>
+        </div>
+        <div class="sidebar-header">
+          <button class="btn-dataarea-toggle btn-dataarea-show" id="btnDaBaEin" title="Datenbereich anzeigen">+</button>
+        </div>
+
+        <!-- Subform: Menu Navigation (sub_Menuefuehrung) -->
+        <div id="Menue" class="subform-container">
+          <iframe
+            id="iframe-menu"
+            src="./sub_Menuefuehrung.html"
+            style="width: 100%; height: 100%; border: none; background-color: #f5f5f5;"
+            title="Navigationsmenü">
+          </iframe>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT AREA -->
+      <div class="content-area">
+        <!-- TAB CONTROL (reg_MA) -->
+        <div id="reg_MA" class="tab-control">
+          <!-- TAB HEADER -->
+          <div class="tab-header">
+            <button class="tab-button tab-active" data-tab="pgAdresse">Adresse</button>
+            <button class="tab-button" data-tab="pgBank">Bankdaten</button>
+            <button class="tab-button" data-tab="pgArbeit">Anstellung</button>
+          </div>
+
+          <!-- PAGE 1: ADRESSE -->
+          <div id="pgAdresse" class="tab-page tab-active">
+            <div class="form-section">
+              <!-- Administrative Fields Row -->
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="PersNr">Personalnr.</label>
+                  <input type="text" id="PersNr" name="PersNr" class="field-input" readonly />
+                </div>
+                <div class="field-group">
+                  <label for="LEXWare_ID">LEXWare ID</label>
+                  <input type="text" id="LEXWare_ID" name="LEXWare_ID" class="field-input" />
+                </div>
+                <div class="field-group field-checkbox">
+                  <label for="IstAktiv">Aktiv</label>
+                  <input type="checkbox" id="IstAktiv" name="IstAktiv" />
+                </div>
+                <div class="field-group field-checkbox">
+                  <label for="IstSubunternehmer">Subunternehmer</label>
+                  <input type="checkbox" id="IstSubunternehmer" name="IstSubunternehmer" />
+                </div>
+              </div>
+
+              <!-- Personal Data Section -->
+              <div class="subsection-title">Persönliche Daten</div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Nachname">Nachname</label>
+                  <input type="text" id="Nachname" name="Nachname" class="field-input" required />
+                </div>
+                <div class="field-group">
+                  <label for="Vorname">Vorname</label>
+                  <input type="text" id="Vorname" name="Vorname" class="field-input" required />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Geschlecht">Geschlecht</label>
+                  <input type="text" id="Geschlecht" name="Geschlecht" class="field-input" />
+                </div>
+                <div class="field-group">
+                  <label for="Geb_Dat">Geb. Datum</label>
+                  <input type="date" id="Geb_Dat" name="Geb_Dat" class="field-input" />
+                </div>
+                <div class="field-group">
+                  <label for="Geb_Ort">Geb. Ort</label>
+                  <input type="text" id="Geb_Ort" name="Geb_Ort" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Geb_Name">Geburtsname</label>
+                  <input type="text" id="Geb_Name" name="Geb_Name" class="field-input" />
+                </div>
+                <div class="field-group">
+                  <label for="Staatsang">Staatsangehörigkeit</label>
+                  <input type="text" id="Staatsang" name="Staatsang" class="field-input" />
+                </div>
+              </div>
+
+              <!-- Address Section -->
+              <div class="subsection-title">Adresse</div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Strasse">Straße</label>
+                  <input type="text" id="Strasse" name="Strasse" class="field-input" />
+                </div>
+                <div class="field-group field-small">
+                  <label for="Nr">Nr.</label>
+                  <input type="text" id="Nr" name="Nr" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="PLZ">PLZ</label>
+                  <input type="text" id="PLZ" name="PLZ" class="field-input" />
+                </div>
+                <div class="field-group">
+                  <label for="Ort">Ort</label>
+                  <input type="text" id="Ort" name="Ort" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Land">Land</label>
+                  <input type="text" id="Land" name="Land" class="field-input" />
+                </div>
+                <div class="field-group">
+                  <label for="Bundesland">Bundesland</label>
+                  <input type="text" id="Bundesland" name="Bundesland" class="field-input" />
+                </div>
+              </div>
+
+              <!-- Contact Section -->
+              <div class="subsection-title">Kontakt</div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Tel_Mobil">Mobil</label>
+                  <input type="tel" id="Tel_Mobil" name="Tel_Mobil" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Tel_Festnetz">Festnetz</label>
+                  <input type="tel" id="Tel_Festnetz" name="Tel_Festnetz" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Email">Email</label>
+                  <input type="email" id="Email" name="Email" class="field-input" />
+                </div>
+              </div>
+
+              <!-- Employee Photo -->
+              <div class="subsection-title">Foto</div>
+              <div class="field-row">
+                <div class="field-group">
+                  <div id="MA_Bild" class="image-control">
+                    <img src="" alt="Mitarbeiterfoto" class="employee-photo" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Subform: Ersatz-Email -->
+              <div id="sub_MA_ErsatzEmail" class="subform-container" style="height: 200px;">
+                <iframe
+                  id="iframe-ersatz-email"
+                  src="./sub_MA_ErsatzEmail.html"
+                  style="width: 100%; height: 100%; border: none; background-color: #f5f5f5;"
+                  title="Ersatz-Email Verwaltung">
+                </iframe>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAGE 2: BANKDATEN -->
+          <div id="pgBank" class="tab-page">
+            <div class="form-section">
+              <div class="subsection-title">Bankverbindung</div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Auszahlungsart">Auszahlungsart</label>
+                  <input type="text" id="Auszahlungsart" name="Auszahlungsart" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Bankname">Bankname</label>
+                  <input type="text" id="Bankname" name="Bankname" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Bankleitzahl">Bankleitzahl (BLZ)</label>
+                  <input type="text" id="Bankleitzahl" name="Bankleitzahl" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Kontonummer">Kontonummer</label>
+                  <input type="text" id="Kontonummer" name="Kontonummer" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="BIC">BIC</label>
+                  <input type="text" id="BIC" name="BIC" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="IBAN">IBAN</label>
+                  <input type="text" id="IBAN" name="IBAN" class="field-input" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAGE 3: ANSTELLUNG -->
+          <div id="pgArbeit" class="tab-page">
+            <div class="form-section">
+              <div class="subsection-title">Anstellungsdaten</div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Anstellungsart">Anstellungsart</label>
+                  <input type="text" id="Anstellungsart" name="Anstellungsart" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Eintrittsdatum">Eintrittsdatum</label>
+                  <input type="date" id="Eintrittsdatum" name="Eintrittsdatum" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Austrittsdatum">Austrittsdatum</label>
+                  <input type="date" id="Austrittsdatum" name="Austrittsdatum" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Kostenstelle">Kostenstelle</label>
+                  <input type="text" id="Kostenstelle" name="Kostenstelle" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group field-checkbox">
+                  <label for="Eigener_PKW">Eigener PKW</label>
+                  <input type="checkbox" id="Eigener_PKW" name="Eigener_PKW" />
+                </div>
+              </div>
+
+              <!-- Badge/ID Fields -->
+              <div class="subsection-title">Ausweisdaten</div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="DienstausweisNr">Dienstauweis-Nr.</label>
+                  <input type="text" id="DienstausweisNr" name="DienstausweisNr" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Ausweis_Endedatum">Ausweis Gültig bis</label>
+                  <input type="date" id="Ausweis_Endedatum" name="Ausweis_Endedatum" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Ausweis_Funktion">Ausweis Funktion</label>
+                  <input type="text" id="Ausweis_Funktion" name="Ausweis_Funktion" class="field-input" />
+                </div>
+              </div>
+
+              <!-- Special IDs -->
+              <div class="subsection-title">Spezial-IDs</div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Epin_DFB">ePIN DFB</label>
+                  <input type="text" id="Epin_DFB" name="Epin_DFB" class="field-input" />
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="Bewacher_ID">Bewacher-ID</label>
+                  <input type="text" id="Bewacher_ID" name="Bewacher_ID" class="field-input" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEE LIST SECTION (Bottom) -->
+    <div class="list-section">
+      <div class="list-header">
+        <h3>Mitarbeiterliste (Filter: Anstellung aktiv)</h3>
+      </div>
+      <div id="lst_MA" class="list-container">
+        <table class="employee-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nachname</th>
+              <th>Vorname</th>
+              <th>Ort</th>
+            </tr>
+          </thead>
+          <tbody id="lst_MA_tbody">
+            <!-- Rows will be populated by form.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIDDEN FIELDS -->
+  <input type="hidden" id="DiDatumAb" name="DiDatumAb" />
+  <input type="hidden" id="lbl_ab" name="lbl_ab" />
+  <button id="btnMADienstpl" class="hidden" style="display:none;">Schedule</button>
+
+  <script src="./bridge.js"></script>
+  <script src="./form.js"></script>
+</body>
+</html>

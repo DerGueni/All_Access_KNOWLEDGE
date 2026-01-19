@@ -1,0 +1,6 @@
+-- Query: qry_MA_Monat_Zusatzwerte
+-- Type: 0
+SELECT tbl_MA_Tageszusatzwerte.*, tbl_MA_Tageszusatzwerte.ID AS ZusWert_ID
+FROM tbl_MA_Tageszusatzwerte
+WHERE (((tbl_MA_Tageszusatzwerte.MA_ID)=Get_Priv_Property("prp_Akt_MA_ID")) AND ((Month([AktDat]))=Get_Priv_Property("prp_AktMonUeb_Monat")) AND ((Year([AktDat]))=Get_Priv_Property("prp_AktMonUeb_Jahr")));
+

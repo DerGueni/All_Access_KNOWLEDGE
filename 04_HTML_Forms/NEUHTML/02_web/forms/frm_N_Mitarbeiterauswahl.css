@@ -1,0 +1,470 @@
+/* Mitarbeiterauswahl - Styles nach Access Screenshot */
+
+/* Container */
+.maw-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    background: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 11px;
+}
+
+/* Linkes Menue - HELLGRAU mit BLAU Header */
+.maw-menu {
+    width: 140px;
+    min-width: 140px;
+    background: #f0f0f0;
+    border-right: 1px solid #cccccc;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-header {
+    background: #4316B2;
+    color: white;
+    padding: 12px 8px;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+.menu-btn {
+    display: block;
+    padding: 8px 6px;
+    background: #e8e8e8;
+    border: 1px solid #cccccc;
+    color: #333;
+    text-decoration: none;
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.menu-btn:hover {
+    background: #d5d5d5;
+}
+
+.menu-btn.active {
+    background: #4316B2;
+    color: white;
+}
+
+.menu-btn.secondary {
+    background: #d0d0d0;
+    color: #666;
+}
+
+/* Hauptbereich */
+.maw-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header - BLAU 2,5cm */
+.maw-header {
+    background: #4316B2;
+    color: white;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 94px;
+    border-bottom: 1px solid #3558c0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.maw-logo {
+    width: 32px;
+    height: 32px;
+    background: white;
+    border-radius: 4px;
+}
+
+.maw-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.maw-btn {
+    padding: 6px 14px;
+    font-size: 11px;
+    border: 1px solid #999;
+    background: #f0f0f0;
+    color: #333;
+    cursor: pointer;
+}
+
+.maw-btn:hover {
+    background: #d5d5d5;
+}
+
+.maw-btn.primary {
+    background: #4316B2;
+    color: white;
+    border-color: #3558c0;
+}
+
+.maw-btn.highlight {
+    background: #4316B2;
+    color: white;
+    border-color: #3558c0;
+}
+
+/* Auftrag Info */
+.maw-auftrag-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: #e8e8e8;
+    border-bottom: 1px solid #999;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.info-left,
+.info-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.info-left label,
+.info-right label {
+    font-weight: 600;
+}
+
+.maw-select {
+    padding: 4px 8px;
+    font-size: 11px;
+    border: 1px solid #999;
+    min-width: 200px;
+}
+
+.maw-select-small {
+    padding: 4px 8px;
+    font-size: 11px;
+    border: 1px solid #999;
+    min-width: 100px;
+}
+
+/* Content */
+.maw-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    padding: 8px;
+    gap: 8px;
+}
+
+/* Linke Spalte */
+.maw-left-panel {
+    width: 280px;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.maw-ma-info {
+    background: white;
+    border: 1px solid #999;
+    padding: 8px;
+}
+
+.ma-label {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.ma-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.ma-checkboxes label {
+    font-size: 10px;
+}
+
+.ma-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ma-filters label {
+    font-size: 10px;
+}
+
+.ma-gesamt {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.ma-gesamt input {
+    width: 80px;
+    padding: 4px;
+    border: 1px solid #999;
+}
+
+/* Dienstbeginn */
+.maw-dienstbeginn {
+    background: white;
+    border: 1px solid #999;
+    padding: 8px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 11px;
+}
+
+.dienstbeginn-table-container {
+    max-height: 120px;
+    overflow: auto;
+}
+
+.dienstbeginn-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+.dienstbeginn-table th,
+.dienstbeginn-table td {
+    padding: 4px 6px;
+    border: 1px solid #999;
+    text-align: center;
+}
+
+.dienstbeginn-table thead {
+    background: #e0e0e0;
+}
+
+.dienstbeginn-table tbody tr:hover {
+    background: #f5f5f5;
+}
+
+.dienstbeginn-table tbody tr.selected {
+    background: #4316B2;
+    color: white;
+}
+
+.endzeit-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.maw-input-time {
+    width: 60px;
+    padding: 4px;
+    border: 1px solid #999;
+    text-align: center;
+}
+
+/* Parallele Einsaetze */
+.maw-parallele {
+    background: white;
+    border: 1px solid #999;
+    padding: 8px;
+    flex: 1;
+}
+
+.parallele-list {
+    max-height: 100px;
+    overflow: auto;
+}
+
+.parallele-item {
+    padding: 4px;
+    font-size: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Mitte Panel */
+.maw-center-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #999;
+    padding: 8px;
+    min-width: 300px;
+}
+
+.ma-list-container {
+    flex: 1;
+    overflow: auto;
+}
+
+.ma-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+.ma-list-table th,
+.ma-list-table td {
+    padding: 3px 6px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.ma-list-table thead {
+    background: #e0e0e0;
+    position: sticky;
+    top: 0;
+}
+
+.ma-list-table tbody tr:hover {
+    background: #f5f5f5;
+    cursor: pointer;
+}
+
+.ma-list-table tbody tr.selected {
+    background: #4316B2;
+    color: white;
+}
+
+/* Action Buttons */
+.maw-action-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+}
+
+.action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 10px;
+    text-align: center;
+}
+
+.maw-btn-arrow {
+    padding: 8px 12px;
+    font-size: 10px;
+    border: 1px solid #999;
+    background: #f0f0f0;
+    cursor: pointer;
+    text-align: center;
+}
+
+.maw-btn-arrow:hover {
+    background: #d5d5d5;
+}
+
+/* Rechts Panel */
+.maw-right-panel {
+    width: 280px;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #999;
+    padding: 8px;
+}
+
+.geplant-table-container {
+    flex: 1;
+    overflow: auto;
+}
+
+.geplant-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+}
+
+.geplant-table th,
+.geplant-table td {
+    padding: 3px 6px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.geplant-table thead {
+    background: #e0e0e0;
+}
+
+/* Ganz rechts */
+.maw-far-right {
+    width: 50px;
+    background: white;
+    border: 1px solid #999;
+    padding: 4px;
+    font-size: 10px;
+}
+
+.mita-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mita-list div {
+    text-align: center;
+    padding: 2px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Footer */
+.maw-footer {
+    background: #4316B2;
+    color: white;
+    padding: 4px 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+    .maw-left-panel {
+        width: 220px;
+        min-width: 220px;
+    }
+    .maw-right-panel {
+        width: 220px;
+        min-width: 220px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .maw-menu {
+        display: none;
+    }
+    .maw-content {
+        flex-wrap: wrap;
+    }
+    .maw-far-right {
+        display: none;
+    }
+}

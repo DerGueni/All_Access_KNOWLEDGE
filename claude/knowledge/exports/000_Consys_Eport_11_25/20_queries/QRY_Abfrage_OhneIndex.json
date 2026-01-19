@@ -1,0 +1,1 @@
+{"id":"QRY_Abfrage_OhneIndex","name":"Abfrage/Ohne Index","sql":{"raw":"SELECT DISTINCTROW [Kunden/Ohne Index].*, DCount(\"*\",\"[Bestellungen]\",\"[Empfänger]='\" & [Firma] & \"'\") AS AnzBest\nFROM [Kunden/Ohne Index]\nORDER BY [Kunden/Ohne Index].Firma;\n","sources":[],"select_fields":[]},"parameters":[],"meta":{"connect":null,"returns_records":wahr,"odbctimeout":60}}

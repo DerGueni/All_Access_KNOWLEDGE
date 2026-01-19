@@ -1,0 +1,7 @@
+-- Query: zqry_ZUO_ZK_NV_FE
+-- Type: 0
+SELECT Null AS VA_ID, Null AS VADatum_ID, Null AS VAStart_ID, Null AS ZUO_ID, ztbl_ZUO_Stunden_FE.NV_ID, Null AS Korr_ID, ztbl_MA_NVerfuegZeiten_FE.MA_ID, ztbl_MA_NVerfuegZeiten_FE.zeittyp_id AS Veranstaltung, Format([vonDat],"dd/mm/yyyy") AS VADatum, Year([VADatum]) AS Jahr, Month([VADatum]) AS Monat, ztbl_ZUO_Stunden_FE.Lohnart_ID, ztbl_ZUO_Stunden_FE.Stunden_brutto AS Anz_Std, ztbl_ZUO_Stunden_FE.Satz, ztbl_ZUO_Stunden_FE.Lohn AS Wert, ztbl_MA_NVerfuegZeiten_FE.vonZeit AS Beginn, ztbl_MA_NVerfuegZeiten_FE.bisZeit AS Ende, False AS gesperrt, False AS exportiert, Now() AS erstellt, ermittle_Benutzer() AS Ersteller, "" AS geaendert, "" AS Aenderer, True AS exportieren, False AS Korrektur, ztbl_MA_NVerfuegZeiten_FE.Bemerkung, tbl_MA_Mitarbeiterstamm.Anstellungsart_ID
+FROM (tbl_MA_Mitarbeiterstamm RIGHT JOIN ztbl_ZUO_Stunden_FE ON tbl_MA_Mitarbeiterstamm.ID = ztbl_ZUO_Stunden_FE.MA_ID) RIGHT JOIN ztbl_MA_NVerfuegZeiten_FE ON ztbl_ZUO_Stunden_FE.NV_ID = ztbl_MA_NVerfuegZeiten_FE.ID
+WHERE (((ztbl_MA_NVerfuegZeiten_FE.zeittyp_id)="Urlaub" Or (ztbl_MA_NVerfuegZeiten_FE.zeittyp_id)="Krank" Or (ztbl_MA_NVerfuegZeiten_FE.zeittyp_id)="Intern"))
+ORDER BY Format([vonDat],"dd/mm/yyyy");
+

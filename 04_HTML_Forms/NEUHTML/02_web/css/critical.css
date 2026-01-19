@@ -1,0 +1,102 @@
+/**
+ * critical.css
+ * Kritische CSS-Regeln fuer sofortiges Rendering
+ * Diese Datei sollte inline im <head> geladen werden
+ */
+
+/* Basis-Reset - minimal */
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;overflow:hidden}
+
+/* Font-Stack mit system-ui fuer schnellstes Rendering */
+body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    font-size:12px;
+    background:#e8e8e8;
+    color:#333;
+}
+
+/* Haupt-Container */
+.app-container{display:flex;height:100vh;width:100vw;overflow:hidden}
+
+/* Sidebar Grundstruktur */
+.app-sidebar{
+    width:180px;
+    min-width:180px;
+    background:#2c3e50;
+    display:flex;
+    flex-direction:column;
+}
+
+/* Main Area */
+.app-main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    background:#f0f0f0;
+}
+
+/* Header */
+.app-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 12px;
+    background:#4316B2;
+    color:#fff;
+    min-height:44px;
+}
+
+/* Footer */
+.app-footer{
+    display:flex;
+    justify-content:space-between;
+    padding:4px 12px;
+    background:#e8e8e8;
+    border-top:1px solid #ccc;
+    min-height:26px;
+    font-size:11px;
+}
+
+/* Content Area */
+.app-content{
+    flex:1;
+    display:flex;
+    overflow:hidden;
+    padding:8px;
+    gap:8px;
+}
+
+/* Buttons minimal */
+.btn{
+    padding:5px 12px;
+    border:1px solid #999;
+    background:#fff;
+    border-radius:3px;
+    cursor:pointer;
+    font-size:11px;
+}
+
+/* Form Controls minimal */
+.form-control{
+    padding:4px 8px;
+    border:1px solid #999;
+    border-radius:2px;
+    font-size:12px;
+}
+
+/* Loading State */
+.loading{opacity:0.6;pointer-events:none}
+.loading::after{
+    content:"";
+    position:absolute;
+    top:50%;left:50%;
+    width:20px;height:20px;
+    margin:-10px 0 0 -10px;
+    border:2px solid #ccc;
+    border-top-color:#4316B2;
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}

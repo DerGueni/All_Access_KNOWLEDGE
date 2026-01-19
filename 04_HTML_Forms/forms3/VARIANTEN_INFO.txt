@@ -1,0 +1,145 @@
+================================================================================
+  DESIGN-VARIANTEN FÜR frm_va_Auftragstamm.html
+================================================================================
+
+ERSTELLTE WERKZEUGE:
+--------------------
+
+1. create_design_variants.py
+   → Python-Script zur Generierung der Design-Varianten
+   → Liest Original-HTML, ersetzt CSS-Sektion, erstellt neue Dateien
+
+2. VARIANTEN_ERSTELLEN.bat
+   → Windows Batch-Datei
+   → Doppelklick → führt Python-Script aus
+   → Zeigt Fortschritt und Ergebnis an
+
+3. create_variants.ps1
+   → PowerShell-Script (Alternative)
+   → Führt Python-Script aus mit bunter Konsolen-Ausgabe
+
+4. README_VARIANTEN.md
+   → Ausführliche Dokumentation
+   → Beschreibt beide Design-Varianten
+   → Farbtabellen, Designphilosophie
+
+5. VARIANTEN_INFO.txt
+   → Diese Datei
+   → Schnellübersicht
+
+
+SCHNELLSTART:
+-------------
+
+METHODE 1 (Empfohlen):
+   Doppelklick auf: VARIANTEN_ERSTELLEN.bat
+
+METHODE 2 (PowerShell):
+   Rechtsklick auf create_variants.ps1 → "Mit PowerShell ausführen"
+
+METHODE 3 (Kommandozeile):
+   cd "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\04_HTML_Forms\forms"
+   python create_design_variants.py
+
+
+ERGEBNIS:
+---------
+
+Nach der Ausführung wird ein neuer Ordner erstellt:
+
+   varianten_auftragstamm\
+      ├── variante_07_minimalist.html   (Minimalist White Design)
+      └── variante_08_nord.html          (Nord Theme Design)
+
+
+VARIANTE 7: MINIMALIST WHITE
+-----------------------------
+
+Design:      Ultra-clean, viel Weißraum
+Hintergrund: #FAFAFA (sehr helles Grau)
+Akzent:      #1565C0 (Blau)
+Stil:        Ghost-Buttons, dünne Linien, sanfte Schatten
+
+Perfekt für:
+   - Professionelle Business-Anwendungen
+   - Nutzer die klare, helle Oberflächen bevorzugen
+   - Tageslicht-Nutzung
+
+
+VARIANTE 8: NORD THEME
+-----------------------
+
+Design:      Nord Color Scheme (nordtheme.com)
+Hintergrund: #2E3440 (Polar Night - dunkel)
+Akzente:     #88C0D0 (Frost - hellblau), #EBCB8B (Aurora - gelb)
+Stil:        Dunkles Theme, augenschonend, Code-Editor-Optik
+
+Perfekt für:
+   - Entwickler und Power-User
+   - Lange Bildschirmarbeit
+   - Nutzer die dunkle Themes bevorzugen
+   - Abendliche/nächtliche Nutzung
+
+
+WICHTIG:
+--------
+
+✓ HTML-Struktur: IDENTISCH in allen Varianten
+✓ JavaScript:    IDENTISCH in allen Varianten
+✓ Funktionalität: IDENTISCH in allen Varianten
+
+✗ NUR CSS wurde geändert!
+
+Das bedeutet:
+   - Alle Buttons funktionieren gleich
+   - Alle Events sind identisch
+   - Alle Formulare haben gleiche IDs
+   - Nur Farben, Abstände, Borders sind unterschiedlich
+
+
+TESTEN:
+-------
+
+1. Öffnen Sie die Varianten-Dateien direkt im Browser
+2. Vergleichen Sie die Designs
+3. Wählen Sie Ihren Favoriten
+4. Integrieren Sie ihn in Ihre Anwendung
+
+
+ANPASSUNGEN:
+------------
+
+Falls Sie Farben ändern möchten:
+
+1. Öffnen Sie: create_design_variants.py
+2. Suchen Sie die CSS-Konstanten:
+   - CSS_MINIMALIST (Zeile ~60)
+   - CSS_NORD (Zeile ~800)
+3. Ändern Sie die Hex-Farbwerte
+4. Führen Sie das Script erneut aus
+
+
+WEITERE VARIANTEN:
+------------------
+
+Sie können beliebig viele Varianten erstellen:
+
+1. Kopieren Sie eine CSS-Konstante (z.B. CSS_NORD)
+2. Benennen Sie sie um (z.B. CSS_DRACULA)
+3. Passen Sie die Farben an
+4. Fügen Sie Code hinzu um die neue Variante zu erstellen
+5. Script erneut ausführen
+
+
+SUPPORT:
+--------
+
+Bei Fragen oder Problemen:
+   - Prüfen Sie README_VARIANTEN.md
+   - Schauen Sie in create_design_variants.py
+   - Alle Scripts sind gut kommentiert
+
+
+================================================================================
+Viel Erfolg mit den neuen Design-Varianten!
+================================================================================

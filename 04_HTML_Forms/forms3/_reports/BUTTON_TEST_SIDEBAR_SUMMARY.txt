@@ -1,0 +1,110 @@
+═══════════════════════════════════════════════════════════════════
+    SIDEBAR-NAVIGATION BUTTON TEST - ZUSAMMENFASSUNG
+═══════════════════════════════════════════════════════════════════
+
+Datum: 15.01.2026
+Report: BUTTON_TEST_REPORT_Sidebar_15012026.md
+
+───────────────────────────────────────────────────────────────────
+ERGEBNIS: shell.html (Hauptmenü)
+───────────────────────────────────────────────────────────────────
+
+Gesamt:           22 Menü-Buttons
+HTML-Formulare:   15 Buttons → 11 ✅ OK, 4 ❌ fehlen
+VBA-Actions:       7 Buttons → alle ✅ funktionieren (via VBA Bridge)
+
+───────────────────────────────────────────────────────────────────
+FEHLENDE FORMULARE (in shell.html referenziert)
+───────────────────────────────────────────────────────────────────
+
+❌ frm_N_Stundenauswertung.html      (PERSONAL > Stundenauswertung)
+❌ zfrm_ZK_Lohnarten_Zuschlag.html   (PERSONAL > Lohnarten)
+❌ frmTop_neue_Vorlagen.html         (EXTRAS > Vorlagen)
+❌ frm_Lex_Aktiv.html                (SYSTEM > Lex Aktiv)
+
+───────────────────────────────────────────────────────────────────
+FORMULARE VORHANDEN, ABER NICHT IN SHELL MENÜ
+───────────────────────────────────────────────────────────────────
+
+✅ frm_MA_Offene_Anfragen.html           (Offene Anfragen)
+✅ frmTop_MA_Abwesenheitsplanung.html    (Abwesenheitsplanung)
+✅ frm_Ausweis_Create.html               (Dienstausweis erstellen)
+✅ frmOff_Outlook_aufrufen.html          (E-Mail)
+✅ frm_Systeminfo.html                   (System Info)
+✅ frm_KD_Verrechnungssaetze.html        (Verrechnungssätze)
+✅ frm_Kundenpreise_gueni.html           (Kundenpreise)
+✅ zfrm_MA_Stunden_Lexware.html          (Stunden Lexware)
+
+→ Diese sollten in shell.html ergänzt werden!
+
+───────────────────────────────────────────────────────────────────
+EMPFOHLENE ERGÄNZUNGEN FÜR shell.html
+───────────────────────────────────────────────────────────────────
+
+<!-- PERSONAL Kategorie erweitern -->
+<button class="menu-btn" data-form="frmTop_MA_Abwesenheitsplanung">Abwesenheitsplanung</button>
+<button class="menu-btn" data-form="frm_MA_Offene_Anfragen">Offene Anfragen</button>
+<button class="menu-btn" data-form="frm_Ausweis_Create">Dienstausweis</button>
+
+<!-- STAMMDATEN Kategorie erweitern -->
+<button class="menu-btn" data-form="frm_Kundenpreise_gueni">Kundenpreise</button>
+
+<!-- SYSTEM Kategorie erweitern -->
+<button class="menu-btn" data-form="frm_Systeminfo">System Info</button>
+<button class="menu-btn" data-form="frmOff_Outlook_aufrufen">E-Mail</button>
+<button class="menu-btn" data-form="frm_KD_Verrechnungssaetze">Verrechnungssätze</button>
+
+<!-- LOHN Kategorie (NEU) -->
+<button class="menu-btn" data-form="zfrm_MA_Stunden_Lexware">Stunden Lexware</button>
+
+───────────────────────────────────────────────────────────────────
+FORM_TITLES erweitern (shell.html, ca. Zeile 430-448)
+───────────────────────────────────────────────────────────────────
+
+const FORM_TITLES = {
+    // ... bestehende Einträge ...
+    'frmTop_MA_Abwesenheitsplanung': 'Abwesenheitsplanung',
+    'frm_MA_Offene_Anfragen': 'Offene Anfragen',
+    'frm_Ausweis_Create': 'Dienstausweis',
+    'frm_Systeminfo': 'System Info',
+    'frmOff_Outlook_aufrufen': 'E-Mail',
+    'frm_KD_Verrechnungssaetze': 'Verrechnungssätze',
+    'frm_Kundenpreise_gueni': 'Kundenpreise',
+    'zfrm_MA_Stunden_Lexware': 'Stunden Lexware'
+};
+
+───────────────────────────────────────────────────────────────────
+VBA BRIDGE SERVER (für VBA-Actions)
+───────────────────────────────────────────────────────────────────
+
+Port: 5002
+Start: api/start_vba_bridge.bat
+Voraussetzung: Access MUSS geöffnet sein (0_Consys_FE_Test.accdb)
+
+VBA-Actions in shell.html:
+  ⚙️ Telefonliste          → rpt_telefonliste
+  ⚙️ Letzter Einsatz       → qry_MA_letzter_Einsatz_Gueni
+  ⚙️ MA Stamm Excel        → btn_MAStamm_Excel_Click_FromHTML
+  ⚙️ FCN Meldeliste        → btn_FCN_Meldeliste_Click_FromHTML
+  ⚙️ Fürth Namensliste     → btn_FuerthNamensliste_Click_FromHTML
+  ⚙️ Sub Stunden           → btn_stunden_sub_Click_FromHTML
+  ⚙️ Stunden MA            → btnStundenMA_Click_FromHTML
+  ⚙️ Löwensaal Sync        → btn_LoewensaalSync_Click_FromHTML
+
+───────────────────────────────────────────────────────────────────
+STATUS: Navigation funktioniert
+───────────────────────────────────────────────────────────────────
+
+✅ Tab-System funktioniert
+✅ Cache-Buster (_t=timestamp) verhindert veraltete Versionen
+✅ URL-Parameter werden korrekt weitergegeben (id, vadatum_id, etc.)
+✅ srcdoc-Methode (statt iframe.src) funktioniert mit VisBug
+✅ SHELL_PARAMS werden als globales Objekt injiziert
+✅ Base-Tag für relative Pfade wird automatisch gesetzt
+
+❌ Formulare ohne .html-Datei führen zu 404-Fehler
+⚠️ VBA-Actions funktionieren nur wenn Access UND VBA Bridge laufen
+
+═══════════════════════════════════════════════════════════════════
+Ende Report
+═══════════════════════════════════════════════════════════════════

@@ -1,0 +1,399 @@
+/**
+ * CONSEC Sidebar - Variante 03: "Dark Professional"
+ * ================================================
+ * Dunkles Theme mit Neon-Akzenten und Glasmorphism
+ *
+ * Farbpalette:
+ * - Hintergrund: #1a1a2e, #16213e, #0f3460
+ * - Akzent: #e94560 (Neon-Pink/Rot)
+ * - Text: #e0e0e0 (hell auf dunkel)
+ *
+ * Anwendung: Diese Datei in shell.html einbinden:
+ * <link rel="stylesheet" href="css/sidebar_variants/sidebar_variant_03_dark.css">
+ */
+
+/* ============================================
+   CSS VARIABLEN (Dark Theme)
+   ============================================ */
+:root {
+    --dark-bg-primary: #1a1a2e;
+    --dark-bg-secondary: #16213e;
+    --dark-bg-tertiary: #0f3460;
+    --dark-accent: #e94560;
+    --dark-accent-hover: #ff6b6b;
+    --dark-text-primary: #e0e0e0;
+    --dark-text-secondary: #a0a0b0;
+    --dark-text-muted: #707080;
+    --dark-border: rgba(255, 255, 255, 0.1);
+    --dark-glass: rgba(255, 255, 255, 0.05);
+    --dark-shadow: rgba(0, 0, 0, 0.4);
+    --dark-glow: rgba(233, 69, 96, 0.4);
+}
+
+/* ============================================
+   SIDEBAR CONTAINER
+   ============================================ */
+.sidebar {
+    width: 200px;
+    background: linear-gradient(180deg,
+        var(--dark-bg-primary) 0%,
+        var(--dark-bg-secondary) 50%,
+        var(--dark-bg-tertiary) 100%);
+    border-right: 1px solid var(--dark-border);
+    box-shadow: 4px 0 20px var(--dark-shadow);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: width 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glasmorphism Overlay */
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.03) 0%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.01) 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ============================================
+   SIDEBAR HEADER
+   ============================================ */
+.sidebar-header {
+    background: linear-gradient(135deg,
+        var(--dark-accent) 0%,
+        #c73e54 100%);
+    color: white;
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 15px var(--dark-glow);
+}
+
+.sidebar-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.5),
+        transparent);
+}
+
+/* ============================================
+   MENU CATEGORIES CONTAINER
+   ============================================ */
+.menu-categories {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Custom Scrollbar (Dark Theme) */
+.menu-categories::-webkit-scrollbar {
+    width: 6px;
+}
+
+.menu-categories::-webkit-scrollbar-track {
+    background: var(--dark-bg-tertiary);
+}
+
+.menu-categories::-webkit-scrollbar-thumb {
+    background: var(--dark-accent);
+    border-radius: 3px;
+}
+
+.menu-categories::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-accent-hover);
+}
+
+/* ============================================
+   CATEGORY BLOCKS - Volle Hoehe nutzen
+   ============================================ */
+.category-block {
+    margin-bottom: 8px;
+    padding: 0 8px;
+}
+
+.category-block:last-child {
+    margin-bottom: 0;
+}
+
+/* ============================================
+   CATEGORY HEADER
+   ============================================ */
+.category-header {
+    background: var(--dark-glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--dark-accent);
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-radius: 6px 6px 0 0;
+    border: 1px solid var(--dark-border);
+    border-bottom: none;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-header::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--dark-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--dark-glow);
+}
+
+/* ============================================
+   MENU BUTTONS - Touch-freundlich (min 44px)
+   ============================================ */
+.menu-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 16px;
+    background: var(--dark-glass);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--dark-border);
+    border-top: none;
+    color: var(--dark-text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-btn:first-of-type {
+    border-top: 1px solid var(--dark-border);
+}
+
+.menu-btn:last-of-type {
+    border-radius: 0 0 6px 6px;
+}
+
+/* Hover-Glow Effekt */
+.menu-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--dark-accent);
+    transform: scaleY(0);
+    transition: transform 0.25s ease;
+}
+
+.menu-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+        var(--dark-glow),
+        transparent);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+/* ============================================
+   HOVER STATE
+   ============================================ */
+.menu-btn:hover {
+    background: rgba(233, 69, 96, 0.1);
+    color: white;
+    padding-left: 22px;
+    border-color: var(--dark-accent);
+    box-shadow: 0 0 20px var(--dark-glow);
+}
+
+.menu-btn:hover::before {
+    transform: scaleY(1);
+}
+
+.menu-btn:hover::after {
+    opacity: 1;
+}
+
+/* ============================================
+   ACTIVE STATE
+   ============================================ */
+.menu-btn.active {
+    background: linear-gradient(135deg,
+        rgba(233, 69, 96, 0.2) 0%,
+        rgba(233, 69, 96, 0.1) 100%);
+    color: white;
+    font-weight: 600;
+    border-color: var(--dark-accent);
+    box-shadow:
+        0 0 20px var(--dark-glow),
+        inset 0 0 20px rgba(233, 69, 96, 0.1);
+}
+
+.menu-btn.active::before {
+    transform: scaleY(1);
+    box-shadow: 0 0 10px var(--dark-accent);
+}
+
+/* ============================================
+   PRESSED STATE
+   ============================================ */
+.menu-btn:active {
+    transform: scale(0.98);
+    background: rgba(233, 69, 96, 0.2);
+}
+
+/* ============================================
+   TOOLTIP (Dark Theme)
+   ============================================ */
+.menu-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--dark-bg-primary);
+    color: var(--dark-text-primary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 400;
+    white-space: nowrap;
+    z-index: 1000;
+    border: 1px solid var(--dark-accent);
+    box-shadow: 0 4px 20px var(--dark-shadow);
+    opacity: 1;
+}
+
+.menu-btn[title]:hover::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: var(--dark-accent);
+    z-index: 1000;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 1200px) {
+    .sidebar {
+        width: 180px;
+    }
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        width: 60px;
+    }
+
+    .sidebar-header {
+        font-size: 0;
+        padding: 16px 8px;
+    }
+
+    .sidebar-header::before {
+        content: 'CS';
+        font-size: 14px;
+    }
+
+    .category-header {
+        font-size: 0;
+        padding: 8px;
+        justify-content: center;
+    }
+
+    .category-header::before {
+        margin: 0;
+    }
+
+    .menu-btn {
+        padding: 12px 8px;
+        font-size: 0;
+        justify-content: center;
+    }
+
+    .menu-btn::after {
+        content: '';
+        width: 20px;
+        height: 20px;
+        background: var(--dark-accent);
+        border-radius: 4px;
+        opacity: 0.6;
+    }
+
+    .menu-btn:hover::after,
+    .menu-btn.active::after {
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 10px var(--dark-glow);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--dark-glow);
+    }
+}
+
+.menu-btn.active::before {
+    animation: pulse-glow 2s infinite;
+}
+
+/* ============================================
+   PREMIUM DEPTH EFFECTS
+   ============================================ */
+.sidebar {
+    perspective: 1000px;
+}
+
+.menu-btn {
+    transform-style: preserve-3d;
+}
+
+.menu-btn:hover {
+    transform: translateX(4px) rotateY(-2deg);
+}
+
+.menu-btn:active {
+    transform: translateX(2px) rotateY(-1deg) scale(0.98);
+}

@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Elements Showcase - Alle Varianten</title>
+    <style>
+        /* ========================================
+           CSS VARIABLES
+           ======================================== */
+        :root {
+            /* Colors */
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --success-light: #dcfce7;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --error: #ef4444;
+            --error-light: #fee2e2;
+            --info: #0ea5e9;
+
+            /* Neutrals */
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Border Radius */
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-full: 9999px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+            --transition-slow: 350ms ease;
+
+            /* Font */
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-mono: 'Consolas', 'Monaco', monospace;
+        }
+
+        /* ========================================
+           BASE STYLES
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ========================================
+           LAYOUT
+           ======================================== */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            color: var(--white);
+            padding: var(--space-xl) var(--space-lg);
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: var(--space-xs);
+        }
+
+        .page-header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+
+        /* Category Grid */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--space-xl);
+        }
+
+        /* Category Card */
+        .category {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+        }
+
+        .category:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-header {
+            background: var(--gray-50);
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .category-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .category-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--primary-light);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .category-body {
+            padding: var(--space-lg);
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: var(--space-lg);
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: var(--space-xs);
+        }
+
+        .input-row {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .input-variant {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .input-variant small {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            margin-top: var(--space-xs);
+            text-align: center;
+        }
+
+        /* ========================================
+           STANDARD INPUT STYLES
+           ======================================== */
+        .input-standard {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            background: var(--white);
+            color: var(--gray-800);
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+
+        .input-standard:hover {
+            border-color: var(--gray-400);
+        }
+
+        .input-standard:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .input-standard:disabled {
+            background: var(--gray-100);
+            color: var(--gray-400);
+            cursor: not-allowed;
+            border-color: var(--gray-200);
+        }
+
+        .input-standard.error {
+            border-color: var(--error);
+            background: var(--error-light);
+        }
+
+        .input-standard.error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+
+        /* ========================================
+           CUSTOM INPUT STYLES
+           ======================================== */
+        .input-custom {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            padding-left: 2.5rem;
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            background: var(--gray-50);
+            color: var(--gray-800);
+            transition: all var(--transition-normal);
+            outline: none;
+        }
+
+        .input-custom:hover {
+            background: var(--white);
+            border-color: var(--gray-300);
+        }
+
+        .input-custom:focus {
+            background: var(--white);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .input-custom-wrapper {
+            position: relative;
+        }
+
+        .input-custom-wrapper .icon {
+            position: absolute;
+            left: var(--space-sm);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: color var(--transition-fast);
+        }
+
+        .input-custom-wrapper:focus-within .icon {
+            color: var(--primary);
+        }
+
+        /* ========================================
+           RANGE SLIDER STYLES
+           ======================================== */
+        .range-container {
+            padding: var(--space-sm) 0;
+        }
+
+        /* Standard Range */
+        .range-standard {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--gray-200);
+            border-radius: var(--radius-full);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .range-standard::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            box-shadow: var(--shadow-md);
+        }
+
+        .range-standard::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: var(--primary-hover);
+        }
+
+        /* Custom Range with Track Fill */
+        .range-custom {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--value, 50%), var(--gray-200) var(--value, 50%), var(--gray-200) 100%);
+            border-radius: var(--radius-full);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .range-custom::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            background: var(--white);
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .range-custom::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Gradient Range */
+        .range-gradient {
+            width: 100%;
+            height: 10px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, var(--success), var(--warning), var(--error));
+            border-radius: var(--radius-full);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .range-gradient::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--white);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all var(--transition-fast);
+        }
+
+        .range-value {
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: var(--space-xs);
+        }
+
+        /* ========================================
+           DATE/TIME INPUT STYLES
+           ======================================== */
+        .datetime-input {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            background: var(--white);
+            color: var(--gray-800);
+            transition: all var(--transition-fast);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .datetime-input:hover {
+            border-color: var(--primary);
+        }
+
+        .datetime-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .datetime-custom {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 2px solid transparent;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(var(--white), var(--white)) padding-box,
+                        linear-gradient(135deg, var(--primary), #7c3aed) border-box;
+            color: var(--gray-800);
+            transition: all var(--transition-normal);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .datetime-custom:focus {
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* ========================================
+           COLOR PICKER STYLES
+           ======================================== */
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .color-standard {
+            width: 50px;
+            height: 40px;
+            padding: 2px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            background: var(--white);
+        }
+
+        .color-standard::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-standard::-webkit-color-swatch {
+            border: none;
+            border-radius: var(--radius-sm);
+        }
+
+        .color-custom {
+            width: 60px;
+            height: 60px;
+            padding: 0;
+            border: 4px solid var(--white);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-fast);
+        }
+
+        .color-custom:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .color-custom::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-custom::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+
+        .color-value {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            padding: var(--space-xs) var(--space-sm);
+            background: var(--gray-100);
+            border-radius: var(--radius-sm);
+        }
+
+        /* ========================================
+           FILE INPUT STYLES
+           ======================================== */
+        .file-standard {
+            width: 100%;
+            padding: var(--space-sm);
+            font-size: 0.85rem;
+            border: 1px dashed var(--gray-300);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+        }
+
+        .file-custom {
+            display: none;
+        }
+
+        .file-custom-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-lg);
+            background: var(--gray-50);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            text-align: center;
+        }
+
+        .file-custom-label:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .file-custom-label.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: scale(1.02);
+        }
+
+        .file-custom-label .icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-sm);
+            color: var(--gray-400);
+        }
+
+        .file-custom-label:hover .icon {
+            color: var(--primary);
+        }
+
+        .file-custom-label span {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .file-custom-label small {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            margin-top: var(--space-xs);
+        }
+
+        .file-name {
+            margin-top: var(--space-sm);
+            font-size: 0.8rem;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* ========================================
+           CHECKBOX STYLES
+           ======================================== */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        /* Standard Checkbox */
+        .checkbox-standard {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .checkbox-standard input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .checkbox-standard span {
+            font-size: 0.9rem;
+            color: var(--gray-700);
+        }
+
+        /* Custom Checkbox */
+        .checkbox-custom {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-custom input {
+            display: none;
+        }
+
+        .checkbox-custom .checkmark {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            background: var(--white);
+        }
+
+        .checkbox-custom .checkmark::after {
+            content: '✓';
+            font-size: 14px;
+            color: var(--white);
+            opacity: 0;
+            transform: scale(0);
+            transition: all var(--transition-fast);
+        }
+
+        .checkbox-custom:hover .checkmark {
+            border-color: var(--primary);
+        }
+
+        .checkbox-custom input:checked + .checkmark {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checkbox-custom input:checked + .checkmark::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .checkbox-custom span {
+            font-size: 0.9rem;
+            color: var(--gray-700);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .toggle-switch .slider {
+            width: 48px;
+            height: 26px;
+            background: var(--gray-300);
+            border-radius: var(--radius-full);
+            position: relative;
+            transition: all var(--transition-normal);
+        }
+
+        .toggle-switch .slider::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--white);
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-md);
+        }
+
+        .toggle-switch input:checked + .slider {
+            background: var(--primary);
+        }
+
+        .toggle-switch input:checked + .slider::before {
+            transform: translateX(22px);
+        }
+
+        .toggle-switch:hover .slider {
+            box-shadow: 0 0 0 3px var(--gray-200);
+        }
+
+        .toggle-switch input:checked + .slider:hover {
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Animated Toggle */
+        .toggle-animated {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-animated input {
+            display: none;
+        }
+
+        .toggle-animated .track {
+            width: 56px;
+            height: 30px;
+            background: linear-gradient(to right, var(--error), var(--gray-300));
+            border-radius: var(--radius-full);
+            position: relative;
+            transition: all var(--transition-slow);
+            overflow: hidden;
+        }
+
+        .toggle-animated .track::before {
+            content: '✗';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: var(--white);
+            opacity: 1;
+            transition: opacity var(--transition-fast);
+        }
+
+        .toggle-animated .track::after {
+            content: '✓';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: var(--white);
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .toggle-animated .thumb {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: var(--white);
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: all var(--transition-slow);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .toggle-animated input:checked + .track {
+            background: linear-gradient(to right, var(--gray-300), var(--success));
+        }
+
+        .toggle-animated input:checked + .track .thumb {
+            transform: translateX(26px);
+        }
+
+        .toggle-animated input:checked + .track::before {
+            opacity: 0;
+        }
+
+        .toggle-animated input:checked + .track::after {
+            opacity: 1;
+        }
+
+        /* ========================================
+           RADIO BUTTON STYLES
+           ======================================== */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        /* Standard Radio */
+        .radio-standard {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .radio-standard input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Custom Radio */
+        .radio-custom {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .radio-custom input {
+            display: none;
+        }
+
+        .radio-custom .radio-mark {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--gray-300);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            background: var(--white);
+        }
+
+        .radio-custom .radio-mark::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+            transition: all var(--transition-fast);
+        }
+
+        .radio-custom:hover .radio-mark {
+            border-color: var(--primary);
+        }
+
+        .radio-custom input:checked + .radio-mark {
+            border-color: var(--primary);
+        }
+
+        .radio-custom input:checked + .radio-mark::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Card Radio */
+        .radio-cards {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .radio-card {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .radio-card input {
+            display: none;
+        }
+
+        .radio-card label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--space-md);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            background: var(--white);
+        }
+
+        .radio-card label:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .radio-card input:checked + label {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .radio-card .icon {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .radio-card span {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        /* ========================================
+           SEARCH WITH AUTOCOMPLETE
+           ======================================== */
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            padding-left: 2.5rem;
+            padding-right: 2.5rem;
+            font-size: 0.9rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-full);
+            background: var(--white);
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--space-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            pointer-events: none;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: var(--space-sm);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: var(--gray-200);
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            transition: all var(--transition-fast);
+        }
+
+        .search-clear:hover {
+            background: var(--gray-300);
+        }
+
+        .search-input:not(:placeholder-shown) + .search-icon + .search-clear {
+            display: flex;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            margin-top: var(--space-xs);
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .autocomplete-dropdown.show {
+            display: block;
+            animation: slideDown var(--transition-fast) ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .autocomplete-item {
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.highlighted {
+            background: var(--primary-light);
+        }
+
+        .autocomplete-item .avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--gray-200);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        .autocomplete-item .info {
+            flex: 1;
+        }
+
+        .autocomplete-item .name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .autocomplete-item .detail {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .no-results {
+            padding: var(--space-md);
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 0.9rem;
+        }
+
+        /* ========================================
+           LIVE VALUE PREVIEW
+           ======================================== */
+        .live-preview {
+            position: fixed;
+            bottom: var(--space-lg);
+            right: var(--space-lg);
+            background: var(--gray-800);
+            color: var(--white);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            max-width: 400px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all var(--transition-normal);
+        }
+
+        .live-preview h3 {
+            font-size: 0.9rem;
+            margin-bottom: var(--space-sm);
+            color: var(--primary-light);
+            font-family: var(--font-family);
+        }
+
+        .live-preview .value-row {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--space-md);
+            padding: var(--space-xs) 0;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .live-preview .value-row:last-child {
+            border-bottom: none;
+        }
+
+        .live-preview .label {
+            color: var(--gray-400);
+        }
+
+        .live-preview .value {
+            color: var(--success);
+            text-align: right;
+            word-break: break-all;
+        }
+
+        /* ========================================
+           ERROR MESSAGE
+           ======================================== */
+        .error-message {
+            font-size: 0.75rem;
+            color: var(--error);
+            margin-top: var(--space-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .error-message::before {
+            content: '⚠';
+        }
+
+        /* ========================================
+           TEXTAREA
+           ======================================== */
+        .textarea-standard {
+            width: 100%;
+            min-height: 100px;
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            background: var(--white);
+            resize: vertical;
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+
+        .textarea-standard:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .textarea-custom {
+            width: 100%;
+            min-height: 100px;
+            padding: var(--space-md);
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: none;
+            border-radius: var(--radius-lg);
+            background: var(--gray-100);
+            resize: vertical;
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+
+        .textarea-custom:focus {
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ========================================
+           SELECT
+           ======================================== */
+        .select-standard {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            background: var(--white);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+
+        .select-standard:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .select-custom-wrapper {
+            position: relative;
+        }
+
+        .select-custom {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            padding-right: 2.5rem;
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            background: var(--white);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .select-custom-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: var(--space-md);
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            pointer-events: none;
+            transition: transform var(--transition-fast);
+        }
+
+        .select-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .select-custom:focus + .select-custom-wrapper::after,
+        .select-custom-wrapper:focus-within::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 900px) {
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-row {
+                flex-direction: column;
+            }
+
+            .input-variant {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: var(--space-md);
+            }
+
+            .live-preview {
+                left: var(--space-md);
+                right: var(--space-md);
+                bottom: var(--space-md);
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <h1>Input Elements Showcase</h1>
+        <p>Alle HTML Input-Typen mit Standard, Custom, Disabled und Error States</p>
+    </header>
+
+    <main class="container">
+        <div class="categories-grid">
+
+            <!-- TEXT INPUTS -->
+            <section class="category">
+                <div class="category-header">
+                    <div class="category-icon">📝</div>
+                    <h2>Text Inputs</h2>
+                </div>
+                <div class="category-body">
+                    <!-- Text -->
+                    <div class="input-group">
+                        <label>Text Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="text" class="input-standard" placeholder="Standard" data-preview="text">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <div class="input-custom-wrapper">
+                                    <span class="icon">👤</span>
+                                    <input type="text" class="input-custom" placeholder="Mit Icon" data-preview="text-custom">
+                                </div>
+                                <small>Custom</small>
+                            </div>
+                            <div class="input-variant">
+                                <input type="text" class="input-standard" placeholder="Disabled" disabled>
+                                <small>Disabled</small>
+                            </div>
+                            <div class="input-variant">
+                                <input type="text" class="input-standard error" placeholder="Error" value="Ungültig">
+                                <div class="error-message">Bitte korrigieren</div>
+                                <small>Error</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="input-group">
+                        <label>Email Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="email" class="input-standard" placeholder="email@beispiel.de" data-preview="email">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <div class="input-custom-wrapper">
+                                    <span class="icon">✉️</span>
+                                    <input type="email" class="input-custom" placeholder="Email eingeben" data-preview="email-custom">
+                                </div>
+                                <small>Custom</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="input-group">
+                        <label>Password Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="password" class="input-standard" placeholder="Passwort" data-preview="password">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <div class="input-custom-wrapper">
+                                    <span class="icon">🔒</span>
+                                    <input type="password" class="input-custom" placeholder="Sicheres Passwort" data-preview="password-custom">
+                                </div>
+                                <small>Custom</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- URL -->
+                    <div class="input-group">
+                        <label>URL Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="url" class="input-standard" placeholder="https://..." data-preview="url">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <div class="input-custom-wrapper">
+                                    <span class="icon">🌐</span>
+                                    <input type="url" class="input-custom" placeholder="Website URL" data-preview="url-custom">
+                                </div>
+                                <small>Custom</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tel -->
+                    <div class="input-group">
+                        <label>Telefon Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="tel" class="input-standard" placeholder="+49 123 456789" data-preview="tel">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <div class="input-custom-wrapper">
+                                    <span class="icon">📱</span>
+                                    <input type="tel" class="input-custom" placeholder="Telefonnummer" data-preview="tel-custom">
+                                </div>
+                                <small>Custom</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NUMBER & RANGE -->
+            <section class="category">
+                <div class="category-header">
+                    <div class="category-icon">🔢</div>
+                    <h2>Number & Range</h2>
+                </div>
+                <div class="category-body">
+                    <!-- Number -->
+                    <div class="input-group">
+                        <label>Number Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="number" class="input-standard" placeholder="0" min="0" max="100" data-preview="number">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <div class="input-custom-wrapper">
+                                    <span class="icon">#</span>
+                                    <input type="number" class="input-custom" placeholder="Menge" min="0" step="5" data-preview="number-custom">
+                                </div>
+                                <small>Custom (Step 5)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Range Standard -->
+                    <div class="input-group">
+                        <label>Range Slider - Standard</label>
+                        <div class="range-container">
+                            <input type="range" class="range-standard" min="0" max="100" value="50" data-preview="range-standard" id="rangeStandard">
+                            <div class="range-value" id="rangeStandardValue">50</div>
+                        </div>
+                    </div>
+
+                    <!-- Range Custom -->
+                    <div class="input-group">
+                        <label>Range Slider - Custom (Track Fill)</label>
+                        <div class="range-container">
+                            <input type="range" class="range-custom" min="0" max="100" value="65" style="--value: 65%;" data-preview="range-custom" id="rangeCustom">
+                            <div class="range-value" id="rangeCustomValue">65</div>
+                        </div>
+                    </div>
+
+                    <!-- Range Gradient -->
+                    <div class="input-group">
+                        <label>Range Slider - Gradient (Temperature)</label>
+                        <div class="range-container">
+                            <input type="range" class="range-gradient" min="0" max="100" value="30" data-preview="range-gradient" id="rangeGradient">
+                            <div class="range-value" id="rangeGradientValue">30°C</div>
+                        </div>
+                    </div>
+
+                    <!-- Disabled Range -->
+                    <div class="input-group">
+                        <label>Range Slider - Disabled</label>
+                        <div class="range-container">
+                            <input type="range" class="range-standard" min="0" max="100" value="75" disabled style="opacity: 0.5;">
+                            <div class="range-value" style="color: var(--gray-400);">75 (disabled)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DATE & TIME -->
+            <section class="category">
+                <div class="category-header">
+                    <div class="category-icon">📅</div>
+                    <h2>Date & Time</h2>
+                </div>
+                <div class="category-body">
+                    <!-- Date -->
+                    <div class="input-group">
+                        <label>Date Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="date" class="datetime-input" data-preview="date">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <input type="date" class="datetime-custom" data-preview="date-custom">
+                                <small>Custom</small>
+                            </div>
+                            <div class="input-variant">
+                                <input type="date" class="datetime-input" disabled>
+                                <small>Disabled</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Time -->
+                    <div class="input-group">
+                        <label>Time Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="time" class="datetime-input" data-preview="time">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <input type="time" class="datetime-custom" data-preview="time-custom">
+                                <small>Custom</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DateTime-Local -->
+                    <div class="input-group">
+                        <label>DateTime-Local Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="datetime-local" class="datetime-input" data-preview="datetime">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <input type="datetime-local" class="datetime-custom" data-preview="datetime-custom">
+                                <small>Custom</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Month -->
+                    <div class="input-group">
+                        <label>Month Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="month" class="datetime-input" data-preview="month">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <input type="month" class="datetime-custom" data-preview="month-custom">
+                                <small>Custom</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Week -->
+                    <div class="input-group">
+                        <label>Week Input</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <input type="week" class="datetime-input" data-preview="week">
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <input type="week" class="datetime-custom" data-preview="week-custom">
+                                <small>Custom</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- COLOR PICKER -->
+            <section class="category">
+                <div class="category-header">
+                    <div class="category-icon">🎨</div>
+                    <h2>Color Picker</h2>
+                </div>
+                <div class="category-body">
+                    <div class="input-group">
+                        <label>Color Input - Standard</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" class="color-standard" value="#2563eb" data-preview="color-standard" id="colorStandard">
+                            <span class="color-value" id="colorStandardValue">#2563eb</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Color Input - Custom (Round)</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" class="color-custom" value="#22c55e" data-preview="color-custom" id="colorCustom">
+                            <span class="color-value" id="colorCustomValue">#22c55e</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Color Presets</label>
+                        <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+                            <input type="color" class="color-custom" value="#ef4444" style="width: 40px; height: 40px;">
+                            <input type="color" class="color-custom" value="#f59e0b" style="width: 40px; height: 40px;">
+                            <input type="color" class="color-custom" value="#22c55e" style="width: 40px; height: 40px;">
+                            <input type="color" class="color-custom" value="#0ea5e9" style="width: 40px; height: 40px;">
+                            <input type="color" class="color-custom" value="#8b5cf6" style="width: 40px; height: 40px;">
+                            <input type="color" class="color-custom" value="#ec4899" style="width: 40px; height: 40px;">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FILE UPLOAD -->
+            <section class="category">
+                <div class="category-header">
+                    <div class="category-icon">📁</div>
+                    <h2>File Upload</h2>
+                </div>
+                <div class="category-body">
+                    <div class="input-group">
+                        <label>File Input - Standard</label>
+                        <input type="file" class="file-standard" data-preview="file">
+                    </div>
+
+                    <div class="input-group">
+                        <label>File Input - Custom (Drag & Drop)</label>
+                        <input type="file" class="file-custom" id="fileCustom" data-preview="file-custom" multiple>
+                        <label for="fileCustom" class="file-custom-label" id="fileDropZone">
+                            <span class="icon">📤</span>
+                            <span>Dateien hierher ziehen oder klicken</span>
+                            <small>PNG, JPG, PDF bis 10MB</small>
+                        </label>
+                        <div class="file-name" id="fileName"></div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>File Input - Disabled</label>
+                        <input type="file" class="file-standard" disabled style="opacity: 0.5;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- CHECKBOXES -->
+            <section class="category">
+                <div class="category-header">
+                    <div class="category-icon">☑️</div>
+                    <h2>Checkboxes</h2>
+                </div>
+                <div class="category-body">
+                    <div class="input-group">
+                        <label>Standard Checkboxes</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-standard">
+                                <input type="checkbox" checked data-preview="cb-standard-1">
+                                <span>Option 1 (checked)</span>
+                            </label>
+                            <label class="checkbox-standard">
+                                <input type="checkbox" data-preview="cb-standard-2">
+                                <span>Option 2</span>
+                            </label>
+                            <label class="checkbox-standard">
+                                <input type="checkbox" disabled>
+                                <span>Option 3 (disabled)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Custom Checkboxes</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-custom">
+                                <input type="checkbox" checked data-preview="cb-custom-1">
+                                <span class="checkmark"></span>
+                                <span>Benachrichtigungen</span>
+                            </label>
+                            <label class="checkbox-custom">
+                                <input type="checkbox" data-preview="cb-custom-2">
+                                <span class="checkmark"></span>
+                                <span>Newsletter abonnieren</span>
+                            </label>
+                            <label class="checkbox-custom">
+                                <input type="checkbox" data-preview="cb-custom-3">
+                                <span class="checkmark"></span>
+                                <span>AGB akzeptieren</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Toggle Switches</label>
+                        <div class="checkbox-group">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked data-preview="toggle-1">
+                                <span class="slider"></span>
+                                <span>Dark Mode</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" data-preview="toggle-2">
+                                <span class="slider"></span>
+                                <span>Auto-Save</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" disabled>
+                                <span class="slider" style="opacity: 0.5;"></span>
+                                <span>Premium Feature (disabled)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Animated Toggle</label>
+                        <div class="checkbox-group">
+                            <label class="toggle-animated">
+                                <input type="checkbox" data-preview="toggle-animated">
+                                <span class="track">
+                                    <span class="thumb"></span>
+                                </span>
+                                <span>Aktiviert / Deaktiviert</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RADIO BUTTONS -->
+            <section class="category">
+                <div class="category-header">
+                    <div class="category-icon">🔘</div>
+                    <h2>Radio Buttons</h2>
+                </div>
+                <div class="category-body">
+                    <div class="input-group">
+                        <label>Standard Radio Buttons</label>
+                        <div class="radio-group">
+                            <label class="radio-standard">
+                                <input type="radio" name="radio-standard" value="1" checked data-preview="radio-standard">
+                                <span>Option 1</span>
+                            </label>
+                            <label class="radio-standard">
+                                <input type="radio" name="radio-standard" value="2" data-preview="radio-standard">
+                                <span>Option 2</span>
+                            </label>
+                            <label class="radio-standard">
+                                <input type="radio" name="radio-standard" value="3" disabled>
+                                <span>Option 3 (disabled)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Custom Radio Buttons</label>
+                        <div class="radio-group">
+                            <label class="radio-custom">
+                                <input type="radio" name="radio-custom" value="klein" data-preview="radio-custom">
+                                <span class="radio-mark"></span>
+                                <span>Klein</span>
+                            </label>
+                            <label class="radio-custom">
+                                <input type="radio" name="radio-custom" value="mittel" checked data-preview="radio-custom">
+                                <span class="radio-mark"></span>
+                                <span>Mittel</span>
+                            </label>
+                            <label class="radio-custom">
+                                <input type="radio" name="radio-custom" value="gross" data-preview="radio-custom">
+                                <span class="radio-mark"></span>
+                                <span>Groß</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Card-Style Radio Buttons</label>
+                        <div class="radio-cards">
+                            <div class="radio-card">
+                                <input type="radio" name="radio-card" value="starter" id="plan-starter" data-preview="radio-card">
+                                <label for="plan-starter">
+                                    <span class="icon">🚀</span>
+                                    <span>Starter</span>
+                                </label>
+                            </div>
+                            <div class="radio-card">
+                                <input type="radio" name="radio-card" value="pro" id="plan-pro" checked data-preview="radio-card">
+                                <label for="plan-pro">
+                                    <span class="icon">⭐</span>
+                                    <span>Pro</span>
+                                </label>
+                            </div>
+                            <div class="radio-card">
+                                <input type="radio" name="radio-card" value="enterprise" id="plan-enterprise" data-preview="radio-card">
+                                <label for="plan-enterprise">
+                                    <span class="icon">🏢</span>
+                                    <span>Enterprise</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEARCH WITH AUTOCOMPLETE -->
+            <section class="category">
+                <div class="category-header">
+                    <div class="category-icon">🔍</div>
+                    <h2>Search mit Autocomplete</h2>
+                </div>
+                <div class="category-body">
+                    <div class="input-group">
+                        <label>Mitarbeiter suchen</label>
+                        <div class="search-container">
+                            <input type="search" class="search-input" placeholder="Name eingeben..." id="searchInput" data-preview="search" autocomplete="off">
+                            <span class="search-icon">🔍</span>
+                            <button class="search-clear" id="searchClear">✕</button>
+                            <div class="autocomplete-dropdown" id="autocompleteDropdown">
+                                <!-- Items werden per JS eingefügt -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TEXTAREA & SELECT -->
+            <section class="category">
+                <div class="category-header">
+                    <div class="category-icon">📋</div>
+                    <h2>Textarea & Select</h2>
+                </div>
+                <div class="category-body">
+                    <div class="input-group">
+                        <label>Textarea</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <textarea class="textarea-standard" placeholder="Standard Textarea..." data-preview="textarea"></textarea>
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <textarea class="textarea-custom" placeholder="Custom Textarea..." data-preview="textarea-custom"></textarea>
+                                <small>Custom</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Select / Dropdown</label>
+                        <div class="input-row">
+                            <div class="input-variant">
+                                <select class="select-standard" data-preview="select">
+                                    <option value="">Bitte wählen...</option>
+                                    <option value="opt1">Option 1</option>
+                                    <option value="opt2">Option 2</option>
+                                    <option value="opt3">Option 3</option>
+                                </select>
+                                <small>Standard</small>
+                            </div>
+                            <div class="input-variant">
+                                <div class="select-custom-wrapper">
+                                    <select class="select-custom" data-preview="select-custom">
+                                        <option value="">Bitte wählen...</option>
+                                        <option value="de">🇩🇪 Deutschland</option>
+                                        <option value="at">🇦🇹 Österreich</option>
+                                        <option value="ch">🇨🇭 Schweiz</option>
+                                    </select>
+                                </div>
+                                <small>Custom</small>
+                            </div>
+                            <div class="input-variant">
+                                <select class="select-standard" disabled>
+                                    <option>Disabled</option>
+                                </select>
+                                <small>Disabled</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- LIVE VALUE PREVIEW -->
+    <div class="live-preview" id="livePreview">
+        <h3>Live Values</h3>
+        <div id="previewContent">
+            <div class="value-row">
+                <span class="label">Keine Eingabe</span>
+                <span class="value">-</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // LIVE PREVIEW FUNCTIONALITY
+        // ========================================
+        const previewContent = document.getElementById('previewContent');
+        const liveValues = {};
+
+        function updatePreview() {
+            const entries = Object.entries(liveValues).filter(([k, v]) => v !== '' && v !== null);
+
+            if (entries.length === 0) {
+                previewContent.innerHTML = '<div class="value-row"><span class="label">Keine Eingabe</span><span class="value">-</span></div>';
+                return;
+            }
+
+            previewContent.innerHTML = entries.map(([key, value]) => `
+                <div class="value-row">
+                    <span class="label">${key}</span>
+                    <span class="value">${value}</span>
+                </div>
+            `).join('');
+        }
+
+        // Alle Input-Elemente mit data-preview tracken
+        document.querySelectorAll('[data-preview]').forEach(input => {
+            const key = input.dataset.preview;
+
+            const updateValue = () => {
+                if (input.type === 'checkbox') {
+                    liveValues[key] = input.checked ? '✓ checked' : '✗ unchecked';
+                } else if (input.type === 'radio') {
+                    if (input.checked) {
+                        liveValues[key] = input.value;
+                    }
+                } else if (input.type === 'file') {
+                    liveValues[key] = input.files.length > 0 ?
+                        Array.from(input.files).map(f => f.name).join(', ') : '';
+                } else {
+                    liveValues[key] = input.value;
+                }
+                updatePreview();
+            };
+
+            input.addEventListener('input', updateValue);
+            input.addEventListener('change', updateValue);
+        });
+
+        // ========================================
+        // RANGE SLIDER UPDATES
+        // ========================================
+        const rangeStandard = document.getElementById('rangeStandard');
+        const rangeStandardValue = document.getElementById('rangeStandardValue');
+        rangeStandard.addEventListener('input', () => {
+            rangeStandardValue.textContent = rangeStandard.value;
+        });
+
+        const rangeCustom = document.getElementById('rangeCustom');
+        const rangeCustomValue = document.getElementById('rangeCustomValue');
+        rangeCustom.addEventListener('input', () => {
+            rangeCustomValue.textContent = rangeCustom.value;
+            rangeCustom.style.setProperty('--value', rangeCustom.value + '%');
+        });
+
+        const rangeGradient = document.getElementById('rangeGradient');
+        const rangeGradientValue = document.getElementById('rangeGradientValue');
+        rangeGradient.addEventListener('input', () => {
+            rangeGradientValue.textContent = rangeGradient.value + '°C';
+        });
+
+        // ========================================
+        // COLOR PICKER UPDATES
+        // ========================================
+        const colorStandard = document.getElementById('colorStandard');
+        const colorStandardValue = document.getElementById('colorStandardValue');
+        colorStandard.addEventListener('input', () => {
+            colorStandardValue.textContent = colorStandard.value;
+        });
+
+        const colorCustom = document.getElementById('colorCustom');
+        const colorCustomValue = document.getElementById('colorCustomValue');
+        colorCustom.addEventListener('input', () => {
+            colorCustomValue.textContent = colorCustom.value;
+        });
+
+        // ========================================
+        // FILE UPLOAD DRAG & DROP
+        // ========================================
+        const fileCustom = document.getElementById('fileCustom');
+        const fileDropZone = document.getElementById('fileDropZone');
+        const fileName = document.getElementById('fileName');
+
+        fileCustom.addEventListener('change', () => {
+            if (fileCustom.files.length > 0) {
+                const names = Array.from(fileCustom.files).map(f => f.name).join(', ');
+                fileName.textContent = '✓ ' + names;
+            } else {
+                fileName.textContent = '';
+            }
+        });
+
+        fileDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.add('dragover');
+        });
+
+        fileDropZone.addEventListener('dragleave', () => {
+            fileDropZone.classList.remove('dragover');
+        });
+
+        fileDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.remove('dragover');
+            fileCustom.files = e.dataTransfer.files;
+            fileCustom.dispatchEvent(new Event('change'));
+        });
+
+        // ========================================
+        // SEARCH AUTOCOMPLETE
+        // ========================================
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const autocompleteDropdown = document.getElementById('autocompleteDropdown');
+
+        // Demo-Daten
+        const employees = [
+            { id: 1, name: 'Max Mustermann', position: 'Entwickler' },
+            { id: 2, name: 'Anna Schmidt', position: 'Designerin' },
+            { id: 3, name: 'Peter Meyer', position: 'Projektleiter' },
+            { id: 4, name: 'Maria Weber', position: 'HR Manager' },
+            { id: 5, name: 'Thomas Müller', position: 'Backend Dev' },
+            { id: 6, name: 'Lisa Fischer', position: 'Frontend Dev' },
+            { id: 7, name: 'Michael Wagner', position: 'DevOps' },
+            { id: 8, name: 'Sandra Becker', position: 'QA Engineer' },
+        ];
+
+        let highlightedIndex = -1;
+
+        function renderAutocomplete(items) {
+            if (items.length === 0) {
+                autocompleteDropdown.innerHTML = '<div class="no-results">Keine Ergebnisse gefunden</div>';
+            } else {
+                autocompleteDropdown.innerHTML = items.map((item, index) => `
+                    <div class="autocomplete-item" data-index="${index}" data-id="${item.id}">
+                        <div class="avatar">${item.name.charAt(0)}</div>
+                        <div class="info">
+                            <div class="name">${item.name}</div>
+                            <div class="detail">${item.position}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            autocompleteDropdown.classList.add('show');
+            highlightedIndex = -1;
+        }
+
+        function selectItem(item) {
+            searchInput.value = item.name;
+            liveValues['search'] = item.name;
+            updatePreview();
+            autocompleteDropdown.classList.remove('show');
+        }
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase().trim();
+
+            if (query.length === 0) {
+                autocompleteDropdown.classList.remove('show');
+                return;
+            }
+
+            const filtered = employees.filter(e =>
+                e.name.toLowerCase().includes(query) ||
+                e.position.toLowerCase().includes(query)
+            );
+
+            renderAutocomplete(filtered);
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            const items = autocompleteDropdown.querySelectorAll('.autocomplete-item');
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlightedIndex = Math.max(highlightedIndex - 1, 0);
+            } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+                e.preventDefault();
+                const item = employees.find(emp => emp.id === parseInt(items[highlightedIndex].dataset.id));
+                if (item) selectItem(item);
+            } else if (e.key === 'Escape') {
+                autocompleteDropdown.classList.remove('show');
+            }
+
+            items.forEach((item, i) => {
+                item.classList.toggle('highlighted', i === highlightedIndex);
+            });
+        });
+
+        autocompleteDropdown.addEventListener('click', (e) => {
+            const itemEl = e.target.closest('.autocomplete-item');
+            if (itemEl) {
+                const item = employees.find(emp => emp.id === parseInt(itemEl.dataset.id));
+                if (item) selectItem(item);
+            }
+        });
+
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            liveValues['search'] = '';
+            updatePreview();
+            autocompleteDropdown.classList.remove('show');
+            searchInput.focus();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                autocompleteDropdown.classList.remove('show');
+            }
+        });
+
+        // ========================================
+        // INITIALIZE
+        // ========================================
+        updatePreview();
+    </script>
+</body>
+</html>

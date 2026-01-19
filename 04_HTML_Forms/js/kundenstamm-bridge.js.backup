@@ -1,0 +1,403 @@
+﻿// Kundenstamm WebView2 Bridge Integration
+// Version 2.0 - Stand: 30.12.2025
+
+// ==================== GLOBALE VARIABLEN ====================
+let alleKunden = [];
+let filteredKunden = [];
+let currentIndex = 0;
+let currentKD = null;
+let isWebView2 = false;
+
+// ==================== INITIALISIERUNG ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // Prüfe ob WebView2 verfügbar
+    isWebView2 = typeof window.chrome !== 'undefined' && window.chrome.webview;
+    
+    // Bridge initialisieren
+    if (typeof Bridge !== 'undefined') {
+        Bridge.init();
+        Bridge.on('onDataReceived', handleDataReceived);
+        Bridge.on('onSearchResults', handleSearchResults);
+        Bridge.on('onSaveComplete', handleSaveComplete);
+        console.log('WebView2 Bridge initialisiert (Kundenstamm)');
+    }
+    
+    loadAllData();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Suche mit Enter
+    const searchEl = document.getElementById('kdSearch');
+    if (searchEl) {
+        searchEl.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') filterKunden();
+            else if (this.value.length > 2 || this.value.length === 0) filterKunden();
+        });
+    }
+    
+    // Nur Aktive Filter
+    const nurAktiveEl = document.getElementById('nurAktive');
+    if (nurAktiveEl) {
+        nurAktiveEl.addEventListener('change', filterKunden);
+    }
+    
+    // AfterUpdate Events für wichtige Felder
+    const fieldsWithAfterUpdate = ['Firma', 'Kuerzel', 'Strasse', 'PLZ', 'Ort', 'Email', 'Telefon'];
+    fieldsWithAfterUpdate.forEach(fieldId => {
+        const el = document.getElementById(fieldId);
+        if (el) {
+            el.addEventListener('change', function() {
+                markAsDirty();
+            });
+        }
+    });
+}
+
+// ==================== DATEN LADEN ====================
+async function loadAllData() {
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('loadData', { type: 'kundenstammComplete', id: 0 });
+    } else {
+        // Fallback: Demo-Daten oder externe Datei
+        try {
+            const response = await fetch('../../data/kunden_data.js');
+            if (response.ok) {
+                const text = await response.text();
+                eval(text);
+                if (typeof KUNDEN_DATA !== 'undefined') {
+                    handleDataReceived(KUNDEN_DATA);
+                }
+            }
+        } catch (e) {
+            console.log('Lade Demo-Daten');
+            loadDemoData();
+        }
+    }
+}
+
+function loadDemoData() {
+    const demoData = {
+        alleKunden: [
+            { id: 27, firma: '1 Agency', ort: 'Nürnberg', aktiv: true },
+            { id: 20731, firma: 'B & M Security', ort: 'Nürnberg', aktiv: true },
+            { id: 20720, firma: 'B.O.S. FRANKEN SECURITY GmbH', ort: 'Bartenstein', aktiv: true }
+        ],
+        stammdaten: {
+            id: 27, firma: '1 Agency', kuerzel: '1Agency',
+            strasse: 'Steinstraße 21', plz: '90419', ort: 'Nürnberg', land: 'DE',
+            telefon: '0911 27 43 74 70', mobil: '', email: 'hr@1agency.de',
+            homepage: 'http://www.1agency.de', iban: '', bic: '', ustIdNr: '',
+            istAktiv: true
+        },
+        ansprechpartner: [
+            { name: 'Holger Rothe', funktion: 'Geschäftsführer', telefon: '0911 27 43 74 70', email: 'hr@1agency.de' }
+        ],
+        konditionen: [],
+        auftraege: []
+    };
+    handleDataReceived(demoData);
+}
+
+function handleDataReceived(data) {
+    console.log('Kundendaten empfangen:', data);
+    
+    // Kunden-Liste
+    if (data.alleKunden) {
+        alleKunden = data.alleKunden;
+        filterKunden();
+    }
+    
+    // Stammdaten
+    if (data.stammdaten) {
+        currentKD = data.stammdaten;
+        fillStammdaten(data.stammdaten);
+    }
+    
+    // Ansprechpartner
+    if (data.ansprechpartner) {
+        fillAnsprechpartner(data.ansprechpartner);
+    }
+    
+    // Konditionen
+    if (data.konditionen) {
+        fillKonditionen(data.konditionen);
+    }
+    
+    // Aufträge
+    if (data.auftraege) {
+        fillAuftraege(data.auftraege);
+    }
+}
+
+// ==================== FORMULAR BEFÜLLEN ====================
+function fillStammdaten(kd) {
+    // Header
+    setElementValue('kdNameDisplay', kd.firma || '');
+    setElementValue('kdBezDisplay', kd.bezeichnung || '');
+    setElementValue('kdIdBox', kd.id);
+    
+    // Stammdaten-Felder
+    setElementChecked('IstAktiv', kd.istAktiv);
+    setElementValue('Kuerzel', kd.kuerzel);
+    setElementValue('Firma', kd.firma);
+    setElementValue('Strasse', kd.strasse);
+    setElementValue('PLZ', kd.plz);
+    setElementValue('Ort', kd.ort);
+    setElementValue('Land', kd.land || 'DE');
+    setElementValue('Telefon', kd.telefon);
+    setElementValue('Mobil', kd.mobil);
+    setElementValue('Email', kd.email);
+    setElementValue('Homepage', kd.homepage);
+    
+    // Bankdaten
+    setElementValue('Kreditinstitut', kd.kreditinstitut);
+    setElementValue('IBAN', kd.iban);
+    setElementValue('BIC', kd.bic);
+    setElementValue('UStIDNr', kd.ustIdNr);
+    
+    // Zahlungsbedingungen
+    setElementValue('Zahlungsbed', kd.zahlbed);
+    
+    // Erstellt/Geändert
+    setElementValue('erstelltVon', kd.erstVon);
+    setElementValue('erstelltAm', kd.erstAm);
+    setElementValue('geaendertVon', kd.aendVon);
+    setElementValue('geaendertAm', kd.aendAm);
+}
+
+function fillAnsprechpartner(ansprech) {
+    const tbody = document.getElementById('ansprechpartnerBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    ansprech.forEach(ap => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${ap.name || ''}</td>
+            <td>${ap.funktion || ''}</td>
+            <td>${ap.telefon || ''}</td>
+            <td>${ap.email || ''}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function fillKonditionen(kond) {
+    const tbody = document.getElementById('konditionenBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    kond.forEach(k => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${k.bezeichnung || ''}</td>
+            <td style="text-align:right">${formatCurrency(k.preis)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function fillAuftraege(auftr) {
+    const tbody = document.getElementById('auftraegeBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    auftr.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${a.datum || ''}</td>
+            <td>${a.auftrag || ''}</td>
+            <td>${a.ort || ''}</td>
+        `;
+        tr.onclick = () => openAuftrag(a.id);
+        tbody.appendChild(tr);
+    });
+}
+
+// ==================== KUNDEN-LISTE ====================
+function filterKunden() {
+    const searchTerm = (document.getElementById('kdSearch')?.value || '').toLowerCase();
+    const nurAktive = document.getElementById('nurAktive')?.checked ?? false;
+    
+    filteredKunden = alleKunden.filter(kd => {
+        const firmaMatch = (kd.firma || '').toLowerCase().includes(searchTerm);
+        const aktivMatch = !nurAktive || kd.aktiv;
+        return firmaMatch && aktivMatch;
+    });
+    
+    renderKundenListe();
+}
+
+function renderKundenListe() {
+    const listBody = document.getElementById('kdListBody');
+    if (!listBody) return;
+    
+    listBody.innerHTML = '';
+    filteredKunden.forEach((kd, idx) => {
+        const row = document.createElement('div');
+        row.className = 'kd-list-row' + (idx === currentIndex ? ' selected' : '');
+        row.innerHTML = `
+            <div>${kd.id}</div>
+            <div>${kd.firma || ''}</div>
+            <div>${kd.ort || ''}</div>
+        `;
+        row.onclick = () => selectKunde(idx);
+        row.ondblclick = () => loadKunde(kd.id);
+        listBody.appendChild(row);
+    });
+}
+
+function selectKunde(idx) {
+    currentIndex = idx;
+    renderKundenListe();
+    const kd = filteredKunden[idx];
+    if (kd) loadKunde(kd.id);
+}
+
+function loadKunde(kdId) {
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('loadData', { type: 'kundenstammComplete', id: kdId });
+    } else {
+        const kd = alleKunden.find(k => k.id === kdId);
+        if (kd) {
+            handleDataReceived({
+                stammdaten: { ...kd },
+                ansprechpartner: [],
+                konditionen: [],
+                auftraege: []
+            });
+        }
+    }
+}
+
+// ==================== NAVIGATION ====================
+function navFirst() { if (filteredKunden.length > 0) selectKunde(0); }
+function navPrev() { if (currentIndex > 0) selectKunde(currentIndex - 1); }
+function navNext() { if (currentIndex < filteredKunden.length - 1) selectKunde(currentIndex + 1); }
+function navLast() { if (filteredKunden.length > 0) selectKunde(filteredKunden.length - 1); }
+
+// ==================== AKTIONEN ====================
+function saveKD() {
+    const data = collectFormData();
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('save', { type: 'kunde', data: data });
+    } else {
+        console.log('Speichere Kunde:', data);
+        alert('Gespeichert (Demo)');
+    }
+}
+
+function deleteKD() {
+    if (!currentKD || !confirm('Kunde wirklich löschen?')) return;
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('delete', { type: 'kunde', id: currentKD.id });
+    }
+}
+
+function newKD() {
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('navigate', { target: 'neuerKunde' });
+    } else {
+        alert('Neuer Kunde (Demo)');
+    }
+}
+
+function openAuftrag(vaId) {
+    if (!vaId) return;
+    if (isWebView2 && typeof Bridge !== 'undefined') {
+        Bridge.sendEvent('navigate', { target: 'auftragsverwaltung', id: vaId });
+    }
+}
+
+function collectFormData() {
+    return {
+        id: currentKD?.id || 0,
+        firma: getElementValue('Firma'),
+        kuerzel: getElementValue('Kuerzel'),
+        strasse: getElementValue('Strasse'),
+        plz: getElementValue('PLZ'),
+        ort: getElementValue('Ort'),
+        land: getElementValue('Land'),
+        telefon: getElementValue('Telefon'),
+        mobil: getElementValue('Mobil'),
+        email: getElementValue('Email'),
+        homepage: getElementValue('Homepage'),
+        iban: getElementValue('IBAN'),
+        bic: getElementValue('BIC'),
+        ustIdNr: getElementValue('UStIDNr'),
+        istAktiv: getElementChecked('IstAktiv')
+    };
+}
+
+function markAsDirty() {
+    document.title = '* Kundenstammblatt - CONSEC';
+}
+
+// ==================== TABS ====================
+function showTab(tabId, btn) {
+    document.querySelectorAll('.tab-body').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
+    const tab = document.getElementById('tab-' + tabId);
+    if (tab) tab.classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+
+// ==================== HILFSFUNKTIONEN ====================
+function setElementValue(id, value) {
+    const el = document.getElementById(id);
+    if (el) {
+        if (el.tagName === 'DIV' || el.tagName === 'SPAN') {
+            el.textContent = value ?? '';
+        } else {
+            el.value = value ?? '';
+        }
+    }
+}
+
+function getElementValue(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+}
+
+function setElementChecked(id, checked) {
+    const el = document.getElementById(id);
+    if (el) el.checked = !!checked;
+}
+
+function getElementChecked(id) {
+    const el = document.getElementById(id);
+    return el ? el.checked : false;
+}
+
+function formatCurrency(num) {
+    if (num === undefined || num === null) return '';
+    return Number(num).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
+}
+
+function handleSearchResults(results) {
+    // Suchergebnisse verarbeiten
+}
+
+function handleSaveComplete(result) {
+    if (result.success) {
+        document.title = 'Kundenstammblatt - CONSEC';
+        alert('Erfolgreich gespeichert');
+    } else {
+        alert('Fehler beim Speichern: ' + result.error);
+    }
+}
+
+// ==================== MENÜ ====================
+function openMenu(target) {
+    const urls = {
+        'dienstplan': '../frm_N_DP_Dienstplan_MA.html',
+        'planung': '../frm_N_DP_Dienstplan_Objekt.html',
+        'auftrag': '../auftragsverwaltung/frm_N_VA_Auftragstamm.html',
+        'mitarbeiter': '../mitarbeiterverwaltung/frm_N_MA_Mitarbeiterstamm_V2.html',
+        'stunden': '../frm_N_Stundenauswertung.html'
+    };
+    if (urls[target]) window.location.href = urls[target];
+}
+

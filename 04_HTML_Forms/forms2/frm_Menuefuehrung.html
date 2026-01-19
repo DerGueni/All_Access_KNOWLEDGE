@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hauptmenue - CONSYS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 11px; }
+        body { background-color: #8080c0; }
+
+        .window-frame {
+            background: #8080c0;
+            padding: 4px;
+            min-height: 100vh;
+        }
+
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-bar button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 28px);
+        }
+
+        .app-sidebar {
+            width: 170px;
+            background: #6060a0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+        }
+
+        .content-area {
+            flex: 1;
+            background: #8080c0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-container {
+            flex: 1;
+            background: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            margin: 4px;
+            padding: 12px;
+            overflow: auto;
+        }
+
+        .menu-header {
+            background: #000080;
+            color: white;
+            padding: 6px 12px;
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .menu-btn {
+            width: 100%;
+            padding: 6px 12px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 11px;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .menu-btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .menu-divider {
+            border: none;
+            border-top: 1px solid #808080;
+            margin: 6px 0;
+        }
+
+        .footer-bar {
+            background: #b8b8d8;
+            border-top: 1px solid #808080;
+            padding: 2px 8px;
+            font-size: 9px;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <div class="title-bar">
+            <span>Hauptmenü</span>
+            <button id="btnClose" title="Schließen">×</button>
+        </div>
+
+        <div class="main-container">
+            <aside class="app-sidebar"></aside>
+
+            <div class="content-area">
+                <div class="menu-container" id="frm_Menuefuehrung">
+                <div class="menu-header">NAVIGATIONS-MENÜ</div>
+                <div class="menu-buttons">
+                    <button class="menu-btn" id="btn_Dienstplanuebersicht" onclick="location.href='frm_N_Dienstplanuebersicht.html'">Dienstplanuebersicht</button>
+                    <button class="menu-btn" id="btn_Planungsuebersicht" onclick="location.href='frm_VA_Planungsuebersicht.html'">Planungsuebersicht</button>
+                    <button class="menu-btn" id="btn_Auftragsverwaltung" onclick="location.href='frm_va_Auftragstamm.html'">Auftragsverwaltung</button>
+                    <button class="menu-btn" id="btn_HTML_Ansicht" type="button">HTML Ansicht</button>
+                    <button class="menu-btn" id="btn_Mitarbeiterverwaltung" onclick="location.href='frm_MA_Mitarbeiterstamm.html'">Mitarbeiterverwaltung</button>
+                    <button class="menu-btn" id="btn_Offene_Mail_Anfragen" onclick="location.href='frm_N_Email_versenden.html'">Offene Mail Anfragen</button>
+                    <button class="menu-btn" id="btn_Excel_Zeitkonten" onclick="location.href='frm_MA_Zeitkonten.html'">Excel Zeitkonten</button>
+                    <hr class="menu-divider">
+                    <button class="menu-btn" id="btn_Zeitkonten" onclick="location.href='frm_MA_Zeitkonten.html'">Zeitkonten</button>
+                    <button class="menu-btn" id="btn_Abwesenheitsplanung" onclick="location.href='frm_MA_Abwesenheit.html'">Abwesenheitsplanung</button>
+                    <button class="menu-btn" id="btn_Dienstausweis" onclick="location.href='frm_Ausweis_Create.html'">Dienstausweis erstellen</button>
+                    <button class="menu-btn" id="btn_Stundenabgleich" onclick="location.href='frm_N_Stundenauswertung.html'">Stundenabgleich</button>
+                    <hr class="menu-divider">
+                    <button class="menu-btn" id="btn_Kundenverwaltung" onclick="location.href='frm_KD_Kundenstamm.html'">Kundenverwaltung</button>
+                    <button class="menu-btn" id="btn_Verrechnungssaetze" onclick="location.href='frm_KD_Kundenstamm.html'">Verrechnungssaetze</button>
+                    <button class="menu-btn" id="btn_SubRechnungen" onclick="location.href='frm_N_Lohnabrechnungen.html'">Sub Rechnungen</button>
+                    <button class="menu-btn" id="btn_Email" onclick="location.href='frm_N_Email_versenden.html'">E-Mail</button>
+                </div>
+
+                <div class="footer-bar">
+                    <span>Ready</span>
+                    <span id="timestamp"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/e2e-logger.js"></script>
+    <script src="../js/api-autostart.js"></script>
+    <script>
+        let apiReadyPromise = null;
+
+        function ensureApiServerReady() {
+            if (window.ApiAutostart && typeof window.ApiAutostart.init === 'function') {
+                if (!apiReadyPromise) {
+                    apiReadyPromise = window.ApiAutostart.init().finally(() => {
+                        apiReadyPromise = null;
+                    });
+                }
+                return apiReadyPromise;
+            }
+            return Promise.resolve(true);
+        }
+
+        async function openHtmlAnsicht() {
+            const htmlUrl = new URL('frm_va_Auftragstamm.html', window.location.href).href;
+            const ready = await ensureApiServerReady();
+            if (!ready) {
+                if (window.ApiAutostart?.showStatus) {
+                    window.ApiAutostart.showStatus('API-Server konnte nicht gestartet. Bitte manuell starten.', 'error');
+                } else {
+                    alert('API-Server konnte nicht gestartet. Bitte start_api_server.bat manuell ausführen.');
+                }
+                return;
+            }
+            window.open(htmlUrl, '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('btn_HTML_Ansicht');
+            if (btn) {
+                btn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    openHtmlAnsicht();
+                });
+            }
+        });
+    </script>
+    <script src="../js/e2e-visibility.js"></script>
+    <script src="../js/sidebar.js"></script>
+    <script type="module" src="logic/frm_Menuefuehrung.logic.js"></script>
+    <script>
+        // E2E: Instrumentierung
+        if (window.e2eLogger) {
+            e2eLogger.log('FORM_LOADED', {
+                form: 'frm_Menuefuehrung',
+                title: document.title,
+                url: window.location.href
+            });
+        }
+
+        document.getElementById('btnClose').addEventListener('click', () => {
+            window.close();
+        });
+        
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = now.toLocaleString('de-DE');
+        }
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+    </script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+</body>
+</html>
+

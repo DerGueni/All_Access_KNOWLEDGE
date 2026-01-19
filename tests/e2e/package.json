@@ -1,0 +1,24 @@
+{
+  "name": "consys-e2e-tests",
+  "version": "1.0.0",
+  "description": "Playwright E2E Tests fuer CONSYS HTML Formulare",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
+    "test:debug": "npx playwright test --debug",
+    "test:kundenstamm": "npx playwright test kundenstamm.spec.ts",
+    "test:objekt": "npx playwright test objekt.spec.ts",
+    "test:dienstplan": "npx playwright test dienstplan.spec.ts",
+    "test:planung": "npx playwright test planung.spec.ts",
+    "report": "npx playwright show-report ../../reports/playwright",
+    "install-browsers": "npx playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "http-server": "^14.1.1"
+  },
+  "keywords": ["consys", "e2e", "playwright", "tests"],
+  "author": "CONSYS Development",
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung - Card Design</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --surface: #ffffff;
+            --surface-hover: #f8fafc;
+            --background: #f1f5f9;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ========== VERTICAL TABS (Left Side) ========== */
+        .vertical-tabs {
+            width: 220px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tabs-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tabs-header h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .tabs-header .subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .tab-list {
+            flex: 1;
+            padding: 12px 8px;
+            position: relative;
+        }
+
+        .tab-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .tab-item:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
+        .tab-item.active {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .tab-item .icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .tab-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .tab-item.active .badge {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Tab Indicator Animation */
+        .tab-indicator {
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 44px;
+            background: var(--primary);
+            border-radius: 0 3px 3px 0;
+            transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        /* Top Header Bar */
+        .header-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .auftrag-badge {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.aktiv { background: #dcfce7; color: #166534; }
+        .status-badge.geplant { background: #dbeafe; color: #1e40af; }
+        .status-badge.abgeschlossen { background: #f3f4f6; color: #374151; }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-hover);
+            border-color: var(--text-muted);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* ========== CONTENT AREA ========== */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* Tab Content Panels */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== CARD GRID ========== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card-grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .card-grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        /* ========== CARDS ========== */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .icon {
+            color: var(--primary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .card-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .card-action:hover {
+            background: var(--surface-hover);
+            color: var(--primary);
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Form Fields in Cards */
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            background: var(--surface);
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-control:disabled {
+            background: var(--background);
+            color: var(--text-muted);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* ========== ACCORDION SECTIONS ========== */
+        .accordion {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: var(--surface);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .accordion-header:hover {
+            background: var(--surface-hover);
+        }
+
+        .accordion-header h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .accordion-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+
+        .accordion-item.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 500px;
+        }
+
+        .accordion-body {
+            padding: 16px;
+            background: var(--background);
+        }
+
+        /* ========== DATA TABLE in Cards ========== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 8px 12px;
+            background: var(--background);
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: var(--surface-hover);
+        }
+
+        /* ========== LARGE CARD (Full Width) ========== */
+        .card-full {
+            grid-column: 1 / -1;
+        }
+
+        /* ========== STAT CARD ========== */
+        .stat-card {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========== NAVIGATION RECORD ========== */
+        .record-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--background);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+        }
+
+        .record-nav button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .record-nav button:hover {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .record-nav span {
+            padding: 0 12px;
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1200px) {
+            .card-grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .vertical-tabs {
+                width: 60px;
+            }
+            .tabs-header, .tab-item span:not(.icon), .tab-item .badge {
+                display: none;
+            }
+            .tab-item {
+                justify-content: center;
+                padding: 12px;
+            }
+            .card-grid-2, .card-grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- VERTICAL TABS -->
+    <nav class="vertical-tabs">
+        <div class="tabs-header">
+            <h1>Auftragsverwaltung</h1>
+            <div class="subtitle">CONSEC Planung</div>
+        </div>
+        <div class="tab-list">
+            <div class="tab-indicator" style="top: 16px;"></div>
+            <div class="tab-item active" data-tab="einsatzliste">
+                <span class="icon">📋</span>
+                <span>Einsatzliste</span>
+                <span class="badge">12</span>
+            </div>
+            <div class="tab-item" data-tab="antworten">
+                <span class="icon">⏳</span>
+                <span>Antworten</span>
+                <span class="badge">3</span>
+            </div>
+            <div class="tab-item" data-tab="rechnung">
+                <span class="icon">💰</span>
+                <span>Rechnung</span>
+            </div>
+            <div class="tab-item" data-tab="bemerkungen">
+                <span class="icon">📝</span>
+                <span>Bemerkungen</span>
+            </div>
+            <div class="tab-item" data-tab="dateien">
+                <span class="icon">📎</span>
+                <span>Zusatzdateien</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- Header Bar -->
+        <header class="header-bar">
+            <div class="header-left">
+                <span class="auftrag-badge">Auftrag #8113</span>
+                <span class="status-badge aktiv">Aktiv</span>
+                <div class="record-nav">
+                    <button title="Erster">⏮</button>
+                    <button title="Zurück">◀</button>
+                    <span>5 / 127</span>
+                    <button title="Vor">▶</button>
+                    <button title="Letzter">⏭</button>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary">🔄 Aktualisieren</button>
+                <button class="btn btn-primary">📧 Einsatzliste senden</button>
+                <button class="btn btn-danger">🗑 Löschen</button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Tab Panel: Einsatzliste -->
+            <div class="tab-panel active" id="panel-einsatzliste">
+                <!-- Card Grid Row 1: Stammdaten -->
+                <div class="card-grid card-grid-3" style="margin-bottom: 20px;">
+                    <!-- Auftragsdaten Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><span class="icon">📅</span> Auftragsdaten</span>
+                            <div class="card-actions">
+                                <button class="card-action" title="Bearbeiten">✏️</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Datum von</label>
+                                    <input type="date" class="form-control" value="2026-01-20">
+                                </div>
+                                <div class="form-group">
+                                    <label>Datum bis</label>
+                                    <input type="date" class="form-control" value="2026-01-22">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Auftrag</label>
+                                <input type="text" class="form-control" value="Messe München - Sicherheit">
+                            </div>
+                            <div class="form-group">
+                                <label>Objekt</label>
+                                <select class="form-control">
+                                    <option selected>Messegelände München</option>
+                                    <option>Arena Nürnberg</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Einsatzort Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><span class="icon">📍</span> Einsatzort</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Ort</label>
+                                <input type="text" class="form-control" value="München">
+                            </div>
+                            <div class="form-group">
+                                <label>Treffpunkt</label>
+                                <input type="text" class="form-control" value="Haupteingang Ost">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Treffzeit</label>
+                                    <input type="time" class="form-control" value="07:30">
+                                </div>
+                                <div class="form-group">
+                                    <label>PKW Anzahl</label>
+                                    <input type="number" class="form-control" value="3">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Auftraggeber Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><span class="icon">🏢</span> Auftraggeber</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Veranstalter</label>
+                                <select class="form-control">
+                                    <option selected>Messe München GmbH</option>
+                                    <option>Arena Events AG</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Ansprechpartner</label>
+                                <input type="text" class="form-control" value="Herr Müller">
+                            </div>
+                            <div class="form-group">
+                                <label>Dienstkleidung</label>
+                                <select class="form-control">
+                                    <option selected>Anzug schwarz</option>
+                                    <option>Uniform</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Grid Row 2: Statistik + Schichten -->
+                <div class="card-grid" style="grid-template-columns: 1fr 3fr; margin-bottom: 20px;">
+                    <!-- Statistik Cards -->
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="card stat-card">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Mitarbeiter geplant</div>
+                        </div>
+                        <div class="card stat-card">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Bestätigt</div>
+                        </div>
+                        <div class="card stat-card">
+                            <div class="stat-value">2</div>
+                            <div class="stat-label">Absagen</div>
+                        </div>
+                    </div>
+
+                    <!-- Schichten Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><span class="icon">⏰</span> Schichten am 20.01.2026</span>
+                            <div class="card-actions">
+                                <button class="card-action" title="Hinzufügen">➕</button>
+                                <button class="card-action" title="Exportieren">📥</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Von</th>
+                                        <th>Bis</th>
+                                        <th>Soll</th>
+                                        <th>Ist</th>
+                                        <th>Position</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>08:00</td>
+                                        <td>16:00</td>
+                                        <td>5</td>
+                                        <td>5</td>
+                                        <td>Einlass</td>
+                                        <td><span class="status-badge aktiv">Komplett</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>16:00</td>
+                                        <td>00:00</td>
+                                        <td>4</td>
+                                        <td>3</td>
+                                        <td>Streife</td>
+                                        <td><span class="status-badge geplant">1 offen</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>00:00</td>
+                                        <td>08:00</td>
+                                        <td>3</td>
+                                        <td>3</td>
+                                        <td>Nachtdienst</td>
+                                        <td><span class="status-badge aktiv">Komplett</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full Width: Mitarbeiterliste -->
+                <div class="card card-full">
+                    <div class="card-header">
+                        <span class="card-title"><span class="icon">👥</span> Eingeplante Mitarbeiter</span>
+                        <div class="header-actions">
+                            <button class="btn btn-primary">➕ Mitarbeiter hinzufügen</button>
+                            <button class="btn btn-secondary">📋 BWN drucken</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nr</th>
+                                    <th>Mitarbeiter</th>
+                                    <th>Von</th>
+                                    <th>Bis</th>
+                                    <th>Std</th>
+                                    <th>Bemerkung</th>
+                                    <th>?</th>
+                                    <th>PKW</th>
+                                    <th>EL</th>
+                                    <th>RE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Müller, Hans</td>
+                                    <td>08:00</td>
+                                    <td>16:00</td>
+                                    <td>8</td>
+                                    <td>Einlass Haupttor</td>
+                                    <td>✓</td>
+                                    <td>✓</td>
+                                    <td>✓</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Schmidt, Peter</td>
+                                    <td>08:00</td>
+                                    <td>16:00</td>
+                                    <td>8</td>
+                                    <td></td>
+                                    <td>✓</td>
+                                    <td></td>
+                                    <td>✓</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Weber, Maria</td>
+                                    <td>16:00</td>
+                                    <td>00:00</td>
+                                    <td>8</td>
+                                    <td>Streife Nord</td>
+                                    <td>?</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Antworten ausstehend -->
+            <div class="tab-panel" id="panel-antworten">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><span class="icon">⏳</span> Ausstehende Antworten</span>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: var(--text-muted);">3 Mitarbeiter haben noch nicht bestätigt.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Rechnung -->
+            <div class="tab-panel" id="panel-rechnung">
+                <div class="card-grid card-grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><span class="icon">💰</span> Rechnungspositionen</span>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead><tr><th>Position</th><th>Menge</th><th>Einzelpreis</th><th>Summe</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Sicherheitsdienst</td><td>96 h</td><td>25,00 €</td><td>2.400,00 €</td></tr>
+                                    <tr><td>PKW-Pauschale</td><td>3</td><td>50,00 €</td><td>150,00 €</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-value">2.550,00 €</div>
+                        <div class="stat-label">Gesamtsumme Netto</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Bemerkungen -->
+            <div class="tab-panel" id="panel-bemerkungen">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><span class="icon">📝</span> Bemerkungen</span>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control" rows="10" placeholder="Notizen zum Auftrag...">Wichtig: VIP-Bereich gesondert absichern.
+Kontakt vor Ort: Herr Müller (0171-1234567)</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Panel: Zusatzdateien -->
+            <div class="tab-panel" id="panel-dateien">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title"><span class="icon">📎</span> Zusatzdateien</span>
+                        <button class="btn btn-primary">📤 Datei hochladen</button>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: var(--text-muted);">Keine Dateien vorhanden.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab Switching with Animated Indicator
+        const tabs = document.querySelectorAll('.tab-item');
+        const panels = document.querySelectorAll('.tab-panel');
+        const indicator = document.querySelector('.tab-indicator');
+
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Move indicator
+                indicator.style.top = (16 + index * 52) + 'px';
+
+                // Show corresponding panel
+                const panelId = 'panel-' + tab.dataset.tab;
+                panels.forEach(p => p.classList.remove('active'));
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+
+        // Accordion functionality
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('open');
+            });
+        });
+    </script>
+</body>
+</html>

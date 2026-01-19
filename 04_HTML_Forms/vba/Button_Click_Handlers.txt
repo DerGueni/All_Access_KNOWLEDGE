@@ -1,0 +1,61 @@
+﻿' =====================================================
+' BUTTON-CLICK-HANDLER FÜR ACCESS-FORMULARE
+' =====================================================
+' Diese Prozeduren in die entsprechenden Access-Formulare einfügen
+
+' =====================================================
+' FÜR frm_MA_Mitarbeiterstamm (Mitarbeiter-Formular)
+' =====================================================
+Private Sub btnHTMLAnsicht_Click()
+    ' Öffnet das HTML-Mitarbeiterstamm-Formular
+    Call OpenMitarbeiterstammHTML(Me.ID)
+End Sub
+
+Private Sub btnAccessAnsicht_Click()
+    ' Wechselt zurück zur Access-Ansicht
+    DoCmd.Close acForm, "frm_N_MA_Mitarbeiterstamm_HTML"
+End Sub
+
+' =====================================================
+' FÜR frm_KD_Kundenstamm (Kunden-Formular)
+' =====================================================
+Private Sub btnHTMLAnsicht_Click()
+    ' Öffnet das HTML-Kundenstamm-Formular
+    Call OpenKundenstammHTML(Me.kun_Id)
+End Sub
+
+' =====================================================
+' FÜR frm_VA_Auftragstamm (Auftrags-Formular)
+' =====================================================
+Private Sub btnHTMLAnsicht_Click()
+    ' Öffnet das HTML-Auftragsverwaltung-Formular
+    Call OpenAuftragsverwaltungHTML(Me.ID)
+End Sub
+
+Private Sub btnMitarbeiterauswahl_Click()
+    ' Öffnet die HTML-Schnellauswahl
+    Call OpenSchnellauswahlHTML(Me.ID, Me.Dat_VA_Von)
+End Sub
+
+' =====================================================
+' FÜR Hauptmenü
+' =====================================================
+Private Sub btnDienstplanMA_Click()
+    Call OpenDienstplanMAHTML(Date)
+End Sub
+
+Private Sub btnDienstplanObjekt_Click()
+    Call OpenDienstplanObjektHTML(Date)
+End Sub
+
+Private Sub btnStundenauswertung_Click()
+    Call OpenStundenauswertungHTML
+End Sub
+
+Private Sub btnAbwesenheiten_Click()
+    Call OpenAbwesenheitenHTML
+End Sub
+
+Private Sub btnLohnabrechnungen_Click()
+    Call OpenLohnabrechnungenHTML
+End Sub

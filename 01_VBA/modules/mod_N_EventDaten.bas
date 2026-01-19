@@ -1,0 +1,507 @@
+Attribute VB_Name = "mod_N_EventDaten"
+' ========================================================================
+' Modul: mod_N_EventDaten
+' Zweck: Web-Scraping von Event-Daten aus öffentlichen Quellen
+' Erstellt: 2026-01-03
+' ========================================================================
+
+' ========================================================================
+' Type Definitionen
+' ========================================================================
+Public Type EventDaten
+    VA_ID As Long
+    Einlass As String
+    Beginn As String
+    Ende As String
+    Infos As String
+    WebLink As String
+    Erfolgreich As Boolean
+    Fehlermeldung As String
+End Type
+
+' ========================================================================
+' Hauptfunktion: HoleEventDatenAusWeb
+' ========================================================================
+Public Function HoleEventDatenAusWeb(VA_ID As Long) As EventDaten
+    On Error GoTo ErrorHandler
+
+    Dim result As EventDaten
+    result.VA_ID = VA_ID
+    result.Erfolgreich = False
+
+    ' Schritt 1: Auftragsdaten aus DB laden
+    Dim rs As DAO.Recordset
+    Dim sql As String
+    Dim suchbegriff As String
+    Dim auftrag As String, objekt As String, ort As String, datum As String, kunde As String
+
+    sql = "SELECT a.Auftrag, a.Objekt, a.Ort, a.Dat_VA_Von, k.kun_Firma " & _
+          "FROM tbl_VA_Auftragstamm a " & _
+          "LEFT JOIN tbl_KD_Kundenstamm k ON a.Veranstalter_ID = k.kun_Id " & _
+          "WHERE a.VA_ID = " & VA_ID
+
+    Set rs = CurrentDb.OpenRecordset(sql, dbOpenSnapshot)
+
+    If rs.EOF Then
+        result.Fehlermeldung = "VA_ID nicht gefunden"
+        GoTo Cleanup
+    End If
+
+    ' Suchbegriffe zusammenstellen
+    auftrag = Nz(rs!auftrag, "")
+    objekt = Nz(rs!objekt, "")
+    ort = Nz(rs!ort, "")
+    datum = IIf(IsNull(rs!Dat_VA_Von), "", Format(rs!Dat_VA_Von, "dd.mm.yyyy"))
+    kunde = Nz(rs!kun_Firma, "")
+
+    rs.Close
+    Set rs = Nothing
+
+    ' Suchbegriff aufbauen
+    suchbegriff = Trim(auftrag & " " & objekt & " " & ort & " " & datum & " " & kunde)
+
+    If Len(suchbegriff) < 5 Then
+        result.Fehlermeldung = "Zu wenige Informationen für Suche"
+        GoTo Cleanup
+    End If
+
+    ' Schritt 2: Web-Suche durchführen
+    Dim htmlContent As String
+    htmlContent = WebSuche(suchbegriff)
+
+    If Len(htmlContent) = 0 Then
+        result.Fehlermeldung = "Keine Websuche-Ergebnisse gefunden"
+        GoTo Cleanup
+    End If
+
+    ' Schritt 3: Event-Webseiten extrahieren und parsen
+    Dim eventLinks As Collection
+    Set eventLinks = ExtrahiereEventLinks(htmlContent)
+
+    If eventLinks.Count = 0 Then
+        result.Fehlermeldung = "Keine Event-Webseiten gefunden"
+        GoTo Cleanup
+    End If
+
+    ' Ersten relevanten Link parsen
+    Dim i As Integer
+    For i = 1 To eventLinks.Count
+        Dim eventData As EventDaten
+        eventData = ParseEventWebseite(CStr(eventLinks(i)))
+
+        If eventData.Erfolgreich Then
+            result = eventData
+            result.VA_ID = VA_ID
+            Exit For
+        End If
+    Next i
+
+    If Not result.Erfolgreich Then
+        result.Fehlermeldung = "Keine verwertbaren Event-Daten gefunden"
+    End If
+
+Cleanup:
+    If Not rs Is Nothing Then
+        If rs.State = 1 Then rs.Close
+        Set rs = Nothing
+    End If
+    HoleEventDatenAusWeb = result
+    Exit Function
+
+ErrorHandler:
+    result.Erfolgreich = False
+    result.Fehlermeldung = "Fehler: " & Err.Description
+    Resume Cleanup
+End Function
+
+' ========================================================================
+' WebSuche: Führt Google/Bing-Suche durch
+' ========================================================================
+Private Function WebSuche(suchbegriff As String) As String
+    On Error GoTo ErrorHandler
+
+    Dim http As Object
+    Dim url As String
+    Dim encodedQuery As String
+    Dim response As String
+
+    ' URL-Encoding für Suchbegriff
+    encodedQuery = URLEncode(suchbegriff)
+
+    ' Google-Suche (primär)
+    url = "https://www.google.com/search?q=" & encodedQuery & "+event+tickets"
+
+    ' MSXML2.XMLHTTP60 für moderne TLS-Unterstützung
+    Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+
+    http.Open "GET", url, False
+    http.setRequestHeader "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    http.setRequestHeader "Accept", "text/html"
+    http.setTimeouts 5000, 5000, 10000, 10000  ' 10 Sekunden Timeout
+
+    http.send
+
+    If http.Status = 200 Then
+        response = http.responseText
+    Else
+        response = ""
+    End If
+
+    Set http = Nothing
+    WebSuche = response
+    Exit Function
+
+ErrorHandler:
+    WebSuche = ""
+    If Not http Is Nothing Then Set http = Nothing
+End Function
+
+' ========================================================================
+' ExtrahiereEventLinks: Findet Event-Webseiten in HTML
+' ========================================================================
+Private Function ExtrahiereEventLinks(htmlContent As String) As Collection
+    On Error Resume Next
+
+    Dim links As New Collection
+    Dim knownSites As Variant
+    Dim i As Integer
+    Dim pos As Long, startPos As Long, endPos As Long
+    Dim link As String
+
+    ' Bekannte Event-Plattformen
+    knownSites = Array("eventim.de", "ticketmaster.de", "eventbrite.de", _
+                       "reservix.de", "ticketmasteronline.de", "myticket.de", _
+                       "mercedes-benz-arena-berlin.de", "olympiastadion.berlin", _
+                       "o2world.de", "lanxess-arena.de")
+
+    ' HTML nach Links durchsuchen
+    pos = 1
+    Do While pos > 0
+        pos = InStr(pos, htmlContent, "href=""http", vbTextCompare)
+        If pos > 0 Then
+            startPos = pos + 6
+            endPos = InStr(startPos, htmlContent, """")
+
+            If endPos > startPos Then
+                link = Mid(htmlContent, startPos, endPos - startPos)
+
+                ' Prüfen ob Link von bekannter Event-Seite
+                For i = LBound(knownSites) To UBound(knownSites)
+                    If InStr(1, link, knownSites(i), vbTextCompare) > 0 Then
+                        On Error Resume Next
+                        links.Add link, link  ' Key=link verhindert Duplikate
+                        On Error GoTo 0
+                        Exit For
+                    End If
+                Next i
+
+                pos = endPos
+            Else
+                pos = 0
+            End If
+        End If
+    Loop
+
+    Set ExtrahiereEventLinks = links
+End Function
+
+' ========================================================================
+' ParseEventWebseite: Extrahiert strukturierte Daten von Event-Seiten
+' ========================================================================
+Public Function ParseEventWebseite(url As String) As EventDaten
+    On Error GoTo ErrorHandler
+
+    Dim result As EventDaten
+    result.Erfolgreich = False
+    result.WebLink = url
+
+    ' HTML-Inhalt laden
+    Dim http As Object
+    Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+
+    http.Open "GET", url, False
+    http.setRequestHeader "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    http.setTimeouts 5000, 5000, 10000, 10000
+
+    http.send
+
+    If http.Status <> 200 Then
+        result.Fehlermeldung = "HTTP " & http.Status
+        GoTo Cleanup
+    End If
+
+    Dim html As String
+    html = http.responseText
+
+    ' Parser-Strategie basierend auf Domain
+    Select Case True
+        Case InStr(url, "eventim.de") > 0
+            result = ParseEventim(html, url)
+        Case InStr(url, "ticketmaster.de") > 0
+            result = ParseTicketmaster(html, url)
+        Case InStr(url, "eventbrite.de") > 0
+            result = ParseEventbrite(html, url)
+        Case Else
+            result = ParseGeneric(html, url)
+    End Select
+
+Cleanup:
+    Set http = Nothing
+    ParseEventWebseite = result
+    Exit Function
+
+ErrorHandler:
+    result.Fehlermeldung = "Parse-Fehler: " & Err.Description
+    Resume Cleanup
+End Function
+
+' ========================================================================
+' Site-spezifische Parser
+' ========================================================================
+Private Function ParseEventim(html As String, url As String) As EventDaten
+    Dim result As EventDaten
+    result.WebLink = url
+
+    ' Eventim verwendet oft JSON-LD für strukturierte Daten
+    result.Beginn = ExtractPattern(html, """startDate"":""([^""]+)""")
+    result.Ende = ExtractPattern(html, """endDate"":""([^""]+)""")
+    result.Einlass = ExtractPattern(html, """doorTime"":""([^""]+)""")
+
+    ' Fallback: HTML-Parsing
+    If Len(result.Beginn) = 0 Then
+        result.Beginn = ExtractPattern(html, "Beginn:?\s*(\d{2}:\d{2})")
+    End If
+
+    result.Infos = ExtractPattern(html, "<meta name=""description"" content=""([^""]+)""")
+    result.Erfolgreich = (Len(result.Beginn) > 0)
+
+    ParseEventim = result
+End Function
+
+Private Function ParseTicketmaster(html As String, url As String) As EventDaten
+    Dim result As EventDaten
+    result.WebLink = url
+
+    result.Beginn = ExtractPattern(html, """startDateTime"":""([^""]+)""")
+    result.Ende = ExtractPattern(html, """endDateTime"":""([^""]+)""")
+    result.Einlass = ExtractPattern(html, "Einlass:?\s*(\d{2}:\d{2})")
+    result.Infos = ExtractPattern(html, "<meta property=""og:description"" content=""([^""]+)""")
+    result.Erfolgreich = (Len(result.Beginn) > 0)
+
+    ParseTicketmaster = result
+End Function
+
+Private Function ParseEventbrite(html As String, url As String) As EventDaten
+    Dim result As EventDaten
+    result.WebLink = url
+
+    result.Beginn = ExtractPattern(html, """start"":\{""local"":""([^""]+)""")
+    result.Ende = ExtractPattern(html, """end"":\{""local"":""([^""]+)""")
+    result.Infos = ExtractPattern(html, "<meta name=""description"" content=""([^""]+)""")
+    result.Erfolgreich = (Len(result.Beginn) > 0)
+
+    ParseEventbrite = result
+End Function
+
+Private Function ParseGeneric(html As String, url As String) As EventDaten
+    Dim result As EventDaten
+    result.WebLink = url
+
+    ' Generisches Parsing: Schema.org JSON-LD
+    result.Beginn = ExtractPattern(html, """startDate"":""([^""]+)""")
+    result.Ende = ExtractPattern(html, """endDate"":""([^""]+)""")
+
+    ' Fallback: Textmuster
+    If Len(result.Beginn) = 0 Then
+        result.Beginn = ExtractPattern(html, "(?:Beginn|Start|Begin):?\s*(\d{2}:\d{2})")
+    End If
+
+    If Len(result.Ende) = 0 Then
+        result.Ende = ExtractPattern(html, "(?:Ende|End):?\s*(\d{2}:\d{2})")
+    End If
+
+    result.Einlass = ExtractPattern(html, "Einlass:?\s*(\d{2}:\d{2})")
+    result.Infos = ExtractPattern(html, "<meta name=""description"" content=""([^""]+)""")
+    result.Erfolgreich = (Len(result.Beginn) > 0 Or Len(result.Infos) > 0)
+
+    ParseGeneric = result
+End Function
+
+' ========================================================================
+' ExtractPattern: Regex-basierte Musterextraktion
+' ========================================================================
+Private Function ExtractPattern(text As String, pattern As String) As String
+    On Error Resume Next
+
+    Dim regex As Object
+    Set regex = CreateObject("VBScript.RegExp")
+
+    regex.pattern = pattern
+    regex.ignoreCase = True
+    regex.MultiLine = True
+
+    Dim matches As Object
+    Set matches = regex.Execute(text)
+
+    If matches.Count > 0 Then
+        ExtractPattern = matches(0).SubMatches(0)
+    Else
+        ExtractPattern = ""
+    End If
+
+    Set regex = Nothing
+End Function
+
+' ========================================================================
+' SpeichereEventDaten: Speichert Daten in tbl_N_VA_EventDaten
+' ========================================================================
+Public Function SpeichereEventDaten(eventData As EventDaten) As Boolean
+    On Error GoTo ErrorHandler
+
+    Dim db As DAO.Database
+    Dim rs As DAO.Recordset
+    Dim sql As String
+
+    Set db = CurrentDb
+
+    ' Prüfen ob Tabelle existiert
+    If Not TableExists("tbl_N_VA_EventDaten") Then
+        CreateEventDatenTable
+    End If
+
+    ' Prüfen ob bereits Eintrag existiert
+    sql = "SELECT * FROM tbl_N_VA_EventDaten WHERE VA_ID = " & eventData.VA_ID
+    Set rs = db.OpenRecordset(sql, dbOpenDynaset)
+
+    If rs.EOF Then
+        rs.AddNew
+    Else
+        rs.Edit
+    End If
+
+    rs!VA_ID = eventData.VA_ID
+    rs!Einlass = Left(eventData.Einlass, 50)
+    rs!Beginn = Left(eventData.Beginn, 50)
+    rs!Ende = Left(eventData.Ende, 50)
+    rs!Infos = Left(eventData.Infos, 255)
+    rs!WebLink = Left(eventData.WebLink, 255)
+    rs!LetzteAktualisierung = Now
+    rs!Erfolgreich = eventData.Erfolgreich
+    rs!Fehlermeldung = Left(eventData.Fehlermeldung, 255)
+
+    rs.Update
+    rs.Close
+    Set rs = Nothing
+    Set db = Nothing
+
+    SpeichereEventDaten = True
+    Exit Function
+
+ErrorHandler:
+    SpeichereEventDaten = False
+    If Not rs Is Nothing Then
+        If rs.State = 1 Then rs.Close
+        Set rs = Nothing
+    End If
+    Set db = Nothing
+End Function
+
+' ========================================================================
+' CreateEventDatenTable: Erstellt tbl_N_VA_EventDaten
+' ========================================================================
+Private Sub CreateEventDatenTable()
+    On Error GoTo ErrorHandler
+
+    Dim db As DAO.Database
+    Dim tbl As DAO.TableDef
+    Dim fld As DAO.Field
+
+    Set db = CurrentDb
+    Set tbl = db.CreateTableDef("tbl_N_VA_EventDaten")
+
+    ' Felder definieren
+    Set fld = tbl.CreateField("ID", dbLong)
+    fld.Attributes = dbAutoIncrField
+    tbl.Fields.Append fld
+
+    tbl.Fields.Append tbl.CreateField("VA_ID", dbLong)
+    tbl.Fields.Append tbl.CreateField("Einlass", dbText, 50)
+    tbl.Fields.Append tbl.CreateField("Beginn", dbText, 50)
+    tbl.Fields.Append tbl.CreateField("Ende", dbText, 50)
+    tbl.Fields.Append tbl.CreateField("Infos", dbText, 255)
+    tbl.Fields.Append tbl.CreateField("WebLink", dbText, 255)
+    tbl.Fields.Append tbl.CreateField("LetzteAktualisierung", dbDate)
+    tbl.Fields.Append tbl.CreateField("Erfolgreich", dbBoolean)
+    tbl.Fields.Append tbl.CreateField("Fehlermeldung", dbText, 255)
+
+    db.TableDefs.Append tbl
+
+    ' Primärschlüssel
+    Dim idx As DAO.Index
+    Set idx = tbl.CreateIndex("PrimaryKey")
+    idx.Primary = True
+    idx.Fields.Append idx.CreateField("ID")
+    tbl.Indexes.Append idx
+
+    ' Index auf VA_ID
+    Set idx = tbl.CreateIndex("VA_ID_Index")
+    idx.Fields.Append idx.CreateField("VA_ID")
+    tbl.Indexes.Append idx
+
+    Set fld = Nothing
+    Set tbl = Nothing
+    Set db = Nothing
+    Exit Sub
+
+ErrorHandler:
+    ' Tabelle existiert bereits oder anderer Fehler
+End Sub
+
+' ========================================================================
+' Hilfsfunktionen
+' ========================================================================
+Private Function TableExists(tableName As String) As Boolean
+    On Error Resume Next
+    Dim tbl As DAO.TableDef
+    Set tbl = CurrentDb.TableDefs(tableName)
+    TableExists = (Err.Number = 0)
+    Set tbl = Nothing
+    On Error GoTo 0
+End Function
+
+Private Function URLEncode(text As String) As String
+    Dim i As Integer
+    Dim char As String
+    Dim result As String
+
+    For i = 1 To Len(text)
+        char = Mid(text, i, 1)
+        Select Case char
+            Case "A" To "Z", "a" To "z", "0" To "9", "-", "_", ".", "~"
+                result = result & char
+            Case " "
+                result = result & "+"
+            Case Else
+                result = result & "%" & Right("0" & Hex(Asc(char)), 2)
+        End Select
+    Next i
+
+    URLEncode = result
+End Function
+
+' ========================================================================
+' Public Wrapper-Funktion für einfachen Zugriff
+' ========================================================================
+Public Sub HoleUndSpeichereEventDaten(VA_ID As Long)
+    On Error Resume Next
+
+    Dim eventData As EventDaten
+    eventData = HoleEventDatenAusWeb(VA_ID)
+
+    If eventData.Erfolgreich Then
+        SpeichereEventDaten eventData
+        MsgBox "Event-Daten erfolgreich geladen und gespeichert!", vbInformation
+    Else
+        MsgBox "Keine Event-Daten gefunden: " & eventData.Fehlermeldung, vbExclamation
+    End If
+End Sub

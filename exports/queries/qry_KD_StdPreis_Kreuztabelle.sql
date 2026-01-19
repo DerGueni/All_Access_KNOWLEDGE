@@ -1,0 +1,8 @@
+-- Query: qry_KD_StdPreis_Kreuztabelle
+-- Type: 16
+TRANSFORM Avg(tbl_KD_Standardpreise.StdPreis) AS MittelwertvonStdPreis
+SELECT tbl_KD_Kundenstamm.kun_Id
+FROM tbl_KD_Artikelbeschreibung INNER JOIN (tbl_KD_Kundenstamm INNER JOIN tbl_KD_Standardpreise ON tbl_KD_Kundenstamm.[kun_Id] = tbl_KD_Standardpreise.[kun_ID]) ON tbl_KD_Artikelbeschreibung.ID = tbl_KD_Standardpreise.Preisart_ID
+GROUP BY tbl_KD_Kundenstamm.kun_Id
+PIVOT tbl_KD_Artikelbeschreibung.Beschreibung;
+

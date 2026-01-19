@@ -1,0 +1,6 @@
+-- Query: zqry_ZK_Stunden_Zusatz
+-- Type: 0
+SELECT ztbl_ZK_Stunden.*, [MA_ID] & [ZUO_ID] & [NV_ID] & [Korr_ID] & [Lohnart_ID] AS Delta_KEY, [ZUO_ID] & [NV_ID] & [Korr_ID] AS Kreuz_KEY, zqry_ZK_Lohnarten_Zuschlag.Bezeichnung_kurz, zqry_ZK_Lohnarten_Zuschlag.Ist_Zeit, zqry_ZK_Lohnarten_Zuschlag.DatumBis, tbl_MA_Mitarbeiterstamm.LEXWare_ID, zqry_ZK_Lohnarten_Zuschlag.Nummer, [Nachname] & " " & [Vorname] AS Name, tbl_MA_Mitarbeiterstamm.Anstellungsart_ID
+FROM (ztbl_ZK_Stunden LEFT JOIN zqry_ZK_Lohnarten_Zuschlag ON ztbl_ZK_Stunden.Lohnart_ID = zqry_ZK_Lohnarten_Zuschlag.ID) LEFT JOIN tbl_MA_Mitarbeiterstamm ON ztbl_ZK_Stunden.MA_ID = tbl_MA_Mitarbeiterstamm.ID
+WHERE (((zqry_ZK_Lohnarten_Zuschlag.DatumBis)>=[VADatum] Or (zqry_ZK_Lohnarten_Zuschlag.DatumBis) Is Null) AND ((zqry_ZK_Lohnarten_Zuschlag.DatumVon)<=[VADatum] Or (zqry_ZK_Lohnarten_Zuschlag.DatumVon) Is Null));
+

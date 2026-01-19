@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragsverwaltung</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif;
+            font-size: 11px;
+            background: #F0F0F0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app { display: flex; height: 100vh; }
+
+        /* === LINKE SIDEBAR === */
+        .sidebar {
+            width: 115px;
+            background: linear-gradient(180deg, #8B1A1A 0%, #6B0F0F 100%);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar .logo {
+            padding: 6px;
+            text-align: center;
+            background: #4A0E0E;
+        }
+
+        .sidebar .logo-box {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 3px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            font-weight: bold;
+            color: #8B1A1A;
+        }
+
+        .sidebar .menu-label {
+            background: #3D0A0A;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 4px 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .sidebar .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 5px 6px;
+            background: #8B1A1A;
+            border: none;
+            border-bottom: 1px solid #5A1010;
+            color: white;
+            text-align: left;
+            font-size: 9px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .sidebar .menu-btn:hover { background: #A02020; }
+        .sidebar .menu-btn.active { background: #C03030; border-left: 3px solid #FFD700; }
+
+        /* === HAUPTBEREICH === */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* === HEADER === */
+        .header {
+            background: #F0F0F0;
+            border-bottom: 1px solid #B0B0B0;
+            padding: 3px 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .header .icon {
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(135deg, #27AE60 0%, #1E8449 100%);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .header .title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            margin-right: 8px;
+        }
+
+        .btn {
+            padding: 3px 8px;
+            border: 1px solid #909090;
+            background: linear-gradient(180deg, #FFF 0%, #E8E8E8 100%);
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 2px;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .btn:hover { background: linear-gradient(180deg, #E8F4FF 0%, #D0E8FF 100%); border-color: #0078D7; }
+        .btn:active { background: #D0D0D0; }
+
+        .btn.green { background: linear-gradient(180deg, #2ECC71 0%, #27AE60 100%); color: white; border-color: #1E8449; }
+        .btn.blue { background: linear-gradient(180deg, #3498DB 0%, #2980B9 100%); color: white; border-color: #1F618D; }
+        .btn.orange { background: linear-gradient(180deg, #E67E22 0%, #D35400 100%); color: white; border-color: #A04000; }
+        .btn.purple { background: linear-gradient(180deg, #9B59B6 0%, #8E44AD 100%); color: white; border-color: #6C3483; }
+        .btn.sm { padding: 2px 5px; font-size: 9px; }
+
+        .header .spacer { flex: 1; }
+
+        /* === CONTENT === */
+        .content { flex: 1; display: flex; overflow: hidden; }
+
+        .content-left { flex: 1; display: flex; flex-direction: column; padding: 6px; overflow: hidden; }
+
+        /* === FORMULAR-FELDER === */
+        .fields {
+            display: grid;
+            grid-template-columns: 50px 220px 15px 35px 180px 85px 1fr;
+            gap: 2px 4px;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 10px;
+            padding: 4px 4px 4px 0;
+        }
+
+        .fields label { text-align: right; color: #333; }
+        .fields input, .fields select {
+            padding: 2px 4px;
+            border: 1px solid #909090;
+            font-size: 10px;
+            font-family: inherit;
+        }
+        .fields input:focus, .fields select:focus { outline: none; border-color: #0078D7; }
+
+        .field-row { display: contents; }
+        .nav-group { display: flex; align-items: center; gap: 2px; }
+
+        /* === TABS === */
+        .tab-area { flex: 1; display: flex; flex-direction: column; border: 1px solid #909090; background: white; min-height: 0; }
+
+        .tab-bar { display: flex; background: #E0E0E0; border-bottom: 1px solid #909090; }
+        .tab-btn {
+            padding: 4px 10px;
+            border: none;
+            background: #E0E0E0;
+            font-size: 10px;
+            cursor: pointer;
+            border-right: 1px solid #B0B0B0;
+            font-family: inherit;
+        }
+        .tab-btn:hover { background: #D0D0D0; }
+        .tab-btn.active { background: white; font-weight: bold; }
+
+        .tab-content { flex: 1; overflow: auto; padding: 6px; }
+        .tab-panel { display: none; height: 100%; flex-direction: column; }
+        .tab-panel.active { display: flex; }
+
+        /* === TABELLE === */
+        .table-wrap { flex: 1; overflow: auto; border: 1px solid #B0B0B0; }
+
+        table.grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        table.grid th, table.grid td {
+            border: 1px solid #D0D0D0;
+            padding: 1px 3px;
+            text-align: left;
+            height: 18px;
+        }
+        table.grid th { background: #F0F0F0; font-weight: 500; position: sticky; top: 0; height: 20px; }
+        table.grid tr:nth-child(even) { background: #FAFAFA; }
+        table.grid tr:hover { background: #E8F4FF; }
+        table.grid tr.sel { background: #C5DDF5; }
+        table.grid tr.sel td { background: #C5DDF5; }
+        table.grid .time { color: #0066CC; }
+        table.grid .money { text-align: right; color: #008000; }
+
+        /* === ABSAGEN === */
+        .absagen {
+            margin-top: 6px;
+            padding: 4px 6px;
+            background: #FFFDE7;
+            border: 1px solid #FFC107;
+        }
+        .absagen h4 { font-size: 10px; margin-bottom: 2px; }
+        .absagen-head { display: flex; gap: 15px; font-size: 9px; color: #666; }
+
+        /* === RECHTE SEITE === */
+        .content-right {
+            width: 220px;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid #909090;
+            background: #F8F8F8;
+            flex-shrink: 0;
+        }
+
+        /* Status oben */
+        .status-box {
+            padding: 6px 8px;
+            border-bottom: 1px solid #D0D0D0;
+        }
+        .status-box h4 { font-size: 10px; margin-bottom: 3px; }
+        .status-box select { width: 100%; padding: 2px; font-size: 10px; margin-bottom: 4px; }
+        .status-list { font-size: 9px; color: #666; }
+        .status-list div { padding: 1px 0 1px 10px; position: relative; }
+        .status-list div::before { content: '•'; position: absolute; left: 0; }
+
+        /* Auftragsliste */
+        .auftraege-box { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .auftraege-header {
+            padding: 4px 8px;
+            background: #E8E8E8;
+            border-bottom: 1px solid #C0C0C0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+        }
+        .auftraege-header input[type="date"] { padding: 1px 3px; border: 1px solid #909090; font-size: 10px; width: 100px; }
+        .auftraege-nav { display: flex; padding: 3px 8px; gap: 3px; border-bottom: 1px solid #D0D0D0; }
+        .auftraege-cols {
+            display: flex;
+            padding: 2px 8px;
+            background: #F0F0F0;
+            border-bottom: 1px solid #D0D0D0;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .auftraege-cols .col-d { width: 70px; }
+
+        .auftraege-list { flex: 1; overflow-y: auto; background: white; }
+        .auftrag-row {
+            display: flex;
+            padding: 2px 8px;
+            border-bottom: 1px solid #F0F0F0;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .auftrag-row:hover { background: #F0F8FF; }
+        .auftrag-row.sel { background: #E0F0FF; }
+        .auftrag-row .d { width: 70px; font-weight: bold; color: #0066CC; }
+        .auftrag-row .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    </style>
+</head>
+<body>
+<div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo"><div class="logo-box">CONSEC</div></div>
+        <div class="menu-label">HAUPTMENÜ</div>
+        <button class="menu-btn">Dienstplanübersicht</button>
+        <button class="menu-btn">Planungsübersicht</button>
+        <button class="menu-btn active">Auftragsverwaltung</button>
+        <button class="menu-btn">Mitarbeiterverwaltung</button>
+        <button class="menu-btn">Offene Mail Anfragen</button>
+        <button class="menu-btn">Excel Zeitkonten</button>
+        <button class="menu-btn">Zeitkonten</button>
+        <button class="menu-btn">Abwesenheitsplanung</button>
+        <button class="menu-btn">Dienstausweis erstellen</button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="icon" style="background:#27AE60;color:white;font-size:14px;font-weight:bold;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:2px;">V</div>
+            <span class="title">Auftragsverwaltung</span>
+            <span style="background:#FFD700;color:#000;font-size:9px;padding:1px 4px;font-weight:bold;">P</span>
+            <span style="background:#FF69B4;color:#FFF;font-size:8px;padding:1px 3px;">DODO</span>
+            <span style="background:#4169E1;color:#FFF;font-size:8px;padding:1px 3px;">DODO</span>
+            <span style="background:#DC143C;color:#FFF;font-size:8px;padding:1px 3px;">DODO</span>
+            <button class="btn sm">Rückmelde-Statistik</button>
+            <button class="btn sm">Syncfehler</button>
+            <button class="btn">Aktualisieren</button>
+            <div class="spacer"></div>
+            <button class="btn">Auftrag kopieren</button>
+            <button class="btn">Auftrag löschen</button>
+            <button class="btn">Einsatzliste senden MA</button>
+            <button class="btn orange">Einsatzliste senden BOS</button>
+            <button class="btn purple">Einsatzliste senden SUB</button>
+        </header>
+
+        <!-- 2. Header-Zeile -->
+        <div class="header" style="border-top:none;padding-top:0;">
+            <div class="spacer"></div>
+            <button class="btn">Mitarbeiterauswahl</button>
+            <button class="btn">Positionen</button>
+            <button class="btn">Neuer Auftrag</button>
+            <button class="btn">Namensliste ESS</button>
+            <button class="btn">Einsatzliste drucken</button>
+            <button class="btn sm">EL Autosend</button>
+            <button class="btn sm">EL gesendet</button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <div class="content-left">
+                <!-- FELDER -->
+                <div class="fields">
+                    <!-- Zeile 1 -->
+                    <label>Datum:</label>
+                    <div class="nav-group">
+                        <input type="date" value="2025-12-12" style="width:95px;">
+                        <span>-</span>
+                        <input type="date" value="2025-12-12" style="width:95px;">
+                    </div>
+                    <span></span>
+                    <label>Nr.:</label>
+                    <input type="text" value="9152" style="width:50px;" readonly>
+                    <label>PKW Anzahl:</label>
+                    <div class="nav-group">
+                        <input type="text" value="0" style="width:30px;">
+                        <label style="margin-left:8px;">Treffpunkt:</label>
+                        <input type="text" value="15 min vor DB vor Ort" style="width:140px;">
+                    </div>
+
+                    <!-- Zeile 2 -->
+                    <label>Auftrag:</label>
+                    <select style="width:100%;"><option>Spvgg Greuther Fürth - Hertha Bsc</option></select>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <label>Dienstkleidung:</label>
+                    <select><option>schwarz neutral</option></select>
+
+                    <!-- Zeile 3 -->
+                    <label>Ort:</label>
+                    <input type="text" value="Fürth" style="width:100%;">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <label>Fahrtkosten/PKW:</label>
+                    <input type="text" value="0,00 €" style="width:60px;">
+
+                    <!-- Zeile 4 -->
+                    <label>Objekt:</label>
+                    <div class="nav-group">
+                        <select style="width:170px;"><option>Sportpark am Ronhof</option></select>
+                        <button class="btn sm">◀</button>
+                        <input type="text" value="Fr. 12.12.25" style="width:65px;text-align:center;">
+                        <button class="btn sm">▶</button>
+                    </div>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <label>Ansprechpartner:</label>
+                    <input type="text" style="width:100%;">
+
+                    <!-- Zeile 5 -->
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <label>Auftraggeber:</label>
+                    <select><option>SPVGG Greuther Fürth GmbH & Co. K</option></select>
+                </div>
+
+                <!-- TABS -->
+                <div class="tab-area">
+                    <div class="tab-bar">
+                        <button class="tab-btn active" data-t="einsatz">Einsatzliste</button>
+                        <button class="tab-btn" data-t="antworten">Antworten ausstehend</button>
+                        <button class="tab-btn" data-t="rechnung">Rechnung</button>
+                    </div>
+                    <div class="tab-content">
+                        <!-- Einsatzliste -->
+                        <div class="tab-panel active" id="t-einsatz">
+                            <div style="margin-bottom:4px;"><button class="btn">BWN drucken</button></div>
+                            <div class="table-wrap">
+                                <table class="grid">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:25px;">Ai</th>
+                                            <th style="width:40px;">von</th>
+                                            <th style="width:40px;">bis</th>
+                                            <th style="width:25px;">Lfi</th>
+                                            <th style="width:110px;">Mitarbeiter</th>
+                                            <th style="width:40px;">von</th>
+                                            <th style="width:40px;">bis</th>
+                                            <th style="width:30px;">Std</th>
+                                            <th>Bemerkungen</th>
+                                            <th style="width:45px;">PKW</th>
+                                            <th style="width:20px;">E</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="sel" style="background:#FFFFC0;"><td>2</td><td class="time">15:00</td><td class="time">21:00</td><td>1</td><td></td><td class="time">15:00</td><td class="time">21:00</td><td>6,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr style="background:#FFFFD0;"><td>40</td><td class="time">16:00</td><td class="time">21:00</td><td>2</td><td></td><td class="time">15:00</td><td class="time">21:00</td><td>6,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td>*</td><td>0</td><td></td><td>3</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td></td><td></td><td></td><td>4</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td></td><td></td><td></td><td>5</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td></td><td></td><td></td><td>6</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td></td><td></td><td></td><td>7</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td></td><td></td><td></td><td>8</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td></td><td></td><td></td><td>9</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td></td><td></td><td></td><td>10</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td></td><td></td><td></td><td>11</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                        <tr><td></td><td></td><td></td><td>12</td><td></td><td class="time">16:00</td><td class="time">21:00</td><td>5,00</td><td></td><td class="money">0,00 €</td><td><input type="checkbox"></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="absagen">
+                                <h4>Absagen:</h4>
+                                <div class="absagen-head"><span>Mitarbeiter</span><span>Bemerkung</span></div>
+                            </div>
+                        </div>
+                        <div class="tab-panel" id="t-antworten"><p>Antworten ausstehend...</p></div>
+                        <div class="tab-panel" id="t-rechnung"><p>Rechnungsdaten...</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECHTE SEITE -->
+            <div class="content-right">
+                <!-- Status -->
+                <div class="status-box">
+                    <h4>Auftragsstatus</h4>
+                    <select><option>In Planung</option><option>Auftrag beendet, Zeiten noch in Bearbeitung</option><option>Einsatzliste versendet</option></select>
+                    <div class="status-list">
+                        <div>In Planung</div>
+                        <div>Auftrag beendet</div>
+                        <div>Zeiten in Bearbeitung</div>
+                        <div>Einsatzliste versendet</div>
+                    </div>
+                </div>
+
+                <!-- Auftragsliste -->
+                <div class="auftraege-box">
+                    <div class="auftraege-header">
+                        <span>Aufträge ab:</span>
+                        <input type="date" value="2025-12-11">
+                    </div>
+                    <div class="auftraege-nav">
+                        <button class="btn sm">Go</button>
+                        <button class="btn sm">&lt;</button>
+                        <button class="btn sm">&gt;</button>
+                    </div>
+                    <div class="auftraege-cols">
+                        <span class="col-d">Datum</span>
+                        <span>Auftrag</span>
+                    </div>
+                    <div class="auftraege-list">
+                        <div class="auftrag-row sel"><span class="d">Fr. 12.12.25</span><span class="n">Spvgg Greuther Fürth</span></div>
+                        <div class="auftrag-row"><span class="d">Sa. 13.12.25</span><span class="n">1099</span></div>
+                        <div class="auftrag-row"><span class="d">Sa. 13.12.25</span><span class="n">Weihnachtsmarkt Altdorf</span></div>
+                        <div class="auftrag-row"><span class="d">Sa. 14.12.25</span><span class="n">Ross Antony & Paul F</span></div>
+                        <div class="auftrag-row"><span class="d">So. 14.12.25</span><span class="n">Weihnachtsmarkt Altdorf</span></div>
+                        <div class="auftrag-row"><span class="d">Sa. 20.12.25</span><span class="n">1. Fc Nürnberg Frauen</span></div>
+                        <div class="auftrag-row"><span class="d">Sa. 20.12.25</span><span class="n">Claudia Koreck</span></div>
+                        <div class="auftrag-row"><span class="d">So. 21.12.25</span><span class="n">1. Fc Nürnberg - Hannover</span></div>
+                        <div class="auftrag-row"><span class="d">Mo. 29.12.25</span><span class="n">Fiddler's Green</span></div>
+                        <div class="auftrag-row"><span class="d">Fr. 02.01.26</span><span class="n">J.b.o.</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.onclick = () => {
+            document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            document.getElementById('t-' + b.dataset.t).classList.add('active');
+        };
+    });
+
+    // Auftrag-Auswahl
+    document.querySelectorAll('.auftrag-row').forEach(r => {
+        r.onclick = () => {
+            document.querySelectorAll('.auftrag-row').forEach(x => x.classList.remove('sel'));
+            r.classList.add('sel');
+        };
+    });
+
+    // Tabellen-Zeilen
+    document.querySelectorAll('table.grid tbody tr').forEach(r => {
+        r.onclick = () => {
+            document.querySelectorAll('table.grid tbody tr').forEach(x => x.classList.remove('sel'));
+            r.classList.add('sel');
+        };
+    });
+</script>
+</body>
+</html>

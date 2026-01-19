@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenstamm - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_KD_Kundenstamm.css">
+</head>
+<body>
+    <div class="kd-container">
+        <!-- Linkes Menue -->
+
+        <!-- Hauptbereich -->
+        <main class="kd-main">
+            <!-- Header -->
+            <header class="kd-header">
+                <div class="header-left">
+                    <div class="kd-logo"></div>
+                    <h1 class="kd-title">Kundenstammblatt</h1>
+                </div>
+                <div class="header-center">
+                    <span id="lblRecordInfo">Datensatz: 1 / 125</span>
+                    <div class="nav-buttons">
+                        <button class="kd-btn-nav" id="btnErster">|&#9664;</button>
+                        <button class="kd-btn-nav" id="btnVorheriger">&#9664;</button>
+                        <button class="kd-btn-nav" id="btnNaechster">&#9654;</button>
+                        <button class="kd-btn-nav" id="btnLetzter">&#9654;|</button>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="header-buttons">
+                        <button class="kd-btn" id="btnVerrechnungssaetze">Verrechnungssaetze</button>
+                        <button class="kd-btn" id="btnUmsatzauswertung">Umsatzauswertung</button>
+                    </div>
+                    <div class="header-buttons">
+                        <button class="kd-btn success" id="btnSpeichern">Speichern</button>
+                        <button class="kd-btn danger" id="btnKundeLoeschen">Kunde löschen</button>
+                        <button class="kd-btn primary" id="btnNeuerKunde">Neuer Kunde</button>
+                    </div>
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V1.55</span>
+                        <span id="lblDatum"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Inhalt mit Tabs und Liste -->
+            <div class="kd-content">
+                <!-- Linke Seite: Kundenliste -->
+                <div class="kd-liste-container">
+                    <div class="liste-header">
+                        <span class="liste-title">Kundenliste</span>
+                        <span id="lblAnzahl">125 Kunden</span>
+                    </div>
+                    <div class="liste-filter">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="chkNurAktive" checked>
+                            Nur Aktive anzeigen
+                        </label>
+                        <input type="text" id="txtSuche" class="kd-input" placeholder="Suchen...">
+                    </div>
+                    <div class="liste-scroll">
+                        <table class="kd-liste">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px;">ID</th>
+                                    <th>Firma/Name</th>
+                                    <th>Ort</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody_Liste">
+                                <tr class="selected"><td>1</td><td>CONSEC GmbH</td><td>Nuernberg</td></tr>
+                                <tr><td>2</td><td>ABC Veranstaltungen</td><td>Fuerth</td></tr>
+                                <tr><td>3</td><td>HC Erlangen</td><td>Erlangen</td></tr>
+                                <tr><td>4</td><td>1. FC Nuernberg</td><td>Nuernberg</td></tr>
+                                <tr><td>5</td><td>NERVY Nuernberg</td><td>Nuernberg</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Rechte Seite: Tabs und Formular -->
+                <div class="kd-formular-container">
+                    <!-- Tab-Navigation -->
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="stammdaten">Stammdaten</button>
+                        <button class="tab-btn" data-tab="konditionen">Konditionen</button>
+                        <button class="tab-btn" data-tab="auftraege">Auftragsuebersicht</button>
+                        <button class="tab-btn" data-tab="dateien">Zusatzdateien</button>
+                        <button class="tab-btn" data-tab="bemerkungen">Bemerkungen</button>
+                    </div>
+
+                    <!-- Tab-Inhalt -->
+                    <div class="tab-content">
+                        <!-- TAB: Stammdaten -->
+                        <div class="tab-pane active" id="tab-stammdaten">
+                            <div class="form-columns">
+                                <!-- Linke Spalte: Kundendaten + Adresse -->
+                                <div class="form-column">
+                                    <fieldset class="kd-fieldset">
+                                        <legend>Kundendaten</legend>
+                                        <div class="field-row">
+                                            <label>ID:</label>
+                                            <input type="text" id="KD_ID" class="kd-input readonly" style="width:60px;" readonly value="1">
+                                            <label style="margin-left:20px;">Kuerzel:</label>
+                                            <input type="text" id="KD_Kuerzel" class="kd-input" style="width:80px;" value="CONSEC">
+                                            <label class="checkbox-inline" style="margin-left:20px;">
+                                                <input type="checkbox" id="KD_IstAktiv" checked>
+                                                Ist aktiv
+                                            </label>
+                                        </div>
+                                        <div class="field-row">
+                                            <label>Firma/Name:</label>
+                                            <input type="text" id="KD_Name1" class="kd-input" style="width:280px;" value="CONSEC GmbH">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>Zusatz:</label>
+                                            <input type="text" id="KD_Name2" class="kd-input" style="width:280px;" value="Sicherheitsdienst">
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="kd-fieldset">
+                                        <legend>Adresse</legend>
+                                        <div class="field-row">
+                                            <label>Strasse:</label>
+                                            <input type="text" id="KD_Strasse" class="kd-input" style="width:280px;" value="Musterstrasse 12">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>PLZ / Ort:</label>
+                                            <input type="text" id="KD_PLZ" class="kd-input" style="width:60px;" value="90402">
+                                            <input type="text" id="KD_Ort" class="kd-input" style="width:180px;" value="Nuernberg">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>Land:</label>
+                                            <input type="text" id="KD_Land" class="kd-input" style="width:140px;" value="Deutschland">
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="kd-fieldset">
+                                        <legend>Kontakt</legend>
+                                        <div class="field-row">
+                                            <label>Telefon:</label>
+                                            <input type="text" id="KD_Telefon" class="kd-input" style="width:140px;" value="0911 12345678">
+                                            <label style="margin-left:15px;">Fax:</label>
+                                            <input type="text" id="KD_Fax" class="kd-input" style="width:120px;">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>E-Mail:</label>
+                                            <input type="email" id="KD_Email" class="kd-input" style="width:220px;" value="info@consec.de">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>Web:</label>
+                                            <input type="text" id="KD_Web" class="kd-input" style="width:220px;" value="www.consec.de">
+                                        </div>
+                                    </fieldset>
+                                </div>
+
+                                <!-- Rechte Spalte: Bankdaten + Ansprechpartner -->
+                                <div class="form-column">
+                                    <fieldset class="kd-fieldset">
+                                        <legend>Bankverbindung</legend>
+                                        <div class="field-row">
+                                            <label>Kreditinstitut:</label>
+                                            <input type="text" id="KD_Bank" class="kd-input" style="width:200px;" value="Sparkasse Nuernberg">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>IBAN:</label>
+                                            <input type="text" id="KD_IBAN" class="kd-input" style="width:240px;" value="DE89 3704 0044 0532 0130 00">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>BIC:</label>
+                                            <input type="text" id="KD_BIC" class="kd-input" style="width:120px;" value="COBADEFFXXX">
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="kd-fieldset">
+                                        <legend>Steuerdaten</legend>
+                                        <div class="field-row">
+                                            <label>UStIDNr.:</label>
+                                            <input type="text" id="KD_UStIDNr" class="kd-input" style="width:160px;" value="DE123456789">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>Zahlungsbedingungen:</label>
+                                            <select id="KD_Zahlungsbedingung" class="kd-select" style="width:180px;">
+                                                <option value="sofort">Sofort</option>
+                                                <option value="7">7 Tage netto</option>
+                                                <option value="14" selected>14 Tage netto</option>
+                                                <option value="30">30 Tage netto</option>
+                                                <option value="60">60 Tage netto</option>
+                                            </select>
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="kd-fieldset">
+                                        <legend>Ansprechpartner</legend>
+                                        <div class="field-row">
+                                            <label>Name:</label>
+                                            <input type="text" id="KD_AP_Name" class="kd-input" style="width:180px;" value="Hr. Mueller">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>Position:</label>
+                                            <input type="text" id="KD_AP_Position" class="kd-input" style="width:180px;" value="Geschaeftsfuehrer">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>Telefon:</label>
+                                            <input type="text" id="KD_AP_Telefon" class="kd-input" style="width:140px;" value="0911 12345679">
+                                        </div>
+                                        <div class="field-row">
+                                            <label>E-Mail:</label>
+                                            <input type="email" id="KD_AP_Email" class="kd-input" style="width:200px;" value="mueller@consec.de">
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB: Konditionen -->
+                        <div class="tab-pane" id="tab-konditionen">
+                            <fieldset class="kd-fieldset">
+                                <legend>Verrechnungssaetze</legend>
+                                <table class="kd-data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Bezeichnung</th>
+                                            <th>Stundensatz</th>
+                                            <th>Nacht-Zuschlag</th>
+                                            <th>Feiertag-Zuschlag</th>
+                                            <th>Gueltig ab</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Standard Sicherheit</td><td>25,00 EUR</td><td>15%</td><td>50%</td><td>01.01.2024</td></tr>
+                                        <tr><td>Event-Sicherheit</td><td>30,00 EUR</td><td>20%</td><td>75%</td><td>01.01.2024</td></tr>
+                                        <tr><td>VIP-Schutz</td><td>45,00 EUR</td><td>25%</td><td>100%</td><td>01.06.2024</td></tr>
+                                    </tbody>
+                                </table>
+                            </fieldset>
+                            <fieldset class="kd-fieldset">
+                                <legend>Besondere Konditionen</legend>
+                                <div class="field-row">
+                                    <label>Rabatt (%):</label>
+                                    <input type="number" id="KD_Rabatt" class="kd-input" style="width:60px;" value="5">
+                                    <label style="margin-left:20px;">Skonto (%):</label>
+                                    <input type="number" id="KD_Skonto" class="kd-input" style="width:60px;" value="2">
+                                    <label style="margin-left:10px;">bei Zahlung innerhalb</label>
+                                    <input type="number" id="KD_SkontoTage" class="kd-input" style="width:40px;" value="7">
+                                    <span>Tagen</span>
+                                </div>
+                            </fieldset>
+                        </div>
+
+                        <!-- TAB: Auftragsübersicht -->
+                        <div class="tab-pane" id="tab-auftraege">
+                            <div class="auftraege-filter">
+                                <label>Zeitraum:</label>
+                                <input type="date" id="datAuftraegeVon" class="kd-input" style="width:120px;">
+                                <span>bis</span>
+                                <input type="date" id="datAuftraegeBis" class="kd-input" style="width:120px;">
+                                <button class="kd-btn" id="btnAuftraegeFiltern">Filtern</button>
+                            </div>
+                            <table class="kd-data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Auftrag-Nr.</th>
+                                        <th>Bezeichnung</th>
+                                        <th>Datum</th>
+                                        <th>Objekt</th>
+                                        <th>Status</th>
+                                        <th>Betrag</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody_Auftraege">
+                                    <tr><td>2024-0125</td><td>Konzert Sicherheit</td><td>15.12.2024</td><td>Arena Nuernberg</td><td class="status-ok">Abgeschlossen</td><td>2.450,00 EUR</td></tr>
+                                    <tr><td>2024-0128</td><td>Firmenevent</td><td>20.12.2024</td><td>Messezentrum</td><td class="status-warn">In Planung</td><td>1.800,00 EUR</td></tr>
+                                    <tr><td>2024-0131</td><td>Silvesterparty</td><td>31.12.2024</td><td>Stadtpark</td><td class="status-open">Offen</td><td>3.200,00 EUR</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- TAB: Zusatzdateien -->
+                        <div class="tab-pane" id="tab-dateien">
+                            <div class="dateien-toolbar">
+                                <button class="kd-btn primary" id="btnDateiHinzufuegen">+ Datei hinzufuegen</button>
+                            </div>
+                            <table class="kd-data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Dateiname</th>
+                                        <th>Typ</th>
+                                        <th>Groesse</th>
+                                        <th>Hochgeladen am</th>
+                                        <th>Aktion</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody_Dateien">
+                                    <tr><td>Vertrag_2024.pdf</td><td>PDF</td><td>245 KB</td><td>01.01.2024</td><td><button class="kd-btn-small">Oeffnen</button></td></tr>
+                                    <tr><td>Logo_Kunde.png</td><td>Bild</td><td>58 KB</td><td>15.03.2024</td><td><button class="kd-btn-small">Oeffnen</button></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- TAB: Bemerkungen -->
+                        <div class="tab-pane" id="tab-bemerkungen">
+                            <fieldset class="kd-fieldset" style="height:calc(100% - 20px);">
+                                <legend>Bemerkungen / Notizen</legend>
+                                <textarea id="KD_Bemerkungen" class="kd-textarea">Wichtiger Kunde seit 2018.
+Bevorzugt Kontakt per E-Mail.
+Sonderkonditionen bei Grossauftraegen moeglich.</textarea>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer mit Erstellt/Geändert Info -->
+            <footer class="kd-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-center">
+                    <span id="lblErstellt">Erstellt am: 15.03.2018 von Admin</span>
+                    <span class="footer-sep">|</span>
+                    <span id="lblGeaendert">Geaendert am: 10.12.2024 von Siegert</span>
+                </div>
+                <div class="footer-right">
+                    <span>API: localhost:5000</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Tab-Navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Alle Tabs deaktivieren
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                // Gewählten Tab aktivieren
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Datum setzen
+        document.getElementById('lblDatum').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="frm_KD_Kundenstamm.logic.js"></script>
+</body>
+</html>

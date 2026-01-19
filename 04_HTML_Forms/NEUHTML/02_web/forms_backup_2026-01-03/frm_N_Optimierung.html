@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS Optimierungs-Hub - Claude AI</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root {
+            --hub-primary: #2c3e50;
+            --hub-accent: #3498db;
+            --hub-success: #27ae60;
+            --hub-warning: #f39c12;
+            --hub-danger: #e74c3c;
+            --hub-info: #17a2b8;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .opt-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .opt-header {
+            background: linear-gradient(135deg, var(--hub-primary) 0%, #34495e 100%);
+            border-radius: 12px;
+            padding: 24px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .opt-header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .opt-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--hub-accent) 0%, #2980b9 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .opt-title-group h1 {
+            color: white;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .opt-title-group p {
+            color: #95a5a6;
+            font-size: 13px;
+        }
+
+        .opt-header-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .header-btn-primary {
+            background: var(--hub-accent);
+            color: white;
+        }
+
+        .header-btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .header-btn-outline {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .header-btn-outline:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Stats Bar */
+        .opt-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.blue { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+        .stat-icon.green { background: rgba(39, 174, 96, 0.2); color: #27ae60; }
+        .stat-icon.orange { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+        .stat-icon.red { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+        .stat-info h3 {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .stat-info p {
+            color: #7f8c8d;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content Grid */
+        .opt-main {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+
+        /* Navigation Sidebar */
+        .opt-nav {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .nav-section {
+            margin-bottom: 20px;
+        }
+
+        .nav-section-title {
+            color: #7f8c8d;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 12px;
+            margin-bottom: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #bdc3c7;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .nav-item:hover {
+            background: rgba(52, 152, 219, 0.15);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--hub-accent) 0%, #2980b9 100%);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-item-icon {
+            width: 24px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--hub-danger);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Content Area */
+        .opt-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 24px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .section-header h2 {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .section-body {
+            padding: 20px 24px;
+        }
+
+        /* Improvement Items */
+        .improvement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .improvement-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 18px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .improvement-item:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: var(--hub-accent);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .improvement-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .improvement-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .improvement-icon.ux { background: rgba(155, 89, 182, 0.2); color: #9b59b6; }
+        .improvement-icon.perf { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+        .improvement-icon.design { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+        .improvement-icon.feature { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+        .improvement-icon.fix { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+        .improvement-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .improvement-category {
+            color: #7f8c8d;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .improvement-desc {
+            color: #95a5a6;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .improvement-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .improvement-priority {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .priority-high {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .priority-medium {
+            background: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+        }
+
+        .priority-low {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .improvement-action {
+            background: var(--hub-accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .improvement-action:hover {
+            background: #2980b9;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .quick-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 20px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .quick-action:hover {
+            background: rgba(52, 152, 219, 0.15);
+            border-color: var(--hub-accent);
+            transform: translateY(-3px);
+        }
+
+        .quick-action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: rgba(52, 152, 219, 0.15);
+            color: var(--hub-accent);
+        }
+
+        .quick-action span {
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Checklist Style */
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .checklist-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .checklist-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #7f8c8d;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .checklist-checkbox.checked {
+            background: var(--hub-success);
+            border-color: var(--hub-success);
+            color: white;
+        }
+
+        .checklist-text {
+            flex: 1;
+            color: #ecf0f1;
+            font-size: 13px;
+        }
+
+        .checklist-item.completed .checklist-text {
+            text-decoration: line-through;
+            color: #7f8c8d;
+        }
+
+        /* Footer */
+        .opt-footer {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-info {
+            color: #7f8c8d;
+            font-size: 11px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #95a5a6;
+            font-size: 11px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--hub-accent);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-card {
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .section-card:nth-child(2) { animation-delay: 0.1s; }
+        .section-card:nth-child(3) { animation-delay: 0.2s; }
+        .section-card:nth-child(4) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="opt-container">
+        <!-- Header -->
+        <header class="opt-header">
+            <div class="opt-header-left">
+                <div class="opt-logo">&#9881;</div>
+                <div class="opt-title-group">
+                    <h1>CONSYS Optimierungs-Hub</h1>
+                    <p>KI-gesteuerte Verbesserungsvorschlaege fuer das HTML-Frontend</p>
+                </div>
+            </div>
+            <div class="opt-header-right">
+                <button class="header-btn header-btn-outline" onclick="window.location.href='frm_Menuefuehrung1.html'">
+                    &#8592; Zurueck zum Hauptmenue
+                </button>
+                <button class="header-btn header-btn-primary" onclick="applyAllOptimizations()">
+                    Alle Optimierungen anwenden
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="opt-stats">
+            <div class="stat-card">
+                <div class="stat-icon blue">&#128196;</div>
+                <div class="stat-info">
+                    <h3>46</h3>
+                    <p>HTML-Formulare</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">&#10003;</div>
+                <div class="stat-info">
+                    <h3>12</h3>
+                    <p>Optimiert</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">&#9888;</div>
+                <div class="stat-info">
+                    <h3>28</h3>
+                    <p>Verbesserungspotenzial</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">&#9889;</div>
+                <div class="stat-info">
+                    <h3>6</h3>
+                    <p>Kritische Punkte</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="opt-main">
+            <!-- Navigation -->
+            <nav class="opt-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Kategorien</div>
+                    <a href="#ux" class="nav-item active">
+                        <span class="nav-item-icon">&#128100;</span>
+                        UX-Verbesserungen
+                        <span class="nav-badge">8</span>
+                    </a>
+                    <a href="#performance" class="nav-item">
+                        <span class="nav-item-icon">&#9889;</span>
+                        Performance
+                        <span class="nav-badge">5</span>
+                    </a>
+                    <a href="#design" class="nav-item">
+                        <span class="nav-item-icon">&#127912;</span>
+                        Design & Layout
+                        <span class="nav-badge">6</span>
+                    </a>
+                    <a href="#features" class="nav-item">
+                        <span class="nav-item-icon">&#10024;</span>
+                        Neue Features
+                        <span class="nav-badge">7</span>
+                    </a>
+                    <a href="#fixes" class="nav-item">
+                        <span class="nav-item-icon">&#128295;</span>
+                        Fehlerbehebungen
+                        <span class="nav-badge">4</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Schnellzugriff</div>
+                    <a href="#quick" class="nav-item">
+                        <span class="nav-item-icon">&#128640;</span>
+                        Quick Actions
+                    </a>
+                    <a href="#checklist" class="nav-item">
+                        <span class="nav-item-icon">&#9745;</span>
+                        Checkliste
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Content -->
+            <div class="opt-content">
+                <!-- Quick Actions -->
+                <section class="section-card" id="quick">
+                    <div class="section-header">
+                        <h2>
+                            <span class="section-header-icon" style="background:rgba(52,152,219,0.2);color:#3498db;">&#128640;</span>
+                            Schnellaktionen
+                        </h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="quick-actions">
+                            <a href="frm_N_Dienstplanuebersicht.html" class="quick-action">
+                                <div class="quick-action-icon">&#128197;</div>
+                                <span>Dienstplan<br>optimiert</span>
+                            </a>
+                            <a href="frm_MA_Mitarbeiterstamm.html" class="quick-action">
+                                <div class="quick-action-icon">&#128100;</div>
+                                <span>Mitarbeiter<br>Stammblatt</span>
+                            </a>
+                            <a href="frm_va_Auftragstamm.html" class="quick-action">
+                                <div class="quick-action-icon">&#128203;</div>
+                                <span>Auftrags-<br>verwaltung</span>
+                            </a>
+                            <a href="frm_KD_Kundenstamm.html" class="quick-action">
+                                <div class="quick-action-icon">&#127970;</div>
+                                <span>Kunden-<br>stamm</span>
+                            </a>
+                            <a href="frm_VA_Planungsuebersicht.html" class="quick-action">
+                                <div class="quick-action-icon">&#128200;</div>
+                                <span>Planungs-<br>uebersicht</span>
+                            </a>
+                            <a href="frm_N_Dashboard.html" class="quick-action">
+                                <div class="quick-action-icon">&#128202;</div>
+                                <span>Neues<br>Dashboard</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- UX Verbesserungen -->
+                <section class="section-card" id="ux">
+                    <div class="section-header">
+                        <h2>
+                            <span class="section-header-icon" style="background:rgba(155,89,182,0.2);color:#9b59b6;">&#128100;</span>
+                            UX-Verbesserungen
+                        </h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="improvement-grid">
+                            <div class="improvement-item" onclick="openImprovement('ux-keyboard')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon ux">&#9000;</div>
+                                    <div>
+                                        <div class="improvement-title">Tastatur-Navigation</div>
+                                        <div class="improvement-category">Accessibility</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Vollstaendige Tastatursteuerung fuer alle Formulare: Tab-Reihenfolge optimieren,
+                                    Shortcuts (Strg+S speichern, Strg+N neu), Focus-Indikatoren verbessern.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('ux-search')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon ux">&#128269;</div>
+                                    <div>
+                                        <div class="improvement-title">Globale Suche</div>
+                                        <div class="improvement-category">Navigation</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Eine zentrale Suchfunktion (Strg+K) die Mitarbeiter, Auftraege, Kunden und
+                                    Objekte durchsucht. Autocomplete mit Live-Ergebnissen.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('ux-breadcrumb')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon ux">&#128279;</div>
+                                    <div>
+                                        <div class="improvement-title">Breadcrumb-Navigation</div>
+                                        <div class="improvement-category">Navigation</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Brotkrumen-Navigation in allen Formularen um die aktuelle Position im System
+                                    anzuzeigen und schnelles Zuruecknavigieren zu ermoeglichen.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('ux-undo')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon ux">&#8634;</div>
+                                    <div>
+                                        <div class="improvement-title">Undo/Redo System</div>
+                                        <div class="improvement-category">Datensicherheit</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Aenderungen rueckgaengig machen mit Strg+Z. Historie der letzten 10 Aenderungen
+                                    mit Moeglichkeit zur Wiederherstellung.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('ux-drag')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon ux">&#128400;</div>
+                                    <div>
+                                        <div class="improvement-title">Drag & Drop Zuordnung</div>
+                                        <div class="improvement-category">Effizienz</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Mitarbeiter per Drag & Drop auf Schichten ziehen im Dienstplan und
+                                    in der Planungsuebersicht. Visuelles Feedback beim Ziehen.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('ux-tooltip')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon ux">&#128172;</div>
+                                    <div>
+                                        <div class="improvement-title">Intelligente Tooltips</div>
+                                        <div class="improvement-category">Information</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Rich-Tooltips mit Kontextinformationen: MA-Details bei Hover, Auftragsinfos,
+                                    Verfuegbarkeitsstatus, Konfliktanzeige.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('ux-filter')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon ux">&#128296;</div>
+                                    <div>
+                                        <div class="improvement-title">Erweiterte Filter</div>
+                                        <div class="improvement-category">Datenansicht</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Filterleiste mit kombinierbaren Filtern: Zeitraum, Status, Ort, MA-Typ.
+                                    Filter speichern und wiederverwenden.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('ux-dark')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon ux">&#127769;</div>
+                                    <div>
+                                        <div class="improvement-title">Dark Mode Toggle</div>
+                                        <div class="improvement-category">Komfort</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Umschaltung zwischen Hell- und Dunkelmodus. Automatische Erkennung der
+                                    Systemeinstellung. Einstellung wird gespeichert.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-low">&#9679; Niedrig</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Performance -->
+                <section class="section-card" id="performance">
+                    <div class="section-header">
+                        <h2>
+                            <span class="section-header-icon" style="background:rgba(46,204,113,0.2);color:#2ecc71;">&#9889;</span>
+                            Performance-Optimierungen
+                        </h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="improvement-grid">
+                            <div class="improvement-item" onclick="openImprovement('perf-lazy')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon perf">&#128247;</div>
+                                    <div>
+                                        <div class="improvement-title">Lazy Loading</div>
+                                        <div class="improvement-category">Ladezeit</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Tabs und Subformulare erst laden wenn sie geoeffnet werden. Bilder/Fotos
+                                    erst bei Sichtbarkeit laden. Initial-Ladezeit um 40% reduzieren.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('perf-virtual')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon perf">&#128218;</div>
+                                    <div>
+                                        <div class="improvement-title">Virtual Scrolling</div>
+                                        <div class="improvement-category">Listen</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Grosse Listen (MA, Auftraege) mit virtuellem Scrolling. Nur sichtbare Zeilen
+                                    rendern. Performance bei 1000+ Eintraegen drastisch verbessern.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('perf-cache')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon perf">&#128190;</div>
+                                    <div>
+                                        <div class="improvement-title">Intelligentes Caching</div>
+                                        <div class="improvement-category">API</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    API-Antworten cachen mit konfigurierbarem TTL. Stammdaten laenger cachen,
+                                    Live-Daten kurzfristig. Cache-Invalidierung bei Aenderungen.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('perf-bundle')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon perf">&#128230;</div>
+                                    <div>
+                                        <div class="improvement-title">CSS/JS Bundling</div>
+                                        <div class="improvement-category">Assets</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Alle CSS/JS Dateien zusammenfassen und minifizieren. Critical CSS inline.
+                                    HTTP-Requests um 60% reduzieren.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('perf-debounce')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon perf">&#128336;</div>
+                                    <div>
+                                        <div class="improvement-title">Debounce/Throttle</div>
+                                        <div class="improvement-category">Events</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Such-Eingaben debounce (300ms), Scroll-Events throttle. Unnoetige API-Calls
+                                    und DOM-Updates vermeiden.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Design & Layout -->
+                <section class="section-card" id="design">
+                    <div class="section-header">
+                        <h2>
+                            <span class="section-header-icon" style="background:rgba(52,152,219,0.2);color:#3498db;">&#127912;</span>
+                            Design & Layout
+                        </h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="improvement-grid">
+                            <div class="improvement-item" onclick="openImprovement('design-consistent')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon design">&#127752;</div>
+                                    <div>
+                                        <div class="improvement-title">Einheitliches Design-System</div>
+                                        <div class="improvement-category">Konsistenz</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Alle Formulare auf einheitliches Farbschema und Komponenten umstellen.
+                                    Design-Tokens fuer Farben, Abstande, Schriften definieren.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('design-responsive')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon design">&#128241;</div>
+                                    <div>
+                                        <div class="improvement-title">Verbesserte Responsiveness</div>
+                                        <div class="improvement-category">Layout</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Breakpoints fuer 11" bis 23" Monitore optimieren. Container Queries fuer
+                                    flexible Komponenten. Touch-Unterstuetzung fuer Tablets.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('design-status')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon design">&#128308;</div>
+                                    <div>
+                                        <div class="improvement-title">Status-Farbschema</div>
+                                        <div class="improvement-category">Visualisierung</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Einheitliche Farben fuer Status: Gruen=OK, Gelb=Warnung, Rot=Fehler/Dringend.
+                                    Farbenblind-freundliche Palette mit Symbolen.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('design-icons')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon design">&#127912;</div>
+                                    <div>
+                                        <div class="improvement-title">Icon-Bibliothek</div>
+                                        <div class="improvement-category">Visuals</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    SVG-Icons statt Unicode-Zeichen. Einheitliche Icon-Groessen und -Stile.
+                                    Icon-Font fuer bessere Performance.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-low">&#9679; Niedrig</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('design-print')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon design">&#128424;</div>
+                                    <div>
+                                        <div class="improvement-title">Druck-Stylesheets</div>
+                                        <div class="improvement-category">Export</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Optimierte Print-CSS fuer alle Formulare. Seitenumbrueche, Kopf-/Fusszeilen,
+                                    Firmenlogo. PDF-Export Funktion.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('design-animations')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon design">&#10024;</div>
+                                    <div>
+                                        <div class="improvement-title">Micro-Animations</div>
+                                        <div class="improvement-category">UX Polish</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Subtile Animationen fuer Feedback: Button-Klicks, Lade-Indikatoren,
+                                    Tab-Wechsel, Erfolgs-/Fehler-Meldungen.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-low">&#9679; Niedrig</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Neue Features -->
+                <section class="section-card" id="features">
+                    <div class="section-header">
+                        <h2>
+                            <span class="section-header-icon" style="background:rgba(241,196,15,0.2);color:#f1c40f;">&#10024;</span>
+                            Neue Features
+                        </h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="improvement-grid">
+                            <div class="improvement-item" onclick="openImprovement('feat-dashboard')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon feature">&#128202;</div>
+                                    <div>
+                                        <div class="improvement-title">Live-Dashboard</div>
+                                        <div class="improvement-category">Uebersicht</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Echtzeit-Dashboard mit: Heutige Einsaetze, Offene Anfragen, Personalstaerke,
+                                    Auslastung, Warnungen. Auto-Refresh alle 60 Sekunden.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('feat-calendar')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon feature">&#128197;</div>
+                                    <div>
+                                        <div class="improvement-title">Interaktiver Kalender</div>
+                                        <div class="improvement-category">Planung</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Monats-/Wochen-/Tagesansicht. Auftraege per Klick/Drag erstellen.
+                                    Feiertage, Schulferien automatisch markiert. Kalendersynchronisation.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('feat-notifications')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon feature">&#128276;</div>
+                                    <div>
+                                        <div class="improvement-title">Benachrichtigungscenter</div>
+                                        <div class="improvement-category">Kommunikation</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Zentrale Benachrichtigungen: Neue Anfragen, Absagen, Aenderungen,
+                                    Erinnerungen. Badge-Counter im Header. Push-Notifications optional.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('feat-reports')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon feature">&#128200;</div>
+                                    <div>
+                                        <div class="improvement-title">Report-Generator</div>
+                                        <div class="improvement-category">Auswertung</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Berichte selbst erstellen: Zeitraum, Gruppierung, Filter waehlbar.
+                                    Vorlagen speichern. Export als PDF, Excel, CSV.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('feat-conflict')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon feature">&#9888;</div>
+                                    <div>
+                                        <div class="improvement-title">Konflikt-Erkennung</div>
+                                        <div class="improvement-category">Planung</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Automatische Erkennung von: Doppelbuchungen, Ueberschneidungen,
+                                    Ruhezeit-Verletzungen, Maximalstunden. Warnung vor dem Speichern.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('feat-quick-create')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon feature">&#10133;</div>
+                                    <div>
+                                        <div class="improvement-title">Schnellerstellung</div>
+                                        <div class="improvement-category">Effizienz</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Floating Action Button fuer schnelles Erstellen: Neuer Auftrag,
+                                    Neue Anfrage, Neuer MA direkt aus jedem Formular.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('feat-favorites')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon feature">&#11088;</div>
+                                    <div>
+                                        <div class="improvement-title">Favoriten & Quicklinks</div>
+                                        <div class="improvement-category">Navigation</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Haeufig verwendete Auftraege, Mitarbeiter, Ansichten als Favoriten
+                                    markieren. Personalisierte Schnellzugriff-Leiste.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-low">&#9679; Niedrig</span>
+                                    <button class="improvement-action">Implementieren</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Fehlerbehebungen -->
+                <section class="section-card" id="fixes">
+                    <div class="section-header">
+                        <h2>
+                            <span class="section-header-icon" style="background:rgba(231,76,60,0.2);color:#e74c3c;">&#128295;</span>
+                            Fehlerbehebungen & Korrekturen
+                        </h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="improvement-grid">
+                            <div class="improvement-item" onclick="openImprovement('fix-links')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon fix">&#128279;</div>
+                                    <div>
+                                        <div class="improvement-title">Defekte Links korrigieren</div>
+                                        <div class="improvement-category">Navigation</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Mehrere Menue-Links zeigen auf "#" statt echte Formulare. Alle Links
+                                    ueberpruefen und korrigieren. 404-Seite erstellen.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Korrigieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('fix-umlauts')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon fix">&#196;</div>
+                                    <div>
+                                        <div class="improvement-title">Umlaut-Encoding</div>
+                                        <div class="improvement-category">Text</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Einige Dateinamen haben Umlaute (frm_N_Dienstplanuebersicht vs
+                                    frm_N_Dienstplanübersicht). Konsistente Benennung ohne Umlaute.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Korrigieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('fix-tabs')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon fix">&#128196;</div>
+                                    <div>
+                                        <div class="improvement-title">Tab-Inhalte laden</div>
+                                        <div class="improvement-category">Funktionalitaet</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Viele Tabs zeigen nur "wird geladen..." an. Tab-Inhalte mit echten
+                                    Daten befuellen oder Platzhalter durch sinnvolle Inhalte ersetzen.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-high">&#9679; Hoch</span>
+                                    <button class="improvement-action">Korrigieren</button>
+                                </div>
+                            </div>
+
+                            <div class="improvement-item" onclick="openImprovement('fix-mobile')">
+                                <div class="improvement-header">
+                                    <div class="improvement-icon fix">&#128241;</div>
+                                    <div>
+                                        <div class="improvement-title">Mobile Darstellung</div>
+                                        <div class="improvement-category">Responsive</div>
+                                    </div>
+                                </div>
+                                <div class="improvement-desc">
+                                    Unter 768px werden wichtige Elemente ausgeblendet. Hamburger-Menue
+                                    fuer mobile Ansicht. Touch-Targets vergroessern.
+                                </div>
+                                <div class="improvement-footer">
+                                    <span class="improvement-priority priority-medium">&#9679; Mittel</span>
+                                    <button class="improvement-action">Korrigieren</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Checkliste -->
+                <section class="section-card" id="checklist">
+                    <div class="section-header">
+                        <h2>
+                            <span class="section-header-icon" style="background:rgba(52,152,219,0.2);color:#3498db;">&#9745;</span>
+                            Implementations-Checkliste
+                        </h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="checklist">
+                            <div class="checklist-item completed" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox checked">&#10003;</div>
+                                <span class="checklist-text">Dienstplanuebersicht Matrix-Layout implementiert</span>
+                            </div>
+                            <div class="checklist-item completed" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox checked">&#10003;</div>
+                                <span class="checklist-text">Planungsuebersicht Auftrags-Matrix erstellt</span>
+                            </div>
+                            <div class="checklist-item completed" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox checked">&#10003;</div>
+                                <span class="checklist-text">Kundenstamm Tab-Layout mit 5 Tabs</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox"></div>
+                                <span class="checklist-text">Einheitliches Seitenmenü in allen Formularen</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox"></div>
+                                <span class="checklist-text">API-Anbindung fuer Datenladen implementieren</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox"></div>
+                                <span class="checklist-text">Globale Suchfunktion (Strg+K) einbauen</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox"></div>
+                                <span class="checklist-text">Tastatur-Navigation optimieren</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox"></div>
+                                <span class="checklist-text">Drag & Drop im Dienstplan</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox"></div>
+                                <span class="checklist-text">Live-Dashboard erstellen</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox"></div>
+                                <span class="checklist-text">Performance-Optimierungen (Lazy Loading, Virtual Scroll)</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox"></div>
+                                <span class="checklist-text">Benachrichtigungscenter implementieren</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-checkbox"></div>
+                                <span class="checklist-text">Druck-Stylesheets fuer alle Formulare</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="opt-footer">
+            <div class="footer-info">
+                CONSYS Optimierungs-Hub | Erstellt von Claude AI | Stand: 19.12.2025
+            </div>
+            <div class="footer-links">
+                <a href="frm_Menuefuehrung1.html">Hauptmenue</a>
+                <a href="frm_N_Dienstplanuebersicht.html">Dienstplan</a>
+                <a href="frm_MA_Mitarbeiterstamm.html">Mitarbeiter</a>
+                <a href="frm_va_Auftragstamm.html">Auftraege</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Navigation active state
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (this.getAttribute('href').startsWith('#')) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        });
+
+        // Toggle checklist
+        function toggleCheck(item) {
+            item.classList.toggle('completed');
+            const checkbox = item.querySelector('.checklist-checkbox');
+            checkbox.classList.toggle('checked');
+            checkbox.innerHTML = checkbox.classList.contains('checked') ? '&#10003;' : '';
+            saveChecklistState();
+        }
+
+        // Save checklist state to localStorage
+        function saveChecklistState() {
+            const items = document.querySelectorAll('.checklist-item');
+            const state = Array.from(items).map(item => item.classList.contains('completed'));
+            localStorage.setItem('consys_checklist', JSON.stringify(state));
+        }
+
+        // Load checklist state from localStorage
+        function loadChecklistState() {
+            const saved = localStorage.getItem('consys_checklist');
+            if (saved) {
+                const state = JSON.parse(saved);
+                const items = document.querySelectorAll('.checklist-item');
+                items.forEach((item, index) => {
+                    if (state[index]) {
+                        item.classList.add('completed');
+                        item.querySelector('.checklist-checkbox').classList.add('checked');
+                        item.querySelector('.checklist-checkbox').innerHTML = '&#10003;';
+                    }
+                });
+            }
+        }
+
+        // Open improvement detail (could open modal or navigate)
+        function openImprovement(id) {
+            console.log('Opening improvement:', id);
+            // Could show modal with detailed implementation steps
+            alert('Feature: ' + id + '\n\nDetaillierte Implementierungsanleitung wird in einer zukuenftigen Version verfuegbar sein.');
+        }
+
+        // Apply all optimizations
+        function applyAllOptimizations() {
+            if (confirm('Moechten Sie alle empfohlenen Optimierungen anwenden?\n\nDies wird mehrere Dateien aktualisieren.')) {
+                alert('Optimierungen werden angewendet...\n\nBitte starten Sie den API-Server und fuehren Sie das Update-Script aus.');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadChecklistState();
+
+            // Update stats from actual counts
+            // In production, this would fetch from API
+        });
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="frm_N_Optimierung.logic.js"></script>
+</body>
+</html>

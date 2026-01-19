@@ -1,0 +1,3508 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <script>
+    // Auto-Load in Shell (Sidebar-Integration)
+    (function() {
+        // Prüfe ob bereits in shell.html geladen (Parameter shell=1 vorhanden)
+        const urlParams = new URLSearchParams(window.location.search);
+        const isInShell = urlParams.has('shell') || window.SHELL_PARAMS;
+
+        // Prüfe ob in iframe eingebettet (z.B. als Subform)
+        const isInIframe = window.self !== window.top;
+
+        // Nur redirect wenn NICHT in shell UND NICHT in iframe
+        if (!isInShell && !isInIframe) {
+            const formName = window.location.pathname.split('/').pop();
+            const recordId = urlParams.get('id') || urlParams.get('ma_id') || urlParams.get('kd_id') || urlParams.get('va_id');
+
+            // URL-Parameter sammeln
+            let shellUrl = 'shell.html?form=' + formName;
+
+            // ID-Parameter (wenn vorhanden)
+            if (recordId) {
+                shellUrl += '&id=' + recordId;
+            }
+
+            // Alle anderen Parameter übernehmen
+            for (const [key, value] of urlParams.entries()) {
+                if (!['shell', 'id', 'ma_id', 'kd_id', 'va_id', '_t'].includes(key)) {
+                    shellUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                }
+            }
+
+            console.log('[Auto-Redirect] Lade mit Sidebar:', shellUrl);
+            window.location.replace(shellUrl);
+        }
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstammblatt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .window-frame {
+            background-color: #8080c0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Title Bar - ausgeblendet gemaess Anforderung */
+        .title-bar {
+            display: none;
+        }
+
+        .title-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .title-bar-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-btn {
+            width: 21px;
+            height: 21px;
+            background: #ece9d8;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-btn.close {
+            background: #c75050;
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 185px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+            overflow: visible;
+        }
+
+        /* Obere helle Kante - 4px nach rechts versetzt */
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        /* Untere dunkle Kante - 4px nach links versetzt */
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:active::before {
+            background: #404070;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn:active::after {
+            background: #ffffff;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.active::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            background-color: #d3d3d3;
+            padding: 3px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Header Row */
+        .header-row {
+            background-color: #d3d3d3; /* Wie Auftragstamm */
+            border: none; /* Wie Auftragstamm - ohne Border */
+            padding: 6px 8px; /* Mehr Padding wie Auftragstamm */
+            display: flex;
+            align-items: flex-start; /* Oben ausrichten fuer 2-Reihen Layout */
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            min-height: 70px; /* Mindesthöhe für 2 Reihen Buttons */
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4040a0, #8080c0);
+            border: 2px solid #404080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .title-text {
+            font-size: 23px !important; /* Formulartitel +8px gemaess Anforderung */
+            font-weight: bold !important;
+            color: #000080;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 1px solid #808080;
+            height: 26px; /* Einheitliche Höhe wie Auftragstamm */
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+            line-height: 1.2;
+            vertical-align: middle;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-green {
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+        }
+
+        .btn-blue {
+            background: linear-gradient(to bottom, #6080d0, #4060a0);
+            color: white;
+        }
+
+        .btn-red {
+            background: linear-gradient(to bottom, #e06060, #c04040);
+            color: white;
+        }
+
+        .gpt-box {
+            display: none; /* Deaktiviert - blockierte Speichern-Button */
+            background: #ffe0e0;
+            border: 1px solid #a00000;
+            padding: 2px 6px;
+            font-size: 9px;
+            text-align: center;
+            line-height: 1.2;
+            position: absolute;
+            right: 10px;
+            top: 28px;
+            pointer-events: none; /* Falls wieder aktiviert: Klicks durchlassen */
+        }
+
+        .header-row-wrapper {
+            position: relative;
+        }
+
+        .header-ma-nr {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        .header-ma-nr input {
+            width: 60px;
+            height: 18px;
+            border: 1px solid #808080;
+            text-align: center;
+            font-size: 10px;
+            background: #e0e0e0;
+        }
+
+        /* Employee Info Row */
+        .employee-info {
+            background-color: #b8b8d8;
+            border: 1px solid #606090;
+            padding: 6px 12px;
+            flex-shrink: 0;
+            text-align: center; /* MA-Name zentriert */
+        }
+
+        .employee-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        /* Work Area */
+        .work-area {
+            display: flex;
+            flex: 1;
+            gap: 3px;
+            overflow: hidden;
+        }
+
+        /* Left Work Panel */
+        .left-work-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Tab Container */
+        .tab-container {
+            background-color: #9090c0;
+            border: 1px solid #606090;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            background: #8080b0;
+            border-bottom: 1px solid #606090;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 4px 10px;
+            background: #a0a0c0;
+            border: 1px solid #808080;
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 10px;
+            margin-right: -1px;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: #9090c0;
+            border-bottom: 1px solid #9090c0;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-content {
+            padding: 8px;
+            flex: 1;
+            overflow: auto;
+            background: #b8b8d8;
+        }
+
+        .tab-page {
+            display: none;
+        }
+
+        .tab-page.active {
+            display: block;
+        }
+
+        /* Form Layout */
+        .form-columns {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding-right: 230px; /* Mehr Platz für vergrößertes Foto (200px + padding) */
+        }
+
+        .form-column {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-label {
+            min-width: 100px;
+            text-align: right;
+            font-size: 11px;
+        }
+
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 11px;
+            background: white;
+            height: 18px;
+            width: 150px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #000080;
+            box-shadow: 0 0 2px #000080;
+        }
+
+        .form-input.readonly {
+            background: #e0e0e0;
+        }
+
+        .form-input.small { width: 200px; }
+        .form-input.medium { width: 200px; }
+        .form-input.wide { width: 200px; }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 105px;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: 13px;
+            height: 13px;
+        }
+
+        .checkbox-row label {
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        /* Photo Section */
+        .photo-section {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: white;
+            border: 1px solid #808080;
+            padding: 5px;
+        }
+
+        .photo-frame {
+            width: 200px; /* Vergrößert von 90px auf 200px */
+            height: 200px; /* Quadratisch 200x200px */
+            border: 1px solid #808080;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .photo-frame img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .photo-btn {
+            width: 200px; /* Angepasst an Foto-Breite */
+            margin-top: 4px;
+            padding: 2px;
+            font-size: 9px;
+            background: linear-gradient(to bottom, #60c060, #308030);
+            color: white;
+            border: 1px solid #206020;
+            cursor: pointer;
+        }
+
+        /* Right Panel: Employee List */
+        .right-panel {
+            width: 425px;
+            background: #9090c0;
+            border: 1px solid #606090;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .right-header {
+            padding: 5px;
+            border-bottom: 1px solid #808080;
+            flex-shrink: 0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .search-box label {
+            font-size: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            height: 18px;
+            border: 1px solid #808080;
+            padding: 1px 4px;
+            font-size: 10px;
+        }
+
+        .filter-box {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .filter-box label {
+            font-size: 10px;
+        }
+
+        .filter-box select {
+            flex: 1;
+            height: 18px;
+            border: 1px solid #808080;
+            font-size: 10px;
+        }
+
+        .list-wrapper {
+            flex: 1;
+            overflow: auto;
+        }
+
+        .data-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .data-grid th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 3px 5px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+
+        .data-grid td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 4px;
+            background: white;
+        }
+
+        .data-grid tr:hover td {
+            background: #e0e0ff;
+        }
+
+        .data-grid tr.selected td {
+            background: #000080;
+            color: white;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 2px 5px;
+            display: flex;
+            gap: 10px;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .status-section {
+            border: 1px inset #808080;
+            padding: 1px 8px;
+            background: #e0e0e0;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(128, 128, 192, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-top-color: #000080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 30px;
+            right: 10px;
+            z-index: 1002;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+        .toast.warning { background: #f57f17; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border: 1px solid;
+            border-color: #e0e0e0 #606060 #606060 #e0e0e0;
+        }
+
+        /* Vollbild-Button oben rechts */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #606060 #606060 #ffffff;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .fullscreen-btn:active {
+            border-color: #606060 #ffffff #ffffff #606060;
+        }
+
+        /* Dropdown Styles (Excel Export) */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f0f0f0;
+            min-width: 160px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            z-index: 100;
+            border: 1px solid #808080;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content button {
+            width: 100%;
+            padding: 6px 10px;
+            text-align: left;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .dropdown-content button:hover {
+            background: #e0e0ff;
+        }
+
+        /* Quick Info Tab Styles */
+        .quickinfo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 8px;
+        }
+
+        .quickinfo-card {
+            background: #f0f0f8;
+            border: 2px solid #606090;
+            border-radius: 4px;
+            min-width: 280px;
+            flex: 1;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .quickinfo-card-header {
+            background: linear-gradient(to bottom, #000080, #404090);
+            color: white;
+            padding: 6px 10px;
+            border-bottom: 1px solid #404080;
+        }
+
+        .quickinfo-card-title {
+            font-weight: bold;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .quickinfo-card-body {
+            padding: 10px;
+        }
+
+        /* Statistik Grid */
+        .quickinfo-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .quickinfo-stat-item {
+            background: white;
+            border: 1px solid #a0a0c0;
+            border-radius: 3px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .quickinfo-stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000080;
+            margin-bottom: 2px;
+        }
+
+        .quickinfo-stat-label {
+            font-size: 9px;
+            color: #606080;
+            text-transform: uppercase;
+        }
+
+        /* Einsaetze Liste */
+        .quickinfo-einsaetze-list {
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid #a0a0c0;
+            background: white;
+        }
+
+        .quickinfo-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+
+        .quickinfo-table th {
+            background: linear-gradient(to bottom, #d0d0e0, #b0b0c0);
+            border: 1px solid #808080;
+            padding: 4px 6px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        .quickinfo-table td {
+            border: 1px solid #c0c0c0;
+            padding: 4px 6px;
+            background: white;
+        }
+
+        .quickinfo-table tr:hover td {
+            background: #e8e8ff;
+        }
+
+        .quickinfo-table tr.clickable {
+            cursor: pointer;
+        }
+
+        .quickinfo-table tr.clickable:hover td {
+            background: #d0d0ff;
+        }
+
+        /* Aktionen Buttons */
+        .quickinfo-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .quickinfo-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: linear-gradient(to bottom, #e8e8f8, #c8c8e0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            cursor: pointer;
+            font-size: 11px;
+            text-align: left;
+            transition: background 0.1s;
+        }
+
+        .quickinfo-action-btn:hover {
+            background: linear-gradient(to bottom, #f0f0ff, #d8d8f0);
+        }
+
+        .quickinfo-action-btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            background: linear-gradient(to bottom, #c0c0d0, #a0a0c0);
+        }
+
+        .quickinfo-action-icon {
+            font-size: 16px;
+        }
+
+        /* Responsive: Auf kleinen Bildschirmen untereinander */
+        @media (max-width: 900px) {
+            .quickinfo-container {
+                flex-direction: column;
+            }
+            .quickinfo-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .quickinfo-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Pflichtfeld-Markierung */
+        .required { color: #cc0000; font-weight: bold; }
+        input:required:invalid { border-color: #cc0000; }
+        input:required:valid { border-color: #008000; }
+        input.invalid { border-color: #cc0000 !important; background-color: #fff8f8 !important; }
+
+    </style>
+    <link rel="stylesheet" href="consys-common.css">
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <script src="js/performance-init.js"></script>
+<link rel="stylesheet" href="css/visbug_overrides.css">
+</head>
+<body data-form="frm_MA_Mitarbeiterstamm">
+    <button class="fullscreen-btn tiny-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild" data-testid="ma-btn-vollbild">â›¶</button>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <span>&#128100;</span>
+                <span>Mitarbeiterstammblatt</span>
+            </div>
+            <div class="title-bar-buttons">
+                <button class="title-btn tiny-btn" onclick="Bridge.sendEvent('minimize')" data-testid="ma-btn-minimieren">_</button>
+                <button class="title-btn" data-testid="ma-btn-maximieren">&#9633;</button>
+                <button class="title-btn close" onclick="closeForm()" data-testid="ma-btn-schliessen">&#10005;</button>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Header Row 1 -->
+                <div class="header-row-wrapper">
+                    <div class="header-row">
+                        <div class="logo-box">M</div>
+                        <span class="title-text">Mitarbeiterstammblatt</span>
+
+                        <button class="btn btn-blue" id="btnMAAdressen" onclick="openMAAdressen()" data-testid="ma-btn-maadressen">MA Adressen</button>
+                        <button class="btn" id="btnAktualisieren" onclick="refreshData()" data-testid="ma-btn-aktualisieren">Aktualisieren</button>
+                        <button class="btn" id="btnZeitkonto" onclick="openZeitkonto()" data-testid="ma-btn-zeitkonto">Zeitkonto</button>
+                        <button class="btn" id="btnNeuMA" onclick="neuerMitarbeiter()" data-testid="ma-btn-neu">Neuer Mitarbeiter</button>
+                        <button class="btn btn-red" id="btnLöschen" onclick="mitarbeiterLöschen()" data-testid="ma-btn-loeschen">Mitarbeiter löschen</button>
+                        <button class="btn" id="btnEinsaetzeFA" onclick="einsaetzeUebertragen('FA')" data-testid="ma-btn-einsaetze-fa">Einsätze FA</button>
+                        <button class="btn" id="btnEinsaetzeMJ" onclick="einsaetzeUebertragen('MJ')" data-testid="ma-btn-einsaetze-mj">Einsätze MJ</button>
+                        <!-- btnMADienstpl: in Access hidden -->
+                        <button class="btn btn-blue" id="btnDienstplan" onclick="openDienstplan()" data-testid="ma-btn-dienstplan" hidden>Dienstplan</button>
+                        <button class="btn btn-blue" id="btnEinsatzÜbersicht" onclick="openEinsatzübersicht()" data-testid="ma-btn-einsatzuebersicht">Einsatzübersicht</button>
+
+                        <!-- Excel-Export Dropdown (Access: btnXLZeitkto, btnXLJahr sichtbar, andere hidden) -->
+                        <div class="dropdown">
+                            <button class="btn">Excel Export &#9660;</button>
+                            <div class="dropdown-content">
+                                <!-- btnXLEinsUeber: in Access hidden -->
+                                <button onclick="btnXLEinsUeber_Click()" hidden>Einsatzuebersicht</button>
+                                <!-- btnXLDiePl: in Access hidden -->
+                                <button onclick="btnXLDiePl_Click()" hidden>Dienstplan</button>
+                                <button onclick="btnXLZeitkto_Click()">Zeitkonto</button>
+                                <button onclick="btnXLJahr_Click()">Jahresuebersicht</button>
+                                <!-- btnXLNverfueg: in Access hidden -->
+                                <button onclick="btnXLNverfueg_Click()" hidden>Nicht Verfuegbar</button>
+                                <!-- btnXLUeberhangStd: in Access hidden -->
+                                <button onclick="btnXLUeberhangStd_Click()" hidden>Ueberhang Stunden</button>
+                            </div>
+                        </div>
+
+                        <!-- Zeitkonto-Buttons (Access: btnZKFest, btnZKMini, btnZKeinzel) -->
+                        <button class="btn btn-blue" id="btnZKFest" onclick="btnZKFest_Click()" title="Zeitkonten Festangestellte fortschreiben" data-testid="ma-btn-zkfest">ZK Fest</button>
+                        <button class="btn btn-blue" id="btnZKMini" onclick="btnZKMini_Click()" title="Zeitkonten Minijobber fortschreiben" data-testid="ma-btn-zkmini">ZK Mini</button>
+                        <button class="btn btn-blue" id="btnZKeinzel" onclick="btnZKeinzel_Click()" title="Einzelsatz Zeitkonto fortschreiben" data-testid="ma-btn-zkeinzel">ZK Einzel</button>
+
+                        <!-- Zeitraum-Auswahl (Access: cboZeitraum) -->
+                        <select id="cboZeitraum" onchange="cboZeitraum_AfterUpdate(parseInt(this.value))" style="height: 20px; font-size: 10px;" data-testid="ma-select-zeitraum">
+                            <option value="8">Dieser Monat</option>
+                            <option value="9">Letzter Monat</option>
+                            <option value="11">Dieses Jahr</option>
+                            <option value="12">Letztes Jahr</option>
+                            <option value="22">Naechste 30 Tage</option>
+                            <option value="23">Naechste 10 Tage</option>
+                            <option value="24">Naechste 14 Tage</option>
+                            <option value="25">Ab Heute</option>
+                        </select>
+
+                        <div class="header-ma-nr">
+                            <span>MA-ID:</span>
+                            <input type="text" id="maNr" readonly data-testid="ma-input-id">
+                        </div>
+
+                        <button class="btn" id="btnSpeichern" onclick="speichern()" data-testid="ma-btn-speichern">Speichern</button>
+                    </div>
+                    <div class="gpt-box">GPT | TEST<br><span id="lblDatum"></span></div>
+                </div>
+
+                <!-- Employee Info -->
+                <div class="employee-info">
+                    <span class="employee-name"><span id="displayNachname">-</span> <span id="displayVorname">-</span></span>
+                </div>
+
+                <!-- Work Area -->
+                <div class="work-area">
+                    <!-- Left Work Panel -->
+                    <div class="left-work-panel">
+                        <div class="tab-container">
+                            <div class="tab-header">
+                                <!-- Sichtbare Tabs (wie in Access) -->
+                                <button class="tab-btn active" data-tab="stammdaten" data-testid="ma-tab-stammdaten">Stammdaten</button>
+                                <button class="tab-btn" data-tab="einsatzübersicht" data-testid="ma-tab-einsatzuebersicht">Einsatzübersicht</button>
+                                <button class="tab-btn" data-tab="dienstplan" data-testid="ma-tab-dienstplan">Dienstplan</button>
+                                <button class="tab-btn" data-tab="nichtverfügbar" data-testid="ma-tab-nichtverfuegbar">Nicht Verfügbar</button>
+                                <button class="tab-btn" data-tab="dienstkleidung" data-testid="ma-tab-dienstkleidung">Bestand Dienstkleidung</button>
+                                <!-- Versteckte Tabs (in Access nicht sichtbar) -->
+                                <button class="tab-btn" data-tab="zeitkonto" data-testid="ma-tab-zeitkonto" hidden>Zeitkonto</button>
+                                <button class="tab-btn" data-tab="jahresübersicht" data-testid="ma-tab-jahresuebersicht" hidden>Jahresübersicht</button>
+                                <button class="tab-btn" data-tab="stundenübersicht" data-testid="ma-tab-stundenuebersicht" hidden>Stundenübers.</button>
+                                <button class="tab-btn" data-tab="vordrucke" data-testid="ma-tab-vordrucke" hidden>Vordrucke</button>
+                                <button class="tab-btn" data-tab="briefkopf" data-testid="ma-tab-briefkopf" hidden>Briefkopf</button>
+                                <button class="tab-btn" data-tab="karte" data-testid="ma-tab-karte" hidden>Karte</button>
+                                <button class="tab-btn" data-tab="subrechnungen" data-testid="ma-tab-subrechnungen" hidden>Sub Rechnungen</button>
+                                <button class="tab-btn" data-tab="ueberhangstunden" data-testid="ma-tab-ueberhangstunden" hidden>Uberhang Std.</button>
+                                <button class="tab-btn" data-tab="qualifikationen" data-testid="ma-tab-qualifikationen" hidden>Qualifikationen</button>
+                                <button class="tab-btn" data-tab="dokumente" data-testid="ma-tab-dokumente" hidden>Dokumente</button>
+                                <button class="tab-btn" data-tab="quickinfo" data-testid="ma-tab-quickinfo" hidden>Quick Info</button>
+                            </div>
+                            <div class="tab-content">
+                                <!-- Tab 1: Stammdaten -->
+                                <div class="tab-page active" id="tab-stammdaten" style="position: relative;">
+                                    <div class="form-columns">
+                                        <!-- Column 1 -->
+                                        <div class="form-column">
+                                            <div class="form-row">
+                                                <span class="form-label">PersNr:</span>
+                                                <input type="text" class="form-input small readonly" id="ID" data-field="ID" readonly data-testid="ma-input-persnr">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">LexNr:</span>
+                                                <input type="text" class="form-input small" id="LEXWare_ID" data-field="LEXWare_ID">
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="IstAktiv" data-field="IstAktiv" data-testid="ma-checkbox-istaktiv">
+                                                <label for="IstAktiv">Aktiv</label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="Lex_Aktiv" data-field="Lex_Aktiv">
+                                                <label for="Lex_Aktiv">Lex_Aktiv</label>
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Nachname: <span class="required">*</span></span>
+                                                <input type="text" class="form-input wide" id="Nachname" data-field="Nachname" required data-testid="ma-input-nachname">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Vorname: <span class="required">*</span></span>
+                                                <input type="text" class="form-input wide" id="Vorname" data-field="Vorname" required data-testid="ma-input-vorname">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Strase:</span>
+                                                <input type="text" class="form-input wide" id="Strasse" data-field="Strasse" data-testid="ma-input-strasse">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Nr:</span>
+                                                <input type="text" class="form-input small" id="Nr" data-field="Nr">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">PLZ:</span>
+                                                <input type="text" class="form-input medium" id="PLZ" data-field="PLZ" pattern="[0-9]{5}" title="5-stellige PLZ eingeben" data-testid="ma-input-plz">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Ort:</span>
+                                                <input type="text" class="form-input wide" id="Ort" data-field="Ort" data-testid="ma-input-ort">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Land:</span>
+                                                <select class="form-select input-md" id="Land" data-field="Land">
+                                                    <option>Deutschland</option>
+                                                    <option>Osterreich</option>
+                                                    <option>Schweiz</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Bundesland:</span>
+                                                <input type="text" class="form-input wide" id="Bundesland" data-field="Bundesland">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Tel. Mobil:</span>
+                                                <input type="tel" class="form-input wide" id="Tel_Mobil" data-field="Tel_Mobil" pattern="[0-9+\-\s/()]+" title="Telefonnummer eingeben" data-testid="ma-input-telmobil">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Tel. Festnetz:</span>
+                                                <input type="tel" class="form-input wide" id="Tel_Festnetz" data-field="Tel_Festnetz" pattern="[0-9+\-\s/()]+" title="Telefonnummer eingeben">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Email:</span>
+                                                <input type="email" class="form-input wide" id="Email" data-field="Email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="Gueltige E-Mail-Adresse eingeben" data-testid="ma-input-email">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Geschlecht:</span>
+                                                <select class="form-select input-md" id="Geschlecht" data-field="Geschlecht">
+                                                    <option></option>
+                                                    <option>mannlich</option>
+                                                    <option>weiblich</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Staatsang.:</span>
+                                                <input type="text" class="form-input wide" id="Staatsang" data-field="Staatsang">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Geb. Datum:</span>
+                                                <input type="date" class="form-input medium" id="Geb_Dat" data-field="Geb_Dat" data-testid="ma-date-geburtstag">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Geb. Ort:</span>
+                                                <input type="text" class="form-input wide" id="Geb_Ort" data-field="Geb_Ort">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Geb. Name:</span>
+                                                <input type="text" class="form-input wide" id="Geb_Name" data-field="Geb_Name">
+                                            </div>
+                                        </div>
+
+                                        <!-- Column 2 -->
+                                        <div class="form-column">
+                                            <div class="form-row">
+                                                <span class="form-label">Eintrittsdatum:</span>
+                                                <input type="date" class="form-input medium" id="Eintrittsdatum" data-field="Eintrittsdatum" data-testid="ma-date-eintritt">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Austrittsdatum:</span>
+                                                <input type="date" class="form-input medium" id="Austrittsdatum" data-field="Austrittsdatum" data-testid="ma-date-austritt">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Anstellungsart:</span>
+                                                <select class="form-select input-md" id="Anstellungsart_ID" data-field="Anstellungsart_ID" data-testid="ma-select-anstellungsart">
+                                                    <option value=""></option>
+                                                    <option value="3">Festangestellt</option>
+                                                    <option value="4">Freiberufler</option>
+                                                    <option value="5">Subunternehmer</option>
+                                                </select>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="IstSubunternehmer" data-field="IstSubunternehmer">
+                                                <label for="IstSubunternehmer">Subunternehmer</label>
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Kleidergrose:</span>
+                                                <select class="form-select input-sm" id="Kleidergroesse" data-field="Kleidergroesse">
+                                                    <option></option>
+                                                    <option>XS</option>
+                                                    <option>S</option>
+                                                    <option>M</option>
+                                                    <option>L</option>
+                                                    <option>XL</option>
+                                                    <option>XXL</option>
+                                                </select>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="Hat_Fahrerausweis" data-field="Hat_Fahrerausweis">
+                                                <label for="Hat_Fahrerausweis">Fahrerausweis</label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="Eigener_PKW" data-field="Eigener_PKW">
+                                                <label for="Eigener_PKW">Eigener PKW</label>
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Dienstausweis:</span>
+                                                <input type="text" class="form-input wide" id="DienstausweisNr" data-field="DienstausweisNr">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Ausweis Ende:</span>
+                                                <input type="date" class="form-input medium" id="Ausweis_Endedatum" data-field="Ausweis_Endedatum">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Ausweis Funktion:</span>
+                                                <input type="text" class="form-input wide" id="Ausweis_Funktion" data-field="Ausweis_Funktion">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Letzte Uberpr. OA:</span>
+                                                <input type="date" class="form-input medium" id="Letzte_Ueberpr_OA" data-field="Letzte_Ueberpr_OA">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Personalausweis-Nr:</span>
+                                                <input type="text" class="form-input wide" id="Personalausweis_Nr" data-field="Personalausweis_Nr">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">DFB Epin:</span>
+                                                <input type="text" class="form-input wide" id="Epin_DFB" data-field="Epin_DFB">
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="Modul1_DFB" data-field="Modul1_DFB">
+                                                <label for="Modul1_DFB">DFB Modul 1</label>
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Bewacher ID:</span>
+                                                <input type="text" class="form-input wide" id="Bewacher_ID" data-field="Bewacher_ID">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Zust. Behorde:</span>
+                                                <input type="text" class="form-input wide" id="Zustaendige_Behoerde" data-field="Zustaendige_Behoerde">
+                                            </div>
+                                        </div>
+
+                                        <!-- Column 3 -->
+                                        <div class="form-column">
+                                            <div class="form-row">
+                                                <span class="form-label">Kontoinhaber:</span>
+                                                <input type="text" class="form-input wide" id="Kontoinhaber" data-field="Kontoinhaber">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Bankname:</span>
+                                                <input type="text" class="form-input wide" id="Bankname" data-field="Bankname">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">IBAN:</span>
+                                                <input type="text" class="form-input wide" id="IBAN" data-field="IBAN" pattern="[A-Z]{2}[0-9]{2}[A-Z0-9]{4}[0-9]{7}([A-Z0-9]?){0,16}" title="IBAN Format: DE12345678901234567890" data-testid="ma-input-iban">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">BIC:</span>
+                                                <input type="text" class="form-input medium" id="BIC" data-field="BIC" pattern="[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?" title="BIC Format: ABCDEFGH oder ABCDEFGHIJK">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Lohngruppe:</span>
+                                                <select class="form-select input-lg" id="Stundenlohn_brutto" data-field="Stundenlohn_brutto">
+                                                    <option></option>
+                                                    <option>BY Lohn 2a/b Okl. 1</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Kostenstelle:</span>
+                                                <input type="text" class="form-input medium" id="Kostenstelle" data-field="Kostenstelle">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Bezuge gezahlt als:</span>
+                                                <input type="text" class="form-input wide" id="Bezuege_gezahlt_als" data-field="Bezuege_gezahlt_als">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Koordinaten:</span>
+                                                <input type="text" class="form-input wide" id="Koordinaten" data-field="Koordinaten">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Steuer-ID:</span>
+                                                <input type="text" class="form-input wide" id="SteuerNr" data-field="SteuerNr">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Tatigkeit Bez.:</span>
+                                                <select class="form-select input-lg" id="Taetigkeit_Bezeichnung" data-field="Taetigkeit_Bezeichnung">
+                                                    <option></option>
+                                                    <option>Sicherheitspersonal</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Krankenkasse:</span>
+                                                <input type="text" class="form-input wide" id="KV_Kasse" data-field="KV_Kasse">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Steuerklasse:</span>
+                                                <input type="text" class="form-input small" id="Steuerklasse" data-field="Steuerklasse">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Sozialvers.Nr:</span>
+                                                <input type="text" class="form-input wide" id="Sozialvers_Nr" data-field="Sozialvers_Nr">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Arbeitsstd./Tag:</span>
+                                                <input type="number" class="form-input small" id="Arbeitsstd_pro_Arbeitstag" data-field="Arbeitsstd_pro_Arbeitstag" step="0.5">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Arbeitstage/Woche:</span>
+                                                <input type="number" class="form-input small" id="Arbeitstage_pro_Woche" data-field="Arbeitstage_pro_Woche" min="1" max="7">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Resturlaub Vorj.:</span>
+                                                <input type="number" class="form-input small" id="Resturlaub_Vorjahr" data-field="Resturlaub_Vorjahr" step="0.5">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Urlaub pro Jahr:</span>
+                                                <input type="number" class="form-input small" id="Urlaubsanspr_pro_Jahr" data-field="Urlaubsanspr_pro_Jahr">
+                                            </div>
+                                            <div class="form-row">
+                                                <span class="form-label">Std. Monat max.:</span>
+                                                <input type="number" class="form-input small" id="StundenZahlMax" data-field="StundenZahlMax">
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="Ist_RV_Befrantrag" data-field="Ist_RV_Befrantrag">
+                                                <label for="Ist_RV_Befrantrag">RV Befreiung beantragt</label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="IstNSB" data-field="IstNSB">
+                                                <label for="IstNSB">Brutto-Std</label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="eMail_Abrechnung" data-field="eMail_Abrechnung">
+                                                <label for="eMail_Abrechnung">Abrechnung per eMail</label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="Hat_keine_34a" data-field="Hat_keine_34a">
+                                                <label for="Hat_keine_34a">Keine 34a</label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="Unterweisungs_34a" data-field="Unterweisungs_34a">
+                                                <label for="Unterweisungs_34a">Unterweisungs Â§ 34a</label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <input type="checkbox" id="HatSachkunde" data-field="HatSachkunde">
+                                                <label for="HatSachkunde">Sachkunde Â§ 34a</label>
+                                            </div>
+                                            <div class="form-row" style="align-items: flex-start;">
+                                                <span class="form-label">Bemerkungen:</span>
+                                                <textarea class="form-input wide" id="Bemerkungen" data-field="Bemerkungen" rows="3" style="height: auto;" data-testid="ma-textarea-bemerkungen"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Photo Section mit Upload -->
+                                    <div class="photo-section">
+                                        <div class="photo-frame">
+                                            <img id="maPhoto" src="" alt="Foto">
+                                        </div>
+                                        <input type="file" id="fotoUploadInput" accept="image/*" style="display:none;" onchange="handleFotoUpload(this)">
+                                        <input type="file" id="fotoUploadInput2" accept="image/*" style="display:none;" onchange="handleFotoUpload2(this)">
+                                        <button class="photo-btn" onclick="document.getElementById('fotoUploadInput').click()" title="Lichtbild hochladen (Access: btnDateisuch)">Foto hochladen</button>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Einsatzübersicht -->
+                                <div class="tab-page" id="tab-einsatzübersicht">
+                                    <div style="padding: 8px;">
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap;">
+                                            <button class="btn" onclick="loadEinsaetze()">Aktualisieren</button>
+                                            <label>Auftrag:</label>
+                                            <select id="cboFilterAuftragEinsatz" data-testid="ma-select-auftrag-einsatz" style="width: 200px;">
+                                                <option value="">Alle Aufträge</option>
+                                            </select>
+                                            <label>Monat:</label>
+                                            <select id="cboMonatEinsatz" data-testid="ma-select-monat-einsatz" style="width: 120px;">
+                                                <option value="">Alle</option>
+                                                <option value="1">Januar</option>
+                                                <option value="2">Februar</option>
+                                                <option value="3">März</option>
+                                                <option value="4">April</option>
+                                                <option value="5">Mai</option>
+                                                <option value="6">Juni</option>
+                                                <option value="7">Juli</option>
+                                                <option value="8">August</option>
+                                                <option value="9">September</option>
+                                                <option value="10">Oktober</option>
+                                                <option value="11">November</option>
+                                                <option value="12">Dezember</option>
+                                            </select>
+                                            <label>Jahr:</label>
+                                            <select id="cboJahrEinsatz" data-testid="ma-select-jahr-einsatz" style="width: 100px;">
+                                                <option value="">Alle</option>
+                                            </select>
+                                            <span style="margin-left: auto;">Letzte 50 Einsätze</span>
+                                        </div>
+                                        <div style="height: 350px; overflow-y: auto; border: 1px solid #808080;">
+                                            <table class="data-grid" id="einsaetzeTable" data-testid="ma-table-einsaetze">
+                                                <thead><tr><th>Datum</th><th>Auftrag</th><th>Objekt</th><th>Von</th><th>Bis</th><th>Std</th></tr></thead>
+                                                <tbody id="einsaetzeTbody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Dienstplan -->
+                                <div class="tab-page" id="tab-dienstplan">
+                                    <div style="padding: 8px;">
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
+                                            <label>Monat:</label>
+                                            <select id="cboMonatDienstplan" data-testid="ma-select-monat-dienstplan" style="width: 120px;">
+                                                <option value="">Alle</option>
+                                                <option value="1">Januar</option>
+                                                <option value="2">Februar</option>
+                                                <option value="3">März</option>
+                                                <option value="4">April</option>
+                                                <option value="5">Mai</option>
+                                                <option value="6">Juni</option>
+                                                <option value="7">Juli</option>
+                                                <option value="8">August</option>
+                                                <option value="9">September</option>
+                                                <option value="10">Oktober</option>
+                                                <option value="11">November</option>
+                                                <option value="12">Dezember</option>
+                                            </select>
+                                            <label>Jahr:</label>
+                                            <select id="cboJahrDienstplan" data-testid="ma-select-jahr-dienstplan" style="width: 100px;">
+                                                <option value="">Alle</option>
+                                            </select>
+                                        </div>
+                                        <iframe src="sub_MA_Dienstplan.html" style="width: 100%; height: 350px; border: none;"></iframe>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Nicht Verfügbar -->
+                                <div class="tab-page" id="tab-nichtverfügbar">
+                                    <div style="padding: 8px;">
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap;">
+                                            <button class="btn btn-green" onclick="neueNichtVerfügbar()">+ Neu</button>
+                                            <button class="btn btn-red" onclick="loescheNichtVerfügbar()">Löschen</button>
+                                            <label>Monat:</label>
+                                            <select id="cboMonatNV" data-testid="ma-select-monat-nv" style="width: 120px;">
+                                                <option value="">Alle</option>
+                                                <option value="1">Januar</option>
+                                                <option value="2">Februar</option>
+                                                <option value="3">März</option>
+                                                <option value="4">April</option>
+                                                <option value="5">Mai</option>
+                                                <option value="6">Juni</option>
+                                                <option value="7">Juli</option>
+                                                <option value="8">August</option>
+                                                <option value="9">September</option>
+                                                <option value="10">Oktober</option>
+                                                <option value="11">November</option>
+                                                <option value="12">Dezember</option>
+                                            </select>
+                                            <label>Jahr:</label>
+                                            <select id="cboJahrNV" data-testid="ma-select-jahr-nv" style="width: 100px;">
+                                                <option value="">Alle</option>
+                                            </select>
+                                        </div>
+                                        <div style="height: 350px; overflow-y: auto; border: 1px solid #808080;">
+                                            <table class="data-grid" id="nvTable" data-testid="ma-table-nichtverfuegbar">
+                                                <thead><tr><th>Von</th><th>Bis</th><th>Grund</th><th>Bemerkung</th></tr></thead>
+                                                <tbody id="nvTbody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Dienstkleidung -->
+                                <div class="tab-page" id="tab-dienstkleidung">
+                                    <div style="padding: 8px;">
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                            <button class="btn btn-green" onclick="neueDienstkleidung()">+ Ausgabe</button>
+                                            <button class="btn" onclick="rückgabeDienstkleidung()">Rückgabe</button>
+                                        </div>
+                                        <div style="height: 350px; overflow-y: auto; border: 1px solid #808080;">
+                                            <table class="data-grid" id="dkTable" data-testid="ma-table-dienstkleidung">
+                                                <thead><tr><th>Artikel</th><th>Größe</th><th>Ausgabe</th><th>Rückgabe</th><th>Status</th></tr></thead>
+                                                <tbody id="dkTbody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Zeitkonto -->
+                                <div class="tab-page" id="tab-zeitkonto">
+                                    <iframe src="sub_MA_Zeitkonto.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                                </div>
+
+                                <!-- Tab: Jahresübersicht -->
+                                <div class="tab-page" id="tab-jahresübersicht">
+                                    <iframe src="sub_MA_Jahresuebersicht.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                                </div>
+
+                                <!-- Tab: Stundenübersicht -->
+                                <div class="tab-page" id="tab-stundenübersicht">
+                                    <iframe src="sub_MA_Stundenuebersicht.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                                </div>
+
+                                <!-- Tab: Vordrucke -->
+                                <div class="tab-page" id="tab-vordrucke">
+                                    <div style="padding: 15px; display: flex; flex-wrap: wrap; gap: 10px;">
+                                        <button class="btn" onclick="druckeVordruck('Arbeitsvertrag')">Arbeitsvertrag</button>
+                                        <button class="btn" onclick="druckeVordruck('Datenschutz')">Datenschutz</button>
+                                        <button class="btn" onclick="druckeVordruck('Schweigepflicht')">Schweigepflicht</button>
+                                        <button class="btn" onclick="druckeVordruck('Dienstausweis')">Dienstausweis</button>
+                                        <button class="btn" onclick="druckeVordruck('Lohnschein')">Lohnschein</button>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Briefkopf -->
+                                <div class="tab-page" id="tab-briefkopf">
+                                    <div style="padding: 8px;">
+                                        <textarea id="briefkopfText" style="width: 100%; height: 350px; font-family: monospace; font-size: 11px;" data-field="Briefkopf"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Karte -->
+                                <div class="tab-page" id="tab-karte">
+                                    <div style="padding: 8px;">
+                                        <div style="margin-bottom: 8px;">
+                                            <button class="btn" onclick="openMaps()">In Google Maps öffnen</button>
+                                        </div>
+                                        <div id="mapContainer" style="width: 100%; height: 350px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; border: 1px solid #808080;">
+                                            <span>Karte: Klicken Sie auf "In Google Maps öffnen"</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Sub Rechnungen -->
+                                <div class="tab-page" id="tab-subrechnungen">
+                                    <iframe src="sub_MA_Rechnungen.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                                </div>
+
+                                <!-- Tab: Ueberhang Stunden -->
+                                <div class="tab-page" id="tab-ueberhangstunden">
+                                    <div style="padding: 8px;">
+                                        <div style="height: 350px; overflow-y: auto; border: 1px solid #808080;">
+                                            <table class="data-grid" id="ueberhangTable">
+                                                <thead><tr><th>Monat</th><th>Soll</th><th>Ist</th><th>Diff</th><th>Ueberhang</th></tr></thead>
+                                                <tbody id="ueberhangTbody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Qualifikationen -->
+                                <div class="tab-page" id="tab-qualifikationen">
+                                    <div style="padding: 8px;">
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                            <button class="btn btn-green" onclick="neueQualifikation()">+ Neu</button>
+                                            <button class="btn btn-red" onclick="loescheQualifikation()">Löschen</button>
+                                            <button class="btn" onclick="loadQualifikationen()">Aktualisieren</button>
+                                        </div>
+                                        <div style="height: 350px; overflow-y: auto; border: 1px solid #808080;">
+                                            <table class="data-grid" id="qualifikationenTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 200px;">Qualifikation</th>
+                                                        <th style="width: 100px;">Erworben am</th>
+                                                        <th style="width: 100px;">Gueltig bis</th>
+                                                        <th style="width: 80px;">Nachweis</th>
+                                                        <th>Bemerkung</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="qualifikationenTbody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Dokumente -->
+                                <div class="tab-page" id="tab-dokumente">
+                                    <div style="padding: 8px;">
+                                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                            <button class="btn btn-green" onclick="neuesDokument()">+ Dokument hinzufügen</button>
+                                            <button class="btn btn-red" onclick="loescheDokument()">Löschen</button>
+                                            <button class="btn" onclick="öffneDokument()">Öffnen</button>
+                                            <button class="btn" onclick="loadDokumente()">Aktualisieren</button>
+                                        </div>
+                                        <div style="height: 350px; overflow-y: auto; border: 1px solid #808080;">
+                                            <table class="data-grid" id="dokumenteTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 200px;">Dateiname</th>
+                                                        <th style="width: 100px;">Typ</th>
+                                                        <th style="width: 100px;">Datum</th>
+                                                        <th style="width: 80px;">Größe</th>
+                                                        <th>Beschreibung</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="dokumenteTbody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Quick Info -->
+                                <div class="tab-page" id="tab-quickinfo">
+                                    <div class="quickinfo-container">
+                                        <!-- Statistik (lfd. Jahr) -->
+                                        <div class="quickinfo-card">
+                                            <div class="quickinfo-card-header">
+                                                <span class="quickinfo-card-title">STATISTIK (LFD. JAHR)</span>
+                                            </div>
+                                            <div class="quickinfo-card-body">
+                                                <div class="quickinfo-stats-grid" id="quickInfoStats">
+                                                    <div class="quickinfo-stat-item">
+                                                        <div class="quickinfo-stat-value" id="qiAnzahlEinsaetze">-</div>
+                                                        <div class="quickinfo-stat-label">Einsaetze</div>
+                                                    </div>
+                                                    <div class="quickinfo-stat-item">
+                                                        <div class="quickinfo-stat-value" id="qiGesamtstunden">-</div>
+                                                        <div class="quickinfo-stat-label">Stunden</div>
+                                                    </div>
+                                                    <div class="quickinfo-stat-item">
+                                                        <div class="quickinfo-stat-value" id="qiZuverlaessigkeit">-</div>
+                                                        <div class="quickinfo-stat-label">Zuverl.</div>
+                                                    </div>
+                                                    <div class="quickinfo-stat-item">
+                                                        <div class="quickinfo-stat-value" id="qiRating">-</div>
+                                                        <div class="quickinfo-stat-label">Rating</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Naechste Einsaetze -->
+                                        <div class="quickinfo-card">
+                                            <div class="quickinfo-card-header">
+                                                <span class="quickinfo-card-title">NAECHSTE EINSAETZE</span>
+                                            </div>
+                                            <div class="quickinfo-card-body">
+                                                <div class="quickinfo-einsaetze-list" id="quickInfoEinsaetze">
+                                                    <table class="quickinfo-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Datum</th>
+                                                                <th>Auftrag</th>
+                                                                <th>Zeit</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="qiEinsaetzeTbody">
+                                                            <tr><td colspan="3" style="text-align:center; color:#666;">Keine Einsaetze</td></tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Aktionen -->
+                                        <div class="quickinfo-card">
+                                            <div class="quickinfo-card-header">
+                                                <span class="quickinfo-card-title">AKTIONEN</span>
+                                            </div>
+                                            <div class="quickinfo-card-body">
+                                                <div class="quickinfo-actions">
+                                                    <button class="quickinfo-action-btn" onclick="quickInfoSendEmail()">
+                                                        <span class="quickinfo-action-icon">&#9993;</span>
+                                                        <span>E-Mail senden</span>
+                                                    </button>
+                                                    <button class="quickinfo-action-btn" onclick="quickInfoShowEinsatzplan()">
+                                                        <span class="quickinfo-action-icon">&#128197;</span>
+                                                        <span>Einsatzplan</span>
+                                                    </button>
+                                                    <button class="quickinfo-action-btn" onclick="quickInfoShowDokumente()">
+                                                        <span class="quickinfo-action-icon">&#128196;</span>
+                                                        <span>Dokumente</span>
+                                                    </button>
+                                                    <button class="quickinfo-action-btn" onclick="quickInfoShowNotizen()">
+                                                        <span class="quickinfo-action-icon">&#128221;</span>
+                                                        <span>Notizen</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Employee List -->
+                    <div class="right-panel">
+                        <div class="right-header">
+                            <div class="search-box">
+                                <label>Name:</label>
+                                <input type="text" id="searchInput" placeholder="Name eingeben..." data-testid="ma-input-suche">
+                            </div>
+                            <div class="filter-box">
+                                <label>Filter:</label>
+                                <select id="NurAktiveMA" data-testid="ma-select-filter">
+                                    <option value="0">Alle MA</option>
+                                    <option value="1">Nur Aktive</option>
+                                    <option value="2">Nur Festangestellte</option>
+                                    <option value="3">Nur Minijobber</option>
+                                    <option value="5" selected>Festangestellte + Minijobber</option>
+                                    <option value="4">Nur Subunternehmer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="list-wrapper" id="listWrapper">
+                            <table class="data-grid" id="maListTable" data-testid="ma-table-mitarbeiterliste">
+                                <thead>
+                                    <tr>
+                                        <th>Nachname</th>
+                                        <th>Vorname</th>
+                                        <th>Ort</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="maListBody">
+                                    <!-- Wird dynamisch gefullt -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-section">Erstellt</span>
+            <span class="status-section" id="erstelltVon">-</span>
+            <span class="status-section" id="erstelltAm">-</span>
+            <span class="status-section">Geandert</span>
+            <span class="status-section" id="geaendertVon">-</span>
+            <span class="status-section" id="geaendertAm">-</span>
+        </div>
+    </div>
+
+    <!-- WebView2 Bridge -->
+    <script src="js/webview2-bridge.js"></script>
+    <!-- Global Button Handlers -->
+    <script src="js/global-handlers.js"></script>
+
+    <script>
+        'use strict';
+
+        // ============================================
+        // ACCESS FORMULAR PROPERTIES (synchronisiert)
+        // RecordSource: tbl_MA_Mitarbeiterstamm
+        // DefaultView: 0 (Einzelformular)
+        // AllowEdits: false (initial, wird dynamisch geaendert)
+        // AllowAdditions: false
+        // AllowDeletions: false
+        // ============================================
+
+        // State
+        const state = {
+            mitarbeiterList: [],
+            currentIndex: 0,
+            currentRecord: null,
+            isDirty: false,           // Access: isDirty-Flag für AfterUpdate
+            allowEdits: true,         // Access: AllowEdits Property
+            allowAdditions: false,    // Access: AllowAdditions Property
+            allowDeletions: false,    // Access: AllowDeletions Property
+            cboZeitraum: 8,           // Dieser Monat (Default aus Access Form_Load)
+            AU_von: null,             // Zeitraum von
+            AU_bis: null              // Zeitraum bis
+        };
+
+        // AppState für global-handlers.js registrieren
+        if (typeof registerAppState === 'function') {
+            registerAppState({
+                formType: 'mitarbeiter',
+                currentIndex: 0,
+                records: [],
+                gotoRecord: showRecord,
+                newRecord: neuerMitarbeiter,
+                saveRecord: speichern,
+                deleteRecord: mitarbeiterLöschen,
+                refreshData: refreshData
+            });
+        }
+
+        // ============================================
+        // INITIALISIERUNG
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            document.getElementById('lblDatum').textContent = formatDate(new Date());
+
+            // Tab-Wechsel
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Menu-Navigation
+            document.querySelectorAll('.menu-btn[data-form]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    navigateToForm(this.dataset.form);
+                });
+            });
+
+            // Search & Filter
+            document.getElementById('searchInput').addEventListener('input', renderMitarbeiterList);
+            document.getElementById('NurAktiveMA').addEventListener('change', loadMitarbeiter);
+            // Filter in Tabs: Event-Listener werden unten bei Tab-Initialisierung hinzugefügt
+
+            // Jahr-Dropdowns in Tabs befüllen (2020-2026)
+            const jahrSelects = ['cboJahrDienstplan', 'cboJahrEinsatz', 'cboJahrNV'];
+            const currentYear = new Date().getFullYear();
+            jahrSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    for (let jahr = 2020; jahr <= 2026; jahr++) {
+                        const opt = document.createElement('option');
+                        opt.value = jahr;
+                        opt.textContent = jahr;
+                        if (jahr === currentYear) opt.selected = true;
+                        select.appendChild(opt);
+                    }
+                }
+            });
+
+            // Event-Listener für Tab-Filter hinzufügen
+            document.getElementById('cboMonatDienstplan')?.addEventListener('change', handleMonatFilterDienstplan);
+            document.getElementById('cboJahrDienstplan')?.addEventListener('change', handleJahrFilterDienstplan);
+            document.getElementById('cboFilterAuftragEinsatz')?.addEventListener('change', handleAuftragFilterEinsatz);
+            document.getElementById('cboMonatEinsatz')?.addEventListener('change', handleMonatFilterEinsatz);
+            document.getElementById('cboJahrEinsatz')?.addEventListener('change', handleJahrFilterEinsatz);
+            document.getElementById('cboMonatNV')?.addEventListener('change', handleMonatFilterNV);
+            document.getElementById('cboJahrNV')?.addEventListener('change', handleJahrFilterNV);
+
+            // Access AfterUpdate Events an Formularfelder binden
+            const anstellungsartSelect = document.getElementById('Anstellungsart_ID');
+            if (anstellungsartSelect) {
+                anstellungsartSelect.addEventListener('change', Anstellungsart_AfterUpdate);
+            }
+
+            const subunternehmerCheckbox = document.getElementById('IstSubunternehmer');
+            if (subunternehmerCheckbox) {
+                subunternehmerCheckbox.addEventListener('change', IstSubunternehmer_AfterUpdate);
+            }
+
+            // Alle Eingabefelder mit data-field tracken für isDirty
+            document.querySelectorAll('[data-field]').forEach(el => {
+                el.addEventListener('change', markDirty);
+                el.addEventListener('input', markDirty);
+            });
+
+            // Access: Form_Load - Dieser Monat als Default Zeitraum
+            state.cboZeitraum = 8;
+            StdZeitraum_Von_Bis(8);
+
+            // Keyboard Navigation
+            document.getElementById('listWrapper').addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    showRecord(Math.min(state.currentIndex + 1, state.mitarbeiterList.length - 1));
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    showRecord(Math.max(state.currentIndex - 1, 0));
+                }
+            });
+
+            // Bridge-Events registrieren
+            Bridge.on('onDataReceived', function(data) {
+                console.log('[Bridge] Data received:', data.type);
+
+                switch(data.type) {
+                    case 'mitarbeiter_list':
+                        state.mitarbeiterList = data.records || [];
+                        if (window.appState) {
+                            window.appState.records = state.mitarbeiterList;
+                        }
+                        renderMitarbeiterList();
+                        if (state.mitarbeiterList.length > 0) {
+                            showRecord(0);
+                        }
+                        hideLoading();
+                        break;
+
+                    case 'mitarbeiter_detail':
+                        loadMitarbeiterData(data.record);
+                        hideLoading();
+                        break;
+
+                    case 'einsaetze':
+                        renderEinsaetze(data.records || []);
+                        break;
+
+                    case 'nichtverfügbar':
+                        renderNichtVerfügbar(data.records || []);
+                        break;
+
+                    case 'dienstkleidung':
+                        renderDienstkleidung(data.records || []);
+                        break;
+
+                    case 'ueberhang':
+                        renderUeberhangStunden(data.records || []);
+                        break;
+
+                    case 'qualifikationen':
+                        renderQualifikationen(data.records || []);
+                        break;
+
+                    case 'dokumente':
+                        renderDokumente(data.records || []);
+                        break;
+
+                    case 'ma_statistik':
+                        renderQuickInfoStats(data.record || data);
+                        break;
+
+                    case 'ma_naechste_einsaetze':
+                        renderNaechsteEinsaetze(data.records || []);
+                        break;
+                }
+            });
+
+            // Response-Events für Speichern/Löschen
+            Bridge.on('onSaveComplete', function(data) {
+                if (data.success) {
+                    showToast('Gespeichert', 'success');
+                    // Access: Form_AfterUpdate aufrufen nach erfolgreichem Speichern
+                    Form_AfterUpdate();
+                    loadMitarbeiter();
+                } else {
+                    showToast('Fehler beim Speichern: ' + (data.error || 'Unbekannter Fehler'), 'error');
+                }
+                hideLoading();
+            });
+
+            Bridge.on('onDeleteComplete', function(data) {
+                if (data.success) {
+                    showToast('Gelöscht', 'success');
+                    loadMitarbeiter();
+                } else {
+                    showToast('Fehler beim Löschen: ' + (data.error || 'Unbekannter Fehler'), 'error');
+                }
+                hideLoading();
+            });
+
+            // Daten laden
+            await loadMitarbeiter();
+
+            // URL-Parameter prüfen
+            const params = new URLSearchParams(window.location.search);
+            const maId = params.get('ma_id');
+            if (maId) {
+                await loadMitarbeiterById(parseInt(maId));
+            }
+
+            hideLoading();
+        });
+
+        // ============================================
+        // DATA LOADING via WebView2 Bridge
+        // ============================================
+        async function loadMitarbeiter() {
+            showLoading();
+            const filterValue = parseInt(document.getElementById('NurAktiveMA').value);
+            const params = {};
+
+            // Access: NurAktiveMA Values
+            // 0 = Alle MA
+            // 1 = Nur Aktive
+            // 2 = Nur Festangestellte
+            // 3 = Nur Minijobber
+            // 4 = Nur Subunternehmer
+            // 5 = Festangestellte + Minijobber (default)
+            if (filterValue === 1) {
+                params.aktiv = true;
+            } else if (filterValue === 2) {
+                params.aktiv = true;
+                params.anstellungsart = 3; // Festangestellte
+            } else if (filterValue === 3) {
+                params.aktiv = true;
+                params.anstellungsart = 4; // Minijobber
+            } else if (filterValue === 4) {
+                params.ist_subunternehmer = true;
+            } else if (filterValue === 5) {
+                params.aktiv = true;
+                params.anstellungsart_in = [3, 4]; // Festangestellte UND Minijobber
+            }
+            // filterValue === 0: keine Parameter = Alle
+
+            Bridge.loadData('mitarbeiter', null, params);
+        }
+
+        /**
+         * Tab-Filter Handler: Dienstplan
+         */
+        function handleMonatFilterDienstplan() {
+            const monat = parseInt(document.getElementById('cboMonatDienstplan').value);
+            const jahr = parseInt(document.getElementById('cboJahrDienstplan').value);
+            console.log('[Dienstplan-Filter] Monat:', monat, 'Jahr:', jahr);
+            // TODO: Dienstplan-Subform mit Filter neu laden
+            if (state.currentMAID) {
+                // Dienstplan-Daten filtern und neu laden
+            }
+        }
+
+        function handleJahrFilterDienstplan() {
+            const jahr = parseInt(document.getElementById('cboJahrDienstplan').value);
+            console.log('[Dienstplan-Filter] Jahr:', jahr);
+            // TODO: Dienstplan-Subform mit Jahr-Filter neu laden
+            if (state.currentMAID) {
+                // Dienstplan-Daten filtern und neu laden
+            }
+        }
+
+        /**
+         * Tab-Filter Handler: Einsatzübersicht
+         */
+        function handleAuftragFilterEinsatz() {
+            const auftragId = parseInt(document.getElementById('cboFilterAuftragEinsatz').value);
+            console.log('[Einsatz-Filter] Auftrag:', auftragId);
+            if (state.currentMAID) {
+                loadEinsaetze(); // Einsätze mit Filter neu laden
+            }
+        }
+
+        function handleMonatFilterEinsatz() {
+            const monat = parseInt(document.getElementById('cboMonatEinsatz').value);
+            const jahr = parseInt(document.getElementById('cboJahrEinsatz').value);
+            console.log('[Einsatz-Filter] Monat:', monat, 'Jahr:', jahr);
+            if (state.currentMAID) {
+                loadEinsaetze(); // Einsätze mit Filter neu laden
+            }
+        }
+
+        function handleJahrFilterEinsatz() {
+            const jahr = parseInt(document.getElementById('cboJahrEinsatz').value);
+            console.log('[Einsatz-Filter] Jahr:', jahr);
+            if (state.currentMAID) {
+                loadEinsaetze(); // Einsätze mit Filter neu laden
+            }
+        }
+
+        /**
+         * Tab-Filter Handler: Nicht Verfügbar
+         */
+        function handleMonatFilterNV() {
+            const monat = parseInt(document.getElementById('cboMonatNV').value);
+            const jahr = parseInt(document.getElementById('cboJahrNV').value);
+            console.log('[NV-Filter] Monat:', monat, 'Jahr:', jahr);
+            if (state.currentMAID) {
+                loadNichtVerfuegbar(); // NV-Daten mit Filter neu laden
+            }
+        }
+
+        function handleJahrFilterNV() {
+            const jahr = parseInt(document.getElementById('cboJahrNV').value);
+            console.log('[NV-Filter] Jahr:', jahr);
+            if (state.currentMAID) {
+                loadNichtVerfuegbar(); // NV-Daten mit Filter neu laden
+            }
+        }
+
+        /**
+         * Subforms mit aktuellem Zeitraum/Filter neu laden
+         */
+        function refreshSubforms() {
+            // Implementierung abhängig von Subform-Struktur
+            console.log('[refreshSubforms] Lade Subforms neu mit Filter');
+            // Beispiel: Dienstplan, Einsätze, Zeitkonto neu laden
+        }
+
+        async function loadMitarbeiterById(maId) {
+            const index = state.mitarbeiterList.findIndex(m => m.ID === maId);
+            if (index >= 0) {
+                await showRecord(index);
+            } else {
+                showLoading();
+                Bridge.loadData('mitarbeiter', maId);
+            }
+        }
+
+        // ============================================
+        // RENDERING-FUNKTIONEN
+        // ============================================
+        function renderMitarbeiterList() {
+            const tbody = document.getElementById('maListBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            state.mitarbeiterList.forEach((ma, index) => {
+                const name = (ma.Nachname || '') + ' ' + (ma.Vorname || '');
+                if (search && !name.toLowerCase().includes(search)) return;
+
+                const tr = document.createElement('tr');
+                tr.dataset.index = index;
+                if (index === state.currentIndex) {
+                    tr.classList.add('selected');
+                }
+                tr.innerHTML = `
+                    <td>${escapeHtml(ma.Nachname || '')}</td>
+                    <td>${escapeHtml(ma.Vorname || '')}</td>
+                    <td>${escapeHtml(ma.Ort || '')}</td>
+                `;
+                tr.addEventListener('click', () => showRecord(index));
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function showRecord(index) {
+            if (index < 0 || index >= state.mitarbeiterList.length) return;
+            state.currentIndex = index;
+
+            // Sync mit appState
+            if (window.appState) {
+                window.appState.currentIndex = index;
+            }
+
+            const maId = state.mitarbeiterList[index].ID;
+
+            // Load full record via Bridge
+            showLoading();
+            Bridge.loadData('mitarbeiter', maId);
+
+            // Vorläufig Listendaten anzeigen
+            state.currentRecord = state.mitarbeiterList[index];
+            loadMitarbeiterData(state.currentRecord);
+            markSelectedRow(index);
+        }
+
+        function loadMitarbeiterData(ma) {
+            document.getElementById('displayNachname').textContent = ma.Nachname || '-';
+            document.getElementById('displayVorname').textContent = ma.Vorname || '-';
+            document.getElementById('maNr').value = ma.ID || '';
+
+            // Alle Felder mit data-field befuellen
+            document.querySelectorAll('[data-field]').forEach(el => {
+                const field = el.dataset.field;
+                let value = ma[field] || '';
+
+                // Datum formatieren
+                if (value && typeof value === 'string' && value.includes('T')) {
+                    if (el.type === 'date') {
+                        value = value.substring(0, 10);
+                    } else {
+                        const date = new Date(value);
+                        if (!isNaN(date)) value = date.toLocaleDateString('de-DE');
+                    }
+                }
+
+                if (el.type === 'checkbox') {
+                    el.checked = !!value;
+                } else {
+                    el.value = value;
+                }
+            });
+
+            // Photo
+            updatePhoto(ma.Lichtbild || ma.MA_Lichtbild);
+
+            // Audit-Felder
+            if (ma.Erst_am) {
+                document.getElementById('erstelltAm').textContent = formatDateTime(ma.Erst_am);
+            }
+            document.getElementById('erstelltVon').textContent = ma.Erst_von || '-';
+            if (ma.Aend_am) {
+                document.getElementById('geaendertAm').textContent = formatDateTime(ma.Aend_am);
+            }
+            document.getElementById('geaendertVon').textContent = ma.Aend_von || '-';
+
+            Bridge.setFormValue('ma_id', ma.ID);
+        }
+
+        function markSelectedRow(index) {
+            document.querySelectorAll('#maListBody tr').forEach((tr, i) => {
+                tr.classList.toggle('selected', parseInt(tr.dataset.index) === index);
+            });
+            document.querySelector(`#maListBody tr[data-index="${index}"]`)?.scrollIntoView({ block: 'nearest' });
+        }
+
+        function updatePhoto(value) {
+            const photoEl = document.getElementById('maPhoto');
+            if (!photoEl) return;
+            const src = resolvePhotoPath(value);
+            if (!src) {
+                photoEl.removeAttribute('src');
+                photoEl.alt = 'Kein Foto';
+                return;
+            }
+            photoEl.onerror = () => {
+                photoEl.removeAttribute('src');
+                photoEl.alt = 'Foto nicht gefunden';
+                console.warn('Mitarbeiterfoto nicht gefunden:', src);
+            };
+            photoEl.alt = 'Mitarbeiterfoto';
+            photoEl.src = src;
+        }
+
+        // UNC-Pfad fuer Mitarbeiterfotos (Server-Share)
+        const MA_FOTO_UNC_BASE = '//vConSYS01-Nbg/Consys/Bilder/Mitarbeiter/';
+
+        function resolvePhotoPath(value) {
+            if (!value) return '';
+            // Bereits vollstaendige URLs
+            if (/^https?:/i.test(value) || /^file:/i.test(value)) return value;
+            // UNC-Pfad (\\server\share\...)
+            if (/^\\\\/.test(value)) {
+                return 'file:' + value.replace(/\\/g, '/');
+            }
+            // Lokaler Windows-Pfad (C:\...)
+            if (/^[A-Za-z]:[\\/]/.test(value)) {
+                return `file:///${value.replace(/\\/g, '/')}`;
+            }
+            // Nur Dateiname -> UNC-Server-Pfad verwenden
+            if (value && !value.includes('/') && !value.includes('\\')) {
+                return `file:${MA_FOTO_UNC_BASE}${value}`;
+            }
+            // Fallback: relativer Pfad
+            return `../media/mitarbeiter/${value}`;
+        }
+
+        // ============================================
+        // FOTO-UPLOAD FUNKTION (Access: btnDateisuch_Click)
+        // ============================================
+        function handleFotoUpload(input) {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswaehlen', 'error');
+                input.value = '';
+                return;
+            }
+
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validierung: Nur Bilddateien
+            if (!file.type.startsWith('image/')) {
+                showToast('Bitte nur Bilddateien auswaehlen (JPG, PNG, etc.)', 'error');
+                input.value = '';
+                return;
+            }
+
+            // Groessenbeschraenkung (max 5MB)
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showToast('Datei zu gross (max. 5 MB)', 'error');
+                input.value = '';
+                return;
+            }
+
+            // Preview sofort anzeigen
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoEl = document.getElementById('maPhoto');
+                if (photoEl) {
+                    photoEl.src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+
+            // Upload via Bridge
+            showLoading();
+
+            // FileReader fuer Base64-Encoding
+            const uploadReader = new FileReader();
+            uploadReader.onload = function(e) {
+                const base64Data = e.target.result.split(',')[1]; // Nur Base64-Teil
+                Bridge.execute('uploadFoto', {
+                    ma_id: state.currentRecord.ID,
+                    filename: file.name,
+                    filetype: file.type,
+                    filesize: file.size,
+                    data: base64Data
+                }).then(response => {
+                    hideLoading();
+                    if (response && response.success) {
+                        showToast('Foto erfolgreich hochgeladen', 'success');
+                        // Pfad im Record aktualisieren
+                        if (response.filepath) {
+                            state.currentRecord.Lichtbild = response.filepath;
+                        }
+                    } else {
+                        showToast('Fehler beim Hochladen: ' + (response?.error || 'Unbekannter Fehler'), 'error');
+                    }
+                }).catch(err => {
+                    hideLoading();
+                    showToast('Fehler beim Hochladen: ' + err.message, 'error');
+                });
+            };
+            uploadReader.readAsDataURL(file);
+
+            // Input zuruecksetzen fuer erneute Auswahl
+            input.value = '';
+        }
+
+        // ============================================
+        // FOTO 2 / DOKUMENT UPLOAD (Access: btnDateisuch2_Click)
+        // ============================================
+        function btnDateisuch2_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswaehlen', 'error');
+                return;
+            }
+            // Oeffnet Dateiauswahl fuer zweites Foto oder Dokument
+            document.getElementById('fotoUploadInput2').click();
+        }
+
+        function handleFotoUpload2(input) {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswaehlen', 'error');
+                input.value = '';
+                return;
+            }
+
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validierung: Bilder oder PDF erlaubt
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+            if (!allowedTypes.includes(file.type)) {
+                showToast('Bitte nur Bilder (JPG, PNG) oder PDF auswaehlen', 'error');
+                input.value = '';
+                return;
+            }
+
+            // Groessenbeschraenkung (max 10MB fuer Dokumente)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showToast('Datei zu gross (max. 10 MB)', 'error');
+                input.value = '';
+                return;
+            }
+
+            // Upload via Bridge
+            showLoading();
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result.split(',')[1];
+                Bridge.execute('uploadDokument', {
+                    ma_id: state.currentRecord.ID,
+                    filename: file.name,
+                    filetype: file.type,
+                    filesize: file.size,
+                    data: base64Data,
+                    typ: 'foto2' // Kennzeichnung als zweites Foto/Zusatzdokument
+                }).then(response => {
+                    hideLoading();
+                    if (response && response.success) {
+                        showToast('Datei erfolgreich hochgeladen', 'success');
+                        // Optional: Dokumente-Tab aktualisieren
+                        loadDokumente();
+                    } else {
+                        showToast('Fehler beim Hochladen: ' + (response?.error || 'Unbekannter Fehler'), 'error');
+                    }
+                }).catch(err => {
+                    hideLoading();
+                    showToast('Fehler beim Hochladen: ' + err.message, 'error');
+                });
+            };
+            reader.readAsDataURL(file);
+
+            input.value = '';
+        }
+
+        // ============================================
+        // AKTIONS-FUNKTIONEN
+        // ============================================
+        async function neuerMitarbeiter() {
+            showLoading();
+            Bridge.sendEvent('saveMitarbeiter', {
+                action: 'create',
+                data: {
+                    Nachname: 'Neuer',
+                    Vorname: 'Mitarbeiter',
+                    IstAktiv: true
+                }
+            });
+        }
+
+        async function mitarbeiterLöschen() {
+            if (!state.currentRecord?.ID) {
+                showToast('Kein Mitarbeiter ausgewahlt', 'warning');
+                return;
+            }
+            if (!confirm('Mitarbeiter wirklich loschen?')) return;
+
+            showLoading();
+            Bridge.sendEvent('deleteMitarbeiter', {
+                id: state.currentRecord.ID
+            });
+        }
+
+        async function speichern() {
+            if (!state.currentRecord?.ID) {
+                showToast('Kein Mitarbeiter ausgewahlt', 'warning');
+                return;
+            }
+
+            // Access: Form_BeforeUpdate aufrufen
+            Form_BeforeUpdate();
+
+            const data = {};
+            document.querySelectorAll('[data-field]').forEach(el => {
+                const field = el.dataset.field;
+                if (el.type === 'checkbox') {
+                    data[field] = el.checked;
+                } else {
+                    data[field] = el.value;
+                }
+            });
+
+            // Access: Aend_am und Aend_von setzen (wie in Form_BeforeUpdate)
+            data['Aend_am'] = new Date().toISOString();
+            data['Aend_von'] = 'WebView2'; // In Access: atCNames(1) = Benutzername
+
+            showLoading();
+            Bridge.sendEvent('saveMitarbeiter', {
+                id: state.currentRecord.ID,
+                data: data
+            });
+
+            // Access: Form_AfterUpdate wird nach erfolgreicher Speicherung aufgerufen
+            // (siehe onSaveComplete Event-Handler)
+        }
+
+        async function refreshData() {
+            await loadMitarbeiter();
+            showToast('Daten aktualisiert', 'success');
+        }
+
+        function openZeitkonto() {
+            if (state.currentRecord?.ID) {
+                Bridge.navigate('frm_MA_Zeitkonten', state.currentRecord.ID);
+            }
+        }
+
+        function openDienstplan() {
+            if (state.currentRecord?.ID) {
+                Bridge.navigate('frm_DP_Dienstplan_MA', state.currentRecord.ID);
+            }
+        }
+
+        function openEinsatzübersicht() {
+            if (state.currentRecord?.ID) {
+                Bridge.navigate('frm_Einsatzübersicht', state.currentRecord.ID);
+            }
+        }
+
+        function openMaps() {
+            const koord = state.currentRecord?.Koordinaten;
+            if (koord) {
+                window.open(`https://www.google.com/maps?q=${koord}`, '_blank');
+            } else if (state.currentRecord) {
+                const addr = `${state.currentRecord.Strasse} ${state.currentRecord.Nr}, ${state.currentRecord.PLZ} ${state.currentRecord.Ort}`;
+                window.open(`https://www.google.com/maps?q=${encodeURIComponent(addr)}`, '_blank');
+            }
+        }
+
+        function einsaetzeUebertragen(typ) {
+            Bridge.sendEvent('einsaetze_uebertragen', {
+                ma_id: state.currentRecord?.ID,
+                typ: typ
+            });
+        }
+
+        function listenDrucken() {
+            Bridge.sendEvent('print', { type: 'mitarbeiterliste' });
+        }
+
+        function mitarbeiterTabelle() {
+            Bridge.navigate('frm_MA_Tabelle');
+        }
+
+        function openMAAdressen() {
+            // Öffnet das MA Adressen Formular mit aktueller MA-ID
+            const maId = state.currentRecord?.ID;
+            if (maId) {
+                if (window.chrome && window.chrome.webview) {
+                    Bridge.navigate('frm_MA_Adressen', { MA_ID: maId });
+                } else {
+                    window.location.href = 'frm_MA_Adressen.html?id=' + maId;
+                }
+            } else {
+                showToast('Bitte erst einen Mitarbeiter auswählen', 'error');
+            }
+        }
+
+        // ============================================
+        // TAB-FUNKTIONEN
+        // ============================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-page').forEach(page => {
+                page.classList.toggle('active', page.id === 'tab-' + tabName);
+            });
+
+            // Daten laden wenn Tab gewechselt wird
+            const maId = state.currentRecord?.ID;
+            if (!maId) return;
+
+            switch(tabName) {
+                case 'einsatzübersicht':
+                    loadEinsaetze();
+                    break;
+                case 'nichtverfügbar':
+                    loadNichtVerfügbar();
+                    break;
+                case 'dienstkleidung':
+                    loadDienstkleidung();
+                    break;
+                case 'ueberhangstunden':
+                    loadUeberhangStunden();
+                    break;
+                case 'qualifikationen':
+                    loadQualifikationen();
+                    break;
+                case 'dokumente':
+                    loadDokumente();
+                    break;
+                case 'quickinfo':
+                    loadQuickInfo();
+                    break;
+            }
+        }
+
+        async function loadEinsaetze() {
+            const maId = state.currentRecord?.ID;
+            if (!maId) return;
+            Bridge.loadData('einsaetze', maId, { limit: 50 });
+        }
+
+        function renderEinsaetze(records) {
+            const tbody = document.getElementById('einsaetzeTbody');
+            tbody.innerHTML = '';
+            records.forEach(e => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${formatDate(e.Datum)}</td><td>${e.Auftrag || ''}</td><td>${e.Objekt || ''}</td><td>${e.Von || ''}</td><td>${e.Bis || ''}</td><td>${e.Stunden || ''}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadNichtVerfügbar() {
+            const maId = state.currentRecord?.ID;
+            if (!maId) return;
+            Bridge.loadData('nichtverfügbar', maId);
+        }
+
+        function renderNichtVerfügbar(records) {
+            const tbody = document.getElementById('nvTbody');
+            tbody.innerHTML = '';
+            records.forEach(nv => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${formatDate(nv.VonDat)}</td><td>${formatDate(nv.BisDat)}</td><td>${nv.Grund || ''}</td><td>${nv.Bemerkung || ''}</td>`;
+                tr.onclick = () => tr.classList.toggle('selected');
+                tbody.appendChild(tr);
+            });
+        }
+
+        function neueNichtVerfügbar() {
+            const von = prompt('Von Datum (TT.MM.JJJJ):');
+            const bis = prompt('Bis Datum (TT.MM.JJJJ):');
+            const grund = prompt('Grund:');
+            if (von && bis && state.currentRecord?.ID) {
+                Bridge.sendEvent('saveNichtVerfügbar', {
+                    ma_id: state.currentRecord.ID,
+                    von,
+                    bis,
+                    grund
+                });
+                setTimeout(loadNichtVerfügbar, 500);
+            }
+        }
+
+        function loescheNichtVerfügbar() {
+            showToast('Bitte Eintrag in Liste auswählen', 'info');
+        }
+
+        async function loadDienstkleidung() {
+            const maId = state.currentRecord?.ID;
+            if (!maId) return;
+            Bridge.loadData('dienstkleidung', maId);
+        }
+
+        function renderDienstkleidung(records) {
+            const tbody = document.getElementById('dkTbody');
+            tbody.innerHTML = '';
+            records.forEach(dk => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${dk.Artikel || ''}</td><td>${dk.Größe || ''}</td><td>${formatDate(dk.Ausgabe)}</td><td>${formatDate(dk.Rückgabe)}</td><td>${dk.Status || ''}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function neueDienstkleidung() {
+            showToast('Dienstkleidung-Ausgabe: Funktion in Access verfügbar', 'info');
+        }
+
+        function rückgabeDienstkleidung() {
+            showToast('Dienstkleidung-Rückgabe: Funktion in Access verfügbar', 'info');
+        }
+
+        async function loadUeberhangStunden() {
+            const maId = state.currentRecord?.ID;
+            if (!maId) return;
+            Bridge.loadData('ueberhang', maId);
+        }
+
+        function renderUeberhangStunden(records) {
+            const tbody = document.getElementById('ueberhangTbody');
+            tbody.innerHTML = '';
+            records.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${u.Monat || ''}</td><td>${u.Soll || ''}</td><td>${u.Ist || ''}</td><td>${u.Diff || ''}</td><td>${u.Ueberhang || ''}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function druckeVordruck(typ) {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('print', { type: 'vordruck', vordruck: typ, ma_id: state.currentRecord.ID });
+            showToast(`Drucke ${typ}...`, 'success');
+        }
+
+        // ============================================
+        // QUALIFIKATIONEN TAB
+        // ============================================
+        async function loadQualifikationen() {
+            const maId = state.currentRecord?.ID;
+            if (!maId) return;
+            Bridge.loadData('qualifikationen', maId);
+        }
+
+        function renderQualifikationen(records) {
+            const tbody = document.getElementById('qualifikationenTbody');
+            tbody.innerHTML = '';
+            if (!records || records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#666;">Keine Qualifikationen vorhanden</td></tr>';
+                return;
+            }
+            records.forEach(q => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${q.Qualifikation || q.Bezeichnung || ''}</td>
+                    <td>${formatDate(q.ErworbenAm || q.Datum)}</td>
+                    <td>${formatDate(q.GueltigBis)}</td>
+                    <td>${q.Nachweis ? 'Ja' : 'Nein'}</td>
+                    <td>${q.Bemerkung || ''}</td>
+                `;
+                tr.onclick = () => selectQualifikation(q.ID, tr);
+                tbody.appendChild(tr);
+            });
+        }
+
+        let selectedQualifikationId = null;
+        function selectQualifikation(id, tr) {
+            selectedQualifikationId = id;
+            document.querySelectorAll('#qualifikationenTbody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+        }
+
+        function neueQualifikation() {
+            const quali = prompt('Qualifikation:');
+            const datum = prompt('Erworben am (TT.MM.JJJJ):');
+            const gueltigBis = prompt('Gueltig bis (TT.MM.JJJJ, leer = unbegrenzt):');
+            if (quali && state.currentRecord?.ID) {
+                Bridge.sendEvent('saveQualifikation', {
+                    ma_id: state.currentRecord.ID,
+                    qualifikation: quali,
+                    erworben_am: datum,
+                    gueltig_bis: gueltigBis || null
+                });
+                setTimeout(loadQualifikationen, 500);
+            }
+        }
+
+        function loescheQualifikation() {
+            if (!selectedQualifikationId) {
+                showToast('Bitte erst Qualifikation auswählen', 'info');
+                return;
+            }
+            if (confirm('Qualifikation wirklich löschen?')) {
+                Bridge.sendEvent('deleteQualifikation', { id: selectedQualifikationId });
+                selectedQualifikationId = null;
+                setTimeout(loadQualifikationen, 500);
+            }
+        }
+
+        // ============================================
+        // DOKUMENTE TAB
+        // ============================================
+        async function loadDokumente() {
+            const maId = state.currentRecord?.ID;
+            if (!maId) return;
+            Bridge.loadData('dokumente', maId);
+        }
+
+        function renderDokumente(records) {
+            const tbody = document.getElementById('dokumenteTbody');
+            tbody.innerHTML = '';
+            if (!records || records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#666;">Keine Dokumente vorhanden</td></tr>';
+                return;
+            }
+            records.forEach(d => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${d.Dateiname || d.FileName || ''}</td>
+                    <td>${d.Typ || d.FileType || ''}</td>
+                    <td>${formatDate(d.Datum || d.UploadDate)}</td>
+                    <td>${formatFileSize(d.Größe || d.FileSize)}</td>
+                    <td>${d.Beschreibung || d.Description || ''}</td>
+                `;
+                tr.ondblclick = () => öffneDokumentById(d.ID);
+                tr.onclick = () => selectDokument(d.ID, tr);
+                tbody.appendChild(tr);
+            });
+        }
+
+        let selectedDokumentId = null;
+        function selectDokument(id, tr) {
+            selectedDokumentId = id;
+            document.querySelectorAll('#dokumenteTbody tr').forEach(r => r.classList.remove('selected'));
+            tr.classList.add('selected');
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return '-';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function neuesDokument() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('uploadDokument', { ma_id: state.currentRecord.ID });
+            showToast('Dateiauswahl wird geöffnet...', 'info');
+        }
+
+        function loescheDokument() {
+            if (!selectedDokumentId) {
+                showToast('Bitte erst Dokument auswählen', 'info');
+                return;
+            }
+            if (confirm('Dokument wirklich löschen?')) {
+                Bridge.sendEvent('deleteDokument', { id: selectedDokumentId });
+                selectedDokumentId = null;
+                setTimeout(loadDokumente, 500);
+            }
+        }
+
+        function öffneDokument() {
+            if (!selectedDokumentId) {
+                showToast('Bitte erst Dokument auswählen', 'info');
+                return;
+            }
+            öffneDokumentById(selectedDokumentId);
+        }
+
+        function öffneDokumentById(id) {
+            Bridge.sendEvent('openDokument', { id: id });
+        }
+
+        // ============================================
+        // QUICK INFO TAB FUNKTIONEN
+        // ============================================
+
+        // Laedt Statistik und naechste Einsaetze fuer den aktuellen Mitarbeiter
+        async function loadQuickInfo() {
+            const maId = state.currentRecord?.ID;
+            if (!maId) {
+                // Keine Daten, Platzhalter anzeigen
+                renderQuickInfoStats(null);
+                renderNaechsteEinsaetze([]);
+                return;
+            }
+
+            // Statistik laden
+            Bridge.loadData('ma_statistik', maId);
+
+            // Naechste Einsaetze laden
+            Bridge.loadData('ma_naechste_einsaetze', maId);
+        }
+
+        // Rendert die Statistik-Werte im Quick Info Tab
+        function renderQuickInfoStats(data) {
+            const qiAnzahl = document.getElementById('qiAnzahlEinsaetze');
+            const qiStunden = document.getElementById('qiGesamtstunden');
+            const qiZuverl = document.getElementById('qiZuverlaessigkeit');
+            const qiRating = document.getElementById('qiRating');
+
+            if (!data) {
+                // Keine Daten - Platzhalter
+                if (qiAnzahl) qiAnzahl.textContent = '-';
+                if (qiStunden) qiStunden.textContent = '-';
+                if (qiZuverl) qiZuverl.textContent = '-';
+                if (qiRating) qiRating.textContent = '-';
+                return;
+            }
+
+            // Werte setzen
+            if (qiAnzahl) qiAnzahl.textContent = (data.anzahl_einsaetze || 0).toString();
+            if (qiStunden) qiStunden.textContent = (data.gesamtstunden || 0).toFixed(0);
+            if (qiZuverl) qiZuverl.textContent = ((data.zuverlaessigkeit || 0) * 100).toFixed(0) + '%';
+            if (qiRating) qiRating.textContent = (data.rating || 0).toFixed(1);
+        }
+
+        // Rendert die naechsten Einsaetze in der Quick Info Tabelle
+        function renderNaechsteEinsaetze(einsaetze) {
+            const tbody = document.getElementById('qiEinsaetzeTbody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            if (!einsaetze || einsaetze.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#666; padding:10px;">Keine kommenden Einsaetze</td></tr>';
+                return;
+            }
+
+            einsaetze.forEach(e => {
+                const tr = document.createElement('tr');
+                tr.className = 'clickable';
+
+                // Datum formatieren (z.B. "15.01")
+                let datumStr = '';
+                if (e.Datum || e.VADatum) {
+                    const d = new Date(e.Datum || e.VADatum);
+                    datumStr = d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+                }
+
+                // Zeit formatieren (z.B. "14:00")
+                let zeitStr = '';
+                if (e.Von || e.VA_Start) {
+                    zeitStr = formatZeit(e.Von || e.VA_Start);
+                }
+
+                // Auftrag/Objekt
+                const auftragStr = e.Auftrag || e.Objekt || e.VA_Bezeichnung || '-';
+
+                tr.innerHTML = `
+                    <td>${datumStr}</td>
+                    <td>${escapeHtml(auftragStr)}</td>
+                    <td>${zeitStr}</td>
+                `;
+
+                // Klick-Handler: Zum Auftrag navigieren
+                tr.addEventListener('click', () => {
+                    if (e.VA_ID || e.Auftrag_ID) {
+                        navigateToAuftrag(e.VA_ID || e.Auftrag_ID);
+                    }
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Hilfsfunktion: Zeit formatieren (HH:MM)
+        function formatZeit(zeit) {
+            if (!zeit) return '';
+            if (typeof zeit === 'string') {
+                // Falls bereits String wie "14:00:00"
+                if (zeit.includes(':')) {
+                    return zeit.substring(0, 5);
+                }
+                // Falls ISO-Datum
+                if (zeit.includes('T')) {
+                    const d = new Date(zeit);
+                    return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                }
+            }
+            return '';
+        }
+
+        // Navigation zum Auftrag
+        function navigateToAuftrag(vaId) {
+            if (window.chrome && window.chrome.webview) {
+                Bridge.navigate('frm_va_Auftragstamm', { VA_ID: vaId });
+            } else {
+                window.location.href = 'frm_va_Auftragstamm.html?va_id=' + vaId;
+            }
+        }
+
+        // ============================================
+        // QUICK INFO AKTIONS-HANDLER
+        // ============================================
+
+        // E-Mail senden
+        function quickInfoSendEmail() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswaehlen', 'error');
+                return;
+            }
+
+            const email = state.currentRecord.Email;
+            if (!email) {
+                showToast('Keine E-Mail-Adresse hinterlegt', 'warning');
+                return;
+            }
+
+            // mailto-Link oeffnen
+            const name = `${state.currentRecord.Vorname || ''} ${state.currentRecord.Nachname || ''}`.trim();
+            const subject = encodeURIComponent('Nachricht von CONSEC');
+            const mailtoUrl = `mailto:${email}?subject=${subject}`;
+
+            // Via Bridge oder direkt
+            if (window.chrome && window.chrome.webview) {
+                Bridge.sendEvent('openMail', {
+                    to: email,
+                    subject: 'Nachricht von CONSEC',
+                    ma_id: state.currentRecord.ID,
+                    ma_name: name
+                });
+            } else {
+                window.location.href = mailtoUrl;
+            }
+
+            showToast('E-Mail wird geoeffnet...', 'success');
+        }
+
+        // Einsatzplan anzeigen
+        function quickInfoShowEinsatzplan() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswaehlen', 'error');
+                return;
+            }
+
+            if (window.chrome && window.chrome.webview) {
+                Bridge.navigate('frm_N_Dienstplanuebersicht', { MA_ID: state.currentRecord.ID });
+            } else {
+                window.location.href = 'frm_N_Dienstplanuebersicht.html?ma_id=' + state.currentRecord.ID;
+            }
+        }
+
+        // Dokumente Tab oeffnen
+        function quickInfoShowDokumente() {
+            switchTab('dokumente');
+            loadDokumente();
+        }
+
+        // Notizen anzeigen/bearbeiten
+        function quickInfoShowNotizen() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswaehlen', 'error');
+                return;
+            }
+
+            // Notizen-Dialog oeffnen oder zu Notizen-Tab wechseln
+            if (window.chrome && window.chrome.webview) {
+                Bridge.sendEvent('openNotizen', {
+                    ma_id: state.currentRecord.ID,
+                    ma_name: `${state.currentRecord.Nachname || ''}, ${state.currentRecord.Vorname || ''}`
+                });
+            } else {
+                // Fallback: Prompt fuer Notizen
+                const currentNotiz = state.currentRecord.Bemerkung || '';
+                const neueNotiz = prompt('Notizen fuer Mitarbeiter:', currentNotiz);
+                if (neueNotiz !== null && neueNotiz !== currentNotiz) {
+                    state.currentRecord.Bemerkung = neueNotiz;
+                    markDirty();
+                    showToast('Notiz geaendert - Speichern nicht vergessen', 'info');
+                }
+            }
+        }
+
+        // ============================================
+        // ACCESS AFTERUPDATE EVENTS (synchronisiert)
+        // ============================================
+
+        // Access: Anstellungsart_AfterUpdate - Setzt IstNSB, IstSubunternehmer, StundenZahlMax basierend auf Anstellungsart
+        function Anstellungsart_AfterUpdate() {
+            const anstellungsartId = parseInt(document.getElementById('Anstellungsart_ID')?.value) || 0;
+            const istNSB = document.getElementById('IstNSB');
+            const subunternehmer = document.getElementById('IstSubunternehmer');
+            const stundenMax = document.getElementById('StundenZahlMax');
+            const stundenlohn = document.getElementById('Stundenlohn_brutto');
+
+            switch(anstellungsartId) {
+                case 11: // Subunternehmer
+                    if(istNSB) istNSB.checked = true;
+                    if(subunternehmer) subunternehmer.checked = true;
+                    if(stundenMax) stundenMax.value = '0';
+                    if(stundenlohn) stundenlohn.value = '';
+                    break;
+                case 5: // Minijobber
+                    if(istNSB) istNSB.checked = false;
+                    if(subunternehmer) subunternehmer.checked = false;
+                    if(stundenMax) stundenMax.value = '38.5';
+                    if(stundenlohn) stundenlohn.value = '2';
+                    break;
+                case 3: // Festangestellt
+                    if(istNSB) istNSB.checked = false;
+                    if(subunternehmer) subunternehmer.checked = false;
+                    if(stundenMax) stundenMax.value = '0';
+                    if(stundenlohn) stundenlohn.value = '1';
+                    break;
+                default:
+                    if(istNSB) istNSB.checked = false;
+                    if(subunternehmer) subunternehmer.checked = false;
+                    if(stundenMax) stundenMax.value = '0';
+                    if(stundenlohn) stundenlohn.value = '';
+            }
+            markDirty();
+        }
+
+        // Access: IstSubunternehmer_AfterUpdate
+        function IstSubunternehmer_AfterUpdate() {
+            const subunternehmer = document.getElementById('IstSubunternehmer');
+            if (subunternehmer?.checked) {
+                const istNSB = document.getElementById('IstNSB');
+                const anstellungsart = document.getElementById('Anstellungsart_ID');
+                if(istNSB) istNSB.checked = true;
+                if(anstellungsart) anstellungsart.value = '11';
+            }
+            markDirty();
+        }
+
+        // Access: Form_BeforeUpdate - Audit-Felder setzen
+        function Form_BeforeUpdate() {
+            // Änderungsdatum und User werden via Bridge an VBA übergeben
+            // In Access: Me.Aend_am = Now(), Me.Aend_von = atCNames(1)
+            console.log('[Access-Sync] Form_BeforeUpdate - Audit-Felder werden gesetzt');
+        }
+
+        // Access: Form_AfterUpdate - Adresse aktualisieren, Liste requeren
+        function Form_AfterUpdate() {
+            if (state.isDirty) {
+                // Access ruft Adresse_Upd auf
+                console.log('[Access-Sync] Form_AfterUpdate - isDirty = true, Adresse_Upd aufrufen');
+                state.isDirty = false;
+            }
+            renderMitarbeiterList();
+        }
+
+        // Mark form as dirty (Access: isDirty = True)
+        function markDirty() {
+            state.isDirty = true;
+        }
+
+        // ============================================
+        // ACCESS ZEITRAUM-FUNKTIONEN (cboZeitraum_AfterUpdate)
+        // ============================================
+
+        // Access: StdZeitraum_Von_Bis - Berechnet Zeitraum basierend auf Auswahl
+        function StdZeitraum_Von_Bis(zeitraumId) {
+            const heute = new Date();
+            let von = new Date();
+            let bis = new Date();
+
+            switch(zeitraumId) {
+                case 8: // Aktueller Monat
+                    von = new Date(heute.getFullYear(), heute.getMonth(), 1);
+                    bis = new Date(heute.getFullYear(), heute.getMonth() + 1, 0);
+                    break;
+                case 9: // Letzter Monat
+                    von = new Date(heute.getFullYear(), heute.getMonth() - 1, 1);
+                    bis = new Date(heute.getFullYear(), heute.getMonth(), 0);
+                    break;
+                case 11: // Aktuelles Jahr
+                    von = new Date(heute.getFullYear(), 0, 1);
+                    bis = new Date(heute.getFullYear(), 11, 31);
+                    break;
+                case 12: // Letztes Jahr
+                    von = new Date(heute.getFullYear() - 1, 0, 1);
+                    bis = new Date(heute.getFullYear() - 1, 11, 31);
+                    break;
+                case 17: // Nächste 90 Tage
+                    bis.setDate(bis.getDate() + 90);
+                    break;
+                case 18: // Nächster Monat
+                    von = new Date(heute.getFullYear(), heute.getMonth() + 1, 1);
+                    bis = new Date(heute.getFullYear(), heute.getMonth() + 2, 0);
+                    break;
+                case 22: // Nächste 30 Tage
+                    bis.setDate(bis.getDate() + 30);
+                    break;
+                case 23: // Nächste 10 Tage
+                    bis.setDate(bis.getDate() + 10);
+                    break;
+                case 24: // Nächste 14 Tage
+                    bis.setDate(bis.getDate() + 14);
+                    break;
+                case 25: // Ab Heute
+                    bis = new Date(heute.getFullYear(), 11, 31);
+                    break;
+                case 27: // Ab Morgen
+                    von.setDate(von.getDate() + 1);
+                    bis = new Date(heute.getFullYear(), 11, 31);
+                    break;
+                default: // Default: Dieser Monat
+                    von = new Date(heute.getFullYear(), heute.getMonth(), 1);
+                    bis = new Date(heute.getFullYear(), heute.getMonth() + 1, 0);
+            }
+
+            state.AU_von = von;
+            state.AU_bis = bis;
+            return { von, bis };
+        }
+
+        // Access: cboZeitraum_AfterUpdate
+        function cboZeitraum_AfterUpdate(zeitraumId) {
+            state.cboZeitraum = zeitraumId || 8;
+            StdZeitraum_Von_Bis(state.cboZeitraum);
+            loadEinsaetze();
+        }
+
+        // Access: MANameEingabe_AfterUpdate - Suche synchronisieren
+        function MANameEingabe_AfterUpdate() {
+            const searchTerm = document.getElementById('searchInput')?.value?.trim() || '';
+            if (searchTerm) {
+                renderMitarbeiterList();
+            }
+        }
+
+        // Access: cboFilterAuftrag_AfterUpdate - Auftragsfilter
+        function cboFilterAuftrag_AfterUpdate(auftragId) {
+            console.log('[Access-Sync] cboFilterAuftrag_AfterUpdate - Auftrags-Filter:', auftragId);
+            // Filtert Einsaetze nach Auftrag
+            if (auftragId) {
+                Bridge.loadData('einsaetze', state.currentRecord?.ID, {
+                    auftrag_id: auftragId,
+                    von: state.AU_von?.toISOString()?.substring(0,10),
+                    bis: state.AU_bis?.toISOString()?.substring(0,10)
+                });
+            } else {
+                loadEinsaetze();
+            }
+        }
+
+        // Access: cboIDSuche_AfterUpdate - MA-ID Suche
+        function cboIDSuche_AfterUpdate(maId) {
+            console.log('[Access-Sync] cboIDSuche_AfterUpdate - MA-ID Suche:', maId);
+            if (maId) {
+                // Suche MA anhand ID in der Liste
+                const index = state.mitarbeiterList.findIndex(m => m.ID === parseInt(maId));
+                if (index >= 0) {
+                    showRecord(index);
+                } else {
+                    // Direkt laden via Bridge
+                    loadMitarbeiterById(parseInt(maId));
+                }
+            }
+        }
+
+        // Access: txRechSub_AfterUpdate - Sub-Rechnungen Filter
+        function txRechSub_AfterUpdate(rechnungsNr) {
+            console.log('[Access-Sync] txRechSub_AfterUpdate - Rechnungs-Filter:', rechnungsNr);
+            if (rechnungsNr && state.currentRecord?.ID) {
+                Bridge.loadData('subrechnungen', state.currentRecord.ID, { rechnung_nr: rechnungsNr });
+            }
+        }
+
+        // ============================================
+        // ACCESS EXCEL-EXPORT FUNKTIONEN
+        // ============================================
+
+        function btnXLEinsUeber_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('excelExport', {
+                type: 'einsatzübersicht',
+                ma_id: state.currentRecord.ID,
+                ma_name: `${state.currentRecord.Nachname} ${state.currentRecord.Vorname}`,
+                von: state.AU_von?.toISOString()?.substring(0,10),
+                bis: state.AU_bis?.toISOString()?.substring(0,10)
+            });
+            showToast('Excel-Export Einsatzübersicht gestartet...', 'success');
+        }
+
+        function btnXLDiePl_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('excelExport', {
+                type: 'dienstplan',
+                ma_id: state.currentRecord.ID,
+                ma_name: `${state.currentRecord.Nachname} ${state.currentRecord.Vorname}`,
+                von: state.AU_von?.toISOString()?.substring(0,10),
+                bis: state.AU_bis?.toISOString()?.substring(0,10)
+            });
+            showToast('Excel-Export Dienstplan gestartet...', 'success');
+        }
+
+        function btnXLJahr_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('excelExport', {
+                type: 'jahresübersicht',
+                ma_id: state.currentRecord.ID,
+                ma_name: `${state.currentRecord.Nachname} ${state.currentRecord.Vorname}`,
+                jahr: new Date().getFullYear()
+            });
+            showToast('Excel-Export Jahresübersicht gestartet...', 'success');
+        }
+
+        function btnXLNverfueg_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('excelExport', {
+                type: 'nichtverfügbar',
+                ma_id: state.currentRecord.ID,
+                ma_name: `${state.currentRecord.Nachname} ${state.currentRecord.Vorname}`
+            });
+            showToast('Excel-Export Nicht Verfügbar gestartet...', 'success');
+        }
+
+        function btnXLUeberhangStd_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('excelExport', {
+                type: 'ueberhangstunden',
+                ma_id: state.currentRecord.ID,
+                ma_name: `${state.currentRecord.Nachname} ${state.currentRecord.Vorname}`
+            });
+            showToast('Excel-Export Ueberhang Stunden gestartet...', 'success');
+        }
+
+        function btnXLZeitkto_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('excelExport', {
+                type: 'zeitkonto',
+                ma_id: state.currentRecord.ID,
+                ma_name: `${state.currentRecord.Nachname} ${state.currentRecord.Vorname}`,
+                monat: new Date().getMonth() + 1,
+                jahr: new Date().getFullYear()
+            });
+            showToast('Excel-Export Zeitkonto gestartet...', 'success');
+        }
+
+        // ============================================
+        // ACCESS ZEITKONTO FUNKTIONEN
+        // ============================================
+
+        function btnZeitkonto_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            // Access: Öffnet Excel-Zeitkonto
+            Bridge.sendEvent('openZeitkonto', {
+                ma_id: state.currentRecord.ID,
+                ma_name: `${state.currentRecord.Nachname} ${state.currentRecord.Vorname}`,
+                von: state.AU_von?.toISOString()?.substring(0,10)
+            });
+        }
+
+        // Access: btnZKeinzel_Click - Einzelsatz Zeitkonto fortschreiben
+        function btnZKeinzel_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('zeitkontoFortschreiben', {
+                ma_id: state.currentRecord.ID,
+                typ: 'einzelsatz',
+                von: state.AU_von?.toISOString()?.substring(0,10),
+                bis: state.AU_bis?.toISOString()?.substring(0,10)
+            });
+            showToast('Zeitkonto wird fortgeschrieben...', 'success');
+        }
+
+        // Access: btnZKFest_Click - Festangestellte Zeitkonten fortschreiben
+        function btnZKFest_Click() {
+            if (!confirm('Zeitkonten Festangestelle von ' + formatDate(state.AU_von) + ' bis ' + formatDate(state.AU_bis) + ' fortschreiben?')) return;
+            Bridge.sendEvent('zeitkontoFortschreiben', {
+                typ: 'festangestellte',
+                von: state.AU_von?.toISOString()?.substring(0,10),
+                bis: state.AU_bis?.toISOString()?.substring(0,10)
+            });
+            showToast('Zeitkonten Festangestellte werden fortgeschrieben...', 'success');
+        }
+
+        // Access: btnZKMini_Click - Minijobber Zeitkonten fortschreiben
+        function btnZKMini_Click() {
+            if (!confirm('Zeitkonten Minijobber von ' + formatDate(state.AU_von) + ' bis ' + formatDate(state.AU_bis) + ' fortschreiben?')) return;
+            Bridge.sendEvent('zeitkontoFortschreiben', {
+                typ: 'minijobber',
+                von: state.AU_von?.toISOString()?.substring(0,10),
+                bis: state.AU_bis?.toISOString()?.substring(0,10)
+            });
+            showToast('Zeitkonten Minijobber werden fortgeschrieben...', 'success');
+        }
+
+        // ============================================
+        // ACCESS DRUCK-/REPORT FUNKTIONEN
+        // ============================================
+
+        // Access: Bericht_drucken_Click - Einsatzübersicht drucken
+        function Bericht_drucken_Click() {
+            Bridge.sendEvent('openReport', { report: 'rpt_einsatzübersicht3' });
+        }
+
+        // Access: btn_Diensplan_prnt_Click
+        function btn_Diensplan_prnt_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('printDienstplan', {
+                ma_id: state.currentRecord.ID,
+                von: state.AU_von?.toISOString()?.substring(0,10),
+                bis: state.AU_bis?.toISOString()?.substring(0,10)
+            });
+        }
+
+        // Access: btn_Dienstplan_send_Click - Dienstplan per Email senden
+        function btn_Dienstplan_send_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            if (!confirm(`Dienstplan an ${state.currentRecord.Nachname}, ${state.currentRecord.Vorname} senden?`)) return;
+            Bridge.sendEvent('sendDienstplan', {
+                ma_id: state.currentRecord.ID,
+                ma_name: `${state.currentRecord.Nachname} ${state.currentRecord.Vorname}`,
+                von: state.AU_von?.toISOString()?.substring(0,10),
+                bis: state.AU_bis?.toISOString()?.substring(0,10)
+            });
+            showToast('Dienstplan wird gesendet...', 'success');
+        }
+
+        // Access: btnReport_Dienstkleidung_Click
+        function btnReport_Dienstkleidung_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('openReport', {
+                report: 'rpt_Dienstkleidung',
+                filter: 'ID = ' + state.currentRecord.ID
+            });
+        }
+
+        // ============================================
+        // ACCESS SONSTIGE BUTTON-FUNKTIONEN
+        // ============================================
+
+        // Access: btnMehrfachtermine_Click - Abwesenheitsplanung öffnen
+        function btnMehrfachtermine_Click() {
+            Bridge.sendEvent('openForm', {
+                form: 'frmTop_MA_Abwesenheitsplanung',
+                cbo_MA_ID: state.currentRecord?.ID
+            });
+        }
+
+        // Access: btn_Dokumente_Click
+        function btn_Dokumente_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('openForm', {
+                form: 'frm_MA_Dokumente',
+                filter: 'MA_ID=' + state.currentRecord.ID
+            });
+        }
+
+        // Access: cmdGeocode_Click - Mitarbeiter geocodieren
+        function cmdGeocode_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('geocodieren', { ma_id: state.currentRecord.ID });
+            showToast('Geocodierung gestartet...', 'success');
+        }
+
+        // Access: btnZuAb_Click - Zu/Abschlaege bearbeiten
+        function btnZuAb_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('openForm', {
+                form: 'zsub_MA_ZUAB',
+                filter: 'MA_ID = ' + state.currentRecord.ID,
+                view: 'datasheet'
+            });
+        }
+
+        // Access: btnCalc_Click - Stundenberechnung öffnen
+        function btnCalc_Click() {
+            if (!state.currentRecord?.ID) {
+                showToast('Bitte erst Mitarbeiter auswählen', 'error');
+                return;
+            }
+            Bridge.sendEvent('openForm', {
+                form: 'zfrm_ZUO_Stunden',
+                filter: 'MA_ID = ' + state.currentRecord.ID
+            });
+        }
+
+        // Access: lbl_Mitarbeitertabelle_Click
+        function lbl_Mitarbeitertabelle_Click() {
+            Bridge.sendEvent('openQuery', { query: 'qry_MA_Mitarbeiterstamm_Gueni' });
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function navigateToForm(formName, recordId) {
+            // WebView2 Modus
+            if (window.chrome && window.chrome.webview && typeof Bridge !== 'undefined') {
+                Bridge.navigate(formName, recordId);
+                return;
+            }
+            // Verwende shell-detector.js Funktion wenn verfuegbar
+            if (typeof window._shellNavigateToForm === 'function') {
+                window._shellNavigateToForm(formName, recordId);
+            } else if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'NAVIGATE', formName: formName, id: recordId }, '*');
+            } else {
+                var url = formName + '.html';
+                if (recordId) url += '?id=' + recordId;
+                window.location.href = url;
+            }
+        }
+
+        function closeForm() {
+            Bridge.close();
+            if (!window.chrome || !window.chrome.webview) {
+                window.close();
+            }
+        }
+
+        function navFirst() {
+            showRecord(0);
+        }
+
+        function navPrev() {
+            showRecord(Math.max(state.currentIndex - 1, 0));
+        }
+
+        function navNext() {
+            showRecord(Math.min(state.currentIndex + 1, state.mitarbeiterList.length - 1));
+        }
+
+        function navLast() {
+            showRecord(state.mitarbeiterList.length - 1);
+        }
+
+        // ============================================
+        // HELPER-FUNKTIONEN
+        // ============================================
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            return d.toLocaleDateString('de-DE');
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleString('de-DE');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Loading mit Verzögerung um Flackern zu vermeiden
+        let loadingTimeout = null;
+
+        function showLoading() {
+            // Zeige Loading erst nach 150ms - verhindert Flackern bei schnellem Laden
+            loadingTimeout = setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('active');
+            }, 150);
+        }
+
+        function hideLoading() {
+            // Timeout abbrechen falls Loading noch nicht angezeigt wurde
+            if (loadingTimeout) {
+                clearTimeout(loadingTimeout);
+                loadingTimeout = null;
+            }
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Vollbild-Toggle Funktion (Browser Fullscreen API)
+        function toggleFullscreen() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.title = 'Vollbild beenden';
+                }).catch(err => console.error('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen().then(() => {
+                    btn.title = 'Vollbild';
+                }).catch(err => console.error('Exit fullscreen error:', err));
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+
+        console.log('[Mitarbeiterstammblatt] Script geladen');
+    </script>
+    <!-- Debug Logger -->
+    <script src="js/debug-logger.js"></script>
+    <!-- Event Logger (erweitert debug-logger) -->
+    <script src="js/logger.js"></script>
+    <!-- Toast Notification System -->
+    <script src="js/toast-system.js"></script>
+    <!-- Shell-Detector: Versteckt Sidebar im iframe-Modus -->
+    <script src="js/shell-detector.js"></script>
+    <!-- Server Watchdog: Prüft API-Server-Verfügbarkeit -->
+    <script src="js/server-watchdog.js"></script>
+    <!-- Logic: Daten-Loading und Business-Logik -->
+    <script src="logic/frm_MA_Mitarbeiterstamm.logic.js"></script>
+</body>
+</html>
+
+
+

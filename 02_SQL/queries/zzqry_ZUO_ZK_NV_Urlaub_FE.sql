@@ -1,0 +1,5 @@
+SELECT Null AS VA_ID, Null AS VADatum_ID, Null AS VAStart_ID, Null AS ZUO_ID, ztbl_MA_NVerfuegZeiten_FE.ID AS NV_ID, Null AS Korr_ID, ztbl_MA_NVerfuegZeiten_FE.MA_ID, ztbl_MA_NVerfuegZeiten_FE.Zeittyp_ID AS Veranstaltung, Format([vonDat],"dd/mm/yyyy") AS VADatum, Year([VADatum]) AS Jahr, Month([VADatum]) AS Monat, 27 AS Lohnart_ID, ermittle_Stunden([Lohnart_ID],[VADatum],[vonZeit],[bisZeit],[MA_ID]) AS Anz_Std, ermittle_Stundensatz([Lohnart_ID],[MA_ID]) AS Satz, ([Anz_Std]*[Satz]) AS Wert, ztbl_MA_NVerfuegZeiten_FE.vonZeit AS Beginn, ztbl_MA_NVerfuegZeiten_FE.bisZeit AS Ende, False AS gesperrt, False AS exportiert, Now() AS erstellt, ermittle_Benutzer() AS Ersteller, "" AS geaendert, "" AS Aenderer, True AS exportieren, False AS Korrektur, ztbl_MA_NVerfuegZeiten_FE.Bemerkung, tbl_MA_Mitarbeiterstamm.Anstellungsart_ID
+FROM ztbl_MA_NVerfuegZeiten_FE INNER JOIN tbl_MA_Mitarbeiterstamm ON ztbl_MA_NVerfuegZeiten_FE.MA_ID = tbl_MA_Mitarbeiterstamm.ID
+WHERE (((ztbl_MA_NVerfuegZeiten_FE.Zeittyp_ID)="Urlaub"))
+ORDER BY Format([vonDat],"dd/mm/yyyy");
+

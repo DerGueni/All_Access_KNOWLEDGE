@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiterstamm - Dashboard</title>
+    <style>
+        :root {
+            /* CONSEC Farbschema - Variante Mitarbeiter (Blau-Orange) */
+            --primary-color: #3b5998;
+            --primary-dark: #2d4373;
+            --primary-light: #5b79b8;
+            --accent-color: #ff6b35;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+
+            /* Neutralfarben */
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+
+            /* Schatten */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+
+            /* Abstände */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+
+            /* Radien */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .app-logo {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.15);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            backdrop-filter: blur(4px);
+        }
+
+        .app-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .app-breadcrumb {
+            font-size: 12px;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .header-center {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 var(--spacing-xl);
+        }
+
+        .global-search {
+            position: relative;
+        }
+
+        .global-search input {
+            width: 100%;
+            padding: 10px 16px 10px 44px;
+            border: none;
+            border-radius: var(--radius-xl);
+            background: rgba(255,255,255,0.12);
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .global-search input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .global-search input:focus {
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+        }
+
+        .global-search::before {
+            content: "🔍";
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        .global-search kbd {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.15);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: inherit;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+
+        .header-btn.accent {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .header-btn.accent:hover {
+            background: #e55a2b;
+        }
+
+        /* === SPLIT CONTAINER === */
+        .split-container {
+            display: flex;
+            height: calc(100vh - 74px);
+        }
+
+        /* === LEFT PANEL === */
+        .list-panel {
+            width: 380px;
+            min-width: 300px;
+            max-width: 500px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            padding: var(--spacing-md);
+            background: linear-gradient(180deg, #fafbfc 0%, white 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--primary-color);
+        }
+
+        .filter-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .filter-chip .count {
+            background: rgba(0,0,0,0.1);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+
+        .filter-chip.active .count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .quick-action {
+            padding: 4px 10px;
+            background: transparent;
+            border: none;
+            font-size: 11px;
+            color: var(--primary-color);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+
+        .quick-action:hover {
+            background: rgba(59, 89, 152, 0.1);
+        }
+
+        /* Employee List */
+        .list-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .employee-card {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+        }
+
+        .employee-card:hover {
+            background: #f8fafc;
+        }
+
+        .employee-card.active {
+            background: linear-gradient(90deg, rgba(59, 89, 152, 0.08) 0%, transparent 100%);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .employee-card.active::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-color);
+        }
+
+        .employee-avatar {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar-img {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .avatar-status {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .avatar-status.online { background: var(--success-color); }
+        .avatar-status.busy { background: var(--danger-color); }
+        .avatar-status.away { background: var(--warning-color); }
+        .avatar-status.offline { background: var(--text-muted); }
+
+        .employee-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .employee-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .employee-name .badge {
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .badge-team { background: #dbeafe; color: #1e40af; }
+        .badge-new { background: #fef3c7; color: #92400e; }
+
+        .employee-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .employee-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .mini-tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+
+        .employee-quick-stats {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* === SPLITTER === */
+        .splitter {
+            width: 8px;
+            background: linear-gradient(90deg, var(--border-color) 0%, #f1f5f9 50%, var(--border-color) 100%);
+            cursor: col-resize;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .splitter:hover, .splitter.dragging {
+            background: var(--primary-color);
+        }
+
+        .splitter-handle {
+            width: 4px;
+            height: 50px;
+            background: var(--text-muted);
+            border-radius: 2px;
+            opacity: 0.4;
+        }
+
+        .splitter:hover .splitter-handle {
+            background: white;
+            opacity: 1;
+        }
+
+        /* === RIGHT PANEL (DASHBOARD) === */
+        .dashboard-panel {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--bg-color);
+        }
+
+        /* Profile Header */
+        .profile-header {
+            background: white;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .profile-main {
+            display: flex;
+            gap: var(--spacing-lg);
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: var(--radius-xl);
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 36px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+        }
+
+        .profile-avatar .edit-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 28px;
+            height: 28px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .profile-info h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .profile-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .meta-item strong {
+            color: var(--text-primary);
+        }
+
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .profile-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .profile-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .profile-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .profile-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* === DASHBOARD CONTENT === */
+        .dashboard-content {
+            padding: var(--spacing-lg);
+        }
+
+        /* === TAB NAVIGATION === */
+        .tab-nav {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-lg);
+            background: white;
+            padding: var(--spacing-xs);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .tab-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tab-btn .tab-count {
+            padding: 2px 8px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .tab-btn.active .tab-count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* === KPI ROW === */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-icon {
+            font-size: 24px;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-trend {
+            margin-top: var(--spacing-sm);
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .kpi-trend.positive { color: var(--success-color); }
+        .kpi-trend.negative { color: var(--danger-color); }
+        .kpi-trend.neutral { color: var(--text-muted); }
+
+        /* === WIDGET GRID === */
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-lg);
+        }
+
+        .widget-grid .span-2 {
+            grid-column: span 2;
+        }
+
+        /* === WIDGET === */
+        .widget {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .widget-header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-title {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .widget-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(59, 89, 152, 0.1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .widget-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .widget-action {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .widget-action:hover {
+            background: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .widget-body {
+            padding: var(--spacing-lg);
+        }
+
+        /* === CALENDAR VIEW === */
+        .calendar-mini {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .cal-header {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 4px;
+        }
+
+        .cal-day {
+            padding: 8px 4px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cal-day:hover {
+            background: #f1f5f9;
+        }
+
+        .cal-day.today {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .cal-day.has-event {
+            position: relative;
+        }
+
+        .cal-day.has-event::after {
+            content: "";
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent-color);
+        }
+
+        .cal-day.absent {
+            background: #fef2f2;
+            color: var(--danger-color);
+        }
+
+        /* === ASSIGNMENT LIST === */
+        .assignment-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .assignment-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-md);
+            transition: background 0.2s;
+        }
+
+        .assignment-item:hover {
+            background: #f8fafc;
+        }
+
+        .assignment-date {
+            width: 50px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .assignment-date .day {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        .assignment-date .month {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .assignment-details {
+            flex: 1;
+        }
+
+        .assignment-title {
+            font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .assignment-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .assignment-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-confirmed { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-canceled { background: #fee2e2; color: #991b1b; }
+
+        /* === SKILL BARS === */
+        .skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .skill-name {
+            width: 100px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .skill-bar {
+            flex: 1;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .skill-fill.expert { background: var(--success-color); }
+        .skill-fill.advanced { background: var(--info-color); }
+        .skill-fill.intermediate { background: var(--warning-color); }
+        .skill-fill.beginner { background: var(--text-muted); }
+
+        .skill-level {
+            width: 60px;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        /* === DOCUMENT LIST === */
+        .document-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+        }
+
+        .document-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .doc-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .doc-icon.pdf { background: #fee2e2; }
+        .doc-icon.doc { background: #dbeafe; }
+        .doc-icon.img { background: #d1fae5; }
+
+        .doc-info {
+            flex: 1;
+        }
+
+        .doc-name {
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .doc-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .doc-action {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: white;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .doc-action:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1400px) {
+            .kpi-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .widget-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .widget-grid .span-2 {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .kpi-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .widget-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .split-container {
+                flex-direction: column;
+            }
+            .list-panel {
+                width: 100%;
+                max-width: none;
+                height: 35vh;
+            }
+            .splitter {
+                width: 100%;
+                height: 8px;
+                cursor: row-resize;
+            }
+            .header-center {
+                display: none;
+            }
+            .profile-header {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+            .profile-actions {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="app-logo">👤</div>
+            <div>
+                <div class="app-title">Mitarbeiterstamm</div>
+                <div class="app-breadcrumb">
+                    <span>Personal</span>
+                    <span>›</span>
+                    <span>Mitarbeiter</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="global-search">
+                <input type="text" placeholder="Mitarbeiter suchen...">
+                <kbd>Strg+K</kbd>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="header-btn">📥 Import</button>
+            <button class="header-btn">📊 Export</button>
+            <button class="header-btn accent">+ Neuer MA</button>
+        </div>
+    </header>
+
+    <!-- SPLIT VIEW -->
+    <div class="split-container">
+        <!-- LEFT: Mitarbeiterliste -->
+        <div class="list-panel" id="listPanel">
+            <div class="filter-bar">
+                <div class="filter-row">
+                    <div class="filter-chip active">
+                        Alle <span class="count">156</span>
+                    </div>
+                    <div class="filter-chip">
+                        Aktiv <span class="count">142</span>
+                    </div>
+                    <div class="filter-chip">
+                        Inaktiv <span class="count">14</span>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action">🏷️ Nach Team</button>
+                    <button class="quick-action">📍 Nach Standort</button>
+                    <button class="quick-action">⚙️ Filter</button>
+                </div>
+            </div>
+            <div class="list-content">
+                <!-- MA 1 -->
+                <div class="employee-card active" onclick="selectEmployee(this, 1)">
+                    <div class="employee-avatar">
+                        <div class="avatar-img">AM</div>
+                        <div class="avatar-status online"></div>
+                    </div>
+                    <div class="employee-info">
+                        <div class="employee-name">
+                            Maier, Anna
+                            <span class="badge badge-team">Teamleitung</span>
+                        </div>
+                        <div class="employee-role">Servicekraft</div>
+                        <div class="employee-tags">
+                            <span class="mini-tag">Führerschein</span>
+                            <span class="mini-tag">Ersthelfer</span>
+                        </div>
+                    </div>
+                    <div class="employee-quick-stats">
+                        <div class="stat-value">847</div>
+                        <div class="stat-label">Std. (Jahr)</div>
+                    </div>
+                </div>
+                <!-- MA 2 -->
+                <div class="employee-card" onclick="selectEmployee(this, 2)">
+                    <div class="employee-avatar">
+                        <div class="avatar-img">TW</div>
+                        <div class="avatar-status online"></div>
+                    </div>
+                    <div class="employee-info">
+                        <div class="employee-name">Weber, Thomas</div>
+                        <div class="employee-role">Ordner</div>
+                        <div class="employee-tags">
+                            <span class="mini-tag">Bewachung</span>
+                        </div>
+                    </div>
+                    <div class="employee-quick-stats">
+                        <div class="stat-value">623</div>
+                        <div class="stat-label">Std. (Jahr)</div>
+                    </div>
+                </div>
+                <!-- MA 3 -->
+                <div class="employee-card" onclick="selectEmployee(this, 3)">
+                    <div class="employee-avatar">
+                        <div class="avatar-img">MF</div>
+                        <div class="avatar-status busy"></div>
+                    </div>
+                    <div class="employee-info">
+                        <div class="employee-name">
+                            Fischer, Maria
+                            <span class="badge badge-new">Neu</span>
+                        </div>
+                        <div class="employee-role">Hostess</div>
+                        <div class="employee-tags">
+                            <span class="mini-tag">Englisch</span>
+                            <span class="mini-tag">Spanisch</span>
+                        </div>
+                    </div>
+                    <div class="employee-quick-stats">
+                        <div class="stat-value">124</div>
+                        <div class="stat-label">Std. (Jahr)</div>
+                    </div>
+                </div>
+                <!-- MA 4 -->
+                <div class="employee-card" onclick="selectEmployee(this, 4)">
+                    <div class="employee-avatar">
+                        <div class="avatar-img">HM</div>
+                        <div class="avatar-status away"></div>
+                    </div>
+                    <div class="employee-info">
+                        <div class="employee-name">Müller, Hans</div>
+                        <div class="employee-role">Techniker</div>
+                        <div class="employee-tags">
+                            <span class="mini-tag">Elektro</span>
+                            <span class="mini-tag">Ton/Licht</span>
+                        </div>
+                    </div>
+                    <div class="employee-quick-stats">
+                        <div class="stat-value">512</div>
+                        <div class="stat-label">Std. (Jahr)</div>
+                    </div>
+                </div>
+                <!-- MA 5 -->
+                <div class="employee-card" onclick="selectEmployee(this, 5)">
+                    <div class="employee-avatar">
+                        <div class="avatar-img">SK</div>
+                        <div class="avatar-status offline"></div>
+                    </div>
+                    <div class="employee-info">
+                        <div class="employee-name">Klein, Sabine</div>
+                        <div class="employee-role">Catering</div>
+                        <div class="employee-tags">
+                            <span class="mini-tag">Hygieneschein</span>
+                        </div>
+                    </div>
+                    <div class="employee-quick-stats">
+                        <div class="stat-value">389</div>
+                        <div class="stat-label">Std. (Jahr)</div>
+                    </div>
+                </div>
+                <!-- MA 6 -->
+                <div class="employee-card" onclick="selectEmployee(this, 6)">
+                    <div class="employee-avatar">
+                        <div class="avatar-img">JB</div>
+                        <div class="avatar-status online"></div>
+                    </div>
+                    <div class="employee-info">
+                        <div class="employee-name">Bauer, Julia</div>
+                        <div class="employee-role">Servicekraft</div>
+                        <div class="employee-tags">
+                            <span class="mini-tag">Student</span>
+                        </div>
+                    </div>
+                    <div class="employee-quick-stats">
+                        <div class="stat-value">276</div>
+                        <div class="stat-label">Std. (Jahr)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPLITTER -->
+        <div class="splitter" id="splitter">
+            <div class="splitter-handle"></div>
+        </div>
+
+        <!-- RIGHT: Dashboard -->
+        <div class="dashboard-panel">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-main">
+                    <div class="profile-avatar">
+                        AM
+                        <div class="edit-badge">📷</div>
+                    </div>
+                    <div class="profile-info">
+                        <h1>Anna Maier</h1>
+                        <div class="profile-subtitle">Servicekraft / Teamleitung</div>
+                        <div class="profile-meta">
+                            <div class="meta-item">📧 anna.maier@email.de</div>
+                            <div class="meta-item">📱 +49 176 1234567</div>
+                            <div class="meta-item">📍 München</div>
+                            <div class="meta-item">🎂 <strong>28 Jahre</strong></div>
+                            <div class="meta-item">📅 Dabei seit <strong>März 2019</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="profile-btn primary">📝 Bearbeiten</button>
+                    <button class="profile-btn">✉️ Nachricht</button>
+                    <button class="profile-btn">📋 Dienstplan</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Tab Navigation -->
+                <div class="tab-nav">
+                    <button class="tab-btn active">
+                        📊 Übersicht
+                    </button>
+                    <button class="tab-btn">
+                        📅 Einsätze
+                        <span class="tab-count">12</span>
+                    </button>
+                    <button class="tab-btn">
+                        ⏰ Zeitkonto
+                    </button>
+                    <button class="tab-btn">
+                        📁 Dokumente
+                        <span class="tab-count">8</span>
+                    </button>
+                    <button class="tab-btn">
+                        💰 Abrechnung
+                    </button>
+                </div>
+
+                <!-- KPI Row -->
+                <div class="kpi-row">
+                    <div class="kpi-card">
+                        <div class="kpi-icon">⏱️</div>
+                        <div class="kpi-value">847</div>
+                        <div class="kpi-label">Stunden (Jahr)</div>
+                        <div class="kpi-trend positive">↑ 12% vs. Vorjahr</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">📅</div>
+                        <div class="kpi-value">68</div>
+                        <div class="kpi-label">Einsätze (Jahr)</div>
+                        <div class="kpi-trend positive">↑ 8 mehr</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">💶</div>
+                        <div class="kpi-value">€ 12.480</div>
+                        <div class="kpi-label">Verdienst (Jahr)</div>
+                        <div class="kpi-trend positive">↑ 15%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">⭐</div>
+                        <div class="kpi-value">98%</div>
+                        <div class="kpi-label">Zuverlässigkeit</div>
+                        <div class="kpi-trend neutral">→ Stabil</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">🏖️</div>
+                        <div class="kpi-value">12</div>
+                        <div class="kpi-label">Resturlaub (Tage)</div>
+                        <div class="kpi-trend neutral">von 24</div>
+                    </div>
+                </div>
+
+                <!-- Widget Grid -->
+                <div class="widget-grid">
+                    <!-- Kalender -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <div class="widget-title">
+                                <div class="widget-icon">📅</div>
+                                Januar 2024
+                            </div>
+                            <div class="widget-actions">
+                                <button class="widget-action">◀</button>
+                                <button class="widget-action">▶</button>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="calendar-mini">
+                                <div class="cal-header">Mo</div>
+                                <div class="cal-header">Di</div>
+                                <div class="cal-header">Mi</div>
+                                <div class="cal-header">Do</div>
+                                <div class="cal-header">Fr</div>
+                                <div class="cal-header">Sa</div>
+                                <div class="cal-header">So</div>
+                                <div class="cal-day">1</div>
+                                <div class="cal-day">2</div>
+                                <div class="cal-day">3</div>
+                                <div class="cal-day">4</div>
+                                <div class="cal-day has-event">5</div>
+                                <div class="cal-day has-event">6</div>
+                                <div class="cal-day">7</div>
+                                <div class="cal-day">8</div>
+                                <div class="cal-day">9</div>
+                                <div class="cal-day has-event">10</div>
+                                <div class="cal-day">11</div>
+                                <div class="cal-day has-event">12</div>
+                                <div class="cal-day has-event">13</div>
+                                <div class="cal-day">14</div>
+                                <div class="cal-day has-event">15</div>
+                                <div class="cal-day has-event">16</div>
+                                <div class="cal-day today has-event">17</div>
+                                <div class="cal-day has-event">18</div>
+                                <div class="cal-day has-event">19</div>
+                                <div class="cal-day has-event">20</div>
+                                <div class="cal-day">21</div>
+                                <div class="cal-day absent">22</div>
+                                <div class="cal-day absent">23</div>
+                                <div class="cal-day">24</div>
+                                <div class="cal-day has-event">25</div>
+                                <div class="cal-day has-event">26</div>
+                                <div class="cal-day has-event">27</div>
+                                <div class="cal-day">28</div>
+                                <div class="cal-day">29</div>
+                                <div class="cal-day">30</div>
+                                <div class="cal-day">31</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nächste Einsätze -->
+                    <div class="widget span-2">
+                        <div class="widget-header">
+                            <div class="widget-title">
+                                <div class="widget-icon">📋</div>
+                                Nächste Einsätze
+                            </div>
+                            <div class="widget-actions">
+                                <button class="widget-action">↻</button>
+                                <button class="widget-action">⋯</button>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="assignment-list">
+                                <div class="assignment-item">
+                                    <div class="assignment-date">
+                                        <div class="day">18</div>
+                                        <div class="month">Jan</div>
+                                    </div>
+                                    <div class="assignment-details">
+                                        <div class="assignment-title">Messe München - Hauptstand</div>
+                                        <div class="assignment-meta">08:00 - 18:00 Uhr | Teamleitung | Halle A</div>
+                                    </div>
+                                    <span class="assignment-status status-confirmed">Bestätigt</span>
+                                </div>
+                                <div class="assignment-item">
+                                    <div class="assignment-date">
+                                        <div class="day">19</div>
+                                        <div class="month">Jan</div>
+                                    </div>
+                                    <div class="assignment-details">
+                                        <div class="assignment-title">Messe München - Hauptstand</div>
+                                        <div class="assignment-meta">08:00 - 18:00 Uhr | Teamleitung | Halle A</div>
+                                    </div>
+                                    <span class="assignment-status status-confirmed">Bestätigt</span>
+                                </div>
+                                <div class="assignment-item">
+                                    <div class="assignment-date">
+                                        <div class="day">25</div>
+                                        <div class="month">Jan</div>
+                                    </div>
+                                    <div class="assignment-details">
+                                        <div class="assignment-title">Konferenz Hotel Vier Jahreszeiten</div>
+                                        <div class="assignment-meta">10:00 - 20:00 Uhr | Service | Ballsaal</div>
+                                    </div>
+                                    <span class="assignment-status status-pending">Angefragt</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Qualifikationen -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <div class="widget-title">
+                                <div class="widget-icon">🎓</div>
+                                Qualifikationen
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="skill-list">
+                                <div class="skill-item">
+                                    <div class="skill-name">Service</div>
+                                    <div class="skill-bar">
+                                        <div class="skill-fill expert" style="width: 95%;"></div>
+                                    </div>
+                                    <div class="skill-level">Experte</div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-name">Teamleitung</div>
+                                    <div class="skill-bar">
+                                        <div class="skill-fill advanced" style="width: 80%;"></div>
+                                    </div>
+                                    <div class="skill-level">Fortgeschr.</div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-name">Technik</div>
+                                    <div class="skill-bar">
+                                        <div class="skill-fill intermediate" style="width: 50%;"></div>
+                                    </div>
+                                    <div class="skill-level">Mittel</div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-name">Englisch</div>
+                                    <div class="skill-bar">
+                                        <div class="skill-fill advanced" style="width: 75%;"></div>
+                                    </div>
+                                    <div class="skill-level">Fließend</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dokumente -->
+                    <div class="widget span-2">
+                        <div class="widget-header">
+                            <div class="widget-title">
+                                <div class="widget-icon">📁</div>
+                                Dokumente
+                            </div>
+                            <div class="widget-actions">
+                                <button class="widget-action">+</button>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="document-list">
+                                <div class="document-item">
+                                    <div class="doc-icon pdf">📄</div>
+                                    <div class="doc-info">
+                                        <div class="doc-name">Arbeitsvertrag_Maier_2019.pdf</div>
+                                        <div class="doc-meta">PDF • 245 KB • Hochgeladen: 01.03.2019</div>
+                                    </div>
+                                    <button class="doc-action">Ansehen</button>
+                                </div>
+                                <div class="document-item">
+                                    <div class="doc-icon img">🖼️</div>
+                                    <div class="doc-info">
+                                        <div class="doc-name">Fuehrerschein_Kopie.jpg</div>
+                                        <div class="doc-meta">JPG • 1.2 MB • Gültig bis: 15.08.2028</div>
+                                    </div>
+                                    <button class="doc-action">Ansehen</button>
+                                </div>
+                                <div class="document-item">
+                                    <div class="doc-icon pdf">📄</div>
+                                    <div class="doc-info">
+                                        <div class="doc-name">Ersthelfer_Zertifikat.pdf</div>
+                                        <div class="doc-meta">PDF • 89 KB • Gültig bis: 20.06.2025</div>
+                                    </div>
+                                    <button class="doc-action">Ansehen</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Splitter Logic
+        const splitter = document.getElementById('splitter');
+        const listPanel = document.getElementById('listPanel');
+        let isResizing = false;
+
+        splitter.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            splitter.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const newWidth = e.clientX;
+            if (newWidth >= 300 && newWidth <= 500) {
+                listPanel.style.width = newWidth + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
+            splitter.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
+
+        // Employee Selection
+        function selectEmployee(element, id) {
+            document.querySelectorAll('.employee-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            element.classList.add('active');
+            console.log('Mitarbeiter ausgewählt:', id);
+        }
+
+        // Filter Chips
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Tab Navigation
+        document.querySelectorAll('.tab-btn').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

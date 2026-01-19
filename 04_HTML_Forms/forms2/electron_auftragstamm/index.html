@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS - Auftragsverwaltung</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/access-theme.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- HAUPTMENÜ (linke Sidebar) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <img src="assets/logo.svg" alt="CONSEC" class="logo-img">
+            </div>
+            <h2 class="sidebar-title">HAUPTMENÜ</h2>
+            <nav class="sidebar-nav">
+                <button class="menu-btn" data-form="frm_DP_Dienstplan_MA">Dienstplanübersicht</button>
+                <button class="menu-btn" data-form="frm_VA_Planungsuebersicht">Planungsübersicht</button>
+                <button class="menu-btn active" data-form="frm_VA_Auftragstamm">Auftragsverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiterverwaltung</button>
+                <button class="menu-btn" data-form="frm_MA_Offene_Anfragen">Offene Mail Anfragen</button>
+                <button class="menu-btn" data-form="frm_MA_Zeitkonten">Excel Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_Zeitkonten">Zeitkonten</button>
+                <button class="menu-btn" data-form="frm_MA_Abwesenheit">Abwesenheitsplanung</button>
+                <button class="menu-btn" data-form="frm_Dienstausweis">Dienstausweis erstellen</button>
+            </nav>
+        </aside>
+
+        <!-- HAUPTBEREICH -->
+        <main class="main-content">
+            <!-- HEADER-BEREICH -->
+            <header class="form-header">
+                <div class="header-left">
+                    <div class="form-title-area">
+                        <img src="assets/icon-nav.svg" alt="" class="title-icon">
+                        <h1 class="form-title">Auftragsverwaltung</h1>
+                    </div>
+                    <!-- Navigation Buttons -->
+                    <div class="nav-buttons">
+                        <button class="nav-btn" id="btnFirst" title="Erster Datensatz">⏮</button>
+                        <button class="nav-btn" id="btnPrev" title="Vorheriger">◀</button>
+                        <button class="nav-btn" id="btnNext" title="Nächster">▶</button>
+                        <button class="nav-btn" id="btnLast" title="Letzter Datensatz">⏭</button>
+                        <button class="nav-btn" id="btnRefresh" title="Aktualisieren">🔄</button>
+                    </div>
+                </div>
+                
+                <!-- Toolbar Buttons -->
+                <div class="toolbar">
+                    <button class="toolbar-btn" id="btnRueckmeldeStatistik">Rückmelde-Statistik</button>
+                    <button class="toolbar-btn" id="btnSyncfehler">Syncfehler</button>
+                    <button class="toolbar-btn" id="btnAktualisieren">Aktualisieren</button>
+                    <button class="toolbar-btn blue" id="btnMitarbeiterauswahl">Mitarbeiterauswahl</button>
+                    <button class="toolbar-btn" id="btnPositionen">Positionen</button>
+                    <button class="toolbar-btn" id="btnAuftragKopieren">Auftrag kopieren</button>
+                    <button class="toolbar-btn red" id="btnAuftragLoeschen">Auftrag löschen</button>
+                    <button class="toolbar-btn" id="btnEinsatzlisteMA">Einsatzliste senden MA</button>
+                    <button class="toolbar-btn green" id="btnEinsatzlisteBOS">Einsatzliste senden BOS</button>
+                    <button class="toolbar-btn highlight" id="btnEinsatzlisteSUB">Einsatzliste<br>senden SUB</button>
+                </div>
+
+                <div class="toolbar-row2">
+                    <button class="toolbar-btn" id="btnPositionen">Positionen</button>
+                    <button class="toolbar-btn" id="btnNeuerAuftrag">Neuer Auftrag</button>
+                    <button class="toolbar-btn" id="btnNamenslisteESS">Namensliste ESS</button>
+                    <button class="toolbar-btn" id="btnEinsatzlisteDrucken">Einsatzliste drucken</button>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="cbAutosendEL">
+                        <span>EL Autosend</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="cbELGesendet">
+                        <span>EL gesendet</span>
+                    </label>
+                </div>
+
+                <!-- Status Bereich (rechts oben) -->
+                <div class="status-area">
+                    <label>- Status -</label>
+                    <select id="cboStatus" class="status-dropdown">
+                        <option value="1">In Planung</option>
+                        <option value="2">Auftrag beendet</option>
+                        <option value="3">Zeiten noch in Bearbeitung</option>
+                        <option value="4">Einsatzliste versendet</option>
+                    </select>
+                    <div class="version-info">
+                        <span id="lblVersion">FE | V1</span>
+                        <span id="lblDatum"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- FORMULAR-INHALT -->
+            <div class="form-body">
+                <!-- Oberer Formular-Bereich (Stammdaten) -->
+                <div class="form-section stammdaten">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Datum:</label>
+                            <input type="text" id="txtDatVon" class="date-input" value="12.12.2025">
+                            <span class="separator">▶</span>
+                            <input type="text" id="txtDatBis" class="date-input" value="12.12.2025">
+                        </div>
+                        <div class="form-group">
+                            <label>Nr.:</label>
+                            <input type="text" id="txtID" class="id-input" readonly value="9152">
+                        </div>
+                        <div class="form-group">
+                            <label>Treffpunkt:</label>
+                            <input type="text" id="txtTreffpunkt" class="text-input wide" value="15 min vor DB vor Ort">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Auftrag:</label>
+                            <select id="cboAuftrag" class="combo-input wide">
+                                <option selected>Spvgg Greuther Fürth - Hertha Bsc</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>PKW Anzahl:</label>
+                            <input type="number" id="txtPKWAnzahl" class="number-input" value="0">
+                            <label class="inline-label">Dienstkleidung:</label>
+                            <select id="cboDienstkleidung" class="combo-input">
+                                <option selected>schwarz neutral</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ort:</label>
+                            <select id="cboOrt" class="combo-input wide">
+                                <option selected>Fürth</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fahrtkosten pro PKW:</label>
+                            <input type="text" id="txtFahrtkosten" class="currency-input" value="0,00 €">
+                            <label class="inline-label">Ansprechpartner:</label>
+                            <input type="text" id="txtAnsprechpartner" class="text-input">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Objekt:</label>
+                            <select id="cboObjekt" class="combo-input">
+                                <option selected>Sportpark am Ronhof</option>
+                            </select>
+                            <button class="small-btn" id="btnObjektID">ID</button>
+                            <!-- Datum Navigation -->
+                            <button class="nav-btn small" id="btnDatumLeft">◀</button>
+                            <select id="cboVADatum" class="date-combo">
+                                <option selected>Fr. 12.12.25</option>
+                            </select>
+                            <button class="nav-btn small" id="btnDatumRight">▶</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Auftraggeber:</label>
+                            <select id="cboAuftraggeber" class="combo-input wide">
+                                <option selected>SPVGG Greuther Fürth GmbH & Co. K</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Control -->
+                <div class="tab-container">
+                    <div class="tab-header">
+                        <button class="tab-btn active" data-tab="einsatzliste">Einsatzliste</button>
+                        <button class="tab-btn" data-tab="antworten">Antworten ausstehend</button>
+                        <button class="tab-btn" data-tab="zusatzdateien">Zusatzdateien</button>
+                        <button class="tab-btn" data-tab="rechnung">Rechnung</button>
+                    </div>
+
+                    <!-- Tab: Einsatzliste -->
+                    <div class="tab-content active" id="tab-einsatzliste">
+                        <div class="einsatzliste-container">
+                            <!-- Linke Spalte: Schichten & Absagen -->
+                            <div class="left-column">
+                                <!-- Schichten (sub_VA_Start) -->
+                                <div class="subform-container schichten">
+                                    <table class="data-table schichten-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Ai</th>
+                                                <th>von</th>
+                                                <th>bis</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="schichtenBody">
+                                            <tr class="selected">
+                                                <td>2</td>
+                                                <td class="time-highlight">15:00</td>
+                                                <td>21:00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>40</td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                            </tr>
+                                            <tr class="new-row">
+                                                <td>*</td>
+                                                <td>0</td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Absagen (sub_MA_VA_Planung_Absage) -->
+                                <div class="subform-container absagen">
+                                    <h4>Absagen:</h4>
+                                    <table class="data-table absagen-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Mitarbeiter</th>
+                                                <th>Bemerkung</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="absagenBody">
+                                            <!-- Dynamisch gefüllt -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Rechte Spalte: Mitarbeiter-Zuordnung -->
+                            <div class="right-column">
+                                <button class="action-btn" id="btnBWNDrucken">BWN drucken</button>
+                                
+                                <!-- Mitarbeiter Zuordnung (sub_MA_VA_Zuordnung) -->
+                                <div class="subform-container zuordnung">
+                                    <table class="data-table zuordnung-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Lfd</th>
+                                                <th>Mitarbeiter</th>
+                                                <th>von</th>
+                                                <th>bis</th>
+                                                <th>Std</th>
+                                                <th>Bemerkungen</th>
+                                                <th>I</th>
+                                                <th>PKW</th>
+                                                <th>E</th>
+                                                <th>F</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="zuordnungBody">
+                                            <tr>
+                                                <td>1</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td class="time-highlight">15:00</td>
+                                                <td>21:00</td>
+                                                <td>6,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>15:00</td>
+                                                <td>21:00</td>
+                                                <td>6,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>4</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>5</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>6</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>7</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>8</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>9</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>10</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>11</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>12</td>
+                                                <td><select class="table-select"><option></option></select></td>
+                                                <td>16:00</td>
+                                                <td>21:00</td>
+                                                <td>5,00</td>
+                                                <td><input type="text" class="table-input"></td>
+                                                <td><input type="checkbox"></td>
+                                                <td>0,00 €</td>
+                                                <td><input type="checkbox"></td>
+                                                <td><input type="checkbox"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Antworten ausstehend -->
+                    <div class="tab-content" id="tab-antworten">
+                        <div class="subform-container">
+                            <p>Keine ausstehenden Antworten</p>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Zusatzdateien -->
+                    <div class="tab-content" id="tab-zusatzdateien">
+                        <div class="subform-container">
+                            <button class="action-btn" id="btnNeuAttach">Neue Datei anhängen</button>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Dateiname</th>
+                                        <th>Typ</th>
+                                        <th>Größe</th>
+                                        <th>Datum</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="zusatzDateienBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Rechnung -->
+                    <div class="tab-content" id="tab-rechnung">
+                        <div class="rechnung-container">
+                            <div class="rechnung-header">
+                                <h4>Rechnungskopf</h4>
+                                <button class="action-btn" id="btnPDFKopf">PDF Kopf</button>
+                                <button class="action-btn" id="btnPDFPos">PDF Positionen</button>
+                            </div>
+                            <table class="data-table rechnung-kopf-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rech.Nr.</th>
+                                        <th>Datum</th>
+                                        <th>Betrag</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rechnungKopfBody">
+                                </tbody>
+                            </table>
+
+                            <h4>Rechnungspositionen</h4>
+                            <table class="data-table rechnung-pos-table">
+                                <thead>
+                                    <tr>
+                                        <th>Pos</th>
+                                        <th>Bezeichnung</th>
+                                        <th>Menge</th>
+                                        <th>EP</th>
+                                        <th>GP</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rechnungPosBody">
+                                </tbody>
+                            </table>
+
+                            <div class="summe-row">
+                                <label>Positionen Gesamtsumme:</label>
+                                <span id="lblPosGesamtsumme">0,00 €</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rechte Sidebar: Auftragsliste & Status -->
+            <aside class="right-sidebar">
+                <div class="auftragsstatus-panel">
+                    <h4>Auftragsstatus</h4>
+                    <div class="status-text">
+                        <p>In Planung</p>
+                        <p>Auftrag beendet, Zeiten noch in Bearbeitung</p>
+                        <p>Einsatzliste versendet</p>
+                    </div>
+                </div>
+
+                <div class="auftraege-filter">
+                    <label>Aufträge ab:</label>
+                    <input type="text" id="txtAuftraegeAb" class="date-input" value="11.12.2025">
+                    <button class="small-btn" id="btnGo">Go</button>
+                    <button class="nav-btn" id="btnTgBack">◀◀</button>
+                    <button class="nav-btn" id="btnTgVor">▶▶</button>
+                </div>
+
+                <div class="auftraege-liste">
+                    <table class="data-table auftraege-table">
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Auftrag</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auftraegeListBody">
+                            <tr class="selected">
+                                <td>Fr. 12.12.25</td>
+                                <td>Spvgg Greuther Fürth</td>
+                            </tr>
+                            <tr>
+                                <td>Sa. 13.12.25</td>
+                                <td>1. Fc Nürnberg Frauen</td>
+                            </tr>
+                            <tr>
+                                <td>Sa. 13.12.25</td>
+                                <td>1099</td>
+                            </tr>
+                            <tr>
+                                <td>Sa. 13.12.25</td>
+                                <td>Weihnachtsmarkt Altdorf</td>
+                            </tr>
+                            <tr>
+                                <td>So. 14.12.25</td>
+                                <td>Ross Antony & Paul</td>
+                            </tr>
+                            <tr>
+                                <td>So. 14.12.25</td>
+                                <td>Weihnachtsmarkt Altdorf</td>
+                            </tr>
+                            <tr>
+                                <td>Sa. 20.12.25</td>
+                                <td>1. Fc Nürnberg Frauen</td>
+                            </tr>
+                            <tr>
+                                <td>Sa. 20.12.25</td>
+                                <td>Claudia Koreck</td>
+                            </tr>
+                            <tr>
+                                <td>So. 21.12.25</td>
+                                <td>1. Fc Nürnberg - Hannover</td>
+                            </tr>
+                            <tr>
+                                <td>So. 21.12.25</td>
+                                <td>Doro</td>
+                            </tr>
+                            <tr>
+                                <td>Mo. 29.12.25</td>
+                                <td>Fiddler's Green</td>
+                            </tr>
+                            <tr>
+                                <td>Fr. 02.01.26</td>
+                                <td>J.b.o.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Footer -->
+        <footer class="form-footer">
+            <div class="footer-left">
+                <span>Erstellt:</span>
+                <input type="text" id="txtErstVon" class="footer-input" readonly>
+                <input type="text" id="txtErstAm" class="footer-input" readonly>
+            </div>
+            <div class="footer-right">
+                <span>Geändert:</span>
+                <input type="text" id="txtAendVon" class="footer-input" readonly>
+                <input type="text" id="txtAendAm" class="footer-input" readonly>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/renderer.js"></script>
+</body>
+</html>

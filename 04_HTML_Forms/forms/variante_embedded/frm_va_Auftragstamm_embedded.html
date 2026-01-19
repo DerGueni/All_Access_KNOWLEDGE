@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragstamm - CONSYS</title>
+    <style>
+        /* Critical CSS - Inline for fast first paint */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f5f5f5;
+        }
+
+        .app-sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .app-sidebar iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .app-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .form-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 30px;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .form-section h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-field label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .subform-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .subform-container iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            display: block;
+        }
+
+        /* Loading state */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .loading::after {
+            content: "Laden...";
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body data-active-menu="auftrag">
+    <!-- Sidebar as embedded iframe -->
+    <aside class="app-sidebar">
+        <iframe src="sub_sidebar.html" id="sidebarFrame"></iframe>
+    </aside>
+
+    <!-- Main content -->
+    <main class="app-content">
+        <header class="form-header">
+            <h1>Auftragstamm</h1>
+        </header>
+
+        <div class="form-body">
+            <!-- Auftrag Details Section -->
+            <section class="form-section">
+                <h2>Auftragsinformationen</h2>
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="auftrag">Auftrag</label>
+                        <input type="text" id="auftrag" name="auftrag" readonly>
+                    </div>
+                    <div class="form-field">
+                        <label for="veranstalter">Veranstalter</label>
+                        <select id="veranstalter" name="veranstalter_id">
+                            <option value="">Bitte wählen...</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="objekt">Objekt</label>
+                        <select id="objekt" name="objekt_id">
+                            <option value="">Bitte wählen...</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="Angebot">Angebot</option>
+                            <option value="Bestätigt">Bestätigt</option>
+                            <option value="Abgeschlossen">Abgeschlossen</option>
+                            <option value="Storniert">Storniert</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-top: 15px;">
+                    <div class="form-field">
+                        <label for="von_datum">Von Datum</label>
+                        <input type="date" id="von_datum" name="von_datum">
+                    </div>
+                    <div class="form-field">
+                        <label for="bis_datum">Bis Datum</label>
+                        <input type="date" id="bis_datum" name="bis_datum">
+                    </div>
+                    <div class="form-field">
+                        <label for="ansprechpartner">Ansprechpartner</label>
+                        <input type="text" id="ansprechpartner" name="ansprechpartner">
+                    </div>
+                    <div class="form-field">
+                        <label for="telefon">Telefon</label>
+                        <input type="tel" id="telefon" name="telefon">
+                    </div>
+                </div>
+
+                <div class="form-field" style="margin-top: 15px;">
+                    <label for="bemerkung">Bemerkung</label>
+                    <textarea id="bemerkung" name="bemerkung" rows="3"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" id="btnSave">Speichern</button>
+                    <button type="button" class="btn btn-secondary" id="btnNew">Neu</button>
+                    <button type="button" class="btn btn-secondary" id="btnDelete">Löschen</button>
+                </div>
+            </section>
+
+            <!-- Subform: Einsatztage -->
+            <section class="form-section">
+                <h2>Einsatztage</h2>
+                <div class="subform-container">
+                    <iframe id="subEinsatztage" data-lazy-src="../sub_VA_AnzTage.html"></iframe>
+                </div>
+            </section>
+
+            <!-- Subform: Schichten -->
+            <section class="form-section">
+                <h2>Schichten</h2>
+                <div class="subform-container">
+                    <iframe id="subSchichten" data-lazy-src="../sub_VA_Start.html"></iframe>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script type="module">
+        // Communication with sidebar iframe
+        const sidebarFrame = document.getElementById('sidebarFrame');
+        const activeMenu = document.body.dataset.activeMenu;
+
+        // Listen for messages from sidebar
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'NAVIGATE' && e.data.file) {
+                // Navigate to different form
+                window.location.href = e.data.file;
+            } else if (e.data.type === 'SIDEBAR_READY') {
+                // Tell sidebar which menu item is active
+                sidebarFrame.contentWindow.postMessage({
+                    type: 'SET_ACTIVE',
+                    form: activeMenu
+                }, '*');
+            }
+        });
+
+        // Form logic
+        let currentAuftragId = null;
+
+        // Initialize form
+        async function initForm() {
+            await loadDropdowns();
+            await loadAuftragListe();
+        }
+
+        // Load dropdown data
+        async function loadDropdowns() {
+            try {
+                // Load Veranstalter (Kunden)
+                const kundenRes = await fetch('http://localhost:5000/api/kunden');
+                const kunden = await kundenRes.json();
+                const veranstalterSelect = document.getElementById('veranstalter');
+                kunden.forEach(k => {
+                    const opt = document.createElement('option');
+                    opt.value = k.kun_Id;
+                    opt.textContent = k.kun_Firma;
+                    veranstalterSelect.appendChild(opt);
+                });
+
+                // Load Objekte
+                const objekteRes = await fetch('http://localhost:5000/api/objekte');
+                const objekte = await objekteRes.json();
+                const objektSelect = document.getElementById('objekt');
+                objekte.forEach(o => {
+                    const opt = document.createElement('option');
+                    opt.value = o.Objekt_ID;
+                    opt.textContent = o.Objekt;
+                    objektSelect.appendChild(opt);
+                });
+            } catch (err) {
+                console.error('Fehler beim Laden der Dropdowns:', err);
+            }
+        }
+
+        // Load Auftrag list (for navigation)
+        async function loadAuftragListe() {
+            try {
+                const res = await fetch('http://localhost:5000/api/auftraege');
+                const auftraege = await res.json();
+                if (auftraege.length > 0) {
+                    loadAuftrag(auftraege[0].VA_ID);
+                }
+            } catch (err) {
+                console.error('Fehler beim Laden der Aufträge:', err);
+            }
+        }
+
+        // Load specific Auftrag
+        async function loadAuftrag(id) {
+            try {
+                const res = await fetch(`http://localhost:5000/api/auftraege/${id}`);
+                const auftrag = await res.json();
+
+                currentAuftragId = id;
+                document.getElementById('auftrag').value = auftrag.Auftrag || '';
+                document.getElementById('veranstalter').value = auftrag.Veranstalter_ID || '';
+                document.getElementById('objekt').value = auftrag.Objekt_ID || '';
+                document.getElementById('status').value = auftrag.Status || 'Angebot';
+                document.getElementById('von_datum').value = auftrag.VonDatum || '';
+                document.getElementById('bis_datum').value = auftrag.BisDatum || '';
+                document.getElementById('ansprechpartner').value = auftrag.Ansprechpartner || '';
+                document.getElementById('telefon').value = auftrag.Telefon || '';
+                document.getElementById('bemerkung').value = auftrag.Bemerkung || '';
+
+                // Load subforms
+                loadSubforms(id);
+            } catch (err) {
+                console.error('Fehler beim Laden des Auftrags:', err);
+            }
+        }
+
+        // Load subforms
+        function loadSubforms(va_id) {
+            const einsatztageFrame = document.getElementById('subEinsatztage');
+            const schichtenFrame = document.getElementById('subSchichten');
+
+            // Lazy load iframes
+            if (einsatztageFrame.dataset.lazySrc) {
+                einsatztageFrame.src = einsatztageFrame.dataset.lazySrc;
+                delete einsatztageFrame.dataset.lazySrc;
+            }
+            if (schichtenFrame.dataset.lazySrc) {
+                schichtenFrame.src = schichtenFrame.dataset.lazySrc;
+                delete schichtenFrame.dataset.lazySrc;
+            }
+
+            // Send VA_ID to subforms when loaded
+            einsatztageFrame.addEventListener('load', () => {
+                einsatztageFrame.contentWindow.postMessage({
+                    type: 'LOAD_DATA',
+                    va_id: va_id
+                }, '*');
+            }, { once: true });
+
+            schichtenFrame.addEventListener('load', () => {
+                schichtenFrame.contentWindow.postMessage({
+                    type: 'LOAD_DATA',
+                    va_id: va_id
+                }, '*');
+            }, { once: true });
+        }
+
+        // Save button
+        document.getElementById('btnSave').addEventListener('click', async () => {
+            if (!currentAuftragId) return;
+
+            const data = {
+                Veranstalter_ID: document.getElementById('veranstalter').value,
+                Objekt_ID: document.getElementById('objekt').value,
+                Status: document.getElementById('status').value,
+                VonDatum: document.getElementById('von_datum').value,
+                BisDatum: document.getElementById('bis_datum').value,
+                Ansprechpartner: document.getElementById('ansprechpartner').value,
+                Telefon: document.getElementById('telefon').value,
+                Bemerkung: document.getElementById('bemerkung').value
+            };
+
+            try {
+                const res = await fetch(`http://localhost:5000/api/auftraege/${currentAuftragId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    alert('Auftrag gespeichert!');
+                } else {
+                    alert('Fehler beim Speichern!');
+                }
+            } catch (err) {
+                console.error('Fehler beim Speichern:', err);
+                alert('Fehler beim Speichern!');
+            }
+        });
+
+        // New button
+        document.getElementById('btnNew').addEventListener('click', () => {
+            currentAuftragId = null;
+            document.querySelectorAll('input, select, textarea').forEach(el => el.value = '');
+        });
+
+        // Delete button
+        document.getElementById('btnDelete').addEventListener('click', async () => {
+            if (!currentAuftragId) return;
+            if (!confirm('Auftrag wirklich löschen?')) return;
+
+            try {
+                const res = await fetch(`http://localhost:5000/api/auftraege/${currentAuftragId}`, {
+                    method: 'DELETE'
+                });
+
+                if (res.ok) {
+                    alert('Auftrag gelöscht!');
+                    loadAuftragListe();
+                } else {
+                    alert('Fehler beim Löschen!');
+                }
+            } catch (err) {
+                console.error('Fehler beim Löschen:', err);
+                alert('Fehler beim Löschen!');
+            }
+        });
+
+        // Initialize on load
+        initForm();
+    </script>
+    <!-- API-Server Lifecycle (Auto-Start/Stop) -->
+    <script src="../../js/api-lifecycle.js"></script>
+</body>
+</html>

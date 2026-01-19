@@ -1,0 +1,919 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Mail versenden</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-size: 11px;
+            background-color: #8080c0;
+            overflow: auto;
+        }
+
+        /* Hauptcontainer */
+        .form-container {
+            width: 1400px;
+            min-height: 100vh;
+            background-color: #8080c0;
+            position: relative;
+        }
+
+        /* Header Section - Blau-Gradient */
+        .form-header {
+            position: relative;
+            height: 70px;
+            background: linear-gradient(to right, #000080, #1084d0);
+            border-bottom: 1px solid #000060;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        /* Detail Section */
+        .form-detail {
+            display: flex;
+            height: calc(100vh - 70px);
+            background-color: #8080c0;
+        }
+
+        /* ============================================ */
+        /* HEADER CONTROLS                             */
+        /* ============================================ */
+
+        .header-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-right: 30px;
+        }
+
+        .header-btn-senden {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 6px 20px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+
+        .header-vorlage {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .header-vorlage label {
+            color: white;
+            font-size: 11px;
+            margin-right: 8px;
+        }
+
+        .header-vorlage select {
+            width: 180px;
+            height: 24px;
+            font-size: 10px;
+        }
+
+        .header-checkbox {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            color: white;
+            font-size: 11px;
+        }
+
+        .header-checkbox input {
+            margin-right: 5px;
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-btn-icon {
+            width: 28px;
+            height: 28px;
+            background: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .header-date {
+            color: white;
+            font-size: 11px;
+        }
+
+        /* ============================================ */
+        /* SIDEBAR - HAUPTMENU                         */
+        /* ============================================ */
+
+        .left-menu {
+            width: 155px;
+            background-color: #6060a0;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d0d0e0, #a0a0c0);
+            padding: 5px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            border: none;
+            margin: 1px 0;
+            overflow: visible;
+        }
+
+        /* Obere helle Kante - 4px nach rechts versetzt */
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        /* Untere dunkle Kante - 4px nach links versetzt */
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: calc(100% - 4px);
+            height: 2px;
+            background: #404070;
+            z-index: 1;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #e0e0f0, #b0b0d0);
+        }
+
+        .menu-btn:active {
+            background: linear-gradient(to bottom, #b0b0d0, #9090b0);
+        }
+
+        .menu-btn:active::before {
+            background: #404070;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn:active::after {
+            background: #ffffff;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(to bottom, #a0a0d0, #8080b0);
+        }
+
+        .menu-btn.active::before {
+            background: #505080;
+            left: 4px;
+            width: calc(100% - 4px);
+        }
+
+        .menu-btn.active::after {
+            background: #c0c0d8;
+            right: 4px;
+            width: calc(100% - 4px);
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        #loadingOverlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 20px 40px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        /* Toast Container */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .toast {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            min-width: 250px;
+        }
+
+        .toast.success { border-left: 4px solid #28a745; }
+        .toast.error { border-left: 4px solid #dc3545; }
+        .toast.info { border-left: 4px solid #17a2b8; }
+
+        /* ============================================ */
+        /* MAIN CONTENT                                */
+        /* ============================================ */
+
+        .main-content {
+            flex: 1;
+            padding: 10px 15px;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Linke Spalte - E-Mail Felder */
+        .email-section {
+            width: 560px;
+            flex-shrink: 0;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .field-label {
+            width: 80px;
+            font-size: 10px;
+            color: #333;
+            padding-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .field-input {
+            flex: 1;
+            height: 22px;
+            font-size: 10px;
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+        }
+
+        .field-textarea {
+            flex: 1;
+            font-size: 10px;
+            border: 1px solid #ccc;
+            padding: 4px;
+            resize: none;
+        }
+
+        .email-text-area {
+            height: 400px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 8px;
+            font-size: 10px;
+        }
+
+        .checkbox-row input[type="checkbox"],
+        .checkbox-row input[type="radio"] {
+            margin-right: 4px;
+        }
+
+        .priority-select {
+            width: 100px;
+            height: 22px;
+            font-size: 10px;
+        }
+
+        .auftrag-select {
+            width: 250px;
+            height: 22px;
+            font-size: 10px;
+        }
+
+        /* Mittlere Spalte - Anhang & Festangestellte */
+        .middle-section {
+            width: 220px;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .anhang-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .btn-small {
+            padding: 3px 8px;
+            font-size: 9px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: #f0f0f0;
+        }
+
+        .btn-delete {
+            background: #ffcccc;
+            border-color: #cc0000;
+            color: #cc0000;
+        }
+
+        .attachfile-list {
+            height: 100px;
+            border: 1px solid #ccc;
+            background: white;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            font-size: 10px;
+        }
+
+        .festangestellt-list {
+            height: 350px;
+            border: 1px solid #ccc;
+            background: white;
+            overflow-y: auto;
+            font-size: 10px;
+        }
+
+        .list-item {
+            padding: 4px 6px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .list-item:hover {
+            background: #e8f4fc;
+        }
+
+        /* Rechte Spalte - Mail senden an */
+        .right-section {
+            flex: 1;
+            min-width: 400px;
+        }
+
+        .senden-an-box {
+            border: 1px solid #ccc;
+            padding: 8px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+
+        .senden-an-title {
+            font-size: 10px;
+            margin-bottom: 8px;
+        }
+
+        .senden-an-options {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 10px;
+        }
+
+        .senden-an-options label {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* Mitarbeiter Tab-Header mit Titel */
+        .mitarbeiter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .mitarbeiter-title {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Zwei Listen nebeneinander */
+        .ma-lists-container {
+            display: flex;
+            gap: 10px;
+            height: 500px;
+        }
+
+        .ma-list-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ma-list-header {
+            display: flex;
+            background: #e0e0e0;
+            font-size: 9px;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            border-bottom: none;
+        }
+
+        .ma-list-header span {
+            padding: 4px 6px;
+            border-right: 1px solid #ccc;
+        }
+
+        .ma-list-header span:last-child {
+            border-right: none;
+        }
+
+        .col-name { width: 120px; flex-shrink: 0; }
+        .col-email { flex: 1; }
+
+        .ma-list {
+            flex: 1;
+            border: 1px solid #ccc;
+            background: white;
+            overflow-y: auto;
+            font-size: 9px;
+        }
+
+        .ma-list-row {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .ma-list-row:hover {
+            background: #e8f4fc;
+        }
+
+        .ma-list-row.selected {
+            background: #000080;
+            color: white;
+        }
+
+        .ma-list-row span {
+            padding: 3px 6px;
+            border-right: 1px solid #eee;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .ma-list-row span:last-child {
+            border-right: none;
+        }
+
+        /* Vollbild-Button oben rechts */
+        .fullscreen-btn {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #606060 #606060 #ffffff;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #000080;
+        }
+
+        .fullscreen-btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .fullscreen-btn:active {
+            border-color: #606060 #ffffff #ffffff #606060;
+        }
+
+    </style>
+</head>
+<body>
+    <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Vollbild">⛶</button>
+    <div class="form-container">
+        <!-- HEADER SECTION -->
+        <div class="form-header">
+            <div class="header-icon">@</div>
+            <span class="header-title">E-Mail versenden</span>
+
+            <button class="header-btn-senden" id="btnOutlook">Senden</button>
+
+            <div class="header-vorlage">
+                <label>Vorlage</label>
+                <select id="cboOutlooktemp">
+                    <option value="">Mitarbeiteranschreiben</option>
+                </select>
+            </div>
+
+            <div class="header-checkbox">
+                <input type="checkbox" id="IsDirectsend">
+                <label for="IsDirectsend">Direkt Senden</label>
+            </div>
+
+            <div class="header-right">
+                <button class="header-btn-icon" id="Befehl121" title="Hilfe">?</button>
+                <button class="header-btn-icon" id="Befehl38" title="Schließen" style="color:red;">&times;</button>
+                <span class="header-date" id="lbl_Datum"></span>
+            </div>
+        </div>
+
+        <!-- DETAIL SECTION -->
+        <div class="form-detail">
+            <!-- Sidebar -->
+            <aside class="left-menu">
+                <div class="menu-header">HAUPTMENU</div>
+                <div class="menu-buttons">
+                    <button class="menu-btn" data-form="frm_DP_Dienstplan_MA">Dienstplanubersicht</button>
+                    <button class="menu-btn" data-form="frm_DP_Dienstplan_Objekt">Planungsubersicht</button>
+                    <button class="menu-btn" data-form="frm_va_Auftragstamm">Auftragsverwaltung</button>
+                    <button class="menu-btn" data-form="frm_MA_Mitarbeiterstamm">Mitarbeiterverwaltung</button>
+                    <button class="menu-btn" data-form="frm_MA_VA_Schnellauswahl">Offene Mail Anfragen</button>
+                    <button class="menu-btn" data-form="frm_MA_Zeitkonten">Excel Zeitkonten</button>
+                    <button class="menu-btn" data-form="frm_MA_Zeitkonten">Zeitkonten</button>
+                    <button class="menu-btn" data-form="frm_Abwesenheiten">Abwesenheitsplanung</button>
+                    <button class="menu-btn">Dienstausweis erstellen</button>
+                    <button class="menu-btn" data-form="frm_MA_Zeitkonten">Stundenabgleich</button>
+                    <button class="menu-btn" data-form="frm_KD_Kundenstamm">Kundenverwaltung</button>
+                    <button class="menu-btn">Verrechnungssatze</button>
+                    <button class="menu-btn">Sub Rechnungen</button>
+                    <button class="menu-btn active" data-form="frmOff_Outlook_aufrufen">E-Mail</button>
+                    <button class="menu-btn" data-form="frm_Menuefuehrung1">Menu 2</button>
+                    <button class="menu-btn">System Info</button>
+                    <button class="menu-btn">Datenbank wechseln</button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Linke Spalte - E-Mail Felder -->
+                <div class="email-section">
+                    <div class="field-row">
+                        <span class="field-label">Absenden als:</span>
+                        <input type="text" class="field-input" id="AbsendenAls" value="consec-auftragsplanung@gmx.de">
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">An:</span>
+                        <input type="text" class="field-input" id="TO" value="info@consec-nuernberg.de">
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">CC:</span>
+                        <input type="text" class="field-input" id="CC">
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">BCC</span>
+                        <input type="text" class="field-input" id="BCC">
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Betreff::</span>
+                        <input type="text" class="field-input" id="Subject">
+                    </div>
+
+                    <div class="checkbox-row">
+                        <span class="field-label"></span>
+                        <input type="checkbox" id="IstEmpfangsbest">
+                        <label for="IstEmpfangsbest">Empfangsbestätigung</label>
+
+                        <select class="priority-select" id="cboSendPrio">
+                            <option value="0">Prio Nieder</option>
+                            <option value="1" selected>Prio Normal</option>
+                            <option value="2">Prio Hoch</option>
+                        </select>
+
+                        <label>Auftrag:</label>
+                        <select class="auftrag-select" id="cbo_VA_ID">
+                            <option value="">-- Auftrag wählen --</option>
+                        </select>
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Text:</span>
+                    </div>
+
+                    <textarea class="field-textarea email-text-area" id="eMailText">Hi,
+
+CONSEC Veranstaltungsservice & Sicherheitsdienst oHG
+Vogelweiherstr. 70
+90441 Nürnberg
+
+0911 - 40 99 77 99 (Tel.)
+0911 - 40 99 77 92 (Fax)
+
+E-Mail: info@consec-nuernberg.de
+http:// www.consec-nuernberg.de
+
+Geschäftsführer: Melanie Oberndorfer, Günther Siegert
+HR A 10816 Amtsgericht Nürnberg
+Steuernr. 240/154/55205
+
+Diese E-Mail könnte vertrauliche und/oder rechtlich geschützte Informationen enthalten. Wenn Sie nicht der richtige Adressat sind oder diese E-Mail  irrtümlich erhalten haben, informieren Sie bitte sofort den Absender und vernichten Sie diese Mail. Das unerlaubte Kopieren, sowie die unbefugte Weitergabe dieser Mail sind nicht gestattet.
+
+Bitte denken Sie an die Umwelt, bevor Sie diese E-Mail ausdrucken / Think before you print!!!</textarea>
+                </div>
+
+                <!-- Mittlere Spalte - Anhang & Festangestellte -->
+                <div class="middle-section">
+                    <div class="anhang-header">
+                        <span class="section-title">Anhang:</span>
+                        <button class="btn-small" id="btnAttachSuch">...</button>
+                        <button class="btn-small btn-delete" id="btnAttLoesch">Anhänge löschen</button>
+                    </div>
+
+                    <div class="section-title" style="margin-top:5px;">Attachfile</div>
+                    <div class="attachfile-list" id="sub_tbltmp_Attachfile">
+                        <div class="list-item" style="color:#888; padding:20px; text-align:center;">*</div>
+                    </div>
+
+                    <div class="section-title">Festangestellte Mitarbeiter</div>
+                    <div class="festangestellt-list" id="Liste256"></div>
+                </div>
+
+                <!-- Rechte Spalte - Mail senden an -->
+                <div class="right-section">
+                    <div class="senden-an-box">
+                        <div class="senden-an-title">Mail senden an</div>
+                        <div class="senden-an-options">
+                            <label><input type="radio" name="SendenAn" value="1" checked> Mitarbeiter</label>
+                        </div>
+                    </div>
+
+                    <div class="mitarbeiter-header">
+                        <span class="mitarbeiter-title">Mitarbeiter</span>
+                    </div>
+
+                    <!-- Zwei Listen nebeneinander -->
+                    <div class="ma-lists-container">
+                        <div class="ma-list-wrapper">
+                            <div class="ma-list-header">
+                                <span class="col-name">Name</span>
+                                <span class="col-email">E-Mail</span>
+                            </div>
+                            <div class="ma-list" id="Lst_MA"></div>
+                        </div>
+                        <div class="ma-list-wrapper">
+                            <div class="ma-list-header">
+                                <span class="col-name">Name</span>
+                                <span class="col-email">E-Mail</span>
+                            </div>
+                            <div class="ma-list" id="Lst_MA2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="loading-spinner">
+            <div>Laden...</div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        const state = {
+            mitarbeiter: [],
+            selectedMAs: new Set()
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('lbl_Datum').textContent = new Date().toLocaleDateString('de-DE');
+            setupEventListeners();
+            await loadData();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('Befehl38').addEventListener('click', () => window.close());
+            document.getElementById('btnOutlook').addEventListener('click', sendEmail);
+            document.getElementById('btnAttachSuch').addEventListener('click', () => alert('Datei auswählen'));
+            document.getElementById('btnAttLoesch').addEventListener('click', () => alert('Anhänge löschen'));
+        }
+
+        async function loadData() {
+            await Promise.all([
+                loadMitarbeiter(),
+                loadAuftraege()
+            ]);
+        }
+
+        async function loadMitarbeiter() {
+            try {
+                const response = await fetch(`${API_BASE}/mitarbeiter?aktiv=true`);
+                const result = await response.json();
+                state.mitarbeiter = result.data || [];
+                renderMitarbeiterListen();
+                renderFestangestellteListe();
+            } catch (e) {
+                console.error('Fehler:', e);
+            }
+        }
+
+        async function loadAuftraege() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const response = await fetch(`${API_BASE}/auftraege?ab_datum=${today}&limit=100`);
+                const result = await response.json();
+                const auftraege = result.data || [];
+
+                const select = document.getElementById('cbo_VA_ID');
+                select.innerHTML = '<option value="">-- Auftrag wählen --</option>' +
+                    auftraege.map(a => `<option value="${a.ID}">${formatDate(a.Dat_VA_Von)} ${a.Auftrag || ''} ${a.Objekt || ''}</option>`).join('');
+            } catch (e) {
+                console.error('Fehler:', e);
+            }
+        }
+
+        function renderMitarbeiterListen() {
+            const list1 = document.getElementById('Lst_MA');
+            const list2 = document.getElementById('Lst_MA2');
+
+            if (!state.mitarbeiter.length) {
+                list1.innerHTML = '<div style="padding:10px;color:#888;">Keine Mitarbeiter</div>';
+                list2.innerHTML = '<div style="padding:10px;color:#888;">Keine Mitarbeiter</div>';
+                return;
+            }
+
+            // Liste 1 - erste Hälfte
+            const half = Math.ceil(state.mitarbeiter.length / 2);
+            const ma1 = state.mitarbeiter.slice(0, half);
+            const ma2 = state.mitarbeiter.slice(half);
+
+            list1.innerHTML = ma1.map(ma => `
+                <div class="ma-list-row ${state.selectedMAs.has(ma.ID) ? 'selected' : ''}" data-id="${ma.ID}">
+                    <span class="col-name">${ma.Nachname || ''} ${ma.Vorname || ''}</span>
+                    <span class="col-email">${ma.Email || ''}</span>
+                </div>
+            `).join('');
+
+            list2.innerHTML = ma2.map(ma => `
+                <div class="ma-list-row ${state.selectedMAs.has(ma.ID) ? 'selected' : ''}" data-id="${ma.ID}">
+                    <span class="col-name">${ma.Nachname || ''} ${ma.Vorname || ''}</span>
+                    <span class="col-email">${ma.Email || ''}</span>
+                </div>
+            `).join('');
+
+            // Event Listener für beide Listen
+            [list1, list2].forEach(list => {
+                list.querySelectorAll('.ma-list-row').forEach(row => {
+                    row.addEventListener('click', () => {
+                        const id = parseInt(row.dataset.id);
+                        if (state.selectedMAs.has(id)) {
+                            state.selectedMAs.delete(id);
+                        } else {
+                            state.selectedMAs.add(id);
+                        }
+                        renderMitarbeiterListen();
+                        updateBCCField();
+                    });
+                });
+            });
+        }
+
+        function renderFestangestellteListe() {
+            const container = document.getElementById('Liste256');
+            const fest = state.mitarbeiter.filter(ma => ma.Anstellungsart_ID === 3);
+
+            if (!fest.length) {
+                // Zeige alle MA als "Festangestellte" für Demo
+                container.innerHTML = state.mitarbeiter.slice(0, 20).map(ma => `
+                    <div class="list-item">${ma.Nachname || ''} ${ma.Vorname || ''}</div>
+                `).join('');
+                return;
+            }
+
+            container.innerHTML = fest.map(ma => `
+                <div class="list-item">${ma.Nachname || ''} ${ma.Vorname || ''}</div>
+            `).join('');
+        }
+
+        function updateBCCField() {
+            const emails = state.mitarbeiter
+                .filter(ma => state.selectedMAs.has(ma.ID) && ma.Email)
+                .map(ma => ma.Email)
+                .join('; ');
+            document.getElementById('BCC').value = emails;
+        }
+
+        async function sendEmail() {
+            const to = document.getElementById('TO').value;
+            const subject = document.getElementById('Subject').value;
+            const bcc = document.getElementById('BCC').value;
+
+            if (!to && !bcc) {
+                alert('Bitte Empfänger angeben');
+                return;
+            }
+
+            alert(`E-Mail wird gesendet...\n\nAn: ${to}\nBCC: ${bcc}\nBetreff: ${subject}`);
+        }
+
+        function formatDate(d) {
+            if (!d) return '';
+            try { return new Date(d).toLocaleDateString('de-DE'); } catch { return d; }
+        }
+
+        // ============================================
+        // VOLLBILD-FUNKTION (Browser Fullscreen API)
+        // ============================================
+        function toggleFullscreen() {
+            const btn = document.getElementById('fullscreenBtn');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.title = 'Vollbild beenden';
+                }).catch(err => console.error('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen().then(() => {
+                    btn.title = 'Vollbild';
+                }).catch(err => console.error('Exit fullscreen error:', err));
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            btn.title = document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild';
+        });
+    </script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+    <script src="../js/global-handlers.js"></script>
+</body>
+</html>

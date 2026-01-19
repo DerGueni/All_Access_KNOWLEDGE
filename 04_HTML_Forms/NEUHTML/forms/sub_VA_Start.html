@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schichten (sub_VA_Start)</title>
+    <link rel="stylesheet" href="sub_VA_Start.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+</head>
+<body>
+    <div class="subform-container" id="sub_VA_Start">
+        <!-- Subform Header -->
+        <div class="subform-header">
+            <span class="subform-title">Schichten</span>
+        </div>
+
+        <!-- Datenbereich (Datenblattansicht) -->
+        <div class="datasheet-container">
+            <table class="datasheet" id="tbl_VA_Start">
+                <thead>
+                    <tr>
+                        <th>Start</th>
+                        <th>Ende</th>
+                        <th>MA Soll</th>
+                        <th>MA Ist</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_VA_Start">
+                    <!-- Daten werden via JS geladen -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Neue Zeile Bereich -->
+        <div class="new-row-area" id="newRowArea" style="display:none;">
+            <input type="text" class="txt-input" id="new_VA_Start" placeholder="Start">
+            <input type="text" class="txt-input" id="new_VA_Ende" placeholder="Ende">
+            <input type="text" class="txt-input txt-small" id="new_MA_Anzahl" placeholder="Soll">
+            <button type="button" class="btn-add" id="btnAddRow">+</button>
+        </div>
+    </div>
+
+    <!-- Logic Module -->
+    <script type="module" src="sub_VA_Start.logic.js"></script>
+</body>
+</html>

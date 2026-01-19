@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ersatz-Email Verwaltung</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 11px;
+      background-color: #f5f5f5;
+    }
+
+    #app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 6px;
+      gap: 6px;
+    }
+
+    .form-header {
+      font-weight: bold;
+      font-size: 10px;
+      color: #333;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 4px;
+      margin-bottom: 4px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 4px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .input-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 100px;
+    }
+
+    label {
+      font-size: 9px;
+      font-weight: bold;
+      color: #666;
+    }
+
+    input[type="email"], input[type="text"] {
+      padding: 4px;
+      border: 1px solid #999;
+      border-radius: 2px;
+      font-size: 10px;
+      font-family: Arial, sans-serif;
+    }
+
+    input[type="email"]:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: #0066cc;
+      box-shadow: 0 0 2px rgba(0, 102, 204, 0.3);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    button {
+      padding: 4px 8px;
+      border: 1px solid #999;
+      border-radius: 2px;
+      background-color: #f0f0f0;
+      cursor: pointer;
+      font-size: 9px;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background-color: #e0e0e0;
+    }
+
+    button:active {
+      background-color: #d0d0d0;
+    }
+
+    .btn-add {
+      background-color: #4CAF50;
+      color: white;
+      border-color: #999;
+    }
+
+    .btn-add:hover {
+      background-color: #45a049;
+    }
+
+    .btn-delete {
+      background-color: #d84848;
+      color: white;
+      border-color: #999;
+    }
+
+    .btn-delete:hover {
+      background-color: #c03030;
+    }
+
+    .email-list {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      background-color: #fff;
+    }
+
+    .email-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px;
+      border-bottom: 1px solid #eee;
+      font-size: 10px;
+    }
+
+    .email-item:last-child {
+      border-bottom: none;
+    }
+
+    .email-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    .email-info {
+      flex: 1;
+    }
+
+    .email-address {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .email-note {
+      font-size: 9px;
+      color: #999;
+      margin-top: 2px;
+    }
+
+    .email-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn-small {
+      padding: 2px 4px;
+      font-size: 8px;
+    }
+
+    .btn-delete-small {
+      background-color: #ff6b6b;
+      color: white;
+    }
+
+    .btn-delete-small:hover {
+      background-color: #ee5a52;
+    }
+
+    .empty-message {
+      padding: 12px;
+      text-align: center;
+      color: #999;
+      font-size: 9px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="form-header">Ersatz-Email-Adressen</div>
+
+    <!-- INPUT SECTION -->
+    <div class="input-row">
+      <div class="input-field" style="flex: 1; min-width: 150px;">
+        <label for="inputEmail">Email-Adresse</label>
+        <input type="email" id="inputEmail" placeholder="name@example.com" />
+      </div>
+      <div class="input-field" style="flex: 1; min-width: 100px;">
+        <label for="inputNote">Notiz (optional)</label>
+        <input type="text" id="inputNote" placeholder="z.B. Privatmail" />
+      </div>
+      <div class="button-group" style="margin-top: 16px;">
+        <button class="btn-add" id="btnAdd">Hinzufügen</button>
+      </div>
+    </div>
+
+    <!-- LIST SECTION -->
+    <div class="email-list" id="emailList">
+      <div class="empty-message">Keine Einträge vorhanden</div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // State
+      let emails = [];
+      let currentEmpId = null;
+
+      const dom = {
+        inputEmail: document.getElementById('inputEmail'),
+        inputNote: document.getElementById('inputNote'),
+        btnAdd: document.getElementById('btnAdd'),
+        emailList: document.getElementById('emailList')
+      };
+
+      // ============================================
+      // LOAD DATA FROM PARENT
+      // ============================================
+      window.addEventListener('message', (event) => {
+        console.log('SubForm received message:', event.data);
+
+        if (event.data.type === 'LOAD_ERSATZ_EMAIL') {
+          currentEmpId = event.data.empId;
+          emails = event.data.emails || [];
+          renderList();
+        }
+      });
+
+      // ============================================
+      // ADD EMAIL
+      // ============================================
+      dom.btnAdd?.addEventListener('click', () => {
+        const email = dom.inputEmail.value.trim();
+        const note = dom.inputNote.value.trim();
+
+        if (!email) {
+          alert('Bitte Email-Adresse eingeben');
+          return;
+        }
+
+        // Basis-Email-Validierung
+        if (!isValidEmail(email)) {
+          alert('Ungültige Email-Adresse');
+          return;
+        }
+
+        // Zu Liste hinzufügen
+        const newEntry = {
+          id: Math.random(),
+          email: email,
+          note: note,
+          timestamp: new Date().toISOString()
+        };
+
+        emails.push(newEntry);
+
+        // Clear inputs
+        dom.inputEmail.value = '';
+        dom.inputNote.value = '';
+        dom.inputEmail.focus();
+
+        // Render
+        renderList();
+
+        // Notify parent
+        notifyParentDataChanged();
+      });
+
+      // ============================================
+      // DELETE EMAIL
+      // ============================================
+      function deleteEmail(id) {
+        if (confirm('Eintrag löschen?')) {
+          emails = emails.filter(e => e.id !== id);
+          renderList();
+          notifyParentDataChanged();
+        }
+      }
+
+      // ============================================
+      // RENDER LIST
+      // ============================================
+      function renderList() {
+        dom.emailList.innerHTML = '';
+
+        if (emails.length === 0) {
+          dom.emailList.innerHTML = '<div class="empty-message">Keine Einträge vorhanden</div>';
+          return;
+        }
+
+        emails.forEach(entry => {
+          const item = document.createElement('div');
+          item.className = 'email-item';
+          item.innerHTML = `
+            <div class="email-info">
+              <div class="email-address">${entry.email}</div>
+              ${entry.note ? `<div class="email-note">${entry.note}</div>` : ''}
+            </div>
+            <div class="email-actions">
+              <button class="btn-delete-small btn-small" onclick="window.__deleteEmail(${entry.id})">Löschen</button>
+            </div>
+          `;
+          dom.emailList.appendChild(item);
+        });
+      }
+
+      // ============================================
+      // NOTIFY PARENT
+      // ============================================
+      function notifyParentDataChanged() {
+        window.parent.postMessage({
+          type: 'ERSATZ_EMAIL_CHANGED',
+          empId: currentEmpId,
+          emails: emails,
+          source: 'sub_MA_ErsatzEmail'
+        }, '*');
+      }
+
+      // ============================================
+      // HELPER: VALIDATE EMAIL
+      // ============================================
+      function isValidEmail(email) {
+        const atPos = email.indexOf('@');
+        const dotPos = email.lastIndexOf('.');
+        return atPos > 0 && dotPos > atPos + 1 && dotPos < email.length - 1;
+      }
+
+      // ============================================
+      // EXPORT FOR ONCLICK
+      // ============================================
+      window.__deleteEmail = deleteEmail;
+
+      // ============================================
+      // NOTIFY PARENT ON READY
+      // ============================================
+      window.parent.postMessage({
+        type: 'SUBFORM_READY',
+        source: 'sub_MA_ErsatzEmail'
+      }, '*');
+
+      console.log('Ersatz-Email SubForm loaded and ready');
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitarbeiter-Zeitkonten - CONSYS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 11px; }
+        body { background-color: #8080c0; }
+
+        .window-frame {
+            background: #8080c0;
+            padding: 4px;
+            min-height: 100vh;
+        }
+
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 28px);
+        }
+
+        .app-sidebar {
+            width: 170px;
+            background: #6060a0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+        }
+
+        .content-area {
+            flex: 1;
+            background: #8080c0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-section {
+            background: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            margin: 4px;
+            padding: 8px;
+            flex: 1;
+            overflow: auto;
+        }
+
+        .toolbar {
+            background: #b8b8d8;
+            padding: 4px 8px;
+            border-bottom: 1px solid #808080;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .toolbar label {
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        .form-select, .form-input {
+            border: 1px solid #808080;
+            padding: 2px 4px;
+            font-size: 10px;
+            background: white;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 3px 12px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #a8c0e0, #6080b0);
+            color: white;
+            font-weight: bold;
+        }
+
+        .summary-bar {
+            background: #d0d0d0;
+            border: 1px solid #808080;
+            padding: 4px 8px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 10px;
+        }
+
+        .summary-item {
+            display: flex;
+            gap: 4px;
+        }
+
+        .summary-label {
+            font-weight: bold;
+        }
+
+        .datasheet {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .datasheet th {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 1px solid #808080;
+            padding: 3px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .datasheet td {
+            border: 1px solid #c0c0c0;
+            padding: 2px 6px;
+            font-size: 10px;
+        }
+
+        .datasheet tr:hover {
+            background: #e0e0ff;
+        }
+
+        .datasheet tfoot td {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .footer-bar {
+            background: #b8b8d8;
+            border-top: 1px solid #808080;
+            padding: 2px 8px;
+            font-size: 9px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .month-panel {
+            width: 250px;
+            background: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px;
+        }
+
+        .month-header {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 10px;
+            margin-bottom: 8px;
+        }
+
+        .content-flex {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .content-main {
+            flex: 1;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <div class="title-bar">
+            <span>Mitarbeiter-Zeitkonten</span>
+            <span id="header-date"></span>
+        </div>
+
+        <div class="main-container">
+            <aside class="app-sidebar"></aside>
+
+            <div class="content-area">
+                <div class="toolbar">
+                    <label>Mitarbeiter:</label>
+                    <select id="cboMitarbeiter" class="form-select" style="width:200px;">
+                        <option value="">-- Mitarbeiter wählen --</option>
+                    </select>
+                    <label>Zeitraum:</label>
+                    <select id="cboPeriode" class="form-select" style="width:150px;">
+                        <option value="monat">Aktueller Monat</option>
+                        <option value="vormonat">Vormonat</option>
+                        <option value="quartal">Aktuelles Quartal</option>
+                        <option value="jahr">Aktuelles Jahr</option>
+                        <option value="custom">Benutzerdefiniert</option>
+                    </select>
+                    <span id="customDates" style="display:none;">
+                        <input type="date" id="datVon" class="form-input">
+                        <span>bis</span>
+                        <input type="date" id="datBis" class="form-input">
+                    </span>
+                    <button id="btnAktualisieren" class="btn btn-primary">Aktualisieren</button>
+                    <button id="btnExport" class="btn">Export</button>
+                    <button id="btnDrucken" class="btn">Drucken</button>
+                </div>
+
+                <div class="summary-bar">
+                <div class="summary-item">
+                    <span class="summary-label">Sollstunden:</span>
+                    <span class="summary-value" id="summSoll">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Iststunden:</span>
+                    <span class="summary-value" id="summIst">0:00</span>
+                </div>
+                <div class="summary-item highlight">
+                    <span class="summary-label">Saldo:</span>
+                    <span class="summary-value" id="summSaldo">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Überstunden:</span>
+                    <span class="summary-value" id="summUeberstunden">0:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Urlaub (Tage):</span>
+                    <span class="summary-value" id="summUrlaub">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Krank (Tage):</span>
+                    <span class="summary-value" id="summKrank">0</span>
+                </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="content-flex">
+                        <div class="content-main">
+                    <table class="datasheet" id="tblZeitkonto">
+                        <thead>
+                            <tr>
+                                <th style="width:90px;">Datum</th>
+                                <th style="width:40px;">Tag</th>
+                                <th style="min-width:180px;">Objekt/Auftrag</th>
+                                <th style="width:60px;">Beginn</th>
+                                <th style="width:60px;">Ende</th>
+                                <th style="width:60px;">Dauer</th>
+                                <th style="width:60px;">Pause</th>
+                                <th style="width:60px;">Netto</th>
+                                <th style="width:70px;">Typ</th>
+                                <th style="min-width:120px;">Bemerkung</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_Zeitkonto">
+                            <tr><td colspan="10" style="text-align:center; padding:40px; color:#999;">Bitte Mitarbeiter auswählen...</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="sum-row">
+                                <td colspan="5" class="sum-label">Summe:</td>
+                                <td id="sumDauer">0:00</td>
+                                <td id="sumPause">0:00</td>
+                                <td id="sumNetto">0:00</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                        </div>
+
+                        <!-- Monatsübersicht rechts -->
+                        <div class="month-panel">
+                    <div class="month-header">Monatsübersicht</div>
+                    <div class="month-content">
+                        <div class="month-chart" id="monthChart">
+                            <!-- Balkendiagramm wird hier generiert -->
+                        </div>
+                        <div class="month-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Arbeitstage:</span>
+                                <span class="stat-value" id="statArbeitstage">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Einsätze:</span>
+                                <span class="stat-value" id="statEinsaetze">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Durchschnitt pro Tag:</span>
+                                <span class="stat-value" id="statDurchschnitt">0:00</span>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-bar">
+                    <span id="lblStatus">Bereit</span>
+                    <span id="lblAnzahl">0 Einträge</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar JS dynamisch laden -->
+    <script type="module" src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="logic/frm_MA_Zeitkonten.logic.js"></script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+</body>
+</html>

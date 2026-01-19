@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verrechnungssaetze - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_Kundenpreise.css">
+</head>
+<body data-active-menu="verrechnungssaetze">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="app-sidebar"></aside>
+
+        <!-- Hauptbereich -->
+        <main class="app-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <div class="consys-logo"></div>
+                    <h1 class="page-title">Verrechnungssaetze</h1>
+                </div>
+                <div class="header-right">
+                    <span id="header-date" class="header-date"></span>
+                    <span id="lblVersion" class="version-info">FE | V1.55</span>
+                </div>
+            </header>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-primary" id="btnNeuerPreis">
+                        <span class="btn-icon">+</span>
+                        Neuer Eintrag
+                    </button>
+                    <button class="btn btn-success" id="btnSpeichern">
+                        <span class="btn-icon">&#10003;</span>
+                        Speichern
+                    </button>
+                    <button class="btn btn-danger" id="btnLoeschen">
+                        <span class="btn-icon">&times;</span>
+                        Löschen
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <input type="text" id="txtSuche" class="search-input" placeholder="Kunde suchen...">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="chkNurAktive" checked>
+                        Nur aktive Kunden
+                    </label>
+                    <span id="lblRecordInfo" class="record-info">Datensätze: 0</span>
+                </div>
+            </div>
+
+            <!-- Tabelle -->
+            <div class="table-container">
+                <table class="data-table" id="tblKundenpreise">
+                    <thead>
+                        <tr>
+                            <th class="col-firma" data-field="kun_Firma">Kunde</th>
+                            <th class="col-preis" data-field="Sicherheitspersonal">Sicherheitspersonal</th>
+                            <th class="col-preis" data-field="Leitungspersonal">Leitungspersonal</th>
+                            <th class="col-preis" data-field="Nachtzuschlag">Nachtzuschlag</th>
+                            <th class="col-preis" data-field="Sonntagszuschlag">Sonntagszuschlag</th>
+                            <th class="col-preis" data-field="Feiertagszuschlag">Feiertagszuschlag</th>
+                            <th class="col-preis" data-field="Fahrtkosten">Fahrtkosten</th>
+                            <th class="col-preis" data-field="Sonstiges">Sonstiges</th>
+                            <th class="col-actions">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody_Preise">
+                        <!-- Dynamisch befüllt via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblAnzahl">0 Datensätze geladen</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="../js/sidebar.js"></script>
+    <script type="module" src="frm_Kundenpreise.logic.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+-- Query: qry_MonZus7
+-- Type: 0
+SELECT tbltmp_MA_Tageszusatzwerte.MA_ID, tbltmp_MA_Tageszusatzwerte.AktDat, tbltmp_MA_Tageszusatzwerte.X34a_RZ, tbltmp_MA_Tageszusatzwerte.Abschlag, tbltmp_MA_Tageszusatzwerte.Nicht_Erscheinen, tbltmp_MA_Tageszusatzwerte.Kaution, tbltmp_MA_Tageszusatzwerte.Dienstkleidung, tbltmp_MA_Tageszusatzwerte.Sonst_Abzuege, tbltmp_MA_Tageszusatzwerte.Sonst_Abzuege_Grund, tbltmp_MA_Tageszusatzwerte.Monatslohn, tbltmp_MA_Tageszusatzwerte.UeberwVon, tbltmp_MA_Tageszusatzwerte.Bemerkungen, tbltmp_MA_Tageszusatzwerte.Erst_von, tbltmp_MA_Tageszusatzwerte.Erst_am, tbltmp_MA_Tageszusatzwerte.Aend_von, tbltmp_MA_Tageszusatzwerte.Aend_am
+FROM tbltmp_MA_Tageszusatzwerte
+WHERE (((tbltmp_MA_Tageszusatzwerte.X34a_RZ)>0)) OR (((tbltmp_MA_Tageszusatzwerte.Abschlag)>0)) OR (((tbltmp_MA_Tageszusatzwerte.Nicht_Erscheinen)>0)) OR (((tbltmp_MA_Tageszusatzwerte.Kaution)>0)) OR (((Len(Trim(Nz([Dienstkleidung]))))>0)) OR (((tbltmp_MA_Tageszusatzwerte.Sonst_Abzuege)>0)) OR (((tbltmp_MA_Tageszusatzwerte.Monatslohn)>0));
+

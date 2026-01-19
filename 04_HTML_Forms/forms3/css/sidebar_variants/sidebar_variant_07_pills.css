@@ -1,0 +1,244 @@
+/**
+ * SIDEBAR VARIANTE 7: Floating Pill Buttons
+ * ==========================================
+ * Premium-Design mit schwebenden, abgerundeten Pill-Buttons
+ *
+ * Features:
+ * - Buttons als abgerundete Pills (border-radius: 20px)
+ * - Schweben über dem Hintergrund (box-shadow)
+ * - Hover: Scale(1.05) + stärkerer Schatten
+ * - Aktiver Button hervorgehoben mit Farbakzent
+ * - Touch-freundlich (min-height: 44px)
+ *
+ * Verwendung: In shell.html einbinden via:
+ * <link rel="stylesheet" href="css/sidebar_variants/sidebar_variant_07_pills.css">
+ */
+
+/* ===== SIDEBAR CONTAINER ===== */
+.sidebar {
+    background: linear-gradient(180deg, #f8f9fc 0%, #e8eaf6 100%);
+    border-right: none;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== MAIN HEADER ===== */
+.sidebar-header {
+    background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+    color: white;
+    padding: 16px 16px;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+    position: relative;
+    z-index: 10;
+}
+
+/* ===== KATEGORIE CONTAINER ===== */
+.menu-categories {
+    padding: 12px 10px;
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== KATEGORIE BLOCK ===== */
+.category-block {
+    margin-bottom: 8px;
+    padding: 0 4px;
+}
+
+.category-block:last-child {
+    margin-bottom: 0;
+}
+
+/* ===== KATEGORIE HEADER ===== */
+.category-header {
+    background: transparent;
+    color: #5c6bc0;
+    padding: 8px 12px 4px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border: none;
+    margin-bottom: 6px;
+}
+
+/* ===== MENU BUTTONS - FLOATING PILLS ===== */
+.menu-btn {
+    /* Pill-Form */
+    background: linear-gradient(145deg, #ffffff, #f0f2f8);
+    border-radius: 22px;
+    padding: 0 16px;
+    min-height: 44px;
+    height: auto;
+
+    /* Text */
+    font-size: 12px;
+    font-weight: 600;
+    color: #37474f;
+    text-align: left;
+
+    /* Box */
+    border: none;
+    margin: 4px 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+
+    /* Floating Effect */
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.06),
+        0 4px 16px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    /* Smooth Transitions */
+    transition:
+        transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+    /* Position for Pseudo-elements */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shine Effect on Buttons */
+.menu-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    transition: left 0.5s ease;
+    pointer-events: none;
+}
+
+/* ===== HOVER STATE ===== */
+.menu-btn:hover {
+    transform: scale(1.05) translateY(-2px);
+    background: linear-gradient(145deg, #ffffff, #e8eaf6);
+    box-shadow:
+        0 6px 20px rgba(63, 81, 181, 0.15),
+        0 8px 25px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+    color: #1a237e;
+}
+
+.menu-btn:hover::before {
+    left: 100%;
+}
+
+/* ===== ACTIVE/PRESSED STATE ===== */
+.menu-btn:active {
+    transform: scale(0.98);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.1),
+        inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.1s ease;
+}
+
+/* ===== SELECTED/CURRENT STATE ===== */
+.menu-btn.active {
+    background: linear-gradient(145deg, #3f51b5, #5c6bc0);
+    color: white;
+    font-weight: 700;
+    box-shadow:
+        0 4px 15px rgba(63, 81, 181, 0.4),
+        0 6px 20px rgba(63, 81, 181, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: scale(1.02);
+}
+
+.menu-btn.active:hover {
+    background: linear-gradient(145deg, #5c6bc0, #7986cb);
+    transform: scale(1.06) translateY(-2px);
+    box-shadow:
+        0 8px 25px rgba(63, 81, 181, 0.5),
+        0 10px 30px rgba(63, 81, 181, 0.25);
+}
+
+/* ===== FOCUS STATE (Accessibility) ===== */
+.menu-btn:focus {
+    outline: none;
+    box-shadow:
+        0 0 0 3px rgba(63, 81, 181, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.menu-btn:focus-visible {
+    outline: 2px solid #3f51b5;
+    outline-offset: 2px;
+}
+
+/* ===== TOOLTIP OVERRIDE ===== */
+.menu-btn[title]:hover::after {
+    background: linear-gradient(135deg, #1a237e, #3949ab);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(26, 35, 126, 0.4);
+}
+
+.menu-btn[title]:hover::before {
+    border-right-color: #1a237e;
+}
+
+/* ===== RESPONSIVE: Mehr Abstand bei weniger Buttons ===== */
+@media (min-height: 800px) {
+    .menu-btn {
+        min-height: 48px;
+        margin: 6px 0;
+    }
+
+    .category-block {
+        margin-bottom: 12px;
+    }
+}
+
+@media (min-height: 1000px) {
+    .menu-btn {
+        min-height: 52px;
+        margin: 8px 0;
+        font-size: 13px;
+    }
+
+    .category-block {
+        margin-bottom: 16px;
+    }
+
+    .category-header {
+        padding: 12px 12px 6px 12px;
+        font-size: 11px;
+    }
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.menu-categories::-webkit-scrollbar {
+    width: 6px;
+}
+
+.menu-categories::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.menu-categories::-webkit-scrollbar-thumb {
+    background: rgba(63, 81, 181, 0.3);
+    border-radius: 3px;
+}
+
+.menu-categories::-webkit-scrollbar-thumb:hover {
+    background: rgba(63, 81, 181, 0.5);
+}

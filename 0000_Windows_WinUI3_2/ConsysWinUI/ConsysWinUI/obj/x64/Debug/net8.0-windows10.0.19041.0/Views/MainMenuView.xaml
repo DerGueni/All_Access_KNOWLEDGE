@@ -1,0 +1,118 @@
+﻿<Page
+    x:Class="ConsysWinUI.Views.MainMenuView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Padding="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock Text="Willkommen bei CONSYS" FontSize="28" FontWeight="Bold"/>
+            <TextBlock Text="Planungssystem" Foreground="Gray" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Dashboard Content -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="24">
+                <!-- Statistics Cards -->
+                <TextBlock Text="Uebersicht" FontSize="20" FontWeight="SemiBold"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Mitarbeiter Card -->
+                    <Border Grid.Column="0" Background="White" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="Mitarbeiter" FontWeight="SemiBold"/>
+                            <TextBlock Text="0" FontSize="32" Foreground="#0078D4" Margin="0,8,0,8"/>
+                            <TextBlock Text="aktiv" Foreground="Gray"/>
+                            <Button Content="Oeffnen" Margin="0,8,0,0" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Kunden Card -->
+                    <Border Grid.Column="1" Background="White" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="Kunden" FontWeight="SemiBold"/>
+                            <TextBlock Text="0" FontSize="32" Foreground="#0078D4" Margin="0,8,0,8"/>
+                            <TextBlock Text="aktiv" Foreground="Gray"/>
+                            <Button Content="Oeffnen" Margin="0,8,0,0" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Auftraege Card -->
+                    <Border Grid.Column="2" Background="White" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="Auftraege" FontWeight="SemiBold"/>
+                            <TextBlock Text="0" FontSize="32" Foreground="#0078D4" Margin="0,8,0,8"/>
+                            <TextBlock Text="gesamt" Foreground="Gray"/>
+                            <Button Content="Oeffnen" Margin="0,8,0,0" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Aktive Auftraege Card -->
+                    <Border Grid.Column="3" Background="White" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="Aktive Auftraege" FontWeight="SemiBold"/>
+                            <TextBlock Text="0" FontSize="32" Foreground="#107C10" Margin="0,8,0,8"/>
+                            <TextBlock Text="in Bearbeitung" Foreground="Gray"/>
+                            <Button Content="Aktualisieren" Margin="0,8,0,0" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Planung Section -->
+                <TextBlock Text="Planung" FontSize="20" FontWeight="SemiBold" Margin="0,16,0,0"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Dienstplan MA -->
+                    <Border Grid.Column="0" Background="White" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="Dienstplan (MA)" FontWeight="SemiBold"/>
+                            <TextBlock Text="Mitarbeiter-zentrierte Planung" Foreground="Gray" Margin="0,8,0,8" TextWrapping="Wrap"/>
+                            <Button Content="Oeffnen" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Dienstplan Objekt -->
+                    <Border Grid.Column="1" Background="White" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Text="Dienstplan (Objekt)" FontWeight="SemiBold"/>
+                            <TextBlock Text="Objekt-zentrierte Planung" Foreground="Gray" Margin="0,8,0,8" TextWrapping="Wrap"/>
+                            <Button Content="Oeffnen" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Schnellauswahl -->
+                    <Border Grid.Column="2" Background="White" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="Schnellauswahl" FontWeight="SemiBold"/>
+                            <TextBlock Text="Schnelle MA-Zuordnung" Foreground="Gray" Margin="0,8,0,8" TextWrapping="Wrap"/>
+                            <Button Content="Oeffnen" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
+

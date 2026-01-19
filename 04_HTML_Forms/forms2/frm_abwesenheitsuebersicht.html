@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abwesenheitsübersicht - CONSYS</title>
+    <style>
+        /* CSS Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 11px;
+        }
+
+        body {
+            background-color: #8080c0;
+            overflow: hidden;
+        }
+
+        /* Window Frame Container */
+        .window-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #8080c0;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 3px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .title-bar-text {
+            color: white;
+        }
+
+        .title-bar-close {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 14px;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            background-color: #8080c0;
+        }
+
+        /* Left Menu */
+        .left-menu {
+            width: 180px;
+            background-color: #6060a0;
+            border-right: 2px solid #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-header {
+            background-color: #000080;
+            color: white;
+            padding: 6px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            border-bottom: 1px solid #ffffff;
+        }
+
+        .menu-item {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 4px 8px;
+            margin: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            text-align: left;
+        }
+
+        .menu-item:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #8080c0;
+            padding: 4px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background-color: #b8b8d8;
+            padding: 4px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(to bottom, #e8e8e8, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            height: 22px;
+        }
+
+        .btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .btn:hover {
+            filter: brightness(1.05);
+        }
+
+        /* Form Section */
+        .form-section {
+            background-color: #b8b8d8;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 8px;
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 200px repeat(7, 1fr);
+            gap: 1px;
+            background: #808080;
+        }
+
+        .calendar-header {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            padding: 6px 8px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 10px;
+            border: 1px solid #808080;
+        }
+
+        .calendar-ma {
+            background: white;
+            padding: 6px 8px;
+            font-size: 10px;
+            font-weight: 500;
+            border: 1px solid #c0c0c0;
+        }
+
+        .calendar-cell {
+            background: white;
+            min-height: 30px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid #c0c0c0;
+            font-size: 9px;
+        }
+
+        .calendar-cell.absent {
+            background: #ffe0e0;
+        }
+
+        .calendar-cell.urlaub {
+            background: #ffeb99;
+        }
+
+        .calendar-cell.krank {
+            background: #ffcccc;
+        }
+
+        .calendar-cell.privat {
+            background: #e0e0e0;
+        }
+
+        .calendar-cell.sonstiges {
+            background: #f0f0f0;
+        }
+
+        .calendar-cell.weekend {
+            background: #f8f8f8;
+        }
+
+        .calendar-cell.weekend.absent {
+            background: #ffe8e8;
+        }
+
+        .calendar-cell:hover {
+            opacity: 0.8;
+        }
+
+        /* Input & Select Styles */
+        .form-input, .form-select {
+            border: 1px solid #808080;
+            padding: 1px 3px;
+            font-size: 10px;
+            background: white;
+            height: 20px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 2px 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            height: 23px;
+            margin-top: 4px;
+        }
+
+        .toolbar-separator {
+            width: 2px;
+            height: 18px;
+            background: linear-gradient(to right, #808080, #ffffff);
+            margin: 0 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="window-frame">
+        <!-- Title Bar -->
+        <div class="title-bar">
+            <span class="title-bar-text">Abwesenheitsübersicht - CONSYS</span>
+            <button class="title-bar-close" onclick="window.close()">×</button>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Menu -->
+            <div class="left-menu">
+                <div class="menu-header">CONSYS</div>
+                <button class="menu-item">Mitarbeiterstamm</button>
+                <button class="menu-item">Kundenstamm</button>
+                <button class="menu-item">Auftragsverwaltung</button>
+                <button class="menu-item">Dienstplan</button>
+                <button class="menu-item">Abwesenheit</button>
+                <button class="menu-item">Zeitkonten</button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <button class="btn" id="btnVorwoche">◄◄</button>
+                    <span id="lblWoche" style="min-width:200px;text-align:center;font-weight:600; font-size: 10px;">KW --</span>
+                    <button class="btn" id="btnNachwoche">►►</button>
+                    <button class="btn" id="btnHeute" style="margin-left:10px;">Heute</button>
+
+                    <div class="toolbar-separator"></div>
+
+                    <label style="font-size: 10px;">Monat:</label>
+                    <select id="cboMonat" class="form-select" style="width:120px;">
+                        <option value="1">Januar</option>
+                        <option value="2">Februar</option>
+                        <option value="3">März</option>
+                        <option value="4">April</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Dezember</option>
+                    </select>
+                    <select id="cboJahr" class="form-select" style="width:80px;">
+                        <option value="2024">2024</option>
+                        <option value="2025" selected>2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+
+                    <div class="toolbar-separator"></div>
+
+                    <label style="font-size: 10px;">Filter:</label>
+                    <select id="cboFilter" class="form-select" style="width:120px;">
+                        <option value="">Alle</option>
+                        <option value="Urlaub">Urlaub</option>
+                        <option value="Krank">Krankheit</option>
+                        <option value="Privat">Privat</option>
+                    </select>
+
+                    <div class="toolbar-separator"></div>
+
+                    <button class="btn" id="btnAktualisieren">Aktualisieren</button>
+                    <button class="btn" id="btnExport">Export</button>
+                    <button class="btn" id="btnDrucken">Drucken</button>
+                </div>
+
+                <!-- Form Section with Calendar -->
+                <div class="form-section">
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Header -->
+                        <div class="calendar-header">Mitarbeiter</div>
+                        <div class="calendar-header">Mo</div>
+                        <div class="calendar-header">Di</div>
+                        <div class="calendar-header">Mi</div>
+                        <div class="calendar-header">Do</div>
+                        <div class="calendar-header">Fr</div>
+                        <div class="calendar-header">Sa</div>
+                        <div class="calendar-header">So</div>
+                        <!-- Wird dynamisch gefuellt -->
+                    </div>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span id="lblStatus">Bereit</span>
+                    <span id="lblAnzahl">0 Mitarbeiter</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('header-date') && (document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE'));
+    </script>
+    <script type="module" src="logic/frm_abwesenheitsuebersicht.logic.js"></script>
+
+    <!-- WebView2 Bridge für Access-Integration -->
+    <script src="../js/webview2-bridge.js"></script>
+</body>
+</html>

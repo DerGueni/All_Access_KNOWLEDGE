@@ -1,0 +1,82 @@
+﻿@charset "utf-8";
+/* Cleaned: 2026-01-11 14:43:42 */
+/* Backup:  C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\04_HTML_Forms\forms3\css\visbug_overrides.css.bak_20260111_144341 */
+
+
+
+# ==========================================================
+# VISBUG FINAL SAVE
+# - stellt sicher: overrides.css ist überall eingebunden
+# - nimmt Clipboard (Save UI Snapshot)
+# - erzwingt !important
+# - speichert sicher
+# ==========================================================
+
+$root = "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\04_HTML_Forms\forms3"
+$css  = "$root\css\visbug_overrides.css"
+
+Write-Host "🔧 Schritt 1: Stelle CSS-Einbindung sicher..." -ForegroundColor Cyan
+
+Get-ChildItem $root -Recurse -Filter "frm_*.html" | ForEach-Object {
+    $html = Get-Content $_.FullName -Raw
+    if ($html -notmatch "visbug_overrides.css") {
+        Copy-Item $_.FullName "$($_.FullName).bak" -Force
+        $html = $html -replace '</head>',
+            '  <link rel="stylesheet" href="css/visbug_overrides.css">' + "`r`n</head>"
+        Set-Content $_.FullName $html -Encoding UTF8
+        Write-Host "  ➕ eingebunden: $($_.Name)" -ForegroundColor Green
+    }
+}
+
+Write-Host "🔧 Schritt 2: Clipboard prüfen..." -ForegroundColor Cyan
+
+$clip = Get-Clipboard -Raw
+if ($clip -notmatch "AUTO-SNAPSHOT") {
+    Write-Host "❌ Clipboard enthält keinen Save-UI Snapshot." -ForegroundColor Red
+    Write-Host "➡️ Erst Lesezeichen »Save UI« klicken, dann erneut." -ForegroundColor Yellow
+    return
+}
+
+Write-Host "🔧 Schritt 3: !important erzwingen..." -ForegroundColor Cyan
+
+$clip = $clip -replace ' !important;', ' !important !important;'
+
+if (!(Test-Path $css)) {
+    "@charset `"utf-8`" !important;`r`n/* VisBug Overrides */`r`n" | Set-Content $css -Encoding UTF8
+}
+
+Add-Content $css "`r`n$clip`r`n" -Encoding UTF8
+
+Write-Host "✅ Gespeichert in visbug_overrides.css" -ForegroundColor Green
+Write-Host "➡️ Jetzt im Browser einfach F5 drücken." -ForegroundColor Cyan
+
+
+
+/* TEST OVERRIDE */
+body{ outline: 5px solid red !important; }
+
+
+
+
+
+
+/* ================= TEST ================= */
+body {
+  outline: 6px solid red !important;
+}
+/* =============== TEST END =============== */
+
+
+/* ===== VISBUG TEST ===== */
+body {
+  outline: 6px solid red !important;
+}
+/* ===== VISBUG TEST END ===== */
+
+
+/* ===== VISBUG TEST ===== */
+body {
+  outline: 6px solid red !important;
+}
+/* ===== VISBUG TEST END ===== */
+

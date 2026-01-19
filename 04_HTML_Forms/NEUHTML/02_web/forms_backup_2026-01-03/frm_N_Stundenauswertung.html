@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datenimport Zeitkonten - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        :root { --accent-color: #5C6BC0; }
+        .app-header { background: #5C6BC0; min-height: 60px; }
+
+        /* Header Buttons */
+        .header-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .header-btn {
+            padding: 4px 8px;
+            font-size: 9px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+            line-height: 1.3;
+            text-align: center;
+        }
+        .header-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .header-btn.primary {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* Tabs */
+        .std-tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            background: #f9f9f9;
+            padding: 0 12px;
+        }
+        .tab-btn {
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab-btn:hover {
+            color: #333;
+        }
+        .tab-btn.active {
+            color: #5C6BC0;
+            border-bottom-color: #5C6BC0;
+            font-weight: 600;
+        }
+
+        /* Tab Panes */
+        .tab-pane {
+            display: none;
+            height: 100%;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Tabellen */
+        .std-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .std-table thead th {
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+            padding: 8px 6px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .std-table tbody td {
+            padding: 6px;
+            border-bottom: 1px solid #eee;
+        }
+        .std-table tbody tr:hover {
+            background: #f8f8f8;
+        }
+
+        /* Summen-Zeile */
+        .summe-row {
+            background: #f0f0f0 !important;
+            font-weight: 600;
+        }
+        .summe-row td {
+            border-bottom: 2px solid #ccc !important;
+        }
+
+        /* Zellen-Ausrichtung */
+        .cell-number {
+            text-align: right;
+            font-family: monospace;
+        }
+
+        /* Differenz-Farben */
+        .text-success { color: #27ae60; }
+        .text-danger { color: #e74c3c; }
+
+        /* Button in Tabelle */
+        .btn-sm {
+            padding: 3px 8px;
+            font-size: 10px;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body data-active-menu="stundenauswertung">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="app-title">Datenimport Zeitkonten</h1>
+                </div>
+                <div class="header-buttons">
+                    <button class="header-btn" id="btnEinsaetzeEinzeln">Einsaetze einzeln</button>
+                    <button class="header-btn" id="btnEinsaetzeFA">Einsaetze FA</button>
+                    <button class="header-btn" id="btnEinsaetzeFAAbrechnung">FA Abrechnung</button>
+                    <button class="header-btn" id="btnEinsaetzeMJ">Einsaetze MJ</button>
+                    <button class="header-btn" id="btnEinsaetzeMJAbrechnung">MJ Abrechnung</button>
+                    <button class="header-btn primary" id="btnExport">Export</button>
+                    <button class="header-btn" id="btnLexwareImport">Lexware Import</button>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Mitarbeiter:</label>
+                    <select id="cboMitarbeiter" class="form-control" style="width:180px;">
+                        <option value="">-- Alle --</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Anstellungsart:</label>
+                    <select id="cboAnstellungsart" class="form-control" style="width:130px;">
+                        <option value="mini" selected>Minijobber</option>
+                        <option value="fest">Festangestellt</option>
+                        <option value="alle">Alle</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <label class="toolbar-label">Zeitraum:</label>
+                    <select id="cboZeitraum" class="form-control" style="width:140px;">
+                        <option value="aktuell" selected>Aktueller Monat</option>
+                        <option value="vormonat">Vormonat</option>
+                        <option value="quartal">Aktuelles Quartal</option>
+                        <option value="jahr">Aktuelles Jahr</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="std-tabs">
+                <button class="tab-btn active" data-tab="tabImportiert">Importierte Daten</button>
+                <button class="tab-btn" data-tab="tabStundenvergleich">Stundenvergleich</button>
+                <button class="tab-btn" data-tab="tabImportfehler">Importfehler</button>
+            </div>
+
+            <div class="app-content" style="padding:0;">
+                <div class="content-main" style="overflow:auto;">
+                    <!-- Tab: Importierte Daten -->
+                    <div class="tab-pane active" id="tabImportiert">
+                        <table class="std-table" id="tblImportiert">
+                            <thead>
+                                <tr>
+                                    <th>Jahr</th>
+                                    <th>Monat</th>
+                                    <th>Name</th>
+                                    <th>Lohnart</th>
+                                    <th class="cell-number">Wert</th>
+                                    <th class="cell-number">Faktor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="summe-row">
+                                    <td></td><td></td><td><strong>Summe</strong></td>
+                                    <td></td><td></td><td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tab: Stundenvergleich -->
+                    <div class="tab-pane" id="tabStundenvergleich">
+                        <p style="padding: 20px; color: #666;">Lade Stundenvergleich...</p>
+                    </div>
+
+                    <!-- Tab: Importfehler -->
+                    <div class="tab-pane" id="tabImportfehler">
+                        <p style="padding: 20px; color: #27ae60;">Keine Importfehler vorhanden.</p>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Datensaetze</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script type="module" src="frm_N_Stundenauswertung.logic.js"></script>
+</body>
+</html>

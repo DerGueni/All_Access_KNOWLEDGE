@@ -1,0 +1,223 @@
+﻿============================================================================
+TABELLENBEZIEHUNGEN
+============================================================================
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference
+  Von: tbl_VA_AnzTage
+  Nach: tbl_VA_Start
+  Feld: ID -> VADatum_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference1
+  Von: tbl_KD_Kundenstamm
+  Nach: tbl_VA_Auftragstamm
+  Feld: kun_Id -> Veranstalter_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference10
+  Von: tbl_MA_Mitarbeiterstamm
+  Nach: tbl_MA_VA_Planung
+  Feld: ID -> MA_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference11
+  Von: tbl_MA_Einsatz_Zuo
+  Nach: tbl_MA_Mitarbeiterstamm
+  Feld: MA_ID -> ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference12
+  Von: tbl_KD_Kundenstamm
+  Nach: tbl_KD_Standardpreise
+  Feld: kun_Id -> kun_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference13
+  Von: tbl_KD_Artikelbeschreibung
+  Nach: tbl_KD_Standardpreise
+  Feld: ID -> Preisart_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference14
+  Von: tbl_MA_Mitarbeiterstamm
+  Nach: tbl_MA_NVerfuegZeiten
+  Feld: ID -> MA_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference15
+  Von: tbl_MA_Zeittyp
+  Nach: tbl_MA_NVerfuegZeiten
+  Feld: Kuerzel_Datev -> Zeittyp_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference16
+  Von: tbl_VA_Start
+  Nach: tbl_MA_VA_Zuordnung
+  Feld: MVA_Ende -> MVA_Ende
+  Feld: MVA_Start -> MVA_Start
+  Feld: VA_ID -> VA_ID
+  Feld: VADatum_ID -> VADatum_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference17
+  Von: tbl_hlp_MA_Anstellungsart
+  Nach: tbl_MA_Mitarbeiterstamm
+  Feld: ID -> Anstellungsart_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference2
+  Von: tbl_VA_Auftragstamm
+  Nach: tbl_MA_VA_Zuordnung
+  Feld: ID -> VA_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference3
+  Von: tbl_VA_Status
+  Nach: tbl_VA_Auftragstamm
+  Feld: ID -> ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference4
+  Von: tbl_VA_Auftragstamm
+  Nach: tbl_VA_Auftragstamm
+  Feld: Auftrag -> Auftrag
+  Feld: Veranstalter_ID -> Veranstalter_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference5
+  Von: tbl_VA_Auftragstamm
+  Nach: tbl_MA_VA_Planung
+  Feld: ID -> VA_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference6
+  Von: tbl_VA_Status
+  Nach: tbl_VA_Auftragstamm
+  Feld: ID -> Veranst_Status_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference7
+  Von: tbl_MA_VA_Zuordnung
+  Nach: tbl_MA_Mitarbeiterstamm
+  Feld: MA_ID -> ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference8
+  Von: tbl_KD_Standardpreise
+  Nach: tbl_VA_Auftragstamm
+  Feld: kun_ID -> Veranstalter_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].Reference9
+  Von: _tblAlleMonate
+  Nach: tbl_MA_Jahresuebersicht
+  Feld: MonNr -> AktMon
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_KD_Kundenstammtbl_KD_Ansprechpartner
+  Von: tbl_KD_Kundenstamm
+  Nach: tbl_KD_Ansprechpartner
+  Feld: kun_Id -> kun_Id
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_MA_Mitarbeiterstammztbl_MA_Mitarbeiterstamm_ZUAB
+  Von: tbl_MA_Mitarbeiterstamm
+  Nach: ztbl_MA_Mitarbeiterstamm_ZUAB
+  Feld: ID -> MA_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_MA_VA_Zuordnungztbl_ZUO_Preis_Lohn
+  Von: tbl_MA_VA_Zuordnung
+  Nach: ztbl_ZUO_Stunden
+  Feld: ID -> Zuo_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_Rch_Kopftbl_Rch_Pos_Auftrag
+  Von: tbl_Rch_Kopf
+  Nach: tbl_Rch_Pos_Auftrag
+  Feld: ID -> Rch_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_Rch_Kopftbl_Rch_Pos_Geschrieben
+  Von: tbl_Rch_Kopf
+  Nach: tbl_Rch_Pos_Geschrieben
+  Feld: ID -> Rch_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_Rch_Kopftbl_Rch_VA_Kopf
+  Von: tbl_Rch_Kopf
+  Nach: tbl_Rch_VA_Kopf
+  Feld: ID -> Rch_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_VA_Akt_Objekt_Kopftbl_VA_Akt_Objekt_Pos
+  Von: tbl_VA_Akt_Objekt_Kopf
+  Nach: tbl_VA_Akt_Objekt_Pos
+  Feld: ID -> VA_Akt_Objekt_Kopf_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_VA_Akt_Objekt_Kopftbl_VA_Akt_Objekt_Pos_MA
+  Von: tbl_VA_Akt_Objekt_Kopf
+  Nach: tbl_VA_Akt_Objekt_Pos_MA
+  Feld: ID -> VA_Akt_Objekt_Kopf_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_VA_AnzTagetbl_MA_VA_Planung
+  Von: tbl_VA_AnzTage
+  Nach: tbl_MA_VA_Planung
+  Feld: ID -> VADatum_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_VA_AnzTagetbl_MA_VA_Zuordnung
+  Von: tbl_VA_AnzTage
+  Nach: tbl_MA_VA_Zuordnung
+  Feld: ID -> VADatum_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_VA_Auftragstammtbl_VA_Akt_Objekt_Kopf
+  Von: tbl_VA_Auftragstamm
+  Nach: tbl_VA_Akt_Objekt_Kopf
+  Feld: ID -> VA_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_VA_Auftragstammtbl_VA_AnzTage
+  Von: tbl_VA_Auftragstamm
+  Nach: tbl_VA_AnzTage
+  Feld: ID -> VA_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_VA_Auftragstammtbl_VA_Start
+  Von: tbl_VA_Auftragstamm
+  Nach: tbl_VA_Start
+  Feld: ID -> VA_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].tbl_VA_Objekttbl_VA_Objekt_Positionen
+  Von: tbl_OB_Objekt
+  Nach: tbl_OB_Objekt_Positionen
+  Feld: ID -> OB_Objekt_Kopf_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].ztbl_ZK_Lohnartenztbl_MA_Mitarbeiterstamm_ZUAB
+  Von: ztbl_ZK_Lohnarten
+  Nach: ztbl_MA_Mitarbeiterstamm_ZUAB
+  Feld: ID -> Lohnart_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].ztbl_ZK_Lohnartenztbl_ZK_Stundensatz
+  Von: ztbl_ZK_Lohnarten
+  Nach: ztbl_ZK_Stundensatz
+  Feld: ID -> Lohnart_ID
+
+Beziehung: [\\vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\Consec_BE_V1.55ANALYSETEST.accdb].ztbl_ZK_Lohnartenztbl_ZUO_Stunden
+  Von: ztbl_ZK_Lohnarten
+  Nach: ztbl_ZUO_Stunden
+  Feld: ID -> Lohnart_ID
+
+Beziehung: {30A474B6-4FB4-4EBE-8114-F4597873151A}
+  Von: MSysNavPaneGroupCategories1
+  Nach: MSysNavPaneGroups1
+  Feld: Id -> GroupCategoryID
+
+Beziehung: {63CBE40A-0F4A-499D-90CE-645844FD38B9}
+  Von: MSysNavPaneGroups1
+  Nach: MSysNavPaneGroupToObjects1
+  Feld: Id -> GroupID
+
+Beziehung: sysLanguagesysOfficeLanguage
+  Von: sysLanguage
+  Nach: sysOfficeLanguage
+  Feld: ID -> LanguageID
+
+Beziehung: sysLanguagesysText
+  Von: sysLanguage
+  Nach: sysText
+  Feld: ID -> LanguageID
+
+Beziehung: sysLanguagesysTextunit
+  Von: sysLanguage
+  Nach: sysTextunit
+  Feld: ID -> LanguageID
+
+Beziehung: sysTextsysTextunit
+  Von: sysText
+  Nach: sysTextunit
+  Feld: ID -> TextID
+
+Beziehung: sysTextunitsysLanguage
+  Von: sysTextunit
+  Nach: sysLanguage
+  Feld: ID -> TextunitID
+
+Beziehung: sysTextunitsysTextunitObject
+  Von: sysTextunit
+  Nach: sysTextunitObject
+  Feld: ID -> TextunitID
+

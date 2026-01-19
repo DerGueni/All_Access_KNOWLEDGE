@@ -1,0 +1,5 @@
+-- Query: qry_Report_MA_Dienstkleidung_sub
+-- Type: 0
+SELECT tbl_MA_Dienstkleidung.MA_ID, tbl_MA_Dienstkleidung_Vorlage.Dienstkleidung, tbl_MA_Dienstkleidung.Anzahl, tbl_MA_Dienstkleidung.Groesse, tbl_MA_Dienstkleidung.Kautionsbetrag, tbl_MA_Dienstkleidung.Ausgabedatum, tbl_MA_Dienstkleidung_Vorlage.Bemerkungen
+FROM tbl_MA_Dienstkleidung INNER JOIN tbl_MA_Dienstkleidung_Vorlage ON tbl_MA_Dienstkleidung.Dienstkleidung_ID = tbl_MA_Dienstkleidung_Vorlage.ID;
+

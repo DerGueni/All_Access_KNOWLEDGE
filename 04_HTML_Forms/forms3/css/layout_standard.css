@@ -1,0 +1,204 @@
+/**
+ * LAYOUT STANDARD - Zentrale Layout-Regeln
+ * Version: 1.0
+ * Erstellt: 2026-01-08
+ *
+ * Diese Datei definiert einheitliche Layout-Regeln fuer alle HTML-Formulare:
+ * - Feldgroessen
+ * - Abstaende (Margins/Paddings)
+ * - Ausrichtung
+ */
+
+/* ============================================================
+   EINHEITLICHE FELDGROESSEN
+   ============================================================ */
+
+/* Standard-Feldbreiten */
+.form-input.small,
+.input-narrow,
+input.small {
+    width: 60px !important;
+}
+
+.form-input.medium,
+.input-medium,
+input.medium {
+    width: 150px !important;
+}
+
+.form-input.wide,
+.input-wide,
+input.wide {
+    width: 200px !important;
+}
+
+/* Standard-Feldhoehe */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+input[type="password"],
+select {
+    height: 22px !important;
+    min-height: 22px !important;
+}
+
+textarea {
+    min-height: 60px;
+}
+
+/* ============================================================
+   EINHEITLICHE ABSTAENDE
+   ============================================================ */
+
+/* Form-Zeilen */
+.form-row {
+    margin-bottom: 6px;
+}
+
+/* Form-Zellen */
+.form-cell {
+    margin-right: 8px;
+}
+
+/* Spalten-Abstand */
+.form-column {
+    gap: 6px;
+}
+
+/* Bereichs-Abstand */
+.form-section,
+.form-columns {
+    margin-bottom: 12px;
+}
+
+/* ============================================================
+   FOTO-BEREICH SCHUTZ
+   ============================================================ */
+
+/* Platz fuer Foto-Section in Formularen mit Mitarbeiterfoto */
+.has-photo .form-columns,
+#tab-stammdaten .form-columns {
+    padding-right: 120px;
+}
+
+/* Photo-Section Container */
+.photo-section {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 10;
+    background: white;
+    border: 1px solid #808080;
+    padding: 5px;
+}
+
+/* ============================================================
+   FLEXBOX LAYOUT STANDARDISIERUNG
+   ============================================================ */
+
+.form-columns {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.form-column {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ============================================================
+   LABEL AUSRICHTUNG
+   ============================================================ */
+
+.form-label {
+    min-width: 100px;
+    text-align: right;
+}
+
+/* ============================================================
+   TABELLEN LAYOUT
+   ============================================================ */
+
+.data-grid,
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-grid th,
+.data-grid td,
+.data-table th,
+.data-table td {
+    padding: 2px 4px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+/* ============================================================
+   TAB-CONTAINER POSITIONIERUNG
+   ============================================================ */
+
+.tab-page.active,
+.tab-pane.active {
+    position: relative; /* Fuer absolute positionierte Kinder wie Photo-Section */
+}
+
+/* ============================================================
+   CHECKBOX/RADIO AUSRICHTUNG
+   ============================================================ */
+
+.checkbox-row,
+.radio-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 105px; /* Ausrichtung unter Labels */
+}
+
+.checkbox-row input[type="checkbox"],
+.checkbox-row input[type="radio"] {
+    width: 13px;
+    height: 13px;
+}
+
+/* ============================================================
+   RESPONSIVE ANPASSUNGEN
+   ============================================================ */
+
+@media (max-width: 1200px) {
+    .form-columns {
+        padding-right: 0; /* Foto-Platz entfernen bei schmalem Viewport */
+    }
+
+    .photo-section {
+        position: relative;
+        margin-bottom: 10px;
+    }
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+
+/* Klasse zum Markieren von Bereichen mit Foto */
+.has-photo {
+    position: relative;
+}
+
+/* Klasse fuer gleiche Feldbreiten in einem Bereich */
+.uniform-fields input,
+.uniform-fields select {
+    width: 150px !important;
+}

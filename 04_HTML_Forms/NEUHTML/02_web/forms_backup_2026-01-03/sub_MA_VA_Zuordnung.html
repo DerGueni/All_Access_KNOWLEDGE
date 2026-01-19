@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MA-Zuordnung (sub_MA_VA_Zuordnung)</title>
+    <link rel="stylesheet" href="sub_MA_VA_Zuordnung.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+</head>
+<body>
+    <div class="subform-container" id="sub_MA_VA_Zuordnung">
+        <!-- Datenbereich (Datenblattansicht) -->
+        <div class="datasheet-container">
+            <table class="datasheet" id="tbl_MA_VA_Zuordnung">
+                <thead>
+                    <tr>
+                        <th class="col-hidden">ID</th>
+                        <th class="col-hidden">VA_ID</th>
+                        <th class="col-lfd">Lfd.</th>
+                        <th class="col-time">von</th>
+                        <th class="col-time">bis</th>
+                        <th class="col-ma">Mitarbeiter</th>
+                        <th class="col-pkw">PKW</th>
+                        <th class="col-hidden">Datum</th>
+                        <th class="col-schicht">Schicht</th>
+                        <th class="col-bemerk">Bemerkungen</th>
+                        <th class="col-el">EL</th>
+                        <th class="col-info">Info</th>
+                        <th class="col-preis">Preisgruppe</th>
+                        <th class="col-pkwanz">PKW Anz</th>
+                        <th class="col-std">Std</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody_MA_VA_Zuordnung">
+                    <!-- Daten werden via JS geladen -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Neue Zeile Bereich -->
+        <div class="new-row-area" id="newRowArea">
+            <div class="new-row-fields">
+                <select class="cbo-input cbo-ma" id="new_cboMA_Ausw" title="Mitarbeiter Eing.">
+                    <option value="">-- MA wählen --</option>
+                </select>
+                <input type="text" class="txt-input txt-time" id="new_MA_Start" placeholder="von">
+                <input type="text" class="txt-input txt-time" id="new_MA_Ende" placeholder="bis">
+                <button type="button" class="btn-add" id="btnAddRow" title="Hinzufügen">+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic Module -->
+    <script type="module" src="sub_MA_VA_Zuordnung.logic.js"></script>
+</body>
+</html>

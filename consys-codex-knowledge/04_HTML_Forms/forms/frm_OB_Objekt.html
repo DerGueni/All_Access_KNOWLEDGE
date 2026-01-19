@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objektpositionen - CONSYS</title>
+    <link rel="stylesheet" href="../css/design-system.css">
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <style>
+        /* ============================================ */
+        /* OBJEKT-FORMULAR SPEZIFISCHE STYLES          */
+        /* ============================================ */
+
+        /* Content-Bereich: Split-Layout */
+        .ob-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 8px;
+            padding: 8px;
+            background: #f5f5f5;
+        }
+
+        /* Objekt-Liste links (30%) */
+        .ob-liste {
+            width: 30%;
+            min-width: 250px;
+            max-width: 400px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: auto;
+        }
+
+        .ob-liste .datasheet {
+            font-size: 11px;
+        }
+
+        .ob-liste .datasheet th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            padding: 6px 8px;
+            font-weight: 600;
+            border-bottom: 2px solid #ccc;
+        }
+
+        .ob-liste .datasheet td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .ob-liste .datasheet tr:hover td {
+            background: #e8f4fc;
+        }
+
+        .ob-liste .datasheet tr.selected td {
+            background: #4316B2;
+            color: white;
+        }
+
+        /* Detail-Bereich rechts (70%) */
+        .ob-detail {
+            flex: 1;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: #e8e8e8;
+            border-bottom: 2px solid #ccc;
+            padding: 4px 4px 0;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            background: #d9d9d9;
+            border: 1px solid #bbb;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 2px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.15s ease;
+        }
+
+        .tab-btn:hover {
+            background: #e6e6e6;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-color: #ccc;
+            color: #4316B2;
+            font-weight: 600;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tab-pane {
+            display: none;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Info-Fieldsets */
+        .info-fieldset {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #fafafa;
+        }
+
+        .info-fieldset legend {
+            padding: 0 8px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #4316B2;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            min-width: 100px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        /* Objekt-spezifische Inputs */
+        .ob-input {
+            height: 26px;
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: inherit;
+        }
+
+        .ob-input:focus {
+            border-color: #4316B2;
+            outline: none;
+            box-shadow: 0 0 3px rgba(67, 22, 178, 0.3);
+        }
+
+        .ob-input[readonly] {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .ob-select {
+            height: 26px;
+            padding: 2px 6px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .ob-select:focus {
+            border-color: #4316B2;
+            outline: none;
+        }
+
+        .ob-textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .ob-textarea:focus {
+            border-color: #4316B2;
+            outline: none;
+        }
+
+        /* Objekt-Buttons */
+        .ob-btn {
+            padding: 6px 12px;
+            background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+            border: 1px solid #bbb;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .ob-btn:hover {
+            background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+            border-color: #999;
+        }
+
+        .ob-btn:active {
+            background: linear-gradient(180deg, #ddd 0%, #ccc 100%);
+        }
+
+        /* Positionen-Tabelle */
+        .positionen-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .positionen-table th {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .positionen-table td {
+            border: 1px solid #ddd;
+            padding: 5px 8px;
+        }
+
+        .positionen-table tr:hover td {
+            background: #f0f8ff;
+        }
+
+        .positionen-table tr.selected td {
+            background: #4316B2;
+            color: white;
+        }
+
+        /* Responsive Anpassungen */
+        @media (max-width: 1200px) {
+            .ob-content {
+                flex-direction: column;
+            }
+
+            .ob-liste {
+                width: 100%;
+                max-width: none;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body data-active-menu="objekte">
+    <div class="app-container">
+        <aside class="app-sidebar"></aside>
+
+        <!-- Hauptbereich -->
+        <main class="app-main">
+            <!-- Header -->
+            <header class="app-header" style="background: #4316B2; color: white; min-height: 94px; height: 94px;">
+                <div class="header-left">
+                    <h1 class="app-title">Objektstammdaten</h1>
+                </div>
+                <div class="header-center">
+                    <span id="lblRecordInfo">Datensatz: - / -</span>
+                </div>
+                <div class="header-right">
+                    <span id="header-date"></span>
+                </div>
+            </header>
+
+            <!-- Toolbar -->
+            <div class="app-toolbar">
+                <div class="toolbar-group">
+                    <button class="btn btn-nav" id="btnErster" title="Erster">|&#9664;</button>
+                    <button class="btn btn-nav" id="btnZurueck" title="Zurück">&#9664;</button>
+                    <span id="lblNavigation" style="padding:0 8px;">1 / 50</span>
+                    <button class="btn btn-nav" id="btnVor" title="Vor">&#9654;</button>
+                    <button class="btn btn-nav" id="btnLetzter" title="Letzter">&#9654;|</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <input type="text" id="txtSuche" class="form-control" placeholder="Objekt suchen..." style="width:180px;">
+                    <button class="btn" id="btnSuchen">Suchen</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <label style="display:flex;align-items:center;gap:4px;">
+                        <input type="checkbox" id="chkNurAktive" checked>
+                        Nur Aktive
+                    </label>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="btn btn-success" id="btnNeu">+ Neu</button>
+                    <button class="btn btn-primary" id="btnSpeichern">Speichern</button>
+                    <button class="btn btn-danger" id="btnLoeschen">Löschen</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="ob-content">
+                <!-- Objekt-Liste links -->
+                <div class="ob-liste">
+                    <table class="datasheet" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Objekt</th>
+                                <th>Ort</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_Liste">
+                            <tr><td colspan="3" style="text-align:center;padding:20px;color:#666;">Lade Objekte...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Detail rechts -->
+                <div class="ob-detail">
+                    <div class="tabs">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-tab="tabStamm">Stammdaten</button>
+                            <button class="tab-btn" data-tab="tabPositionen">Positionen</button>
+                            <button class="tab-btn" data-tab="tabKontakte">Kontakte</button>
+                            <button class="tab-btn" data-tab="tabDokumente">Dokumente</button>
+                        </div>
+                        <div class="tab-content">
+                            <!-- Tab Stammdaten -->
+                            <div class="tab-pane active" id="tabStamm">
+                                <div style="padding:12px;overflow:auto;height:100%;">
+                                    <fieldset class="info-fieldset">
+                                        <legend>Objektdaten</legend>
+                                        <div class="info-row">
+                                            <span class="info-label">Objekt-ID:</span>
+                                            <input type="text" class="ob-input" id="Objekt_ID" style="width:100px;" readonly>
+                                            <span class="info-label" style="margin-left:16px;">Status:</span>
+                                            <select class="ob-select" id="Objekt_Status">
+                                                <option value="1" selected>Aktiv</option>
+                                                <option value="0">Inaktiv</option>
+                                            </select>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Bezeichnung:</span>
+                                            <input type="text" class="ob-input" id="Objekt_Name" style="flex:1;">
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="info-fieldset">
+                                        <legend>Adresse</legend>
+                                        <div class="info-row">
+                                            <span class="info-label">Strasse:</span>
+                                            <input type="text" class="ob-input" id="Objekt_Strasse" style="flex:1;">
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">PLZ / Ort:</span>
+                                            <input type="text" class="ob-input" id="Objekt_PLZ" style="width:70px;">
+                                            <input type="text" class="ob-input" id="Objekt_Ort" style="flex:1;margin-left:8px;">
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="info-fieldset">
+                                        <legend>Zuordnung</legend>
+                                        <div class="info-row">
+                                            <span class="info-label">Kunde:</span>
+                                            <select class="ob-select" id="Objekt_Kunde" style="flex:1;">
+                                                <option value="">-- Kunde waehlen --</option>
+                                            </select>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Ansprechpartner:</span>
+                                            <input type="text" class="ob-input" id="Objekt_Ansprechpartner" style="flex:1;">
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Telefon:</span>
+                                            <input type="text" class="ob-input" id="Objekt_Telefon" style="width:150px;">
+                                            <span class="info-label" style="margin-left:16px;">E-Mail:</span>
+                                            <input type="email" class="ob-input" id="Objekt_Email" style="flex:1;">
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="info-fieldset">
+                                        <legend>Bemerkungen</legend>
+                                        <textarea class="ob-textarea" id="Objekt_Bemerkungen" rows="3"></textarea>
+                                    </fieldset>
+                                </div>
+                            </div>
+
+                            <!-- Tab Positionen -->
+                            <div class="tab-pane" id="tabPositionen">
+                                <div style="padding:12px;">
+                                    <div style="margin-bottom:8px;">
+                                        <button class="ob-btn" id="btnNeuePosition">+ Neue Position</button>
+                                        <button class="ob-btn" id="btnPositionLoeschen">Loeschen</button>
+                                    </div>
+                                    <table class="positionen-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:60px;">Pos-Nr</th>
+                                                <th>Bezeichnung</th>
+                                                <th style="width:80px;">MA Soll</th>
+                                                <th style="width:100px;">Qualifikation</th>
+                                                <th style="width:80px;">Stundensatz</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>P01</td>
+                                                <td>Einlasskontrolle</td>
+                                                <td>4</td>
+                                                <td>34a</td>
+                                                <td>25,00 EUR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P02</td>
+                                                <td>Streifendienst</td>
+                                                <td>2</td>
+                                                <td>34a</td>
+                                                <td>23,00 EUR</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P03</td>
+                                                <td>Empfang</td>
+                                                <td>1</td>
+                                                <td>-</td>
+                                                <td>20,00 EUR</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Tab Kontakte -->
+                            <div class="tab-pane" id="tabKontakte">
+                                <div style="padding:12px;">
+                                    <p style="color:#999;text-align:center;padding:40px;">Kontaktdaten werden hier angezeigt</p>
+                                </div>
+                            </div>
+
+                            <!-- Tab Dokumente -->
+                            <div class="tab-pane" id="tabDokumente">
+                                <div style="padding:12px;">
+                                    <p style="color:#999;text-align:center;padding:40px;">Dokumente werden hier angezeigt</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <div class="footer-left"><span id="lblStatus">Bereit</span></div>
+                <div class="footer-right"><span id="lblAnzahl">0 Objekte</span></div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="../js/sidebar.js"></script>
+    <script>
+        document.getElementById('header-date').textContent = new Date().toLocaleDateString('de-DE');
+
+        // Tab-Switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tabId)?.classList.add('active');
+            });
+        });
+    </script>
+    <!-- Logic-Modul einbinden -->
+    <script type="module" src="logic/frm_OB_Objekt.logic.js"></script>
+</body>
+</html>

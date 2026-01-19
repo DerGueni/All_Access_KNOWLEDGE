@@ -1,0 +1,315 @@
+/**
+ * SIDEBAR VARIANTE 8: Left Border Indicator
+ * ==========================================
+ * Minimalistisches Design mit linkem Farbbalken als Indikator
+ *
+ * Features:
+ * - Aktiver Button mit linkem Farbbalken (4px)
+ * - Subtiler Hover-Effekt (Hintergrund-Highlight)
+ * - Klare visuelle Hierarchie durch Kontrast
+ * - Breadcrumb-Style fuer aktiven Bereich
+ * - Touch-freundlich (min-height: 44px)
+ *
+ * Verwendung: In shell.html einbinden via:
+ * <link rel="stylesheet" href="css/sidebar_variants/sidebar_variant_08_indicator.css">
+ */
+
+/* ===== CSS CUSTOM PROPERTIES ===== */
+:root {
+    --indicator-color: #0066cc;
+    --indicator-hover: #0052a3;
+    --sidebar-bg: #1e1e2e;
+    --sidebar-bg-light: #2a2a3e;
+    --text-primary: #e4e4e7;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --border-color: rgba(255, 255, 255, 0.06);
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    --active-bg: rgba(0, 102, 204, 0.12);
+}
+
+/* ===== SIDEBAR CONTAINER ===== */
+.sidebar {
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    box-shadow: none;
+}
+
+/* ===== MAIN HEADER ===== */
+.sidebar-header {
+    background: var(--sidebar-bg-light);
+    color: var(--text-primary);
+    padding: 14px 16px;
+    font-weight: 700;
+    font-size: 13px;
+    text-align: left;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+/* Indicator Line unter Header */
+.sidebar-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--indicator-color), transparent);
+}
+
+/* ===== KATEGORIE CONTAINER ===== */
+.menu-categories {
+    padding: 8px 0;
+    gap: 0;
+}
+
+/* ===== KATEGORIE BLOCK ===== */
+.category-block {
+    margin-bottom: 4px;
+    padding: 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.category-block:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* ===== KATEGORIE HEADER ===== */
+.category-header {
+    background: transparent;
+    color: var(--text-muted);
+    padding: 12px 16px 6px 16px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border: none;
+    position: relative;
+}
+
+/* ===== MENU BUTTONS - INDICATOR STYLE ===== */
+.menu-btn {
+    /* Layout */
+    background: transparent;
+    padding: 0 16px 0 20px;
+    min-height: 44px;
+    height: auto;
+
+    /* Text */
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: left;
+
+    /* Box */
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+
+    /* Left Border Indicator (hidden by default) */
+    border-left: 4px solid transparent;
+
+    /* Smooth Transitions */
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        padding-left 0.15s ease;
+
+    /* Position for Pseudo-elements */
+    position: relative;
+}
+
+/* ===== HOVER STATE ===== */
+.menu-btn:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+    border-left-color: rgba(0, 102, 204, 0.4);
+    padding-left: 22px;
+}
+
+/* Subtle highlight bar on hover */
+.menu-btn:hover::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+        180deg,
+        transparent,
+        var(--indicator-color),
+        transparent
+    );
+    opacity: 0.5;
+}
+
+/* ===== ACTIVE/PRESSED STATE ===== */
+.menu-btn:active {
+    background: rgba(0, 102, 204, 0.08);
+}
+
+/* ===== SELECTED/CURRENT STATE ===== */
+.menu-btn.active {
+    background: var(--active-bg);
+    color: var(--indicator-color);
+    font-weight: 600;
+    border-left-color: var(--indicator-color);
+    padding-left: 22px;
+}
+
+/* Active Indicator Bar */
+.menu-btn.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 4px;
+    background: var(--indicator-color);
+    border-radius: 0 2px 2px 0;
+    box-shadow: 2px 0 8px rgba(0, 102, 204, 0.4);
+}
+
+/* Breadcrumb Dot for active category */
+.category-block:has(.menu-btn.active) .category-header::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--indicator-color);
+    border-radius: 50%;
+    margin-top: 3px;
+}
+
+/* Active Category Header Style */
+.category-block:has(.menu-btn.active) .category-header {
+    color: var(--indicator-color);
+}
+
+.menu-btn.active:hover {
+    background: rgba(0, 102, 204, 0.18);
+    border-left-color: var(--indicator-hover);
+}
+
+/* ===== FOCUS STATE (Accessibility) ===== */
+.menu-btn:focus {
+    outline: none;
+    background: var(--hover-bg);
+}
+
+.menu-btn:focus-visible {
+    outline: 2px solid var(--indicator-color);
+    outline-offset: -2px;
+}
+
+/* ===== TOOLTIP OVERRIDE ===== */
+.menu-btn[title]:hover::after {
+    background: var(--sidebar-bg-light);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.menu-btn[title]:hover::before {
+    border-right-color: var(--sidebar-bg-light);
+}
+
+/* ===== RESPONSIVE: Mehr Abstand bei weniger Buttons ===== */
+@media (min-height: 800px) {
+    .menu-btn {
+        min-height: 48px;
+    }
+
+    .category-block {
+        margin-bottom: 8px;
+        padding-bottom: 4px;
+    }
+
+    .category-header {
+        padding: 14px 16px 8px 16px;
+    }
+}
+
+@media (min-height: 1000px) {
+    .menu-btn {
+        min-height: 52px;
+        font-size: 13px;
+    }
+
+    .category-block {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+    }
+
+    .category-header {
+        padding: 16px 16px 10px 16px;
+        font-size: 11px;
+    }
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.menu-categories::-webkit-scrollbar {
+    width: 4px;
+}
+
+.menu-categories::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.menu-categories::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.menu-categories::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== LIGHT MODE ALTERNATIVE ===== */
+/* Uncomment for light mode version */
+/*
+:root {
+    --indicator-color: #0066cc;
+    --indicator-hover: #0052a3;
+    --sidebar-bg: #ffffff;
+    --sidebar-bg-light: #f8f9fa;
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a5568;
+    --text-muted: #9ca3af;
+    --border-color: rgba(0, 0, 0, 0.08);
+    --hover-bg: rgba(0, 0, 0, 0.03);
+    --active-bg: rgba(0, 102, 204, 0.08);
+}
+*/
+
+/* ===== ANIMATION: Indicator Pulse on Load ===== */
+@keyframes indicatorPulse {
+    0% { box-shadow: 2px 0 8px rgba(0, 102, 204, 0.4); }
+    50% { box-shadow: 2px 0 16px rgba(0, 102, 204, 0.6); }
+    100% { box-shadow: 2px 0 8px rgba(0, 102, 204, 0.4); }
+}
+
+.menu-btn.active::before {
+    animation: indicatorPulse 2s ease-in-out infinite;
+}
+
+/* Disable animation after initial load (optional - add via JS after 3s) */
+.menu-btn.active.no-pulse::before {
+    animation: none;
+}

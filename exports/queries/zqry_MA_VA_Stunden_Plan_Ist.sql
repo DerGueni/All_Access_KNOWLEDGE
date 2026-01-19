@@ -1,0 +1,6 @@
+-- Query: zqry_MA_VA_Stunden_Plan_Ist
+-- Type: 0
+SELECT [Nachname] & " " & [Vorname] AS Name, [Nachname] & " " & [Vorname] & "  (" & [Art] & ")" AS Name_, zqry_MA_VA_Zuordnung_Planung_Stunden_Union.Jahr, zqry_MA_VA_Zuordnung_Planung_Stunden_Union.Monat, Round([SummevonMA_Brutto_Std2],2) AS Stunden_Netto, Round([SummevonMA_Netto_Std2],2) AS Stunden_Brutto, zqry_MA_VA_Zuordnung_Planung_Stunden_Union.Art, tbl_MA_Mitarbeiterstamm.Anstellungsart_ID
+FROM tbl_MA_Mitarbeiterstamm INNER JOIN zqry_MA_VA_Zuordnung_Planung_Stunden_Union ON tbl_MA_Mitarbeiterstamm.ID = zqry_MA_VA_Zuordnung_Planung_Stunden_Union.MA_ID
+WHERE (((zqry_MA_VA_Zuordnung_Planung_Stunden_Union.Jahr)=Year(Now())) AND ((zqry_MA_VA_Zuordnung_Planung_Stunden_Union.Art)="IST"));
+

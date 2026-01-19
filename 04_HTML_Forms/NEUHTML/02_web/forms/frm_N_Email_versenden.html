@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Mail versenden - CONSYS</title>
+    <link rel="stylesheet" href="../css/app-layout.css">
+    <link rel="stylesheet" href="../theme/consys_theme.css">
+    <link rel="stylesheet" href="frm_N_Email_versenden.css">
+</head>
+<body>
+    <div class="email-container">
+        <!-- Linkes Menue -->
+        <aside class="email-menu">
+            <div class="menu-header">HAUPTMENUE</div>
+            <nav class="menu-buttons">
+                <a href="frm_N_Dienstplanuebersicht.html" class="menu-btn">Dienstplanuebersicht</a>
+                <a href="frm_VA_Planungsuebersicht.html" class="menu-btn">Planungsuebersicht</a>
+                <a href="frm_va_Auftragstamm.html" class="menu-btn">Auftragsverwaltung</a>
+                <a href="frm_MA_Mitarbeiterstamm.html" class="menu-btn">Mitarbeiterverwaltung</a>
+                <a href="#" class="menu-btn">Offene Mail Anfragen</a>
+                <a href="#" class="menu-btn">Excel Zeitkonten</a>
+                <a href="frm_MA_Zeitkonten.html" class="menu-btn">Zeitkonten</a>
+                <a href="frm_MA_Abwesenheit.html" class="menu-btn">Abwesenheitsplanung</a>
+                <a href="frm_Ausweis_Create.html" class="menu-btn">Dienstausweis erstellen</a>
+                <a href="#" class="menu-btn">Stundenabgleich</a>
+                <a href="frm_KD_Kundenstamm.html" class="menu-btn">Kundenverwaltung</a>
+                <a href="#" class="menu-btn">Verrechnungssaetze</a>
+                <a href="#" class="menu-btn">Sub Rechnungen</a>
+                <a href="frm_N_Email_versenden.html" class="menu-btn active">E-Mail</a>
+                <a href="#" class="menu-btn secondary">Menue 2</a>
+                <a href="#" class="menu-btn secondary">System Info</a>
+            </nav>
+        </aside>
+
+        <!-- Hauptbereich -->
+        <main class="email-main">
+            <!-- Header -->
+            <header class="email-header">
+                <div class="header-left">
+                    <div class="email-logo"></div>
+                    <h1 class="email-title">E-Mail versenden</h1>
+                    <button class="email-btn primary" id="btnSenden">Senden</button>
+                </div>
+                <div class="header-center">
+                    <label>Vorlage</label>
+                    <select id="cboVorlage" class="email-select">
+                        <option value="mitarbeiter" selected>Mitarbeiteranschreiben</option>
+                        <option value="dienstplan">Dienstplan</option>
+                        <option value="abrechnung">Abrechnung</option>
+                    </select>
+                    <label><input type="checkbox" id="chkDirektSenden"> Direkt Senden</label>
+                </div>
+                <div class="header-right">
+                    <button class="email-btn-icon" id="btnHelp" title="Hilfe">?</button>
+                    <button class="email-btn-icon danger" id="btnClose" title="Schliessen">X</button>
+                    <div class="date-info" id="lblDatum">14.12.2025</div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="email-content">
+                <!-- Linke Seite: E-Mail Formular -->
+                <div class="email-form-section">
+                    <div class="form-row">
+                        <label>Absenden als:</label>
+                        <input type="text" id="txtAbsender" class="email-input-large" value="consec-auftragsplanung@gmx.de">
+                    </div>
+                    <div class="form-row">
+                        <label>An:</label>
+                        <input type="text" id="txtAn" class="email-input-large" value="info@consec-nuernberg.de">
+                        <span class="required">*</span>
+                    </div>
+                    <div class="form-row">
+                        <label>CC:</label>
+                        <input type="text" id="txtCC" class="email-input-large">
+                    </div>
+                    <div class="form-row">
+                        <label>BCC:</label>
+                        <input type="text" id="txtBCC" class="email-input-large">
+                    </div>
+                    <div class="form-row">
+                        <label>Betreff:</label>
+                        <input type="text" id="txtBetreff" class="email-input-large">
+                    </div>
+                    <div class="form-row">
+                        <label><input type="checkbox" id="chkEmpfangsbestaetigung"> Empfangsbestaetigung</label>
+                        <label>Prio</label>
+                        <select id="cboPrio" class="email-select-small">
+                            <option value="normal" selected>Normal</option>
+                            <option value="hoch">Hoch</option>
+                            <option value="niedrig">Niedrig</option>
+                        </select>
+                        <label>Auftrag:</label>
+                        <select id="cboAuftrag" class="email-select">
+                            <option value=""></option>
+                        </select>
+                    </div>
+
+                    <!-- E-Mail Body -->
+                    <div class="email-body">
+                        <textarea id="txtBody" class="email-textarea">Hi,
+
+CONSEC Veranstaltungsservice & Sicherheitsdienst oHG
+Vogelweiherstr. 70
+90441 Nuernberg
+
+0911 - 40 99 77 99 (Tel.)
+0911 - 40 99 77 92 (Fax)
+
+E-Mail: info@consec-nuernberg.de
+http:// www.consec-nuernberg.de
+
+Geschaeftsfuehrer: Melanie Oberndorfer, Guenther Siegert
+HR A 10816 Amtsgericht Nuernberg
+Steuernr. 240/154/55205
+
+Diese E-Mail koennte vertrauliche und/oder rechtlich geschuetzte Informationen enthalten. Wenn Sie nicht der richtige
+Adressat sind oder diese E-Mail irrtuemlich erhalten haben, informieren Sie bitte sofort den Absender und vernichten
+Sie diese Mail. Das unerlaubte Kopieren, sowie die unbefugte Weitergabe dieser Mail sind nicht gestattet.
+
+Bitte denken Sie an die Umwelt, bevor Sie diese E-Mail ausdrucken / Think before you print!!!</textarea>
+                    </div>
+                </div>
+
+                <!-- Anhang Bereich -->
+                <div class="email-attachment-section">
+                    <div class="attachment-header">
+                        <label>Anhang:</label>
+                        <button class="email-btn-small" id="btnAnhangHinzu">...</button>
+                        <button class="email-btn-small" id="btnAnhangLoeschen">Anhaenge loeschen</button>
+                    </div>
+                    <div class="attachment-list-label">Attachfile</div>
+                    <div class="attachment-list" id="lstAttachments">
+                        <!-- Anhaenge werden hier angezeigt -->
+                    </div>
+                </div>
+
+                <!-- Rechte Seite: Empfaenger -->
+                <div class="email-recipients-section">
+                    <div class="recipients-header">
+                        <span>Mail senden an</span>
+                        <label><input type="radio" name="sendTo" value="mitarbeiter" checked> Mitarbeiter</label>
+                    </div>
+
+                    <!-- Festangestellte Mitarbeiter -->
+                    <div class="recipients-group">
+                        <div class="group-title">Festangestellte Mitarbeiter</div>
+                        <div class="recipients-list" id="lstFestangestellte">
+                            <div class="recipient-item">Alali Ahmad</div>
+                            <div class="recipient-item">Alayoubi Salim</div>
+                            <div class="recipient-item">Glatz Michaela</div>
+                            <div class="recipient-item">Goeschelbauer Thomas</div>
+                            <div class="recipient-item">Hamberger Bernd</div>
+                            <div class="recipient-item">Oberndorfer Melanie</div>
+                            <div class="recipient-item">Prost Guido</div>
+                            <div class="recipient-item">Shaaban Mohammad</div>
+                            <div class="recipient-item">Tusjak Julia</div>
+                            <div class="recipient-item">Zilling Thomas</div>
+                        </div>
+                    </div>
+
+                    <!-- Mitarbeiter Listen -->
+                    <div class="recipients-tables">
+                        <div class="recipients-table-container">
+                            <div class="table-title">Mitarbeiter</div>
+                            <table class="recipients-table" id="tblMitarbeiter1">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>E-Mail</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>A&R Sec</td><td>aramyan@ar-s</td></tr>
+                                    <tr><td>Akcay Ediz</td><td>Edak96@gmx</td></tr>
+                                    <tr><td>Alali Ahmad</td><td>mood5@gmx.d</td></tr>
+                                    <tr><td>Alayoubi Salim</td><td>alaysalim9@g</td></tr>
+                                    <tr><td>Aldaba Wesam</td><td>wesamaldaba</td></tr>
+                                    <tr><td>Alhajjaj Mohamm</td><td>Mhmdh461701</td></tr>
+                                    <tr><td>Alrajab Mahmod</td><td>Alrajabmahmo</td></tr>
+                                    <tr><td>Ameri Targhi Moh</td><td>ja.ameri1961@</td></tr>
+                                    <tr><td>Antakia Khalaf Al</td><td>Abdalhaleem.l</td></tr>
+                                    <tr><td>Argentino Luigi</td><td>Argentinogabri</td></tr>
+                                    <tr><td>Aykan Metin</td><td>Metinaykan94</td></tr>
+                                    <tr><td>Badran Ammar</td><td>Ammar.bad92</td></tr>
+                                    <tr><td>Badran Majd</td><td>Magd9bad@g</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="recipients-table-container">
+                            <table class="recipients-table" id="tblMitarbeiter2">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>E-Mail</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Kallweit Marco</td><td>kallweitmarco</td></tr>
+                                    <tr><td>Kappner Benjami</td><td>b.kaeppner@ga</td></tr>
+                                    <tr><td>Kawthery Mahm</td><td>kawthery40@</td></tr>
+                                    <tr><td>Kiki Yazan</td><td>Yazankiki21@</td></tr>
+                                    <tr><td>Kilbauch Artur</td><td>akilbauch@g</td></tr>
+                                    <tr><td>Kocak Gokalp</td><td>gokalp.95@ho</td></tr>
+                                    <tr><td>Koge Aria</td><td>aria.koge@me</td></tr>
+                                    <tr><td>Koge Juanita</td><td>vollmilch38@i</td></tr>
+                                    <tr><td>Konrad Eduard</td><td>eduard_konrac</td></tr>
+                                    <tr><td>KS Security</td><td>stavros-Kirma</td></tr>
+                                    <tr><td>Kupfer Sabina</td><td>st-kupfer@t-or</td></tr>
+                                    <tr><td>Kuypers Johanne</td><td>johannes.kuyp</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="email-footer">
+                <div class="footer-left">
+                    <span id="lblStatus">Bereit</span>
+                </div>
+                <div class="footer-right">
+                    <span id="lblAnzahl">0 Empfaenger</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module">
+        import { Bridge } from '../js/webview2-bridge.js';
+
+        let mitarbeiter = [];
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            document.getElementById('lblDatum').textContent = new Date().toLocaleDateString('de-DE', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+
+            document.getElementById('btnSenden').addEventListener('click', sendeEmail);
+            await loadMitarbeiter();
+        }
+
+        async function loadMitarbeiter() {
+            try {
+                const result = await Bridge.mitarbeiter.list({ aktiv: true });
+                mitarbeiter = result.data || result || [];
+
+                // Empfaenger-Liste rendern
+                const container = document.querySelector('.recipients-list');
+                if (container) {
+                    container.innerHTML = mitarbeiter.slice(0, 10).map(ma =>
+                        `<div class="recipient-item" data-id="${ma.ID}">${ma.Nachname} ${ma.Vorname}</div>`
+                    ).join('');
+                }
+
+                // Tabellen rendern
+                const tbody1 = document.querySelector('#tblMitarbeiter1 tbody');
+                const tbody2 = document.querySelector('#tblMitarbeiter2 tbody');
+                if (tbody1 && tbody2) {
+                    const half = Math.ceil(mitarbeiter.length / 2);
+                    tbody1.innerHTML = mitarbeiter.slice(0, half).map(ma =>
+                        `<tr><td>${ma.Nachname} ${ma.Vorname}</td><td>${ma.MA_eMail || ''}</td></tr>`
+                    ).join('');
+                    tbody2.innerHTML = mitarbeiter.slice(half).map(ma =>
+                        `<tr><td>${ma.Nachname} ${ma.Vorname}</td><td>${ma.MA_eMail || ''}</td></tr>`
+                    ).join('');
+                }
+
+                // Klick-Handler
+                document.querySelectorAll('.recipient-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        this.classList.toggle('selected');
+                        updateEmpfaengerCount();
+                    });
+                });
+
+            } catch (e) {
+                console.error('[Email] Fehler:', e);
+            }
+        }
+
+        function updateEmpfaengerCount() {
+            const count = document.querySelectorAll('.recipient-item.selected').length;
+            document.getElementById('lblAnzahl').textContent = `${count} Empfaenger`;
+        }
+
+        async function sendeEmail() {
+            const selected = [...document.querySelectorAll('.recipient-item.selected')].map(el => el.dataset.id);
+            if (selected.length === 0) { alert('Keine Empfaenger ausgewaehlt'); return; }
+
+            try {
+                document.getElementById('lblStatus').textContent = 'Sende E-Mails...';
+                await Bridge.execute('sendEmail', {
+                    ma_ids: selected,
+                    absender: document.getElementById('txtAbsender').value,
+                    an: document.getElementById('txtAn').value,
+                    cc: document.getElementById('txtCC').value,
+                    bcc: document.getElementById('txtBCC').value,
+                    betreff: document.getElementById('txtBetreff')?.value || 'CONSYS Nachricht'
+                });
+                document.getElementById('lblStatus').textContent = `${selected.length} E-Mails gesendet`;
+            } catch (e) {
+                console.error('[Email] Fehler:', e);
+                document.getElementById('lblStatus').textContent = 'Fehler beim Senden';
+            }
+        }
+    </script>
+</body>
+</html>

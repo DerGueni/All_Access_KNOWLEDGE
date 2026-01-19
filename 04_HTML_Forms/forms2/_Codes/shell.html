@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS HTML Shell</title>
+    <link rel="stylesheet" href="../../css/app-layout.css">
+    <link rel="stylesheet" href="../../theme/consys_theme.css">
+    <link rel="stylesheet" href="shell.css">
+</head>
+<body>
+    <div class="shell">
+        <aside class="shell-sidebar">
+            <div class="sidebar-header">CONSYS</div>
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">Stammdaten</div>
+                    <button data-form="mitarbeiterstamm">Mitarbeiterstamm</button>
+                    <button data-form="kundenstamm">Kundenstamm</button>
+                    <button data-form="auftragstamm">Auftragstamm</button>
+                </div>
+                <div class="menu-section">
+                    <div class="menu-title">Planung</div>
+                    <button data-form="dienstplanuebersicht">Dienstplanuebersicht</button>
+                    <button data-form="planungsuebersicht">Planungsuebersicht</button>
+                </div>
+                <div class="menu-section">
+                    <div class="menu-title">Disposition</div>
+                    <button data-form="schnellauswahl">Schnellauswahl</button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="shell-main">
+            <div class="shell-header">
+                <div class="shell-title">HTML Ansicht</div>
+                <div class="shell-status">Aktiv: <span id="currentForm">-</span></div>
+            </div>
+            <div class="shell-tabs" id="tabList"></div>
+            <div class="shell-content" id="tabContent"></div>
+        </div>
+    </div>
+
+    <script src="../../js/api-autostart.js"></script>
+    <script src="shell.js"></script>
+</body>
+</html>
