@@ -6,8 +6,11 @@ Vergleicht Buttons zwischen HTML und Access mit genauer Formular-Zuordnung
 import sys
 import os
 import re
+import unicodedata
 from pathlib import Path
 import pandas as pd
+import json
+from datetime import datetime
 from bs4 import BeautifulSoup
 
 # Access Bridge importieren
@@ -18,10 +21,66 @@ from access_bridge_ultimate import AccessBridge
 HTML_DIR = Path(r'C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\04_HTML_Forms\forms3')
 REPORTS_DIR = HTML_DIR / '_reports'
 REPORTS_DIR.mkdir(exist_ok=True)
+EXPORTS_FORMS_DIR = Path(r'C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\exports\forms')
 
 # Button-Datenstrukturen
 html_buttons = []  # {form, name, label, function, onclick}
 access_buttons = []  # {form, name, label, onclick, vba_function}
+
+def normalize_text(value):
+    if value is None:
+        return ''
+    text = str(value).strip().lower()
+    # Deutsche Sonderzeichen vereinheitlichen
+    text = text.replace('ß', 'ss')
+    text = unicodedata.normalize('NFKD', text)
+    text = ''.join(ch for ch in text if not unicodedata.combining(ch))
+    text = re.sub(r'[^a-z0-9]+', '', text)
+    return text
+
+
+def normalize_name(value):
+    text = normalize_text(value)
+    # Entferne typische Access/HTML-Präfixe
+    for prefix in ('cmd', 'btn', 'button', 'bt'):
+        if text.startswith(prefix):
+            text = text[len(prefix):]
+            break
+    # Entferne häufige Suffixe
+    for suffix in ('button', 'btn', 'cmd'):
+        if text.endswith(suffix) and len(text) > len(suffix):
+            text = text[:-len(suffix)]
+            break
+    return text
+
+
+def build_aliases():
+    # Manuelle Alias-Mappings: HTML-ID -> Access-Name (normalisiert)
+    # Nur dort nutzen, wo identische Funktion/Label bekannt ist
+    return {
+        'btnclose': 'btnformularschliessen',
+        'btn_formular_schliessen': 'btnformularschliessen',
+        'btnschliessen': 'btnformularschliessen',
+        'cmdclose': 'btnformularschliessen',
+        'cmdschliessen': 'btnformularschliessen',
+        'cmd_schliessen': 'btnformularschliessen',
+        'btnexit': 'btnformularschliessen',
+        'cmdexit': 'btnformularschliessen',
+        'btncancel': 'btnabbrechen',
+        'cmdcancel': 'btnabbrechen',
+        'btnabbruch': 'btnabbrechen',
+        'cmdabbruch': 'btnabbrechen',
+        'btnok': 'btnspeichern',
+        'cmdok': 'btnspeichern',
+        'btnsave': 'btnspeichern',
+        'cmdsave': 'btnspeichern',
+        'btnrefresh': 'btnaktualisieren',
+        'cmdrefresh': 'btnaktualisieren',
+    }
+
+
+ALIASES = build_aliases()
+
 
 def extract_html_buttons(html_file):
     """Extrahiert alle Buttons aus einer HTML-Datei"""
@@ -30,12 +89,22 @@ def extract_html_buttons(html_file):
     with open(html_file, 'r', encoding='utf-8') as f:
         soup = BeautifulSoup(f.read(), 'html.parser')
 
-    # Finde alle Buttons
-    for button in soup.find_all('button'):
+    # Finde alle Buttons (button + input[type=button|submit|reset])
+    button_nodes = list(soup.find_all('button'))
+    for input_btn in soup.find_all('input'):
+        input_type = (input_btn.get('type') or '').lower()
+        if input_type in ('button', 'submit', 'reset'):
+            button_nodes.append(input_btn)
+
+    for button in button_nodes:
         btn_id = button.get('id', '')
         btn_class = button.get('class', [])
         btn_onclick = button.get('onclick', '')
-        btn_text = button.get_text(strip=True)
+        btn_text = button.get_text(strip=True) if button.name == 'button' else ''
+        btn_value = button.get('value', '')
+        btn_title = button.get('title', '')
+        btn_action = button.get('data-action', '')
+        btn_aria = button.get('aria-label', '')
 
         # Extrahiere Funktion aus onclick
         function = ''
@@ -44,18 +113,23 @@ def extract_html_buttons(html_file):
             if match:
                 function = match.group(1)
 
+        label = btn_text or btn_value or btn_title or btn_aria or btn_action or btn_id
         buttons.append({
             'form': html_file.name,
             'name': btn_id,
-            'label': btn_text,
+            'label': label,
             'function': function,
             'onclick': btn_onclick,
-            'class': ' '.join(btn_class) if isinstance(btn_class, list) else btn_class
+            'class': ' '.join(btn_class) if isinstance(btn_class, list) else btn_class,
+            'data_action': btn_action,
+            'title': btn_title,
+            'value': btn_value,
+            'aria_label': btn_aria
         })
 
     return buttons
 
-def extract_access_buttons():
+def extract_access_buttons(allow_forms=None):
     """Extrahiert alle Buttons aus Access-Formularen"""
     buttons = []
 
@@ -67,6 +141,8 @@ def extract_access_buttons():
             try:
                 # Überspringe System-Formulare
                 if form_name.startswith('~'):
+                    continue
+                if allow_forms and form_name not in allow_forms:
                     continue
 
                 print(f"  +- {form_name}")
@@ -113,28 +189,132 @@ def extract_access_buttons():
 
     return buttons
 
+def load_loose_json(path):
+    raw = path.read_text(encoding='latin-1')
+    raw = raw.replace('\ufeff', '')
+    # Entferne trailing commas vor } oder ]
+    raw = re.sub(r',\s*([}\]])', r'\1', raw)
+    return json.loads(raw)
+
+
+def extract_access_buttons_from_exports(allow_forms=None):
+    """Extrahiert Buttons aus Access-Exports (controls.json)."""
+    buttons = []
+    if not EXPORTS_FORMS_DIR.exists():
+        return buttons
+
+    form_dirs = [p for p in EXPORTS_FORMS_DIR.iterdir() if p.is_dir()]
+    for form_dir in form_dirs:
+        form_name = form_dir.name
+        if allow_forms and form_name not in allow_forms:
+            continue
+        controls_path = form_dir / 'controls.json'
+        if not controls_path.exists():
+            continue
+        try:
+            data = load_loose_json(controls_path)
+            controls = data.get('Controls') or data.get('controls') or []
+        except Exception as e:
+            print(f"    [WARN] Export-JSON Fehler bei {form_name}: {e}")
+            continue
+
+        for ctrl in controls:
+            try:
+                if ctrl.get('ControlType') == 104:  # acCommandButton
+                    btn_name = ctrl.get('Name', '')
+                    btn_caption = ctrl.get('Caption', '')
+                    btn_onclick = ctrl.get('OnClick', '')
+
+                    vba_function = ''
+                    if btn_onclick:
+                        if btn_onclick == '[Event Procedure]':
+                            vba_function = f'{btn_name}_Click'
+                        else:
+                            match = re.search(r'=\s*(\w+)\s*\(', str(btn_onclick))
+                            if match:
+                                vba_function = match.group(1)
+
+                    buttons.append({
+                        'form': form_name,
+                        'name': btn_name,
+                        'label': btn_caption,
+                        'onclick': btn_onclick,
+                        'vba_function': vba_function
+                    })
+            except Exception:
+                pass
+
+    return buttons
+
 def match_buttons():
     """Vergleicht HTML- und Access-Buttons und erstellt Abweichungsliste"""
     comparisons = []
+
+    # Access-Index pro Formular
+    access_by_form = {}
+    for btn in access_buttons:
+        access_by_form.setdefault(btn['form'], []).append(btn)
 
     # 1. Vergleiche HTML-Buttons mit Access
     for html_btn in html_buttons:
         # Suche passendes Access-Formular (ohne .html)
         html_form_base = html_btn['form'].replace('.html', '')
 
-        # Suche entsprechenden Access-Button
-        matching_access = [
-            ab for ab in access_buttons
-            if ab['form'] == html_form_base and ab['name'] == html_btn['name']
-        ]
+        # Access-Buttons für Formular
+        access_candidates = access_by_form.get(html_form_base, [])
+
+        # Vorbereitung: Normalisierte Werte
+        html_name = html_btn['name']
+        html_label = html_btn['label']
+        html_function = html_btn['function']
+        html_name_norm = normalize_name(html_name)
+        html_label_norm = normalize_text(html_label)
+        html_alias = ALIASES.get(normalize_text(html_name), '')
+
+        # Matching-Priorität: Name exakt -> Name normalisiert -> Alias -> Funktion -> Label
+        matching_access = []
+
+        # 1) Exakter Name
+        matching_access = [ab for ab in access_candidates if ab['name'] == html_name]
+
+        # 2) Normalisierter Name (btn/cmd/Unterstriche)
+        if not matching_access and html_name_norm:
+            matching_access = [
+                ab for ab in access_candidates
+                if normalize_name(ab['name']) == html_name_norm
+            ]
+
+        # 3) Alias-Mapping
+        if not matching_access and html_alias:
+            matching_access = [
+                ab for ab in access_candidates
+                if normalize_name(ab['name']) == html_alias
+            ]
+
+        # 4) Funktion (OnClick -> VBA)
+        if not matching_access and html_function:
+            html_function_norm = normalize_name(html_function)
+            matching_access = [
+                ab for ab in access_candidates
+                if ab.get('vba_function') == html_function
+                or ab.get('vba_function') == f"{ab['name']}_Click"
+                or normalize_name(ab.get('vba_function')) == html_function_norm
+            ]
+
+        # 5) Label-Normalisierung
+        if not matching_access and html_label_norm:
+            matching_access = [
+                ab for ab in access_candidates
+                if normalize_text(ab.get('label')) == html_label_norm
+            ]
 
         if matching_access:
             # Button existiert in beiden
             access_btn = matching_access[0]
 
             # Prüfe ob identisch
-            label_match = html_btn['label'].lower() == access_btn['label'].lower()
-            function_match = html_btn['function'] == access_btn['vba_function']
+            label_match = normalize_text(html_btn['label']) == normalize_text(access_btn['label'])
+            function_match = normalize_name(html_btn['function']) == normalize_name(access_btn['vba_function'])
 
             if label_match and function_match:
                 status = '[OK] identisch'
@@ -177,6 +357,26 @@ def match_buttons():
             if hb['form'] == access_form_html and hb['name'] == access_btn['name']
         ]
 
+        # Zusätzliche Mapping-Regeln für Access->HTML
+        if not matching_html:
+            access_name_norm = normalize_name(access_btn['name'])
+            access_label_norm = normalize_text(access_btn['label'])
+            matching_html = [
+                hb for hb in html_buttons
+                if hb['form'] == access_form_html and (
+                    normalize_name(hb['name']) == access_name_norm or
+                    normalize_text(hb['label']) == access_label_norm or
+                    normalize_name(hb.get('function')) == normalize_name(access_btn.get('vba_function'))
+                )
+            ]
+        if not matching_html:
+            access_alias = ALIASES.get(normalize_text(access_btn['name']), '')
+            if access_alias:
+                matching_html = [
+                    hb for hb in html_buttons
+                    if hb['form'] == access_form_html and normalize_name(hb['name']) == access_alias
+                ]
+
         if not matching_html:
             # Button nur in Access
             comparisons.append({
@@ -198,11 +398,20 @@ def create_reports(comparisons):
     """Erstellt Excel und Markdown Reports"""
     df = pd.DataFrame(comparisons)
 
+    # Abweichungen nummerieren (nur nicht-[OK])
+    df['Nr'] = ''
+    deviation_mask = df['Status'] != '[OK] identisch'
+    df.loc[deviation_mask, 'Nr'] = range(1, deviation_mask.sum() + 1)
+    # Nr-Spalte nach vorne ziehen
+    cols = ['Nr'] + [c for c in df.columns if c != 'Nr']
+    df = df[cols]
+
     # Sortiere nach HTML-Formular und Status
     df = df.sort_values(['HTML_Formular', 'Status', 'HTML_Button'])
 
     # Version 1: Nach Formular gruppiert
-    excel_file = REPORTS_DIR / 'BUTTON_ABWEICHUNGEN_MIT_FORMULAR_2026-01-15.xlsx'
+    date_tag = datetime.now().strftime('%Y-%m-%d')
+    excel_file = REPORTS_DIR / f'BUTTON_ABWEICHUNGEN_MIT_FORMULAR_{date_tag}.xlsx'
     with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
         df.to_excel(writer, sheet_name='Nach Formular', index=False)
 
@@ -226,10 +435,10 @@ def create_reports(comparisons):
     print(f"\n[OK] Excel-Report erstellt: {excel_file}")
 
     # Markdown-Report
-    md_file = REPORTS_DIR / 'BUTTON_ABWEICHUNGEN_MIT_FORMULAR_2026-01-15.md'
+    md_file = REPORTS_DIR / f'BUTTON_ABWEICHUNGEN_MIT_FORMULAR_{date_tag}.md'
     with open(md_file, 'w', encoding='utf-8') as f:
         f.write('# Button-Abweichungsanalyse mit Formular-Zuordnung\n\n')
-        f.write('**Erstellt:** 2026-01-15\n\n')
+        f.write(f'**Erstellt:** {date_tag}\n\n')
 
         # Statistik
         f.write('## Statistik\n\n')
@@ -286,7 +495,10 @@ def main():
 
     # 2. Access-Buttons extrahieren
     print("Analysiere Access-Formulare...")
-    access_buttons = extract_access_buttons()
+    html_form_bases = {f.name.replace('.html', '') for f in html_files}
+    access_buttons = extract_access_buttons_from_exports(allow_forms=html_form_bases)
+    if not access_buttons:
+        access_buttons = extract_access_buttons(allow_forms=html_form_bases)
     print(f"\n[OK] {len(access_buttons)} Access-Buttons gefunden\n")
 
     # 3. Vergleiche Buttons
