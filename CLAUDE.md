@@ -124,9 +124,17 @@ Wenn Informationen fehlen oder etwas unklar ist:
 
 - **HTML-Formulare:** `04_HTML_Forms\forms3\`
 - **Logic-Dateien:** `04_HTML_Forms\forms3\logic\`
-- **API Server:** Port 5000 (`Access Bridge\api_server.py`)
+- **API Server Port 5000:**
+  - `Access Bridge\api_server.py` (Browser-Modus)
+  - `04_HTML_Forms\forms3\_scripts\mini_api.py` (VBA startet diesen!)
 - **VBA Bridge:** Port 5002 (`04_HTML_Forms\api\vba_bridge_server.py`)
 - **VBA-Exports:** `exports\vba\forms\` + `exports\forms\`
+
+### 🚨 KRITISCHE REGEL: API-SERVER SYNCHRONITÄT
+**mini_api.py und api_server.py MÜSSEN IMMER identische Routen haben!**
+- VBA `StartAPIServerIfNeeded()` startet `mini_api.py`
+- Browser kann `api_server.py` erwarten
+- Bei neuen/geänderten Routen: BEIDE Dateien aktualisieren!
 
 ---
 
@@ -271,19 +279,48 @@ CSS: font-size: 11px, table-layout: fixed
 
 ---
 
-## 🏆 ERLEDIGT-REGEL (KRITISCH!)
+## 🏆 ERLEDIGT-REGEL (KRITISCH!) - STRIKT EINHALTEN!
+
+### 🚨🚨🚨 OBERSTE PRIORITÄT 🚨🚨🚨
+
+**SÄMTLICHE KORREKTUREN MÜSSEN ANSCHLIESSEND SORGFÄLTIG GEPRÜFT UND GETESTET WERDEN BEVOR AUSGABE ALS "ERLEDIGT" GENANNT WIRD!**
+
+**NIEMALS "Erledigt" sagen ohne vorher SELBST getestet zu haben!**
+
+### ⛔ ABSOLUTE PFLICHT VOR JEDER "ERLEDIGT"-MELDUNG:
+
+**JEDE Änderung MUSS ausgiebig geprüft und getestet werden!**
+
+**Pflicht-Testschritte (ALLE müssen durchgeführt werden):**
+1. **API-Test:** `curl` oder Browser-Request ausführen und Ergebnis zeigen
+2. **Browser-Test:** Seite mit Playwright öffnen und Funktion auslösen
+3. **Console prüfen:** Keine Fehler in der Browser-Console
+4. **Ergebnis verifizieren:** Screenshot oder Log zeigen das erwartete Verhalten
 
 **Eine Aufgabe gilt ERST als erledigt, wenn:**
-1. Der **Senior Master Agent** die Aufgabe geprüft hat
-2. Der **Senior Master Agent** die Aufgabe getestet hat
-3. Der Test **erfolgreich** war
+1. ALLE oben genannten Tests **tatsächlich durchgeführt** wurden
+2. ALLE Tests **erfolgreich** waren (keine Fehler, kein 405, kein Connection Refused)
+3. Das **Ergebnis im Browser sichtbar** ist (nicht nur Code geschrieben)
 
 **Erst dann darf ausgegeben werden:** `"Erledigt !"`
 
-**VERBOTEN:**
-- "Erledigt" sagen ohne Test
+### ❌ STRIKT VERBOTEN:
+- "Erledigt" sagen ohne ALLE Tests durchzuführen
 - "Sollte funktionieren" als Abschluss
-- Aufgabe als fertig markieren ohne Prüfung
+- "Code angepasst" ohne Browser-Verifizierung
+- "Müsste klappen" ohne tatsächlichen Test
+- Aufgabe als fertig markieren wenn Server nicht läuft
+- Aufgabe als fertig markieren bei ANY Fehler in Console/API
+
+### ✅ KORREKTE ERLEDIGT-MELDUNG FORMAT:
+```
+✅ API getestet: POST /api/xyz → {"success": true}
+✅ Browser getestet: Doppelklick auf MA → MA erscheint in Liste
+✅ Console: Keine Fehler
+✅ Ergebnis: [Screenshot/Log des erwarteten Verhaltens]
+
+Erledigt !
+```
 
 ---
 

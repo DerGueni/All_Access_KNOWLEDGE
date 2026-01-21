@@ -212,7 +212,28 @@ export async function loadFirstVisibleAuftragProtected(dependencies) {
                 // Auftrag ins Formular laden
                 // ═══════════════════════════════════════════════════════
                 await loadAuftrag(auftragId);
-                
+
+                // FIX 19.01.2026: Nach loadAuftrag das gewählte Datum wiederherstellen
+                // loadAuftrag überschreibt state.currentVADatum mit einsatztage[0]
+                // Gleiche Logik wie in setupAuftragslisteClickHandlerWithDate()
+                if (displayDate) {
+                    setTimeout(() => {
+                        const cboVADatum = document.getElementById('cboVADatum');
+                        if (cboVADatum) {
+                            for (let i = 0; i < cboVADatum.options.length; i++) {
+                                const optValue = cboVADatum.options[i].value;
+                                if (optValue === displayDate || optValue.includes(displayDate)) {
+                                    cboVADatum.selectedIndex = i;
+                                    state.currentVADatum = displayDate;
+                                    state.currentVADatum_ID = optValue;
+                                    console.log('[Auftragstamm-Loader] VADatum wiederhergestellt:', displayDate);
+                                    break;
+                                }
+                            }
+                        }
+                    }, 300);
+                }
+
                 setStatus('Auftrag geladen');
                 return;
             }

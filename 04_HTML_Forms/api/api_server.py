@@ -52,6 +52,99 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# =============================================================================
+# VBA BRIDGE WATCHDOG - Auto-Start & Auto-Restart
+# =============================================================================
+import subprocess
+import urllib.request
+import time as time_module
+
+VBA_BRIDGE_PORT = 5002
+VBA_BRIDGE_CHECK_INTERVAL = 30  # Sekunden
+_vba_bridge_process = None
+_vba_bridge_watchdog_running = False
+
+def is_vba_bridge_running():
+    """Prüft ob VBA Bridge Server auf Port 5002 erreichbar ist"""
+    try:
+        req = urllib.request.Request(f'http://localhost:{VBA_BRIDGE_PORT}/api/health', method='GET')
+        with urllib.request.urlopen(req, timeout=2) as response:
+            return response.status == 200
+    except:
+        return False
+
+def start_vba_bridge():
+    """Startet den VBA Bridge Server"""
+    global _vba_bridge_process
+
+    api_dir = os.path.dirname(os.path.abspath(__file__))
+    vba_bridge_script = os.path.join(api_dir, 'vba_bridge_server.py')
+
+    if not os.path.exists(vba_bridge_script):
+        logger.error(f"[VBA Bridge] Script nicht gefunden: {vba_bridge_script}")
+        return False
+
+    try:
+        # Starte VBA Bridge als subprocess
+        logger.info("[VBA Bridge] Starte VBA Bridge Server...")
+        _vba_bridge_process = subprocess.Popen(
+            [sys.executable, vba_bridge_script],
+            cwd=api_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0
+        )
+
+        # Warte kurz und prüfe ob gestartet
+        time_module.sleep(3)
+
+        if is_vba_bridge_running():
+            logger.info(f"[VBA Bridge] Server läuft auf Port {VBA_BRIDGE_PORT}")
+            return True
+        else:
+            logger.warning("[VBA Bridge] Server gestartet aber nicht erreichbar")
+            return False
+
+    except Exception as e:
+        logger.error(f"[VBA Bridge] Start fehlgeschlagen: {e}")
+        return False
+
+def vba_bridge_watchdog():
+    """Watchdog-Thread der VBA Bridge überwacht und bei Bedarf neu startet"""
+    global _vba_bridge_watchdog_running
+    _vba_bridge_watchdog_running = True
+
+    logger.info("[VBA Bridge Watchdog] Gestartet - überwache VBA Bridge")
+
+    # Initiales Starten
+    if not is_vba_bridge_running():
+        start_vba_bridge()
+
+    while _vba_bridge_watchdog_running:
+        time_module.sleep(VBA_BRIDGE_CHECK_INTERVAL)
+
+        if not is_vba_bridge_running():
+            logger.warning("[VBA Bridge Watchdog] VBA Bridge nicht erreichbar - starte neu...")
+            start_vba_bridge()
+
+def start_vba_bridge_watchdog():
+    """Startet den Watchdog als Daemon-Thread"""
+    watchdog_thread = threading.Thread(target=vba_bridge_watchdog, daemon=True)
+    watchdog_thread.start()
+    logger.info("[VBA Bridge Watchdog] Watchdog-Thread gestartet")
+
+def stop_vba_bridge_watchdog():
+    """Stoppt den Watchdog"""
+    global _vba_bridge_watchdog_running, _vba_bridge_process
+    _vba_bridge_watchdog_running = False
+
+    if _vba_bridge_process:
+        try:
+            _vba_bridge_process.terminate()
+            logger.info("[VBA Bridge] Prozess beendet")
+        except:
+            pass
+
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": ["Content-Type"]}})  # CORS für alle Routen aktivieren
 
@@ -1311,6 +1404,60 @@ def get_auftrag_absagen(id):
     except Exception as e:
         logger.error(f"Error in get_auftrag_absagen: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/auftraege/<int:va_id>/anfragen', methods=['GET'])
+def get_auftrag_anfragen(va_id):
+    """
+    Ausstehende MA-Anfragen für einen Auftrag (für Antworten-Tab)
+    Gibt alle Planungen mit Status_ID < 3 (geplant/benachrichtigt) zurück
+    """
+    try:
+        vadatum_id = request.args.get('vadatum_id', type=int)
+
+        if vadatum_id:
+            # Erst das Datum holen
+            datum_sql = "SELECT VADatum FROM tbl_VA_AnzTage WHERE ID = ?"
+            datum_result = execute_query(datum_sql, [vadatum_id])
+            if not datum_result:
+                return jsonify({"success": True, "data": []})
+
+            va_datum = datum_result[0].get('VADatum')
+
+            sql = """
+                SELECT
+                    p.ID, p.VA_ID, p.MA_ID, p.VADatum, p.Status_ID,
+                    m.Nachname, m.Vorname
+                FROM tbl_MA_VA_Planung p
+                LEFT JOIN tbl_MA_Mitarbeiterstamm m ON p.MA_ID = m.ID
+                WHERE p.VA_ID = ? AND p.Status_ID < 3 AND p.VADatum = ?
+                ORDER BY m.Nachname
+            """
+            data = execute_query(sql, [va_id, va_datum])
+        else:
+            sql = """
+                SELECT
+                    p.ID, p.VA_ID, p.MA_ID, p.VADatum, p.Status_ID,
+                    m.Nachname, m.Vorname
+                FROM tbl_MA_VA_Planung p
+                LEFT JOIN tbl_MA_Mitarbeiterstamm m ON p.MA_ID = m.ID
+                WHERE p.VA_ID = ? AND p.Status_ID < 3
+                ORDER BY p.VADatum, m.Nachname
+            """
+            data = execute_query(sql, [va_id])
+
+        # MA_Name in Python zusammenbauen
+        for row in data:
+            nachname = row.get('Nachname') or ''
+            vorname = row.get('Vorname') or ''
+            row['MA_Name'] = f"{nachname}, {vorname}" if nachname else vorname
+
+        return jsonify({"success": True, "data": data})
+
+    except Exception as e:
+        logger.error(f"Error in get_auftrag_anfragen: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 @app.route('/api/auftraege/<int:va_id>/zusatzdateien', methods=['GET'])
 def get_auftrag_zusatzdateien(va_id):
@@ -3521,6 +3668,65 @@ def get_verfuegbarkeit():
 # API ROUTEN - QUERY (für benutzerdefinierte Abfragen)
 # =============================================================================
 
+@app.route('/api/mitarbeiter/verfuegbar', methods=['GET'])
+def get_mitarbeiter_verfuegbar():
+    """Access-Style Verfuegbarkeitscheck wie mini_api"""
+    try:
+        datum = request.args.get('datum')
+        va_start = request.args.get('va_start')
+        va_ende = request.args.get('va_ende')
+        geplant_verfuegbar = request.args.get('geplant_verfuegbar', 'false').lower() in ('true', '1')
+
+        if not datum:
+            return jsonify({"success": False, "error": "datum erforderlich"}), 400
+
+        try:
+            datum_obj = datetime.strptime(datum, '%Y-%m-%d')
+        except ValueError:
+            return jsonify({"success": False, "error": "datum im format YYYY-MM-DD erforderlich"}), 400
+
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT ID FROM tbl_MA_Mitarbeiterstamm WHERE IstAktiv = True")
+            alle_ma = [row[0] for row in cursor.fetchall() if row[0]]
+
+            cursor.execute(
+                "SELECT DISTINCT MA_ID FROM tbl_MA_NVerfuegZeiten WHERE ? BETWEEN vonDat AND bisDat",
+                (datum_obj,)
+            )
+            nicht_verfuegbar = {row[0] for row in cursor.fetchall() if row[0]}
+
+            sql_plan = "SELECT DISTINCT MA_ID FROM tbl_MA_VA_Planung WHERE VADatum = ?"
+            params = [datum_obj]
+            if va_start:
+                sql_plan += " AND MVA_Start = ?"
+                params.append(va_start)
+            if va_ende:
+                sql_plan += " AND MVA_Ende = ?"
+                params.append(va_ende)
+
+            cursor.execute(sql_plan, tuple(params))
+            geplant = {row[0] for row in cursor.fetchall() if row[0]}
+
+        if geplant_verfuegbar:
+            verfuegbar_ma = [ma for ma in alle_ma if ma not in nicht_verfuegbar]
+        else:
+            verfuegbar_ma = [ma for ma in alle_ma if ma not in nicht_verfuegbar and ma not in geplant]
+
+        return jsonify({
+            "success": True,
+            "data": {
+                "verfuegbar": verfuegbar_ma,
+                "nicht_verfuegbar": sorted(nicht_verfuegbar),
+                "geplant": sorted(geplant),
+                "datum": datum_obj.strftime('%Y-%m-%d')
+            }
+        })
+
+    except Exception as e:
+        logger.error(f"Error in get_mitarbeiter_verfuegbar: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route('/api/query', methods=['POST'])
 def execute_custom_query():
     """Führt eine benutzerdefinierte SQL-Abfrage aus"""
@@ -3917,12 +4123,17 @@ if __name__ == '__main__':
 
     def signal_handler(sig, frame):
         print("\n[SERVER] Shutdown angefordert...")
+        stop_vba_bridge_watchdog()
         print("[SERVER] Server beendet.")
         sys.exit(0)
 
     # Graceful shutdown bei Ctrl+C
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
+
+    # VBA Bridge Watchdog starten (Auto-Start & Auto-Restart)
+    print("[VBA Bridge] Starte Auto-Watchdog...")
+    start_vba_bridge_watchdog()
 
     # Server starten (Production Mode)
     run_server(use_production=True)

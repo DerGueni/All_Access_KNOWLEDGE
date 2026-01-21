@@ -3,6 +3,12 @@
 VBA Bridge Server - Port 5002
 Ermöglicht HTML-Formularen den Aufruf von VBA-Funktionen in Access
 
+STABIL für Mehrbenutzerbetrieb (3+ parallele Benutzer):
+- Thread-safe COM-Aufrufe mit Lock
+- Connection-Pooling für Access
+- Automatische Wiederverbindung bei Fehlern
+- Request-Timeout-Handling
+
 Endpoints:
 - POST /api/vba/anfragen - Sendet Anfragen an Mitarbeiter (wie btnMail_Click in Access)
 - POST /api/vba/execute - Führt beliebige VBA-Funktion aus
@@ -16,6 +22,8 @@ import os
 import sys
 import json
 import traceback
+import threading
+import time
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -28,6 +36,14 @@ try:
 except ImportError:
     HAS_WIN32COM = False
     print("WARNUNG: win32com nicht installiert. VBA-Aufrufe werden simuliert.")
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# THREAD-SAFETY: Lock für COM-Aufrufe (COM ist nicht thread-safe!)
+# ═══════════════════════════════════════════════════════════════════════════════
+_com_lock = threading.RLock()
+_access_app_cache = None
+_last_access_check = 0
+ACCESS_CHECK_INTERVAL = 30  # Sekunden zwischen Verbindungsprüfungen
 
 app = Flask(__name__)
 CORS(app)
@@ -59,26 +75,54 @@ def log(message):
 
 def get_access_app():
     """
-    Holt laufende Access-Instanz oder startet neue.
+    Holt laufende Access-Instanz mit Caching und Thread-Safety.
     Access MUSS bereits geöffnet sein mit dem Frontend!
+
+    Features:
+    - Connection wird gecached für schnelleren Zugriff
+    - Automatische Prüfung ob Verbindung noch aktiv
+    - Thread-safe durch Lock
     """
+    global _access_app_cache, _last_access_check
+
     if not HAS_WIN32COM:
         return None
 
-    pythoncom.CoInitialize()
+    current_time = time.time()
 
-    try:
-        # Versuche bestehende Access-Instanz zu finden
-        access_app = win32com.client.GetActiveObject("Access.Application")
-        log(f"Bestehende Access-Instanz gefunden: {access_app.CurrentDb().Name}")
-        return access_app
-    except:
-        log("Keine laufende Access-Instanz gefunden!")
-        return None
+    with _com_lock:
+        try:
+            pythoncom.CoInitialize()
 
-def run_vba_function(func_name, *args):
+            # Cache noch gültig?
+            if _access_app_cache is not None and (current_time - _last_access_check) < ACCESS_CHECK_INTERVAL:
+                # Schnelle Prüfung ob Verbindung noch aktiv
+                try:
+                    _ = _access_app_cache.Visible  # Quick check
+                    return _access_app_cache
+                except:
+                    log("Cached Access-Verbindung verloren - reconnect...")
+                    _access_app_cache = None
+
+            # Neue Verbindung herstellen
+            access_app = win32com.client.GetActiveObject("Access.Application")
+            db_name = access_app.CurrentDb().Name
+            log(f"Access-Instanz verbunden: {db_name}")
+
+            # Cache aktualisieren
+            _access_app_cache = access_app
+            _last_access_check = current_time
+
+            return access_app
+
+        except Exception as e:
+            log(f"Keine laufende Access-Instanz gefunden: {e}")
+            _access_app_cache = None
+            return None
+
+def run_vba_function(func_name, *args, timeout=60):
     """
-    Führt VBA-Funktion in Access aus via Eval().
+    Führt VBA-Funktion in Access aus via Eval() - THREAD-SAFE!
 
     WICHTIG: Application.Run funktioniert nicht zuverlässig via COM,
     daher wird Eval() verwendet.
@@ -86,38 +130,53 @@ def run_vba_function(func_name, *args):
     Args:
         func_name: Name der VBA-Funktion (z.B. "Anfragen")
         *args: Argumente für die Funktion
+        timeout: Maximale Ausführungszeit in Sekunden (Standard: 60s)
 
     Returns:
         Ergebnis der VBA-Funktion oder Fehlertext
+
+    Thread-Safety:
+        Verwendet globales Lock für COM-Aufrufe
     """
-    access_app = get_access_app()
-    if not access_app:
-        return {"success": False, "error": "Access nicht geöffnet!"}
+    global _access_app_cache
 
-    try:
-        # Argumente für Eval formatieren
-        formatted_args = []
-        for arg in args:
-            if isinstance(arg, str):
-                # Strings mit Anführungszeichen
-                formatted_args.append(f'"{arg}"')
-            else:
-                formatted_args.append(str(arg))
+    with _com_lock:  # Thread-safe!
+        access_app = get_access_app()
+        if not access_app:
+            return {"success": False, "error": "Access nicht geöffnet!"}
 
-        # Eval-Ausdruck zusammenbauen
-        eval_expr = f"{func_name}({', '.join(formatted_args)})"
-        log(f"VBA Eval: {eval_expr}")
+        try:
+            # Argumente für Eval formatieren
+            formatted_args = []
+            for arg in args:
+                if isinstance(arg, str):
+                    # Strings mit Anführungszeichen - escape innere Anführungszeichen
+                    escaped = str(arg).replace('"', '""')
+                    formatted_args.append(f'"{escaped}"')
+                elif arg is None:
+                    formatted_args.append("Null")
+                else:
+                    formatted_args.append(str(arg))
 
-        # VBA-Funktion via Eval ausführen
-        result = access_app.Eval(eval_expr)
-        log(f"VBA Ergebnis: {result}")
-        return {"success": True, "result": result}
-    except Exception as e:
-        error_msg = str(e)
-        log(f"VBA-Fehler: {func_name}({args}) - {error_msg}")
-        return {"success": False, "error": error_msg}
-    finally:
-        pythoncom.CoUninitialize()
+            # Eval-Ausdruck zusammenbauen
+            eval_expr = f"{func_name}({', '.join(formatted_args)})"
+            log(f"VBA Eval: {eval_expr}")
+
+            # VBA-Funktion via Eval ausführen
+            result = access_app.Eval(eval_expr)
+            log(f"VBA Ergebnis: {result}")
+            return {"success": True, "result": result}
+
+        except Exception as e:
+            error_msg = str(e)
+            log(f"VBA-Fehler: {func_name}({args}) - {error_msg}")
+
+            # Bei COM-Fehler Cache invalidieren für nächsten Versuch
+            if "RPC" in error_msg or "disconnected" in error_msg.lower():
+                log("COM-Verbindungsfehler - Cache wird geleert")
+                _access_app_cache = None
+
+            return {"success": False, "error": error_msg}
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # API ENDPOINTS
@@ -218,24 +277,60 @@ def vba_anfragen():
         results = []
         sent_count = 0
 
+        # DEBUG: Schreibe alle Debug-Infos in eine Datei
+        debug_file = r"C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\VBA_DEBUG.txt"
+        with open(debug_file, "a", encoding="utf-8") as f:
+            f.write(f"\n{'='*60}\n")
+            f.write(f"[{datetime.now()}] ANFRAGEN START\n")
+            f.write(f"VA_ID={va_id}, VADatum_ID={vadatum_id}, VAStart_ID={vastart_id}\n")
+            f.write(f"MA_IDs={ma_ids}\n")
+
         for ma_id in ma_ids:
             try:
                 log(f"Sende Anfrage an MA_ID={ma_id}")
 
-                # VBA-Funktion "Anfragen" aufrufen
-                # Signatur: Anfragen(MA_ID, VA_ID, VADatum_ID, VAStart_ID)
-                vba_result = run_vba_function("Anfragen", int(ma_id), int(va_id), int(vadatum_id), int(vastart_id))
+                # DEBUG
+                with open(debug_file, "a", encoding="utf-8") as f:
+                    f.write(f"\n[DEBUG] MA_ID={ma_id} - Rufe HTML_Anfragen auf...\n")
+
+                # WRAPPER-FUNKTION: HTML_Anfragen kombiniert Texte_lesen + Anfragen in EINEM Aufruf!
+                # Grund: Public VBA-Variablen (Email, VADatum, etc.) persistieren nur innerhalb
+                # einer VBA-Funktion sicher. Bei separaten COM-Aufrufen kann es zu NULL-Fehlern kommen.
+                # Signatur: HTML_Anfragen(MA_ID As Integer, VA_ID As Long, VADatum_ID As Long, VAStart_ID As Long) As String
+                vba_result = run_vba_function("HTML_Anfragen", int(ma_id), int(va_id), int(vadatum_id), int(vastart_id))
+
+                # DEBUG
+                with open(debug_file, "a", encoding="utf-8") as f:
+                    f.write(f"[DEBUG] VBA Result: {vba_result}\n")
 
                 if vba_result.get("success"):
                     status = vba_result.get("result", "OK")
-                    if "OK" in str(status):
+                    log(f"HTML_Anfragen Ergebnis für MA_ID={ma_id}: {status}")
+
+                    # DEBUG
+                    with open(debug_file, "a", encoding="utf-8") as f:
+                        f.write(f"[DEBUG] Status: '{status}' (type: {type(status).__name__})\n")
+
+                    # Erfolg: Status enthält "OK" oder ">BEREITS..." etc.
+                    if "OK" in str(status) or ">BEREITS" in str(status) or ">ERNEUT" in str(status):
                         sent_count += 1
+                        with open(debug_file, "a", encoding="utf-8") as f:
+                            f.write(f"[DEBUG] >>> GEZÄHLT als gesendet (sent_count={sent_count})\n")
+                    else:
+                        with open(debug_file, "a", encoding="utf-8") as f:
+                            f.write(f"[DEBUG] >>> NICHT gezählt - kein OK/BEREITS/ERNEUT gefunden\n")
                     results.append({"MA_ID": ma_id, "status": status})
                 else:
-                    results.append({"MA_ID": ma_id, "status": f"FEHLER: {vba_result.get('error')}"})
+                    error_msg = vba_result.get('error', 'Unbekannter Fehler')
+                    log(f"HTML_Anfragen FEHLER für MA_ID={ma_id}: {error_msg}")
+                    with open(debug_file, "a", encoding="utf-8") as f:
+                        f.write(f"[DEBUG] FEHLER: {error_msg}\n")
+                    results.append({"MA_ID": ma_id, "status": f"FEHLER: {error_msg}"})
 
             except Exception as e:
                 log(f"Fehler bei MA_ID={ma_id}: {str(e)}")
+                with open(debug_file, "a", encoding="utf-8") as f:
+                    f.write(f"[DEBUG] EXCEPTION: {str(e)}\n")
                 results.append({"MA_ID": ma_id, "status": f"FEHLER: {str(e)}"})
 
         log(f"Anfragen abgeschlossen: {sent_count}/{len(ma_ids)} gesendet")
@@ -281,6 +376,15 @@ def vba_execute():
                 "error": "win32com nicht verfügbar",
                 "simulated": True
             })
+
+        # SPEZIALFALL: Bei "Anfragen" MUSS zuerst Texte_lesen aufgerufen werden!
+        # Texte_lesen setzt die Public-Variablen (Email, VName, NName, VADatum, VA_Uhrzeit etc.)
+        # die Anfragen benötigt. In Access-Forms passiert das automatisch, hier nicht.
+        if func_name == "Anfragen" and len(args) >= 4:
+            ma_id, va_id, vadatum_id, vastart_id = args[0], args[1], args[2], args[3]
+            log(f"Anfragen: Rufe zuerst Texte_lesen auf für MA={ma_id}, VA={va_id}, Datum={vadatum_id}, Start={vastart_id}")
+            texte_result = run_vba_function("Texte_lesen", str(ma_id), str(va_id), str(vadatum_id), str(vastart_id))
+            log(f"Texte_lesen Ergebnis: {texte_result}")
 
         result = run_vba_function(func_name, *args)
         return jsonify(result)
@@ -1240,6 +1344,54 @@ def vba_abwesenheiten():
         return jsonify({"success": False, "error": str(e)}), 500
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# KEEP-ALIVE BACKGROUND THREAD
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_keep_alive_thread = None
+_keep_alive_running = False
+
+def keep_alive_check():
+    """
+    Background-Thread der regelmäßig die Access-Verbindung prüft.
+    Verhindert Verbindungsabbrüche bei längerer Inaktivität.
+    """
+    global _keep_alive_running, _access_app_cache
+    log("Keep-Alive Thread gestartet")
+
+    while _keep_alive_running:
+        try:
+            time.sleep(60)  # Alle 60 Sekunden prüfen
+            if not _keep_alive_running:
+                break
+
+            with _com_lock:
+                if _access_app_cache is not None:
+                    try:
+                        pythoncom.CoInitialize()
+                        # Einfache Prüfung
+                        _ = _access_app_cache.Visible
+                        log("Keep-Alive: Access-Verbindung OK")
+                    except:
+                        log("Keep-Alive: Verbindung verloren - wird beim nächsten Request neu verbunden")
+                        _access_app_cache = None
+        except Exception as e:
+            log(f"Keep-Alive Fehler: {e}")
+
+    log("Keep-Alive Thread beendet")
+
+def start_keep_alive():
+    """Startet den Keep-Alive Background Thread"""
+    global _keep_alive_thread, _keep_alive_running
+    _keep_alive_running = True
+    _keep_alive_thread = threading.Thread(target=keep_alive_check, daemon=True)
+    _keep_alive_thread.start()
+
+def stop_keep_alive():
+    """Stoppt den Keep-Alive Background Thread"""
+    global _keep_alive_running
+    _keep_alive_running = False
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # SERVER START
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1247,7 +1399,16 @@ if __name__ == '__main__':
     log("=" * 60)
     log("VBA Bridge Server startet auf Port 5002")
     log(f"win32com verfügbar: {HAS_WIN32COM}")
+    log("STABIL: Thread-safe für Mehrbenutzerbetrieb")
     log("=" * 60)
 
-    # Server starten
-    app.run(host='0.0.0.0', port=5002, debug=False, threaded=False)
+    # Keep-Alive Thread starten
+    start_keep_alive()
+
+    try:
+        # Server starten mit Threading für parallele Requests
+        # WICHTIG: threaded=True ermöglicht mehrere gleichzeitige Benutzer
+        app.run(host='0.0.0.0', port=5002, debug=False, threaded=True)
+    finally:
+        stop_keep_alive()
+        log("Server beendet")

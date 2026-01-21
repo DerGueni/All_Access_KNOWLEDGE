@@ -135,10 +135,18 @@ function setupEventListeners() {
     elements.btnDelSelected?.addEventListener('click', entferneAusGeplant);
     elements.btnAktualisieren?.addEventListener('click', renderMitarbeiterListe);
 
-    // E-Mail Anfragen - ENTFERNT: Wird bereits in HTML registriert (btnMail_Click, btnMailSelected_Click)
-    // Diese nutzen den korrekten Batch-Endpoint /api/vba/anfragen
-    // elements.btnMailSelected?.addEventListener('click', () => versendeAnfragen(false));
-    // elements.btnMail?.addEventListener('click', () => versendeAnfragen(true));
+    // E-Mail Anfragen - Access-Paritaet: Original VBA-Anfragen() Ablauf (inkl. HTML-Template in Access)
+    // Capture-Handler verhindert doppelte Ausfuehrung aus Inline-Skripten im HTML
+    elements.btnMailSelected?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        versendeAnfragen(false);
+    }, true);
+    elements.btnMail?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        versendeAnfragen(true);
+    }, true);
 
     // Navigation - Zurück zum Auftrag
     elements.btnAuftrag?.addEventListener('click', () => {
@@ -1337,29 +1345,28 @@ async function sendAnfrageViaAccessVBA(maId, vaId, vaDatumId, vaStartId) {
     console.log(`[VBA] Anfragen aufrufen: MA=${maId}, VA=${vaId}, Datum=${vaDatumId}, Start=${vaStartId}`);
 
     try {
-        // Einzelnen MA-Aufruf über generischen /api/vba/execute Endpoint
-        // (Der /api/vba/anfragen Endpoint ist für Batch-Verarbeitung gedacht)
-        const response = await fetch('http://localhost:5002/api/vba/execute', {
+        // Verwende /api/vba/anfragen Endpoint - ruft HTML_Anfragen() Wrapper auf
+        // Dieser funktioniert zuverlässiger als der direkte Anfragen() Aufruf
+        const response = await fetch('http://localhost:5002/api/vba/anfragen', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                function: 'Anfragen',
-                args: [
-                    parseInt(maId),
-                    parseInt(vaId),
-                    parseInt(vaDatumId),
-                    parseInt(vaStartId || 0)
-                ]
+                VA_ID: parseInt(vaId),
+                VADatum_ID: parseInt(vaDatumId),
+                VAStart_ID: parseInt(vaStartId || 0),
+                MA_IDs: [parseInt(maId)],
+                selectedOnly: true
             })
         });
         
         if (response.ok) {
             const result = await response.json();
             console.log('[VBA] Ergebnis:', result);
-            
-            // Access gibt Strings zurück wie ">OK", ">HAT KEINE EMAIL", ">BEREITS ZUGESAGT!", etc.
-            const vbaResult = result.result || '';
-            
+
+            // /api/vba/anfragen gibt: {success, results: [{MA_ID, status}], sent, total}
+            // Der Status-String ist in results[0].status
+            const vbaResult = (result.results && result.results[0]?.status) || result.result || '';
+
             if (vbaResult.includes('>OK')) {
                 return { success: true, method: 'vba', result: vbaResult };
             } else if (vbaResult.includes('>HAT KEINE EMAIL')) {
@@ -1370,6 +1377,9 @@ async function sendAnfrageViaAccessVBA(maId, vaId, vaDatumId, vaStartId) {
                 return { success: false, method: 'vba', error: 'Bereits abgesagt', skip: true, result: vbaResult };
             } else if (vbaResult.includes('>ERNEUT ANGEFRAGT')) {
                 return { success: true, method: 'vba', result: vbaResult, requery: true };
+            } else if (result.success && result.sent > 0) {
+                // Fallback: API meldet Erfolg
+                return { success: true, method: 'vba', result: vbaResult || 'OK' };
             } else {
                 return { success: false, method: 'vba', error: vbaResult || 'Unbekannter Fehler', result: vbaResult };
             }
@@ -1475,9 +1485,12 @@ async function setzeAngefragt(maId, vaId, vaDatumId, vaStartId) {
 
 // Phase 8: Hauptfunktion - MIT VBA BRIDGE INTEGRATION
 async function versendeAnfragen(alle) {
-    console.log('[Logic] versendeAnfragen - state.selectedAuftrag:', state.selectedAuftrag, 'state.selectedDatum:', state.selectedDatum);
+    const vaId = state.selectedAuftrag || window.formState?.VA_ID || null;
+    const vaDatumId = state.selectedDatum || window.formState?.VADatum_ID || null;
+
+    console.log('[Logic] versendeAnfragen - VA_ID:', vaId, 'VADatum_ID:', vaDatumId);
     
-    if (!state.selectedAuftrag || !state.selectedDatum) {
+    if (!vaId || !vaDatumId) {
         alert('Bitte Auftrag und Datum auswählen');
         return;
     }
@@ -1499,7 +1512,9 @@ async function versendeAnfragen(alle) {
 
     const maList = Array.from(maRows).map(row => ({
         id: parseInt(row.dataset.maid || row.dataset.id),
-        name: row.textContent.trim().split('\n')[0] || 'Unbekannt'
+        name: row.textContent.trim().split('\n')[0] || 'Unbekannt',
+        planId: parseInt(row.dataset.id || ''),
+        vaStartId: parseInt(row.dataset.vastartid || row.dataset.vastartId || row.dataset.vastart_id || '')
     })).filter(ma => ma.id);
 
     if (maList.length === 0) {
@@ -1510,9 +1525,43 @@ async function versendeAnfragen(alle) {
     // Custom Confirm Modal statt Browser-confirm()
     showCustomConfirm(`${maList.length} Mitarbeiter anfragen?`, async () => {
         // === Ab hier: Bestätigt ===
-        const vaStartId = state.selectedSchicht !== null
-            ? (state.schichten[state.selectedSchicht]?.ID || state.schichten[state.selectedSchicht]?.VAStart_ID)
-            : null;
+        let defaultVaStartId = null;
+        const selectedSchichtRow = document.querySelector('#lstZeiten_Body .listbox-row.selected');
+        if (selectedSchichtRow?.dataset?.id) {
+            defaultVaStartId = parseInt(selectedSchichtRow.dataset.id);
+        }
+        if (!defaultVaStartId && window.formState?.VAStart_ID) {
+            defaultVaStartId = parseInt(window.formState.VAStart_ID);
+        }
+        if (!defaultVaStartId && state.selectedSchicht !== null) {
+            defaultVaStartId = state.schichten[state.selectedSchicht]?.ID || state.schichten[state.selectedSchicht]?.VAStart_ID || null;
+        }
+
+        let planById = null;
+        let planByMa = null;
+        const needsPlanMap = maList.some(m => !m.vaStartId && m.planId);
+        if (needsPlanMap) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/planungen?va_id=${vaId}&datum_id=${vaDatumId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && Array.isArray(result.data)) {
+                        planById = new Map();
+                        planByMa = new Map();
+                        result.data.forEach(p => {
+                            const pid = p.ID || p.MVA_ID || p.id;
+                            const vstart = p.VAStart_ID || p.VAStartId || p.vastart_id;
+                            if (pid && vstart) planById.set(String(pid), vstart);
+                            if (p.MA_ID && vstart && !planByMa.has(String(p.MA_ID))) {
+                                planByMa.set(String(p.MA_ID), vstart);
+                            }
+                        });
+                    }
+                }
+            } catch (e) {
+                console.warn('[versendeAnfragen] Planungen-Map konnte nicht geladen werden:', e.message);
+            }
+        }
 
         // 1. VBA Bridge prüfen - PFLICHT! (kein Fallback)
         const vbaBridgeAvailable = await checkVBABridge();
@@ -1543,11 +1592,23 @@ async function versendeAnfragen(alle) {
                 // - PHP-Datei für automatische Antwort
                 // - MD5-Hash Generierung
                 // ========================================
+                const rowVaStartId = ma.vaStartId
+                    || planById?.get(String(ma.planId))
+                    || planByMa?.get(String(ma.id))
+                    || defaultVaStartId;
+
+                if (!rowVaStartId) {
+                    console.warn('[versendeAnfragen] VAStart_ID fehlt fuer MA:', ma.id);
+                    anfrageModal.addLogEntry(ma.name, 'Fehler', 'VAStart_ID fehlt');
+                    anfrageModal.updateProgress(i + 1, maList.length);
+                    continue;
+                }
+
                 const vbaResult = await sendAnfrageViaAccessVBA(
                     ma.id,
-                    state.selectedAuftrag,
-                    state.selectedDatum,
-                    vaStartId
+                    vaId,
+                    vaDatumId,
+                    rowVaStartId
                 );
 
                 if (vbaResult.success) {

@@ -30,6 +30,21 @@ Jede Änderung wird wie folgt dokumentiert:
 | Formular | Element | Grund | Datum |
 |----------|---------|-------|-------|
 | frm_va_Auftragstamm.html | First Auftrag Auto-Load | Aktuellster Auftrag wird beim Start vollständig geladen (VA_ID aus getSortedAuftraege()[0].VA_ID) | 2026-01-18 |
+| frm_va_Auftragstamm.html | GESAMTE DATEI | Chrome-Extension Korruption bereinigt, aus Backup 16.01. wiederhergestellt (265KB) | 2026-01-19 |
+| frm_KD_Kundenstamm.html | GESAMTE DATEI | Chrome-Extension Korruption bereinigt, aus Backup 14.01. wiederhergestellt (226KB) | 2026-01-19 |
+| frm_DP_Dienstplan_MA.html | GESAMTE DATEI | Chrome-Extension Korruption bereinigt, aus Backup 17.01. wiederhergestellt (23KB) | 2026-01-19 |
+| frm_MA_VA_Schnellauswahl.html | GESAMTE DATEI | Chrome-Extension Korruption bereinigt, aus Backup 18.01. wiederhergestellt (134KB) | 2026-01-19 |
+| shell.html | Tab-Close Button | Encoding korrigiert: "Ã—" → "&times;" (Zeile 558) | 2026-01-19 |
+| frm_MA_VA_Schnellauswahl.html | List_MA_DblClick | DblClick auf MA fügt zur Planung hinzu via POST /api/planungen | 2026-01-19 |
+| api_server.py | GET /api/planungen Route | methods=['GET'] explizit hinzugefügt (Zeile 1725), behebt 405-Konflikt mit POST | 2026-01-19 |
+| mod_N_WebView2_forms3.bas | URL-Parameter Extraktion | VBA extrahiert form+id aus JSON und fügt an URL (Zeile 143-166) | 2026-01-19 |
+| auftragstamm-loader.js | loadFirstVisibleAuftragProtected | setTimeout nach loadAuftrag setzt korrektes Datum in cboVADatum (Zeile 216-234) | 2026-01-19 |
+| frm_va_Auftragstamm.logic.js | Zeitzonen-Fix generateDaysBetween | Lokales Datum statt toISOString() (Zeile 1695) - verhindert UTC-Verschiebung | 2026-01-19 |
+| frm_va_Auftragstamm.html | Clientseitige Filterung loadAuftraegeListe | API ignoriert datum_von, daher Filter im JS (Zeile 2841-2848) | 2026-01-19 |
+| frm_va_Auftragstamm.html | Zeitzonen-Fix today-Variable | Lokales Datum für Auftraege_ab (Zeile 2707-2711) | 2026-01-19 |
+| **GESAMT** | **First Auftrag Loading System** | **5 Dateien, VBA+JS+HTML - Lädt korrekten aktuellen Auftrag beim Start** | **2026-01-19** |
+| mini_api.py | POST /api/planungen Route | Zeile 620-661 - Akzeptiert Gross- UND Kleinschreibung (va_id/VA_ID) | 2026-01-19 |
+| **REGEL** | **API-Server Synchronität** | **mini_api.py UND api_server.py MÜSSEN identische Routen haben!** | **2026-01-19** |
 
 ---
 
@@ -45,6 +60,164 @@ Jede Änderung wird wie folgt dokumentiert:
 ---
 
 <!-- ÄNDERUNGEN AB HIER EINFÜGEN -->
+
+### 2026-01-20 17:14 - frm_MA_VA_Schnellauswahl.logic.js
+**Element:** btnMail / btnMailSelected (VAStart_ID Mapping)
+**Typ:** js
+**Aenderung:** VAStart_ID pro geplanter Zeile ermittelt (Planungsliste/API), Fallback auf formState/Schicht, Versand via Access VBA je MA
+**Vorher:** Nur state.selectedSchicht genutzt; bei fehlender Schicht VAStart_ID null
+**Nachher:** VAStart_ID aus Planungsliste oder /api/planungen; Fallback auf formState.VAStart_ID/Schicht; fehlende VAStart_ID wird geloggt und nicht gesendet
+**Anweisung:** "Bitte Nr 224 Problem beheben. Die Funktion muss aber den exakten Funktionsablauf des original Access Buttons durchlaufen und die entsprechenden HTML Vorlagen fuer die Mail verwenden" + "Teste den btnMail mit einem beliebigen Mitarbeiter fuer eine beliebige Veranstaltung"
+**Status:** ? In Bearbeitung
+
+
+### 2026-01-20 16:57 - frm_MA_VA_Schnellauswahl.logic.js
+**Element:** btnMail / btnMailSelected (Click-Handler)
+**Typ:** js
+**�nderung:** Click-Handler in Logic-Datei reaktiviert (Capture) und auf Access-Flow (`Anfragen()` via VBA Bridge) gelegt
+**Vorher:** Click-Handler im Logic-Modul auskommentiert; HTML-Inline war f�hrend
+**Nachher:** Logic-Modul bindet Capture-Handler, verhindert doppelte Ausf�hrung und nutzt Access-VBA Ablauf + HTML-Mail-Template aus Access
+**Anweisung:** "Bitte Nr 224 Problem beheben. Die Funktion muss aber den exakten Funktionsablauf des original Access Buttons durchlaufen und die entsprechenden HTML Vorlagen f�r die Mail verwenden"
+**Status:** ? In Bearbeitung
+
+
+### 2026-01-19 22:30 - mini_api.py POST /api/planungen Route
+**Element:** mini_api.py (Zeile 620-661)
+**Typ:** python (API-Route)
+**Änderung:** POST-Route für /api/planungen hinzugefügt
+
+**Problem:**
+- DblClick in Schnellauswahl (MA zu Auftrag zuordnen) gab 405 Method Not Allowed
+- mini_api.py hatte keine POST-Route für /api/planungen
+- api_server.py hatte die Route, aber VBA startet mini_api.py
+
+**Fix:**
+```python
+@app.route('/api/planungen', methods=['POST'])
+def planungen_create():
+    data = request.get_json()
+    va_id = data.get('VA_ID')
+    ma_id = data.get('MA_ID')
+    vadatum_id = data.get('VADatum_ID')
+    # ... INSERT INTO tbl_MA_VA_Planung ...
+    return jsonify({"success": True, "id": new_id})
+```
+
+**WICHTIGE REGEL:**
+mini_api.py und api_server.py MÜSSEN IMMER identische Routen haben!
+VBA startet mini_api.py, Browser kann api_server.py erwarten.
+
+**Test-Ergebnis:** `{"success": True, "id": 94047}` ✓
+**Status:** ✅ Abgeschlossen & Eingefroren
+
+---
+
+### 2026-01-19 21:15 - Zeitzonen-Fix + First Auftrag Loading Fix
+**Element:** frm_va_Auftragstamm.logic.js, auftragstamm-loader.js, mod_N_WebView2_forms3.bas
+**Typ:** js, vba (Zeitzonen-Bug + Datum-Wiederherstellung)
+**Änderung:** Drei zusammenhängende Bugs behoben die falsches Datum beim Laden anzeigten
+
+**Problem 1: VBA URL-Parameter**
+- VBA öffnete URL ohne Parameter, verließ sich auf WebView2 Bridge
+- Fix: Extraktion von form+id aus JSON und Anhängen an URL (Zeile 143-166)
+
+**Problem 2: Datum wird überschrieben**
+- loadAuftrag() überschreibt state.currentVADatum mit einsatztage[0]
+- Fix: setTimeout in loadFirstVisibleAuftragProtected stellt Datum wieder her (Zeile 216-234)
+
+**Problem 3: Zeitzonen-Bug (KRITISCH)**
+- `toISOString().split('T')[0]` konvertiert zu UTC
+- Bei UTC+1 wird "2026-01-20T00:00:00" zu "2026-01-19" (1 Tag zurück!)
+- Fix: Lokales Datum mit getFullYear/getMonth/getDate (logic.js Zeile 1695 + html Zeile 2707-2711)
+
+**Problem 4: API ignoriert Datumsfilter**
+- API `/auftraege?datum_von=...` gibt ALLE Aufträge zurück, ignoriert Filter
+- Dadurch erscheint Malleparty (29.11.2025) obwohl Filter auf 2026-01-19
+- Fix: Clientseitige Filterung in loadAuftraegeListe (html Zeile 2841-2848)
+
+**Vorher:**
+```javascript
+dateString: day.toISOString().split('T')[0], // YYYY-MM-DD (BUG: UTC!)
+```
+
+**Nachher:**
+```javascript
+const localDateString = day.getFullYear() + '-' +
+    String(day.getMonth() + 1).padStart(2, '0') + '-' +
+    String(day.getDate()).padStart(2, '0');
+dateString: localDateString, // YYYY-MM-DD (lokal, nicht UTC!)
+```
+
+**Test-Ergebnis:**
+- Liste zeigt: "20.01.2026 Frontm3n Lux Kirche" ✓
+- Formular zeigt: "Datum: 20.01.2026 - 20.01.2026" ✓
+- Beide Daten stimmen überein!
+
+**Anweisung:** "beim laden muss IMMER der aktuellste Auftrag geladen und angezeigt werden"
+**Status:** ✅ Abgeschlossen + EINGEFROREN
+
+**🔒 EINGEFROREN AM 19.01.2026 22:10 - NICHT ÄNDERN OHNE EXPLIZITE ANWEISUNG!**
+Betroffene Dateien und Zeilen:
+- `mod_N_WebView2_forms3.bas` Zeile 143-166 (URL-Parameter)
+- `auftragstamm-loader.js` Zeile 216-234 (setTimeout Datum-Fix)
+- `frm_va_Auftragstamm.logic.js` Zeile 1692-1698 (lokales Datum)
+- `frm_va_Auftragstamm.html` Zeile 2707-2711 (lokales today)
+- `frm_va_Auftragstamm.html` Zeile 2841-2848 (clientseitige Filterung)
+
+---
+
+### 2026-01-19 20:30 - DblClick Schnellauswahl + API-Route Fix
+**Element:** frm_MA_VA_Schnellauswahl.html List_MA_DblClick + api_server.py
+**Typ:** js, python (API-Route-Konflikt behoben)
+**Änderung:** POST /api/planungen gab 405 Method Not Allowed zurück
+
+**Vorher:**
+- GET-Route `/api/planungen` ohne explizites `methods=['GET']` (Zeile 1725)
+- Flask-Routing-Konflikt mit POST-Route
+- DblClick rief Handler korrekt auf, aber API verweigerte POST
+
+**Nachher:**
+- GET-Route explizit: `@app.route('/api/planungen', methods=['GET'])`
+- POST funktioniert: `{"success": true, "id": 94044}`
+- DblClick fügt MA korrekt zur Planung hinzu
+
+**Test-Ergebnis:**
+- API: `curl POST /api/planungen` → `{"success": true}`
+- Browser: DblClick auf MA → erscheint in "Mitarbeiter geplant"
+- Console: `[addMAToPlanung] Erfolgreich, ID: 94044`
+
+**Anweisung:** "Doppelklick in der Mitarbeiterauswal in der schnellauswahl funktioniert wieder nicht"
+**Status:** ✅ Abgeschlossen + EINGEFROREN
+
+---
+
+### 2026-01-19 20:15 - Chrome-Extension Korruption bereinigt (4 Formulare + shell.html)
+**Element:** GESAMTE DATEIEN
+**Typ:** html (Korruptionsbereinigung)
+**Änderung:** Chrome-Extension hatte style="position: relative;" und Script-Tags in HTML injiziert
+
+**Betroffene Dateien:**
+- frm_va_Auftragstamm.html (450KB → 265KB)
+- frm_KD_Kundenstamm.html
+- frm_DP_Dienstplan_MA.html
+- frm_MA_VA_Schnellauswahl.html
+- shell.html (Encoding "Ã—" → "&times;")
+
+**Vorher:**
+- HTML-Dateien mit Chrome-Extension Korruption (style="position: relative;" überall)
+- Injizierte Script-Tags: `<script src="chrome-extension://oglffgiaiekgeicdgkdlnlkhliajdlja/injectScript.js">`
+- BOM-Zeichen und data-yd-content-ready Attribute
+- Tab-Titel zeigte "Aufträge Ã—" statt "×"
+
+**Nachher:**
+- Saubere HTML-Dateien aus Backups wiederhergestellt
+- Keine Chrome-Extension Artefakte mehr
+- Tab-Close Button zeigt korrektes "×" Symbol
+
+**Anweisung:** "findest du die fehler nicht selber ? die funktion war bereits korrekt funktionierend eingefroren !"
+**Status:** ✅ Abgeschlossen + EINGEFROREN
+
+---
 
 ### 2026-01-18 - frm_KD_Verrechnungssaetze - API Tabellen-Korrektur (#3 + #16)
 **Element:** api_server.py, frm_KD_Verrechnungssaetze.logic.js

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONSYS - Offline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8060a0 0%, #4060a0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .offline-container {
+            text-align: center;
+            padding: 40px;
+            max-width: 500px;
+        }
+
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .retry-btn {
+            background: white;
+            color: #4060a0;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .retry-btn:active {
+            transform: translateY(0);
+        }
+
+        .status {
+            margin-top: 24px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .cached-pages {
+            margin-top: 32px;
+            text-align: left;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .cached-pages h3 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+
+        .cached-pages ul {
+            list-style: none;
+        }
+
+        .cached-pages li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .cached-pages li:last-child {
+            border-bottom: none;
+        }
+
+        .cached-pages a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cached-pages a:hover {
+            text-decoration: underline;
+        }
+
+        .online-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .online-indicator.offline {
+            background: #dc3545;
+        }
+
+        .online-indicator.online {
+            background: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="online-indicator offline" id="statusIndicator">
+        Offline
+    </div>
+
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+        <h1>Keine Internetverbindung</h1>
+        <p>
+            Die Verbindung zum Server konnte nicht hergestellt werden.
+            Bitte pruefen Sie Ihre Internetverbindung und versuchen Sie es erneut.
+        </p>
+        <button class="retry-btn" onclick="retryConnection()">
+            Erneut versuchen
+        </button>
+        <div class="status" id="statusText">
+            Warte auf Verbindung...
+        </div>
+
+        <div class="cached-pages" id="cachedPages" style="display: none;">
+            <h3>Verfuegbare Offline-Seiten:</h3>
+            <ul id="cachedPagesList"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Online/Offline Status ueberwachen
+        function updateOnlineStatus() {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+
+            if (navigator.onLine) {
+                indicator.textContent = 'Online';
+                indicator.className = 'online-indicator online';
+                statusText.textContent = 'Verbindung wiederhergestellt!';
+
+                // Nach kurzer Verzoegerung zur Hauptseite weiterleiten
+                setTimeout(() => {
+                    window.location.href = '/shell.html';
+                }, 1500);
+            } else {
+                indicator.textContent = 'Offline';
+                indicator.className = 'online-indicator offline';
+                statusText.textContent = 'Warte auf Verbindung...';
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        // Initial-Status pruefen
+        updateOnlineStatus();
+
+        // Erneut versuchen
+        function retryConnection() {
+            const statusText = document.getElementById('statusText');
+            statusText.textContent = 'Pruefe Verbindung...';
+
+            fetch('/api/health', { method: 'GET', cache: 'no-store' })
+                .then(response => {
+                    if (response.ok) {
+                        statusText.textContent = 'Verbindung hergestellt!';
+                        setTimeout(() => {
+                            window.location.href = '/shell.html';
+                        }, 500);
+                    } else {
+                        throw new Error('Server nicht erreichbar');
+                    }
+                })
+                .catch(() => {
+                    statusText.textContent = 'Server nicht erreichbar. Bitte spaeter erneut versuchen.';
+                });
+        }
+
+        // Gecachte Seiten anzeigen
+        async function showCachedPages() {
+            if (!('caches' in window)) return;
+
+            try {
+                const cache = await caches.open('consys-static-v1');
+                const keys = await cache.keys();
+                const htmlPages = keys
+                    .map(req => new URL(req.url).pathname)
+                    .filter(path => path.endsWith('.html') && path !== '/offline.html')
+                    .sort();
+
+                if (htmlPages.length > 0) {
+                    const container = document.getElementById('cachedPages');
+                    const list = document.getElementById('cachedPagesList');
+
+                    list.innerHTML = htmlPages.map(path => {
+                        const name = path.replace(/^\//, '').replace('.html', '');
+                        return `<li><a href="${path}">📄 ${name}</a></li>`;
+                    }).join('');
+
+                    container.style.display = 'block';
+                }
+            } catch (e) {
+                console.log('Konnte gecachte Seiten nicht laden:', e);
+            }
+        }
+
+        showCachedPages();
+
+        // Periodisch Verbindung pruefen
+        setInterval(() => {
+            if (!navigator.onLine) return;
+
+            fetch('/api/health', { method: 'GET', cache: 'no-store' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/shell.html';
+                    }
+                })
+                .catch(() => {});
+        }, 5000);
+    </script>
+</body>
+</html>

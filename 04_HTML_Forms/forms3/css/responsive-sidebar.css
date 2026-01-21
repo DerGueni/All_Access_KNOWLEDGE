@@ -1,0 +1,269 @@
+/**
+ * Responsive Sidebar CSS
+ * Mobile-First Design mit Hamburger-Menu
+ *
+ * Breakpoints:
+ * - Mobile: < 768px (Sidebar versteckt, Hamburger sichtbar)
+ * - Tablet: 768px - 1024px (Sidebar schmal)
+ * - Desktop: > 1024px (Sidebar voll sichtbar)
+ */
+
+/* Hamburger Button (default versteckt) */
+.hamburger-btn {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 10001;
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(to bottom, #8060a0 0%, #6040c0 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+}
+
+.hamburger-btn:hover {
+    transform: scale(1.05);
+}
+
+.hamburger-btn:active {
+    transform: scale(0.95);
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background: white;
+    margin: 5px auto;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+/* Hamburger Animation - Open State */
+.hamburger-btn.active span:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger-btn.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-btn.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Overlay fuer Mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.visible {
+    opacity: 1;
+}
+
+/* =============================================
+   TABLET BREAKPOINT (768px - 1024px)
+   ============================================= */
+@media screen and (max-width: 1024px) {
+    .sidebar {
+        width: 200px !important;
+        min-width: 200px !important;
+    }
+
+    .sidebar .sidebar-logo {
+        font-size: 14px;
+    }
+
+    .sidebar .menu-item {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .sidebar .menu-section-title {
+        font-size: 10px;
+    }
+
+    /* Content anpassen */
+    .main-content,
+    .content-area,
+    .form-container {
+        margin-left: 200px !important;
+    }
+}
+
+/* =============================================
+   MOBILE BREAKPOINT (< 768px)
+   ============================================= */
+@media screen and (max-width: 768px) {
+    /* Hamburger sichtbar */
+    .hamburger-btn {
+        display: block;
+    }
+
+    /* Sidebar versteckt, als Overlay */
+    .sidebar {
+        position: fixed !important;
+        left: -260px !important;
+        top: 0 !important;
+        height: 100vh !important;
+        width: 250px !important;
+        min-width: 250px !important;
+        z-index: 9999 !important;
+        transition: left 0.3s ease !important;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.3) !important;
+    }
+
+    /* Sidebar sichtbar wenn aktiv */
+    .sidebar.open {
+        left: 0 !important;
+    }
+
+    /* Overlay sichtbar */
+    .sidebar-overlay {
+        display: block;
+        pointer-events: none;
+    }
+
+    .sidebar-overlay.visible {
+        pointer-events: auto;
+    }
+
+    /* Content volle Breite */
+    .main-content,
+    .content-area,
+    .form-container {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Header anpassen fuer Hamburger */
+    .header-row,
+    .form-header {
+        padding-left: 60px !important;
+    }
+
+    /* Tabellen responsive */
+    .data-table-container {
+        overflow-x: auto;
+    }
+
+    /* Buttons in Header wrappen */
+    .button-row {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .button-row .btn,
+    .button-row button {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
+
+/* =============================================
+   VERY SMALL SCREENS (< 480px)
+   ============================================= */
+@media screen and (max-width: 480px) {
+    .hamburger-btn {
+        top: 5px;
+        left: 5px;
+        width: 40px;
+        height: 40px;
+    }
+
+    .header-row,
+    .form-header {
+        padding-left: 50px !important;
+    }
+
+    /* Titel kuerzen */
+    .title-text {
+        font-size: 13px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+
+    /* Tabs scrollbar */
+    .tab-buttons {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-btn {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+
+    /* Form-Felder stapeln */
+    .form-row,
+    .field-row {
+        flex-direction: column;
+    }
+
+    .form-field,
+    .field-group {
+        width: 100% !important;
+        margin-bottom: 8px;
+    }
+
+    /* Dialog/Modal anpassen */
+    .modal-content,
+    .dialog-content {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        margin: 10px auto !important;
+    }
+}
+
+/* =============================================
+   LANDSCAPE PHONE
+   ============================================= */
+@media screen and (max-width: 812px) and (orientation: landscape) {
+    .sidebar {
+        width: 200px !important;
+    }
+
+    .sidebar.open {
+        left: 0 !important;
+    }
+
+    .header-row {
+        padding-top: 5px !important;
+        padding-bottom: 5px !important;
+    }
+}
+
+/* =============================================
+   PRINT STYLES
+   ============================================= */
+@media print {
+    .sidebar,
+    .hamburger-btn,
+    .sidebar-overlay {
+        display: none !important;
+    }
+
+    .main-content,
+    .content-area,
+    .form-container {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+}

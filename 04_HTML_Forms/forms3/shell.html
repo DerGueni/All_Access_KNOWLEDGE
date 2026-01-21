@@ -4,8 +4,15 @@
   <link rel="stylesheet" href="css/visbug_overrides.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6040c0">
     <title>CONSYS - Verwaltung</title>
-        <link rel="stylesheet" href="css/fonts_override.css">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="img/icon-192.png">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/responsive-sidebar.css">
     <style>
         * {
             margin: 0;
@@ -422,6 +429,38 @@
     <script src="js/debug-logger.js"></script>
     <script src="js/logger.js"></script>
 
+    <!-- Error Tracking System -->
+    <script src="js/error-tracking.js"></script>
+
+    <!-- Context Menu -->
+    <script src="js/context-menu.js"></script>
+
+    <!-- Responsive Sidebar -->
+    <script src="js/responsive-sidebar.js"></script>
+
+    <!-- WebSocket Client fuer Echtzeit-Updates -->
+    <script src="js/websocket-client.js"></script>
+
+    <!-- Bulk Operations -->
+    <script src="js/bulk-operations.js"></script>
+
+    <!-- Pagination -->
+    <script src="js/pagination.js"></script>
+
+    <!-- Offline Storage (IndexedDB) -->
+    <script src="js/offline-storage.js"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('[PWA] Service Worker registriert:', reg.scope))
+                .catch(err => console.warn('[PWA] SW Registrierung fehlgeschlagen:', err));
+        });
+    }
+    </script>
+
     <!-- WebView2 Bridge (falls verfügbar) -->
     <script src="js/webview2-bridge.js"></script>
 
@@ -555,7 +594,7 @@
             tabElement.id = tabId;
             tabElement.innerHTML = `
                 <span class="tab-title" title="${title}">${title}</span>
-                <button class="tab-close" title="Tab schließen">Ã—</button>
+                <button class="tab-close" title="Tab schließen">&times;</button>
             `;
 
             // Click auf Tab = aktivieren

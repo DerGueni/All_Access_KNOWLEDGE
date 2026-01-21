@@ -178,28 +178,10 @@ function setupEventListeners() {
         });
     }
 
-    elements.btnStartdatum.addEventListener('click', () => {
-        const newDate = elements.dtStartdatum.value;
-        if (newDate) {
-            state.startDate = new Date(newDate);
-            // Auf Montag der Woche setzen
-            const dayOfWeek = state.startDate.getDay();
-            const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-            state.startDate.setDate(state.startDate.getDate() + diff);
-            updateDateInputs();
-            loadDienstplan();
-        }
-    });
-
-    elements.dtStartdatum.addEventListener('change', (e) => {
-        state.startDate = new Date(e.target.value);
-        // Auf Montag der Woche setzen
-        const dayOfWeek = state.startDate.getDay();
-        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-        state.startDate.setDate(state.startDate.getDate() + diff);
-        updateDateInputs();
-        loadDienstplan();
-    });
+    elements.btnStartdatum.addEventListener('click', () => applyStartdatumFromValue(elements.dtStartdatum?.value, true));
+    elements.dtStartdatum.addEventListener('change', (e) => applyStartdatumFromValue(e.target.value));
+    elements.dtStartdatum.addEventListener('blur', () => applyStartdatumFromValue(elements.dtStartdatum?.value));
+    elements.dtStartdatum.addEventListener('dblclick', () => elements.dtStartdatum?.showPicker?.());
 
     // Filter
     elements.NurAktiveMA.addEventListener('change', (e) => {
@@ -219,6 +201,26 @@ function setupEventListeners() {
     // Tag-Label DblClick Handler (Access: lbl_Tag_*_DblClick)
     // Ermöglicht schnelle Navigation zum gewählten Tag
     setupTagLabelDblClick();
+}
+
+function applyStartdatumFromValue(value, force = false) {
+    if (!value) return false;
+    const newDate = new Date(value);
+    if (Number.isNaN(newDate.getTime())) {
+        return false;
+    }
+    const dayOfWeek = newDate.getDay();
+    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    newDate.setDate(newDate.getDate() + diff);
+    const normalized = newDate.getTime();
+    const current = state.startDate.getTime();
+    if (!force && normalized === current) {
+        return false;
+    }
+    state.startDate = newDate;
+    updateDateInputs();
+    loadDienstplan();
+    return true;
 }
 
 /**

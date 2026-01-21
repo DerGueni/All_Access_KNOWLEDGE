@@ -172,14 +172,9 @@ function setupEventListeners() {
     elements.btn_Heute.addEventListener('click', goToToday);
 
     // dtStartdatum Exit Event (wie VBA dtStartdatum_Exit) - Refresh bei Verlassen
-    elements.dtStartdatum.addEventListener('change', () => {
-        const newDate = elements.dtStartdatum.value;
-        if (newDate) {
-            state.startDate = new Date(newDate);
-            updateDateInputs();
-            loadData();
-        }
-    });
+    elements.dtStartdatum.addEventListener('change', () => updateStartDate(elements.dtStartdatum?.value));
+    elements.dtStartdatum.addEventListener('blur', () => updateStartDate(elements.dtStartdatum?.value));
+    elements.dtStartdatum.addEventListener('dblclick', () => elements.dtStartdatum?.showPicker?.());
 
     // btnreq (Refresh-Button, falls vorhanden)
     if (elements.btnreq) {
@@ -237,6 +232,8 @@ function setupEventListeners() {
     // Buttons
     elements.Befehl37.addEventListener('click', () => window.close());
     elements.btnOutpExcel.addEventListener('click', exportExcel);
+
+    setupDayHeaderDblClick();
 }
 
 /**
@@ -299,6 +296,47 @@ function updateHeaderLabels() {
             dayHeader.classList.toggle('feiertag', isFeiertag);
         }
     }
+}
+
+function setupDayHeaderDblClick() {
+    for (let i = 1; i <= 7; i++) {
+        const header = document.querySelector(`#day_${i} .day-title`);
+        if (!header) continue;
+        header.style.cursor = 'pointer';
+        header.addEventListener('dblclick', () => {
+            const parsed = parseDayTitle(header.textContent);
+            if (parsed) {
+                const iso = parsed.toISOString();
+                console.log(`[DP-Objekt] Klick auf Tag ${i} (${iso}), Startdatum setzen`);
+                updateStartDate(iso, { force: true });
+            }
+        });
+    }
+}
+
+function parseDayTitle(text) {
+    if (!text) return null;
+    const match = text.match(/(\\d{1,2})\\.(\\d{1,2})\\.(\\d{2})$/);
+    if (!match) return null;
+    const day = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10) - 1;
+    const year = 2000 + parseInt(match[3], 10);
+    const date = new Date(year, month, day);
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function updateStartDate(value, { force = false } = {}) {
+    if (!value) return false;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return false;
+    date.setHours(0, 0, 0, 0);
+    if (!force && state.startDate && state.startDate.getTime() === date.getTime()) {
+        return false;
+    }
+    state.startDate = date;
+    updateDateInputs();
+    loadData();
+    return true;
 }
 
 /**

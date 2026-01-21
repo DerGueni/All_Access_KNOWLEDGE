@@ -1690,9 +1690,13 @@ function renderAuftragsliste() {
         const days = generateDaysBetween(dateVon, dateBis);
 
         days.forEach(day => {
+            // FIX 19.01.2026: Lokales Datum verwenden statt UTC (toISOString verschiebt bei UTC+1)
+            const localDateString = day.getFullYear() + '-' +
+                String(day.getMonth() + 1).padStart(2, '0') + '-' +
+                String(day.getDate()).padStart(2, '0');
             allDays.push({
                 date: day,
-                dateString: day.toISOString().split('T')[0], // YYYY-MM-DD
+                dateString: localDateString, // YYYY-MM-DD (lokal, nicht UTC!)
                 auftrag: rec.VA_Bezeichnung || rec.Auftrag || '',
                 ort: rec.VA_Ort || rec.Ort || '',
                 objekt: rec.VA_Objekt || rec.Objekt || '',
@@ -1774,9 +1778,13 @@ function renderAuftragslisteFiltered(filterStatusId) {
         const days = generateDaysBetween(dateVon, dateBis);
 
         days.forEach(day => {
+            // FIX 19.01.2026: Lokales Datum verwenden statt UTC (toISOString verschiebt bei UTC+1)
+            const localDateString = day.getFullYear() + '-' +
+                String(day.getMonth() + 1).padStart(2, '0') + '-' +
+                String(day.getDate()).padStart(2, '0');
             allDays.push({
                 date: day,
-                dateString: day.toISOString().split('T')[0], // YYYY-MM-DD
+                dateString: localDateString, // YYYY-MM-DD (lokal, nicht UTC!)
                 auftrag: rec.VA_Bezeichnung || rec.Auftrag || '',
                 ort: rec.VA_Ort || rec.Ort || '',
                 objekt: rec.VA_Objekt || rec.Objekt || '',
@@ -1984,7 +1992,8 @@ function applyStatusRules(statusValue) {
     setSubformLocked('sub_MA_VA_Zuordnung', lockInputs);
     setSubformLocked('sub_VA_Start', lockInputs);
     setSubformLocked('sub_MA_VA_Planung_Absage', lockInputs);
-    sendToSubform('sub_MA_VA_Zuordnung', { type: 'set_locked', locked: lockInputs });
+    // ACCESS-PARITÄT: Veranst_Status_ID_AfterUpdate -> sub_MA_VA_Zuordnung.Locked = True/False
+    sendToSubform('sub_MA_VA_Zuordnung', { type: 'lock_subform', locked: lockInputs });
 }
 
 async function applyObjektRules(value) {
@@ -2428,6 +2437,9 @@ window.copyToNextDay = typeof kopiereInFolgetag === 'function' ? kopiereInFolget
 window.planKopie = typeof kopiereInFolgetag === 'function' ? kopiereInFolgetag : function() { alert('Funktion kopiereInFolgetag nicht verfuegbar'); };
 window.datenInFolgetag = typeof kopiereInFolgetag === 'function' ? kopiereInFolgetag : function() { alert('Funktion kopiereInFolgetag nicht verfuegbar'); };
 window.auftragLoeschen = typeof loeschenAuftrag === 'function' ? loeschenAuftrag : function() { alert('Funktion loeschenAuftrag nicht verfuegbar'); };
+
+// FIX: btnSchnellPlan - Mitarbeiterauswahl oeffnen (Access-Paritaet)
+window.openMitarbeiterauswahl = typeof openMitarbeiterauswahl === 'function' ? openMitarbeiterauswahl : function() { alert('Funktion openMitarbeiterauswahl nicht verfuegbar'); };
 
 // Einsatzliste-Varianten
 window.sendeEinsatzlisteMA = function() { if (typeof sendeEinsatzliste === 'function') sendeEinsatzliste('MA'); else alert('Funktion sendeEinsatzliste nicht verfuegbar'); };
