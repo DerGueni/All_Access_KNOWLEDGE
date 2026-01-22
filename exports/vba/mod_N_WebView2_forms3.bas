@@ -12,8 +12,12 @@ Private Const API_SERVER_PATH As String = "C:\Users\guenther.siegert\Documents\0
 Private Const API_PORT As Integer = 5000
 Private Const HTML_PORT As Integer = 5000  ' KORRIGIERT: mini_api.py serviert HTML+API auf Port 5000
 
+' NEU: VBA Bridge Server (Port 5002) - WICHTIG fuer Anfragen, Buttons etc.
+Private Const VBA_BRIDGE_PATH As String = "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\04_HTML_Forms\api\vba_bridge_server.py"
+Private Const VBA_BRIDGE_PORT As Integer = 5002
+
 ' Windows API fuer Sleep
-Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As LongPtr)
+Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 
 ' =====================================================
 ' HAUPT-FUNKTIONEN: HTML-Formulare oeffnen
@@ -118,8 +122,12 @@ Private Sub OpenWebView2Form(htmlPath As String, title As String, width As Long,
     Dim cmd As String
     Dim httpUrl As String
 
-    ' WICHTIG: API-Server MUSS laufen fuer Datenzugriff!
+    ' WICHTIG: BEIDE Server muessen laufen!
+    ' 1. API-Server auf Port 5000 fuer Daten
     StartAPIServerIfNeeded
+
+    ' 2. VBA-Bridge-Server auf Port 5002 fuer Anfragen/Buttons
+    StartVBABridgeIfNeeded
 
     ' Pruefen ob HTML-Datei existiert (fuer Fehlermeldung)
     If Dir(htmlPath) = "" Then
@@ -139,6 +147,31 @@ Private Sub OpenWebView2Form(htmlPath As String, title As String, width As Long,
     Dim fileName As String
     fileName = Mid(htmlPath, InStrRev(htmlPath, "\") + 1)
     httpUrl = "http://localhost:" & HTML_PORT & "/" & fileName
+
+    ' FIX 19.01.2026: Parameter aus jsonData extrahieren und an URL anhaengen
+    ' Damit shell.html die Parameter SOFORT hat, nicht erst via WebView2 Bridge
+    Dim formStart As Long, formEnd As Long
+    Dim formName As String, idValue As String
+
+    formStart = InStr(jsonData, """form"":""") + 8
+    If formStart > 8 Then
+        formEnd = InStr(formStart, jsonData, """")
+        formName = Mid(jsonData, formStart, formEnd - formStart)
+        httpUrl = httpUrl & "?form=" & formName
+
+        ' ID-Parameter extrahieren
+        Dim idStart As Long, idEnd As Long
+        idStart = InStr(jsonData, """id"":")
+        If idStart > 0 Then
+            idStart = idStart + 6  ' Nach "id":
+            idEnd = InStr(idStart, jsonData, ",")
+            If idEnd = 0 Then idEnd = InStr(idStart, jsonData, "}")
+            idValue = Trim(Mid(jsonData, idStart, idEnd - idStart))
+            If IsNumeric(idValue) And Val(idValue) > 0 Then
+                httpUrl = httpUrl & "&id=" & idValue
+            End If
+        End If
+    End If
 
     ' JSON escapen fuer Kommandozeile
     Dim escapedJson As String
@@ -209,9 +242,11 @@ Private Function IsAPIServerRunning() As Boolean
     On Error GoTo 0
 End Function
 
-' Startet API-Server falls nicht bereits aktiv
+' Startet API-Server falls nicht bereits aktiv - MIT WARTE-SCHLEIFE
 Public Sub StartAPIServerIfNeeded()
     On Error GoTo ErrorHandler
+
+    Dim i As Integer
 
     If IsAPIServerRunning() Then
         Debug.Print "[API] Server laeuft bereits auf Port " & API_PORT
@@ -232,11 +267,19 @@ Public Sub StartAPIServerIfNeeded()
     cmd = "cmd /c cd /d """ & workDir & """ && start /min python mini_api.py"
     Shell cmd, vbHide
 
-    Debug.Print "[API] Server gestartet auf Port " & API_PORT
+    Debug.Print "[API] Server wird gestartet auf Port " & API_PORT
 
-    ' Kurz warten bis Server hochgefahren (2 Sekunden)
-    DoEvents
-    Sleep 2000
+    ' WARTE-SCHLEIFE: Bis zu 10 Sekunden warten bis Server antwortet
+    For i = 1 To 20
+        DoEvents
+        Sleep 500
+        If IsAPIServerRunning() Then
+            Debug.Print "[API] Server bereit nach " & (i * 0.5) & " Sekunden"
+            Exit Sub
+        End If
+    Next i
+
+    Debug.Print "[API] WARNUNG: Server antwortet nach 10 Sekunden noch nicht"
 
     Exit Sub
 
@@ -263,6 +306,103 @@ Public Sub CheckAPIServer()
 End Sub
 
 ' =====================================================
+' VBA-BRIDGE-SERVER FUNKTIONEN (Port 5002)
+' NEU: 20.01.2026 - Automatischer Start fuer HTML-Formulare
+' =====================================================
+
+' Prueft ob VBA-Bridge-Server auf Port 5002 laeuft
+Private Function IsVBABridgeRunning() As Boolean
+    On Error Resume Next
+
+    Dim objHTTP As Object
+    Set objHTTP = CreateObject("MSXML2.XMLHTTP")
+
+    objHTTP.Open "GET", "http://localhost:" & VBA_BRIDGE_PORT & "/api/health", False
+    objHTTP.setRequestHeader "Content-Type", "application/json"
+    objHTTP.Send
+
+    IsVBABridgeRunning = (objHTTP.Status = 200)
+
+    Set objHTTP = Nothing
+    On Error GoTo 0
+End Function
+
+' Startet VBA-Bridge-Server falls nicht bereits aktiv - MIT WARTE-SCHLEIFE
+Public Sub StartVBABridgeIfNeeded()
+    On Error GoTo ErrorHandler
+
+    Dim i As Integer
+
+    If IsVBABridgeRunning() Then
+        Debug.Print "[VBA-Bridge] Server laeuft bereits auf Port " & VBA_BRIDGE_PORT
+        Exit Sub
+    End If
+
+    ' Pruefen ob vba_bridge_server.py existiert
+    If Dir(VBA_BRIDGE_PATH) = "" Then
+        Debug.Print "[VBA-Bridge] vba_bridge_server.py nicht gefunden: " & VBA_BRIDGE_PATH
+        Exit Sub
+    End If
+
+    Dim cmd As String
+    Dim workDir As String
+    workDir = Left(VBA_BRIDGE_PATH, InStrRev(VBA_BRIDGE_PATH, "\") - 1)
+
+    ' Python VBA-Bridge-Server im Hintergrund starten
+    cmd = "cmd /c cd /d """ & workDir & """ && start /min python vba_bridge_server.py"
+    Shell cmd, vbHide
+
+    Debug.Print "[VBA-Bridge] Server wird gestartet auf Port " & VBA_BRIDGE_PORT
+
+    ' WARTE-SCHLEIFE: Bis zu 15 Sekunden warten bis Server antwortet (COM braucht laenger)
+    For i = 1 To 30
+        DoEvents
+        Sleep 500
+        If IsVBABridgeRunning() Then
+            Debug.Print "[VBA-Bridge] Server bereit nach " & (i * 0.5) & " Sekunden"
+            Exit Sub
+        End If
+    Next i
+
+    Debug.Print "[VBA-Bridge] WARNUNG: Server antwortet nach 15 Sekunden noch nicht"
+
+    Exit Sub
+
+ErrorHandler:
+    Debug.Print "[VBA-Bridge] Fehler: " & Err.description
+End Sub
+
+' Beide Server starten (API + VBA-Bridge)
+Public Sub StartAllServers()
+    StartAPIServerIfNeeded
+    StartVBABridgeIfNeeded
+End Sub
+
+' Beide Server Status pruefen
+Public Sub CheckAllServers()
+    Dim msg As String
+    msg = "Server-Status:" & vbCrLf & vbCrLf
+
+    If IsAPIServerRunning() Then
+        msg = msg & "API-Server (Port " & API_PORT & "): LAEUFT" & vbCrLf
+    Else
+        msg = msg & "API-Server (Port " & API_PORT & "): GESTOPPT" & vbCrLf
+    End If
+
+    If IsVBABridgeRunning() Then
+        msg = msg & "VBA-Bridge (Port " & VBA_BRIDGE_PORT & "): LAEUFT" & vbCrLf
+    Else
+        msg = msg & "VBA-Bridge (Port " & VBA_BRIDGE_PORT & "): GESTOPPT" & vbCrLf
+    End If
+
+    msg = msg & vbCrLf & "Beide Server starten?"
+
+    If MsgBox(msg, vbQuestion + vbYesNo, "CONSYS Server-Status") = vbYes Then
+        StartAllServers
+    End If
+End Sub
+
+' =====================================================
 ' BROWSER-MODUS: Formulare im Standard-Browser oeffnen
 ' Der API-Server serviert HTML + Daten auf localhost:5000
 ' =====================================================
@@ -270,6 +410,7 @@ End Sub
 ' Auftragsverwaltung im Browser oeffnen (via shell.html fuer Sidebar!)
 Public Sub OpenAuftragstamm_Browser(Optional VA_ID As Long = 0)
     StartAPIServerIfNeeded
+    StartVBABridgeIfNeeded
 
     Dim url As String
     url = "http://localhost:" & HTML_PORT & "/shell.html?form=frm_va_Auftragstamm"
@@ -282,6 +423,7 @@ End Sub
 ' Mitarbeiterstamm im Browser oeffnen (via shell.html fuer Sidebar!)
 Public Sub OpenMitarbeiterstamm_Browser(Optional MA_ID As Long = 0)
     StartAPIServerIfNeeded
+    StartVBABridgeIfNeeded
 
     Dim url As String
     url = "http://localhost:" & HTML_PORT & "/shell.html?form=frm_MA_Mitarbeiterstamm"
@@ -294,6 +436,7 @@ End Sub
 ' Kundenstamm im Browser oeffnen (via shell.html fuer Sidebar!)
 Public Sub OpenKundenstamm_Browser(Optional KD_ID As Long = 0)
     StartAPIServerIfNeeded
+    StartVBABridgeIfNeeded
 
     Dim url As String
     url = "http://localhost:" & HTML_PORT & "/shell.html?form=frm_KD_Kundenstamm"
@@ -306,6 +449,7 @@ End Sub
 ' Objektverwaltung im Browser oeffnen (via shell.html fuer Sidebar!)
 Public Sub OpenObjekt_Browser(Optional OB_ID As Long = 0)
     StartAPIServerIfNeeded
+    StartVBABridgeIfNeeded
 
     Dim url As String
     url = "http://localhost:" & HTML_PORT & "/shell.html?form=frm_OB_Objekt"
@@ -318,6 +462,7 @@ End Sub
 ' Dienstplan im Browser oeffnen (via shell.html fuer Sidebar!)
 Public Sub OpenDienstplan_Browser(Optional StartDatum As Date)
     StartAPIServerIfNeeded
+    StartVBABridgeIfNeeded
 
     Dim url As String
     url = "http://localhost:" & HTML_PORT & "/shell.html?form=frm_N_DP_Dienstplan_MA"
@@ -330,6 +475,7 @@ End Sub
 ' Hauptmenue/Dashboard im Browser oeffnen (shell.html ohne Form = Menuefuehrung)
 Public Function OpenHTMLAnsicht()
     StartAPIServerIfNeeded
+    StartVBABridgeIfNeeded
 
     Dim url As String
     url = "http://localhost:" & HTML_PORT & "/shell.html"

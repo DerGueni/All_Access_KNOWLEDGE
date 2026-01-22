@@ -2314,27 +2314,24 @@
             photoEl.src = src;
         }
 
-        // UNC-Pfad fuer Mitarbeiterfotos (Server-Share)
-        const MA_FOTO_UNC_BASE = '//vConSYS01-Nbg/Consys/Bilder/Mitarbeiter/';
+        // API-Endpoint fuer Mitarbeiterfotos (Server proxied UNC-Pfad)
+        // Browser koennen nicht direkt auf file:// oder UNC-Pfade zugreifen
 
         function resolvePhotoPath(value) {
             if (!value) return '';
-            // Bereits vollstaendige URLs
-            if (/^https?:/i.test(value) || /^file:/i.test(value)) return value;
-            // UNC-Pfad (\\server\share\...)
-            if (/^\\\\/.test(value)) {
-                return 'file:' + value.replace(/\\/g, '/');
+            // Bereits vollstaendige HTTP/HTTPS URLs
+            if (/^https?:/i.test(value)) return value;
+            // Nur Dateiname extrahieren (falls Pfad enthalten)
+            let filename = value;
+            if (value.includes('/') || value.includes('\\')) {
+                // Pfad -> nur Dateiname nehmen
+                filename = value.split(/[/\\]/).pop();
             }
-            // Lokaler Windows-Pfad (C:\...)
-            if (/^[A-Za-z]:[\\/]/.test(value)) {
-                return `file:///${value.replace(/\\/g, '/')}`;
+            // API-Endpoint verwenden (Server lädt vom UNC-Pfad)
+            if (filename) {
+                return `/api/fotos/mitarbeiter/${encodeURIComponent(filename)}`;
             }
-            // Nur Dateiname -> UNC-Server-Pfad verwenden
-            if (value && !value.includes('/') && !value.includes('\\')) {
-                return `file:${MA_FOTO_UNC_BASE}${value}`;
-            }
-            // Fallback: relativer Pfad
-            return `../media/mitarbeiter/${value}`;
+            return '';
         }
 
         // ============================================

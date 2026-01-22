@@ -68,17 +68,56 @@ Jede Ã„nderung wird wie folgt dokumentiert:
 **Vorher:** Nur state.selectedSchicht genutzt; bei fehlender Schicht VAStart_ID null
 **Nachher:** VAStart_ID aus Planungsliste oder /api/planungen; Fallback auf formState.VAStart_ID/Schicht; fehlende VAStart_ID wird geloggt und nicht gesendet
 **Anweisung:** "Bitte Nr 224 Problem beheben. Die Funktion muss aber den exakten Funktionsablauf des original Access Buttons durchlaufen und die entsprechenden HTML Vorlagen fuer die Mail verwenden" + "Teste den btnMail mit einem beliebigen Mitarbeiter fuer eine beliebige Veranstaltung"
-**Status:** ? In Bearbeitung
+**Status:** âœ… Abgeschlossen
+
+
+### 2026-01-22 00:45 - frm_MA_VA_Schnellauswahl.html
+**Element:** `populatePlanungListe()` Datenattribute
+**Typ:** html/js
+**Datei:** `04_HTML_Forms/forms3/frm_MA_VA_Schnellauswahl.html`
+**Zeile:** 1618
+**Ã„nderung:** Planungszeilen speichern jetzt VAStart_ID/VADatum_ID sowie MA-Start/-Ende als data-Attribute, damit `versendeAnfragen()` jede Schicht exakt wie in Access zuordnen kann.
+**Vorher:**
+```javascript
+row.dataset.id = plan.ID || plan.MVA_ID || plan.id;
+row.dataset.maid = plan.MA_ID;
+row.dataset.statusId = statusId;
+const startZeit = plan.MA_Start || plan.MVA_Start;
+```
+**Nachher:**
+```javascript
+row.dataset.id = plan.ID || plan.MVA_ID || plan.id;
+row.dataset.maid = plan.MA_ID;
+row.dataset.statusId = statusId;
+const vaStartId = plan.VAStart_ID || plan.VAStartId || plan.vastart_id || plan.MVA_Start_ID || null;
+if (vaStartId) {
+    row.dataset.vastartid = vaStartId;
+}
+const vadatumId = plan.VADatum_ID || plan.vadatum_id || plan.VADatumID;
+if (vadatumId) {
+    row.dataset.vadatumid = vadatumId;
+}
+const startZeit = plan.MA_Start || plan.MVA_Start || plan.VA_Start;
+const endeZeit = plan.MA_Ende || plan.MVA_Ende || plan.VA_Ende;
+if (startZeit) {
+    row.dataset.maStart = startZeit;
+}
+if (endeZeit) {
+    row.dataset.maEnde = endeZeit;
+}
+```
+**Benutzeranweisung:** "Bitte Nr 224 Problem beheben. Die Funktion muss aber den exakten Funktionsablauf des original Access Buttons durchlaufen und die entsprechenden HTML Vorlagen fuer die Mail verwenden"
+**Status:** âœ… Abgeschlossen
 
 
 ### 2026-01-20 16:57 - frm_MA_VA_Schnellauswahl.logic.js
 **Element:** btnMail / btnMailSelected (Click-Handler)
 **Typ:** js
-**Änderung:** Click-Handler in Logic-Datei reaktiviert (Capture) und auf Access-Flow (`Anfragen()` via VBA Bridge) gelegt
-**Vorher:** Click-Handler im Logic-Modul auskommentiert; HTML-Inline war führend
-**Nachher:** Logic-Modul bindet Capture-Handler, verhindert doppelte Ausführung und nutzt Access-VBA Ablauf + HTML-Mail-Template aus Access
-**Anweisung:** "Bitte Nr 224 Problem beheben. Die Funktion muss aber den exakten Funktionsablauf des original Access Buttons durchlaufen und die entsprechenden HTML Vorlagen für die Mail verwenden"
-**Status:** ? In Bearbeitung
+**ï¿½nderung:** Click-Handler in Logic-Datei reaktiviert (Capture) und auf Access-Flow (`Anfragen()` via VBA Bridge) gelegt
+**Vorher:** Click-Handler im Logic-Modul auskommentiert; HTML-Inline war fï¿½hrend
+**Nachher:** Logic-Modul bindet Capture-Handler, verhindert doppelte Ausfï¿½hrung und nutzt Access-VBA Ablauf + HTML-Mail-Template aus Access
+**Anweisung:** "Bitte Nr 224 Problem beheben. Die Funktion muss aber den exakten Funktionsablauf des original Access Buttons durchlaufen und die entsprechenden HTML Vorlagen fï¿½r die Mail verwenden"
+**Status:** âœ… Abgeschlossen
 
 
 ### 2026-01-19 22:30 - mini_api.py POST /api/planungen Route
@@ -2652,3 +2691,4 @@ async function applyObjektRules(value) {
 **Status:** âœ… Abgeschlossen
 
 ---
+

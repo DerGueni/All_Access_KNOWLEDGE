@@ -440,10 +440,12 @@ const Bridge = {
                     // Falls einzelner Mitarbeiter geladen werden soll (mit ID)
                     if (id) {
                         result = await apiFetch(`/mitarbeiter/${id}`);
-                        this._fireEvent('onDataReceived', { type: 'mitarbeiter', record: result.data || result });
+                        // Event-Typ: mitarbeiter_detail (wie HTML erwartet)
+                        this._fireEvent('onDataReceived', { type: 'mitarbeiter_detail', record: result.data || result });
                     } else {
                         result = await apiFetch(mitarbeiterUrl);
-                        this._fireEvent('onDataReceived', { type: 'mitarbeiter', records: Array.isArray(result) ? result : (result.data || []) });
+                        // Event-Typ: mitarbeiter_list (wie HTML erwartet)
+                        this._fireEvent('onDataReceived', { type: 'mitarbeiter_list', records: Array.isArray(result) ? result : (result.data || []) });
                     }
                     return result;
 

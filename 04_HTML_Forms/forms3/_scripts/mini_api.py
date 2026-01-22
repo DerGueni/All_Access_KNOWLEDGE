@@ -224,7 +224,7 @@ def auftrag_detail(id):
 # --- MITARBEITER ---
 @app.route('/api/mitarbeiter')
 def mitarbeiter_list():
-    """Mitarbeiterliste"""
+    """Mitarbeiterliste mit erweiterten Filtern"""
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -232,6 +232,9 @@ def mitarbeiter_list():
         aktiv = request.args.get('aktiv', '')
         limit = request.args.get('limit', 500, type=int)
         search = request.args.get('search', '')
+        anstellung = request.args.get('anstellung', '')
+        kategorie = request.args.get('kategorie', '')
+        nur34a = request.args.get('nur34a', '')
 
         sql = f"SELECT TOP {limit} * FROM tbl_MA_Mitarbeiterstamm WHERE 1=1"
 
@@ -240,6 +243,23 @@ def mitarbeiter_list():
         if search:
             sql += f" AND (Nachname LIKE '%{search}%' OR Vorname LIKE '%{search}%' OR Kurzname LIKE '%{search}%')"
 
+        # Anstellungsart-Filter (3=Festangestellt, 5=Minijobber, 9=Studenten, 13=Alle aktiven)
+        if anstellung and anstellung != '9':  # 9 = Alle
+            if anstellung == '13':  # Alle aktiven (3, 4, 5)
+                sql += " AND Anstellungsart_ID IN (3, 4, 5)"
+            elif anstellung == '5':  # Mini + Midi (4, 5)
+                sql += " AND Anstellungsart_ID IN (4, 5)"
+            else:
+                sql += f" AND Anstellungsart_ID = {int(anstellung)}"
+
+        # Kategorie/Qualifikation Filter
+        if kategorie and kategorie != '' and kategorie != '1':  # 1 = Alle
+            sql += f" AND Kategorie_ID = {int(kategorie)}"
+
+        # Nur 34a (Hat_keine_34a = False bedeutet HAT 34a)
+        if nur34a == 'true' or nur34a == '1':
+            sql += " AND Hat_keine_34a = 0"
+
         sql += " ORDER BY Nachname, Vorname"
 
         cursor.execute(sql)
@@ -247,6 +267,69 @@ def mitarbeiter_list():
         conn.close()
         return jsonify({"success": True, "data": result})
     except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/mitarbeiter/verfuegbar')
+def mitarbeiter_verfuegbar():
+    """Prüft Verfügbarkeit der Mitarbeiter für ein Datum/Zeitraum"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        datum = request.args.get('datum', '')
+        va_start = request.args.get('va_start', '')
+        va_ende = request.args.get('va_ende', '')
+        geplant_verfuegbar = request.args.get('geplant_verfuegbar', 'false')
+
+        if not datum:
+            return jsonify({"success": False, "error": "Datum erforderlich"}), 400
+
+        # Alle aktiven Mitarbeiter holen
+        sql_ma = "SELECT ID FROM tbl_MA_Mitarbeiterstamm WHERE IstAktiv = -1"
+        cursor.execute(sql_ma)
+        alle_ma = [row[0] for row in cursor.fetchall()]
+
+        # Nicht verfügbare MA (aus tbl_MA_NVerfuegZeiten)
+        sql_nv = f"""
+            SELECT DISTINCT MA_ID FROM tbl_MA_NVerfuegZeiten
+            WHERE vonDat <= #{datum}# AND bisDat >= #{datum}#
+        """
+        cursor.execute(sql_nv)
+        nicht_verfuegbar = set(row[0] for row in cursor.fetchall())
+
+        # Bereits geplante MA (aus tbl_MA_VA_Planung)
+        sql_geplant = f"""
+            SELECT DISTINCT MA_ID FROM tbl_MA_VA_Planung
+            WHERE VADatum = #{datum}#
+        """
+        if va_start:
+            sql_geplant += f" AND MVA_Start = #{va_start}#"
+
+        cursor.execute(sql_geplant)
+        geplant = set(row[0] for row in cursor.fetchall())
+
+        conn.close()
+
+        # Verfügbare berechnen
+        if geplant_verfuegbar == 'true':
+            # Geplant = Verfügbar: Nur nicht_verfuegbar ausschließen
+            verfuegbar = [ma for ma in alle_ma if ma not in nicht_verfuegbar]
+        else:
+            # Normal: Nicht verfügbar UND geplant ausschließen
+            verfuegbar = [ma for ma in alle_ma if ma not in nicht_verfuegbar and ma not in geplant]
+
+        return jsonify({
+            "success": True,
+            "data": {
+                "verfuegbar": verfuegbar,
+                "nicht_verfuegbar": list(nicht_verfuegbar),
+                "geplant": list(geplant),
+                "datum": datum
+            }
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/mitarbeiter/<int:id>')
@@ -581,7 +664,8 @@ def planungen_list():
     """Planungen = Alias fuer Zuordnungen (tbl_MA_VA_Planung)"""
     try:
         va_id = request.args.get('va_id', type=int)
-        vadatum_id = request.args.get('vadatum_id', type=int)
+        # FIX 20.01.2026: Akzeptiere beide Parameter-Namen (HTML sendet datum_id)
+        vadatum_id = request.args.get('vadatum_id', type=int) or request.args.get('datum_id', type=int)
 
         conn = get_connection()
         cursor = conn.cursor()
@@ -613,6 +697,77 @@ def planungen_list():
         result = query_to_list(cursor)
         conn.close()
         return jsonify({"success": True, "data": result})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# FIX 19.01.2026: POST Route fuer Planungen (DblClick Schnellauswahl)
+@app.route('/api/planungen', methods=['POST'])
+def planungen_create():
+    """Neue Planung erstellen (MA zu Auftrag zuordnen)"""
+    try:
+        data = request.get_json()
+        # Akzeptiere sowohl Gross- als auch Kleinschreibung
+        va_id = data.get('VA_ID') or data.get('va_id')
+        ma_id = data.get('MA_ID') or data.get('ma_id')
+        vadatum_id = data.get('VADatum_ID') or data.get('vadatum_id')
+
+        if not all([va_id, ma_id, vadatum_id]):
+            return jsonify({"success": False, "error": "VA_ID, MA_ID und VADatum_ID erforderlich"}), 400
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Pruefen ob bereits zugeordnet
+        cursor.execute("""
+            SELECT ID FROM tbl_MA_VA_Planung
+            WHERE VA_ID = ? AND MA_ID = ? AND VADatum_ID = ?
+        """, [va_id, ma_id, vadatum_id])
+        existing = cursor.fetchone()
+
+        if existing:
+            conn.close()
+            return jsonify({"success": False, "error": "MA bereits zugeordnet", "existing_id": existing[0]}), 409
+
+        # Neue Zuordnung erstellen
+        cursor.execute("""
+            INSERT INTO tbl_MA_VA_Planung (VA_ID, MA_ID, VADatum_ID)
+            VALUES (?, ?, ?)
+        """, [va_id, ma_id, vadatum_id])
+        conn.commit()
+
+        # Neue ID holen
+        cursor.execute("SELECT @@IDENTITY")
+        new_id = cursor.fetchone()[0]
+        conn.close()
+
+        return jsonify({"success": True, "id": new_id})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# FIX 19.01.2026: DELETE Route fuer Planungen (DblClick entfernen in Schnellauswahl)
+@app.route('/api/planungen/<int:plan_id>', methods=['DELETE'])
+def planungen_delete(plan_id):
+    """Planung loeschen (MA aus Auftrag entfernen)"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Pruefen ob Eintrag existiert
+        cursor.execute("SELECT ID FROM tbl_MA_VA_Planung WHERE ID = ?", [plan_id])
+        existing = cursor.fetchone()
+
+        if not existing:
+            conn.close()
+            return jsonify({"success": False, "error": "Planung nicht gefunden"}), 404
+
+        # Loeschen
+        cursor.execute("DELETE FROM tbl_MA_VA_Planung WHERE ID = ?", [plan_id])
+        conn.commit()
+        conn.close()
+
+        return jsonify({"success": True, "deleted_id": plan_id})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -1625,6 +1780,90 @@ def auftraege_absagen(va_id):
         import traceback
         traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/auftraege/<int:va_id>/anfragen')
+def auftraege_anfragen(va_id):
+    """
+    Ausstehende MA-Anfragen für einen Auftrag (für Antworten-Tab)
+    Gibt alle Planungen mit Status_ID 1 (geplant) oder 2 (benachrichtigt) zurück
+    """
+    try:
+        vadatum_id = request.args.get('vadatum_id', '')
+
+        with get_db() as conn:
+            cursor = conn.cursor()
+
+            # Anfragen aus tbl_MA_VA_Planung mit Status_ID < 3 (geplant/benachrichtigt)
+            cursor.execute("""
+                SELECT * FROM tbl_MA_VA_Planung
+                WHERE VA_ID = ? AND Status_ID < 3
+                ORDER BY VADatum_ID, MA_ID
+            """, (va_id,))
+
+            anfragen = query_to_list(cursor)
+
+            # MA-Namen nachträglich laden (verhindert JOIN-Probleme)
+            if anfragen:
+                ma_ids = list(set(a.get('MA_ID') for a in anfragen if a.get('MA_ID')))
+                if ma_ids:
+                    ids_str = ','.join(str(int(mid)) for mid in ma_ids)
+                    cursor.execute(f"""
+                        SELECT ID, Nachname, Vorname, Tel_Mobil
+                        FROM tbl_MA_Mitarbeiterstamm
+                        WHERE ID IN ({ids_str})
+                    """)
+                    ma_dict = {row[0]: {'Nachname': row[1], 'Vorname': row[2], 'Tel_Mobil': row[3]}
+                               for row in cursor.fetchall()}
+                    # Namen hinzufügen
+                    for a in anfragen:
+                        ma = ma_dict.get(a.get('MA_ID'), {})
+                        a['Nachname'] = ma.get('Nachname', '')
+                        a['Vorname'] = ma.get('Vorname', '')
+                        a['Tel_Mobil'] = ma.get('Tel_Mobil', '')
+
+            return jsonify({"success": True, "data": anfragen})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ============================================
+# MITARBEITER-FOTOS (UNC-Server-Pfad)
+# ============================================
+# Pfad für Mitarbeiterfotos (wie in Access VBA: prp_CONSYS_GrundPfad & TLookup("Pfad", "_tblEigeneFirma_Pfade", "ID = 7"))
+# S: ist gemappt auf \\vConSYS01-NBG\Consys
+MA_FOTO_UNC_PATH = r"S:\Bilder\Mitarbeiter"
+
+@app.route('/api/fotos/mitarbeiter/<filename>')
+def serve_mitarbeiter_foto(filename):
+    """
+    Serviert Mitarbeiterfotos vom UNC-Server-Pfad.
+    Browser koennen nicht direkt auf file:// zugreifen,
+    daher proxy via HTTP.
+    """
+    try:
+        # Sicherheitspruefung: Nur Bilddateien erlauben
+        allowed_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp'}
+        _, ext = os.path.splitext(filename.lower())
+        if ext not in allowed_extensions:
+            return jsonify({'error': 'Ungueltiger Dateityp'}), 400
+
+        # Pfadtraversal-Schutz
+        if '..' in filename or '/' in filename or '\\' in filename:
+            return jsonify({'error': 'Ungueltiger Dateiname'}), 400
+
+        full_path = os.path.join(MA_FOTO_UNC_PATH, filename)
+
+        if os.path.exists(full_path):
+            return send_from_directory(MA_FOTO_UNC_PATH, filename)
+        else:
+            print(f"[WARN] Mitarbeiterfoto nicht gefunden: {full_path}")
+            return jsonify({'error': 'Foto nicht gefunden'}), 404
+    except Exception as e:
+        print(f"[ERROR] Fehler beim Laden des Mitarbeiterfotos: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 # ============================================

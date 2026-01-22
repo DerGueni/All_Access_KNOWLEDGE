@@ -657,3 +657,124 @@ Private Function IsFormOpen(formName As String) As Boolean
     On Error Resume Next
     IsFormOpen = (SysCmd(acSysCmdGetObjectState, acForm, formName) = acObjStateOpen)
 End Function
+
+
+' ============================================================================
+' HTML_Anfragen - Wrapper fuer Mitarbeiter-Anfragen via HTML
+' WICHTIG: Kombiniert Texte_lesen + Anfragen in EINEM Aufruf!
+' Grund: Public Variables (Email, VADatum, etc.) muessen zwischen den Aufrufen
+' persistieren. Bei separaten COM-Aufrufen koennte das fehlschlagen.
+'
+' HINWEIS: Verwendet HTML_Texte_lesen (NULL-safe) statt original Texte_lesen,
+' da der MA moeglicherweise noch nicht in tbl_MA_VA_Planung eingetragen ist.
+' ============================================================================
+Public Function HTML_Anfragen(ByVal MA_ID As Integer, ByVal VA_ID As Long, _
+    ByVal VADatum_ID As Long, ByVal VAStart_ID As Long) As String
+    On Error GoTo ErrorHandler
+
+    Dim texteResult As String
+    Dim anfrageResult As String
+
+    ' SCHRITT 1: HTML_Texte_lesen aufrufen (NULL-safe Version!)
+    ' Liest Zeiten aus tbl_VA_Start statt tbl_MA_VA_Planung
+    texteResult = HTML_Texte_lesen(CStr(MA_ID), CStr(VA_ID), CStr(VADatum_ID), CStr(VAStart_ID))
+
+    ' Pruefen ob Texte_lesen erfolgreich war
+    If Len(texteResult) > 0 Then
+        ' Texte_lesen gibt nur bei Fehler einen Text zurueck
+        HTML_Anfragen = "TEXTE_FEHLER: " & texteResult
+        Exit Function
+    End If
+
+    ' SCHRITT 2: Anfragen aufrufen - nutzt die gesetzten Public Variables
+    anfrageResult = Anfragen(MA_ID, VA_ID, VADatum_ID, VAStart_ID)
+
+    ' Ergebnis zurueckgeben
+    HTML_Anfragen = anfrageResult
+
+    Exit Function
+
+ErrorHandler:
+    HTML_Anfragen = "FEHLER: " & Err.Number & " - " & Err.description
+End Function
+
+
+' ============================================================================
+' HTML_Texte_lesen - NULL-sichere Version von Texte_lesen fuer HTML-Formulare
+' Liest Zeiten aus tbl_VA_Start statt tbl_MA_VA_Planung, da der MA
+' moeglicherweise noch nicht geplant ist (nur in HTML, nicht in Access)
+' ============================================================================
+Public Function HTML_Texte_lesen(ByVal MA_ID As String, ByVal VA_ID As String, _
+    ByVal VADatum_ID As String, ByVal VAStart_ID As String) As String
+
+    On Error Resume Next
+
+    ' Public Variables zuruecksetzen
+    Email = ""
+    VName = ""
+    NName = ""
+    va_text = ""
+    VA_Objekt = ""
+    VA_Ort = ""
+    VADatum = ""
+    VA_Uhrzeit = ""
+    VA_Ende = ""
+    DC = ""
+    TP = ""
+    tpzeit = ""
+    Sender = ""
+
+    ' E-Mail ist PFLICHT
+    Email = TLookup("Email", "tbl_Ma_Mitarbeiterstamm", "ID=" & MA_ID)
+    If Err.Number <> 0 Or Len(Nz(Email, "")) = 0 Then
+        HTML_Texte_lesen = "Mitarbeiter " & MA_ID & ": Emailadresse fehlt!"
+        Exit Function
+    End If
+
+    ' Mitarbeiter-Daten
+    VName = Nz(TLookup("Vorname", "tbl_Ma_Mitarbeiterstamm", "ID = " & MA_ID), "")
+    NName = Nz(TLookup("Nachname", "tbl_Ma_Mitarbeiterstamm", "ID = " & MA_ID), "")
+
+    ' Auftrags-Daten
+    va_text = Nz(TLookup("Auftrag", "tbl_VA_Auftragstamm", "ID = " & VA_ID), "")
+    VA_Objekt = Nz(TLookup("Objekt", "tbl_VA_Auftragstamm", "ID = " & VA_ID), "")
+    VA_Ort = Nz(TLookup("Ort", "tbl_VA_Auftragstamm", "ID = " & VA_ID), "")
+    DC = Nz(TLookup("Dienstkleidung", "tbl_VA_Auftragstamm", "ID = " & VA_ID), "")
+    TP = Nz(TLookup("Treffpunkt", "tbl_VA_Auftragstamm", "ID = " & VA_ID), "")
+    tpzeit = Nz(TLookup("Treffp_Zeit", "tbl_VA_Auftragstamm", "ID = " & VA_ID), "")
+
+    ' WICHTIG: Datum und Zeiten aus tbl_VA_Start lesen (nicht Planung!)
+    ' Dies funktioniert auch wenn der MA noch nicht geplant ist
+    VADatum = Nz(TLookup("VADatum", "tbl_VA_Start", "ID = " & VAStart_ID), "")
+    VA_Uhrzeit = Nz(TLookup("VA_Start", "tbl_VA_Start", "ID = " & VAStart_ID), "")
+    VA_Ende = Nz(TLookup("VA_Ende", "tbl_VA_Start", "ID = " & VAStart_ID), "")
+
+    ' Sender ermitteln
+    Sender = detect_sender
+
+    ' Uhrzeiten formatieren - NUR wenn nicht leer!
+    If Len(VA_Uhrzeit & "") > 0 Then
+        On Error Resume Next
+        VA_Uhrzeit = Format(VA_Uhrzeit, "HH:MM")
+        On Error GoTo 0
+    End If
+
+    If Len(VA_Ende & "") > 0 Then
+        On Error Resume Next
+        VA_Ende = Format(VA_Ende, "HH:MM")
+        On Error GoTo 0
+    End If
+
+    If Len(tpzeit & "") > 0 Then
+        On Error Resume Next
+        tpzeit = Format(tpzeit, "HH:MM")
+        On Error GoTo 0
+    End If
+
+    ' Autoende herausnehmen (bei 4,5h keine Endzeit)
+    If stunden(VA_Uhrzeit, VA_Ende) = "4,5" Then VA_Ende = ""
+
+    ' Erfolg: Leerer String
+    HTML_Texte_lesen = ""
+
+End Function

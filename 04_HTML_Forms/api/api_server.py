@@ -241,8 +241,9 @@ def serve_html_root(filename):
 # MITARBEITER-FOTOS (UNC-Server-Pfad)
 # =============================================================================
 
-# UNC-Pfad für Mitarbeiterfotos (wie in Access VBA: prp_CONSYS_GrundPfad & TLookup("Pfad", "_tblEigeneFirma_Pfade", "ID = 7"))
-MA_FOTO_UNC_PATH = r"\\vConSYS01-Nbg\Consys\Bilder\Mitarbeiter"
+# Pfad für Mitarbeiterfotos (wie in Access VBA: prp_CONSYS_GrundPfad & TLookup("Pfad", "_tblEigeneFirma_Pfade", "ID = 7"))
+# S: ist gemappt auf \\vConSYS01-NBG\Consys
+MA_FOTO_UNC_PATH = r"S:\Bilder\Mitarbeiter"
 
 @app.route('/api/fotos/mitarbeiter/<filename>')
 def serve_mitarbeiter_foto(filename):
@@ -2753,24 +2754,24 @@ def get_anfragen():
 
         sql = """
             SELECT
-                p.ID,
-                p.VA_ID,
-                p.VADatum_ID,
-                p.VAStart_ID,
-                p.MA_ID,
-                p.Status_ID,
-                p.Anfragezeitpunkt,
-                p.Rueckmeldezeitpunkt,
-                p.MVA_Start,
-                p.MVA_Ende,
-                m.Nachname,
-                m.Vorname,
-                a.Auftrag,
-                a.Ort,
-                a.Dat_VA_Von
+                p.[ID],
+                p.[VA_ID],
+                p.[VADatum_ID],
+                p.[VAStart_ID],
+                p.[MA_ID],
+                p.[Status_ID],
+                p.[Anfragezeitpunkt],
+                p.[Rueckmeldezeitpunkt],
+                p.[MVA_Start],
+                p.[MVA_Ende],
+                m.[Nachname],
+                m.[Vorname],
+                a.[Auftrag],
+                a.[Ort],
+                a.[Dat_VA_Von]
             FROM (tbl_MA_VA_Planung AS p
-                LEFT JOIN tbl_MA_Mitarbeiterstamm AS m ON p.MA_ID = m.ID)
-                LEFT JOIN tbl_VA_Auftragstamm AS a ON p.VA_ID = a.ID
+                LEFT JOIN tbl_MA_Mitarbeiterstamm AS m ON p.[MA_ID] = m.[ID])
+                LEFT JOIN tbl_VA_Auftragstamm AS a ON p.[VA_ID] = a.[ID]
             WHERE 1=1
         """
 
@@ -2785,7 +2786,7 @@ def get_anfragen():
             sql += " AND p.Status_ID = ?"
             params.append(status_id)
 
-        sql += " ORDER BY p.Anfragezeitpunkt DESC"
+        sql += " ORDER BY p.[Anfragezeitpunkt] DESC"
 
         rows = execute_query(sql, params)
         return jsonify({"success": True, "data": rows})

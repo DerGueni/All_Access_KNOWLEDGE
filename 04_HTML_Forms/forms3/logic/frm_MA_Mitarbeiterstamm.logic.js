@@ -323,10 +323,11 @@ async function loadList() {
  * Demo-Daten anzeigen wenn API nicht erreichbar
  */
 function showDemoData() {
+    // Demo-Daten mit realen Feldnamen (wie API) + tblBilddatei fuer Foto-Test
     state.records = [
-        { MA_ID: 707, MA_Nachname: 'Alali', MA_Vorname: 'Ahmad', MA_Ort: 'Nürnberg', IstAktiv: true },
-        { MA_ID: 708, MA_Nachname: 'Müller', MA_Vorname: 'Thomas', MA_Ort: 'Fürth', IstAktiv: true },
-        { MA_ID: 709, MA_Nachname: 'Schmidt', MA_Vorname: 'Peter', MA_Ort: 'Erlangen', IstAktiv: true }
+        { ID: 707, Nachname: 'Alali', Vorname: 'Ahmad', Ort: 'Nürnberg', IstAktiv: true, tblBilddatei: 'Alali.jpg' },
+        { ID: 708, Nachname: 'Müller', Vorname: 'Thomas', Ort: 'Fürth', IstAktiv: true },
+        { ID: 709, Nachname: 'Schmidt', Vorname: 'Peter', Ort: 'Erlangen', IstAktiv: true }
     ];
     renderList();
     if (state.records.length > 0) gotoRecord(0);

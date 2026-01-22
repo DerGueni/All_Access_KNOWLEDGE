@@ -1065,13 +1065,26 @@ function openMitarbeiterauswahl() {
         alert('Bitte zuerst einen Auftrag auswaehlen');
         return;
     }
+
+    const params = new URLSearchParams();
+    params.set('va_id', state.currentVA_ID);
+    params.set('id', state.currentVA_ID);
+    if (state.currentVADatum_ID) params.set('vadatum_id', state.currentVADatum_ID);
+    if (state.currentVAStart_ID) params.set('vaStart_id', state.currentVAStart_ID);
+    if (state.currentVADatum) params.set('va_datum', state.currentVADatum);
+
+    const context = Object.fromEntries(params.entries());
+
+    const url = new URL('frm_MA_VA_Schnellauswahl.html', window.location.href);
+    url.search = params.toString();
+
     if (window.parent?.ConsysShell?.showForm) {
         localStorage.setItem('consec_va_id', String(state.currentVA_ID));
-        window.parent.ConsysShell.showForm('schnellauswahl');
+        window.parent.ConsysShell.showForm('schnellauswahl', context);
         return;
     }
-    const url = new URL(`frm_MA_VA_Schnellauswahl.html?va_id=${state.currentVA_ID}`, window.location.href).href;
-    window.open(url, '_blank');
+
+    window.open(url.href, '_blank');
 }
 
 function openHTMLAnsicht() {
