@@ -45,12 +45,79 @@ Jede Änderung wird wie folgt dokumentiert:
 | **GESAMT** | **First Auftrag Loading System** | **5 Dateien, VBA+JS+HTML - Lädt korrekten aktuellen Auftrag beim Start** | **2026-01-19** |
 | mini_api.py | POST /api/planungen Route | Zeile 620-661 - Akzeptiert Gross- UND Kleinschreibung (va_id/VA_ID) | 2026-01-19 |
 | **REGEL** | **API-Server Synchronität** | **mini_api.py UND api_server.py MÜSSEN identische Routen haben!** | **2026-01-19** |
+| frm_va_Auftragstamm.html | **LAYOUT: .work-area, .content-area** | width: 100% - Dehnt sich bis zum Rand | 2026-01-22 |
+| frm_va_Auftragstamm.html | **LAYOUT: .right-panel** | width: 650px, max-width: 750px - Auftragsliste ganz rechts | 2026-01-22 |
+| frm_va_Auftragstamm.html | **LAYOUT: .subform-left** | width: 280px - Schichten/Absagen Block | 2026-01-22 |
+| sub_MA_VA_Zuordnung.html | **LAYOUT: .col-std** | width: 26px, text-align: right - Std-Spalte + Header rechtsbündig | 2026-01-22 |
+| sub_MA_VA_Zuordnung.html | **LAYOUT: .new-row** | background: #ffffff, hover: #f0f0f0 - Einsatzliste Zeilen | 2026-01-22 |
+| mini_api.py | **/api/auftraege expand_days** | JOIN a.ID = t.VA_ID für MA_Anzahl_Soll/Ist Berechnung | 2026-01-22 |
+| **REGEL** | **Auftragstamm Layout-Aufteilung** | **Optik und Aufteilung NICHT selbstständig ändern!** | **2026-01-22** |
+| mini_api.py | **POST /api/anfragen/create** | KOMPLETTE FUNKTION anfragen_create() Zeile 904-962 - INSERT mit VADatum, MVA_Start, MVA_Ende | **2026-01-24** |
+| mini_api.py | **tbl_VA_Start Tabelle** | Startzeit-Daten aus tbl_VA_Start (NICHT tbl_VA_Startzeiten!) | **2026-01-24** |
+| mini_api.py | **INSERT tbl_MA_VA_Planung** | MUSS enthalten: MA_ID, VA_ID, VADatum_ID, VAStart_ID, Status_ID, Anfragezeitpunkt, VADatum, MVA_Start, MVA_Ende | **2026-01-24** |
+| Access VBA | **zmd_Mail.Anfragen()** | VBA-Funktion fuer Mail-Versand - NICHT AENDERN (Access-seitig) | **2026-01-24** |
+| Access VBA | **zmd_Mail.create_Mail()** | CDO/SMTP Mail-Versand ueber Mailjet - NICHT AENDERN | **2026-01-24** |
+| **KRITISCH** | **MA-ANFRAGE-MAIL-SYSTEM** | **API + VBA arbeiten zusammen: API setzt Daten, VBA sendet Mail. NIEMALS eigenstaendig aendern!** | **2026-01-24** |
+| mini_api.py | **/api/einsatzliste/senden** | POST-Endpoint für Einsatzliste versenden - erstellt Excel mit Access-Vorlage S:\Vorlage_EINSATZLISTE.xls | **2026-01-24** |
+| mini_api.py | **_create_einsatzliste_excel()** | Verwendet Original Access-Vorlage, befüllt Zeilen 1,6-9,12-17+ exakt wie VBA fXL_Export_Auftrag | **2026-01-24** |
+| mini_api.py | **_send_einsatzliste_emails()** | Outlook-Versand mit HTML-Body aus HTMLBodies/HTML_Body_Einsatzliste.txt + Excel-Anhang | **2026-01-24** |
+| frm_va_Auftragstamm.html | **sendeEinsatzlisteMA()** | Zeile 2963-3019 - Nutzt API-Endpoint mit VBA-Bridge als Fallback | **2026-01-24** |
+| **KRITISCH** | **EINSATZLISTE-MAIL-SYSTEM** | **API + Excel-Vorlage + HTML-Body + Outlook. Vorlage: S:\Vorlage_EINSATZLISTE.xls - NIEMALS eigenständig ändern!** | **2026-01-24** |
+| mini_api.py | **SMTP E-Mail-Versand (Mailjet)** | Server: in-v3.mailjet.com:25, Absender: consec-auftragsplanung@gmx.de - Ersetzt Outlook COM | **2026-01-24** |
+| mini_api.py | **send_email_smtp()** | Zeile 2094-2135 - SMTP-Versand-Funktion mit Attachment-Support | **2026-01-24** |
+| mini_api.py | **_send_einsatzliste_emails()** | Umgestellt auf SMTP statt Outlook | **2026-01-24** |
+| mini_api.py | **_send_dienstplan_email()** | Umgestellt auf SMTP statt Outlook | **2026-01-24** |
+| **OFFEN** | **SMTP E-Mail-Zustellung** | **E-Mails werden von Mailjet akzeptiert aber kommen nicht an - Absender-Verifizierung pruefen!** | **2026-01-24** |
+| frm_va_Auftragstamm.html | **Right Column: Treffpunkt, PLZ, Ansprechpartner, Dienstkleidung** | Fehlende Felder aus Access ergaenzt (Zeile 1388-1409) | **2026-01-25** |
+| frm_va_Auftragstamm.html | **Header: Veranst_Status_ID, Veranstalter_ID** | Auftragsstatus + Kunde Dropdowns im Header (Zeile 1329-1341) | **2026-01-25** |
+| frm_va_Auftragstamm.html | **CSS: .form-section height** | Von 130px auf auto/min-height:130px/max-height:160px (Zeile 500-502) | **2026-01-25** |
+| frm_va_Auftragstamm.html | **JS: loadAuftragData PLZ** | PLZ-Feld Zuweisung hinzugefuegt (Zeile 2129) | **2026-01-25** |
+| frm_va_Auftragstamm.html | **Auftragsliste (rechts)** | Laedt korrekt, Sortierung, Filterung, Klick-Navigation - EINGEFROREN | **2026-01-25** |
+| sub_MA_VA_Zuordnung.html | **Einsatzliste Zuordnungen** | Zugesagte MA werden korrekt eingetragen, Zeilen-Rendering - EINGEFROREN | **2026-01-25** |
+| variante_shell/shell.html | **NAVIGATE mit ID/params** | loadForm erweitert um id und params Parameter fuer Formular-Navigation (Zeile 268-304) | **2026-01-25** |
+| js/webview2-bridge.js | **'kunde' case im Switch** | Einzelner Kunde-Abruf mit Event-Feuering (Zeile 455-462) | **2026-01-25** |
+| frm_va_Auftragstamm.html | **#statusOverview** | Anfrage-Panel wieder sichtbar (display:none entfernt, Zeile 1615) | **2026-01-25** |
+| logic/frm_DP_Dienstplan_Objekt.logic.js | **Auftrag-Gruppierung** | Deduplizierung nach Auftrag+Objekt+Ort, VA_IDs-Array (Zeile 399-425, 528-537) | **2026-01-25** |
 
 ---
 
 ## 📝 ÄNDERUNGSHISTORIE
 
 <!-- Neue Einträge werden hier automatisch eingefügt -->
+
+### 2026-01-25 - frm_va_Auftragstamm.html - Fehlende Access-Felder ergaenzt
+**Element:** form-section (Right Column), Header (Status-Group)
+**Typ:** html + css + js
+**Aenderung:** Funktions- und Eigenschaftsabgleich mit Access durchgefuehrt, fehlende Felder ergaenzt
+
+**Hinzugefuegte Felder (Right Column):**
+- Treffpunkt (input, id="Treffpunkt")
+- Treffp_Zeit (time, id="Treffp_Zeit")
+- PLZ (input, id="PLZ")
+- Ansprechpartner (input, id="Ansprechpartner")
+- Dienstkleidung (input + datalist, id="Dienstkleidung")
+
+**Hinzugefuegte Felder (Header):**
+- Veranstalter_ID (select, id="Veranstalter_ID") - Kunde-Dropdown
+- Veranst_Status_ID (select, id="Veranst_Status_ID") - Auftragsstatus-Dropdown
+
+**CSS-Anpassung:**
+```css
+.form-section {
+    height: auto;
+    min-height: 130px;
+    max-height: 160px;
+}
+```
+
+**JS-Anpassung:**
+- loadAuftragData: PLZ-Feld Zuweisung hinzugefuegt
+- veranstalterChanged() wird bei Kunde-Aenderung aufgerufen
+
+**Anweisung:** "ja, ergaenze die fehlenden felder"
+**Status:** ✅ Abgeschlossen
+
+---
 
 ### === INITIALE ERSTELLUNG ===
 **Datum:** 2026-01-16
@@ -60,6 +127,367 @@ Jede Änderung wird wie folgt dokumentiert:
 ---
 
 <!-- ÄNDERUNGEN AB HIER EINFÜGEN -->
+
+### 2026-01-24 23:45 - mini_api.py - SMTP E-Mail-Versand (Mailjet)
+**Element:** E-Mail-Versand System
+**Typ:** python api
+**Änderung:** Outlook COM-Automation durch SMTP ersetzt
+
+**Problem:** Outlook blockiert automatischen E-Mail-Versand (Sicherheitsabfrage)
+
+**Lösung:**
+1. SMTP-Konfiguration hinzugefügt (Mailjet: in-v3.mailjet.com:25)
+2. `send_email_smtp()` Funktion implementiert mit HTML + Attachment Support
+3. Einsatzliste-Versand auf SMTP umgestellt
+4. Dienstplan-Versand auf SMTP umgestellt
+
+**SMTP-Konfiguration (mini_api.py Zeile 19-24):**
+```python
+SMTP_SERVER = "in-v3.mailjet.com"
+SMTP_PORT = 25
+SMTP_USERNAME = "97455f0f699bcd3a1cb8602299c3dadd"
+SMTP_PASSWORD = "1dd9946e4f632343405471b1b700c52f"
+SMTP_FROM_EMAIL = "consec-auftragsplanung@gmx.de"
+```
+
+**Status:** ⚠️ OFFEN - E-Mails werden von Mailjet akzeptiert (250 OK queued) aber kommen nicht beim Empfänger an. Mögliche Ursache: Absender-Adresse bei Mailjet nicht verifiziert.
+
+**Nächste Schritte:**
+- Mailjet Dashboard prüfen (Sender-Verifizierung)
+- Spam-Ordner prüfen
+- Alternative Absender-Adresse testen
+
+---
+
+### 2026-01-24 22:30 - Filter-Tests durchgeführt
+**Element:** Schnellauswahl, Mitarbeiterstamm, Dienstplan
+**Typ:** test/validierung
+**Änderung:** Sichtbare Filter-Tests mit Playwright + DevTools
+
+**Getestete Filter:**
+- **Schnellauswahl:** VA_ID, cboVADatum, IstAktiv, IstVerfuegbar, cbNur34a, cboAnstArt, cboQuali
+- **Mitarbeiterstamm:** NurAktiveMA (6 Optionen), cboFilterAuftragEinsatz
+- **Dienstplan:** dtStartdatum, dtEnddatum, cboKW, NurAktiveMA
+
+**API-Ergebnisse:**
+- Alle MA: 500 (limit)
+- Nur Aktive: 211
+- Nur Festangestellte: 10
+- Nur Minijobber: 113
+
+**Status:** ✅ Filter funktionieren, cboQuali hat keine Daten (fehlender API-Endpoint)
+
+---
+
+### 2026-01-24 15:55 - mini_api.py - MA-ANFRAGE-MAIL-SYSTEM (EINGEFROREN!)
+**Element:** POST /api/anfragen/create, tbl_MA_VA_Planung INSERT
+**Typ:** python api
+**Änderung:** Korrektur Mail-Versand mit vollständigen Datum/Zeit-Feldern
+
+**Problem:** Mail-Anfragen wurden ohne Datum/Uhrzeiten versendet (leere Felder)
+
+**Lösung:**
+1. Startzeit-Daten aus `tbl_VA_Start` holen (VADatum, MVA_Start, MVA_Ende)
+2. Beim INSERT in `tbl_MA_VA_Planung` diese Felder mitsetzen
+3. VBA-Funktion `Anfragen()` liest diese und füllt Mail-Template korrekt
+
+**Betroffene Code-Stellen (mini_api.py Zeile 904-962):**
+```python
+# Startzeit-Daten holen aus tbl_VA_Start (NICHT tbl_VA_Startzeiten!)
+cursor.execute("""
+    SELECT VADatum, MVA_Start, MVA_Ende
+    FROM tbl_VA_Start
+    WHERE ID = ?
+""", (vastart_id,))
+
+# INSERT mit ALLEN erforderlichen Feldern
+cursor.execute("""
+    INSERT INTO tbl_MA_VA_Planung
+    (MA_ID, VA_ID, VADatum_ID, VAStart_ID, Status_ID, Anfragezeitpunkt,
+     VADatum, MVA_Start, MVA_Ende)
+    VALUES (?, ?, ?, ?, 2, ?, ?, ?, ?)
+""", (ma_id, va_id, vadatum_id, vastart_id, datetime.now(),
+      va_datum, mva_start, mva_ende))
+```
+
+**Verifiziert:** Mail-Log ID 57472 zeigt korrektes Datum "31.01.2026" im Betreff
+**Status:** ✅ EINGEFROREN - NICHT MEHR ÄNDERN!
+**Anweisung:** "DIESE FUNKTIONALITÄT BITTE SOFORT ALS FUNKTIONIEREND EINFRIEREN"
+
+---
+
+### 2026-01-24 - frm_MA_VA_Schnellauswahl.html - Zusage-Buttons + REST API
+**Element:** btnAddZusage, btnDelZusage, btnMoveZusage, btnSortPlan, btnSortZugeord
+**Typ:** html + js
+**Änderung:** Buttons sichtbar gemacht und auf REST API umgestellt
+
+**1. Button-Column sichtbar (Zeile 906):**
+- Vorher: `display: none`
+- Nachher: `display: flex; flex-direction: column; gap: 4px; padding: 4px`
+
+**2. btnAddZusage_Click auf REST API (Zeile 1989-2048):**
+- Vorher: `Bridge.sendEvent('zuordnung_erstellen', {...})`
+- Nachher: `fetch(\`${API_BASE}/planungen/${planId}/zusage\`, { method: 'POST' })`
+
+**3. btnMoveZusage_Click auf REST API (Zeile 2050-2115):**
+- Vorher: `Bridge.sendEvent('zuordnung_to_planung', {...})`
+- Nachher:
+  1. `PUT /api/zuordnungen/${zuoId}` mit `{ MA_ID: 0 }` (Slot leeren)
+  2. `POST /api/planungen` (neue Planung erstellen)
+
+**4. btnDelZusage_Click auf REST API (Zeile 2117-2169):**
+- Vorher: `Bridge.sendEvent('zuordnung_clear', {...})`
+- Nachher: `PUT /api/zuordnungen/${zuoId}` mit `{ MA_ID: 0 }`
+
+**5. Sort-Funktionen clientseitig (Zeile 2171-2210):**
+- Vorher: `Bridge.sendEvent('sort_zuo_plan', {...})`
+- Nachher: Clientseitige Sortierung nach Nachname mit `localeCompare('de')`
+
+**6. API_BASE Variable hinzugefügt (Zeile 949):**
+```javascript
+const API_BASE = 'http://localhost:5000/api';
+```
+
+**Anweisung:** "fahre mit den offenen punkten fort und nutze REST API"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-24 - frm_DP_Dienstplan_MA.logic.js - tmpMA Kontext
+**Element:** navigateWeek(), goToToday()
+**Typ:** js
+**Änderung:** MA-Kontext-Erhaltung bei Navigation implementiert (wie VBA tmpMA)
+
+**Problem:** Bei Navigation (Vor/Zurück/Heute) ging die MA-Auswahl verloren
+
+**Lösung:**
+```javascript
+// Neue Funktionen (Zeile 262-290):
+function saveMitarbeiterKontext() {
+    const activeRow = document.querySelector('.calendar-row.active, .calendar-row.selected');
+    if (activeRow) state.tmpMA = activeRow.dataset.maId;
+}
+
+function restoreMitarbeiterKontext() {
+    if (!state.tmpMA) return;
+    setTimeout(() => {
+        const targetRow = document.querySelector(`[data-ma-id="${state.tmpMA}"]`);
+        if (targetRow) {
+            targetRow.classList.add('selected');
+            targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        state.tmpMA = null;
+    }, 100);
+}
+
+// navigateWeek und goToToday erweitert:
+saveMitarbeiterKontext();  // Vor Navigation
+loadDienstplan().then(() => restoreMitarbeiterKontext());  // Nach Navigation
+```
+
+**Anweisung:** "fahre mit den offenen punkten fort"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-24 - frm_KD_Kundenstamm.html - Schließen-Button
+**Element:** btnSchliessen, closeForm()
+**Typ:** html + js
+**Änderung:** Fehlender "Schließen" Button hinzugefügt (wie Access Befehl38_Click)
+
+**HTML (Zeile 850):**
+```html
+<button class="btn" id="btnSchliessen" onclick="closeForm()" title="Formular schliessen">Schliessen</button>
+```
+
+**JavaScript (Zeile 2675-2688):**
+```javascript
+function closeForm() {
+    if (window.Bridge) {
+        Bridge.sendEvent('close', { form: 'frm_KD_Kundenstamm' });
+        return;
+    }
+    // Fallback: Tab schließen oder zur Startseite
+    if (window.opener) window.close();
+    else if (parent !== window) parent.postMessage({ type: 'CLOSE_TAB' }, '*');
+    else window.location.href = 'index.html';
+}
+```
+
+**Anweisung:** "fahre mit den offenen punkten fort"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-24 - frm_va_Auftragstamm.html - Neue Buttons + Funktionen
+**Element:** btnMailPos, btn_VA_Neu_Aus_Vorlage
+**Typ:** html + js
+**Änderung:** Zwei fehlende Buttons aus Access hinzugefügt
+
+**1. btnMailPos hinzugefügt (Zeile 1319):**
+```html
+<button class="btn unified-btn btn-blue" id="btnMailPos" onclick="sendeEinsatzlistePOS()"
+        title="Einsatzliste an Positionen senden">EL senden POS</button>
+```
+
+**2. sendeEinsatzlistePOS() Funktion (Zeile 4897-4932):**
+- Ruft VBA Bridge `HTML_btnMailPos_Click(VA_ID, VADatum_ID)` auf
+- Fallback: Öffnet frm_MA_Serien_eMail_Auftrag.html mit `?mode=position`
+
+**3. btn_VA_Neu_Aus_Vorlage hinzugefügt (Zeile 1311):**
+```html
+<button class="btn unified-btn" id="btn_VA_Neu_Aus_Vorlage" onclick="auftragAusVorlage()"
+        title="Auftrag aus Vorlage erstellen">Aus Vorlage</button>
+```
+
+**4. auftragAusVorlage() Funktion (Zeile 4736-4794):**
+- Versucht VBA Bridge `HTML_btn_VA_Neu_Aus_Vorlage_Click`
+- Fallback: Lädt Vorlagen via API und zeigt Auswahl-Dialog
+- Kopiert ausgewählte Vorlage via `/auftraege/{id}/copy`
+
+**Anweisung:** "fahre mit den offenen punkten in den html formularen fort"
+**Status:** ✅ Abgeschlossen
+
+---
+
+### 2026-01-24 - frm_MA_Serien_eMail_Auftrag - btnSchnellPlan + btnZuAbsage
+**Element:** btnSchnellPlan, btnZuAbsage
+**Typ:** html + js
+**Änderung:** Zwei Navigations-Buttons hinzugefuegt
+
+**1. btnSchnellPlan (HTML Zeile 43):**
+```html
+<button class="btn unified-btn" id="btnSchnellPlan" onclick="btnSchnellPlan_Click()"
+        title="MA-Planung Schnellauswahl">Schnellauswahl</button>
+```
+
+**2. btnSchnellPlan_Click() (logic.js Zeile 643):**
+- Prueft ob VA_ID und VADatumID gesetzt sind
+- Navigiert zu frm_MA_VA_Schnellauswahl.html mit URL-Parametern
+- Exportiert via `window.btnSchnellPlan_Click`
+
+**3. btnZuAbsage (HTML Zeile 44):**
+```html
+<button class="btn unified-btn" id="btnZuAbsage" onclick="btnZuAbsage_Click()"
+        title="Zu-/Absagen verwalten">Zu-/Absagen</button>
+```
+
+**4. btnZuAbsage_Click() (logic.js Zeile 671):**
+- Prueft ob VA_ID gesetzt ist
+- Navigiert zu Zu-/Absagen-Formular
+- Exportiert via `window.btnZuAbsage_Click`
+
+**Anweisung:** "fahre mit den offenen punkten fort"
+**Status:** ✅ VERIFIZIERT - Master Agent: PASS
+
+---
+
+### 2026-01-24 - frmTop_MA_Abwesenheitsplanung - bznUebernehmen Button
+**Element:** bznUebernehmen, API_BASE, closeForm
+**Typ:** html + js
+**Änderung:** Access-konformer Uebernehmen-Button + REST API Fallback
+
+**1. bznUebernehmen Button (HTML Zeile 376):**
+- Vorher: `btnSpeichern` mit Text "Speichern"
+- Nachher: `bznUebernehmen` mit Text "Uebernehmen" (Access-Name)
+
+**2. bznUebernehmen_Click() (logic.js Zeile 336):**
+- Sammelt berechnete Fehlzeiten
+- Bridge.sendEvent('bznUebernehmen', { abwesenheiten }) bei WebView2
+- REST API Fallback: POST /api/abwesenheiten/uebernehmen
+- Zeigt Erfolgsmeldung: "Nicht-Verfuegbar-Zeiten erfolgreich uebernommen"
+
+**3. API_BASE definiert (logic.js Zeile 330):**
+```javascript
+const API_BASE = 'http://localhost:5000/api';
+```
+
+**4. closeForm() hinzugefuegt (logic.js Zeile 410):**
+- Bridge.sendEvent('close', {...}) bei WebView2
+- Browser-Fallback: window.close() oder parent.postMessage
+
+**Anweisung:** "offene punkte in html formularen"
+**Status:** ✅ VERIFIZIERT - Master Agent: PASS
+
+---
+
+### 2026-01-24 - frm_MA_VA_Positionszuordnung - 6 kritische Buttons
+**Element:** btnAddAll, btnDelAll, btnAddSelected, btnDelSelected, mcobtnDelete, btnRepeat, maTypFilter
+**Typ:** html + js
+**Änderung:** 6 fehlende Bulk-Operations-Buttons + MA-Typ Filter
+
+**1. mcobtnDelete (HTML Zeile 58):**
+```html
+<button class="btn unified-btn btn-danger" id="mcobtnDelete"
+        title="Ausgewaehlte Position loeschen">Pos. loeschen</button>
+```
+
+**2. btnRepeat (HTML Zeile 59):**
+```html
+<button class="btn unified-btn" id="btnRepeat"
+        title="Zuordnung auf andere Tage wiederholen">Wiederholen</button>
+```
+
+**3. Bulk-Buttons Panel (HTML Zeilen 113-116):**
+- btnAddSelected: Ausgewaehlte MA zuordnen
+- btnAddAll: Alle verfuegbaren MA zuordnen
+- btnDelSelected: Ausgewaehlte MA entfernen
+- btnDelAll: Alle zugeordneten MA entfernen
+
+**4. MA-Typ Filter Radio-Buttons (HTML Zeilen 95-97):**
+```html
+<input type="radio" name="maTypFilter" value="0" checked> Alle
+<input type="radio" name="maTypFilter" value="1"> Fest
+<input type="radio" name="maTypFilter" value="2"> Frei
+```
+
+**5. Implementierte Funktionen (Inline-Script):**
+- alleHinzufuegen() - Zeile 347
+- alleEntfernen() - Zeile 372
+- ausgewaehlteHinzufuegen() - Zeile 402
+- ausgewaehlteEntfernen() - Zeile 416
+- positionLoeschen() - Zeile 441
+- zuordnungWiederholen() - Zeile 460
+- maTypFilterAnwenden() - Zeile 488
+
+**6. Logic.js Erweiterungen:**
+- API_BASE fuer REST Fallback
+- Bulk-Funktionen mit async/await und API-Aufrufen
+- window.* Exports fuer globalen Zugriff
+
+**Anweisung:** "alle elemente funktionierend wie in access"
+**Status:** ✅ VERIFIZIERT - Master Agent: PASS
+
+---
+
+### 2026-01-23 15:45 - MCP SERVER INSTALLATION
+**Element:** OfficeMCP + VBA-Debug MCP
+**Typ:** Konfiguration
+**Änderung:** Zwei neue MCP-Server installiert und konfiguriert
+**Details:**
+- **OfficeMCP v1.0.5** (pip install officemcp)
+  - Pfad: `C:\Users\guenther.siegert\AppData\Roaming\Python\Python312\Scripts\officemcp.exe`
+  - Arbeitsordner: `C:\Users\guenther.siegert\Documents\OfficeMCP`
+  - Für: Excel, Word, PowerPoint, Outlook (OHNE Access-Bezug)
+
+- **VBA-Debug MCP** (von Claude Desktop erstellt)
+  - Pfad: `C:\Users\guenther.siegert\Documents\MCP-Servers\vba-debug-mcp\src`
+  - Für: VBA Error-Trapping, Debug.Print, Compile-Check
+
+**Entscheidungslogik dokumentiert in:**
+- `~/.claude/CLAUDE.md`
+- `CLAUDE.md` (Projekt)
+- `settings.json` Instructions
+- `mcp_tools/MCP_SERVER_UEBERSICHT.md`
+
+**Gelöschte Dateien:**
+- INSTALL_MCP.bat (veraltet)
+- INSTALL_MCP_COMPLETE.bat (veraltet)
+
+**Status:** ✅ Konfiguriert, wartet auf Neustart
+**Anweisung:** MCP-Server Installation auf Benutzerwunsch
+
+---
 
 ### 2026-01-20 17:14 - frm_MA_VA_Schnellauswahl.logic.js
 **Element:** btnMail / btnMailSelected (VAStart_ID Mapping)
@@ -2692,3 +3120,80 @@ async function applyObjektRules(value) {
 
 ---
 
+### 2026-01-22 16:25 - frm_va_Auftragstamm.html
+**Element:** Layout-Anpassungen (.right-panel, .subform-left, absolute Felder)
+**Typ:** css/html
+**Datei:** `04_HTML_Forms/forms3/frm_va_Auftragstamm.html`
+**Änderung:**
+1. `.right-panel` verbreitert: 530px → 600px (Soll/Ist/Status Spalten sichtbar)
+2. `.subform-left` verbreitert: 200px → 240px (+40px für Schichten/Absagen Block)
+3. Treffpunkt-Block nach rechts verschoben (left: 276px → 360px)
+4. Dienstkleidung-Block nach rechts verschoben (left: 276px → 360px)
+5. Ansprechpartner-Block nach rechts verschoben (left: 261px → 345px)
+6. Auftraggeber-Block nach rechts verschoben (left: 276px → 360px)
+7. Status/Rech.Nr/Folgetag neu positioniert (left: 710px, verschiedene top-Werte)
+
+**Vorher:**
+- right-panel: width: 530px
+- subform-left: width: 200px
+- Treffpunkt etc. ab left: 261-276px
+
+**Nachher:**
+- right-panel: width: 600px
+- subform-left: width: 240px
+- Treffpunkt etc. ab left: 345-360px
+- Status/Rech.Nr/Folgetag bei left: 710px
+
+**Anweisung:** "Bitte die Auftragsliste rechts so verbreitern dass auch die Spalten Soll, Ist, Status noch sichtbar angezeigt werden und die Auftragsliste dann ganz rechts anordnen. Dafür den Block mit Schichten und Absagen 40 Pixel breiter bitte" + "Den markierten Block oben ein Stück weiter nach rechts so dass keine Überlagerungen mehr da sind"
+**Status:** ✅ Abgeschlossen
+
+---
+
+
+### 2026-01-22 17:08 - frm_MA_Mitarbeiterstamm.html
+**Element:** Tabs Einsatzübersicht / Nicht Verfügbar (Datenladung) + Bridge mitarbeiter_detail
+**Typ:** html/js
+**Änderung:** Einsatzübersicht lädt jetzt über `/api/zuordnungen` (statt nicht existierender `einsaetze`-Bridge), Nicht Verfügbar über `/api/mitarbeiter/<id>`; Bridge-Detaildaten werden korrekt aus `data.record.mitarbeiter` gelesen; Zeitformat-Helfer ergänzt.
+**Vorher:** `loadEinsaetze()` rief `Bridge.loadData('einsaetze')` (kein Mapping) und `loadNichtVerfügbar()` rief `Bridge.loadData('nichtverfügbar')`; `mitarbeiter_detail` nahm flache Record-Struktur an.
+**Nachher:** REST-Aufruf `/api/zuordnungen?ma_id=...` + Rendering in Tabelle; Nicht Verfügbar aus `data.data.nicht_verfuegbar`; `mitarbeiter_detail` akzeptiert verschachtelte Struktur; `formatTime()` hinzugefügt.
+**Anweisung:** "Prüfe bitte das HTML Formular Mitarbeiterstamm ... ob alle Tabs ... korrekt ... mit Daten aus dem Backend befüllt werden."
+**Status:** ✅ Abgeschlossen
+
+### 2026-01-22 17:08 - frm_MA_Mitarbeiterstamm.logic.js
+**Element:** btnAU_Lesen_Click + Nicht-Verfügbar Filter
+**Typ:** js
+**Änderung:** Einsatzübersicht nutzt jetzt `/api/zuordnungen` mit ma_id/von/bis; Rendering auf `#einsaetzeTbody` und Feld-Mapping korrigiert. Nicht Verfügbar lädt aus `/api/mitarbeiter/<id>` und filtert clientseitig (ab heute / von-bis).
+**Vorher:** `btnAU_Lesen_Click` rief `/api/mitarbeiter/<id>/zuordnungen` (nicht vorhanden) und renderte in `#lst_Zuo`; Nicht Verfügbar nutzte `/api/mitarbeiter/<id>/nverfueg` (nicht vorhanden).
+**Nachher:** REST-Endpoint `/api/zuordnungen` + Rendering in Einsatzübersicht; Nicht Verfügbar aus `data.nicht_verfuegbar` mit Filter.
+**Anweisung:** "Prüfe bitte das HTML Formular Mitarbeiterstamm ... ob alle Tabs ... korrekt ... mit Daten aus dem Backend befüllt werden."
+**Status:** ✅ Abgeschlossen
+
+### 2026-01-22 17:25 - frm_MA_Mitarbeiterstamm.html
+**Element:** Tab-Header (sichtbare Tabs + Label)
+**Typ:** html
+**Änderung:** Access-Tabs sichtbar geschaltet; Labels an Access angepasst ("Stundenübersicht", "Überhang Stunden"). Nicht-Access Tabs (Qualifikationen, Dokumente, Quick Info) bleiben verborgen.
+**Vorher:** Mehrere Access-Tabs waren hidden; Labels "Stundenübers." und "Uberhang Std.".
+**Nachher:** Alle Access-Tabs sichtbar; Labels exakt wie Access.
+**Anweisung:** "bitte alles erledigen" (Tabs wie in Access sichtbar)
+**Status:** ✅ Abgeschlossen
+
+### 2026-01-22 17:25 - api_server.py
+**Element:** /api/dienstplan/ma Query (JOIN-Klammern)
+**Typ:** python
+**Änderung:** Access-kompatible Klammerung der LEFT JOINs eingefügt.
+**Vorher:** Mehrere LEFT JOINs ohne Access-Klammern.
+**Nachher:** FROM (tbl_MA_VA_Planung LEFT JOIN tbl_VA_Start) LEFT JOIN tbl_VA_Auftragstamm.
+**Anweisung:** "bitte alles erledigen" (Dienstplan-Endpoint beheben)
+**Status:** ✅ Abgeschlossen
+
+### 2026-01-22 17:25 - mini_api.py
+**Element:** /api/dienstplan/ma Query
+**Typ:** python
+**Änderung:** Query an api_server angepasst: p.VADatum statt tbl_VA_AnzTage-Join; Auftragstamm Join über a.VA_ID; Access-Klammern für LEFT JOINs.
+**Vorher:** LEFT JOIN auf tbl_VA_AnzTage; Join auf a.ID.
+**Nachher:** Filter auf p.VADatum; Join auf a.VA_ID; Klammerung für Access.
+**Anweisung:** "bitte alles erledigen" (Route-Parität mini_api/api_server)
+**Status:** ✅ Abgeschlossen
+
+## 2026-01-22 16:50
+- Dienstplan MA: SQL in api_server/mini_api umgestellt auf vollqualifizierte Tabellennamen + Klammern, um Access-ODBC Parameter-Fehler zu vermeiden (ohne Aliasse).

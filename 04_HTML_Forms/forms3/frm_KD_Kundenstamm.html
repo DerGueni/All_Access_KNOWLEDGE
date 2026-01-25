@@ -846,7 +846,8 @@
                         <button class="btn" id="btnOutlook" onclick="openOutlook()" title="E-Mail senden" data-testid="kd-btn-outlook">✉ Outlook</button>
                         <button class="btn" id="btnWord" onclick="openWord()" title="Brief erstellen" data-testid="kd-btn-word">📄 Word</button>
                         <button class="btn btn-green" id="btnNeuKunde" onclick="neuerKunde()" data-testid="kd-btn-neu" style="left: 15px;">Neuer Kunde</button>
-                        <button class="btn btn-red" id="btnLoeschen" onclick="kundeLoeschen()" data-testid="kd-btn-loeschen" style="left: 220px;">Kunde löschen</button>
+                        <button class="btn btn-red" id="btnLoeschen" onclick="kundeLoeschen()" data-testid="kd-btn-loeschen" style="left: 220px;">Kunde loeschen</button>
+                        <button class="btn" id="btnSchliessen" onclick="closeForm()" data-testid="kd-btn-schliessen" title="Formular schliessen">Schliessen</button>
 
                         <!-- cboKDNrSuche: Direkte Kunden-Nummer Suche -->
                         <div class="header-kd-nr">
@@ -2503,8 +2504,14 @@
                         showRecord(0);
                     }
                     hideLoading();
+                } else if (data.type === 'kunde' && data.kunde) {
+                    // Einzeldatensatz empfangen (25.01.2026: type-Check hinzugefuegt)
+                    state.currentRecord = data.kunde;
+                    loadKundeData(data.kunde);
+                    hideLoading();
                 } else if (data.kunde) {
-                    // Einzeldatensatz empfangen
+                    // Alternative: Nur kunde-Objekt ohne type
+                    state.currentRecord = data.kunde;
                     loadKundeData(data.kunde);
                     hideLoading();
                 }
@@ -2669,6 +2676,23 @@
                 type: 'kunde',
                 id: state.currentRecord.kun_Id
             });
+        }
+
+        // closeForm - Formular schliessen (wie Access Befehl38_Click)
+        function closeForm() {
+            // Versuche VBA Bridge
+            if (window.Bridge) {
+                Bridge.sendEvent('close', { form: 'frm_KD_Kundenstamm' });
+                return;
+            }
+            // Fallback: Tab schliessen oder zur Startseite
+            if (window.opener) {
+                window.close();
+            } else if (parent !== window) {
+                parent.postMessage({ type: 'CLOSE_TAB', form: 'frm_KD_Kundenstamm' }, '*');
+            } else {
+                window.location.href = 'index.html';
+            }
         }
 
         async function speichern() {
@@ -3008,6 +3032,17 @@
             input.click();
         }
 
+        // API-Helper Funktion
+        async function apiCall(endpoint) {
+            const baseUrl = 'http://localhost:5000/api';
+            const url = endpoint.startsWith('/') ? baseUrl + endpoint : baseUrl + '/' + endpoint;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return await response.json();
+        }
+
         async function loadZusatzdateien() {
             if (!state.currentRecord?.kun_Id) return;
 
@@ -3123,12 +3158,7 @@
             }
         }
 
-        function closeForm() {
-            Bridge.close();
-            if (!window.chrome || !window.chrome.webview) {
-                window.close();
-            }
-        }
+        // closeForm wurde bereits früher definiert (Zeile 2676)
 
         // ============================================
         // HELPER-FUNKTIONEN

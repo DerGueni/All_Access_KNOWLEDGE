@@ -265,7 +265,7 @@
         /**
          * Load a form into the iframe
          */
-        function loadForm(formName) {
+        function loadForm(formName, id = null, params = null) {
             if (!formName) return;
 
             // Update active menu button
@@ -280,13 +280,27 @@
             // Show loading
             showLoading();
 
-            // Load form in iframe
+            // Load form in iframe - mit URL-Parametern fuer ID und params (25.01.2026)
             shellState.currentForm = formName;
-            shellState.iframe.src = formName + '.html';
+            let formUrl = formName + '.html?shell=1';
+            if (id) {
+                formUrl += '&id=' + encodeURIComponent(id);
+                formUrl += '&va_id=' + encodeURIComponent(id); // Kompatibilitaet
+            }
+            if (params) {
+                for (const [key, value] of Object.entries(params)) {
+                    if (value !== null && value !== undefined) {
+                        formUrl += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+                    }
+                }
+            }
+            shellState.iframe.src = formUrl;
 
             // Update browser history (optional)
             if (window.history && window.history.pushState) {
-                window.history.pushState({form: formName}, '', `?form=${formName}`);
+                let historyUrl = `?form=${formName}`;
+                if (id) historyUrl += `&id=${id}`;
+                window.history.pushState({form: formName, id: id}, '', historyUrl);
             }
         }
 
@@ -296,9 +310,9 @@
         function handleIframeMessage(event) {
             const data = event.data;
 
-            // Navigation request from iframe
+            // Navigation request from iframe (25.01.2026: ID und params weitergeben)
             if (data.type === 'NAVIGATE') {
-                loadForm(data.formName);
+                loadForm(data.formName, data.id || null, data.params || null);
             }
 
             // Close request

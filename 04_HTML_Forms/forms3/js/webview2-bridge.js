@@ -455,6 +455,15 @@ const Bridge = {
                     this._fireEvent('onDataReceived', { type: 'kunden', records: Array.isArray(result) ? result : (result.data || []) });
                     return result;
 
+                case 'kunde':
+                    // Einzelner Kunde laden
+                    if (id) {
+                        result = await apiFetch(`/kunden/${id}`);
+                        const kundeData = result.data || result;
+                        this._fireEvent('onDataReceived', { type: 'kunde', kunde: kundeData });
+                    }
+                    return result;
+
                 case 'schichten':
                     // WICHTIG: vadatum_id Parameter beruecksichtigen - nur Schichten des ausgewaehlten Tages laden
                     let schichtenUrl = `/schichten?va_id=${id}`;

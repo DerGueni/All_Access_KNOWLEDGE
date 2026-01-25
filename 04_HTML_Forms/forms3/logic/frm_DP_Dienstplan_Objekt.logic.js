@@ -316,7 +316,7 @@ function setupDayHeaderDblClick() {
 
 function parseDayTitle(text) {
     if (!text) return null;
-    const match = text.match(/(\\d{1,2})\\.(\\d{1,2})\\.(\\d{2})$/);
+    const match = text.match(/(\d{1,2})\.(\d{1,2})\.(\d{2})$/);
     if (!match) return null;
     const day = parseInt(match[1], 10);
     const month = parseInt(match[2], 10) - 1;
@@ -360,14 +360,15 @@ async function loadData() {
             });
         } else {
             // REST-API Fallback fuer Browser-Modus
-            const API_BASE = 'http://localhost:5000';
+            // Fallback-Pattern: Nutze globale API_BASE wenn vorhanden (aus webview2-bridge.js)
+            const API_BASE_LOCAL = (typeof API_BASE !== 'undefined') ? API_BASE.replace(/\/api$/, '') : 'http://localhost:5000';
 
             // Auftraege laden (mit Schichten im Zeitraum)
-            const auftraegeResponse = await fetch(`${API_BASE}/api/auftraege?von=${startStr}&bis=${endStr}&limit=100`);
+            const auftraegeResponse = await fetch(`${API_BASE_LOCAL}/api/auftraege?von=${startStr}&bis=${endStr}&limit=100`);
             const auftraege = await auftraegeResponse.json();
 
             // Einsatztage/Schichten laden (VADatum-Tabelle)
-            const einsatztageResponse = await fetch(`${API_BASE}/api/einsatztage?von=${startStr}&bis=${endStr}`);
+            const einsatztageResponse = await fetch(`${API_BASE_LOCAL}/api/einsatztage?von=${startStr}&bis=${endStr}`);
             const einsatztageJson = await einsatztageResponse.json();
             let einsatztage = [];
             if (Array.isArray(einsatztageJson)) {
@@ -377,7 +378,7 @@ async function loadData() {
             }
 
             // Zuordnungen laden (MA-Zuweisungen)
-            const zuordnungenResponse = await fetch(`${API_BASE}/api/zuordnungen?von=${startStr}&bis=${endStr}`);
+            const zuordnungenResponse = await fetch(`${API_BASE_LOCAL}/api/zuordnungen?von=${startStr}&bis=${endStr}`);
             const zuordnungenJson = await zuordnungenResponse.json();
             let zuordnungen = [];
             if (Array.isArray(zuordnungenJson)) {
@@ -387,13 +388,31 @@ async function loadData() {
             }
 
             // State aktualisieren - sicherstellen dass auftraege ein Array ist
+            let rawAuftraege = [];
             if (Array.isArray(auftraege)) {
-                state.auftraege = auftraege;
+                rawAuftraege = auftraege;
             } else if (auftraege && Array.isArray(auftraege.data)) {
-                state.auftraege = auftraege.data;
-            } else {
-                state.auftraege = [];
+                rawAuftraege = auftraege.data;
             }
+
+            // 25.01.2026: Auftraege nach Auftrag+Objekt gruppieren (Deduplizierung)
+            // Mehrere DB-Eintraege mit gleichem Auftragsnamen werden zusammengefasst
+            const auftragGroups = new Map();
+            rawAuftraege.forEach(a => {
+                const key = `${a.Auftrag || 'Unbekannt'}_${a.Objekt || ''}_${a.Ort || ''}`;
+                if (!auftragGroups.has(key)) {
+                    // Erstes Vorkommen - speichere mit allen zugehoerigen IDs
+                    auftragGroups.set(key, {
+                        ...a,
+                        VA_IDs: [a.VA_ID || a.ID]  // Sammle alle IDs fuer Schichten-Lookup
+                    });
+                } else {
+                    // Weiteres Vorkommen - fuege ID hinzu
+                    auftragGroups.get(key).VA_IDs.push(a.VA_ID || a.ID);
+                }
+            });
+            state.auftraege = Array.from(auftragGroups.values());
+            console.log(`[DP-Objekt] ${rawAuftraege.length} Auftraege zu ${state.auftraege.length} gruppiert`);
 
             // Einsatztage nach VA_ID + Datum gruppieren
             // Neue Struktur: einsatztage["VA_ID_DATUM"] = [schicht1, schicht2, ...]
@@ -450,14 +469,17 @@ function renderCalendar() {
     if (state.istAuftrAusblend && state.posAusblendAb > 0) {
         // Aufträge mit mehr als X Positionen ausblenden
         auftraege = auftraege.filter(auftrag => {
-            const vaId = auftrag.VA_ID || auftrag.ID;
+            // 25.01.2026: Unterstuetzung fuer gruppierte Auftraege
+            const vaIds = auftrag.VA_IDs || [auftrag.VA_ID || auftrag.ID];
             let totalSchichten = 0;
             for (let i = 0; i < 7; i++) {
                 const date = new Date(state.startDate);
                 date.setDate(date.getDate() + i);
                 const dateKey = formatDateForInput(date);
-                const key = `${vaId}_${dateKey}`;
-                totalSchichten += (state.einsatztage[key] || []).length;
+                for (const vaId of vaIds) {
+                    const key = `${vaId}_${dateKey}`;
+                    totalSchichten += (state.einsatztage[key] || []).length;
+                }
             }
             return totalSchichten <= state.posAusblendAb;
         });
@@ -466,19 +488,22 @@ function renderCalendar() {
     if (state.nurFreieSchichten) {
         // Nur Aufträge mit freien Schichten anzeigen
         auftraege = auftraege.filter(auftrag => {
-            const vaId = auftrag.VA_ID || auftrag.ID;
+            // 25.01.2026: Unterstuetzung fuer gruppierte Auftraege
+            const vaIds = auftrag.VA_IDs || [auftrag.VA_ID || auftrag.ID];
             for (let i = 0; i < 7; i++) {
                 const date = new Date(state.startDate);
                 date.setDate(date.getDate() + i);
                 const dateKey = formatDateForInput(date);
-                const key = `${vaId}_${dateKey}`;
-                const schichten = state.einsatztage[key] || [];
-                
-                for (const schicht of schichten) {
-                    const zuordnungen = state.zuordnungen[schicht.VADatum_ID] || [];
-                    const soll = schicht.Soll || 1;
-                    if (zuordnungen.length < soll) {
-                        return true; // Hat freie Schichten
+                for (const vaId of vaIds) {
+                    const key = `${vaId}_${dateKey}`;
+                    const schichten = state.einsatztage[key] || [];
+
+                    for (const schicht of schichten) {
+                        const zuordnungen = state.zuordnungen[schicht.VADatum_ID] || [];
+                        const soll = schicht.Soll || 1;
+                        if (zuordnungen.length < soll) {
+                            return true; // Hat freie Schichten
+                        }
                     }
                 }
             }
@@ -494,7 +519,8 @@ function renderCalendar() {
     let html = '';
 
     for (const auftrag of auftraege.slice(0, 50)) {
-        const vaId = auftrag.VA_ID || auftrag.ID;
+        // 25.01.2026: Unterstuetzung fuer gruppierte Auftraege mit mehreren VA_IDs
+        const vaIds = auftrag.VA_IDs || [auftrag.VA_ID || auftrag.ID];
         const auftragName = auftrag.Auftrag || auftrag.VA_Bezeichnung || 'Unbekannt';
         const objekt = auftrag.Objekt || auftrag.VA_Objekt || '';
         const ort = auftrag.Ort || auftrag.VA_Ort || '';
@@ -513,8 +539,12 @@ function renderCalendar() {
             const isWeekend = date.getDay() === 0 || date.getDay() === 6;
             const isFeiertag = istFeiertag(date);
 
-            const key = `${vaId}_${dateKey}`;
-            const schichten = state.einsatztage[key] || [];
+            // 25.01.2026: Sammle Schichten von allen zugehoerigen VA_IDs
+            let schichten = [];
+            for (const vaId of vaIds) {
+                const key = `${vaId}_${dateKey}`;
+                schichten = schichten.concat(state.einsatztage[key] || []);
+            }
 
             const dayClasses = [];
             if (isWeekend) dayClasses.push('weekend');
@@ -808,8 +838,13 @@ function handleBridgeData(data) {
     }
 }
 
-// Init bei DOM ready
-document.addEventListener('DOMContentLoaded', init);
+// Init bei DOM ready (Module werden async geladen, daher readyState-Check)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    // DOM bereits geladen, sofort initialisieren
+    init();
+}
 
 // Globaler Zugriff
 window.DienstplanObjekt = {
