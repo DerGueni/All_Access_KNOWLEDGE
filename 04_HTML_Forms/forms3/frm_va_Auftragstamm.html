@@ -1324,7 +1324,9 @@
                                 <label for="cbAutosendEL" style="position: relative;">EL Autosend</label>
                             </div>
                             <button class="btn unified-btn" id="btnELGesendet" onclick="showELGesendet()" data-testid="auftrag-btn-el-gesendet" style="position: relative;">EL gesendet</button>
-                            <span style="position: relative;"></span><!-- Platzhalter fuer symmetrisches 6-Spalten-Grid -->
+                            <!-- 25.01.2026: Fehlende Access-Buttons hinzugefuegt -->
+                            <button class="btn unified-btn" id="btnSyncErr" onclick="syncfehlerChecken()" data-testid="auftrag-btn-syncfehler" style="position: relative;" title="Syncfehler checken">Sync Check</button>
+                            <button class="btn unified-btn" id="btn_Ordnerkonzept" onclick="ordnerkonzeptOeffnen()" data-testid="auftrag-btn-ordnerkonzept" style="position: relative;" title="Ordnerkonzept oeffnen">Ordner</button>
                         </div>
                         <!-- Auftragsstatus und Kunde (25.01.2026 - aus Access ergaenzt) -->
                         <div class="status-group" style="position: relative; margin-left: 20px;">
@@ -1534,7 +1536,7 @@
                                 <div class="tab-page" id="tab-zusatzdateien" style="position: relative;">
                                     <div class="bwn-row" style="position: relative;">
                                         <span class="form-label" style="position: relative;">Doppelklick auf Dateinamen zeigt Inhalt an bzw. offnet Office-Pgm</span>
-                                        <button class="btn" onclick="neuenAttachHinzufuegen()" data-testid="auftrag-btn-attach-hinzufuegen" style="position: relative;">Neuen Attach hinzufugen</button>
+                                        <button class="btn" id="btnNeuAttach" onclick="neuenAttachHinzufuegen()" data-testid="auftrag-btn-attach-hinzufuegen" style="position: relative;" title="Neuen Attach hinzufuegen">Neuen Attach hinzufuegen</button>
                                     </div>
                                     <div class="grid-wrapper" style="flex: 1 1 0%; position: relative;">
                                         <table class="data-grid" id="gridAttach" data-testid="auftrag-table-attach" style="position: relative;">
@@ -1696,8 +1698,8 @@
                             <input type="date" class="date-input" id="Auftraege_ab" onchange="filterAuftraege()" data-testid="auftrag-date-auftraege-ab" style="position: relative;">
 
                             <button class="nav-btn tiny-btn" onclick="filterAuftraege()" data-testid="auftrag-btn-filter-go" style="position: relative;">Go</button>
-                            <button class="nav-btn" onclick="tageZurueck()" data-testid="auftrag-btn-tage-zurueck" style="position: relative;">&lt;&lt;</button>
-                            <button class="nav-btn" onclick="tageVor()" data-testid="auftrag-btn-tage-vor" style="position: relative;">&gt;&gt;</button>
+                            <button class="nav-btn" id="btnTgBack" onclick="tageZurueck()" data-testid="auftrag-btn-tage-zurueck" style="position: relative;" title="Tage zurueck">&lt;&lt;</button>
+                            <button class="nav-btn" id="btnTgVor" onclick="tageVor()" data-testid="auftrag-btn-tage-vor" style="position: relative;" title="Tage vor">&gt;&gt;</button>
                             <button class="nav-btn" onclick="abHeute()" data-testid="auftrag-btn-ab-heute" style="position: relative;">Ab Heute</button>
                         </div>
 
@@ -3575,6 +3577,28 @@
 
         function rechnungLexware() {
             Bridge.sendEvent('lexware', { va_id: state.currentAuftragId });
+        }
+
+        // 25.01.2026: Fehlende Access-Funktionen hinzugefuegt
+        function syncfehlerChecken() {
+            // Prueft Synchronisationsfehler fuer aktuellen Auftrag
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewaehlt', 'warning');
+                return;
+            }
+            // API-Aufruf oder Bridge-Event
+            Bridge.sendEvent('syncCheck', { va_id: state.currentAuftragId });
+            showToast('Synchronisation wird geprueft...', 'info');
+        }
+
+        function ordnerkonzeptOeffnen() {
+            // Oeffnet Ordnerstruktur fuer aktuellen Auftrag
+            if (!state.currentAuftragId) {
+                showToast('Kein Auftrag ausgewaehlt', 'warning');
+                return;
+            }
+            // Bridge-Event zum Oeffnen des Ordnerkonzepts
+            Bridge.sendEvent('openFolder', { va_id: state.currentAuftragId, type: 'ordnerkonzept' });
         }
 
         async function neuenAttachHinzufuegen() {

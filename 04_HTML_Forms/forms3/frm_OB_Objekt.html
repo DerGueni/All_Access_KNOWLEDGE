@@ -1521,8 +1521,8 @@
                             <!-- Zeile 1: 6 Buttons -->
                             <button class="btn unified-btn btn-green" onclick="newRecord()" data-testid="objekt-btn-neu">+ Neu</button>
                             <button class="btn unified-btn btn-yellow" onclick="saveRecord()" data-testid="objekt-btn-speichern">Speichern</button>
-                            <button class="btn unified-btn btn-red" onclick="deleteRecord()" data-testid="objekt-btn-loeschen">Löschen</button>
-                            <button class="btn unified-btn" onclick="printReport()" data-testid="objekt-btn-bericht">Bericht</button>
+                            <button class="btn unified-btn btn-red" id="mcobtnDelete" onclick="deleteRecord()" data-testid="objekt-btn-loeschen" title="Objekt loeschen (Access: mcobtnDelete)">Löschen</button>
+                            <button class="btn unified-btn" id="btnReport" onclick="printReport()" data-testid="objekt-btn-bericht" title="Objektliste drucken (Access: btnReport)">Bericht</button>
                             <button class="btn unified-btn" onclick="openNewVeranstalter()" data-testid="objekt-btn-neuer-veranstalter">Neuer Veranstalter</button>
                             <button class="btn unified-btn" onclick="geocodeAdresse()" title="Adresse geocodieren (OSM)" data-testid="objekt-btn-geocode">Geocode</button>
 
@@ -1782,7 +1782,7 @@
 
                                         <button class="btn" onclick="addAttachment()">+ Datei hinzufügen</button>
 
-                                        <button class="btn" onclick="newAttachment()">Neue Anlage</button>
+                                        <button class="btn" id="btnNeuAttach" onclick="newAttachment()" data-testid="objekt-btn-neue-vorlage" title="Neue Objektvorlage (Access: btnNeuAttach)">Neue Anlage</button>
 
                                         <button class="btn btn-red" onclick="deleteAttachment()">Datei löschen</button>
 

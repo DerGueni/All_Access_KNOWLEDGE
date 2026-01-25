@@ -846,7 +846,7 @@
                         <button class="btn" id="btnOutlook" onclick="openOutlook()" title="E-Mail senden" data-testid="kd-btn-outlook">✉ Outlook</button>
                         <button class="btn" id="btnWord" onclick="openWord()" title="Brief erstellen" data-testid="kd-btn-word">📄 Word</button>
                         <button class="btn btn-green" id="btnNeuKunde" onclick="neuerKunde()" data-testid="kd-btn-neu" style="left: 15px;">Neuer Kunde</button>
-                        <button class="btn btn-red" id="btnLoeschen" onclick="kundeLoeschen()" data-testid="kd-btn-loeschen" style="left: 220px;">Kunde loeschen</button>
+                        <button class="btn btn-red" id="mcobtnDelete" onclick="kundeLoeschen()" data-testid="kd-btn-loeschen" style="left: 220px;" title="Kunde loeschen (Access: mcobtnDelete)">Kunde loeschen</button>
                         <button class="btn" id="btnSchliessen" onclick="closeForm()" data-testid="kd-btn-schliessen" title="Formular schliessen">Schliessen</button>
 
                         <!-- cboKDNrSuche: Direkte Kunden-Nummer Suche -->
@@ -1233,7 +1233,7 @@
                                 <!-- Tab 5: Zusatzdateien -->
                                 <div class="tab-page" id="tab-zusatzdateien">
                                     <div style="margin-bottom: 10px;">
-                                        <button class="btn btn-blue" onclick="dateiHinzufuegen()">Datei hinzufugen</button>
+                                        <button class="btn btn-blue" id="btnNeuAttach" onclick="dateiHinzufuegen()" data-testid="kd-btn-neue-anlage" title="Neue Anlage hinzufuegen (Access: btnNeuAttach)">Datei hinzufuegen</button>
                                     </div>
                                     <div class="list-wrapper" style="height: 300px;">
                                         <table class="data-grid" id="dateienTable">
