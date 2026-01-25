@@ -67,6 +67,11 @@ function init() {
         btnListStandard: document.getElementById('cmdListMA_Standard'),
         btnListEntfernung: document.getElementById('cmdListMA_Entfernung'),
 
+        // Zusage-Buttons (Access-Paritaet)
+        btnAddZusage: document.getElementById('btnAddZusage'),
+        btnMoveZusage: document.getElementById('btnMoveZusage'),
+        btnDelZusage: document.getElementById('btnDelZusage'),
+
         // Listen
         maList: document.getElementById('List_MA_Body'),
         lstZeiten: document.getElementById('lstZeiten_Body'),
@@ -189,6 +194,87 @@ function setupEventListeners() {
     // Sortier-Buttons (Access-kompatibel: cmdListMA_Standard, cmdListMA_Entfernung)
     elements.btnListStandard?.addEventListener('click', cmdListMA_Standard);
     elements.btnListEntfernung?.addEventListener('click', cmdListMA_Entfernung);
+
+    // Zusage-Buttons (Access-Paritaet)
+    elements.btnAddZusage?.addEventListener('click', verschiebeZuZusage);
+    elements.btnMoveZusage?.addEventListener('click', verschiebezurueckZuPlanung);
+    elements.btnDelZusage?.addEventListener('click', entferneAusZusage);
+}
+
+// ============================================
+// Zusage-Operationen (Access-Paritaet)
+// ============================================
+
+/**
+ * Verschiebt ausgewaehlte MA von Planung zu Zusage
+ * Access: btnAddZusage_Click
+ */
+function verschiebeZuZusage() {
+    const lstGeplant = elements.lstGeplant;
+    const lstZusage = elements.lstZusage;
+    if (!lstGeplant || !lstZusage) return;
+
+    const selectedRows = lstGeplant.querySelectorAll('tr.selected');
+    if (selectedRows.length === 0) {
+        alert('Bitte erst Mitarbeiter in der Planung-Liste auswaehlen');
+        return;
+    }
+
+    selectedRows.forEach(row => {
+        row.classList.remove('selected');
+        lstZusage.appendChild(row);
+    });
+
+    setStatus(selectedRows.length + ' MA zu Zusage verschoben');
+    console.log('[Schnellauswahl] Zu Zusage verschoben:', selectedRows.length);
+}
+
+/**
+ * Verschiebt ausgewaehlte MA von Zusage zurueck zu Planung
+ * Access: btnMoveZusage_Click
+ */
+function verschiebezurueckZuPlanung() {
+    const lstGeplant = elements.lstGeplant;
+    const lstZusage = elements.lstZusage;
+    if (!lstGeplant || !lstZusage) return;
+
+    const selectedRows = lstZusage.querySelectorAll('tr.selected');
+    if (selectedRows.length === 0) {
+        alert('Bitte erst Mitarbeiter in der Zusage-Liste auswaehlen');
+        return;
+    }
+
+    selectedRows.forEach(row => {
+        row.classList.remove('selected');
+        lstGeplant.appendChild(row);
+    });
+
+    setStatus(selectedRows.length + ' MA zurueck zu Planung');
+    console.log('[Schnellauswahl] Zurueck zu Planung:', selectedRows.length);
+}
+
+/**
+ * Entfernt ausgewaehlte MA aus Zusage-Liste
+ * Access: btnDelZusage_Click
+ */
+function entferneAusZusage() {
+    const lstZusage = elements.lstZusage;
+    if (!lstZusage) return;
+
+    const selectedRows = lstZusage.querySelectorAll('tr.selected');
+    if (selectedRows.length === 0) {
+        alert('Bitte erst Mitarbeiter in der Zusage-Liste auswaehlen');
+        return;
+    }
+
+    if (!confirm(selectedRows.length + ' Mitarbeiter aus Zusage entfernen?')) {
+        return;
+    }
+
+    selectedRows.forEach(row => row.remove());
+
+    setStatus(selectedRows.length + ' MA aus Zusage entfernt');
+    console.log('[Schnellauswahl] Aus Zusage entfernt:', selectedRows.length);
 }
 
 // ============================================
@@ -483,6 +569,18 @@ function renderMitarbeiterListe() {
     // Filtern
     let gefiltert = state.mitarbeiter.filter(ma => {
         if (nurAktive && !ma.IstAktiv) return false;
+        // Verfuegbarkeitsfilter: Nur MA die an dem Datum verfuegbar sind
+        if (nurFreie) {
+            // Falls MA nicht_verfuegbar Array hat, prüfen ob aktuelles Datum enthalten ist
+            if (ma.nicht_verfuegbar && state.selectedDatum) {
+                const isBlocked = ma.nicht_verfuegbar.some(nv =>
+                    nv.VADatum_ID == state.selectedDatum || nv.vadatum_id == state.selectedDatum
+                );
+                if (isBlocked) return false;
+            }
+            // Falls explizites Flag vorhanden
+            if (ma.IstVerfuegbar === false || ma.istFrei === false) return false;
+        }
         if (nur34a && !ma.Hat34a) return false;
         if (anst && ma.Anstellungsart_ID != anst) return false;
         if (suche) {
@@ -906,6 +1004,16 @@ function renderMitarbeiterListeMitEntfernung() {
     // Filtern
     let gefiltert = state.mitarbeiter.filter(ma => {
         if (nurAktive && !ma.IstAktiv) return false;
+        // Verfuegbarkeitsfilter: Nur MA die an dem Datum verfuegbar sind
+        if (nurFreie) {
+            if (ma.nicht_verfuegbar && state.selectedDatum) {
+                const isBlocked = ma.nicht_verfuegbar.some(nv =>
+                    nv.VADatum_ID == state.selectedDatum || nv.vadatum_id == state.selectedDatum
+                );
+                if (isBlocked) return false;
+            }
+            if (ma.IstVerfuegbar === false || ma.istFrei === false) return false;
+        }
         if (nur34a && !ma.Hat34a) return false;
         if (anst && ma.Anstellungsart_ID != anst) return false;
         if (suche) {

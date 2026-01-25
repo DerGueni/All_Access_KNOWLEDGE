@@ -637,6 +637,67 @@ function btnAuftragClick() {
 }
 
 /**
+ * btnSchnellPlan_Click - MA-Planung Schnellauswahl oeffnen
+ * VBA: DoCmd.OpenForm "frm_MA_VA_Schnellauswahl"
+ */
+function btnSchnellPlan_Click() {
+    console.log('[MA_Serien_eMail_Auftrag] btnSchnellPlan_Click');
+
+    if (!currentVAID || !currentVADatumID) {
+        alert('Bitte erst Auftrag und Datum waehlen');
+        return;
+    }
+
+    const url = `frm_MA_VA_Schnellauswahl.html?va_id=${currentVAID}&vadatum_id=${currentVADatumID}`;
+
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+            type: 'NAVIGATE',
+            form: 'frm_MA_VA_Schnellauswahl',
+            params: { va_id: currentVAID, vadatum_id: currentVADatumID }
+        }, '*');
+    } else {
+        window.location.href = url;
+    }
+}
+
+// Export fuer onclick
+window.btnSchnellPlan_Click = btnSchnellPlan_Click;
+
+/**
+ * btnZuAbsage_Click - Zu-/Absagen verwalten
+ * VBA: DoCmd.OpenForm "frmTop_MA_ZuAbsage"
+ */
+function btnZuAbsage_Click() {
+    console.log('[MA_Serien_eMail_Auftrag] btnZuAbsage_Click');
+
+    if (!currentVAID) {
+        alert('Bitte erst einen Auftrag waehlen');
+        return;
+    }
+
+    const url = `frmTop_MA_ZuAbsage.html?va_id=${currentVAID}`;
+
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+            type: 'NAVIGATE',
+            form: 'frmTop_MA_ZuAbsage',
+            params: { va_id: currentVAID }
+        }, '*');
+    } else {
+        // Fallback: Absage-Formular in neuem Fenster oder Alert
+        if (document.getElementById('frmTop_MA_ZuAbsage')) {
+            window.location.href = url;
+        } else {
+            alert('Zu-/Absagen werden im Auftragstamm verwaltet.\\nBitte ueber "Zurueck zum Auftrag" navigieren.');
+        }
+    }
+}
+
+// Export fuer onclick
+window.btnZuAbsage_Click = btnZuAbsage_Click;
+
+/**
  * btnAttachSuch_Click - Datei auswaehlen
  * VBA: Oeffnet Dateidialog und fuegt Attachment hinzu
  */

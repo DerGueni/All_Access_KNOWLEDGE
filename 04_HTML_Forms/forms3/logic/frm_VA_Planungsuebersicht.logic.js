@@ -13,8 +13,8 @@
  * GEÄNDERT 2026-01-18: Bridge.query() ersetzt durch fetch() Aufrufe
  */
 
-// API-Basis-URL
-const API_BASE = 'http://localhost:5000/api';
+// API-Basis-URL (Fallback wenn global API_BASE nicht definiert)
+const API_BASE_LOCAL = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000/api';
 
 // State
 const state = {
@@ -205,7 +205,7 @@ async function loadData() {
         updateDayHeaders();
 
         // 1. Aufträge im Zeitraum laden
-        const auftraegeResponse = await fetch(`${API_BASE}/auftraege?von=${von}&bis=${bis}&limit=200`);
+        const auftraegeResponse = await fetch(`${API_BASE_LOCAL}/auftraege?von=${von}&bis=${bis}&limit=200`);
         if (!auftraegeResponse.ok) {
             throw new Error(`Aufträge-API: HTTP ${auftraegeResponse.status}`);
         }
@@ -219,7 +219,7 @@ async function loadData() {
             const vaId = auftrag.ID;
 
             // Schichten laden
-            const schichtenResponse = await fetch(`${API_BASE}/auftraege/${vaId}/schichten`);
+            const schichtenResponse = await fetch(`${API_BASE_LOCAL}/auftraege/${vaId}/schichten`);
             let schichten = [];
             if (schichtenResponse.ok) {
                 const schichtenResult = await schichtenResponse.json();
@@ -227,7 +227,7 @@ async function loadData() {
             }
 
             // Zuordnungen laden
-            const zuordnungenResponse = await fetch(`${API_BASE}/auftraege/${vaId}/zuordnungen`);
+            const zuordnungenResponse = await fetch(`${API_BASE_LOCAL}/auftraege/${vaId}/zuordnungen`);
             let zuordnungen = [];
             if (zuordnungenResponse.ok) {
                 const zuordnungenResult = await zuordnungenResponse.json();
@@ -680,7 +680,7 @@ function setupDeleteKeyHandler() {
             if (confirm('Zuordnung wirklich löschen?')) {
                 try {
                     console.log('[Planungsübersicht] Lösche Zuordnung:', state.selectedZuoId);
-                    const response = await fetch(`http://localhost:5000/api/zuordnungen/${state.selectedZuoId}`, {
+                    const response = await fetch(`${API_BASE_LOCAL}/zuordnungen/${state.selectedZuoId}`, {
                         method: 'DELETE'
                     });
 
@@ -730,8 +730,12 @@ window.navigateZurueck = function() {
 // INITIALISIERUNG
 // ============================================================
 
-// Init bei DOM ready
-document.addEventListener('DOMContentLoaded', init);
+// Init bei DOM ready (Module werden async geladen, daher readyState-Check)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
 // Globaler Zugriff
 window.Planungsuebersicht = {

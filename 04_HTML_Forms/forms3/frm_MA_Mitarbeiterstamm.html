@@ -1040,21 +1040,21 @@
                     <div class="left-work-panel">
                         <div class="tab-container">
                             <div class="tab-header" style="flex-wrap: wrap;">
-                                <!-- Sichtbare Tabs (wie in Access) -->
+                                <!-- Tabs (wie in Access) -->
                                 <button class="tab-btn active" data-tab="stammdaten" data-testid="ma-tab-stammdaten">Stammdaten</button>
                                 <button class="tab-btn" data-tab="einsatzübersicht" data-testid="ma-tab-einsatzuebersicht">Einsatzübersicht</button>
                                 <button class="tab-btn" data-tab="dienstplan" data-testid="ma-tab-dienstplan">Dienstplan</button>
                                 <button class="tab-btn" data-tab="nichtverfügbar" data-testid="ma-tab-nichtverfuegbar">Nicht Verfügbar</button>
                                 <button class="tab-btn" data-tab="dienstkleidung" data-testid="ma-tab-dienstkleidung">Bestand Dienstkleidung</button>
-                                <!-- Versteckte Tabs (in Access nicht sichtbar) -->
                                 <button class="tab-btn" data-tab="zeitkonto" data-testid="ma-tab-zeitkonto">Zeitkonto</button>
-                                <button class="tab-btn" data-tab="jahresübersicht" data-testid="ma-tab-jahresuebersicht" hidden>Jahresübersicht</button>
-                                <button class="tab-btn" data-tab="stundenübersicht" data-testid="ma-tab-stundenuebersicht" hidden>Stundenübers.</button>
-                                <button class="tab-btn" data-tab="vordrucke" data-testid="ma-tab-vordrucke" hidden>Vordrucke</button>
-                                <button class="tab-btn" data-tab="briefkopf" data-testid="ma-tab-briefkopf" hidden>Briefkopf</button>
-                                <button class="tab-btn" data-tab="karte" data-testid="ma-tab-karte" hidden>Karte</button>
-                                <button class="tab-btn" data-tab="subrechnungen" data-testid="ma-tab-subrechnungen" hidden>Sub Rechnungen</button>
-                                <button class="tab-btn" data-tab="ueberhangstunden" data-testid="ma-tab-ueberhangstunden">Uberhang Std.</button>
+                                <button class="tab-btn" data-tab="jahresübersicht" data-testid="ma-tab-jahresuebersicht">Jahresübersicht</button>
+                                <button class="tab-btn" data-tab="stundenübersicht" data-testid="ma-tab-stundenuebersicht">Stundenübersicht</button>
+                                <button class="tab-btn" data-tab="vordrucke" data-testid="ma-tab-vordrucke">Vordrucke</button>
+                                <button class="tab-btn" data-tab="briefkopf" data-testid="ma-tab-briefkopf">Briefkopf</button>
+                                <button class="tab-btn" data-tab="karte" data-testid="ma-tab-karte">Karte</button>
+                                <button class="tab-btn" data-tab="subrechnungen" data-testid="ma-tab-subrechnungen">Sub Rechnungen</button>
+                                <button class="tab-btn" data-tab="ueberhangstunden" data-testid="ma-tab-ueberhangstunden">Überhang Stunden</button>
+                                <!-- Nicht in Access sichtbar -->
                                 <button class="tab-btn" data-tab="qualifikationen" data-testid="ma-tab-qualifikationen" hidden>Qualifikationen</button>
                                 <button class="tab-btn" data-tab="dokumente" data-testid="ma-tab-dokumente" hidden>Dokumente</button>
                                 <button class="tab-btn" data-tab="quickinfo" data-testid="ma-tab-quickinfo" hidden>Quick Info</button>
@@ -1828,6 +1828,7 @@
             mitarbeiterList: [],
             currentIndex: 0,
             currentRecord: null,
+            currentMAID: null,        // Aktuelle MA_ID für Tab-Filter
             isDirty: false,           // Access: isDirty-Flag für AfterUpdate
             allowEdits: true,         // Access: AllowEdits Property
             allowAdditions: false,    // Access: AllowAdditions Property
@@ -1971,7 +1972,13 @@
                         break;
 
                     case 'mitarbeiter_detail':
-                        loadMitarbeiterData(data.record);
+                        {
+                            const record = data.record?.mitarbeiter ? data.record.mitarbeiter : data.record;
+                            loadMitarbeiterData(record || {});
+                            if (data.record?.nicht_verfuegbar) {
+                                renderNichtVerfügbar(data.record.nicht_verfuegbar);
+                            }
+                        }
                         hideLoading();
                         break;
 
@@ -2092,18 +2099,27 @@
             const monat = parseInt(document.getElementById('cboMonatDienstplan').value);
             const jahr = parseInt(document.getElementById('cboJahrDienstplan').value);
             console.log('[Dienstplan-Filter] Monat:', monat, 'Jahr:', jahr);
-            // TODO: Dienstplan-Subform mit Filter neu laden
             if (state.currentMAID) {
-                // Dienstplan-Daten filtern und neu laden
+                // Dienstplan-iframe mit neuen Parametern neu laden
+                const iframe = document.querySelector('#tab-dienstplan iframe');
+                if (iframe) {
+                    const baseUrl = 'sub_MA_Dienstplan.html';
+                    iframe.src = `${baseUrl}?ma_id=${state.currentMAID}&monat=${monat}&jahr=${jahr}`;
+                }
             }
         }
 
         function handleJahrFilterDienstplan() {
+            const monat = parseInt(document.getElementById('cboMonatDienstplan').value);
             const jahr = parseInt(document.getElementById('cboJahrDienstplan').value);
             console.log('[Dienstplan-Filter] Jahr:', jahr);
-            // TODO: Dienstplan-Subform mit Jahr-Filter neu laden
             if (state.currentMAID) {
-                // Dienstplan-Daten filtern und neu laden
+                // Dienstplan-iframe mit neuen Parametern neu laden
+                const iframe = document.querySelector('#tab-dienstplan iframe');
+                if (iframe) {
+                    const baseUrl = 'sub_MA_Dienstplan.html';
+                    iframe.src = `${baseUrl}?ma_id=${state.currentMAID}&monat=${monat}&jahr=${jahr}`;
+                }
             }
         }
 
@@ -2218,6 +2234,7 @@
 
             // Vorläufig Listendaten anzeigen
             state.currentRecord = state.mitarbeiterList[index];
+            state.currentMAID = maId;  // Für Tab-Filter (Dienstplan, Einsätze, etc.)
             loadMitarbeiterData(state.currentRecord);
             markSelectedRow(index);
         }
@@ -2762,15 +2779,31 @@
         async function loadEinsaetze() {
             const maId = document.getElementById('ID')?.value || document.getElementById('maNr')?.value;
             if (!maId) return;
-            Bridge.loadData('einsaetze', maId, { limit: 50 });
+            try {
+                const url = `/api/zuordnungen?ma_id=${encodeURIComponent(maId)}`;
+                const response = await fetch(url);
+                if (response.ok) {
+                    const result = await response.json();
+                    const records = (result.data || result || []).slice(0, 50);
+                    renderEinsaetze(records);
+                }
+            } catch (e) {
+                console.warn('[Einsaetze] Laden fehlgeschlagen:', e);
+            }
         }
 
         function renderEinsaetze(records) {
             const tbody = document.getElementById('einsaetzeTbody');
             tbody.innerHTML = '';
             records.forEach(e => {
+                const datum = formatDate(e.VADatum || e.Datum);
+                const auftrag = e.Auftrag || e.Auftrag_ID || '';
+                const objekt = e.Objekt || '';
+                const von = formatTime(e.MA_Start || e.MVA_Start || e.VA_Start || e.Von);
+                const bis = formatTime(e.MA_Ende || e.MVA_Ende || e.VA_Ende || e.Bis);
+                const stunden = e.MA_Brutto_Std ?? e.Ma_brutto_std2 ?? e.MA_Netto_std2 ?? e.MA_Netto_Std ?? e.Stunden ?? '';
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${formatDate(e.Datum)}</td><td>${e.Auftrag || ''}</td><td>${e.Objekt || ''}</td><td>${e.Von || ''}</td><td>${e.Bis || ''}</td><td>${e.Stunden || ''}</td>`;
+                tr.innerHTML = `<td>${datum}</td><td>${auftrag}</td><td>${objekt}</td><td>${von}</td><td>${bis}</td><td>${stunden}</td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -2778,7 +2811,16 @@
         async function loadNichtVerfügbar() {
             const maId = document.getElementById('ID')?.value || document.getElementById('maNr')?.value;
             if (!maId) return;
-            Bridge.loadData('nichtverfügbar', maId);
+            try {
+                const response = await fetch(`/api/mitarbeiter/${encodeURIComponent(maId)}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    const records = result?.data?.nicht_verfuegbar || result?.nicht_verfuegbar || [];
+                    renderNichtVerfügbar(records);
+                }
+            } catch (e) {
+                console.warn('[NichtVerfuegbar] Laden fehlgeschlagen:', e);
+            }
         }
 
         function renderNichtVerfügbar(records) {
@@ -3946,6 +3988,16 @@
             if (!date) return '';
             const d = new Date(date);
             return d.toLocaleDateString('de-DE');
+        }
+
+        function formatTime(value) {
+            if (!value) return '';
+            const d = new Date(value);
+            if (!Number.isNaN(d.getTime())) {
+                return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            }
+            const match = String(value).match(/T(\d{2}:\d{2})/);
+            return match ? match[1] : String(value);
         }
 
         function formatDateTime(dateStr) {

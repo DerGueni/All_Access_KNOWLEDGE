@@ -15,7 +15,7 @@ const state = {
 // ============================================
 // INITIALISIERUNG
 // ============================================
-document.addEventListener('DOMContentLoaded', async () => {
+async function init() {
     console.log('[Abwesenheitsplanung] Initialisierung...');
 
     // Aktuelles Datum anzeigen
@@ -39,7 +39,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     hideLoading();
     showToast('Formular geladen', 'success');
-});
+}
+
+// Init bei DOM ready (Module werden async geladen, daher readyState-Check)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
 // ============================================
 // EVENT-LISTENER
@@ -56,9 +63,9 @@ function initEventListeners() {
     document.getElementById('btnMarkLoesch').addEventListener('click', loescheMarkierte);
     document.getElementById('btnAllLoesch').addEventListener('click', loescheAlle);
 
-    // Speichern & Schließen
-    document.getElementById('btnSpeichern').addEventListener('click', speichereAbwesenheiten);
-    document.getElementById('btnSchliessen').addEventListener('click', () => window.close());
+    // Uebernehmen & Schliessen (wie in Access: bznUebernehmen)
+    document.getElementById('bznUebernehmen').addEventListener('click', bznUebernehmen_Click);
+    document.getElementById('btnSchliessen').addEventListener('click', closeForm);
 
     // Reset
     document.getElementById('btnReset').addEventListener('click', resetForm);
@@ -325,11 +332,17 @@ function loescheAlle() {
 }
 
 // ============================================
-// SPEICHERN
+// API Basis-URL (Fallback wenn global API_BASE nicht definiert)
 // ============================================
-async function speichereAbwesenheiten() {
+const API_BASE_LOCAL = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000/api';
+
+// ============================================
+// UEBERNEHMEN (bznUebernehmen_Click - wie in Access)
+// Speichert berechnete Fehlzeiten in die Produktivtabelle
+// ============================================
+async function bznUebernehmen_Click() {
     if (state.berechneteFehlzeiten.length === 0) {
-        showToast('Keine Abwesenheiten zum Speichern', 'warning');
+        showToast('Keine Abwesenheiten zum Uebernehmen', 'warning');
         return;
     }
 
@@ -338,52 +351,84 @@ async function speichereAbwesenheiten() {
     const bemerkung = document.getElementById('Bemerkung').value;
 
     if (!maId || !grundId) {
-        showToast('Mitarbeiter und Grund müssen ausgewählt sein', 'error');
+        showToast('Mitarbeiter und Grund muessen ausgewaehlt sein', 'error');
         return;
     }
 
     const grundObj = state.abwesenheitsgruende.find(g => g.ID == grundId);
-    const grundBezeichnung = grundObj ? grundObj.Bezeichnung : '';
+    const grundBezeichnung = grundObj ? (grundObj.Bezeichnung || grundObj.Kuerzel_Datev || '') : '';
 
     showLoading();
-    updateStatus('Speichere Abwesenheiten...');
+    updateStatus('Uebernehme Abwesenheiten...');
 
     try {
-        // WebView2 Bridge: Abwesenheiten speichern
+        // Abwesenheiten-Daten vorbereiten
         const abwesenheiten = state.berechneteFehlzeiten.map(entry => ({
             MA_ID: parseInt(maId),
             vonDat: formatDateISO(entry.datum),
             bisDat: formatDateISO(entry.datum),
-            Grund: grundBezeichnung,
+            AbwesenArt: grundBezeichnung,
             Bemerkung: bemerkung || null,
             IstGanztag: !entry.zeitVon,
             ZeitVon: entry.zeitVon || null,
             ZeitBis: entry.zeitBis || null
         }));
 
+        // Versuche zuerst WebView2 Bridge
         if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
-            Bridge.sendEvent('saveAbwesenheiten', { abwesenheiten });
+            Bridge.sendEvent('bznUebernehmen', { abwesenheiten });
+            showToast(`${abwesenheiten.length} Abwesenheiten werden uebernommen...`, 'info');
+            updateStatus('Uebernehmen laeuft...');
 
-            // Warte auf Bestätigung
-            showToast(`${abwesenheiten.length} Abwesenheiten werden gespeichert...`, 'info');
-            updateStatus('Speichern läuft...');
-
-            // Reset nach Verzögerung
             setTimeout(() => {
                 hideLoading();
-                showToast('Abwesenheiten gespeichert', 'success');
+                showToast('Nicht-Verfuegbar-Zeiten erfolgreich uebernommen', 'success');
                 resetForm();
             }, 1500);
         } else {
-            hideLoading();
-            showToast('WebView2 Bridge nicht verfügbar', 'error');
+            // REST API Fallback
+            console.log('[Abwesenheitsplanung] REST API Fallback aktiv');
+
+            const response = await fetch(`${API_BASE_LOCAL}/abwesenheiten/uebernehmen`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ abwesenheiten })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                hideLoading();
+                showToast(`${result.count || abwesenheiten.length} Nicht-Verfuegbar-Zeiten erfolgreich uebernommen`, 'success');
+                resetForm();
+            } else {
+                throw new Error(`API Fehler: ${response.status}`);
+            }
         }
 
     } catch (error) {
         hideLoading();
-        console.error('Fehler beim Speichern:', error);
-        showToast('Fehler beim Speichern der Abwesenheiten', 'error');
-        updateStatus('Fehler beim Speichern');
+        console.error('Fehler beim Uebernehmen:', error);
+        showToast('Fehler beim Uebernehmen der Abwesenheiten: ' + error.message, 'error');
+        updateStatus('Fehler beim Uebernehmen');
+    }
+}
+
+// ============================================
+// FORMULAR SCHLIESSEN
+// ============================================
+function closeForm() {
+    if (typeof Bridge !== 'undefined' && Bridge.sendEvent) {
+        Bridge.sendEvent('close', { form: 'frmTop_MA_Abwesenheitsplanung' });
+        return;
+    }
+
+    // Browser-Fallback
+    if (window.opener) {
+        window.close();
+    } else if (parent !== window) {
+        parent.postMessage({ type: 'CLOSE_TAB', form: 'frmTop_MA_Abwesenheitsplanung' }, '*');
+    } else {
+        window.location.href = 'index.html';
     }
 }
 

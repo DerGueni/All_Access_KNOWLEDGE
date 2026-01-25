@@ -259,25 +259,63 @@ function setupTagLabelDblClick() {
 }
 
 /**
- * Navigation: Woche vor/zurück
+ * tmpMA Kontext speichern (wie VBA: tmpMA = Me.sub_DP_Grund.Form.Recordset.fields("MA_ID"))
+ * Bewahrt aktuelle MA-Auswahl bei Navigation
+ */
+function saveMitarbeiterKontext() {
+    const activeRow = document.querySelector('.calendar-row.active, .calendar-row.selected, tr.selected');
+    if (activeRow) {
+        state.tmpMA = activeRow.dataset.maId || activeRow.dataset.id;
+        console.log('[tmpMA] Kontext gespeichert:', state.tmpMA);
+    }
+}
+
+/**
+ * tmpMA Kontext wiederherstellen (wie VBA: tmpMA = 0 nach Restore)
+ * Scrollt zur vorherigen MA-Auswahl nach Navigation
+ */
+function restoreMitarbeiterKontext() {
+    if (!state.tmpMA) return;
+
+    setTimeout(() => {
+        const targetRow = document.querySelector(`[data-ma-id="${state.tmpMA}"], [data-id="${state.tmpMA}"]`);
+        if (targetRow) {
+            targetRow.classList.add('selected');
+            targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            console.log('[tmpMA] Kontext wiederhergestellt:', state.tmpMA);
+        }
+        state.tmpMA = null; // Reset wie VBA: tmpMA = 0
+    }, 100);
+}
+
+/**
+ * Navigation: Woche vor/zurueck
  * Angepasst auf Access-Original (2 Tage statt 7)
+ * Mit tmpMA Kontext-Erhaltung wie VBA
  */
 function navigateWeek(direction) {
+    saveMitarbeiterKontext(); // VBA: tmpMA = Me.sub_DP_Grund.Form.Recordset.fields("MA_ID")
     state.startDate.setDate(state.startDate.getDate() + (direction * 2));
     updateDateInputs();
-    loadDienstplan();
+    loadDienstplan().then(() => {
+        restoreMitarbeiterKontext(); // VBA: tmpMA = 0
+    });
 }
 
 /**
  * Navigation: Ab Heute
+ * Mit tmpMA Kontext-Erhaltung wie VBA
  */
 function goToToday() {
+    saveMitarbeiterKontext(); // VBA: tmpMA = Me.sub_DP_Grund.Form.Recordset.fields("MA_ID")
     const today = new Date();
     const dayOfWeek = today.getDay();
     const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     state.startDate = new Date(today.setDate(today.getDate() + diff));
     updateDateInputs();
-    loadDienstplan();
+    loadDienstplan().then(() => {
+        restoreMitarbeiterKontext(); // VBA: tmpMA = 0
+    });
 }
 
 /**
@@ -363,13 +401,14 @@ async function loadDienstplan() {
             });
         } else {
             // REST-API Fallback für Browser-Modus
-            const API_BASE = 'http://localhost:5000';
+            // Fallback-Pattern: Nutze globale API_BASE wenn vorhanden (aus webview2-bridge.js)
+            const API_BASE_LOCAL = (typeof API_BASE !== 'undefined') ? API_BASE.replace(/\/api$/, '') : 'http://localhost:5000';
 
             // Mitarbeiter laden mit korrekten API-Parametern
             // Filter: 0=Alle, 1=Alle aktiven, 2=Festangestellte, 3=Minijobber, 4=Sub
             // Anstellungsart_IDs aus tbl_hlp_MA_Anstellungsart:
             // 3=Festangestellter, 5=Minijobber, 11=Sub
-            let maUrl = `${API_BASE}/api/mitarbeiter`;
+            let maUrl = `${API_BASE_LOCAL}/api/mitarbeiter`;
             const params = ['filter_anstellung=false']; // Default-Filter deaktivieren
 
             if (state.filter === 0) {
@@ -404,7 +443,7 @@ async function loadDienstplan() {
             }
 
             // Dienstpläne/Zuordnungen laden
-            const dpResponse = await fetch(`${API_BASE}/api/zuordnungen?von=${startStr}&bis=${endStr}`);
+            const dpResponse = await fetch(`${API_BASE_LOCAL}/api/zuordnungen?von=${startStr}&bis=${endStr}`);
             const dpJson = await dpResponse.json();
             let dienstplanDaten = [];
             if (Array.isArray(dpJson)) {
@@ -869,8 +908,13 @@ function handleBridgeData(data) {
     }
 }
 
-// Init bei DOM ready
-document.addEventListener('DOMContentLoaded', init);
+// Init bei DOM ready (Module werden async geladen, daher readyState-Check)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    // DOM bereits geladen, sofort initialisieren
+    init();
+}
 
 // Globaler Zugriff
 window.DienstplanMA = {

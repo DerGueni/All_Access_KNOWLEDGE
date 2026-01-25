@@ -1075,7 +1075,12 @@ function openMitarbeiterauswahl() {
 
     const context = Object.fromEntries(params.entries());
 
-    const url = new URL('frm_MA_VA_Schnellauswahl.html', window.location.href);
+    // Fix: about:srcdoc ist keine gueltige Base-URL, verwende Parent-Origin oder localhost
+    let baseUrl = window.location.href;
+    if (baseUrl.startsWith('about:') || !baseUrl.startsWith('http')) {
+        baseUrl = window.parent?.location?.href || 'http://localhost:8080/';
+    }
+    const url = new URL('frm_MA_VA_Schnellauswahl.html', baseUrl);
     url.search = params.toString();
 
     if (window.parent?.ConsysShell?.showForm) {
@@ -2762,6 +2767,40 @@ function einsatzlisteDrucken() { return druckeEinsatzliste(); }
 function sendeEinsatzlisteMA() { return sendeEinsatzliste('MA'); }
 function sendeEinsatzlisteBOS() { return sendeEinsatzliste('BOS'); }
 function sendeEinsatzlisteSUB() { return sendeEinsatzliste('SUB'); }
+function sendeEinsatzlistePOS() { return sendeEinsatzliste('POS'); }
+
+// Auftrag aus Vorlage erstellen (Access: btn_VA_Neu_Aus_Vorlage_Click)
+async function auftragAusVorlage() {
+    console.log('[auftragAusVorlage] Auftrag aus Vorlage erstellen');
+
+    // Pruefe ob VBA Bridge verfuegbar
+    try {
+        const response = await fetch('http://localhost:5002/api/vba/auftrag/aus-vorlage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            if (result.va_id) {
+                // Neuen Auftrag laden
+                state.currentVA_ID = result.va_id;
+                await loadAuftragDetails(result.va_id);
+                setStatus('Auftrag aus Vorlage erstellt: ' + result.va_id);
+            }
+        } else {
+            // Fallback: Manueller Dialog
+            const vorlageId = prompt('Vorlagen-Auftrag-ID eingeben:');
+            if (vorlageId) {
+                alert('Auftrag aus Vorlage ' + vorlageId + ' wird erstellt (VBA Bridge erforderlich)');
+            }
+        }
+    } catch (error) {
+        console.warn('[auftragAusVorlage] VBA Bridge nicht verfuegbar:', error.message);
+        alert('Auftrag aus Vorlage: VBA Bridge erforderlich (Port 5002)');
+    }
+}
 
 // Datum-Navigation
 function datumNavLeft() { return navigateVADatum('left'); }

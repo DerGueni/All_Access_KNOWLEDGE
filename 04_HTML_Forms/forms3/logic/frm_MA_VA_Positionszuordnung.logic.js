@@ -5,10 +5,14 @@
  */
 import { Bridge } from '../api/bridgeClient.js';
 
+// API Basis-URL fuer REST Fallback
+const API_BASE = 'http://localhost:5000/api';
+
 let elements = {};
 let currentAuftragId = null;
 let currentDatum = null;
 let currentSchichtId = null;
+let currentPositionId = null;
 
 async function init() {
     console.log('[MA_VA_Positionszuordnung] Initialisierung...');
@@ -488,6 +492,173 @@ function applyFilter() {
     // TODO: Filter-Logik implementieren
     console.log('[MA_VA_Positionszuordnung] Filter anwenden');
 }
+
+// ============================================
+// BULK-OPERATIONEN MIT API (Access: btnAddAll, btnDelAll)
+// ============================================
+
+async function alleHinzufuegen() {
+    const selectedPosition = elements.positionenListe?.querySelector('.position-item.selected');
+    if (!selectedPosition) {
+        showError('Bitte zuerst eine Position auswaehlen');
+        return;
+    }
+
+    const positionId = selectedPosition.dataset.id;
+    const items = elements.mitarbeiterListe?.querySelectorAll('.position-item, .ma-item');
+    if (!items || items.length === 0) {
+        updateStatus('Keine verfuegbaren MA');
+        return;
+    }
+
+    updateStatus('Ordne alle MA zu...');
+    let count = 0;
+
+    for (const item of items) {
+        try {
+            const maId = item.dataset.id;
+            if (maId && positionId) {
+                // Versuche API-Aufruf
+                if (typeof Bridge !== 'undefined' && Bridge.execute) {
+                    await Bridge.execute('zuordnenMitarbeiterZuPosition', {
+                        position_id: positionId,
+                        ma_id: maId
+                    });
+                } else {
+                    // REST API Fallback
+                    await fetch(`${API_BASE}/positionen/${positionId}/zuordnen`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ma_id: maId })
+                    });
+                }
+            }
+            // Visuelles Verschieben
+            await mitarbeiterZuordnen(item);
+            count++;
+        } catch (error) {
+            console.error('[MA_VA_Positionszuordnung] Fehler bei MA:', error);
+        }
+    }
+
+    showSuccess(count + ' MA zugeordnet');
+    updateCounters();
+}
+
+async function alleEntfernen() {
+    const items = elements.zugeordneteListe?.querySelectorAll('.position-item, .ma-item');
+    if (!items || items.length === 0) {
+        updateStatus('Keine zugeordneten MA');
+        return;
+    }
+
+    if (!confirm('Wirklich alle ' + items.length + ' Zuordnungen entfernen?')) {
+        return;
+    }
+
+    updateStatus('Entferne alle Zuordnungen...');
+    let count = 0;
+
+    for (const item of items) {
+        try {
+            const maId = item.dataset.id;
+            const positionId = currentPositionId || item.dataset.positionId;
+
+            if (maId && positionId) {
+                // Versuche API-Aufruf
+                if (typeof Bridge !== 'undefined' && Bridge.execute) {
+                    await Bridge.execute('entfernenMitarbeiterVonPosition', {
+                        position_id: positionId,
+                        ma_id: maId
+                    });
+                } else {
+                    // REST API Fallback
+                    await fetch(`${API_BASE}/positionen/${positionId}/zuordnen/${maId}`, {
+                        method: 'DELETE'
+                    });
+                }
+            }
+            // Visuelles Verschieben
+            await mitarbeiterEntfernen(item);
+            count++;
+        } catch (error) {
+            console.error('[MA_VA_Positionszuordnung] Fehler beim Entfernen:', error);
+        }
+    }
+
+    showSuccess(count + ' MA entfernt');
+    updateCounters();
+}
+
+async function zuordnungWiederholen() {
+    const selectedPosition = elements.positionenListe?.querySelector('.position-item.selected');
+    if (!selectedPosition) {
+        showError('Bitte zuerst eine Position auswaehlen');
+        return;
+    }
+
+    const zugeordnete = elements.zugeordneteListe?.querySelectorAll('.position-item, .ma-item');
+    if (!zugeordnete || zugeordnete.length === 0) {
+        showError('Keine Zuordnungen zum Wiederholen vorhanden');
+        return;
+    }
+
+    const zielDatum = prompt('Auf welches Datum soll die Zuordnung kopiert werden? (Format: TT.MM.JJJJ oder YYYY-MM-DD)');
+    if (!zielDatum) return;
+
+    const positionId = selectedPosition.dataset.id || currentPositionId;
+    updateStatus('Wiederhole Zuordnung auf ' + zielDatum + '...');
+
+    try {
+        if (typeof Bridge !== 'undefined' && Bridge.execute) {
+            await Bridge.execute('zuordnungWiederholen', {
+                position_id: positionId,
+                ziel_datum: zielDatum
+            });
+        } else {
+            // REST API Fallback
+            await fetch(`${API_BASE}/positionen/${positionId}/wiederholen`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ziel_datum: zielDatum })
+            });
+        }
+
+        showSuccess(zugeordnete.length + ' Zuordnungen auf ' + zielDatum + ' kopiert');
+    } catch (error) {
+        console.error('[MA_VA_Positionszuordnung] Fehler beim Wiederholen:', error);
+        showError('Wiederholung fehlgeschlagen');
+    }
+}
+
+// MA-Typ Filter anwenden (Access: MA_Typ_AfterUpdate)
+function maTypFilterAnwenden(filterValue) {
+    const items = elements.mitarbeiterListe?.querySelectorAll('.position-item, .ma-item');
+
+    items?.forEach(item => {
+        const istFest = item.dataset.istFest === 'true' || item.dataset.istFest === '1';
+
+        switch (filterValue) {
+            case '0': // Alle
+                item.style.display = '';
+                break;
+            case '1': // Nur Fest
+                item.style.display = istFest ? '' : 'none';
+                break;
+            case '2': // Nur Frei
+                item.style.display = !istFest ? '' : 'none';
+                break;
+        }
+    });
+
+    updateStatus('Filter: ' + (filterValue === '0' ? 'Alle' : filterValue === '1' ? 'Fest' : 'Frei'));
+}
+
+// Expose functions to global scope for inline script
+window.alleHinzufuegen = alleHinzufuegen;
+window.alleEntfernen = alleEntfernen;
+window.zuordnungWiederholen = zuordnungWiederholen;
+window.maTypFilterAnwenden = maTypFilterAnwenden;
 
 function formatDate(dateStr) {
     if (!dateStr) return '';

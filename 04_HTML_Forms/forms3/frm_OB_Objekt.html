@@ -2092,6 +2092,9 @@
 
             });
 
+            // Form Open ausführen (NACH loadObjekte, damit state.objekteList vorhanden ist)
+            handleFormOpen();
+
         });
 
 
@@ -3300,7 +3303,7 @@
 
 
 
-                    const response = await fetch('http://localhost:5000/api/attachments/upload', {
+                    const response = await fetch(`${API_BASE}/attachments/upload`, {
 
                         method: 'POST',
 
@@ -3378,7 +3381,7 @@
 
 
 
-                const response = await fetch(`http://localhost:5000/api/attachments/${state.selectedAttachment.ZusatzNr}`, {
+                const response = await fetch(`${API_BASE}/attachments/${state.selectedAttachment.ZusatzNr}`, {
 
                     method: 'DELETE'
 
@@ -3432,7 +3435,7 @@
 
 
 
-                const tbody = document.getElementById('attachmentsTbody');
+                const tbody = document.getElementById('attachBody');
 
                 if (!tbody) return;
 
@@ -3490,7 +3493,7 @@
 
             // Datei öffnen via API
 
-            window.open(`http://localhost:5000/api/attachments/${att.ZusatzNr}/download`, '_blank');
+            window.open(`${API_BASE}/attachments/${att.ZusatzNr}/download`, '_blank');
 
         }
 
@@ -4626,13 +4629,8 @@ Tastenkürzel:
 
 
 
-        // Form Open nach DOM ready ausführen
-
-        document.addEventListener('DOMContentLoaded', () => {
-
-            setTimeout(handleFormOpen, 100);
-
-        });
+        // Form Open wird jetzt im ersten DOMContentLoaded Handler aufgerufen
+        // (nach loadObjekte, damit state.objekteList vorhanden ist)
 
 
 

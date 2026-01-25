@@ -1899,17 +1899,12 @@ window.TermineAbHeute_AfterUpdate = async function() {
     if (!maId) return;
 
     try {
-        let url = `/api/mitarbeiter/${maId}/nverfueg`;
-        if (termineAbHeute) {
-            url += '?ab_heute=1';
-        } else if (auVon && auBis) {
-            url += `?von=${auVon}&bis=${auBis}`;
-        }
-
-        const response = await fetch(url);
+        const response = await fetch(`/api/mitarbeiter/${maId}`);
         if (response.ok) {
             const data = await response.json();
-            renderNVerfuegListe(data.data || data);
+            const list = (data?.data?.nicht_verfuegbar) || data?.nicht_verfuegbar || [];
+            const filtered = filterNichtVerfuegbar(list, termineAbHeute, auVon, auBis);
+            renderNVerfuegListe(filtered);
         }
     } catch (err) {
         console.error('[TermineAbHeute] Fehler:', err);
@@ -1917,7 +1912,7 @@ window.TermineAbHeute_AfterUpdate = async function() {
 };
 
 function renderNVerfuegListe(data) {
-    const tbody = document.querySelector('#sub_MA_tbl_MA_NVerfuegZeiten tbody, #gridNVerfueg tbody');
+    const tbody = document.querySelector('#nvTbody, #sub_MA_tbl_MA_NVerfuegZeiten tbody, #gridNVerfueg tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
     (data || []).forEach(row => {
@@ -1931,6 +1926,25 @@ function formatDate(d) {
     if (!d) return '';
     const date = new Date(d);
     return date.toLocaleDateString('de-DE');
+}
+
+function filterNichtVerfuegbar(list, abHeute, von, bis) {
+    const today = new Date();
+    const start = von ? new Date(von) : null;
+    const end = bis ? new Date(bis) : null;
+    return (list || []).filter(item => {
+        const from = item.vonDat ? new Date(item.vonDat) : null;
+        const to = item.bisDat ? new Date(item.bisDat) : null;
+        if (abHeute) {
+            if (to && to < today) return false;
+            return true;
+        }
+        if (start && end) {
+            if (from && from > end) return false;
+            if (to && to < start) return false;
+        }
+        return true;
+    });
 }
 
 // Event-Binding für TermineAbHeute Checkbox
@@ -1947,7 +1961,8 @@ window.btnAU_Lesen_Click = async function() {
     const maId = state.currentRecord?.ID;
     const auVon = document.getElementById('AU_von')?.value;
     const auBis = document.getElementById('AU_bis')?.value;
-    const filterAuftrag = document.getElementById('cboFilterAuftrag')?.value;
+    const filterAuftrag = document.getElementById('cboFilterAuftragEinsatz')?.value ||
+        document.getElementById('cboFilterAuftrag')?.value;
 
     if (!maId) {
         console.warn('[btnAU_Lesen] Kein MA ausgewählt');
@@ -1955,9 +1970,13 @@ window.btnAU_Lesen_Click = async function() {
     }
 
     try {
-        // API-Aufruf für Zuordnungen
-        let url = `/api/mitarbeiter/${maId}/zuordnungen?von=${auVon}&bis=${auBis}`;
-        if (filterAuftrag) url += `&auftrag=${encodeURIComponent(filterAuftrag)}`;
+        // API-Aufruf für Zuordnungen (Access: qry_MA_VA_Plan_All_AufUeber2_Zuo)
+        const params = new URLSearchParams();
+        if (maId) params.append('ma_id', maId);
+        if (auVon) params.append('von', auVon);
+        if (auBis) params.append('bis', auBis);
+        if (filterAuftrag) params.append('va_id', filterAuftrag);
+        const url = `/api/zuordnungen?${params.toString()}`;
 
         const response = await fetch(url);
         if (response.ok) {
@@ -1980,16 +1999,41 @@ window.btnAU_Lesen_Click = async function() {
 };
 
 function renderLstZuo(data) {
-    const tbody = document.querySelector('#lst_Zuo tbody, #gridZuordnungen tbody');
+    const tbody = document.getElementById('einsaetzeTbody') ||
+        document.querySelector('#lst_Zuo tbody, #gridZuordnungen tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
     (data || []).forEach(row => {
+        const datum = formatDateCell(row.VADatum || row.Datum);
+        const auftrag = row.Auftrag || row.Auftrag_ID || '';
+        const objekt = row.Objekt || '';
+        const beginn = formatTimeCell(row.MA_Start || row.MVA_Start || row.VA_Start || row.Beginn);
+        const ende = formatTimeCell(row.MA_Ende || row.MVA_Ende || row.VA_Ende || row.Ende);
+        const stunden = row.MA_Brutto_Std ?? row.Ma_brutto_std2 ?? row.MA_Netto_std2 ?? row.MA_Netto_Std ?? row.Stunden ?? '';
         const tr = document.createElement('tr');
         tr.dataset.id = row.ID || row.id;
-        tr.innerHTML = `<td>${row.VADatum || ''}</td><td>${row.Auftrag || ''}</td><td>${row.Beginn || ''}</td><td>${row.Ende || ''}</td><td>${row.MA_Brutto_Std || ''}</td><td>${row.MA_Netto_Std || ''}</td>`;
+        // Einsatzübersicht: Datum | Auftrag | Objekt | Von | Bis | Std
+        tr.innerHTML = `<td>${datum}</td><td>${auftrag}</td><td>${objekt}</td><td>${beginn}</td><td>${ende}</td><td>${stunden ?? ''}</td>`;
         tr.onclick = () => lst_Zuo_Click(row);
         tbody.appendChild(tr);
     });
+}
+
+function formatDateCell(value) {
+    if (!value) return '';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
+    return d.toLocaleDateString('de-DE');
+}
+
+function formatTimeCell(value) {
+    if (!value) return '';
+    const d = new Date(value);
+    if (!Number.isNaN(d.getTime())) {
+        return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    }
+    const match = String(value).match(/T(\d{2}:\d{2})/);
+    return match ? match[1] : String(value);
 }
 
 function updateSummeLabel(text) {

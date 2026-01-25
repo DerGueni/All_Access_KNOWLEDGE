@@ -1764,6 +1764,7 @@ window.kundeLöschen = typeof deleteRecord === 'function' ? deleteRecord : funct
     if (typeof Toast !== 'undefined') Toast.warning('Loeschen nicht verfuegbar');
     else alert('Loeschen nicht verfuegbar');
 };
+window.kundeLoeschen = window.kundeLöschen; // Alias ohne Umlaut fuer HTML onclick
 window.sucheKundeNr = function() {
     const input = document.getElementById('inputKundeNr') || document.querySelector('input[name="kundeNr"]');
     if (input && input.value) {

@@ -52,9 +52,46 @@
 
 ---
 
-## 🛑 GESCHÜTZTE BEREICHE
+## 🛑 GESCHÜTZTE BEREICHE - ABSOLUTE SPERRZONE
 
-**VOR Änderung:** Suche "GESCHÜTZT" → Gefunden? STOPP + User fragen!
+### ⛔ KRITISCHE WARNUNG - LIES DAS ZUERST!
+**Eingefrorene Bereiche wurden MEHRFACH kaputt gemacht!**
+**Jede Verletzung wirft das Projekt um TAGE zurück!**
+
+### 🔒 FREEZE-PROTOKOLL (VERPFLICHTEND)
+**VOR JEDER Code-Änderung diese Checkliste durchgehen:**
+
+1. **FREEZE-CHECK:** Ist die Datei/Funktion in der Freeze-Liste unten?
+   - JA → **SOFORT STOPP! KEINE Änderung ohne explizite User-Freigabe!**
+   - NEIN → Weiter zu Schritt 2
+
+2. **SCOPE-CHECK:** Könnte meine Änderung indirekt einen eingefrorenen Bereich betreffen?
+   - CSS-Änderung? → Header-Styles sind eingefroren!
+   - JS-Änderung? → Button-Bindings prüfen!
+   - Layout-Änderung? → Alle Positionen sind eingefroren!
+   - JA → **STOPP + User fragen!**
+
+3. **MINIMAL-PRINZIP:** Nur das ABSOLUTE MINIMUM ändern!
+   - Keine "Verbesserungen"
+   - Keine "Aufräumarbeiten"
+   - Keine "Refactorings"
+   - Keine "Optimierungen"
+
+### ❌ ABSOLUT VERBOTEN (ohne explizite Freigabe):
+- Änderung von CSS-Werten (font-size, color, padding, margin, position)
+- Änderung von Layout-Strukturen (Reihenfolge, Container, Grid)
+- Änderung von funktionierenden Event-Handlern
+- Änderung von API-Routen die funktionieren
+- Entfernen von "auskommentierten" Code (oft absichtlich!)
+- "Aufräumen" von Code
+- "Vereinheitlichen" von Styles
+- "Verbessern" von irgendetwas das funktioniert
+
+### 🚨 BEI VERSTOSS:
+Du hast gerade einen eingefrorenen Bereich geändert!
+1. SOFORT rückgängig machen
+2. User informieren was passiert ist
+3. Auf Anweisung warten
 
 ### Access-Instanzen (NUR diese!)
 - Frontend: `0_Consys_FE_Test.accdb`
@@ -86,10 +123,24 @@
 
 ## 🔴 ÄNDERUNGS-TRACKING (PFLICHT!)
 
-Bei JEDER HTML/CSS/JS-Änderung:
+### VOR jeder Änderung - PFLICHT-FRAGEN:
+1. **Hat der User diese Änderung EXPLIZIT angefordert?**
+   - NEIN → **STOPP! Nicht ändern!**
+   - "Könnte man verbessern" ist KEINE Anforderung!
+   - "Wäre besser wenn" ist KEINE Anforderung!
+
+2. **Ist der Bereich eingefroren?**
+   - Siehe FREEZE-Liste oben → **STOPP wenn ja!**
+
+3. **Ist es das MINIMUM für die Aufgabe?**
+   - Nur genau das ändern was angefordert wurde
+   - NICHTS "nebenbei" verbessern
+
+### Bei JEDER HTML/CSS/JS-Änderung:
 1. Explizite Anweisung vorhanden? Sonst STOPP!
-2. In `CLAUDE2.md` dokumentieren
-3. Kritisch? → Einfrieren
+2. Freeze-Check durchgeführt? Sonst STOPP!
+3. In `CLAUDE2.md` dokumentieren
+4. Kritisch? → Einfrieren
 
 ---
 
@@ -107,21 +158,77 @@ Bei JEDER HTML/CSS/JS-Änderung:
 
 ---
 
-## 🔒 EINGEFRORENE ÄNDERUNGEN (2026-01-16)
+---
 
-### CSS Header (15px, schwarz)
-- `css/form-titles.css`, `css/unified-header.css`
+## 🔒 EINGEFRORENE ÄNDERUNGEN - ABSOLUTE SPERRZONE
 
-### Header-korrigierte Formulare (27 Stück) ✅
+### ⛔⛔⛔ WARNUNG: DIESE LISTE IST HEILIG! ⛔⛔⛔
+**Alles hier wurde GETESTET und FUNKTIONIERT!**
+**NIEMALS ändern ohne EXPLIZITE Freigabe vom User!**
+**"Verbesserungen" sind KEINE Freigabe!**
+
+### Datum: 2026-01-16 (und fortlaufend)
+
+### 🔒 CSS Header (15px, schwarz) - EINGEFROREN!
+- `css/form-titles.css` → **KEINE Änderung!**
+- `css/unified-header.css` → **KEINE Änderung!**
+- Font-size: 15px → **NICHT ändern!**
+- Color: schwarz → **NICHT ändern!**
+
+### 🔒 Header-korrigierte Formulare (27 Stück) - EINGEFROREN!
+**Diese Formulare NICHT anfassen (Header, Layout, Styles):**
 frm_MA_VA_Schnellauswahl, frm_DP_Dienstplan_MA, frm_DP_Dienstplan_Objekt, frm_Einsatzuebersicht, frm_MA_Abwesenheit, frm_MA_Zeitkonten, frm_Rechnung, frm_Angebot, frm_N_Bewerber, frm_Rueckmeldestatistik, frm_Systeminfo, frm_Abwesenheiten, frm_Ausweis_Create, frm_Kundenpreise_gueni, frm_MA_Serien_eMail_Auftrag, frm_MA_Serien_eMail_dienstplan, frm_MA_VA_Positionszuordnung, frm_abwesenheitsuebersicht, frm_DP_Einzeldienstplaene, frm_MA_Tabelle, frm_Mahnung, frm_KD_Verrechnungssaetze, frm_MA_Offene_Anfragen, frm_MA_Adressen, frm_KD_Umsatzauswertung, frm_va_Auftragstamm2
 *(Ausnahme: frm_Menuefuehrung1 - eigenes Design)*
 
-### Export-System (eingefroren)
-`mod_ClaudeExport_Ultimate.bas` → erstellt 4 Index-Dateien
+**Was ist bei diesen Formularen eingefroren:**
+- Header-Struktur und -Styling
+- Schriftgrößen
+- Farben
+- Abstände
+- Layout-Positionen
+
+### 🔒 Export-System - EINGEFROREN!
+`mod_ClaudeExport_Ultimate.bas` → **NICHT ändern!**
+Erstellt 4 Index-Dateien → Struktur ist fix!
 
 ---
 
-## ⚠️ REGELN
+## 🚨 FREEZE-VERLETZUNGS-ERKENNUNG
+
+### Typische Fehler die zum Freeze-Bruch führen:
+
+**1. "Ich räume nur kurz auf"**
+→ NEIN! Aufräumen ist VERBOTEN!
+
+**2. "Das macht den Code besser"**
+→ NEIN! Verbesserungen sind VERBOTEN!
+
+**3. "Das war eh doppelt"**
+→ NEIN! Doppelter Code ist oft ABSICHT!
+
+**4. "Die Styles waren inkonsistent"**
+→ NEIN! Inkonsistenz ist manchmal ABSICHT!
+
+**5. "Ich passe nur schnell X an, Y bleibt gleich"**
+→ STOPP! Prüfen ob Y eingefroren ist!
+
+**6. "Das hängt zusammen, also ändere ich beides"**
+→ STOPP! Nur das Ändern was EXPLIZIT angefordert wurde!
+
+### 📝 Selbst-Test vor JEDER Änderung:
+```
+❓ Wurde diese spezifische Änderung angefordert? 
+❓ Ist die Datei in der Freeze-Liste?
+❓ Betrifft es CSS/Layout eines eingefrorenen Formulars?
+❓ Ändere ich mehr als das absolute Minimum?
+❓ "Verbessere" ich etwas das funktioniert?
+
+Wenn IRGENDEINE Antwort unsicher ist → USER FRAGEN!
+```
+
+---
+
+## ⚙️ REGELN
 
 ### ENCODING
 - **HTML/CSS/JS/Python:** UTF-8 mit echten Umlauten (ö ü ä)
@@ -187,3 +294,139 @@ PRE-IMPL → POST-IMPL → COMPLIANCE → ACCESS-PARITÄT → BROWSER-TEST → R
 
 ### Definition of Done
 ✅ Alle Gates ✅ CLAUDE2.md ✅ Browser-Test ✅ Console OK ✅ Regression OK
+
+---
+
+## 🔧 ACCESS BRIDGE vs. OFFICEMCP - ENTSCHEIDUNGSLOGIK (PFLICHT!)
+
+### WICHTIG: Bei JEDER Office/Access-Aufgabe diese Logik anwenden!
+
+### 📊 Entscheidungsmatrix
+
+| Aufgabe | Tool | Grund |
+|---------|------|-------|
+| VBA-Funktion aufrufen | **Access Bridge** | `run_vba_function()` |
+| Query erstellen/ändern | **Access Bridge** | `create_query()` |
+| Formular erstellen | **Access Bridge** | `create_form()` |
+| VBA-Modul importieren | **Access Bridge** | `import_vba_module()` |
+| SQL auf Backend | **Access Bridge** | `execute_sql()` |
+| Access-Objekte auflisten | **Access Bridge** | `list_forms()`, `list_queries()` |
+| Mail mit Access-Templates | **Access Bridge** | VBA `create_Mail()` nutzt Templates |
+| Mail OHNE Access-Daten | **OfficeMCP** | `Officer.Outlook` direkt |
+| Excel-Datei erstellen/bearbeiten | **OfficeMCP** | `Officer.Excel` |
+| Word-Dokument erstellen | **OfficeMCP** | `Officer.Word` |
+| PowerPoint bearbeiten | **OfficeMCP** | `Officer.PowerPoint` |
+| Screenshot Office-App | **OfficeMCP** | `ScreenShot()` |
+| Office-App starten/prüfen | **OfficeMCP** | `Launch()`, `AvailableApps()` |
+
+### 🚦 Entscheidungsbaum
+
+```
+Aufgabe betrifft Access-Datenbank?
+├── JA → Braucht VBA-Ausführung oder DB-Zugriff?
+│   ├── JA → ACCESS BRIDGE ULTIMATE
+│   │   - run_vba_function() für VBA
+│   │   - execute_sql() für Daten
+│   │   - create_query/form/module() für Objekte
+│   └── NEIN → Nur Daten lesen?
+│       └── JA → ACCESS BRIDGE (execute_sql)
+│
+└── NEIN → Betrifft andere Office-App?
+    ├── Outlook (Mail ohne Access-Templates) → OFFICEMCP
+    ├── Excel → OFFICEMCP
+    ├── Word → OFFICEMCP
+    └── PowerPoint → OFFICEMCP
+```
+
+### 📧 SPEZIALFALL: E-MAIL VERSAND
+
+**Mail MIT Access-Daten/Templates:**
+```python
+# RICHTIG: Access Bridge → VBA aufrufen
+bridge.run_vba_function("create_Mail", MA_ID, VA_ID, VADatum_ID, VAStart_ID, 1)
+# → Nutzt Templates von \\vConSYS01-NBG\Database\HTMLBodies\
+# → Nutzt Platzhalter-Logik aus VBA
+# → Loggt in tbl_Log_eMail_Sent
+```
+
+**Mail OHNE Access-Bezug:**
+```python
+# OfficeMCP direkt (nur wenn KEINE Access-Templates benötigt!)
+# Officer.Outlook für einfache Mails
+```
+
+### 🔗 Access Bridge Ultimate - Pfad & Verwendung
+
+**Pfad:** `C:\Users\guenther.siegert\Documents\Access Bridge\access_bridge_ultimate.py`
+
+**Import:**
+```python
+from access_bridge_ultimate import AccessBridge
+
+with AccessBridge() as bridge:
+    # VBA ausführen
+    result = bridge.run_vba_function("FunktionsName", arg1, arg2)
+
+    # SQL ausführen
+    data = bridge.execute_sql("SELECT * FROM tbl_MA_Mitarbeiterstamm", fetch=True)
+
+    # Objekte erstellen
+    bridge.create_query("TestQuery", "SELECT * FROM tbl")
+```
+
+### 🔗 OfficeMCP - Verfügbare Tools
+
+**Nach Claude Code Neustart verfügbar als `mcp__officemcp__*`:**
+- `AvailableApps()` - Installierte Office-Apps
+- `Launch(app_name, visible)` - App starten
+- `Visible(app_name, visible)` - Sichtbarkeit setzen
+- `ScreenShot(save_path)` - Screenshot erstellen
+- `RootFolder()` - Arbeitsverzeichnis
+
+**Arbeitsverzeichnis:** `C:\Users\guenther.siegert\Documents\OfficeMCP`
+
+### ⚠️ NIEMALS:
+- OfficeMCP für Access-Datenbank-Operationen nutzen
+- Access Bridge für Excel/Word/PowerPoint nutzen
+- Mail mit Access-Templates über OfficeMCP senden (Templates gehen verloren!)
+- Beide Tools für dieselbe Aufgabe mischen
+
+---
+
+## 🐛 VBA DEBUG MCP - ENTSCHEIDUNGSLOGIK
+
+### Wann VBA Debug MCP nutzen:
+
+| Situation | Tool | Grund |
+|-----------|------|-------|
+| VBA Runtime-Fehler erkennen | **VBA Debug MCP** | Error-Trapping, Call Stack |
+| Debug.Print Ausgaben lesen | **VBA Debug MCP** | Echtzeit-Abfangen |
+| Syntax vor Import prüfen | **VBA Debug MCP** | Compile-Check |
+| VBA-Funktion ausführen | Access Bridge | `run_vba_function()` |
+| VBA-Modul importieren | Access Bridge | `import_vba_module()` |
+
+### Entscheidungsbaum bei VBA-Problemen:
+
+```
+VBA-Problem?
+├── Fehler erkennen/debuggen?
+│   └── VBA DEBUG MCP
+│
+├── Code ausführen?
+│   └── ACCESS BRIDGE
+│
+└── Code importieren/ändern?
+    └── ACCESS BRIDGE
+```
+
+### Tool-Zusammenspiel (WICHTIG!):
+
+```
+[Entwicklung]     → Access Bridge (Module, Queries, Forms)
+       ↓
+[Debugging]       → VBA Debug MCP (Fehler, Debug.Print)
+       ↓
+[Ausführung]      → Access Bridge (run_vba_function)
+       ↓
+[Office-Export]   → OfficeMCP (Excel, Word, Outlook)
+```

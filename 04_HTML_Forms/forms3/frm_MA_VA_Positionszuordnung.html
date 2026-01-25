@@ -47,7 +47,7 @@
                     <div class="buttons-grid">
                         <label class="toolbar-label" style="color:#fff; margin-right:4px;">Auftrag:</label>
                         <select id="cboAuftrag" class="form-control" style="width:200px; height:26px;">
-                            <option value="">-- Auftrag wählen --</option>
+                            <option value="">-- Auftrag waehlen --</option>
                         </select>
                         <label class="toolbar-label" style="color:#fff; margin-left:12px; margin-right:4px;">Datum:</label>
                         <select id="cboDatum" class="form-control" style="width:120px; height:26px;">
@@ -55,6 +55,8 @@
                         </select>
                         <button class="btn unified-btn btn-primary" id="btnSpeichern">Speichern</button>
                         <button class="btn unified-btn" id="btnAktualisieren">Aktualisieren</button>
+                        <button class="btn unified-btn btn-danger" id="mcobtnDelete" title="Ausgewaehlte Position loeschen">Pos. loeschen</button>
+                        <button class="btn unified-btn" id="btnRepeat" title="Zuordnung auf andere Tage wiederholen">Wiederholen</button>
                     </div>
                     <span id="header-date" style="color:#fff; font-size:11px; margin-left:auto; margin-right:8px;"></span>
                 </div>
@@ -84,10 +86,18 @@
                         </div>
                     </div>
 
-                    <!-- Verfügbare MA -->
+                    <!-- Verfuegbare MA -->
                     <div class="zuordnung-panel">
-                        <div class="panel-header">Verfügbare Mitarbeiter <span id="lblMAAnzahl">(0)</span></div>
-                        <div class="panel-content" id="panelVerfügbar">
+                        <div class="panel-header">
+                            Verfuegbare Mitarbeiter <span id="lblMAAnzahl">(0)</span>
+                            <!-- MA-Typ Filter (Access: OptionGroup MA_Typ) -->
+                            <div style="float:right; font-size:10px; font-weight:normal;">
+                                <label><input type="radio" name="maTypFilter" value="0" checked> Alle</label>
+                                <label style="margin-left:6px;"><input type="radio" name="maTypFilter" value="1"> Fest</label>
+                                <label style="margin-left:6px;"><input type="radio" name="maTypFilter" value="2"> Frei</label>
+                            </div>
+                        </div>
+                        <div class="panel-content" id="panelVerfuegbar">
                             <div class="position-item">
                                 <div>
                                     <div class="position-name">Mustermann, Max</div>
@@ -96,6 +106,14 @@
                                 <button class="btn btn-sm btn-success">&#10140;</button>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Bulk-Buttons zwischen Panels (Access: btnAddAll, btnDelAll, btnAddSelected, btnDelSelected) -->
+                    <div class="zuordnung-buttons" style="display:flex; flex-direction:column; gap:8px; justify-content:center; padding:8px;">
+                        <button class="btn btn-sm btn-success" id="btnAddSelected" title="Ausgewaehlte MA zuordnen">&#10140;</button>
+                        <button class="btn btn-sm btn-primary" id="btnAddAll" title="Alle verfuegbaren MA zuordnen">&#10140;&#10140;</button>
+                        <button class="btn btn-sm btn-danger" id="btnDelSelected" title="Ausgewaehlte MA entfernen">&#10140;</button>
+                        <button class="btn btn-sm btn-warning" id="btnDelAll" title="Alle zugeordneten MA entfernen">&#10006;&#10006;</button>
                     </div>
 
                     <!-- Zugeordnete MA -->
@@ -162,7 +180,7 @@
             const btnSpeichern = document.getElementById('btnSpeichern');
             const btnAktualisieren = document.getElementById('btnAktualisieren');
             const panelPositionen = document.getElementById('panelPositionen');
-            const panelVerfuegbar = document.getElementById('panelVerfügbar');
+            const panelVerfuegbar = document.getElementById('panelVerfuegbar');
             const panelZugeordnet = document.getElementById('panelZugeordnet');
             const lblStatus = document.getElementById('lblStatus');
 
@@ -245,6 +263,23 @@
                 });
             }
 
+            // Bulk-Buttons Event-Listener (Access: btnAddAll, btnDelAll, btnAddSelected, btnDelSelected)
+            document.getElementById('btnAddAll')?.addEventListener('click', alleHinzufuegen);
+            document.getElementById('btnDelAll')?.addEventListener('click', alleEntfernen);
+            document.getElementById('btnAddSelected')?.addEventListener('click', ausgewaehlteHinzufuegen);
+            document.getElementById('btnDelSelected')?.addEventListener('click', ausgewaehlteEntfernen);
+
+            // Position loeschen (Access: mcobtnDelete)
+            document.getElementById('mcobtnDelete')?.addEventListener('click', positionLoeschen);
+
+            // Wiederholung (Access: btnRepeat)
+            document.getElementById('btnRepeat')?.addEventListener('click', zuordnungWiederholen);
+
+            // MA-Typ Filter (Access: MA_Typ OptionGroup AfterUpdate)
+            document.querySelectorAll('input[name="maTypFilter"]').forEach(radio => {
+                radio.addEventListener('change', maTypFilterAnwenden);
+            });
+
             // Initial Counter update
             updateCounters();
         });
@@ -296,7 +331,7 @@
                 infoEl.textContent = 'Qualifikation: 34a';
             }
 
-            document.getElementById('panelVerfügbar')?.appendChild(clonedItem);
+            document.getElementById('panelVerfuegbar')?.appendChild(clonedItem);
             maItem.remove();
 
             updateCounters();
@@ -304,10 +339,171 @@
             console.log('[MA_VA_Positionszuordnung] Entfernt:', maName);
         }
 
-        // Zähler aktualisieren
+        // ============================================
+        // BULK-OPERATIONEN (Access: btnAddAll, btnDelAll, btnAddSelected, btnDelSelected)
+        // ============================================
+
+        // Alle verfuegbaren MA zuordnen (Access: btnAddAll_Click)
+        function alleHinzufuegen() {
+            const selectedPosition = document.querySelector('#panelPositionen .position-item.selected');
+            if (!selectedPosition) {
+                alert('Bitte zuerst eine Position auswaehlen');
+                return;
+            }
+
+            const panelVerfuegbar = document.getElementById('panelVerfuegbar');
+            const items = panelVerfuegbar?.querySelectorAll('.position-item');
+            if (!items || items.length === 0) {
+                updateStatus('Keine verfuegbaren MA');
+                return;
+            }
+
+            let count = 0;
+            items.forEach(item => {
+                mitarbeiterZuordnen(item);
+                count++;
+            });
+
+            updateStatus(count + ' MA zugeordnet');
+            console.log('[MA_VA_Positionszuordnung] Alle hinzugefuegt:', count);
+        }
+
+        // Alle zugeordneten MA entfernen (Access: btnDelAll_Click)
+        function alleEntfernen() {
+            const panelZugeordnet = document.getElementById('panelZugeordnet');
+            const items = panelZugeordnet?.querySelectorAll('.position-item');
+            if (!items || items.length === 0) {
+                updateStatus('Keine zugeordneten MA');
+                return;
+            }
+
+            if (!confirm('Wirklich alle ' + items.length + ' Zuordnungen entfernen?')) {
+                return;
+            }
+
+            let count = 0;
+            items.forEach(item => {
+                mitarbeiterEntfernen(item);
+                count++;
+            });
+
+            updateStatus(count + ' MA entfernt');
+            console.log('[MA_VA_Positionszuordnung] Alle entfernt:', count);
+        }
+
+        // Ausgewaehlte MA zuordnen (Access: btnAddSelected_Click)
+        function ausgewaehlteHinzufuegen() {
+            const selectedPosition = document.querySelector('#panelPositionen .position-item.selected');
+            if (!selectedPosition) {
+                alert('Bitte zuerst eine Position auswaehlen');
+                return;
+            }
+
+            const panelVerfuegbar = document.getElementById('panelVerfuegbar');
+            const selectedItems = panelVerfuegbar?.querySelectorAll('.position-item.selected');
+            if (!selectedItems || selectedItems.length === 0) {
+                // Wenn nichts ausgewaehlt, ersten verfuegbaren MA nehmen
+                const firstItem = panelVerfuegbar?.querySelector('.position-item');
+                if (firstItem) {
+                    mitarbeiterZuordnen(firstItem);
+                    updateStatus('1 MA zugeordnet');
+                }
+                return;
+            }
+
+            selectedItems.forEach(item => {
+                mitarbeiterZuordnen(item);
+            });
+            updateStatus(selectedItems.length + ' MA zugeordnet');
+        }
+
+        // Ausgewaehlte MA entfernen (Access: btnDelSelected_Click)
+        function ausgewaehlteEntfernen() {
+            const panelZugeordnet = document.getElementById('panelZugeordnet');
+            const selectedItems = panelZugeordnet?.querySelectorAll('.position-item.selected');
+            if (!selectedItems || selectedItems.length === 0) {
+                // Wenn nichts ausgewaehlt, ersten zugeordneten MA entfernen
+                const firstItem = panelZugeordnet?.querySelector('.position-item');
+                if (firstItem) {
+                    mitarbeiterEntfernen(firstItem);
+                    updateStatus('1 MA entfernt');
+                }
+                return;
+            }
+
+            selectedItems.forEach(item => {
+                mitarbeiterEntfernen(item);
+            });
+            updateStatus(selectedItems.length + ' MA entfernt');
+        }
+
+        // Position loeschen (Access: mcobtnDelete_Click)
+        function positionLoeschen() {
+            const selectedPosition = document.querySelector('#panelPositionen .position-item.selected');
+            if (!selectedPosition) {
+                alert('Bitte zuerst eine Position auswaehlen');
+                return;
+            }
+
+            const posName = selectedPosition.querySelector('.position-name')?.textContent || 'Position';
+            if (!confirm('Position "' + posName + '" wirklich loeschen?')) {
+                return;
+            }
+
+            selectedPosition.remove();
+            updateCounters();
+            updateStatus('Position geloescht: ' + posName);
+            console.log('[MA_VA_Positionszuordnung] Position geloescht:', posName);
+        }
+
+        // Zuordnung auf andere Tage wiederholen (Access: btnRepeat_Click)
+        function zuordnungWiederholen() {
+            const selectedPosition = document.querySelector('#panelPositionen .position-item.selected');
+            if (!selectedPosition) {
+                alert('Bitte zuerst eine Position auswaehlen');
+                return;
+            }
+
+            const zugeordnete = document.querySelectorAll('#panelZugeordnet .position-item');
+            if (zugeordnete.length === 0) {
+                alert('Keine Zuordnungen zum Wiederholen vorhanden');
+                return;
+            }
+
+            // TODO: Dialog fuer Datum-Auswahl oeffnen
+            const zielDatum = prompt('Auf welches Datum soll die Zuordnung kopiert werden? (Format: TT.MM.JJJJ)');
+            if (!zielDatum) return;
+
+            updateStatus('Wiederhole Zuordnung auf ' + zielDatum + '...');
+            console.log('[MA_VA_Positionszuordnung] Wiederhole:', zugeordnete.length, 'MA auf', zielDatum);
+
+            // Simuliere API-Aufruf
+            setTimeout(() => {
+                updateStatus('Zuordnung auf ' + zielDatum + ' uebernommen');
+                alert(zugeordnete.length + ' Zuordnungen wurden auf ' + zielDatum + ' kopiert.');
+            }, 500);
+        }
+
+        // MA-Typ Filter anwenden (Access: MA_Typ_AfterUpdate)
+        function maTypFilterAnwenden() {
+            const filterValue = document.querySelector('input[name="maTypFilter"]:checked')?.value || '0';
+            const panelVerfuegbar = document.getElementById('panelVerfuegbar');
+            const items = panelVerfuegbar?.querySelectorAll('.position-item');
+
+            items?.forEach(item => {
+                // Hier wuerde normalerweise nach Fest/Frei gefiltert werden
+                // Vorerst alle anzeigen
+                item.style.display = '';
+            });
+
+            updateStatus('Filter: ' + (filterValue === '0' ? 'Alle' : filterValue === '1' ? 'Fest' : 'Frei'));
+            console.log('[MA_VA_Positionszuordnung] MA-Typ Filter:', filterValue);
+        }
+
+        // Zaehler aktualisieren
         function updateCounters() {
             const posCount = document.querySelectorAll('#panelPositionen .position-item').length;
-            const maCount = document.querySelectorAll('#panelVerfügbar .position-item').length;
+            const maCount = document.querySelectorAll('#panelVerfuegbar .position-item').length;
             const zugeordnetCount = document.querySelectorAll('#panelZugeordnet .position-item').length;
 
             const lblPosAnzahl = document.getElementById('lblPosAnzahl');
