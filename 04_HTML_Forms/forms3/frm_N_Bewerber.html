@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bewerber - CONSYS</title>
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
+    <style>
+        body { background-color: #8080c0; font-family: 'Segoe UI', sans-serif; font-size: 11px; margin: 0; }
+        .window-frame { height: 100vh; display: flex; flex-direction: column; }
+        .content { flex: 1; padding: 15px; overflow: auto; background: #d3d3d3; display: flex; gap: 10px; }
+        .left-panel { width: 350px; display: flex; flex-direction: column; gap: 10px; }
+        .right-panel { flex: 1; display: flex; flex-direction: column; }
+        .form-section { background: #b8b8d8; border: 1px solid #606090; padding: 10px; }
+        .form-section h3 { margin: 0 0 10px 0; color: #000080; font-size: 12px; border-bottom: 1px solid #808080; padding-bottom: 5px; }
+        .form-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .form-label { min-width: 80px; font-weight: bold; text-align: right; }
+        .form-input, .form-select { height: 22px; border: 1px solid #808080; padding: 2px 4px; flex: 1; }
+        .btn { background: linear-gradient(to bottom, #e8e8e8, #c0c0c0); border: 1px solid #808080; height: 26px; padding: 4px 12px; cursor: pointer; }
+        .btn:hover { background: linear-gradient(to bottom, #f0f0f0, #d0d0d0); }
+        .data-table { width: 100%; border-collapse: collapse; background: white; flex: 1; }
+        .data-table th, .data-table td { border: 1px solid #808080; padding: 4px 6px; text-align: left; }
+        .data-table th { background: #c0c0e0; font-weight: bold; position: sticky; top: 0; }
+        .data-table tr:hover { background: #e8e8f8; cursor: pointer; }
+        .data-table tr.selected { background: #4040a0; color: white; }
+        .table-wrapper { flex: 1; overflow: auto; border: 1px solid #606090; }
+        .status-offen { color: #0000ff; }
+        .status-eingeladen { color: #008000; }
+        .status-abgelehnt { color: #ff0000; }
+    </style>
+</head>
+<body data-form="frm_N_Bewerber">
+    <div class="window-frame">
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box" style="width:36px;height:36px;background:linear-gradient(135deg,#4040a0,#8080c0);border:2px solid #404080;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold; color: #000080;">Bewerberverwaltung</span>
+                <div class="buttons-grid" style="display:flex;gap:8px;margin-left:auto;">
+                    <button class="btn" id="btnNeu" onclick="neuerBewerber()">Neu</button>
+                    <button class="btn" id="btnSpeichern" onclick="speichern()">Speichern</button>
+                    <button class="btn" id="btnEinladen" onclick="einladen()">Einladen</button>
+                    <button class="btn" id="btnAblehnen" onclick="ablehnen()">Ablehnen</button>
+                    <button class="btn" id="btnLoeschen" onclick="loeschen()">Loeschen</button>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="left-panel">
+                <div class="form-section">
+                    <h3>Bewerber-Details</h3>
+                    <div class="form-row"><span class="form-label">Nachname:</span><input type="text" class="form-input" id="txtNachname"></div>
+                    <div class="form-row"><span class="form-label">Vorname:</span><input type="text" class="form-input" id="txtVorname"></div>
+                    <div class="form-row"><span class="form-label">Strasse:</span><input type="text" class="form-input" id="txtStrasse"></div>
+                    <div class="form-row"><span class="form-label">PLZ/Ort:</span><input type="text" class="form-input" id="txtPLZ" style="width:60px;flex:none;"><input type="text" class="form-input" id="txtOrt"></div>
+                    <div class="form-row"><span class="form-label">Telefon:</span><input type="text" class="form-input" id="txtTelefon"></div>
+                    <div class="form-row"><span class="form-label">E-Mail:</span><input type="email" class="form-input" id="txtEmail"></div>
+                    <div class="form-row"><span class="form-label">Geb.Dat:</span><input type="date" class="form-input" id="txtGebDat"></div>
+                    <div class="form-row"><span class="form-label">Status:</span><select class="form-select" id="cboStatus">
+                        <option value="1">Offen</option>
+                        <option value="2">Eingeladen</option>
+                        <option value="3">Abgelehnt</option>
+                        <option value="4">Eingestellt</option>
+                    </select></div>
+                </div>
+                <div class="form-section">
+                    <h3>Bemerkungen</h3>
+                    <textarea id="txtBemerkung" style="width:100%;height:80px;border:1px solid #808080;"></textarea>
+                </div>
+            </div>
+            <div class="right-panel">
+                <div class="form-section" style="flex:1;display:flex;flex-direction:column;">
+                    <h3>Bewerberliste</h3>
+                    <div class="form-row">
+                        <span class="form-label">Filter:</span>
+                        <select class="form-select" id="cboFilter" onchange="filterBewerber()" style="width:150px;flex:none;">
+                            <option value="alle">Alle</option>
+                            <option value="offen" selected>Offen</option>
+                            <option value="eingeladen">Eingeladen</option>
+                        </select>
+                        <input type="text" class="form-input" id="txtSuche" placeholder="Suche..." style="width:150px;flex:none;">
+                        <button class="btn" onclick="loadBewerber()">Suchen</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="tblBewerber">
+                            <thead>
+                                <tr>
+                                    <th>Nachname</th>
+                                    <th>Vorname</th>
+                                    <th>Ort</th>
+                                    <th>Bewerbung</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bewerberTbody">
+                                <tr><td colspan="5" style="text-align:center;padding:20px;color:#606060;">Laden...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Platzhalter-Logic
+        async function loadBewerber() {
+            try {
+                const resp = await fetch('http://localhost:5000/api/bewerber');
+                const data = await resp.json();
+                renderBewerber(data.data || []);
+            } catch(e) {
+                document.getElementById('bewerberTbody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:red;">API nicht erreichbar</td></tr>';
+            }
+        }
+        function renderBewerber(list) {
+            const tbody = document.getElementById('bewerberTbody');
+            if (!list.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Keine Bewerber gefunden</td></tr>';
+                return;
+            }
+            tbody.innerHTML = list.map(b => `<tr onclick="selectBewerber(${b.ID})">
+                <td>${b.Nachname || ''}</td>
+                <td>${b.Vorname || ''}</td>
+                <td>${b.Ort || ''}</td>
+                <td>${b.Bewerbungsdatum || ''}</td>
+                <td class="status-${(b.Status || 'offen').toLowerCase()}">${b.Status || 'Offen'}</td>
+            </tr>`).join('');
+        }
+        function selectBewerber(id) { console.log('Bewerber ausgewaehlt:', id); }
+        function neuerBewerber() { alert('Neuer Bewerber wird implementiert'); }
+        function speichern() { alert('Speichern wird implementiert'); }
+        function einladen() { alert('Einladen wird implementiert'); }
+        function ablehnen() { alert('Ablehnen wird implementiert'); }
+        function loeschen() { alert('Loeschen wird implementiert'); }
+        function filterBewerber() { loadBewerber(); }
+
+        // Initial laden
+        loadBewerber();
+        console.log('[frm_N_Bewerber] Formular geladen');
+    </script>
+</body>
+</html>

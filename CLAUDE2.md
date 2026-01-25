@@ -85,6 +85,21 @@ Jede Änderung wird wie folgt dokumentiert:
 
 <!-- Neue Einträge werden hier automatisch eingefügt -->
 
+### 2026-01-25 17:30 - frm_va_Auftragstamm.html - Status-Panel (Anfrage-Panel) sichtbar gemacht
+**Element:** .right-panel, .right-header
+**Typ:** css
+**Aenderung:** Status-Panel war nicht sichtbar wegen CSS-Konflikt zwischen position:absolute und overflow:hidden
+**Vorher:**
+- .right-panel: padding-top:100px, margin-top:-100px, height:calc(100%+100px)
+- .right-header: position:absolute, top:0
+**Nachher:**
+- .right-panel: ohne padding-top/margin-top/height-Anpassungen
+- .right-header: position:static (statt absolute)
+**Ergebnis:** Status-Panel mit "In Planung (141)", "Auftrag beendet (0)", "Einsatzliste versendet (0)" ist jetzt sichtbar
+**Status:** ✅ Abgeschlossen
+
+---
+
 ### 2026-01-25 - frm_va_Auftragstamm.html - Fehlende Access-Felder ergaenzt
 **Element:** form-section (Right Column), Header (Status-Group)
 **Typ:** html + css + js

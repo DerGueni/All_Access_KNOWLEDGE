@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lohnabrechnungen - CONSYS</title>
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
+    <style>
+        body { background-color: #8080c0; font-family: 'Segoe UI', sans-serif; font-size: 11px; margin: 0; }
+        .window-frame { height: 100vh; display: flex; flex-direction: column; }
+        .content { flex: 1; padding: 15px; overflow: auto; background: #d3d3d3; }
+        .filter-bar { background: #b8b8d8; border: 1px solid #606090; padding: 10px; margin-bottom: 10px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 5px; }
+        .filter-label { font-weight: bold; }
+        .form-input, .form-select { height: 22px; border: 1px solid #808080; padding: 2px 4px; }
+        .btn { background: linear-gradient(to bottom, #e8e8e8, #c0c0c0); border: 1px solid #808080; height: 26px; padding: 4px 12px; cursor: pointer; }
+        .btn:hover { background: linear-gradient(to bottom, #f0f0f0, #d0d0d0); }
+        .btn-primary { background: linear-gradient(to bottom, #4080c0, #306090); color: white; }
+        .data-section { background: white; border: 1px solid #606090; flex: 1; display: flex; flex-direction: column; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { border: 1px solid #c0c0c0; padding: 4px 6px; text-align: left; }
+        .data-table th { background: #c0c0e0; font-weight: bold; position: sticky; top: 0; }
+        .data-table tr:hover { background: #e8e8f8; }
+        .data-table tr.selected { background: #4040a0; color: white; }
+        .table-wrapper { flex: 1; overflow: auto; }
+        .summary-bar { background: #e0e0f0; border-top: 1px solid #808080; padding: 8px 10px; display: flex; gap: 20px; }
+        .summary-item { font-weight: bold; }
+        .summary-value { color: #000080; }
+        .status-offen { color: #ff8000; }
+        .status-abgerechnet { color: #008000; }
+        .status-storniert { color: #ff0000; }
+    </style>
+</head>
+<body data-form="frm_N_Lohnabrechnungen">
+    <div class="window-frame">
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box" style="width:36px;height:36px;background:linear-gradient(135deg,#4040a0,#8080c0);border:2px solid #404080;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold; color: #000080;">Lohnabrechnungen</span>
+                <div class="buttons-grid" style="display:flex;gap:8px;margin-left:auto;">
+                    <button class="btn" id="btnAktualisieren" onclick="loadAbrechnungen()">Aktualisieren</button>
+                    <button class="btn" id="btnBerechnen" onclick="berechnen()">Berechnen</button>
+                    <button class="btn btn-primary" id="btnExportExcel" onclick="exportExcel()">Excel Export</button>
+                    <button class="btn" id="btnDrucken" onclick="drucken()">Drucken</button>
+                </div>
+            </div>
+        </div>
+        <div class="content" style="display:flex;flex-direction:column;">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <span class="filter-label">Monat:</span>
+                    <select class="form-select" id="cboMonat" style="width:120px;">
+                        <option value="01">Januar</option>
+                        <option value="02">Februar</option>
+                        <option value="03">Maerz</option>
+                        <option value="04">April</option>
+                        <option value="05">Mai</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Dezember</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <span class="filter-label">Jahr:</span>
+                    <input type="number" class="form-input" id="txtJahr" value="2026" style="width:70px;">
+                </div>
+                <div class="filter-group">
+                    <span class="filter-label">Mitarbeiter:</span>
+                    <select class="form-select" id="cboMitarbeiter" style="width:200px;">
+                        <option value="">-- Alle --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <span class="filter-label">Status:</span>
+                    <select class="form-select" id="cboStatus" style="width:120px;">
+                        <option value="">Alle</option>
+                        <option value="offen">Offen</option>
+                        <option value="abgerechnet">Abgerechnet</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="loadAbrechnungen()">Filtern</button>
+            </div>
+            <div class="data-section">
+                <div class="table-wrapper">
+                    <table class="data-table" id="tblAbrechnungen">
+                        <thead>
+                            <tr>
+                                <th style="width:30px;"><input type="checkbox" id="chkAll" onclick="toggleAll()"></th>
+                                <th>MA-Nr</th>
+                                <th>Nachname</th>
+                                <th>Vorname</th>
+                                <th style="text-align:right;">Std.</th>
+                                <th style="text-align:right;">Brutto</th>
+                                <th style="text-align:right;">Netto</th>
+                                <th>Status</th>
+                                <th>Abr.Datum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="abrechnungenTbody">
+                            <tr><td colspan="9" style="text-align:center;padding:20px;">Laden...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="summary-bar">
+                    <span class="summary-item">Gesamt: <span class="summary-value" id="sumAnzahl">0</span> Mitarbeiter</span>
+                    <span class="summary-item">Stunden: <span class="summary-value" id="sumStunden">0,00</span></span>
+                    <span class="summary-item">Brutto: <span class="summary-value" id="sumBrutto">0,00 EUR</span></span>
+                    <span class="summary-item">Netto: <span class="summary-value" id="sumNetto">0,00 EUR</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Aktuellen Monat setzen
+        document.getElementById('cboMonat').value = String(new Date().getMonth() + 1).padStart(2, '0');
+
+        async function loadAbrechnungen() {
+            const monat = document.getElementById('cboMonat').value;
+            const jahr = document.getElementById('txtJahr').value;
+            try {
+                const resp = await fetch(`http://localhost:5000/api/lohn/abrechnungen?monat=${monat}&jahr=${jahr}`);
+                const data = await resp.json();
+                renderAbrechnungen(data.data || []);
+            } catch(e) {
+                document.getElementById('abrechnungenTbody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:red;">API nicht erreichbar</td></tr>';
+            }
+        }
+        function renderAbrechnungen(list) {
+            const tbody = document.getElementById('abrechnungenTbody');
+            if (!list.length) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Keine Abrechnungen fuer diesen Zeitraum</td></tr>';
+                updateSummary([]);
+                return;
+            }
+            tbody.innerHTML = list.map(a => `<tr>
+                <td><input type="checkbox" class="row-check" data-id="${a.ID}"></td>
+                <td>${a.MA_Nr || ''}</td>
+                <td>${a.Nachname || ''}</td>
+                <td>${a.Vorname || ''}</td>
+                <td style="text-align:right;">${(a.Stunden || 0).toFixed(2)}</td>
+                <td style="text-align:right;">${(a.Brutto || 0).toFixed(2)}</td>
+                <td style="text-align:right;">${(a.Netto || 0).toFixed(2)}</td>
+                <td class="status-${(a.Status || 'offen').toLowerCase()}">${a.Status || 'Offen'}</td>
+                <td>${a.Abr_Datum || ''}</td>
+            </tr>`).join('');
+            updateSummary(list);
+        }
+        function updateSummary(list) {
+            document.getElementById('sumAnzahl').textContent = list.length;
+            document.getElementById('sumStunden').textContent = list.reduce((s,a) => s + (a.Stunden||0), 0).toFixed(2);
+            document.getElementById('sumBrutto').textContent = list.reduce((s,a) => s + (a.Brutto||0), 0).toFixed(2) + ' EUR';
+            document.getElementById('sumNetto').textContent = list.reduce((s,a) => s + (a.Netto||0), 0).toFixed(2) + ' EUR';
+        }
+        function toggleAll() {
+            const checked = document.getElementById('chkAll').checked;
+            document.querySelectorAll('.row-check').forEach(c => c.checked = checked);
+        }
+        function berechnen() { alert('Berechnung wird implementiert'); }
+        function exportExcel() { alert('Excel-Export wird implementiert'); }
+        function drucken() { alert('Drucken wird implementiert'); }
+
+        loadAbrechnungen();
+        console.log('[frm_N_Lohnabrechnungen] Formular geladen');
+    </script>
+</body>
+</html>

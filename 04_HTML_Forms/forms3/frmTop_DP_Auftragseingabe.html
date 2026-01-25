@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auftragseingabe - CONSYS</title>
+    <link rel="stylesheet" href="css/fonts_override.css">
+    <link rel="stylesheet" href="css/unified-header.css">
+    <link rel="stylesheet" href="css/form-titles.css">
+    <style>
+        body { background-color: #8080c0; font-family: 'Segoe UI', sans-serif; font-size: 11px; margin: 0; }
+        .window-frame { height: 100vh; display: flex; flex-direction: column; }
+        .content { flex: 1; padding: 15px; overflow: auto; background: #d3d3d3; }
+        .form-section { background: #b8b8d8; border: 1px solid #606090; padding: 10px; margin-bottom: 10px; }
+        .form-section h3 { margin: 0 0 10px 0; color: #000080; font-size: 12px; }
+        .form-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .form-label { min-width: 100px; font-weight: bold; }
+        .form-input, .form-select { height: 22px; border: 1px solid #808080; padding: 2px 4px; }
+        .form-input { width: 200px; }
+        .form-select { width: 208px; }
+        .btn { background: linear-gradient(to bottom, #e8e8e8, #c0c0c0); border: 1px solid #808080; height: 26px; padding: 4px 12px; cursor: pointer; }
+        .btn:hover { background: linear-gradient(to bottom, #f0f0f0, #d0d0d0); }
+        .data-table { width: 100%; border-collapse: collapse; background: white; }
+        .data-table th, .data-table td { border: 1px solid #808080; padding: 4px 6px; text-align: left; }
+        .data-table th { background: #c0c0e0; font-weight: bold; }
+        .data-table tr:hover { background: #e8e8f8; }
+        .placeholder-msg { text-align: center; padding: 40px; color: #404080; font-style: italic; }
+    </style>
+</head>
+<body data-form="frmTop_DP_Auftragseingabe">
+    <div class="window-frame">
+        <div class="header-row-wrapper">
+            <div class="header-row combined-buttons">
+                <div class="logo-box" style="width:36px;height:36px;background:linear-gradient(135deg,#4040a0,#8080c0);border:2px solid #404080;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">C</div>
+                <span class="title-text" style="font-size: 16px; font-weight: bold; color: #000080;">Auftragseingabe</span>
+                <div class="buttons-grid" style="display:flex;gap:8px;margin-left:auto;">
+                    <button class="btn" id="btnSpeichern" onclick="speichern()">Speichern</button>
+                    <button class="btn" id="btnAbbrechen" onclick="abbrechen()">Abbrechen</button>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="form-section">
+                <h3>Auftrags-Details</h3>
+                <div class="form-row">
+                    <span class="form-label">Auftrag:</span>
+                    <select class="form-select" id="cboAuftrag"><option value="">-- Auftrag waehlen --</option></select>
+                </div>
+                <div class="form-row">
+                    <span class="form-label">Datum:</span>
+                    <input type="date" class="form-input" id="txtDatum">
+                </div>
+                <div class="form-row">
+                    <span class="form-label">Schicht:</span>
+                    <select class="form-select" id="cboSchicht"><option value="">-- Schicht waehlen --</option></select>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>Mitarbeiter zuordnen</h3>
+                <table class="data-table" id="tblMitarbeiter">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th>Nachname</th>
+                            <th>Vorname</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" class="placeholder-msg">Bitte Auftrag und Schicht waehlen</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Platzhalter-Logic
+        function speichern() { alert('Speichern-Funktion wird implementiert'); }
+        function abbrechen() { window.close(); }
+        console.log('[frmTop_DP_Auftragseingabe] Formular geladen');
+    </script>
+</body>
+</html>
