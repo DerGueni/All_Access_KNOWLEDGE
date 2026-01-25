@@ -156,10 +156,9 @@ def add_cors_headers(response):
 def health_check():
     """Health-Check für Verbindungsstatus"""
     try:
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1")
-        release_connection(conn)
+        # Verwende execute_query statt direktem get_connection
+        # Das hat automatisches Retry bei geschlossener Verbindung
+        result = execute_query("SELECT 1 AS test")
         return jsonify({
             'status': 'ok',
             'backend': 'connected',
@@ -385,7 +384,18 @@ def get_connection():
 
     with _conn_lock:
         if _global_conn is not None:
-            return _global_conn
+            # Prüfe ob Verbindung noch gültig ist
+            try:
+                _global_conn.cursor().execute("SELECT 1")
+                return _global_conn
+            except:
+                # Verbindung ist geschlossen/ungültig, erstelle neue
+                logger.info("Existierende Verbindung ungueltig, erstelle neue...")
+                try:
+                    _global_conn.close()
+                except:
+                    pass
+                _global_conn = None
 
         # Neue Verbindung erstellen
         conn_str = f"DRIVER={{Microsoft Access Driver (*.mdb, *.accdb)}};DBQ={BACKEND_PATH};"
@@ -2303,7 +2313,7 @@ def check_verfuegbarkeit():
 # ============================================
 
 @app.route('/api/query', methods=['POST'])
-def execute_query():
+def api_execute_query():
     """Führt eine SELECT-Abfrage aus (nur lesend!)"""
     try:
         data = request.get_json()
@@ -8020,6 +8030,10 @@ def pre_warm_connection():
         cursor.close()
         release_connection(conn)
         logger.info(f"Datenbankverbindung OK ({count} aktive Mitarbeiter)")
+        # WICHTIG: Verbindung nach Test schliessen, damit erste Request frische Verbindung bekommt
+        # Dies verhindert "closed connection" Fehler nach Waitress-Initialisierung
+        reset_connection()
+        logger.info("Verbindung nach Test geschlossen (wird bei erstem Request neu erstellt)")
         return True
     except Exception as e:
         logger.error(f"Datenbankverbindung fehlgeschlagen: {e}")
