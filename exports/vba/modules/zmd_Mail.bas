@@ -2,7 +2,7 @@ Attribute VB_Name = "zmd_Mail"
 Option Compare Database
 Option Explicit
     
-    'Für Mailversand
+    'Fï¿½r Mailversand
     Const cdoSendUsingMethod = "http://schemas.microsoft.com/cdo/configuration/sendusing"
     Const cdoSMTPUseSSL = "http://schemas.microsoft.com/cdo/configuration/smtpusessl"
     Const cdoSendUsingPort = 2
@@ -23,8 +23,8 @@ Option Explicit
     Public VA_Text     As String
     Public VA_Ort      As String
     Public VA_Objekt   As String
-    Public VADatum     As String 'Besser wäre MVA_Datum, dieses wird gelesen!
-    Public VA_Uhrzeit  As String 'Besser wäre MVA_Uhrzeit, diese wird gelesen!
+    Public VADatum     As String 'Besser wï¿½re MVA_Datum, dieses wird gelesen!
+    Public VA_Uhrzeit  As String 'Besser wï¿½re MVA_Uhrzeit, diese wird gelesen!
     Public VA_Ende     As String
     Public DC          As String
     Public TP          As String
@@ -32,7 +32,7 @@ Option Explicit
     Public Sender      As String
     
     
-'Mitarbeiter für Veranstaltung anfragen
+'Mitarbeiter fï¿½r Veranstaltung anfragen
 Function Anfragen(ByVal MA_ID As Integer, ByVal VA_ID As Long, _
     ByVal VADatum_ID As Long, ByVal VAStart_ID As Long) As String
     
@@ -45,7 +45,7 @@ Dim sql             As String
 '    'Texte nachlesen
 '    subRC = Texte_lesen(MA_ID, VA_ID, VADatum_ID, VAStart_ID)
     
-    'Prüfen, ob der Mitarbeiter eine Email-Adresse hat
+    'Prï¿½fen, ob der Mitarbeiter eine Email-Adresse hat
     If IsNull(TLookup("Email", MASTAMM, "ID = " & MA_ID)) Then
         Anfragen = ">HAT KEINE EMAIL"
             
@@ -65,14 +65,19 @@ Dim sql             As String
         CRITERIAFORINFO = "VA_ID = " & VA_ID & _
             " AND VADatum_ID = " & VADatum_ID & " AND VAStart_ID = " & VAStart_ID & " AND MA_ID = 0 AND IstFraglich = False"
             
-        Status = TLookup("Status_ID", PLANUNG, Criteria)
-        'Status 1 bis 4:  1=Geplant, 2=Benachrichtigt, 3=Zusage, 4 =Absage
-        'Zusage 3 wird gelöscht kommt zu Zugeordnet -> Prüfung , ob MA bereits zugeordnet -> prüfen, ob das vorher schon passiert, sonst einkommentieren + anpassen!
+        ' NULL-safe: Wenn kein Planungs-Eintrag existiert, Status = 0
+        Status = Nz(TLookup("Status_ID", PLANUNG, Criteria), 0)
+        'Status 0 = Nicht geplant, 1=Geplant, 2=Benachrichtigt, 3=Zusage, 4=Absage
+        'Zusage 3 wird gelï¿½scht kommt zu Zugeordnet -> Prï¿½fung , ob MA bereits zugeordnet -> prï¿½fen, ob das vorher schon passiert, sonst einkommentieren + anpassen!
     '    If TLookup("ID", ZUORDNUNG, criteria) <> Null Then
     '        Status = 3
     '    endif.
-        
+
         Select Case Status
+            Case 0
+                ' MA ist nicht in der Planung - muss erst geplant werden
+                Anfragen = ">NICHT GEPLANT"
+
             Case 1
                 'Mitarbeiter anfragen
                 check = create_Mail(MA_ID, VA_ID, VADatum_ID, VAStart_ID, 1) & vbCrLf
@@ -112,7 +117,7 @@ Dim sql             As String
             
         End Select
      
-        'Datei für Autmatische Antwort erzeugen
+        'Datei fï¿½r Autmatische Antwort erzeugen
         create_PHP MD5, Email, VADatum, VA_Uhrzeit, VA_Ende, VA_Text, VA_Ort, VA_Objekt, MA_ID
 
     End If
@@ -147,7 +152,7 @@ Dim Criteria As String
         " AND VADatum_ID = " & VADatum_ID & " AND VAStart_ID = " & VAStart_ID
 
     'Status 1 bis 4:  1=Geplant, 2=Benachrichtigt, 3=Zusage, 4 =Absage
-    '(Zusage 3 wird gelöscht kommt zu Zugeordnet)
+    '(Zusage 3 wird gelï¿½scht kommt zu Zugeordnet)
     
     If TUpdate("Status_ID = 2", PLANUNG, Criteria) = "OK" Then
       setze_Angefragt = ">OK"
@@ -181,12 +186,12 @@ On Error Resume Next
 
     Email = TLookup("Email", "tbl_Ma_Mitarbeiterstamm", "ID=" & MA_ID)
     
-    'eM@il Adresse muss gepflegt sein, da mit Grundlage für md5hash
+    'eM@il Adresse muss gepflegt sein, da mit Grundlage fï¿½r md5hash
     If Err.Number <> 0 Then
         Texte_lesen = "Mitarbeiter " & MA_ID & ": Emailadresse fehlt!"
     End If
     
-    'Rest ist rille für weitere Verarbeitung...
+    'Rest ist rille fï¿½r weitere Verarbeitung...
     VName = TLookup("Vorname", MASTAMM, "ID = " & MA_ID)
     NName = TLookup("Nachname", MASTAMM, "ID = " & MA_ID)
     VA_Text = TLookup("Auftrag", AUFTRAGSTAMM, "ID = " & VA_ID)
@@ -194,6 +199,8 @@ On Error Resume Next
     VA_Ort = TLookup("Ort", AUFTRAGSTAMM, "ID = " & VA_ID)
     VADatum = TLookup("VADatum", PLANUNG, "VADatum_ID = " & VADatum_ID & _
         " AND MA_ID = " & MA_ID & " AND VAStart_ID = " & VAStart_ID)
+    'FIX 27.01.2026: Datum formatieren (sonst wird ISO-Format angezeigt)
+    If IsDate(VADatum) Then VADatum = Format(VADatum, "DD.MM.YYYY")
     VA_Uhrzeit = TLookup("MVA_Start", PLANUNG, "VADatum_ID = " & VADatum_ID & _
         " AND MA_ID = " & MA_ID & " AND VAStart_ID = " & VAStart_ID)
     DC = TLookup("Dienstkleidung", AUFTRAGSTAMM, "ID = " & VA_ID)
@@ -243,7 +250,7 @@ End Function
 
 
 'Mail direkt erzeugen
-'Mailtype: 1=Anfrage, 2=Zusagebestätigung, 3=Absagebestätigung
+'Mailtype: 1=Anfrage, 2=Zusagebestï¿½tigung, 3=Absagebestï¿½tigung
 Function create_Mail(ByVal MA_ID As Integer, ByVal VA_ID As Long, ByVal VADatum_ID As Long, ByVal VAStart_ID As Long, Mailtype As Integer, Optional ByVal Attachment As String) As String
 
     Dim config  'As CDO.Configuration
@@ -275,15 +282,15 @@ Function create_Mail(ByVal MA_ID As Integer, ByVal VA_ID As Long, ByVal VADatum_
                 Exit Function
             End If
         
-            'URLs für Zusagen und Absage
+            'URLs fï¿½r Zusagen und Absage
             urlja = url & "&ZUSAGE=1"
             urlnein = url & "&ZUSAGE=0"
             
             'Betreffzeile aufbauen
             Subject = "CONSEC Anfrage zu " & VA_Text & ", " & VADatum & " in " & VA_Ort
         
-        Case Else ' Bestätigung
-            Subject = "Deine Rückmeldung ist angekommen " & VA_Text & ", " & VADatum & " in " & VA_Ort 'HIER noch unterscheiden-->ABSAGE /ZUSAGE
+        Case Else ' Bestï¿½tigung
+            Subject = "Deine Rï¿½ckmeldung ist angekommen " & VA_Text & ", " & VADatum & " in " & VA_Ort 'HIER noch unterscheiden-->ABSAGE /ZUSAGE
         
     End Select
     
@@ -295,12 +302,12 @@ Function create_Mail(ByVal MA_ID As Integer, ByVal VA_ID As Long, ByVal VADatum_
             txtFile = TXTConf
             ZuAbsage = "Zusage"
             Farbe = "green"
-            Zusatztext = "Eine Übersicht über alle Deine zugesagten Aufträge findest Du als Dienstplan im Anhang." & vbCrLf & vbCrLf & "Viele Grüße"
+            Zusatztext = "Eine ï¿½bersicht ï¿½ber alle Deine zugesagten Auftrï¿½ge findest Du als Dienstplan im Anhang." & vbCrLf & vbCrLf & "Viele Grï¿½ï¿½e"
         Case 3
             txtFile = TXTConf
             ZuAbsage = "Absage"
             Farbe = "red"
-            Zusatztext = "Eine Übersicht über alle Deine zugesagten Aufträge findest Du als Dienstplan im Anhang." & vbCrLf & vbCrLf & "Viele Grüße"
+            Zusatztext = "Eine ï¿½bersicht ï¿½ber alle Deine zugesagten Auftrï¿½ge findest Du als Dienstplan im Anhang." & vbCrLf & vbCrLf & "Viele Grï¿½ï¿½e"
     End Select
     
     'Mailtext aufbauen
@@ -403,28 +410,28 @@ On Error GoTo Err_HTML
       create_HTML = create_HTML & vbCrLf & Buffer
     Loop While Not EOF(1)
     
-    Close #1    ' Datei schließen
+    Close #1    ' Datei schlieï¿½en
 
     'Umlaute anpassen -> create_HTML
-    create_HTML = Replace(create_HTML, "Ü", "&#220;", , , vbBinaryCompare)
-    create_HTML = Replace(create_HTML, "Ä", "&#196;", , , vbBinaryCompare)
-    create_HTML = Replace(create_HTML, "Ö", "&#214;", , , vbBinaryCompare)
-    create_HTML = Replace(create_HTML, "ü", "&#252;", , , vbBinaryCompare)
-    create_HTML = Replace(create_HTML, "ä", "&#228;", , , vbBinaryCompare)
-    create_HTML = Replace(create_HTML, "ö", "&#246;", , , vbBinaryCompare)
-    create_HTML = Replace(create_HTML, "ß", "&#223;", , , vbBinaryCompare)
-    create_HTML = Replace(create_HTML, "Ãœ", "&#220;")  'Ü
-    create_HTML = Replace(create_HTML, "Ã„", "&#196;")  'Ä
-    create_HTML = Replace(create_HTML, "Ã–", "&#214;")  'Ö
-    create_HTML = Replace(create_HTML, "Ã¼", "&#252;")  'ü
-    create_HTML = Replace(create_HTML, "Ã¤", "&#228;")  'ä
-    create_HTML = Replace(create_HTML, "Ã¶", "&#246;")  'ö
-    create_HTML = Replace(create_HTML, "ÃŸ", "&#223;")  'ß
-    create_HTML = Replace(create_HTML, "Ãœ", "&#220;")  'Ü
-    create_HTML = Replace(create_HTML, "Ã„", "&#196;")  'Ä
-    create_HTML = Replace(create_HTML, "ï", "")         'Mist raus
-    create_HTML = Replace(create_HTML, "¿", "")         'Mist raus
-    create_HTML = Replace(create_HTML, "»", "")         'Mist raus
+    create_HTML = Replace(create_HTML, "ï¿½", "&#220;", , , vbBinaryCompare)
+    create_HTML = Replace(create_HTML, "ï¿½", "&#196;", , , vbBinaryCompare)
+    create_HTML = Replace(create_HTML, "ï¿½", "&#214;", , , vbBinaryCompare)
+    create_HTML = Replace(create_HTML, "ï¿½", "&#252;", , , vbBinaryCompare)
+    create_HTML = Replace(create_HTML, "ï¿½", "&#228;", , , vbBinaryCompare)
+    create_HTML = Replace(create_HTML, "ï¿½", "&#246;", , , vbBinaryCompare)
+    create_HTML = Replace(create_HTML, "ï¿½", "&#223;", , , vbBinaryCompare)
+    create_HTML = Replace(create_HTML, "Ãœ", "&#220;")  'ï¿½
+    create_HTML = Replace(create_HTML, "Ã„", "&#196;")  'ï¿½
+    create_HTML = Replace(create_HTML, "Ã–", "&#214;")  'ï¿½
+    create_HTML = Replace(create_HTML, "Ã¼", "&#252;")  'ï¿½
+    create_HTML = Replace(create_HTML, "Ã¤", "&#228;")  'ï¿½
+    create_HTML = Replace(create_HTML, "Ã¶", "&#246;")  'ï¿½
+    create_HTML = Replace(create_HTML, "ÃŸ", "&#223;")  'ï¿½
+    create_HTML = Replace(create_HTML, "Ãœ", "&#220;")  'ï¿½
+    create_HTML = Replace(create_HTML, "Ã„", "&#196;")  'ï¿½
+    create_HTML = Replace(create_HTML, "ï¿½", "")         'Mist raus
+    create_HTML = Replace(create_HTML, "ï¿½", "")         'Mist raus
+    create_HTML = Replace(create_HTML, "ï¿½", "")         'Mist raus
     
 End_HTML:
     Exit Function
@@ -520,9 +527,9 @@ On Error GoTo Err
     'Anhang
     Attachment = PfadTemp & "Dienstplan_" & von & "-" & bis & ".pdf"
 
-    'Prüfen, ob Bericht geöffnet
+    'Prï¿½fen, ob Bericht geï¿½ffnet
     If fctIsReportOpen(Report) Then
-        MsgBox "Bitte zuerst den Bericht schließen!"
+        MsgBox "Bitte zuerst den Bericht schlieï¿½en!"
         Exit Function
     End If
 
@@ -538,7 +545,7 @@ On Error GoTo Err
 
     Body = Replace(Body, "[A_Sender]", Sender)
 
-    'Alte Datei löschen falls noch vorhanden
+    'Alte Datei lï¿½schen falls noch vorhanden
     If FileExists(Attachment) Then Kill Attachment
 
     'Bericht im Temp-Verzeichnis als PDF sichern
@@ -553,7 +560,7 @@ On Error GoTo Err
 
 
 Ende:
-    'Datei löschen
+    'Datei lï¿½schen
     If FileExists(Attachment) Then Kill Attachment
     Exit Function
 Err:
@@ -575,7 +582,7 @@ Dim Datei       As String
     If Monat = 0 Then Monat = Month(Now) - 1
     MonatStr = Monat_lang(Monat)
 
-    PfadAbrech = PfadPlanungAktuell & "A  - Lexware Datenträger\2 - Abr Lohn\CONSEC_Security_Veranstaltungsservice_&_" & Jahr & "_" & MonatStr & "\"
+    PfadAbrech = PfadPlanungAktuell & "A  - Lexware Datentrï¿½ger\2 - Abr Lohn\CONSEC_Security_Veranstaltungsservice_&_" & Jahr & "_" & MonatStr & "\"
     such = Jahr & "_" & MonatStr & "_" & LexID & "_"
     Datei = Dir(PfadAbrech & "*" & such & "*.pdf")
     
@@ -597,7 +604,7 @@ Dim Email       As String
 
     
     If Datei = "" Then
-        Lohnabrechnung_senden = "Keine Datei übergeben"
+        Lohnabrechnung_senden = "Keine Datei ï¿½bergeben"
         Exit Function
     End If
     

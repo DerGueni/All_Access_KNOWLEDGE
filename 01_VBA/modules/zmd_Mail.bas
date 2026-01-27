@@ -194,6 +194,8 @@ On Error Resume Next
     VA_Ort = TLookup("Ort", AUFTRAGSTAMM, "ID = " & VA_ID)
     VADatum = TLookup("VADatum", PLANUNG, "VADatum_ID = " & VADatum_ID & _
         " AND MA_ID = " & MA_ID & " AND VAStart_ID = " & VAStart_ID)
+    'FIX 27.01.2026: Datum formatieren (sonst wird ISO-Format angezeigt)
+    If IsDate(VADatum) Then VADatum = Format(VADatum, "DD.MM.YYYY")
     VA_Uhrzeit = TLookup("MVA_Start", PLANUNG, "VADatum_ID = " & VADatum_ID & _
         " AND MA_ID = " & MA_ID & " AND VAStart_ID = " & VAStart_ID)
     DC = TLookup("Dienstkleidung", AUFTRAGSTAMM, "ID = " & VA_ID)
