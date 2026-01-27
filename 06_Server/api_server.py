@@ -85,6 +85,15 @@ with open(config_path, 'r') as f:
 BACKEND_PATH = config['database']['backend_path']
 FRONTEND_PATH = config['database']['frontend_path']
 
+backend_path_obj = Path(BACKEND_PATH)
+if not backend_path_obj.exists():
+    logger.warning(
+        "Backend-DB nicht erreichbar (%s); verwende lokale Frontend-Kopie %s",
+        BACKEND_PATH,
+        FRONTEND_PATH,
+    )
+    BACKEND_PATH = FRONTEND_PATH
+
 # ============================================
 # Connection Pool für Access ODBC
 # ============================================
@@ -1825,24 +1834,26 @@ def get_dienstplan_ma(ma_id):
         datum_von = request.args.get('von')
         datum_bis = request.args.get('bis')
 
+        # Access braucht Klammern bei mehreren LEFT JOINs
         query = """
-            SELECT p.*, s.VA_Start, s.VA_Ende, a.Objekt, a.Auftrag
-            FROM tbl_MA_VA_Planung p
-            LEFT JOIN tbl_VA_Start s ON p.VAStart_ID = s.ID
-            LEFT JOIN tbl_VA_Auftragstamm a ON p.VA_ID = a.VA_ID
-            WHERE p.MA_ID = ?
+            SELECT [tbl_MA_VA_Planung].*, [tbl_VA_Start].[VA_Start], [tbl_VA_Start].[VA_Ende],
+                   [tbl_VA_Auftragstamm].[Objekt], [tbl_VA_Auftragstamm].[Auftrag]
+            FROM ([tbl_MA_VA_Planung]
+            LEFT JOIN [tbl_VA_Start] ON [tbl_MA_VA_Planung].[VAStart_ID] = [tbl_VA_Start].[ID])
+            LEFT JOIN [tbl_VA_Auftragstamm] ON [tbl_MA_VA_Planung].[VA_ID] = [tbl_VA_Auftragstamm].[VA_ID]
+            WHERE [tbl_MA_VA_Planung].[MA_ID] = ?
         """
         params = [ma_id]
 
         if datum_von:
-            query += " AND p.VADatum >= ?"
+            query += " AND [tbl_MA_VA_Planung].[VADatum] >= ?"
             params.append(datum_von)
 
         if datum_bis:
-            query += " AND p.VADatum <= ?"
+            query += " AND [tbl_MA_VA_Planung].[VADatum] <= ?"
             params.append(datum_bis)
 
-        query += " ORDER BY p.VADatum, s.VA_Start"
+        query += " ORDER BY [tbl_MA_VA_Planung].[VADatum], [tbl_VA_Start].[VA_Start]"
 
         cursor.execute(query, params)
         rows = cursor.fetchall()

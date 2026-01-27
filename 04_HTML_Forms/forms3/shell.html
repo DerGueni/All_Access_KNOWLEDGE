@@ -1,6 +1,8 @@
 ﻿<!DOCTYPE html>
 <html lang="de">
 <head>
+    <!-- Base-URL für korrekte relative Pfade (wichtig für WebView2/Redirect) -->
+    <base href="/forms/">
   <link rel="stylesheet" href="css/visbug_overrides.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -572,7 +574,8 @@
             }
 
             // URL erstellen (mit Cache-Buster fuer aktuelle Versionen)
-            let formUrl = formName + '.html?shell=1&_t=' + Date.now();
+            // WICHTIG: Absoluter Pfad /forms/ fuer API-Server Kompatibilitaet
+            let formUrl = '/forms/' + formName + '.html?shell=1&_t=' + Date.now();
             if (recordId) {
                 formUrl += '&id=' + recordId;
             }
@@ -620,23 +623,30 @@
                     const response = await fetch(formUrl, { cache: 'no-store' });
                     if (!response.ok) throw new Error('HTTP ' + response.status);
                     let html = await response.text();
-                    // Base-Tag für relative Pfade
-                    const baseDir = formUrl.split('?')[0].replace(/[^/]*$/, '');
-                    if (!html.includes('<base')) {
-                        html = html.replace('<head>', '<head><base href="' + baseDir + '">');
-                    }
 
                     // URL-Parameter als globale Variable injizieren (srcdoc verliert URL-Parameter)
-                    // Erstelle ein Objekt mit allen Parametern für das Formular
                     const shellParams = {
                         shell: '1',
                         id: recordId || null,
                         va_id: recordId || null,
                         ...(params || {})
                     };
+                    console.log('[Shell] Injiziere SHELL_PARAMS:', JSON.stringify(shellParams));
+
+                    // Base-Tag für relative Pfade
+                    const baseDir = formUrl.split('?')[0].replace(/[^/]*$/, '');
+                    const baseTag = html.includes('<base') ? '' : '<base href="' + baseDir + '">';
+
                     // Script-Tag aufteilen um vorzeitiges Schließen zu vermeiden
                     const paramsScript = '<script>window.SHELL_PARAMS = ' + JSON.stringify(shellParams) + ';<\/script>';
-                    html = html.replace('<head>', '<head>' + paramsScript);
+
+                    // Injektion mit Regex der auch <head style="..."> findet
+                    // Verwende Callback-Funktion statt $& für Kompatibilität
+                    html = html.replace(/<head[^>]*>/i, function(match) {
+                        console.log('[Shell] HEAD-Tag gefunden:', match);
+                        return match + paramsScript + baseTag;
+                    });
+                    console.log('[Shell] SHELL_PARAMS injiziert:', html.includes('SHELL_PARAMS'));
 
                     iframe.srcdoc = html;
                 } catch(e) {

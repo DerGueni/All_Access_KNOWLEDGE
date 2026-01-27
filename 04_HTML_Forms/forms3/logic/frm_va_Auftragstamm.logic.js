@@ -2456,8 +2456,8 @@ window.planKopie = typeof kopiereInFolgetag === 'function' ? kopiereInFolgetag :
 window.datenInFolgetag = typeof kopiereInFolgetag === 'function' ? kopiereInFolgetag : function() { alert('Funktion kopiereInFolgetag nicht verfuegbar'); };
 window.auftragLoeschen = typeof loeschenAuftrag === 'function' ? loeschenAuftrag : function() { alert('Funktion loeschenAuftrag nicht verfuegbar'); };
 
-// FIX: btnSchnellPlan - Mitarbeiterauswahl oeffnen (Access-Paritaet)
-window.openMitarbeiterauswahl = typeof openMitarbeiterauswahl === 'function' ? openMitarbeiterauswahl : function() { alert('Funktion openMitarbeiterauswahl nicht verfuegbar'); };
+// FIX: btnSchnellPlan - Mitarbeiterauswahl - NICHT ueberschreiben! Die HTML-Datei hat die korrekte Implementierung
+// window.openMitarbeiterauswahl = typeof openMitarbeiterauswahl === 'function' ? openMitarbeiterauswahl : function() { alert('Funktion openMitarbeiterauswahl nicht verfuegbar'); };
 
 // Einsatzliste-Varianten
 window.sendeEinsatzlisteMA = function() { if (typeof sendeEinsatzliste === 'function') sendeEinsatzliste('MA'); else alert('Funktion sendeEinsatzliste nicht verfuegbar'); };

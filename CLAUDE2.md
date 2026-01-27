@@ -78,12 +78,150 @@ Jede Änderung wird wie folgt dokumentiert:
 | js/webview2-bridge.js | **'kunde' case im Switch** | Einzelner Kunde-Abruf mit Event-Feuering (Zeile 455-462) | **2026-01-25** |
 | frm_va_Auftragstamm.html | **#statusOverview** | Anfrage-Panel wieder sichtbar (display:none entfernt, Zeile 1615) | **2026-01-25** |
 | logic/frm_DP_Dienstplan_Objekt.logic.js | **Auftrag-Gruppierung** | Deduplizierung nach Auftrag+Objekt+Ort, VA_IDs-Array (Zeile 399-425, 528-537) | **2026-01-25** |
+| **⛔⛔⛔ KRITISCH ⛔⛔⛔** | **ACCESS "HTML ANSICHT" BUTTON-SYSTEM** | **ABSOLUT EINGEFROREN - KEINE ÄNDERUNGEN OHNE EXPLIZITE FREIGABE!** | **2026-01-26** |
+| mod_N_WebView2_COM.bas | **GESAMTES MODUL** | VBA-Modul für HTML-Formular-Öffnung via WebView2/Browser - OpenHTML_Auftragstamm(), OpenHTMLviaCOM() | **2026-01-26** |
+| mod_N_WebView2_forms3.bas | **StartAPIServerIfNeeded** | Startet API-Server (Port 5000) vor Formular-Öffnung | **2026-01-26** |
+| mod_N_WebView2_forms3.bas | **StartVBABridgeIfNeeded** | Startet VBA-Bridge-Server (Port 5002) vor Formular-Öffnung | **2026-01-26** |
+| START_VBA_BRIDGE.bat | **GESAMTE DATEI** | Batch-Skript für VBA-Bridge-Start, Class='Access.Application' Syntax | **2026-01-26** |
+| vba_bridge_server.py | **GESAMTE DATEI** | Flask-Server Port 5002, Class='Access.Application' in get_access_app() | **2026-01-26** |
+| api_server.py | **Server-Konfiguration** | Port 5000, Backend-Verbindung, CORS-Headers - NICHT ÄNDERN | **2026-01-26** |
+| frm_va_Auftragstamm.html | **loadAuftrag(vaId, vadatumId)** | MUSS beide Parameter erhalten! VADatum_ID für Mehrtages-Aufträge | **2026-01-26** |
+| frm_va_Auftragstamm.html | **Alle loadAuftrag() Aufrufe** | Zeilen 1954-1956, 2765-2767, 2788-2790, 2799-2801, 2810-2812, 2819-2821, 2985-2987 - übergeben VA_ID + VADatum_ID | **2026-01-26** |
+| frm_va_Auftragstamm.html | **loadAuftragData() setVal-Helper** | Zeile 2136-2145 - Null-Check für fehlende DOM-Elemente (PLZ etc.) | **2026-01-26** |
+| shell.html | **form-Parameter Verarbeitung** | URL-Parameter ?form=xxx wird korrekt an iframe übergeben | **2026-01-26** |
+| **SERVER-PORTS** | **5000, 5002, 8080** | API=5000, VBA-Bridge=5002, HTTP=8080 - Ports NICHT ändern! | **2026-01-26** |
+| **URL-FORMAT** | **http://127.0.0.1:5000/shell.html?form=** | WebView2 benötigt 127.0.0.1 (NICHT localhost!) | **2026-01-26** |
+| **ABHÄNGIGKEITEN** | **Reihenfolge Server-Start** | 1. API-Server → 2. VBA-Bridge → 3. HTML-Formular öffnen | **2026-01-26** |
+| **⛔ REGEL** | **HTML-ANSICHT BUTTON** | **VBA + Server + HTML arbeiten zusammen. NIEMALS einzelne Komponenten ändern ohne Gesamtsystem zu testen!** | **2026-01-26** |
+| logic/frm_va_Auftragstamm.logic.js | **Zeile 2460 AUSKOMMENTIERT** | Überschrieb window.openMitarbeiterauswahl mit Fallback-Funktion - NICHT REAKTIVIEREN! | **2026-01-26** |
+| shell.html | **SHELL_PARAMS Injektion (Regex)** | Zeile 627-650 - Verwendet Regex-Callback für `<head...>` mit Attributen (z.B. style="...") | **2026-01-26** |
+| **KRITISCH** | **Mitarbeiterauswahl → Schnellauswahl** | openMitarbeiterauswahl() sendet NAVIGATE mit VA_ID + VADatum_ID, shell.html injiziert SHELL_PARAMS | **2026-01-26** |
+| frm_MA_VA_Schnellauswahl.html | **loadAuftraegeListe() SHELL_PARAMS** | Zeile 1149-1157 - Prüft SHELL_PARAMS zusätzlich zu URL-Params für VA_ID | **2026-01-26** |
+| frm_MA_VA_Schnellauswahl.html | **Form_Load() SHELL_PARAMS** | Zeile 1103-1108 - MA-Selektion-Check berücksichtigt SHELL_PARAMS | **2026-01-26** |
+| **⛔⛔⛔ KRITISCH ⛔⛔⛔** | **MITARBEITERAUSWAHL GESAMTSYSTEM** | **4 Dateien arbeiten zusammen - NIEMALS einzeln ändern!** | **2026-01-26** |
+| | **1. frm_va_Auftragstamm.html** | openMitarbeiterauswahl() - sendet NAVIGATE Message mit VA_ID, VADatum_ID | |
+| | **2. logic/frm_va_Auftragstamm.logic.js** | Zeile 2460 AUSKOMMENTIERT - darf NICHT reaktiviert werden! | |
+| | **3. shell.html** | SHELL_PARAMS Injektion (Zeile 627-650) - Regex für <head...> mit Attributen | |
+| | **4. frm_MA_VA_Schnellauswahl.html** | Form_Open, Form_Load, loadAuftraegeListe - alle prüfen SHELL_PARAMS | |
+| **⛔ REGEL** | **srcdoc-iframes** | window.location.search ist LEER! Immer SHELL_PARAMS zusätzlich prüfen! | **2026-01-26** |
+| api_server.py | **/api/auftraege Soll/Ist Query** | Zeile 766-772 - SELECT mit MA_Anzahl_Soll/Ist Subqueries auch OHNE expand_days | **2026-01-27** |
 
 ---
 
 ## 📝 ÄNDERUNGSHISTORIE
 
 <!-- Neue Einträge werden hier automatisch eingefügt -->
+
+### 2026-01-26 15:45 - Mitarbeiterauswahl-Button Fix (2 Dateien)
+**Element:** `openMitarbeiterauswahl()` + SHELL_PARAMS Injektion
+**Typ:** js/bugfix
+**Dateien:** `logic/frm_va_Auftragstamm.logic.js`, `shell.html`
+
+**Problem:** Mitarbeiterauswahl-Button öffnete Schnellauswahl-Formular OHNE korrekten Auftrag (VA_ID/VADatum_ID waren null)
+
+**Root Cause 1:** `logic/frm_va_Auftragstamm.logic.js` Zeile 2460 überschrieb `window.openMitarbeiterauswahl` mit einer Fallback-Funktion
+**Fix 1:** Zeile 2460 auskommentiert
+```javascript
+// FIX: btnSchnellPlan - Mitarbeiterauswahl - NICHT ueberschreiben! Die HTML-Datei hat die korrekte Implementierung
+// window.openMitarbeiterauswahl = typeof openMitarbeiterauswahl === 'function' ? openMitarbeiterauswahl : function() { alert('Funktion openMitarbeiterauswahl nicht verfuegbar'); };
+```
+
+**Root Cause 2:** `shell.html` SHELL_PARAMS-Injektion fand `<head>` nicht, weil manche HTML-Dateien `<head style="...">` haben
+**Fix 2:** Zeile 627-650 - Regex mit Callback statt einfachem String-Replace
+```javascript
+html = html.replace(/<head[^>]*>/i, function(match) {
+    console.log('[Shell] HEAD-Tag gefunden:', match);
+    return match + paramsScript + baseTag;
+});
+```
+
+**Test:** Playwright-Test bestätigt: `formState_VA_ID: 9389, formState_VADatum_ID: 652418`
+**Anweisung:** "Jetzt öffnet der Button Mitarbeiterauswahl das Formular Schnellauswahl nicht mit dem korrekten Auftrag"
+**Status:** ✅ Abgeschlossen
+
+### 2026-01-26 16:15 - Schnellauswahl Auftrag-Dropdown Reset Fix
+**Element:** `loadAuftraegeListe()` + `Form_Load()`
+**Typ:** js/bugfix
+**Datei:** `frm_MA_VA_Schnellauswahl.html`
+
+**Problem:** Auftrag wurde kurz korrekt angezeigt, dann auf "-- Auftrag wählen --" zurückgesetzt
+
+**Root Cause:** `loadAuftraegeListe()` prüfte nur `window.location.search` für VA_ID - bei srcdoc-iframes ist das LEER!
+**Fix 1:** Zeile 1149-1157 - SHELL_PARAMS zusätzlich prüfen
+```javascript
+const shellParams3 = window.SHELL_PARAMS || {};
+const vaIdFromUrl = urlParams3.get('va_id') || urlParams3.get('id') || shellParams3.va_id || shellParams3.id;
+```
+
+**Fix 2:** Zeile 1103-1108 - Form_Load MA-Selektion-Check
+```javascript
+const shellParams2 = window.SHELL_PARAMS || {};
+if (!urlParams2.get('va_id') && !urlParams2.get('id') && !shellParams2.va_id && !shellParams2.id) {
+```
+
+**Test:** Playwright + Browser bestätigt: Auftrag bleibt im Dropdown ausgewählt
+**Anweisung:** "Bei Klick auf Mitarbeiterauswahl wird die Schnellauswahl kurz mit dem richtigen Auftrag angezeigt aber kurz danach kommt oben Auftrag auswählen"
+**Status:** ✅ Abgeschlossen + EINGEFROREN
+
+### 2026-01-26 00:12 - mod_N_WebView2_COM.bas - Access-Button startet VBABridge
+**Element:** `mod_N_WebView2_COM.OpenHTMLviaCOM`
+**Typ:** vba
+**Datei:** `exports/vba/mod_N_WebView2_COM.bas`
+**Zeile:** 69-78
+**Änderung:** Access-Button löst nun neben dem API-Server ebenfalls den VBA-Bridge-Serverstart aus, bevor `frm_va_Auftragstamm` geladen wird.
+**Vorher:**
+```vb
+    mod_N_WebView2_forms3.StartAPIServerIfNeeded
+```
+**Nachher:**
+```vb
+    mod_N_WebView2_forms3.StartAPIServerIfNeeded
+    mod_N_WebView2_forms3.StartVBABridgeIfNeeded
+```
+**Benutzeranweisung:** "prüfe und behebe kritische Probleme und stelle sicher, dass beim Klick auf den Access-Button (HTML-Ansicht) zuerst API-Server und der vorher startende VBA-Bridge-Server laufen, bevor das HTML-Formular Auftragstamm geladen wird."
+**Status:** ✅ Abgeschlossen
+
+### 2026-01-25 23:06 - API + HTML-Server laufen
+**Element:** API-Health & HTML-Server
+**Typ:** tests
+**Änderung:** API-/Web-Status erneut geprüft
+**Vorher:** API meldete 'closed connection' und HTTP-Port 8080 war frei
+**Nachher:** `GET /api/health` → {"backend":"connected","frontend":"C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\0_Consys_FE_Test.accdb","status":"ok"}, `GET /api/dienstplan/ma/1?…` → {"data":[],"success":true}; `curl http://localhost:8080/frm_MA_Mitarbeiterstamm.html` liefert HTML → Webserver erreichbar.
+**Anweisung:** Browser-Tests mit Playwright-MCP durchführen (forms3 verfügbar)
+**Status:** ✅ Abgeschlossen
+
+
+
+### 2026-01-25 23:40 - API + HTML-Server Blocker
+**Element:** Access-Share / HTML-Server
+**Typ:** test/diagnose
+**Änderung:** Netzlaufwerk- und HTTP-Server-Versuche dokumentiert
+**Vorher:** API lieferte "closed connection"; HTML-Server war nicht erreichbar
+**Nachher:** `net use S:` + `Test-Path S:\CONSEC\CONSEC PLANUNG AKTUELL\B - DIVERSES\0_Consec_V1_BE_V1.55_Test.accdb` melden weiterhin "Zugriff verweigert" bzw. "Netzwerkname wurde nicht gefunden"; `curl http://localhost:5000/api/health` und `/api/dienstplan/ma/1` geben wiederholt "Attempt to use a closed connection." zurück; `python -m http.server 8080`, der PowerShell-Job, und `npx http-server` wurden gestartet, aber Port 8080 bleibt frei (Curl/Playwright geben ERR_CONNECTION_REFUSED), also sind die Formulare noch nicht erreichbar.
+**Anweisung:** UNC-Share und HTTP-Server dauerhaft sicherstellen, damit API und Browser-Tests selbstständig durchlaufen können.
+**Status:** ⏳ Blockiert - UNC + HTTP-Server noch nicht stabil
+
+
+
+### 2026-01-25 18:40 - Backend UNC-Zugriff prüfen
+**Element:** Test-Path \vconsys01-nbg\Consys\CONSEC\CONSEC PLANUNG AKTUELL\B - DIVERSES\0_Consec_V1_BE_V1.55_Test.accdb
+**Typ:** test/diagnose
+**Änderung:** geprüft, ob das Access-Backend per UNC erreichbar ist
+**Vorher:** bisher nur S:-Laufwerk verwendet, API schlug mit "closed connection" fehl
+**Nachher:** `Test-Path` auf UNC-Share liefert "Access to the path ... is denied"
+**Anweisung:** Fehlerursache auf UNC-Zugriff eingrenzen
+**Status:** ⏳ Blockiert - fehlende Berechtigung
+
+
+
+### 2026-01-25 23:25 - 06_Server/config.json - Backend-Pfad auf UNC umgestellt
+**Element:** backend_path
+**Typ:** json
+**Aenderung:** Backend-Pfad von S:-Laufwerk auf UNC umgestellt
+**Vorher:** S:\CONSEC\CONSEC PLANUNG AKTUELL\B - DIVERSES\0_Consec_V1_BE_V1.55_Test.accdb
+**Nachher:** \\\\vconsys01-nbg\\Consys\\CONSEC\\CONSEC PLANUNG AKTUELL\\B - DIVERSES\\0_Consec_V1_BE_V1.55_Test.accdb
+**Anweisung:** "1" (UNC-Pfad in config.json verwenden)
+**Status:** ✅ Abgeschlossen
 
 ### 2026-01-25 17:30 - frm_va_Auftragstamm.html - Status-Panel (Anfrage-Panel) sichtbar gemacht
 **Element:** .right-panel, .right-header

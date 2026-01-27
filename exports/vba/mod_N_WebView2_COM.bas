@@ -68,6 +68,8 @@ Private Function OpenHTMLviaCOM(formName As String, recordId As Long, WindowTitl
     
     ' 2. API-Server starten (WICHTIG fuer Daten!)
     mod_N_WebView2_forms3.StartAPIServerIfNeeded
+    ' 3. VBA-Bridge-Server starten (Anfragen/Buttons im HTML)
+    mod_N_WebView2_forms3.StartVBABridgeIfNeeded
     
     ' 3. HTTP-URL bauen statt lokaler Pfad!
     httpUrl = "http://localhost:5000/shell.html?form=" & formName

@@ -990,56 +990,9 @@
         }
 
         // ============================================
-        // VBA BRIDGE SERVER CHECK
+        // VBA BRIDGE - NICHT MEHR BENÖTIGT!
+        // E-Mail-Versand erfolgt direkt per SMTP via API
         // ============================================
-
-        let vbaBridgeAvailable = false;
-
-        async function checkVBABridge() {
-            try {
-                const response = await fetch('http://localhost:5002/api/health', {
-                    method: 'GET',
-                    signal: AbortSignal.timeout(2000)
-                });
-                if (response.ok) {
-                    vbaBridgeAvailable = true;
-                    console.log('[VBA Bridge] Server erreichbar auf Port 5002');
-                    return true;
-                }
-            } catch (e) {
-                console.warn('[VBA Bridge] Server nicht erreichbar:', e.message);
-            }
-            vbaBridgeAvailable = false;
-            return false;
-        }
-
-        async function ensureVBABridge() {
-            const isAvailable = await checkVBABridge();
-            if (!isAvailable) {
-                // Server nicht erreichbar - Hinweis zeigen
-                showToast('VBA Bridge Server wird gestartet...', 'info');
-
-                // Versuche Server via Access/Shell zu starten (falls WebView2)
-                if (window.chrome && window.chrome.webview) {
-                    window.chrome.webview.postMessage(JSON.stringify({
-                        action: 'START_VBA_BRIDGE',
-                        requestId: 'start-vba-bridge-' + Date.now()
-                    }));
-                    // Warte kurz und pruefe erneut
-                    await new Promise(resolve => setTimeout(resolve, 3000));
-                    const retryOk = await checkVBABridge();
-                    if (retryOk) {
-                        showToast('VBA Bridge Server gestartet', 'success');
-                        return true;
-                    }
-                }
-
-                // Falls immer noch nicht verfuegbar - Fehler anzeigen
-                showToast('VBA Bridge Server nicht erreichbar! E-Mail-Versand nicht möglich.', 'error');
-                return false;
-            }
-            return true;
-        }
 
         // ============================================
         // FORM EVENTS (Form_Open, Form_Load, Form_Close)
@@ -1049,8 +1002,8 @@
         async function Form_Open() {
             console.log('[VBA] Form_Open');
 
-            // VBA Bridge Server pruefen/starten (fuer E-Mail-Anfragen)
-            await ensureVBABridge();
+            // HINWEIS: VBA Bridge wird NICHT mehr benötigt!
+            // E-Mail-Anfragen werden direkt per SMTP via API gesendet.
 
             // Listen leeren
             const lstZeiten = document.getElementById('lstZeiten_Body');
@@ -1091,20 +1044,24 @@
         }
 
         // Form_Load - Nach dem Laden
+        // FIX 26.01.2026: ACCESS-PARITÄT - Form_Load setzt cboAnstArt=5 und ruft IMMER zf_MA_Selektion
         async function Form_Load() {
             console.log('[VBA] Form_Load');
 
             // Aufträge-Dropdown laden
             await loadAuftraegeListe();
 
-            // Anstellungsart: Default=13 (Alle aktiven) aus Access übernommen
-            // Wird im HTML bereits als selected gesetzt, daher keine Änderung nötig
-
-            // MA-Selektion nur wenn kein Auftrag via URL übergeben wurde
-            const urlParams2 = new URLSearchParams(window.location.search);
-            if (!urlParams2.get('va_id') && !urlParams2.get('id')) {
-                await zf_MA_Selektion();
+            // ACCESS Form_Load Zeile 1008-1009: Me.cboAnstArt = 5 + Call cboAnstArt_AfterUpdate
+            // In Access wird Anstellungsart auf 5 (Minijobber) gesetzt und AfterUpdate getriggert
+            // Das HTML-Dropdown hat bereits den Default, aber wir müssen zf_MA_Selektion IMMER aufrufen
+            const cboAnstArt = document.getElementById('cboAnstArt');
+            if (cboAnstArt && !cboAnstArt.value) {
+                cboAnstArt.value = '5'; // Default: Minijobber
             }
+
+            // zf_MA_Selektion IMMER aufrufen (wie Access cboAnstArt_AfterUpdate)
+            // Das aktualisiert die MA-Liste mit den korrekten Filtern
+            await zf_MA_Selektion();
         }
 
         // Aufträge-Dropdown laden
@@ -1146,11 +1103,14 @@
                     vaSelect.appendChild(option);
                 });
 
-                // Wenn VA_ID via URL übergeben, im Dropdown setzen
+                // Wenn VA_ID via URL oder SHELL_PARAMS übergeben, im Dropdown setzen
+                // WICHTIG: Bei srcdoc-iframes ist window.location.search LEER - SHELL_PARAMS verwenden!
                 const urlParams3 = new URLSearchParams(window.location.search);
-                const vaIdFromUrl = urlParams3.get('va_id') || urlParams3.get('id');
+                const shellParams3 = window.SHELL_PARAMS || {};
+                const vaIdFromUrl = urlParams3.get('va_id') || urlParams3.get('id') || shellParams3.va_id || shellParams3.id;
                 if (vaIdFromUrl) {
                     vaSelect.value = vaIdFromUrl;
+                    console.log('[loadAuftraegeListe] VA_ID aus SHELL_PARAMS gesetzt:', vaIdFromUrl);
                 }
 
                 console.log('[Form_Load] Aufträge-Dropdown geladen:', result.data.length, 'Einträge');
@@ -1271,12 +1231,15 @@
                         }
                     }
 
-                    // 4. Mitarbeiter-Liste laden
-                    console.log('[VAOpen] Lade Mitarbeiter...');
-                    await loadMitarbeiterListe();
-
-                    // 5. Geplante und zugesagte MA laden
+                    // 4. Geplante und zugesagte MA laden (VOR Mitarbeiterliste, wie in Access!)
+                    // ACCESS: cboVADatum_AfterUpdate lädt lstMA_Zusage + lstMA_Plan zuerst
+                    console.log('[VAOpen] Lade Geplante und Zugesagte...');
                     await loadPlanungUndZusage(iVA_ID, selectedDatumId);
+
+                    // 5. Mitarbeiter-Liste laden via zf_MA_Selektion (NICHT loadMitarbeiterListe!)
+                    // FIX 26.01.2026: Access ruft zf_MA_Selektion via lstZeiten_AfterUpdate → f_lstZeiten_upd
+                    console.log('[VAOpen] Rufe zf_MA_Selektion...');
+                    await zf_MA_Selektion();
 
                     // 6. Parallele Einsätze laden
                     await loadParalleleEinsaetzeData(selectedDatumId);
@@ -1624,7 +1587,9 @@
         }
 
         function populatePlanungListe(planungen) {
+            console.log('[populatePlanungListe] Planungen:', planungen?.length);
             const lstPlan = document.getElementById('lstMA_Plan_Body');
+            console.log('[populatePlanungListe] lstPlan Element:', lstPlan ? 'gefunden' : 'NICHT GEFUNDEN');
             if (!lstPlan) return;
 
             lstPlan.innerHTML = '';
@@ -1934,6 +1899,10 @@
                     console.log('[addMAToPlanung] Erfolgreich, ID:', result.id);
                     // Planungsliste aktualisieren
                     await refreshPlanungListe();
+                } else if (response.status === 409) {
+                    // FIX 26.01.2026: Bei 409 (Duplikat) trotzdem Liste aktualisieren, MA existiert bereits
+                    console.log('[addMAToPlanung] MA existiert bereits (409), Liste aktualisieren');
+                    await refreshPlanungListe();
                 } else {
                     console.error('[addMAToPlanung] API-Fehler:', response.status);
                 }
@@ -2232,41 +2201,41 @@
 
         // ============================================
         // MAIL ANFRAGEN (btnMail, btnMailSelected)
-        // Ruft Access VBA Funktion via VBA Bridge auf mit Daten aus HTML-Formular
+        // Sendet E-Mails direkt per SMTP via API (OHNE VBA Bridge!)
         // ============================================
 
-        // btnMail_Click - Alle Mitarbeiter anfragen (via VBA Bridge)
+        // btnMail_Click - Alle Mitarbeiter anfragen
         async function btnMail_Click() {
-            console.log('[VBA] btnMail_Click - Alle anfragen via VBA Bridge');
-            await sendeAnfragenViaVBABridge(false);
+            console.log('[Mail] btnMail_Click - Alle anfragen via SMTP API');
+            await sendeAnfragenViaSMTP(false);
         }
 
-        // btnMailSelected_Click - Nur selektierte anfragen (via VBA Bridge)
+        // btnMailSelected_Click - Nur selektierte anfragen
         async function btnMailSelected_Click() {
-            console.log('[VBA] btnMailSelected_Click - Selektierte anfragen via VBA Bridge');
-            await sendeAnfragenViaVBABridge(true);
+            console.log('[Mail] btnMailSelected_Click - Selektierte anfragen via SMTP API');
+            await sendeAnfragenViaSMTP(true);
         }
 
         /**
-         * Sendet E-Mail-Anfragen via VBA Bridge
-         * Die VBA-Funktion wird mit den Daten aus dem HTML-Formular aufgerufen
+         * Sendet E-Mail-Anfragen direkt per SMTP via API (Mailjet)
+         * Verwendet HTML_Body_Anfrage.txt als Vorlage
          * @param {boolean} selectedOnly - true = nur selektierte MA, false = alle geplanten MA
          */
-        async function sendeAnfragenViaVBABridge(selectedOnly) {
+        async function sendeAnfragenViaSMTP(selectedOnly) {
             // Validierung - ALLE 3 IDs sind erforderlich!
             if (!formState.VA_ID || !formState.VADatum_ID) {
                 alert('Bitte Auftrag und Datum wählen');
                 return;
             }
 
-            // VAStart_ID ist PFLICHT für VBA-Funktion!
+            // VAStart_ID ist PFLICHT!
             if (!formState.VAStart_ID) {
-                console.error('[VBA Bridge] FEHLER: VAStart_ID ist nicht gesetzt!');
+                console.error('[Mail] FEHLER: VAStart_ID ist nicht gesetzt!');
                 alert('Bitte zuerst eine Schicht (Zeitraum) auswählen!');
                 return;
             }
 
-            console.log('[VBA Bridge] Parameter:', {
+            console.log('[Mail] Parameter:', {
                 VA_ID: formState.VA_ID,
                 VADatum_ID: formState.VADatum_ID,
                 VAStart_ID: formState.VAStart_ID
@@ -2290,46 +2259,28 @@
             })).filter(m => m.MA_ID);
 
             const maIds = maList.map(m => m.MA_ID);
-            console.log('[VBA Bridge] MA-IDs für Anfrage:', maIds);
+            console.log('[Mail] MA-IDs für Anfrage:', maIds);
 
             // Bestätigung
             if (!confirm(`${maIds.length} Mitarbeiter per E-Mail anfragen?`)) {
                 return;
             }
 
-            // VBA Bridge URL
-            const vbaBridgeUrl = 'http://localhost:5002/api/vba/anfragen';
-            
+            // API URL für direkten SMTP-Versand
+            const apiUrl = 'http://localhost:5000/api/anfragen/senden';
+
             try {
-                // Prüfe ob VBA Bridge erreichbar - PFLICHT, kein Fallback!
-                const healthCheck = await fetch('http://localhost:5002/api/health', {
-                    method: 'GET',
-                    signal: AbortSignal.timeout(3000)
-                }).catch(() => null);
+                console.log('[Mail] Sende Anfragen via SMTP API...');
+                showToast('Sende E-Mail-Anfragen...', 'info');
 
-                if (!healthCheck || !healthCheck.ok) {
-                    console.error('[VBA Bridge] NICHT ERREICHBAR - E-Mail-Versand nicht möglich!');
-                    showToast('VBA Bridge Server nicht erreichbar! Bitte start_vba_bridge.bat starten.', 'error');
-                    alert('VBA Bridge Server ist nicht erreichbar!\\n\\nE-Mail-Anfragen können nur über den VBA Bridge Server gesendet werden.\\n\\nBitte starten Sie: start_vba_bridge.bat');
-                    return;
-                }
-
-                // VBA Bridge aufrufen - sendet Daten an Access VBA Funktion
-                console.log('[VBA Bridge] Sende Anfrage-Daten an Access...');
-                showToast('Sende E-Mail-Anfragen via Access...', 'info');
-
-                const response = await fetch(vbaBridgeUrl, {
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        // Auftragsdaten aus HTML-Formular
-                        VA_ID: formState.VA_ID,
-                        VADatum_ID: formState.VADatum_ID,
-                        VAStart_ID: formState.VAStart_ID,
-                        // Mitarbeiter-IDs die angefragt werden sollen
-                        MA_IDs: maIds,
-                        // Flag ob nur selektierte
-                        selectedOnly: selectedOnly
+                        va_id: formState.VA_ID,
+                        vadatum_id: formState.VADatum_ID,
+                        vastart_id: formState.VAStart_ID,
+                        ma_ids: maIds
                     }),
                     signal: AbortSignal.timeout(120000) // 2 Min Timeout für E-Mail-Versand
                 });
@@ -2337,50 +2288,53 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    console.log('[VBA Bridge] Anfragen Ergebnis:', result);
+                    console.log('[Mail] Anfragen Ergebnis:', result);
 
-                    // Erfolgsmeldung mit Details - WICHTIG: Prüfen ob wirklich gesendet!
                     const sent = result.sent || 0;
                     const total = result.total || maIds.length;
                     const failed = result.failed || (total - sent);
 
-                    // KRITISCH: Wenn sent=0 wurde NICHTS gesendet (z.B. Access nicht verbunden)
                     if (sent === 0 && total > 0) {
-                        console.error('[VBA Bridge] WARNUNG: Keine Mails gesendet! Access möglicherweise nicht verbunden.');
-                        showToast('KEINE Mails gesendet! Access verbunden?', 'error');
-                        alert('ACHTUNG: Es wurden KEINE E-Mails gesendet!\\n\\nMögliche Ursachen:\\n- Access ist nicht geöffnet\\n- Access-Verbindung unterbrochen\\n\\nBitte Access prüfen und erneut versuchen.');
+                        console.error('[Mail] WARNUNG: Keine Mails gesendet!');
+                        showToast('KEINE Mails gesendet! Prüfe MA-E-Mail-Adressen.', 'error');
+
+                        // Details anzeigen
+                        const details = result.results?.filter(r => r.status !== 'gesendet')
+                            .map(r => `${r.name}: ${r.status}`)
+                            .join('\n') || 'Keine Details';
+                        alert(`ACHTUNG: Keine E-Mails gesendet!\n\nDetails:\n${details}`);
                         return;
                     } else if (failed > 0) {
                         showToast(`${sent} E-Mails gesendet, ${failed} fehlgeschlagen`, 'warning');
                     } else {
-                        showToast(`${sent} E-Mail-Anfragen erfolgreich versendet`, 'success');
+                        showToast(`${sent} E-Mail-Anfragen erfolgreich versendet!`, 'success');
                     }
-                    
-                    // Listen aktualisieren (Status "Angefragt" setzen)
+
+                    // Listen aktualisieren
                     await refreshPlanungListe();
                     await zf_MA_Selektion();
 
-                    // Optional: Zum Auftragstamm navigieren (wie in Access nach btnMail_Click)
-                    if (result.navigateTo === 'frm_va_Auftragstamm' || confirm('Zurück zum Auftragstamm?')) {
+                    // Zum Auftragstamm navigieren?
+                    if (confirm('Zurück zum Auftragstamm?')) {
                         setTimeout(() => {
                             navigateToForm('frm_va_Auftragstamm', formState.VA_ID);
                         }, 500);
                     }
                 } else {
-                    console.error('[VBA Bridge] Fehler:', result.error);
-                    showToast('VBA-Versand fehlgeschlagen: ' + (result.error || 'Unbekannter Fehler'), 'error');
-                    alert('E-Mail-Versand fehlgeschlagen!\\n\\nFehler: ' + (result.error || 'Unbekannter Fehler'));
+                    console.error('[Mail] Fehler:', result.error);
+                    showToast('E-Mail-Versand fehlgeschlagen: ' + (result.error || 'Unbekannter Fehler'), 'error');
+                    alert('E-Mail-Versand fehlgeschlagen!\n\nFehler: ' + (result.error || 'Unbekannter Fehler'));
                 }
 
             } catch (err) {
-                console.error('[VBA Bridge] Verbindungsfehler:', err);
+                console.error('[Mail] Verbindungsfehler:', err);
 
                 if (err.name === 'TimeoutError' || err.name === 'AbortError') {
-                    showToast('VBA Bridge Timeout - Server antwortet nicht', 'error');
-                    alert('VBA Bridge Server antwortet nicht!\\n\\nBitte prüfen Sie ob Access geöffnet ist und der Server läuft.');
+                    showToast('Timeout - Server antwortet nicht', 'error');
+                    alert('Server antwortet nicht!\n\nBitte prüfen Sie ob der API-Server läuft.');
                 } else {
-                    showToast('VBA Bridge Verbindungsfehler', 'error');
-                    alert('VBA Bridge Verbindungsfehler!\\n\\nBitte prüfen Sie ob der Server läuft: start_vba_bridge.bat');
+                    showToast('Verbindungsfehler zum API-Server', 'error');
+                    alert('Verbindungsfehler!\n\nBitte prüfen Sie ob der API-Server auf Port 5000 läuft.');
                 }
             }
         }
@@ -2692,9 +2646,31 @@
 
                     populateMitarbeiterListe(mitarbeiter);
 
-                    // Gesamt-Anzeige aktualisieren
+                    // FIX 27.01.2026: Geplante MA aus der Liste ausblenden (ACCESS-PARITÄT)
+                    // In Access werden geplante MA nicht in der Verfügbarkeitsliste angezeigt
+                    if (formState.VA_ID && formState.VADatum_ID) {
+                        try {
+                            const planungResponse = await fetch(`http://localhost:5000/api/planungen?va_id=${formState.VA_ID}&datum_id=${formState.VADatum_ID}`);
+                            if (planungResponse.ok) {
+                                const planungResult = await planungResponse.json();
+                                if (planungResult.success && planungResult.data) {
+                                    const geplante = planungResult.data.filter(p => {
+                                        const statusId = p.Status_ID || p.Status || p.status_id || 1;
+                                        return statusId < 3;
+                                    });
+                                    console.log('[zf_MA_Selektion] Geplante MA ausblenden:', geplante.length);
+                                    hidePlannedMAFromList(geplante);
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('[zf_MA_Selektion] Planungen abrufen fehlgeschlagen:', e);
+                        }
+                    }
+
+                    // Gesamt-Anzeige aktualisieren (nach hidePlannedMAFromList)
+                    const visibleCount = document.querySelectorAll('#List_MA_Body .listbox-row:not([style*="display: none"])').length;
                     const iGesMA = document.getElementById('iGes_MA');
-                    if (iGesMA) iGesMA.value = mitarbeiter.length;
+                    if (iGesMA) iGesMA.value = visibleCount;
                 }
             } catch (err) {
                 console.error('[zf_MA_Selektion] Fehler:', err);
@@ -3067,7 +3043,8 @@
         // ============================================
 
         // List_MA_DblClick - MA zur Planung hinzufügen
-        function List_MA_DblClick(event) {
+        // FIX 26.01.2026: async hinzugefügt für await bei addMAToPlanung
+        async function List_MA_DblClick(event) {
             console.log('[VBA] List_MA_DblClick');
 
             // Angeklickte Zeile finden
@@ -3099,9 +3076,10 @@
             }
 
             // MA zur Planung hinzufügen (maId bereits oben definiert)
+            // FIX 26.01.2026: await hinzugefügt damit refreshPlanungListe NACH dem Speichern aufgerufen wird
             if (maId) {
-                addMAToPlanung(parseInt(maId));
-                refreshPlanungListe();
+                await addMAToPlanung(parseInt(maId));
+                await refreshPlanungListe();
                 zf_MA_Selektion();
             }
         }
@@ -3171,13 +3149,21 @@
         // ============================================
 
         async function refreshPlanungListe() {
-            if (!formState.VA_ID || !formState.VADatum_ID) return;
+            console.log('[refreshPlanungListe] Start - VA_ID:', formState.VA_ID, 'VADatum_ID:', formState.VADatum_ID);
+            if (!formState.VA_ID || !formState.VADatum_ID) {
+                console.log('[refreshPlanungListe] ABBRUCH - VA_ID oder VADatum_ID fehlt');
+                return;
+            }
 
             try {
                 // API verwendet datum_id nicht vadatum_id
-                const response = await fetch(`http://localhost:5000/api/planungen?va_id=${formState.VA_ID}&datum_id=${formState.VADatum_ID}`);
+                const url = `http://localhost:5000/api/planungen?va_id=${formState.VA_ID}&datum_id=${formState.VADatum_ID}`;
+                console.log('[refreshPlanungListe] URL:', url);
+                const response = await fetch(url);
+                console.log('[refreshPlanungListe] Response Status:', response.status);
                 if (response.ok) {
                     const result = await response.json();
+                    console.log('[refreshPlanungListe] Planungen von API:', result.data?.length);
                     if (result.success && result.data) {
                         // ACCESS-PARITÄT: qry_Mitarbeiter_Geplant hat WHERE Status_ID < 3
                         // Nur Status 1 (Geplant) und 2 (Benachrichtigt) in lstMA_Plan anzeigen
@@ -3185,10 +3171,13 @@
                             const statusId = p.Status_ID || p.Status || p.status_id || 1;
                             return statusId < 3;
                         });
+                        console.log('[refreshPlanungListe] Gefiltert (Status<3):', geplante.length);
                         populatePlanungListe(geplante);
                         // Geplante MA aus linker Liste ausblenden
                         hidePlannedMAFromList(geplante);
                     }
+                } else {
+                    console.error('[refreshPlanungListe] Response nicht OK:', response.status);
                 }
             } catch (err) {
                 console.error('[refreshPlanungListe] Fehler:', err);
@@ -3198,20 +3187,28 @@
         // Geplante/zugesagte MA aus der linken Verfügbarkeitsliste ausblenden
         function hidePlannedMAFromList(planungen) {
             const listMA = document.getElementById('List_MA_Body');
-            if (!listMA) return;
+            if (!listMA) {
+                console.log('[hidePlannedMAFromList] List_MA_Body nicht gefunden');
+                return;
+            }
 
-            // MA_IDs der geplanten sammeln
-            const plannedMAIds = new Set(planungen.map(p => String(p.MA_ID)));
+            // MA_IDs der geplanten sammeln (prüfe auch ma_id, maid als Alias)
+            const plannedMAIds = new Set(planungen.map(p => String(p.MA_ID || p.ma_id || p.maid)));
+            console.log('[hidePlannedMAFromList] Geplante MA_IDs:', Array.from(plannedMAIds));
 
             // Alle Zeilen durchgehen und geplante ausblenden
+            let hiddenCount = 0;
             listMA.querySelectorAll('.listbox-row').forEach(row => {
                 const maId = row.dataset.maid || row.dataset.id;
                 if (plannedMAIds.has(String(maId))) {
                     row.style.display = 'none';
+                    hiddenCount++;
+                    console.log('[hidePlannedMAFromList] Verstecke MA:', maId, row.dataset.name);
                 } else {
                     row.style.display = '';
                 }
             });
+            console.log('[hidePlannedMAFromList] Versteckt:', hiddenCount, 'Zeilen');
 
             // Anzahl aktualisieren
             const visibleCount = listMA.querySelectorAll('.listbox-row:not([style*="display: none"])').length;

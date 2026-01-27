@@ -356,6 +356,18 @@
             background: linear-gradient(to bottom, #f0f090, #d0d050);
         }
 
+        /* Orange Button fuer Mitarbeiterauswahl (26.01.2026) */
+        .btn-orange {
+            background: linear-gradient(to bottom, #ffcc80, #ff9933);
+            color: #000;
+        }
+        .unified-btn.btn-orange {
+            border-color: #ffe0a0 #996600 #996600 #ffe0a0;
+        }
+        .btn-orange:hover {
+            background: linear-gradient(to bottom, #ffd090, #ffaa44);
+        }
+
         /* Kombinierter Button-Block */
         .combined-buttons {
             flex-wrap: wrap;
@@ -489,17 +501,16 @@
             background-color: #b8b8d8;
             border: 1px solid #606090;
             padding: 8px 12px;
-            display: grid !important;
-            grid-template-columns: auto auto auto !important; /* 3 Spalten: left, right, middle */
-            flex-direction: row !important; /* Ueberschreibt column aus app-layout.css */
-            gap: 20px;
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 15px;
             flex-shrink: 0;
-            align-items: start;
-            font-size: calc(var(--base-font-size) + 3px); /* +3px fuer bessere Lesbarkeit */
-            font-weight: bold; /* Fett gemaess Anforderung */
-            height: auto; /* Dynamische Hoehe fuer alle Felder */
-            min-height: 130px;
-            max-height: 160px; /* Etwas mehr Platz fuer zusaetzliche Felder */
+            align-items: flex-start;
+            font-size: calc(var(--base-font-size) + 3px);
+            font-weight: bold;
+            height: auto;
+            min-height: 110px;
+            max-height: none; /* Keine Begrenzung (26.01.2026) */
         }
 
         .form-section .form-label,
@@ -538,20 +549,11 @@
             text-align: right;
         }
 
-        /* Grid-Spalten Reihenfolge: left (1), right (2), middle (3) */
+        /* Spalten-Reihenfolge (26.01.2026 neu strukturiert) */
         .form-column.left {
-            order: 1;
+            order: 1; /* Block 1: Datum, Auftrag, Ort, Objekt */
         }
-
-        .form-column.right {
-            order: 2; /* Treffpunkt etc. in der Mitte */
-            margin-left: -75px; /* 75px nach links verschoben (14.01.2026) */
-        }
-
-        .form-column.middle {
-            order: 3; /* PKW/Fahrtkosten ganz rechts */
-            justify-self: end; /* Rechtsbündig in Grid */
-        }
+        /* Block 2, 3, 4 haben inline order-Styles */
 
         /* Einheitliche Feldbreiten gemaess Anforderung - ALLE Felder gleich breit */
         .input-narrow { width: 80px; height: 22px; } /* Nur fuer Datums-/Zeitfelder */
@@ -875,11 +877,12 @@
             background: white;
         }
 
-        /* Right Panel - flexibel fuer volle Bildschirmbreite (25.01.2026) */
+        /* Right Panel - 80px breiter (26.01.2026) */
         .right-panel {
-            flex: 1; /* Flexibel statt fixer Breite */
-            min-width: 480px;
-            max-width: none; /* Keine Begrenzung - volle Breite nutzen */
+            flex: 0 0 auto; /* Nicht mehr flexibel wachsen */
+            width: 560px; /* 80px breiter als vorher */
+            min-width: 500px;
+            max-width: 600px; /* Begrenzt */
             background: #9090c0;
             border: 1px solid #606090;
             display: flex;
@@ -963,6 +966,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: var(--base-font-size);
+            table-layout: fixed; /* 26.01.2026: Feste Spaltenbreiten */
         }
 
         .auftraege-table th {
@@ -975,6 +979,7 @@
             font-weight: bold;
             white-space: nowrap;
             cursor: pointer;
+            overflow: hidden;
         }
 
         .auftraege-table td {
@@ -984,6 +989,8 @@
             background: white;
             height: 20px;
             font-weight: normal;
+            overflow: hidden;
+            text-overflow: ellipsis; /* 26.01.2026: Lange Texte abschneiden */
         }
 
         .auftraege-table tr:nth-child(even) td {
@@ -1301,6 +1308,7 @@
                         <span class="title-text" style="position: relative;">Auftragsverwaltung</span>
                         <!-- Aktualisieren links nach Titel (14.01.2026) -->
                         <button class="btn unified-btn" id="btnAktualisieren" onclick="refreshData()" data-testid="auftrag-btn-aktualisieren" style="margin-left: 60px; position: relative;">Aktualisieren</button>
+                        <!-- Mitarbeiterauswahl Button jetzt im lila Block (26.01.2026) -->
                         <!-- Buttons in exakt 2 Reihen - Beginn ab "Positionen" gemaess Anforderung -->
                         <div class="buttons-grid" style="margin-left: 10px; position: relative;">
                             <!-- Zeile 1: 5 Buttons (Positionen nach unten verschoben) -->
@@ -1314,7 +1322,7 @@
                             <button class="btn unified-btn" id="btnMailEins" onclick="sendeEinsatzlisteMA()" data-testid="auftrag-btn-el-senden-ma" style="position: relative;">EL senden MA</button>
                             <button class="btn unified-btn btn-green" id="btnMailBOS" onclick="sendeEinsatzlisteBOS()" data-testid="auftrag-btn-el-senden-bos" style="position: relative;">EL senden BOS</button>
                             <button class="btn unified-btn btn-yellow" id="btnMailSub" onclick="sendeEinsatzlisteSUB()" data-testid="auftrag-btn-el-senden-sub" style="position: relative;">EL senden SUB</button>
-                            <button class="btn unified-btn btn-blue" id="btnMailPos" onclick="sendeEinsatzlistePOS()" data-testid="auftrag-btn-el-senden-pos" title="Einsatzliste an Positionen senden" style="position: relative;">EL senden POS</button>
+                            <!-- EL senden POS entfernt (26.01.2026) -->
                             <div class="checkbox-group" style="position: relative;">
                                 <input type="checkbox" id="cbAutosendEL" name="Autosend_EL" onchange="saveField('Autosend_EL', this.checked)" data-testid="auftrag-checkbox-autosendel" style="position: relative;">
                                 <label for="cbAutosendEL" style="position: relative;">EL Autosend</label>
@@ -1324,13 +1332,9 @@
                             <button class="btn unified-btn" id="btnSyncErr" onclick="syncfehlerChecken()" data-testid="auftrag-btn-syncfehler" style="position: relative;" title="Syncfehler checken">Sync Check</button>
                             <button class="btn unified-btn" id="btn_Ordnerkonzept" onclick="ordnerkonzeptOeffnen()" data-testid="auftrag-btn-ordnerkonzept" style="position: relative;" title="Ordnerkonzept oeffnen">Ordner</button>
                         </div>
-                        <!-- Auftragsstatus und Kunde (25.01.2026 - aus Access ergaenzt) -->
+                        <!-- Kunde nach unten in lila Block verschoben (26.01.2026) -->
                         <div class="status-group" style="position: relative; margin-left: 20px;">
-                            <span class="form-label" style="font-weight: bold; position: relative;">Kunde:</span>
-                            <select class="form-select" id="Veranstalter_ID" name="Veranstalter_ID" onchange="veranstalterChanged()" data-testid="auftrag-select-kunde" style="width: 180px; position: relative;">
-                                <option value="">-- Kunde waehlen --</option>
-                            </select>
-                            <span class="form-label" style="font-weight: bold; margin-left: 15px; position: relative;">Status:</span>
+                            <span class="form-label" style="font-weight: bold; position: relative;">Status:</span>
                             <select class="form-select" id="Veranst_Status_ID" name="Veranst_Status_ID" onchange="statusChanged()" data-testid="auftrag-select-status" style="width: 120px; position: relative;">
                                 <option value="1">In Planung</option>
                                 <option value="2">Versendet</option>
@@ -1379,44 +1383,78 @@
                         </div>
                     </div>
 
-                    <!-- Middle Column - PKW/Fahrtkosten + Datums-Navigation -->
-                    <div class="form-column middle" style="position: relative;">
-                        <div class="form-row" style="position: relative;">
-                            <span class="form-label" style="display: none;">PKW Anzahl:</span>
-                            <input type="number" class="form-input input-xs" id="PKW_Anzahl" name="PKW_Anzahl" value="0" min="0" data-testid="auftrag-input-pkwanzahl" autocomplete="off" style="display: none;">
+                    <!-- Block 2: Treffpunkt, PLZ, Ansprechp., Dienstkleidung, Kunde -->
+                    <div class="form-column" style="order: 2;">
+                        <div class="form-row">
+                            <span class="form-label" style="min-width: 85px; text-align: right;">Treffpunkt:</span>
+                            <input type="time" class="form-input" id="Treffp_Zeit" name="Treffp_Zeit" onchange="saveField('Treffp_Zeit', this.value)" style="width: 60px;">
+                            <input type="text" class="form-input" id="Treffpunkt" name="Treffpunkt" onchange="saveField('Treffpunkt', this.value)" style="width: 180px;">
                         </div>
-                        <div class="form-row" style="position: relative;">
-                            <span class="form-label" style="position: relative;">Fahrtkosten:</span>
-                            <input type="text" class="form-input input-xs" id="Fahrtkosten" name="Fahrtkosten" value="0,00" onchange="saveField('Fahrtkosten', this.value)" data-testid="auftrag-input-fahrtkosten" style="position: relative;">
+                        <div class="form-row">
+                            <span class="form-label" style="min-width: 85px; text-align: right;">Ansprechp.:</span>
+                            <input type="text" class="form-input" id="Ansprechpartner" name="Ansprechpartner" onchange="saveField('Ansprechpartner', this.value)" style="width: 180px;">
                         </div>
-                        <!-- Datum Navigation fur Mehrtagesauftrage (verschoben) -->
-                        <div class="form-row" style="margin-top: 4px; position: relative;">
-                            <button class="nav-btn" id="btnDatumLeft" onclick="datumNavLeft()" style="padding: 1px 4px; position: relative;" data-testid="auftrag-btn-datum-links">◀</button>
-                            <select class="form-select" id="cboVADatum" style="width: 100px; position: relative;" onchange="vaDatumChanged()" data-testid="auftrag-select-vadatum"><option value="" style="position: relative;">-- Datum wählen --</option><option value="651652" style="position: relative;">21.01.2026</option></select>
-                            <button class="nav-btn" id="btnDatumRight" onclick="datumNavRight()" style="padding: 1px 4px; position: relative;" data-testid="auftrag-btn-datum-rechts">▶</button>
+                        <div class="form-row">
+                            <span class="form-label" style="min-width: 85px; text-align: right;">Dienstkleidung:</span>
+                            <input type="text" class="form-input" id="Dienstkleidung" name="Dienstkleidung" list="kleidungListe" onchange="saveField('Dienstkleidung', this.value)" style="width: 180px;">
+                        </div>
+                        <div class="form-row">
+                            <span class="form-label" style="min-width: 85px; text-align: right;">Kunde:</span>
+                            <select class="form-select" id="Veranstalter_ID" name="Veranstalter_ID" onchange="veranstalterChanged()" style="width: 180px;">
+                                <option value="">-- Kunde waehlen --</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Right Column - Treffpunkt, PLZ, Ansprechpartner -->
-                    <div class="form-column right" style="position: relative;">
-                        <div class="form-row" style="position: relative;">
-                            <span class="form-label" style="position: relative;">Treffpunkt:</span>
-                            <input type="text" class="form-input input-wide" id="Treffpunkt" name="Treffpunkt" onchange="saveField('Treffpunkt', this.value)" data-testid="auftrag-input-treffpunkt" style="position: relative;">
+                    <!-- Block 3: Fahrtkosten, PKW, Datum-Nav, Mitarbeiterauswahl, Positionen -->
+                    <div class="form-column" style="order: 3; display: flex; flex-direction: column; gap: 3px; align-items: flex-start;">
+                        <div class="form-row">
+                            <span class="form-label" style="min-width: 75px; text-align: right;">Fahrtkosten:</span>
+                            <input type="text" class="form-input" id="Fahrtkosten" name="Fahrtkosten" value="0,00" onchange="saveField('Fahrtkosten', this.value)" style="width: 70px;">
                         </div>
-                        <div class="form-row" style="position: relative;">
-                            <span class="form-label" style="position: relative;">Treffp.Zeit:</span>
-                            <input type="time" class="form-input input-narrow" id="Treffp_Zeit" name="Treffp_Zeit" onchange="saveField('Treffp_Zeit', this.value)" data-testid="auftrag-input-treffpzeit" style="width: 80px; position: relative;">
-                            <span class="form-label" style="margin-left: 10px; position: relative;">PLZ:</span>
-                            <input type="text" class="form-input" id="PLZ" name="PLZ" onchange="saveField('PLZ', this.value)" data-testid="auftrag-input-plz" style="width: 60px; position: relative;">
+                        <div class="form-row">
+                            <span class="form-label" style="min-width: 75px; text-align: right;">PKW:</span>
+                            <input type="number" class="form-input" id="PKW_Anzahl" name="PKW_Anzahl" value="0" min="0" style="width: 50px;">
                         </div>
-                        <div class="form-row" style="position: relative;">
-                            <span class="form-label" style="position: relative;">Ansprechp.:</span>
-                            <input type="text" class="form-input input-wide" id="Ansprechpartner" name="Ansprechpartner" onchange="saveField('Ansprechpartner', this.value)" data-testid="auftrag-input-ansprechpartner" style="position: relative;">
+                        <div class="form-row">
+                            <button class="nav-btn" id="btnDatumLeft" onclick="datumNavLeft()" style="padding: 2px 6px;">◀</button>
+                            <select class="form-select" id="cboVADatum" style="width: 95px;" onchange="vaDatumChanged()">
+                                <option value="">-- Datum --</option>
+                            </select>
+                            <button class="nav-btn" id="btnDatumRight" onclick="datumNavRight()" style="padding: 2px 6px;">▶</button>
                         </div>
-                        <div class="form-row" style="position: relative;">
-                            <span class="form-label" style="position: relative;">Kleidung:</span>
-                            <input type="text" class="form-input input-medium" id="Dienstkleidung" name="Dienstkleidung" list="kleidungListe" onchange="saveField('Dienstkleidung', this.value)" data-testid="auftrag-input-dienstkleidung" style="position: relative;">
+                        <div class="form-row" style="gap: 5px;">
+                            <button class="btn unified-btn btn-orange" id="btnSchnellPlan" onclick="openMitarbeiterauswahl()" style="padding: 3px 8px;">Mitarbeiterauswahl</button>
+                            <button class="btn unified-btn" id="btnPositionen" onclick="openPositionen()" style="padding: 3px 8px;">Positionen</button>
                         </div>
+                    </div>
+
+                    <!-- Block 4: Statusblock (ganz rechts) -->
+                    <div class="status-block" style="order: 4; margin-left: auto; padding: 5px; background: #b8b8d8; border: 1px solid #808080;">
+                        <table class="status-table" id="statusOverview">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Auftragsstatus</strong></td>
+                                    <td class="count"><strong>Anzahl</strong></td>
+                                    <td><strong>Aktion</strong></td>
+                                </tr>
+                                <tr data-status="1">
+                                    <td>In Planung</td>
+                                    <td class="count" id="countPlanung">0</td>
+                                    <td><button class="anzeigen-btn" onclick="filterByStatus(1)">Anzeigen</button></td>
+                                </tr>
+                                <tr data-status="3">
+                                    <td>Auftrag beendet, Zeiten noch in Bearb.</td>
+                                    <td class="count" id="countBeendet">0</td>
+                                    <td><button class="anzeigen-btn" onclick="filterByStatus(3)">Anzeigen</button></td>
+                                </tr>
+                                <tr data-status="2">
+                                    <td>Einsatzliste versendet</td>
+                                    <td class="count" id="countVersendet">0</td>
+                                    <td><button class="anzeigen-btn" onclick="filterByStatus(2)">Anzeigen</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -1662,32 +1700,7 @@
 
                     <!-- Right Panel: Auftragsliste -->
                     <div class="right-panel">
-                        <div class="right-header">
-                            <!-- 25.01.2026: Status-Tabelle wieder sichtbar (Anfrage-Panel) -->
-                            <table class="status-table" id="statusOverview" style="position: relative;">
-                                <tbody style="position: relative;"><tr style="position: relative;">
-                                    <td style="position: relative;"><strong style="position: relative;">Auftragsstatus</strong></td>
-                                    <td class="count" style="position: relative;"><strong style="position: relative;">Anzahl</strong></td>
-                                    <td style="position: relative;"><strong style="position: relative;">Aktion</strong></td>
-                                </tr>
-                                <tr data-status="1" style="position: relative;">
-                                    <td style="position: relative;">In Planung</td>
-                                    <td class="count" id="countPlanung" style="position: relative;">141</td>
-                                    <td style="position: relative;"><button class="anzeigen-btn" onclick="filterByStatus(1)" style="position: relative;">Anzeigen</button></td>
-                                </tr>
-                                <tr data-status="3" style="position: relative;">
-                                    <td style="position: relative;">Auftrag beendet, Zeiten noch in Bearbeitung</td>
-                                    <td class="count" id="countBeendet" style="position: relative;">0</td>
-                                    <td style="position: relative;"><button class="anzeigen-btn" onclick="filterByStatus(3)" style="position: relative;">Anzeigen</button></td>
-                                </tr>
-                                <tr data-status="2" style="position: relative;">
-                                    <td style="position: relative;">Einsatzliste versendet</td>
-                                    <td class="count" id="countVersendet" style="position: relative;">0</td>
-                                    <td style="position: relative;"><button class="anzeigen-btn" onclick="filterByStatus(2)" style="position: relative;">Anzeigen</button></td>
-                                </tr>
-                            </tbody></table>
-                            <!-- Status und Rech.Nr wurden in den Header-Block verschoben (15.01.2026) -->
-                        </div>
+                        <!-- right-header: Statusblock nach oben in lila Block verschoben (26.01.2026) -->
 
                         <div class="date-nav" style="position: relative;">
                             <span style="position: relative;">Aufträge ab:</span>
@@ -1703,12 +1716,12 @@
                             <table class="auftraege-table" id="auftraegeTable" data-testid="auftrag-table-auftragsliste" style="position: relative;">
                                 <thead style="position: relative;">
                                     <tr style="position: relative;">
-                                        <th onclick="sortAuftraege('datum')" style="width: 70px; text-align: center;">Datum</th>
-                                        <th onclick="sortAuftraege('auftrag')" style="width: 77px;">Auftrag</th>
-                                        <th onclick="sortAuftraege('objekt')" style="width: 70px;">Objekt</th>
-                                        <th onclick="sortAuftraege('soll')" style="width: 35px; text-align: center;">Soll</th>
-                                        <th onclick="sortAuftraege('ist')" style="width: 35px; text-align: center;">Ist</th>
-                                        <th onclick="sortAuftraege('status')" style="width: 55px; text-align: center;">Status</th>
+                                        <th onclick="sortAuftraege('datum')" style="width: 65px; text-align: center;">Datum</th>
+                                        <th onclick="sortAuftraege('auftrag')" style="width: 120px;">Auftrag</th>
+                                        <th onclick="sortAuftraege('objekt')" style="width: 90px;">Objekt</th>
+                                        <th onclick="sortAuftraege('soll')" style="width: 25px; text-align: center;">Soll</th>
+                                        <th onclick="sortAuftraege('ist')" style="width: 25px; text-align: center;">Ist</th>
+                                        <th onclick="sortAuftraege('status')" style="width: 50px; text-align: center;">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="auftraegeBody" style="position: relative;">
@@ -1938,8 +1951,9 @@
             if (vaId) {
                 await loadAuftrag(parseInt(vaId));
             } else if (state.auftraege.length > 0) {
-                // Ersten (aktuellsten) Auftrag laden - API liefert ID
-                await loadAuftrag(getSortedAuftraege()[0].ID);
+                // Ersten (aktuellsten) Auftrag laden - API liefert ID + VADatum_ID
+                const firstAuftrag = getSortedAuftraege()[0];
+                await loadAuftrag(firstAuftrag.ID || firstAuftrag.VA_ID, firstAuftrag.VADatum_ID);
             }
 
             hideLoading();
@@ -2119,15 +2133,17 @@
             document.getElementById('Ort').value = auftrag.Ort || '';
             document.getElementById('Objekt').value = auftrag.Objekt || '';
             // Objekt_ID-Select entfernt gemaess Layout-Anforderung
-            document.getElementById('Treffp_Zeit').value = auftrag.Treffp_Zeit || '';
-            document.getElementById('Treffpunkt').value = auftrag.Treffpunkt || '';
-            document.getElementById('Dienstkleidung').value = auftrag.Dienstkleidung || '';
-            document.getElementById('Ansprechpartner').value = auftrag.Ansprechpartner || '';
-            document.getElementById('PLZ').value = auftrag.PLZ || '';
-            document.getElementById('Veranstalter_ID').value = auftrag.Veranstalter_ID || '';
-            document.getElementById('Veranst_Status_ID').value = auftrag.Veranst_Status_ID || '1';
-            document.getElementById('PKW_Anzahl').value = auftrag.PKW_Anzahl || 0;
-            document.getElementById('Fahrtkosten').value = formatCurrency(auftrag.Fahrtkosten);
+            // Felder mit Null-Check (nicht alle Elemente existieren immer)
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+            setVal('Treffp_Zeit', auftrag.Treffp_Zeit || '');
+            setVal('Treffpunkt', auftrag.Treffpunkt || '');
+            setVal('Dienstkleidung', auftrag.Dienstkleidung || '');
+            setVal('Ansprechpartner', auftrag.Ansprechpartner || '');
+            setVal('PLZ', auftrag.PLZ || '');
+            setVal('Veranstalter_ID', auftrag.Veranstalter_ID || '');
+            setVal('Veranst_Status_ID', auftrag.Veranst_Status_ID || '1');
+            setVal('PKW_Anzahl', auftrag.PKW_Anzahl || 0);
+            setVal('Fahrtkosten', formatCurrency(auftrag.Fahrtkosten));
             // Rech_NR nur setzen wenn Element existiert
             const rechNrEl = document.getElementById('Rech_NR');
             if (rechNrEl) rechNrEl.value = auftrag.Rech_NR || '';
@@ -2248,8 +2264,8 @@
                     <td style="text-align: center;">${formatDateShort(displayDatum)}</td>
                     <td>${escapeHtml(a.Auftrag || '')}</td>
                     <td>${escapeHtml(a.Objekt || '')}</td>
-                    <td style="text-align: center;">${a.Soll || a.MA_Anzahl_Soll || a.MA_Soll || 0}</td>
-                    <td style="text-align: center;">${a.Ist || a.MA_Anzahl_Ist || a.MA_Ist || 0}</td>
+                    <td style="text-align: center;">${a.MA_Anzahl_Soll ?? a.Soll ?? 0}</td>
+                    <td style="text-align: center;">${a.MA_Anzahl_Ist ?? a.Ist ?? 0}</td>
                     <td style="text-align: center;">${getStatusText(a.Veranst_Status_ID)}</td>
                 `;
                 // NEU 16.01.2026: VADatum_ID übergeben für korrekten Tag
@@ -2749,7 +2765,7 @@
             await loadAuftraegeListe();
             // Nach Filtern den ersten Auftrag laden damit Schichten/Einsatzliste angezeigt werden
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(getSortedAuftraege()[0].ID);
+                { const fa = getSortedAuftraege()[0]; await loadAuftrag(fa.ID || fa.VA_ID, fa.VADatum_ID); }
             }
         }
 
@@ -2772,7 +2788,7 @@
             state.filterStatus = status;
             await loadAuftraegeListe();
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(getSortedAuftraege()[0].ID);
+                { const fa = getSortedAuftraege()[0]; await loadAuftrag(fa.ID || fa.VA_ID, fa.VADatum_ID); }
             }
         }
 
@@ -2783,7 +2799,7 @@
             input.value = formatDateISO(date);
             await loadAuftraegeListe();
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(getSortedAuftraege()[0].ID);
+                { const fa = getSortedAuftraege()[0]; await loadAuftrag(fa.ID || fa.VA_ID, fa.VADatum_ID); }
             }
         }
 
@@ -2794,7 +2810,7 @@
             input.value = formatDateISO(date);
             await loadAuftraegeListe();
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(getSortedAuftraege()[0].ID);
+                { const fa = getSortedAuftraege()[0]; await loadAuftrag(fa.ID || fa.VA_ID, fa.VADatum_ID); }
             }
         }
 
@@ -2803,7 +2819,7 @@
             state.filterStatus = null;
             await loadAuftraegeListe();
             if (state.auftraege && state.auftraege.length > 0) {
-                await loadAuftrag(getSortedAuftraege()[0].ID);
+                { const fa = getSortedAuftraege()[0]; await loadAuftrag(fa.ID || fa.VA_ID, fa.VADatum_ID); }
             }
         }
 
@@ -2969,7 +2985,7 @@
                         state.currentAuftragId = null;
                         await loadAuftraegeListe();
                         if (state.auftraege.length > 0) {
-                            await loadAuftrag(getSortedAuftraege()[0].ID);
+                            { const fa = getSortedAuftraege()[0]; await loadAuftrag(fa.ID || fa.VA_ID, fa.VADatum_ID); }
                         }
                         showToast('Auftrag gelöscht', 'success');
                     } else {
@@ -3358,6 +3374,12 @@
         }
 
         async function openMitarbeiterauswahl() {
+            console.log('[openMitarbeiterauswahl] AUFGERUFEN mit state:', {
+                currentAuftragId: state.currentAuftragId,
+                currentVADatumId: state.currentVADatumId,
+                currentVAStartId: state.currentVAStartId,
+                currentAuftrag: state.currentAuftrag ? state.currentAuftrag.Auftrag : 'n/a'
+            });
             if (!state.currentAuftragId) {
                 alert('Bitte zuerst einen Auftrag auswählen!');
                 return;
@@ -3398,7 +3420,7 @@
             // Shell erwartet: type: 'NAVIGATE', formName, id, params
             if (window.parent && window.parent !== window) {
                 // Im iframe - an Shell senden mit allen relevanten Parametern
-                window.parent.postMessage({
+                const navMessage = {
                     type: 'NAVIGATE',
                     formName: 'frm_MA_VA_Schnellauswahl',
                     id: state.currentAuftragId,
@@ -3406,7 +3428,9 @@
                         vadatum_id: state.currentVADatumId || null,
                         vastart_id: state.currentVAStartId || null
                     }
-                }, '*');
+                };
+                console.log('[openMitarbeiterauswahl] SENDE NAVIGATE:', JSON.stringify(navMessage));
+                window.parent.postMessage(navMessage, '*');
             } else {
                 // Standalone-Modus: Direkt öffnen mit URL-Parametern
                 const url = 'frm_MA_VA_Schnellauswahl.html?va_id=' + state.currentAuftragId +
