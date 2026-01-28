@@ -13,7 +13,7 @@
 
     const API_BASE_URL = 'http://localhost:5000';
     const VBA_BRIDGE_URL = 'http://localhost:5002';
-    const CHECK_TIMEOUT = 5000; // 5 Sekunden Timeout
+    const CHECK_TIMEOUT = 10000; // 10 Sekunden Timeout (Access ODBC braucht Zeit)
 
     /**
      * Prüft ob ein Server erreichbar ist
@@ -262,14 +262,15 @@
         return apiRunning;
     }
 
-    // Auto-Check beim Laden (nach 3000ms Verzögerung - Server braucht Zeit zum Starten)
+    // Auto-Check beim Laden (nach 5000ms Verzögerung - Server braucht Zeit zum Starten)
     // Beim Öffnen via Access müssen API Server und VBA Bridge erst hochfahren
+    // WICHTIG: Längere Verzögerung um "API Server nicht erreichbar" Dialog zu vermeiden
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(checkServers, 3000);
+            setTimeout(checkServers, 5000);
         });
     } else {
-        setTimeout(checkServers, 3000);
+        setTimeout(checkServers, 5000);
     }
 
     // Global verfügbar machen

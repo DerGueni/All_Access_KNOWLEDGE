@@ -14,7 +14,12 @@ Private Const API_SERVER_DIR As String = "C:\Users\guenther.siegert\Documents\00
 Private Const WATCHDOG_SCRIPT As String = "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\08_Tools\python\api_server_watchdog.py"
 Private Const WATCHDOG_VBS As String = "C:\Users\guenther.siegert\Documents\0006_All_Access_KNOWLEDGE\08_Tools\python\START_API_WATCHDOG_SILENT.vbs"
 Private Const API_PORT As Integer = 5000
-Private Const SHELL_URL As String = "http://localhost:5000/forms/shell.html"
+Private Const SHELL_URL As String = "http://localhost:3000/shell.html"
+
+' Chrome mit Remote Debugging (fuer DevTools MCP)
+Private Const CHROME_DEBUG_PORT As Integer = 9222
+Private Const CHROME_PATH_1 As String = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+Private Const CHROME_PATH_2 As String = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
 
 ' =====================================================
 ' HAUPTFUNKTION - WIRD VOM BUTTON AUFGERUFEN
@@ -137,6 +142,79 @@ ErrorHandler:
 End Sub
 
 ' =====================================================
+' PRUEFE OB CHROME MIT REMOTE DEBUGGING LAEUFT
+' =====================================================
+Private Function IsChromeDebugRunning() As Boolean
+    On Error Resume Next
+
+    Dim objHTTP As Object
+    Set objHTTP = CreateObject("MSXML2.XMLHTTP")
+
+    ' Pruefe ob DevTools Port erreichbar ist
+    objHTTP.Open "GET", "http://localhost:" & CHROME_DEBUG_PORT & "/json/version", False
+    objHTTP.Send
+
+    IsChromeDebugRunning = (objHTTP.Status = 200)
+
+    Set objHTTP = Nothing
+    On Error GoTo 0
+End Function
+
+' =====================================================
+' FINDE CHROME PFAD
+' =====================================================
+Private Function GetChromePath() As String
+    If Dir(CHROME_PATH_1) <> "" Then
+        GetChromePath = CHROME_PATH_1
+    ElseIf Dir(CHROME_PATH_2) <> "" Then
+        GetChromePath = CHROME_PATH_2
+    Else
+        ' Versuche ueber Registry
+        On Error Resume Next
+        Dim objShell As Object
+        Set objShell = CreateObject("WScript.Shell")
+        GetChromePath = objShell.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe\")
+        Set objShell = Nothing
+        On Error GoTo 0
+    End If
+End Function
+
+' =====================================================
+' STARTE CHROME MIT REMOTE DEBUGGING
+' =====================================================
+Private Sub StartChromeWithDebug()
+    On Error GoTo ErrorHandler
+
+    Dim chromePath As String
+    chromePath = GetChromePath()
+
+    If chromePath = "" Then
+        Debug.Print "[Chrome] Chrome nicht gefunden - nutze Standard-Browser"
+        Exit Sub
+    End If
+
+    Debug.Print "[Chrome] Starte Chrome mit Remote Debugging auf Port " & CHROME_DEBUG_PORT
+
+    Dim objShell As Object
+    Set objShell = CreateObject("WScript.Shell")
+
+    ' Chrome mit Remote Debugging starten
+    Dim cmd As String
+    cmd = """" & chromePath & """ --remote-debugging-port=" & CHROME_DEBUG_PORT & _
+          " --user-data-dir=""%TEMP%\chrome-debug-consys"" """ & SHELL_URL & """"
+
+    objShell.Run cmd, 1, False
+
+    Debug.Print "[Chrome] Chrome mit DevTools gestartet - Port " & CHROME_DEBUG_PORT
+
+    Set objShell = Nothing
+    Exit Sub
+
+ErrorHandler:
+    Debug.Print "[Chrome] Fehler: " & Err.Description
+End Sub
+
+' =====================================================
 ' OEFFNE BROWSER MIT SHELL.HTML
 ' =====================================================
 Private Sub OpenBrowser()
@@ -147,8 +225,16 @@ Private Sub OpenBrowser()
     Dim objShell As Object
     Set objShell = CreateObject("WScript.Shell")
 
-    ' Oeffne Browser mit shell.html
-    objShell.Run "cmd /c start """" """ & SHELL_URL & """", 0, False
+    ' Pruefe ob Chrome mit Remote Debugging bereits laeuft
+    If IsChromeDebugRunning() Then
+        Debug.Print "[Browser] Chrome Debug laeuft bereits - oeffne neuen Tab"
+        ' Oeffne URL in bestehendem Chrome mit Debug
+        objShell.Run "cmd /c start """" """ & SHELL_URL & """", 0, False
+    Else
+        ' Starte Chrome mit Remote Debugging
+        Debug.Print "[Browser] Starte Chrome mit Remote Debugging..."
+        StartChromeWithDebug
+    End If
 
     Debug.Print "[Browser] Shell.html oeffnet sich..."
 

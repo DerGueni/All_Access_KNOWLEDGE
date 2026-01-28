@@ -35,7 +35,7 @@ def get_access_app():
     
     try:
         if _access_app is None:
-            _access_app = win32com.client.GetObject(class_name="Access.Application")
+            _access_app = win32com.client.GetObject(Class="Access.Application")
         return _access_app
     except:
         _access_app = None

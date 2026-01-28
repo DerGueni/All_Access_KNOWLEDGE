@@ -25,11 +25,11 @@ if errorlevel 1 (
     pip install pywin32 --quiet
 )
 
-echo [*] Prüfe Access...
-python -c "import win32com.client; access = win32com.client.GetObject(class_name='Access.Application'); print('[OK] Access läuft')" >nul 2>&1
+echo [*] Pruefe Access...
+python -c "import win32com.client; access = win32com.client.GetObject(Class='Access.Application'); print('[OK] Access laeuft')" 2>nul
 if errorlevel 1 (
-    echo ❌ FEHLER: Access läuft nicht!
-    echo Bitte öffnen Sie zuerst das Access Frontend
+    echo 00! FEHLER: Access laeuft nicht!
+    echo Bitte oeffnen Sie zuerst das Access Frontend
     pause
     exit /b 1
 )

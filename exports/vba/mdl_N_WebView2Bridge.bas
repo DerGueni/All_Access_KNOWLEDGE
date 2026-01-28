@@ -15,6 +15,9 @@ Private Const API_SERVER_PORT As Long = 5000
 ' Globale Variable für Server-Status
 Private g_APIServerStarted As Boolean
 
+' Windows API fuer Sleep (Access VBA hat kein Application.Wait!)
+Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+
 ' =====================================================
 ' ÖFFENTLICHE FUNKTIONEN - Formulare öffnen
 ' =====================================================
@@ -397,7 +400,7 @@ Public Function EnsureAPIServerRunning() As Boolean
         Dim i As Integer
         For i = 1 To 20
             DoEvents
-            Application.Wait Now + TimeValue("00:00:00.5")
+            Sleep 500
             If IsServerResponding() Then
                 g_APIServerStarted = True
                 Debug.Print "[API] Server gestartet nach " & i * 0.5 & " Sekunden"

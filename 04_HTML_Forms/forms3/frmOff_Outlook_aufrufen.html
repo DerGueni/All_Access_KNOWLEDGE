@@ -705,12 +705,41 @@
             document.getElementById('btnAttLoesch').addEventListener('click', clearAttachments);
             document.getElementById('cboOutlooktemp').addEventListener('change', loadTemplate);
 
+            // NEU: cboOutlooktemp DblClick - öffnet Template-Editor (VBA: cboOutlooktemp_DblClick)
+            document.getElementById('cboOutlooktemp').addEventListener('dblclick', openTemplateEditor);
+
+            // NEU: Befehl121 Click - öffnet Hilfe-Formular (VBA: Befehl121_Click)
+            document.getElementById('Befehl121').addEventListener('click', openHilfeForm);
+
             // Bridge Event Handler
             if (window.Bridge) {
                 Bridge.on('onDataReceived', handleDataReceived);
                 Bridge.on('onTemplateLoaded', handleTemplateLoaded);
                 Bridge.on('onAttachmentSelected', handleAttachmentSelected);
                 Bridge.on('onEmailSent', handleEmailSent);
+            }
+        }
+
+        // NEU: Template-Editor öffnen (VBA: DoCmd.OpenForm "frm_Outlook_eMail_template")
+        function openTemplateEditor() {
+            console.log('[E-Mail] Template-Editor öffnen');
+            if (window.Bridge) {
+                Bridge.sendEvent('openForm', { formName: 'frm_Outlook_eMail_template' });
+            } else {
+                console.log('[E-Mail] Template-Editor: frm_Outlook_eMail_template');
+            }
+        }
+
+        // NEU: Hilfe-Formular öffnen (VBA: DoCmd.OpenForm "frm_Hilfe_Anzeige")
+        function openHilfeForm() {
+            console.log('[E-Mail] Hilfe-Formular öffnen');
+            if (window.Bridge) {
+                Bridge.sendEvent('openForm', {
+                    formName: 'frm_Hilfe_Anzeige',
+                    whereCondition: "Formularname = 'frmOff_Outlook_aufrufen'"
+                });
+            } else {
+                console.log('[E-Mail] Hilfe nicht verfügbar (keine Bridge)');
             }
         }
 
@@ -811,14 +840,14 @@
             const ma2 = state.mitarbeiter.slice(half);
 
             list1.innerHTML = ma1.map(ma => `
-                <div class="ma-list-row ${state.selectedMAs.has(ma.ID) ? 'selected' : ''}" data-id="${ma.ID}">
+                <div class="ma-list-row ${state.selectedMAs.has(ma.ID) ? 'selected' : ''}" data-id="${ma.ID}" data-email="${ma.Email || ''}">
                     <span class="col-name">${ma.Nachname || ''} ${ma.Vorname || ''}</span>
                     <span class="col-email">${ma.Email || ''}</span>
                 </div>
             `).join('');
 
             list2.innerHTML = ma2.map(ma => `
-                <div class="ma-list-row ${state.selectedMAs.has(ma.ID) ? 'selected' : ''}" data-id="${ma.ID}">
+                <div class="ma-list-row ${state.selectedMAs.has(ma.ID) ? 'selected' : ''}" data-id="${ma.ID}" data-email="${ma.Email || ''}">
                     <span class="col-name">${ma.Nachname || ''} ${ma.Vorname || ''}</span>
                     <span class="col-email">${ma.Email || ''}</span>
                 </div>
@@ -827,6 +856,7 @@
             // Event Listener für beide Listen
             [list1, list2].forEach(list => {
                 list.querySelectorAll('.ma-list-row').forEach(row => {
+                    // Click: Selektion toggle
                     row.addEventListener('click', () => {
                         const id = parseInt(row.dataset.id);
                         if (state.selectedMAs.has(id)) {
@@ -837,6 +867,17 @@
                         renderMitarbeiterListen();
                         updateBCCField();
                     });
+
+                    // NEU: DblClick Handler für Lst_MA/Lst_MA2 (VBA: Lst_MA_DblClick, Lst_MA2_DblClick)
+                    row.addEventListener('dblclick', (e) => {
+                        e.stopPropagation(); // Verhindere dass Click auch feuert
+                        const email = row.dataset.email;
+                        if (!email) {
+                            console.log('[Lst_MA] Keine E-Mail für diesen Mitarbeiter');
+                            return;
+                        }
+                        addEmailToField(email);
+                    });
                 });
             });
         }
@@ -845,17 +886,46 @@
             const container = document.getElementById('Liste256');
             const fest = state.mitarbeiter.filter(ma => ma.Anstellungsart_ID === 3);
 
-            if (!fest.length) {
-                // Zeige alle MA als "Festangestellte" für Demo
-                container.innerHTML = state.mitarbeiter.slice(0, 20).map(ma => `
-                    <div class="list-item">${ma.Nachname || ''} ${ma.Vorname || ''}</div>
-                `).join('');
-                return;
-            }
+            // Fallback: alle MA als "Festangestellte" für Demo
+            const displayList = fest.length ? fest : state.mitarbeiter.slice(0, 20);
 
-            container.innerHTML = fest.map(ma => `
-                <div class="list-item">${ma.Nachname || ''} ${ma.Vorname || ''}</div>
+            container.innerHTML = displayList.map(ma => `
+                <div class="list-item" data-email="${ma.Email || ''}">${ma.Nachname || ''} ${ma.Vorname || ''}</div>
             `).join('');
+
+            // NEU: DblClick Handler für Liste256 (VBA: Liste256_DblClick)
+            container.querySelectorAll('.list-item').forEach(item => {
+                item.addEventListener('dblclick', () => {
+                    const email = item.dataset.email;
+                    if (!email) {
+                        console.log('[Liste256] Keine E-Mail für diesen Eintrag');
+                        return;
+                    }
+                    addEmailToField(email);
+                });
+            });
+        }
+
+        // NEU: E-Mail zu TO oder BCC hinzufügen (VBA: IstEinzelEmail Logik)
+        function addEmailToField(email) {
+            // Prüfe ob Einzelmail-Modus (TO) oder Serienmail-Modus (BCC)
+            // Da kein IstEinzelEmail Checkbox vorhanden, verwenden wir TO wenn leer, sonst BCC
+            const toField = document.getElementById('TO');
+            const bccField = document.getElementById('BCC');
+
+            if (!toField.value.trim()) {
+                // TO ist leer -> setze als TO
+                toField.value = email;
+                console.log('[E-Mail] E-Mail zu TO hinzugefügt:', email);
+            } else {
+                // TO ist gefüllt -> füge zu BCC hinzu
+                if (bccField.value.trim()) {
+                    bccField.value = bccField.value + '; ' + email;
+                } else {
+                    bccField.value = email;
+                }
+                console.log('[E-Mail] E-Mail zu BCC hinzugefügt:', email);
+            }
         }
 
         function updateBCCField() {

@@ -727,53 +727,92 @@ def dashboard():
 
 @app.route('/api/auftraege')
 def get_auftraege():
-    """Alle Aufträge mit optionaler Filterung"""
+    """Alle Auftraege mit optionaler Filterung und expand_days Support (26.01.2026)"""
     try:
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Parameter für Filterung
+        # Parameter fuer Filterung
         kunde_id = request.args.get('kunde_id')
         datum_ab = request.args.get('ab')  # Datum ab Filter (alt)
         datum_von = request.args.get('von') or request.args.get('datum_von')  # Startdatum Filter (beide Varianten)
         datum_bis = request.args.get('bis') or request.args.get('datum_bis')  # Enddatum Filter (beide Varianten)
+        status = request.args.get('status')
+        search = request.args.get('search', '')
         limit = request.args.get('limit', 100, type=int)
         offset = request.args.get('offset', 0, type=int)
+        # NEU 26.01.2026: expand_days fuer Mehrtages-Auftraege mit Soll/Ist pro Tag
+        expand_days = request.args.get('expand_days', 'false').lower() == 'true'
 
         # Query bauen mit optionalen Filtern
         where_clauses = []
         params = []
 
+        if expand_days:
+            # Expandierte Ansicht: Jeder Einsatztag als eigene Zeile mit Soll/Ist
+            base_query = f"""
+                SELECT TOP {limit}
+                    a.*,
+                    t.VADatum as Datum,
+                    t.ID as VADatum_ID,
+                    (SELECT SUM(s.MA_Anzahl) FROM tbl_VA_Start s WHERE s.VA_ID = a.ID AND s.VADatum = t.VADatum) AS MA_Anzahl_Soll,
+                    (SELECT COUNT(*) FROM tbl_MA_VA_Planung p WHERE p.VA_ID = a.ID AND p.VADatum = t.VADatum) AS MA_Anzahl_Ist
+                FROM tbl_VA_Auftragstamm a
+                INNER JOIN tbl_VA_AnzTage t ON a.ID = t.VA_ID
+            """
+            table_prefix = "a."
+            datum_field = "t.VADatum"
+        else:
+            # NORMAL-Modus: Alle Felder + aggregierte Soll/Ist ueber ALLE Tage des Auftrags
+            base_query = f"""SELECT TOP {limit}
+                    a.*,
+                    (SELECT SUM(s.MA_Anzahl) FROM tbl_VA_Start s WHERE s.VA_ID = a.ID) AS MA_Anzahl_Soll,
+                    (SELECT COUNT(*) FROM tbl_MA_VA_Planung p WHERE p.VA_ID = a.ID) AS MA_Anzahl_Ist
+                FROM tbl_VA_Auftragstamm a"""
+            table_prefix = "a."
+            datum_field = "a.Dat_VA_Von"
+
         if kunde_id:
-            where_clauses.append("Veranstalter_ID = ?")
+            where_clauses.append(f"{table_prefix}Veranstalter_ID = ?")
             params.append(int(kunde_id))
 
+        if status:
+            where_clauses.append(f"{table_prefix}Veranst_Status_ID = ?")
+            params.append(int(status))
+
+        if search:
+            search_clause = f"({table_prefix}Auftrag LIKE ? OR {table_prefix}Objekt LIKE ? OR {table_prefix}Ort LIKE ?)"
+            where_clauses.append(search_clause)
+            params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
+
         if datum_ab:
-            where_clauses.append("Dat_VA_Von >= ?")
+            where_clauses.append(f"{datum_field} >= ?")
             params.append(datum_ab)
 
-        # Neuer Filter: von/bis für Zeitraumabfrage
+        # Neuer Filter: von/bis fuer Zeitraumabfrage
         if datum_von:
-            where_clauses.append("Dat_VA_Bis >= ?")
+            where_clauses.append(f"{datum_field} >= ?")
             params.append(datum_von)
 
         if datum_bis:
-            where_clauses.append("Dat_VA_Von <= ?")
+            if expand_days:
+                where_clauses.append(f"{datum_field} <= ?")
+            else:
+                where_clauses.append("a.Dat_VA_Von <= ?")
             params.append(datum_bis)
 
         where_sql = ""
         if where_clauses:
-            where_sql = "WHERE " + " AND ".join(where_clauses)
+            where_sql = " WHERE " + " AND ".join(where_clauses)
 
-        # Wenn ab-Datum gesetzt: ASC (naechster Auftrag zuerst)
-        # Sonst: DESC (neuester zuerst)
-        sort_order = "ASC" if datum_ab else "DESC"
+        # Sortierung
+        if expand_days:
+            order_sql = " ORDER BY t.VADatum ASC, a.Auftrag ASC"
+        else:
+            sort_order = "ASC" if datum_ab else "DESC"
+            order_sql = f" ORDER BY a.Dat_VA_Von {sort_order}, a.ID {sort_order}"
 
-        query = f"""
-            SELECT TOP {limit} * FROM tbl_VA_Auftragstamm
-            {where_sql}
-            ORDER BY Dat_VA_Von {sort_order}, ID {sort_order}
-        """
+        query = base_query + where_sql + order_sql
 
         if params:
             cursor.execute(query, params)
@@ -783,8 +822,12 @@ def get_auftraege():
         rows = cursor.fetchall()
         auftraege = [row_to_dict(cursor, row) for row in rows]
 
-        # Gesamtanzahl mit gleichen Filtern
-        count_query = f"SELECT COUNT(*) FROM tbl_VA_Auftragstamm {where_sql}"
+        # Gesamtanzahl
+        if expand_days:
+            count_query = "SELECT COUNT(*) FROM tbl_VA_Auftragstamm a INNER JOIN tbl_VA_AnzTage t ON a.ID = t.VA_ID" + where_sql
+        else:
+            count_query = "SELECT COUNT(*) FROM tbl_VA_Auftragstamm a" + where_sql
+
         if params:
             cursor.execute(count_query, params)
         else:
@@ -2105,11 +2148,26 @@ def create_planung():
             release_connection(conn)
             return jsonify({'success': False, 'error': 'MA bereits eingeteilt', 'existing_id': existing[0]}), 409
 
-        # Einfügen
+        # Zeiten aus tbl_VA_Start holen wenn VAStart_ID vorhanden
+        mva_start = None
+        mva_ende = None
+        if vastart_id:
+            cursor.execute("""
+                SELECT VADatum, VA_Start, VA_Ende FROM tbl_VA_Start WHERE ID = ?
+            """, [vastart_id])
+            start_row = cursor.fetchone()
+            if start_row:
+                # VADatum aus tbl_VA_Start übernehmen falls nicht explizit gesetzt
+                if not vadatum:
+                    vadatum = start_row[0]
+                mva_start = start_row[1]
+                mva_ende = start_row[2]
+
+        # Einfügen mit MVA_Start und MVA_Ende
         cursor.execute("""
-            INSERT INTO tbl_MA_VA_Planung (VA_ID, VADatum_ID, VAStart_ID, PosNr, MA_ID, Status_ID, VADatum)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, [va_id, vadatum_id, vastart_id, pos_nr, ma_id, status_id, vadatum])
+            INSERT INTO tbl_MA_VA_Planung (VA_ID, VADatum_ID, VAStart_ID, PosNr, MA_ID, Status_ID, VADatum, MVA_Start, MVA_Ende)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, [va_id, vadatum_id, vastart_id, pos_nr, ma_id, status_id, vadatum, mva_start, mva_ende])
 
         conn.commit()
 

@@ -105,9 +105,31 @@ def get_access_app():
                     _access_app_cache = None
 
             # Neue Verbindung herstellen
-            access_app = win32com.client.GetActiveObject("Access.Application")
-            db_name = access_app.CurrentDb().Name
-            log(f"Access-Instanz verbunden: {db_name}")
+            try:
+                access_app = win32com.client.GetActiveObject("Access.Application")
+            except Exception as e:
+                log(f"GetActiveObject fehlgeschlagen, starte Access via DispatchEx: {e}")
+                access_app = win32com.client.DispatchEx("Access.Application")
+                try:
+                    access_app.Visible = True
+                except Exception:
+                    pass
+
+            # Sicherstellen, dass das Frontend geladen ist
+            try:
+                current_db = access_app.CurrentDb().Name
+            except Exception:
+                current_db = ""
+            if not current_db or os.path.normcase(current_db) != os.path.normcase(ACCESS_FE_PATH):
+                try:
+                    access_app.OpenCurrentDatabase(ACCESS_FE_PATH)
+                    current_db = access_app.CurrentDb().Name
+                except Exception as e:
+                    log(f"Access-Frontend konnte nicht geoeffnet werden: {e}")
+                    _access_app_cache = None
+                    return None
+
+            log(f"Access-Instanz verbunden: {current_db}")
 
             # Cache aktualisieren
             _access_app_cache = access_app

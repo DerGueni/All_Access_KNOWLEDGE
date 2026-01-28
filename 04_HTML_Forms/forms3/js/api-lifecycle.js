@@ -16,10 +16,11 @@
     'use strict';
 
     const API_BASE = 'http://localhost:5000';
-    const API_CHECK_ENDPOINT = '/api/tables';
+    const API_CHECK_ENDPOINT = '/api/health';  // health ist schneller als tables
     const CHECK_INTERVAL = 30000; // 30 Sekunden
-    const MAX_RETRIES = 3;
-    const RETRY_DELAY = 2000; // 2 Sekunden
+    const MAX_RETRIES = 5;  // Mehr Retries
+    const RETRY_DELAY = 3000; // 3 Sekunden
+    const INITIAL_DELAY = 2000; // 2 Sekunden warten vor erstem Check
 
     // State
     let _isRunning = false;
@@ -39,15 +40,25 @@
         // Registriere Formular
         registerForm();
 
-        // Pruefe API-Server
-        const serverOk = await checkAndStartServer();
+        // WICHTIG: Warte kurz bevor erster API-Check (Server braucht Zeit)
+        console.log('[API-Lifecycle] Warte ' + INITIAL_DELAY + 'ms vor API-Check...');
+        await sleep(INITIAL_DELAY);
+
+        // Pruefe API-Server mit mehreren Versuchen
+        let serverOk = false;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+            serverOk = await checkAndStartServer();
+            if (serverOk) break;
+            console.log('[API-Lifecycle] Versuch ' + attempt + '/3 fehlgeschlagen, warte...');
+            await sleep(RETRY_DELAY);
+        }
 
         if (serverOk) {
             console.log('[API-Lifecycle] API-Server bereit');
             // Starte periodische Ueberpruefung
             startHealthCheck();
         } else {
-            console.warn('[API-Lifecycle] API-Server nicht verfuegbar');
+            console.warn('[API-Lifecycle] API-Server nicht verfuegbar nach mehreren Versuchen');
             showServerError();
         }
 
@@ -172,10 +183,11 @@
             const response = await fetch(API_BASE + API_CHECK_ENDPOINT, {
                 method: 'GET',
                 headers: { 'Accept': 'application/json' },
-                signal: AbortSignal.timeout(3000) // 3 Sekunden Timeout
+                signal: AbortSignal.timeout(8000) // 8 Sekunden Timeout (Access ODBC braucht Zeit)
             });
             return response.ok || response.status < 500;
         } catch (e) {
+            console.log('[API-Lifecycle] Server-Check fehlgeschlagen:', e.message);
             return false;
         }
     }

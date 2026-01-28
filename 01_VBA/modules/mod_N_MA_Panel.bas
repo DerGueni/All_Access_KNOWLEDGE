@@ -292,11 +292,11 @@ Public Function SendeMinijobberAnfragen(VA_ID As Long, MA_IDs As String, _
             Set rs = db.OpenRecordset(sql, dbOpenSnapshot)
 
             If rs!Cnt = 0 Then
-                ' Neue Anfrage erstellen
+                ' Neue Anfrage erstellen (Status 1 = Angefragt)
                 sql = "INSERT INTO tbl_MA_VA_Planung (VA_ID, MA_ID, VADatum, Status, " & _
                       "Erstellt_am, Erstellt_von) VALUES (" & _
                       VA_ID & ", " & maId & ", #" & Format(VADatum, "yyyy-mm-dd") & "#, " & _
-                      "1, Now(), " & _  ' Status 1 = Angefragt
+                      "1, Now(), " & _
                       "'" & Environ("USERNAME") & "')"
 
                 db.Execute sql, dbFailOnError

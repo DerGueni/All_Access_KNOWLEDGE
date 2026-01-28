@@ -8,6 +8,9 @@ Attribute VB_Name = "mod_N_Test_HTMLButtons"
 ' AUSFUEHRUNG: Im VBA-Editor Direktfenster eingeben:
 ' Test_Alle_HTMLButtons
 
+' Windows API fuer Sleep (Access VBA hat kein Application.Wait!)
+Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+
 Public Sub Test_Alle_HTMLButtons()
     On Error GoTo ErrorHandler
 
@@ -40,7 +43,7 @@ Public Sub Test_Alle_HTMLButtons()
 
     ' Kurze Pause
     DoEvents
-    Application.Wait Now + TimeValue("0:00:02")
+    Sleep 2000
 
     ' TEST 2: OpenAuftragsverwaltungHTML(1)
     Debug.Print "[TEST 2] OpenAuftragsverwaltungHTML(1)"
@@ -60,7 +63,7 @@ Public Sub Test_Alle_HTMLButtons()
     Debug.Print ""
 
     DoEvents
-    Application.Wait Now + TimeValue("0:00:02")
+    Sleep 2000
 
     ' TEST 3: OpenMitarbeiterstammHTML(707)
     Debug.Print "[TEST 3] OpenMitarbeiterstammHTML(707)"
@@ -80,7 +83,7 @@ Public Sub Test_Alle_HTMLButtons()
     Debug.Print ""
 
     DoEvents
-    Application.Wait Now + TimeValue("0:00:02")
+    Sleep 2000
 
     ' TEST 4: OpenKundenstammHTML(1)
     Debug.Print "[TEST 4] OpenKundenstammHTML(1)"
@@ -100,7 +103,7 @@ Public Sub Test_Alle_HTMLButtons()
     Debug.Print ""
 
     DoEvents
-    Application.Wait Now + TimeValue("0:00:02")
+    Sleep 2000
 
     ' TEST 5: OpenHTMLMenu()
     Debug.Print "[TEST 5] OpenHTMLMenu()"
