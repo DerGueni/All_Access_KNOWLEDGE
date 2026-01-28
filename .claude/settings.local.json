@@ -5,19 +5,12 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(dir:*)",
-      "Bash(start /min cmd /c \"python api_server.py\")",
-      "Bash(reg query \"HKEY_CLASSES_ROOT\\\\Consys.WebView2Host\")",
-      "Bash(python -c \"\nfrom access_bridge_ultimate import AccessBridge\n\n# Modul-Code lesen\nwith open\\(r''C:\\\\Users\\\\guenther.siegert\\\\Documents\\\\0006_All_Access_KNOWLEDGE\\\\01_VBA\\\\mod_N_WebView2_forms3.bas'', ''r'', encoding=''utf-8''\\) as f:\n    code = f.read\\(\\)\n\n# Attribute-Zeile entfernen \\(wird von Bridge automatisch gesetzt\\)\nlines = code.split\\(''\\\\n''\\)\nif lines[0].startswith\\(''Attribute VB_Name''\\):\n    code = ''\\\\n''.join\\(lines[1:]\\)\n\nwith AccessBridge\\(\\) as bridge:\n    # Pruefen ob Modul existiert\n    if bridge.module_exists\\(''mod_N_WebView2_forms3''\\):\n        print\\(''Modul existiert bereits - wird aktualisiert...''\\)\n        bridge.delete_module\\(''mod_N_WebView2_forms3''\\)\n    \n    # Modul importieren \\(auto_prefix=False da Name bereits korrekt\\)\n    result = bridge.import_vba_module\\(''mod_N_WebView2_forms3'', code, auto_prefix=False\\)\n    print\\(f''Import Ergebnis: {result}''\\)\n    \n    # Alle Module auflisten zur Bestaetigung\n    modules = bridge.list_modules\\(\\)\n    print\\(f''\\\\nAlle Module \\({len\\(modules\\)}\\):''\\)\n    for m in modules:\n        if ''WebView'' in m or ''HTML'' in m:\n            print\\(f''  - {m}''\\)\n\")",
       "Bash(python:*)",
-      "Bash(reg query \"HKEY_CLASSES_ROOT\\\\Consys.WebView2Host\" /s)",
-      "Bash(reg query \"HKEY_CLASSES_ROOT\\\\ConsysWV2.WebView2Host\" /s)",
-      "Bash(reg query \"HKEY_CLASSES_ROOT\" /f \"WebView2\" /k)",
-      "Bash(timeout /t 3)",
-      "Bash(ping:*)",
-      "Bash(start \"\" \"C:\\\\Users\\\\guenther.siegert\\\\Documents\\\\0006_All_Access_KNOWLEDGE\\\\WebView2_Access\\\\COM_Wrapper\\\\WebView2App\\\\bin\\\\Release\\\\net48\\\\WebView2App.exe\" \"C:\\\\Users\\\\guenther.siegert\\\\Documents\\\\0006_All_Access_KNOWLEDGE\\\\04_HTML_Forms\\\\forms3\\\\frm_va_Auftragstamm.html\" --title \"Auftragsverwaltung\" --width 1500 --height 900)",
       "Bash(curl:*)",
-      "Bash(start \"\" \"http://localhost:8080/frm_va_Auftragstamm.html\")",
       "Bash(copy:*)",
+      "Bash(chmod:*)",
+      "Bash(./scripts/freeze*.sh:*)",
+      "Bash(./scripts/unfreeze.sh:*)",
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_console_messages",
@@ -26,5 +19,92 @@
       "mcp__playwright__browser_evaluate"
     ],
     "default": "allow"
+  },
+
+  "freezeProtection": {
+    "enabled": true,
+    "freezeFile": "claude.freeze.json",
+    "stableDir": "stable/",
+    "experimentsDir": "experiments/",
+
+    "rules": {
+      "checkBeforeWrite": true,
+      "checkBeforeEdit": true,
+      "requireExplicitUnfreeze": true,
+      "warnOnPatternMatch": true,
+      "blockProtectedBlocks": true
+    },
+
+    "hooks": {
+      "preWrite": {
+        "description": "Prueft vor jedem Schreibvorgang ob Datei eingefroren ist",
+        "command": "./scripts/freeze-check.sh",
+        "failOnFrozen": true
+      },
+      "preEdit": {
+        "description": "Prueft vor jeder Bearbeitung ob Datei eingefroren ist",
+        "command": "./scripts/freeze-check.sh",
+        "failOnFrozen": true
+      },
+      "postFreeze": {
+        "description": "Nach Einfrieren - Backup erstellen",
+        "command": "cp -p ${FILE} stable/$(basename ${FILE})_$(date +%Y-%m-%d)"
+      }
+    },
+
+    "protectedPatterns": [
+      "04_HTML_Forms/forms3/css/form-titles.css",
+      "04_HTML_Forms/forms3/css/unified-header.css",
+      "06_Server/api_server.py",
+      "04_HTML_Forms/forms3/_scripts/mini_api.py",
+      "exports/vba/**/*.bas"
+    ],
+
+    "neverModify": [
+      "claude.freeze.json",
+      "CLAUDE.md",
+      ".claude/settings.local.json"
+    ],
+
+    "alwaysAskBefore": [
+      "*.css",
+      "*.html",
+      "**/logic/*.js",
+      "**/*api*.py"
+    ]
+  },
+
+  "sessionRules": {
+    "description": "Regeln fuer alle zukuenftigen Sessions",
+
+    "beforeAnyChange": [
+      "Pruefe ob Datei in claude.freeze.json gelistet ist",
+      "Pruefe ob Datei einem frozenPattern entspricht",
+      "Pruefe ob Aenderung innerhalb eines PROTECTED-Blocks liegt",
+      "Bei Treffer: STOPP und User fragen"
+    ],
+
+    "afterSuccessfulChange": [
+      "Frage ob Element eingefroren werden soll",
+      "Bei 'ja': ./scripts/freeze.sh ausfuehren",
+      "Dokumentiere in CLAUDE2.md"
+    ],
+
+    "experimentWorkflow": [
+      "Neue Features zuerst in experiments/ entwickeln",
+      "Nach erfolgreichem Test nach stable/ kopieren",
+      "Dann erst ins Projekt uebernehmen"
+    ]
+  },
+
+  "protectedBlockMarkers": {
+    "start": ["// PROTECTED START", "/* PROTECTED START", "<!-- PROTECTED START", "# PROTECTED START"],
+    "end": ["// PROTECTED END", "/* PROTECTED END", "<!-- PROTECTED END", "# PROTECTED END"]
+  },
+
+  "metadata": {
+    "version": "2.0.0",
+    "created": "2026-01-28",
+    "description": "Claude Code CLI Konfiguration mit Freeze-Schutzsystem"
   }
 }

@@ -1,0 +1,107 @@
+{
+  "$schema": "./freeze.schema.json",
+  "version": "1.0.0",
+  "created": "2026-01-28",
+  "description": "Claude Code Freeze-System - Schutz vor unbeabsichtigten Aenderungen",
+
+  "frozenFiles": [
+    {
+      "path": "04_HTML_Forms/forms3/css/form-titles.css",
+      "reason": "Header-Styling 15px schwarz - EINGEFROREN",
+      "frozenAt": "2026-01-16",
+      "frozenBy": "Guenther"
+    },
+    {
+      "path": "04_HTML_Forms/forms3/css/unified-header.css",
+      "reason": "Unified Header - EINGEFROREN",
+      "frozenAt": "2026-01-16",
+      "frozenBy": "Guenther"
+    },
+    {
+      "path": "06_Server/api_server.py",
+      "reason": "API Server - kritische Infrastruktur",
+      "frozenAt": "2026-01-28",
+      "frozenBy": "System"
+    },
+    {
+      "path": "04_HTML_Forms/forms3/_scripts/mini_api.py",
+      "reason": "VBA-API - muss mit api_server.py synchron bleiben",
+      "frozenAt": "2026-01-28",
+      "frozenBy": "System"
+    }
+  ],
+
+  "frozenPatterns": [
+    {
+      "pattern": "04_HTML_Forms/forms3/frm_MA_VA_Schnellauswahl.html",
+      "reason": "Header-korrigiertes Formular"
+    },
+    {
+      "pattern": "04_HTML_Forms/forms3/frm_DP_Dienstplan_*.html",
+      "reason": "Dienstplan-Formulare eingefroren"
+    },
+    {
+      "pattern": "04_HTML_Forms/forms3/frm_Einsatzuebersicht.html",
+      "reason": "Header-korrigiertes Formular"
+    },
+    {
+      "pattern": "exports/vba/**/*.bas",
+      "reason": "VBA-Exports - nur lesen, nicht aendern"
+    }
+  ],
+
+  "frozenFunctions": [
+    {
+      "file": "04_HTML_Forms/forms3/logic/sub_MA_VA_Zuordnung.logic.js",
+      "function": "isBrowserMode",
+      "line": "isBrowserMode = true",
+      "reason": "Browser-Modus Flag - NICHT aendern"
+    },
+    {
+      "file": "04_HTML_Forms/forms3/logic/frm_va_Auftragstamm.logic.js",
+      "function": "bindButtons",
+      "reason": "Button-Bindings - auskommentiert lassen"
+    }
+  ],
+
+  "protectedBlocks": [
+    {
+      "file": "04_HTML_Forms/forms3/shell.html",
+      "startMarker": "// PROTECTED START - Console Override",
+      "endMarker": "// PROTECTED END - Console Override",
+      "reason": "console.warn statt alert() - NICHT aendern"
+    }
+  ],
+
+  "protectedEndpoints": [
+    "/api/auftraege/<va_id>/schichten",
+    "/api/auftraege/<va_id>/zuordnungen",
+    "/api/auftraege/<va_id>/absagen"
+  ],
+
+  "protectedVBAButtons": [
+    "btn_ListeStd",
+    "btnDruckZusage",
+    "btnMailEins",
+    "btnMailBOS",
+    "btnMailSub",
+    "cmdAuftragKopieren",
+    "cmdAuftragLoeschen",
+    "btn_BWN_Druck",
+    "cmd_BWN_send"
+  ],
+
+  "rules": {
+    "requireExplicitApproval": true,
+    "warnOnFrozenAccess": true,
+    "blockFrozenWrites": true,
+    "logAllAttempts": true
+  },
+
+  "metadata": {
+    "lastUpdated": "2026-01-28",
+    "totalFrozenFiles": 4,
+    "totalFrozenPatterns": 4,
+    "totalProtectedBlocks": 1
+  }
+}
