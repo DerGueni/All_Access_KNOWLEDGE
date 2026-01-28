@@ -370,3 +370,102 @@ ACCESS_EXPORT/modules/
 - Events implementieren ohne zu wissen welche VBA-Funktion in Access aufgerufen wird
 - Bei nicht gefundenen Elementen aufgeben - stattdessen Element-Mapper und Suchstrategien nutzen
 - `forms/` mit alten Timestamp-Dateien benutzen - immer die aktuelle {formname}.json nehmen
+
+---
+
+## FREEZE-SCHUTZSYSTEM (NEU 2026-01-28)
+
+### Uebersicht
+
+Das Freeze-System schuetzt stabile Dateien und Funktionen vor unbeabsichtigten Aenderungen.
+
+### Wichtige Dateien
+
+| Datei | Zweck |
+|-------|-------|
+| `claude.freeze.json` | Zentrale Freeze-Datenbank |
+| `scripts/freeze.sh` | Datei einfrieren |
+| `scripts/unfreeze.sh` | Datei auftauen |
+| `scripts/freeze-check.sh` | Prueft ob eingefroren |
+| `scripts/freeze-list.sh` | Zeigt alle eingefrorenen |
+| `stable/` | Stabile Versionen |
+| `experiments/` | Testbereich |
+
+### VOR JEDER AENDERUNG - PFLICHT-CHECK
+
+```bash
+# Pruefe ob Datei eingefroren ist
+./scripts/freeze-check.sh <pfad>
+
+# Zeige alle eingefrorenen Dateien
+./scripts/freeze-list.sh
+```
+
+### Workflow bei Aenderungen
+
+```
+1. FREEZE-CHECK: ./scripts/freeze-check.sh <datei>
+   -> Eingefroren? STOPP! User fragen!
+   -> Nicht eingefroren? Weiter.
+
+2. EXPERIMENT-FIRST: Grosse Aenderungen zuerst in experiments/
+
+3. AENDERN: Aenderung durchfuehren
+
+4. TESTEN: Browser-Test + Console-Check
+
+5. FREEZE-FRAGE: "Soll ich das einfrieren?"
+   -> Ja: ./scripts/freeze.sh <datei> "Grund"
+   -> Nein: Weiter
+
+6. DOKUMENTIEREN: In CLAUDE2.md eintragen
+```
+
+### PROTECTED-Bloecke
+
+Code zwischen diesen Markern darf NICHT geaendert werden:
+
+```javascript
+// PROTECTED START - Beschreibung
+... geschuetzter Code ...
+// PROTECTED END - Beschreibung
+```
+
+```html
+<!-- PROTECTED START - Beschreibung -->
+... geschuetzter Code ...
+<!-- PROTECTED END - Beschreibung -->
+```
+
+```python
+# PROTECTED START - Beschreibung
+... geschuetzter Code ...
+# PROTECTED END - Beschreibung
+```
+
+### Einfrieren/Auftauen
+
+```bash
+# Datei einfrieren
+./scripts/freeze.sh 04_HTML_Forms/forms3/css/style.css "Header-Styling fertig"
+
+# Datei auftauen (NUR mit User-Erlaubnis!)
+./scripts/unfreeze.sh 04_HTML_Forms/forms3/css/style.css
+```
+
+### Regeln fuer zukuenftige Sessions
+
+1. **IMMER** freeze-check vor Aenderungen
+2. **NIE** frozenFiles ueberschreiben ohne Erlaubnis
+3. **NIE** PROTECTED-Bloecke aendern
+4. **ZUERST** in experiments/ testen
+5. **DANN** nach stable/ kopieren
+6. **DANN** ins Projekt uebernehmen
+
+### Exit-Codes freeze-check.sh
+
+| Code | Bedeutung |
+|------|-----------|
+| 0 | Nicht eingefroren - Aenderung erlaubt |
+| 1 | EINGEFROREN - STOPP! |
+| 2 | Fehler (Parameter fehlt) |
